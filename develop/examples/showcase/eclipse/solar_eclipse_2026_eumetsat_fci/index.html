@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24417,7 +24417,6 @@ eclipse so much more dramatically.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">stamp_mark</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_dotenv</span><span class="p">,</span> <span class="n">load_dotenv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
@@ -24447,7 +24446,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from cleopatra.glyphs.gridded.array_glyph import FrameLabel
-from cleopatra.styling.watermark import stamp_mark
 from dotenv import find_dotenv, load_dotenv
 from IPython.display import Image, display
 from loguru import logger
@@ -25494,10 +25492,56 @@ darkens the middle of the disk around greatest eclipse, then lifts.</p>
 <span class="n">BRAND_MARK</span> <span class="o">=</span> <span class="n">BRAND_DIR</span> <span class="o">/</span> <span class="s2">"earthlens-lockup-stacked-overlay-full.png"</span>
 <span class="c1"># the plated variant: it carries its own navy scrim, which the transparent one needs over</span>
 <span class="c1"># busy imagery -- under the Meteosat mark the background runs mean 99, std 84, p90 254</span>
-<span class="n">LOGO_FRAC</span> <span class="o">=</span> <span class="mf">0.18</span>  <span class="c1"># of figure width</span>
+<span class="n">LOGO_FRAC</span> <span class="o">=</span> <span class="mf">0.11</span>  <span class="c1"># of figure width</span>
 <span class="n">LOGO_MARGIN_Y</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># of figure height -- tucked low, clear of the imagery</span>
 <span class="n">LOGO_MARGIN</span> <span class="o">=</span> <span class="mf">0.025</span>
 <span class="n">SCRIM</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"facecolor"</span><span class="p">:</span> <span class="s2">"#091c30"</span><span class="p">,</span> <span class="s2">"alpha"</span><span class="p">:</span> <span class="mf">0.55</span><span class="p">,</span> <span class="s2">"edgecolor"</span><span class="p">:</span> <span class="s2">"none"</span><span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_mark_with_shadow</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">blur</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">strength</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The mark pre-composited over a blurred dark copy of itself.</span>
+
+<span class="sd">    A shadow rather than a panel: the mark keeps its transparent background, but the dark halo</span>
+<span class="sd">    gives the near-white wordmark something to sit against. Over sunlit cloud the bare mark</span>
+<span class="sd">    measures ~1 contrast, which is invisible.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path: Path to the RGBA lockup.</span>
+<span class="sd">        blur: Shadow blur radius, as a fraction of mark width.</span>
+<span class="sd">        strength: Shadow opacity, 0..1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: `(rgba, grow)` -- the composited image and how much wider it is than the mark,</span>
+<span class="sd">            so the caller can size the axes by the mark rather than by the padded canvas.</span>
+<span class="sd">    """</span>
+    <span class="n">mark</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mark</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># no alpha: treat black as transparent</span>
+        <span class="n">mark</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">mark</span><span class="p">,</span> <span class="n">mark</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)])</span>
+    <span class="n">pad</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">mark</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">blur</span> <span class="o">*</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">mark</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">mark</span><span class="p">,</span> <span class="p">((</span><span class="n">pad</span><span class="p">,</span> <span class="n">pad</span><span class="p">),</span> <span class="p">(</span><span class="n">pad</span><span class="p">,</span> <span class="n">pad</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+    <span class="n">shade</span> <span class="o">=</span> <span class="n">gaussian_filter</span><span class="p">(</span><span class="n">mark</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">sigma</span><span class="o">=</span><span class="n">mark</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">blur</span><span class="p">)</span> <span class="o">*</span> <span class="n">strength</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">mark</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">mark</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">shade</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">mark</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">share</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">mark</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="mf">1e-6</span><span class="p">))</span>
+    <span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">mark</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">share</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>  <span class="c1"># shadow contributes black</span>
+    <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">mark</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">mark</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pad</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">stamp_logo</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="n">LOGO_MARGIN</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Draw the earthlens mark in the figure's bottom-right corner.</span>
+
+<span class="sd">    Sized as a fraction of the figure, not in pixels, because the MP4 and the GIF are saved</span>
+<span class="sd">    from the same figure at different dpi -- a pixel size would come out inconsistent.</span>
+<span class="sd">    """</span>
+    <span class="n">rgba</span><span class="p">,</span> <span class="n">grow</span> <span class="o">=</span> <span class="n">_mark_with_shadow</span><span class="p">(</span><span class="n">BRAND_MARK</span><span class="p">)</span>
+    <span class="n">fig_w</span><span class="p">,</span> <span class="n">fig_h</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_size_inches</span><span class="p">()</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="n">frac</span> <span class="o">*</span> <span class="n">grow</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="p">(</span><span class="n">rgba</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">rgba</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">fig_w</span> <span class="o">/</span> <span class="n">fig_h</span><span class="p">)</span>
+    <span class="n">inset</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">margin</span> <span class="o">-</span> <span class="n">width</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">],</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">inset</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+    <span class="n">inset</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">set_alpha</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">inset</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rgba</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">"antialiased"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">inset</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">stamp_titles</span><span class="p">(</span>
@@ -25604,10 +25648,56 @@ darkens the middle of the disk around greatest eclipse, then lifts.</p>
 BRAND_MARK = BRAND_DIR / "earthlens-lockup-stacked-overlay-full.png"
 # the plated variant: it carries its own navy scrim, which the transparent one needs over
 # busy imagery -- under the Meteosat mark the background runs mean 99, std 84, p90 254
-LOGO_FRAC = 0.18  # of figure width
+LOGO_FRAC = 0.11  # of figure width
 LOGO_MARGIN_Y = 0.0  # of figure height -- tucked low, clear of the imagery
 LOGO_MARGIN = 0.025
 SCRIM = {"facecolor": "#091c30", "alpha": 0.55, "edgecolor": "none"}
+
+
+def _mark_with_shadow(path, blur=0.05, strength=0.9):
+    """The mark pre-composited over a blurred dark copy of itself.
+
+    A shadow rather than a panel: the mark keeps its transparent background, but the dark halo
+    gives the near-white wordmark something to sit against. Over sunlit cloud the bare mark
+    measures ~1 contrast, which is invisible.
+
+    Args:
+        path: Path to the RGBA lockup.
+        blur: Shadow blur radius, as a fraction of mark width.
+        strength: Shadow opacity, 0..1.
+
+    Returns:
+        tuple: `(rgba, grow)` -- the composited image and how much wider it is than the mark,
+            so the caller can size the axes by the mark rather than by the padded canvas.
+    """
+    mark = plt.imread(path)
+    if mark.shape[2] == 3:  # no alpha: treat black as transparent
+        mark = np.dstack([mark, mark.max(axis=2)])
+    pad = int(round(mark.shape[1] * blur * 3))
+    mark = np.pad(mark, ((pad, pad), (pad, pad), (0, 0)))
+    shade = gaussian_filter(mark[..., 3], sigma=mark.shape[1] * blur) * strength
+    out = np.zeros_like(mark)
+    out[..., 3] = np.clip(mark[..., 3] + shade * (1.0 - mark[..., 3]), 0.0, 1.0)
+    share = np.divide(mark[..., 3], np.maximum(out[..., 3], 1e-6))
+    out[..., :3] = mark[..., :3] * share[..., None]  # shadow contributes black
+    return out, mark.shape[1] / (mark.shape[1] - 2 * pad)
+
+
+def stamp_logo(fig, frac=LOGO_FRAC, margin=LOGO_MARGIN):
+    """Draw the earthlens mark in the figure's bottom-right corner.
+
+    Sized as a fraction of the figure, not in pixels, because the MP4 and the GIF are saved
+    from the same figure at different dpi -- a pixel size would come out inconsistent.
+    """
+    rgba, grow = _mark_with_shadow(BRAND_MARK)
+    fig_w, fig_h = fig.get_size_inches()
+    width = frac * grow
+    height = width * (rgba.shape[0] / rgba.shape[1]) * (fig_w / fig_h)
+    inset = fig.add_axes([1.0 - margin - width, LOGO_MARGIN_Y, width, height], zorder=6)
+    inset.set_axis_off()
+    inset.patch.set_alpha(0.0)
+    inset.imshow(rgba, interpolation="antialiased")
+    return inset
 
 
 def stamp_titles(
@@ -25752,7 +25842,7 @@ _array_glyph.get_indices2 = _domain_cell_count</div>
 <span class="c1"># `full_bleed` draws no title and no colorbar, so the frame label is the only text on the axes.</span>
 <span class="p">(</span><span class="n">label</span><span class="p">,)</span> <span class="o">=</span> <span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">texts</span>
 <span class="n">stamp_titles</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="s2">"Meteosat-12 · MTG-I1 / FCI"</span><span class="p">)</span>
-<span class="n">stamp_mark</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">BRAND_MARK</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="n">LOGO_MARGIN</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">))</span>
+<span class="n">stamp_logo</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="p">)</span>
 <span class="n">mp4</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_fci_nsper.mp4"</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mp4</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
 <span class="n">gif</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_fci_nsper.gif"</span><span class="p">)</span>
@@ -25782,7 +25872,7 @@ glyph.animate(
 # `full_bleed` draws no title and no colorbar, so the frame label is the only text on the axes.
 (label,) = glyph.fig.axes[0].texts
 stamp_titles(glyph.fig, label, "Meteosat-12 · MTG-I1 / FCI")
-stamp_mark(glyph.fig, BRAND_MARK, frac=LOGO_FRAC, margin=(LOGO_MARGIN, LOGO_MARGIN_Y))
+stamp_logo(glyph.fig)
 mp4 = OUT / "eclipse_fci_nsper.mp4"
 glyph.save_animation(str(mp4), fps=3, dpi=150)
 gif = str(OUT / "eclipse_fci_nsper.gif")
@@ -25849,7 +25939,7 @@ are real, not a crop.</p>
 <span class="c1"># `full_bleed` draws no title and no colorbar, so the frame label is the only text on the axes.</span>
 <span class="p">(</span><span class="n">label2</span><span class="p">,)</span> <span class="o">=</span> <span class="n">glyph2</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">texts</span>
 <span class="n">stamp_titles</span><span class="p">(</span><span class="n">glyph2</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">label2</span><span class="p">,</span> <span class="s2">"Meteosat-12 · MTG-I1 / FCI"</span><span class="p">)</span>
-<span class="n">stamp_mark</span><span class="p">(</span><span class="n">glyph2</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">BRAND_MARK</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="n">LOGO_MARGIN</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">))</span>
+<span class="n">stamp_logo</span><span class="p">(</span><span class="n">glyph2</span><span class="o">.</span><span class="n">fig</span><span class="p">)</span>
 <span class="n">mp4b</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_fci_tpers.mp4"</span>
 <span class="n">glyph2</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mp4b</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
 <span class="n">gif2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_fci_tpers.gif"</span><span class="p">)</span>
@@ -25879,7 +25969,7 @@ glyph2.animate(
 # `full_bleed` draws no title and no colorbar, so the frame label is the only text on the axes.
 (label2,) = glyph2.fig.axes[0].texts
 stamp_titles(glyph2.fig, label2, "Meteosat-12 · MTG-I1 / FCI")
-stamp_mark(glyph2.fig, BRAND_MARK, frac=LOGO_FRAC, margin=(LOGO_MARGIN, LOGO_MARGIN_Y))
+stamp_logo(glyph2.fig)
 mp4b = OUT / "eclipse_fci_tpers.mp4"
 glyph2.save_animation(str(mp4b), fps=3, dpi=150)
 gif2 = str(OUT / "eclipse_fci_tpers.gif")
