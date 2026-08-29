@@ -8,10 +8,10 @@ import numpy as np
 import pytest
 from pyramids.dataset import Dataset
 
-from earthlens.jrc_flood import backend as backend_module
-from earthlens.jrc_flood.backend import JRCFlood
+from earthlens.jrc import backend as backend_module
+from earthlens.jrc.backend import JRC
 
-pytestmark = pytest.mark.jrc_flood
+pytestmark = pytest.mark.jrc
 
 #: The verified EFHM geotransform + a modest raster size for the fakes.
 _GT = (-24.54208333, 0.0008333333333333334, 0.0, 71.13375, 0.0, -0.0008333333333333334)
@@ -73,9 +73,9 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> dict:
     return recorder
 
 
-def _make(tmp_path: Path, **kwargs) -> JRCFlood:
-    """Construct a JRCFlood over a Rhine-delta bbox under tmp_path."""
-    return JRCFlood(
+def _make(tmp_path: Path, **kwargs) -> JRC:
+    """Construct a JRC over a Rhine-delta bbox under tmp_path."""
+    return JRC(
         lat_lim=[51.8, 52.0],
         lon_lim=[4.8, 5.0],
         path=tmp_path,
@@ -118,12 +118,12 @@ class TestReturnPeriods:
     def test_missing_bbox_raises(self):
         """A missing bounding box raises a clear error."""
         with pytest.raises(ValueError, match="bounding box"):
-            JRCFlood(path="x")
+            JRC(path="x")
 
     def test_antimeridian_aoi_rejected_at_construction(self, tmp_path: Path):
         """An antimeridian-crossing AOI (west > east) is rejected at construction."""
         with pytest.raises(ValueError, match="antimeridian"):
-            JRCFlood(lat_lim=[51.8, 52.0], lon_lim=[179.4, -179.8], path=tmp_path)
+            JRC(lat_lim=[51.8, 52.0], lon_lim=[179.4, -179.8], path=tmp_path)
 
     def test_aoi_tag_includes_polygon(self, tmp_path: Path):
         """The cache key folds in the real `aoi=` polygon (a GeoDataFrame)."""
@@ -184,7 +184,7 @@ class TestFetch:
         fake_pyramids["source"] = _FakeSource(
             (0.0, 0.01, 0.0, 10.0, 0.0, -0.01), 100, 100
         )
-        backend = JRCFlood(lat_lim=[50.0, 51.0], lon_lim=[50.0, 51.0], path=tmp_path)
+        backend = JRC(lat_lim=[50.0, 51.0], lon_lim=[50.0, 51.0], path=tmp_path)
         with pytest.raises(ValueError, match="outside the EFHM"):
             backend.download()
 
@@ -272,7 +272,7 @@ class TestFetchReal:
         # assertion fails if source-carry-through breaks and the fallback stamps.
         _write_efhm_geotiff(src, no_data_value=-8888.0)
         monkeypatch.setattr(backend_module, "efhm_url", lambda rp, **kw: str(src))
-        out = JRCFlood(
+        out = JRC(
             lat_lim=[51.8, 52.0],
             lon_lim=[4.8, 5.0],
             return_periods=[100],
@@ -291,7 +291,7 @@ class TestFetchReal:
         src = tmp_path / "efhm.tif"
         _write_efhm_geotiff(src, no_data_value=-9999.0, fill=-9999.0)
         monkeypatch.setattr(backend_module, "efhm_url", lambda rp, **kw: str(src))
-        out = JRCFlood(
+        out = JRC(
             lat_lim=[51.8, 52.0],
             lon_lim=[4.8, 5.0],
             return_periods=[100],
@@ -306,7 +306,7 @@ class TestFetchReal:
         src = tmp_path / "efhm.tif"
         _write_efhm_geotiff(src)
         monkeypatch.setattr(backend_module, "efhm_url", lambda rp, **kw: str(src))
-        out = JRCFlood(
+        out = JRC(
             lat_lim=[51.9, 51.9],
             lon_lim=[4.9, 4.9],
             return_periods=[100],

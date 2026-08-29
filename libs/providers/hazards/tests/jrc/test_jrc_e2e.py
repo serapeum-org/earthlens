@@ -7,7 +7,7 @@ network availability; a default `pytest` run skips it.
 
 Run with:
 
-    pytest -m "e2e and jrc_flood" libs/providers/hazards/tests/jrc_flood
+    pytest -m "e2e and jrc" libs/providers/hazards/tests/jrc
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ import pytest
 
 from earthlens.earthlens import EarthLens
 
-pytestmark = [pytest.mark.e2e, pytest.mark.jrc_flood]
+pytestmark = [pytest.mark.e2e, pytest.mark.jrc]
 
 #: A tiny Rhine-delta AOI (Netherlands) — inside the EFHM coverage, small
 #: enough to window-read in seconds.

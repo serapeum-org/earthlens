@@ -28,7 +28,7 @@ products `ensemble_flood_extent` (the default), `ensemble_water_extent`,
 `ensemble_likelihood`, plus `reference_water_mask`, `exclusion_mask`,
 `advisory_flags`, and the per-algorithm `dlr_` / `tuw_` / `list_` flood-extent
 and likelihood intermediates. It is the live-observed flood-extent complement to
-the modelled `aqueduct`, the return-period `jrc_flood`, and the impact
+the modelled `aqueduct`, the return-period `jrc`, and the impact
 `hanze` / `flodis` backends.
 
 ```python

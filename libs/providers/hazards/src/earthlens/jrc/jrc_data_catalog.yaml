@@ -15,6 +15,7 @@ attribution: >-
 
 datasets:
   efhm:
+    kind: flood_hazard_raster
     title: "JRC River flood hazard maps for Europe and the Mediterranean Basin (EFHM)"
     band: water_depth
     long_name: River-flood water depth

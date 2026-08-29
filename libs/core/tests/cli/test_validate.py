@@ -52,7 +52,7 @@ _CURATED_ENUM = (
     "iucn",
     "bathymetry",
     "fabdem",
-    "jrc_flood",
+    "jrc",
     "pvgis",
     "glaciers",
     "soilgrids",

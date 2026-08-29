@@ -15,7 +15,7 @@ is `[100]`.
 ## Listing the product programmatically
 
 ```python
-from earthlens.jrc_flood import Catalog
+from earthlens.jrc import Catalog
 
 catalog = Catalog()
 list(catalog.datasets)              # ['efhm']

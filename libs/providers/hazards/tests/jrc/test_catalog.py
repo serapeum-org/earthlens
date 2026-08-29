@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from earthlens.jrc_flood.catalog import (
+from earthlens.jrc.catalog import (
     CATALOG_PATH,
     Catalog,
     Dataset,
@@ -14,7 +14,7 @@ from earthlens.jrc_flood.catalog import (
     clear_catalog_cache,
 )
 
-pytestmark = pytest.mark.jrc_flood
+pytestmark = pytest.mark.jrc
 
 
 class TestCatalog:
@@ -79,5 +79,5 @@ class TestParseCatalog:
 
     def test_catalog_path_points_at_yaml(self):
         """CATALOG_PATH is the bundled EFHM YAML."""
-        assert CATALOG_PATH.name == "jrc_flood_data_catalog.yaml"
+        assert CATALOG_PATH.name == "jrc_data_catalog.yaml"
         assert CATALOG_PATH.exists()

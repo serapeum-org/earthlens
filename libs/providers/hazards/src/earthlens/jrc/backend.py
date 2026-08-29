@@ -1,6 +1,6 @@
-"""JRC European flood-hazard backend — `JRCFlood(AbstractDataSource)`.
+"""JRC European flood-hazard backend — `JRC(AbstractDataSource)`.
 
-`JRCFlood` is a download-and-localise raster backend (`OUTPUT_KIND="raster"`)
+`JRC` is a download-and-localise raster backend (`OUTPUT_KIND="raster"`)
 for the JRC European Flood Hazard Map (EFHM): "River flood hazard maps for
 Europe and the Mediterranean Basin". Each cell value is river-flood water depth
 (m) for a chosen return period.
@@ -44,11 +44,11 @@ from earthlens.base.spatial import (
     widen_degenerate_bbox,
     windowed_bbox_crop,
 )
-from earthlens.jrc_flood._helpers import efhm_url
-from earthlens.jrc_flood.catalog import Catalog, Dataset
+from earthlens.jrc._helpers import efhm_url
+from earthlens.jrc.catalog import Catalog, Dataset
 
 
-class JRCFlood(AbstractDataSource):
+class JRC(AbstractDataSource):
     """JRC European Flood Hazard Map backend (raster GeoTIFF output).
 
     Fetches the EFHM water-depth grid for one or more return periods, cropped to
@@ -79,6 +79,11 @@ class JRCFlood(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    #: Maps a catalog row's `kind` to the instance `OUTPUT_KIND`, set per instance
+    #: in `__init__` so a future non-raster JRC dataset can return another shape
+    #: (the `RiskIndicators` / `NSI` / `ecmwf`-endpoint pattern). EFHM is raster.
+    _KIND_TO_OUTPUT: dict[str, OutputKind] = {"flood_hazard_raster": "raster"}
 
     AGGREGATE_REFUSAL_REASON = "the JRC flood hazard map is a set of static per-return-period depth grids with no temporal axis, so there is nothing to reduce. Call download() without aggregate="
 
@@ -126,12 +131,13 @@ class JRCFlood(AbstractDataSource):
         """
         if lat_lim is None or lon_lim is None:
             raise ValueError(
-                "JRCFlood requires a bounding box (lat_lim=[s, n], "
+                "JRC requires a bounding box (lat_lim=[s, n], "
                 "lon_lim=[w, e]) — a hazard-map subset has no default extent."
             )
 
         self._catalog = catalog if catalog is not None else Catalog()
         self._dataset: Dataset = self._catalog.get("efhm")
+        self.OUTPUT_KIND = self._KIND_TO_OUTPUT.get(self._dataset.kind, "raster")
         self._return_periods = self._resolve_return_periods(return_periods)
 
         super().__init__(
@@ -370,7 +376,7 @@ class JRCFlood(AbstractDataSource):
         url = product.metadata["url"]
         target = Path(self.path) / f"{product.id}.tif"
         if self._is_cached(target):
-            logger.info(f"JRCFlood: {target.name} already holds this AOI; skipping.")
+            logger.info(f"JRC: {target.name} already holds this AOI; skipping.")
             return target
 
         # Tune the /vsicurl read (readdir-suppression + retry/timeout) for the
@@ -384,7 +390,7 @@ class JRCFlood(AbstractDataSource):
                         f"Mediterranean coverage; no RP{rp} data to write."
                     )
                 logger.info(
-                    f"JRCFlood RP{rp}: windowed /vsicurl crop of {self._bbox} "
+                    f"JRC RP{rp}: windowed /vsicurl crop of {self._bbox} "
                     f"from {url}"
                 )
                 # A point / cell-edge AOI (min == max on an axis) is widened to

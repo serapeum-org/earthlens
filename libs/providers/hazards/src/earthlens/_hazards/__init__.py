@@ -18,8 +18,8 @@ _AQUEDUCT_MODULE = "earthlens.aqueduct"
 #: Module path shared by the three NSI facade keys (nsi / nfip / nfhl).
 _NSI = "earthlens.nsi"
 
-#: Module path for the JRC-flood backend, reused across its alias keys.
-_JRC_FLOOD = "earthlens.jrc_flood"
+#: Module path for the JRC backend, reused across its alias keys.
+_JRC = "earthlens.jrc"
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
 #: distribution's 33 data-source keys.
@@ -49,10 +49,10 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'hdx': ('earthlens.hdx', 'HDX', 'hdx', {}),
     'overture': ('earthlens.overture', 'Overture', 'overture', {}),
     'firms': ('earthlens.firms', 'FIRMS', '', {}),
-    'jrc-flood': (_JRC_FLOOD, 'JRCFlood', '', {}),
-    'efhm': (_JRC_FLOOD, 'JRCFlood', '', {}),
-    'jrc-flood-hazard': (_JRC_FLOOD, 'JRCFlood', '', {}),
-    'european-flood-hazard': (_JRC_FLOOD, 'JRCFlood', '', {}),
+    'jrc-flood': (_JRC, 'JRC', '', {}),
+    'efhm': (_JRC, 'JRC', '', {}),
+    'jrc-flood-hazard': (_JRC, 'JRC', '', {}),
+    'european-flood-hazard': (_JRC, 'JRC', '', {}),
     'risk-indicators': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'thinkhazard': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'inform': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),

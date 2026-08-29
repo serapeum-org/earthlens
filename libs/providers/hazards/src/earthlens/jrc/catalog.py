@@ -1,7 +1,7 @@
 """Catalog loader for the JRC European flood-hazard (EFHM) backend.
 
 EFHM is a single product served as one whole-Europe GeoTIFF per return period,
-so the catalog is one `jrc_flood_data_catalog.yaml` at the package root holding
+so the catalog is one `jrc_data_catalog.yaml` at the package root holding
 the dataset row (band, CRS, the return-period list, the URL template) plus the
 CC-BY-4.0 licence / attribution. It loads through the shared strict YAML loader
 and the `(path, mtime)` parse cache, and exposes the row via the inherited
@@ -22,7 +22,7 @@ from earthlens.base import AbstractCatalog
 from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
-CATALOG_PATH: Path = Path(__file__).parent / "jrc_flood_data_catalog.yaml"
+CATALOG_PATH: Path = Path(__file__).parent / "jrc_data_catalog.yaml"
 
 _CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
@@ -37,6 +37,8 @@ class Dataset(BaseModel):
 
     Attributes:
         id: The catalog key (`"efhm"`).
+        kind: Access-method + output discriminator the backend dispatches on
+            (`"flood_hazard_raster"` for EFHM).
         title: Human-readable product title.
         band: The single water-depth band name (`"water_depth"`).
         long_name: Human-readable band description.
@@ -54,7 +56,7 @@ class Dataset(BaseModel):
     Examples:
         - Read the return periods and band:
             ```python
-            >>> from earthlens.jrc_flood import Catalog
+            >>> from earthlens.jrc import Catalog
             >>> row = Catalog().get("efhm")
             >>> row.band, row.return_periods[:3]
             ('water_depth', [10, 20, 30])
@@ -65,6 +67,7 @@ class Dataset(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     id: str
+    kind: str = "flood_hazard_raster"
     title: str = ""
     band: str = "water_depth"
     long_name: str = ""
@@ -120,7 +123,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
 class Catalog(AbstractCatalog):
     """Product catalog for the JRC European flood-hazard backend.
 
-    Reads the bundled `jrc_flood_data_catalog.yaml` and exposes its single row
+    Reads the bundled `jrc_data_catalog.yaml` and exposes its single row
     under the inherited `datasets` field — which supplies the `cat["efhm"]` /
     `"efhm" in cat` / `len(cat)` surface and the did-you-mean error for free.
     Instantiate with no arguments; the base `model_post_init` auto-loads via
@@ -135,7 +138,7 @@ class Catalog(AbstractCatalog):
     Examples:
         - List products and read the licence:
             ```python
-            >>> from earthlens.jrc_flood import Catalog
+            >>> from earthlens.jrc import Catalog
             >>> cat = Catalog()
             >>> list(cat.datasets)
             ['efhm']

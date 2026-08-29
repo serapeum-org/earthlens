@@ -41,7 +41,7 @@ def efhm_url(
     Examples:
         - The verified RP100 URL:
             ```python
-            >>> from earthlens.jrc_flood._helpers import efhm_url
+            >>> from earthlens.jrc._helpers import efhm_url
             >>> efhm_url(100)
             'https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-EFAS/flood_hazard/Europe_RP100_filled_depth.tif'
 

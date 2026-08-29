@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from earthlens.jrc_flood import _helpers as h
+from earthlens.jrc import _helpers as h
 
-pytestmark = pytest.mark.jrc_flood
+pytestmark = pytest.mark.jrc
 
 
 class TestEfhmUrl:

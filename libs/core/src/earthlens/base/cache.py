@@ -11,7 +11,7 @@ skip-if-exists fast path fires only for a genuine match.
 The tag is bbox-plus-polygon: a backend that supports a polygon `aoi=` can be
 handed two requests with the same bounding box but different polygon masks, so
 the polygon geometry (when present) is hashed into the tag to keep their cached
-crops distinct. Shared by the `fabdem` and `jrc_flood` backends (issue #972).
+crops distinct. Shared by the `fabdem` and `jrc` backends (issue #972).
 """
 
 from __future__ import annotations
