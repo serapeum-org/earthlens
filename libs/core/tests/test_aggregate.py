@@ -6,18 +6,28 @@ four-cell decision matrix in `_resolve_pressure_level`,
 `window_groups`, `reduce_time_axis` (op dispatch + skipna + min_count),
 `_resolve_op` (auto-routing from `Variable.is_flux`), and round-trip
 runs of `aggregate_netcdf` against synthetic NetCDFs (H7).
+
+`TestAggregateAgainstARealNetCDF` drives the same path against a NetCDF
+written to disk by pyramids rather than a mock, so the suite can observe
+what a mock has none of: how much the aggregator reads, and whether it
+releases the file it opens.
 """
 
 from __future__ import annotations
 
+import gc
+import os
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import numpy as np
 import pandas as pd
+import psutil
 import pytest
 from pydantic import ValidationError
+from pyramids.dataset import Dataset, DatasetCollection
+from pyramids.netcdf._cube_netcdf_writer import CubeNetCDFWriter
 
 from earthlens.aggregate import (
     _LEVEL_DIM_CANDIDATES,
@@ -1780,11 +1790,6 @@ def _write_real_nc(path, *, periods=6, rows=2, cols=3):
     aggregator's own time reader decodes the result, which is the point - the
     fixture exercises the same path a downloaded cube takes.
     """
-    import gc
-
-    from pyramids.dataset import Dataset, DatasetCollection
-    from pyramids.netcdf._cube_netcdf_writer import CubeNetCDFWriter
-
     frames = Path(path).parent / f"{Path(path).stem}_frames"
     frames.mkdir(parents=True, exist_ok=True)
     values = np.arange(periods * rows * cols, dtype="f4").reshape(periods, rows, cols)
@@ -1810,8 +1815,6 @@ def _write_real_nc(path, *, periods=6, rows=2, cols=3):
 
 def _open_handles():
     """Paths this process currently holds open."""
-    import psutil
-
     return {handle.path for handle in psutil.Process().open_files()}
 
 
@@ -1822,10 +1825,6 @@ def _handles_on(path, before):
     mapped drive under its UNC name, so equal paths can spell differently and a
     string comparison silently never matches.
     """
-    import os
-
-    import psutil
-
     found = []
     for handle in psutil.Process().open_files():
         if handle.path in before:
