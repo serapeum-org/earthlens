@@ -234,8 +234,7 @@ class JRC(AbstractDataSource):
                 )
             if prod not in ("medium_term", "subseasonal"):
                 raise ValueError(
-                    f"product must be 'medium_term' or 'subseasonal', got "
-                    f"{product!r}."
+                    f"product must be 'medium_term' or 'subseasonal', got {product!r}."
                 )
             return f"sea_level_{prod}"
         raise ValueError(
@@ -486,9 +485,7 @@ class JRC(AbstractDataSource):
                         f"the AOI {self._bbox} is outside the EFHM's Europe / "
                         f"Mediterranean coverage; no RP{rp} data to write."
                     )
-                logger.info(
-                    f"JRC EFHM RP{rp}: windowed /vsicurl crop of {self._bbox}"
-                )
+                logger.info(f"JRC EFHM RP{rp}: windowed /vsicurl crop of {self._bbox}")
                 geo = source.geotransform
                 bbox = widen_degenerate_bbox(self._bbox, geo[1], geo[5])
                 windowed = windowed_bbox_crop(source, bbox, epsg=4326)
@@ -496,7 +493,10 @@ class JRC(AbstractDataSource):
                 close_quietly(source)
 
         try:
-            windowed = ensure_no_data(windowed, self._dataset.nodata)
+            nodata = (
+                self._dataset.nodata if self._dataset.nodata is not None else -9999.0
+            )
+            windowed = ensure_no_data(windowed, nodata)
             cropped = crop_to_aoi(
                 windowed,
                 self.space,
@@ -573,9 +573,7 @@ class JRC(AbstractDataSource):
                     f"{self._field!r} {win_cols}x{win_rows} at ({col_off}, {row_off})"
                 )
                 array = np.asarray(
-                    variable.read_array(
-                        window=[col_off, row_off, win_cols, win_rows]
-                    ),
+                    variable.read_array(window=[col_off, row_off, win_cols, win_rows]),
                     dtype="float32",
                 )
                 window_geo = _helpers.window_origin(geo, col_off, row_off)

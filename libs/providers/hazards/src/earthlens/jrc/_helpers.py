@@ -134,7 +134,9 @@ def _parse_reference_time(value) -> datetime:
     )
 
 
-def _descend_newest(url: str, level: int, endfls_marker: str, http_text) -> tuple[str, str] | None:
+def _descend_newest(
+    url: str, level: int, endfls_marker: str, http_text
+) -> tuple[str, str] | None:
     """Depth-first descend `level` numeric dirs, returning the newest complete cycle."""
     for name in _numeric_dirs(list_directory(url, http_text=http_text)):
         child = f"{url}{name}/"
@@ -216,7 +218,9 @@ def find_cycle_file(cycle_url: str, glob: str, *, http_text=_http_text) -> str:
     raise ValueError(f"no file matching {glob!r} in {cycle_url}.")
 
 
-def grid_geotransform(cols: int, rows: int) -> tuple[float, float, float, float, float, float]:
+def grid_geotransform(
+    cols: int, rows: int
+) -> tuple[float, float, float, float, float, float]:
     """Build the global north-up affine from a gridded variable's shape.
 
     Interim reconstruction until pyramids#1071 builds the affine from the CF

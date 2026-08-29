@@ -9,15 +9,11 @@ import pandas as pd
 import pytest
 from pyramids.dataset import Dataset as PyramidsDataset
 
-from earthlens.jrc import Catalog, JRC, _helpers
+from earthlens.jrc import JRC, Catalog, _helpers
 
 pytestmark = pytest.mark.jrc
 
-_COASTAL_CSV = (
-    "GID_0,NAME_0,summary_TWL_1_10\n"
-    "ABW,Aruba,2\n"
-    "NLD,Netherlands,9\n"
-)
+_COASTAL_CSV = "GID_0,NAME_0,summary_TWL_1_10\nABW,Aruba,2\nNLD,Netherlands,9\n"
 
 
 class _FakeHttp:
@@ -88,10 +84,20 @@ class TestDatasetResolution:
     @pytest.mark.parametrize(
         ("kwargs", "expected", "output_kind"),
         [
-            (dict(dataset="sea_level", product="medium_term"), "sea_level_medium_term", "raster"),
-            (dict(dataset="sea_level", product="subseasonal"), "sea_level_subseasonal", "raster"),
             (
-                dict(dataset="sea_level", product="subseasonal", representation="coastal"),
+                dict(dataset="sea_level", product="medium_term"),
+                "sea_level_medium_term",
+                "raster",
+            ),
+            (
+                dict(dataset="sea_level", product="subseasonal"),
+                "sea_level_subseasonal",
+                "raster",
+            ),
+            (
+                dict(
+                    dataset="sea_level", product="subseasonal", representation="coastal"
+                ),
                 "sea_level_subseasonal_coastal",
                 "tabular",
             ),
@@ -112,14 +118,22 @@ class TestDatasetResolution:
     def test_unknown_product_rejected(self):
         """An unknown product is rejected with a clear message."""
         with pytest.raises(ValueError, match="product"):
-            JRC(dataset="sea_level", product="seasonal", lat_lim=[51.0, 53.0], lon_lim=[3.0, 5.0])
+            JRC(
+                dataset="sea_level",
+                product="seasonal",
+                lat_lim=[51.0, 53.0],
+                lon_lim=[3.0, 5.0],
+            )
 
     def test_unknown_representation_rejected(self):
         """An unknown representation is rejected."""
         with pytest.raises(ValueError, match="representation"):
             JRC(
-                dataset="sea_level", product="subseasonal", representation="bogus",
-                lat_lim=[51.0, 53.0], lon_lim=[3.0, 5.0],
+                dataset="sea_level",
+                product="subseasonal",
+                representation="bogus",
+                lat_lim=[51.0, 53.0],
+                lon_lim=[3.0, 5.0],
             )
 
     def test_gridded_requires_bbox(self):
@@ -146,8 +160,12 @@ class TestCycleResolution:
     def test_latest_picks_newest_complete(self):
         """'latest' descends to the newest cycle carrying the endFls sentinel."""
         url, cycle_id = _helpers.resolve_cycle(
-            "https://x/root", "medium_term_forecasts", "%Y/%m/%d/%H",
-            "latest", "endFls", http_text=self._http(),
+            "https://x/root",
+            "medium_term_forecasts",
+            "%Y/%m/%d/%H",
+            "latest",
+            "endFls",
+            http_text=self._http(),
         )
         assert url.endswith("/2026/08/26/12/")
         assert cycle_id == "20260826T12"
@@ -155,23 +173,33 @@ class TestCycleResolution:
     def test_latest_backtracks_past_incomplete(self):
         """A newer hour without endFls is skipped for the older complete one."""
         url, cycle_id = _helpers.resolve_cycle(
-            "https://x/root", "medium_term_forecasts", "%Y/%m/%d/%H",
-            "latest", "endFls", http_text=self._http(incomplete_hour="18"),
+            "https://x/root",
+            "medium_term_forecasts",
+            "%Y/%m/%d/%H",
+            "latest",
+            "endFls",
+            http_text=self._http(incomplete_hour="18"),
         )
         assert url.endswith("/2026/08/26/12/")
 
     def test_explicit_reference_time(self):
         """An explicit cycle resolves to its folder when complete."""
         url, cycle_id = _helpers.resolve_cycle(
-            "https://x/root", "medium_term_forecasts", "%Y/%m/%d/%H",
-            "2026-08-26T12", "endFls", http_text=self._http(),
+            "https://x/root",
+            "medium_term_forecasts",
+            "%Y/%m/%d/%H",
+            "2026-08-26T12",
+            "endFls",
+            http_text=self._http(),
         )
         assert cycle_id == "20260826T12"
 
     def test_incomplete_cycle_raises(self):
         """An explicit cycle without endFls raises rather than returning it."""
         http = _FakeHttp(
-            "https://x/root", "medium_term_forecasts", ("2026", "08", "26", "00"),
+            "https://x/root",
+            "medium_term_forecasts",
+            ("2026", "08", "26", "00"),
             ["mediumTermTWLforecastGridded_x.nc"],
         )
         # Overwrite the leaf so it has no endFls.
@@ -180,8 +208,12 @@ class TestCycleResolution:
         ]
         with pytest.raises(ValueError, match="not complete"):
             _helpers.resolve_cycle(
-                "https://x/root", "medium_term_forecasts", "%Y/%m/%d/%H",
-                "2026-08-26T00", "endFls", http_text=http,
+                "https://x/root",
+                "medium_term_forecasts",
+                "%Y/%m/%d/%H",
+                "2026-08-26T00",
+                "endFls",
+                http_text=http,
             )
 
     def test_find_cycle_file_matches_glob(self):
@@ -202,12 +234,24 @@ class TestAffineHelpers:
 
     def test_grid_geotransform_is_global_north_up(self):
         """The reconstructed affine is the global 0.25 deg north-up transform."""
-        assert _helpers.grid_geotransform(1440, 720) == (-180.0, 0.25, 0.0, 90.0, 0.0, -0.25)
+        assert _helpers.grid_geotransform(1440, 720) == (
+            -180.0,
+            0.25,
+            0.0,
+            90.0,
+            0.0,
+            -0.25,
+        )
 
     def test_pixel_window_maps_bbox(self):
         """A bbox maps to the expected clamped pixel window."""
         geo = _helpers.grid_geotransform(1440, 720)
-        assert _helpers.pixel_window(geo, (3.0, 51.0, 5.0, 53.0), 1440, 720) == (732, 148, 8, 8)
+        assert _helpers.pixel_window(geo, (3.0, 51.0, 5.0, 53.0), 1440, 720) == (
+            732,
+            148,
+            8,
+            8,
+        )
 
     def test_pixel_window_none_when_degenerate(self):
         """A zero-area bbox yields no window."""
@@ -217,7 +261,14 @@ class TestAffineHelpers:
     def test_window_origin_shifts_to_corner(self):
         """The window origin is the bbox top-left in degrees, not index space."""
         geo = _helpers.grid_geotransform(1440, 720)
-        assert _helpers.window_origin(geo, 732, 148) == (3.0, 0.25, 0.0, 53.0, 0.0, -0.25)
+        assert _helpers.window_origin(geo, 732, 148) == (
+            3.0,
+            0.25,
+            0.0,
+            53.0,
+            0.0,
+            -0.25,
+        )
 
 
 # --------------------------------------------------------------------------- #
@@ -230,15 +281,21 @@ class TestGriddedFetch:
         """The crop is georeferenced in degrees (guards the index-space regression)."""
         row = Catalog().get("sea_level_medium_term")
         http = _FakeHttp(
-            row.base_url, row.product, ("2026", "08", "26", "12"),
+            row.base_url,
+            row.product,
+            ("2026", "08", "26", "12"),
             ["mediumTermTWLforecastGridded_202608261200-202609101200.nc"],
         )
         monkeypatch.setattr(_helpers, "_http_text", http)
         monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", _fake_read_file)
 
         backend = JRC(
-            dataset="sea_level", product="medium_term", reference_time="latest",
-            lat_lim=[51.0, 53.0], lon_lim=[3.0, 5.0], path=tmp_path,
+            dataset="sea_level",
+            product="medium_term",
+            reference_time="latest",
+            lat_lim=[51.0, 53.0],
+            lon_lim=[3.0, 5.0],
+            path=tmp_path,
         )
         paths = backend.download()
         assert len(paths) == 1 and paths[0].exists()
@@ -251,7 +308,9 @@ class TestGriddedFetch:
         assert origin_x == pytest.approx(3.0, abs=0.25)
         assert origin_y == pytest.approx(53.0, abs=0.25)
         # the window origin (col 732, row 148) is encoded into the data
-        assert float(732 * 1000 + 148) in set(np.asarray(written.read_array())[0].ravel())
+        assert float(732 * 1000 + 148) in set(
+            np.asarray(written.read_array())[0].ravel()
+        )
 
 
 class TestCoastalFetch:
@@ -261,13 +320,17 @@ class TestCoastalFetch:
         """`download()` returns a `DataFrame` for the coastal representation."""
         row = Catalog().get("sea_level_subseasonal_coastal")
         http = _FakeHttp(
-            row.base_url, row.product, ("2026", "08", "24", "00"),
+            row.base_url,
+            row.product,
+            ("2026", "08", "24", "00"),
             ["subSeasonalCoastalForecast_202608240000-202610090000.csv"],
         )
         monkeypatch.setattr(_helpers, "_http_text", http)
 
         backend = JRC(
-            dataset="sea_level", product="subseasonal", representation="coastal",
+            dataset="sea_level",
+            product="subseasonal",
+            representation="coastal",
             reference_time="latest",
         )
         result = backend.download()
@@ -285,8 +348,10 @@ class TestGuards:
     def test_aggregate_rejected(self):
         """A non-None aggregate= is refused (no reducible time axis)."""
         backend = JRC(
-            dataset="sea_level", product="medium_term",
-            lat_lim=[51.0, 53.0], lon_lim=[3.0, 5.0],
+            dataset="sea_level",
+            product="medium_term",
+            lat_lim=[51.0, 53.0],
+            lon_lim=[3.0, 5.0],
         )
         with pytest.raises(Exception, match="aggregate="):
             backend.download(aggregate="mean")
@@ -298,7 +363,11 @@ class TestGuards:
     def test_sea_level_rows_carry_attribution(self):
         """Each sea-level row states its (pending-citation) attribution."""
         catalog = Catalog()
-        for key in ("sea_level_medium_term", "sea_level_subseasonal", "sea_level_subseasonal_coastal"):
+        for key in (
+            "sea_level_medium_term",
+            "sea_level_subseasonal",
+            "sea_level_subseasonal_coastal",
+        ):
             assert "JRC" in catalog.get(key).attribution
 
     def test_no_xarray_in_src(self):
@@ -306,7 +375,9 @@ class TestGuards:
         import earthlens.jrc as package
 
         for module in Path(package.__file__).parent.glob("*.py"):
-            assert "import xarray" not in module.read_text(encoding="utf-8"), module.name
+            assert "import xarray" not in module.read_text(encoding="utf-8"), (
+                module.name
+            )
 
 
 class TestHelperEdges:
@@ -352,15 +423,20 @@ class TestHelperEdges:
         http.tree["https://x/r/medium_term_forecasts/2026/08/26/12/"] = ["f.nc"]
         with pytest.raises(ValueError, match="no complete cycle"):
             _helpers.resolve_cycle(
-                "https://x/r", "medium_term_forecasts", "%Y/%m/%d/%H",
-                "latest", "endFls", http_text=http,
+                "https://x/r",
+                "medium_term_forecasts",
+                "%Y/%m/%d/%H",
+                "latest",
+                "endFls",
+                http_text=http,
             )
 
     def test_find_cycle_file_no_match_raises(self):
         """A cycle folder without the expected file raises."""
         with pytest.raises(ValueError, match="no file matching"):
             _helpers.find_cycle_file(
-                "https://x/c/", "*Gridded_*.nc",
+                "https://x/c/",
+                "*Gridded_*.nc",
                 http_text=lambda url: '<a href="other.txt">o</a>',
             )
 
@@ -376,14 +452,20 @@ class TestGriddedEdges:
     def _backend(self, tmp_path, monkeypatch):
         row = Catalog().get("sea_level_medium_term")
         http = _FakeHttp(
-            row.base_url, row.product, ("2026", "08", "26", "12"),
+            row.base_url,
+            row.product,
+            ("2026", "08", "26", "12"),
             ["mediumTermTWLforecastGridded_202608261200-202609101200.nc"],
         )
         monkeypatch.setattr(_helpers, "_http_text", http)
         monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", _fake_read_file)
         return JRC(
-            dataset="sea_level", product="medium_term", reference_time="latest",
-            lat_lim=[51.0, 53.0], lon_lim=[3.0, 5.0], path=tmp_path,
+            dataset="sea_level",
+            product="medium_term",
+            reference_time="latest",
+            lat_lim=[51.0, 53.0],
+            lon_lim=[3.0, 5.0],
+            path=tmp_path,
         )
 
     def test_cached_output_is_reused(self, tmp_path: Path, monkeypatch):
