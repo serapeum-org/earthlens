@@ -22,7 +22,7 @@ _NSI = "earthlens.nsi"
 _JRC = "earthlens.jrc"
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 33 data-source keys.
+#: distribution's 37 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
@@ -53,6 +53,12 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'efhm': (_JRC, 'JRC', '', {}),
     'jrc-flood-hazard': (_JRC, 'JRC', '', {}),
     'european-flood-hazard': (_JRC, 'JRC', '', {}),
+    # Sea-level (Total Water Level) probabilistic forecasts — same JRC backend;
+    # dataset='sea_level' selects the family (product / representation pick the row).
+    'sea-level-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
+    'jrc-sea-level': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
+    'coastal-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level', 'product': 'subseasonal', 'representation': 'coastal'}),
+    'twl-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
     'risk-indicators': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'thinkhazard': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'inform': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),

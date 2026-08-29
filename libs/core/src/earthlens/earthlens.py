@@ -451,7 +451,7 @@ class EarthLens:
              'aqueduct-flood-risk', 'aqueduct-floods', 'argo', 'argo-floats', 'argopy', 'asf',
              'bare-earth-dem', 'bathymetry', 'bdc', 'brazil-data-cube', 'caravan', 'caravan-grdc',
              'catrare', 'cdse', 'chc', 'chirps', 'climate-indices', 'climate-projections',
-             'climate_indices', 'cmems', 'cmip6', 'cop-dem', 'copernicus-dem', 'dea',
+             'climate_indices', 'cmems', 'cmip6', 'coastal-forecast', 'cop-dem', 'copernicus-dem', 'dea',
              'deafrica', 'dem', 'digital-earth-africa', 'digital-earth-australia', 'drought', 'earth-search',
              'earthdata', 'ecmwf', 'edo', 'eea-aq', 'efhm', 'elevation',
              'emdat', 'eodc', 'erddap', 'etopo', 'eumetsat', 'european-flood-hazard', 'fab-dem',
@@ -461,15 +461,15 @@ class EarthLens:
              'global-forest-watch', 'global-solar-atlas', 'global-wind-atlas', 'gloh2o', 'goes', 'google-earth-engine',
              'grdc-caravan', 'gsa', 'gwa', 'hanze', 'hdx', 'himawari',
              'human-settlement', 'inform', 'insar', 'ioos', 'isimip', 'isric',
-             'iucn', 'jaxa', 'jaxa-earth', 'jrc-flood', 'jrc-flood-hazard', 'landsat',
+             'iucn', 'jaxa', 'jaxa-earth', 'jrc-flood', 'jrc-flood-hazard', 'jrc-sea-level', 'landsat',
              'mswep', 'mswx', 'national-water-model', 'natural-earth', 'nexrad', 'nfhl',
              'nfip', 'nrel', 'nsi', 'nsrdb', 'nwis', 'nwm',
              'nwp', 'obis', 'ohsome', 'openaq', 'openeo', 'openstreetmap',
              'osm', 'overpass', 'overture', 'pangeo-cmip6', 'planetary-computer', 'protected-planet',
              'ptree', 'pvgis', 'radar', 'radklim', 'radolan', 'redlist',
-             'rgi', 'risk-indicators', 'sensor-community', 'sentinel-hub', 'sentinelhub', 'soilgrids',
+             'rgi', 'risk-indicators', 'sea-level-forecast', 'sensor-community', 'sentinel-hub', 'sentinelhub', 'soilgrids',
              'solar-pv', 'solar-wind-atlas', 'stac', 'teleconnections', 'thinkhazard', 'tiger',
-             'tropycal', 'usdm', 'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda',
+             'tropycal', 'twl-forecast', 'usdm', 'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda',
              'wdpa', 'wgms', 'wind-toolkit', 'world-pop', 'worldpop']
 
             ```
