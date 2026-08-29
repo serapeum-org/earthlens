@@ -488,7 +488,16 @@ def _apply_extras_and_strips(request: dict[str, Any], var_info: Variable) -> Non
         request: The request dict assembled so far (mutated in place).
         var_info: The catalog row supplying `extras` and `request_kind`.
     """
-    request.update(var_info.extras)
+    # Copy by value: the catalog row is cached for the life of the process, so
+    # assigning a list or dict straight out of `extras` would let an edit to one
+    # request rewrite it for every later retrieve of that variable. The levels
+    # this PR promotes to first-class arrive exactly this way.
+    request.update(
+        {
+            key: list(value) if isinstance(value, list) else value
+            for key, value in var_info.extras.items()
+        }
+    )
     for stripped in _REQUEST_KIND_STRIPS.get(var_info.request_kind, ()):
         if stripped not in var_info.extras:
             request.pop(stripped, None)

@@ -598,6 +598,25 @@ class TestBuildRequest:
             f"{pressure_level_var_info.cds_pressure_level!r}"
         )
 
+    def test_the_request_does_not_alias_an_extras_value(self, ecmwf_stub):
+        """extras are merged from the row, which is cached for the process."""
+        extras = {"pressure_level": ["1000"]}
+        var_info = Variable(
+            cds_dataset="reanalysis-carra-means",
+            cds_variable="cloud_cover",
+            nc_variable="ccl",
+            units="%",
+            product_type=["reanalysis"],
+            extras=extras,
+        )
+        ecmwf_stub.pressure_level = None
+        request = ecmwf_stub._build_request(var_info)
+        request["pressure_level"].append("MUTATED")
+        assert var_info.extras["pressure_level"] == ["1000"], (
+            "editing a request rewrote the cached row's extras; got "
+            f"{var_info.extras['pressure_level']!r}"
+        )
+
     def test_it_overrides_a_level_carried_in_extras(self, ecmwf_stub):
         """The CARRA means rows keep their level in extras, merged after the build."""
         var_info = Variable(
