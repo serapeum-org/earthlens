@@ -34,11 +34,14 @@ two most common ways a retrieve is refused.
 
 from __future__ import annotations
 
+import math
 import os
 import shutil
 import zipfile
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterable, Mapping
+from collections.abc import Set as AbstractSet
 from functools import partial
+from numbers import Real
 from pathlib import Path
 from typing import Any
 
@@ -506,17 +509,18 @@ def _apply_extras_and_strips(request: dict[str, Any], var_info: Variable) -> Non
             request.pop(key, None)
 
 
-def _render_level(level: str | int | float) -> str:
+def _render_level(level: Any) -> str:
     """Render one pressure level the way CDS spells it.
 
     A whole number written as a float — `500.0`, which is what arithmetic on
     levels produces — would otherwise reach the store as `"500.0"` and match no
-    level it offers.
+    level it offers. Any real number is accepted, so a numpy scalar out of an
+    array of levels renders like the builtin it stands for.
 
-    A level is a pressure in hPa, so anything that does not read as a number is
-    refused here rather than sent. The store's own constraint check would catch
-    most of them, but not under `skip_constraints=True` and not offline, and a
-    rejected request says far less than this does.
+    A level is a pressure in hPa, so anything that does not read as a finite
+    number is refused here rather than sent. The store's own constraint check
+    would catch most of them, but not under `skip_constraints=True` and not
+    offline, and a rejected request says far less than this does.
 
     Args:
         level: A single level.
@@ -525,26 +529,32 @@ def _render_level(level: str | int | float) -> str:
         The level as a string.
 
     Raises:
-        TypeError: If given a bool, which is an `int` subclass and would
+        TypeError: If given a bool, which is a `numbers.Real` and would
             otherwise render as `"True"`.
-        ValueError: If the level does not read as a number.
+        ValueError: If the level does not read as a number, or reads as one
+            that is not finite.
     """
     if isinstance(level, bool):
         raise TypeError(f"pressure_level= takes a number, not {level!r}.")
-    if isinstance(level, float) and level.is_integer():
-        return str(int(level))
+    if isinstance(level, Real) and not isinstance(level, str):
+        value = float(level)
+        if not math.isfinite(value):
+            raise ValueError(f"{level!r} is not a finite pressure level.")
+        return str(int(value)) if value.is_integer() else str(level)
     text = str(level)
     try:
-        float(text)
+        value = float(text)
     except (TypeError, ValueError):
         raise ValueError(
             f"{level!r} is not a pressure level; levels are numbers in hPa."
         ) from None
+    if not math.isfinite(value):
+        raise ValueError(f"{level!r} is not a finite pressure level.")
     return text
 
 
 def _normalize_pressure_level(
-    pressure_level: list[str] | str | int | float | None,
+    pressure_level: Any | None,
 ) -> list[str] | None:
     """Normalize the `pressure_level=` override to a list of strings.
 
@@ -560,10 +570,11 @@ def _normalize_pressure_level(
         The levels as a list of strings, or None to keep each row's own level.
 
     Raises:
-        TypeError: If given something that is neither a level nor a sequence of
-            levels. A mapping and a `bytes` are refused by name rather than
-            iterated — one yields its keys, the other its byte values — and a
-            bool is refused by :func:`_render_level` as an `int` subclass.
+        TypeError: If given something that is neither a level nor a sequence
+            of levels. A mapping, a set and a `bytes` are refused by name
+            rather than iterated — they yield keys, an unspecified order, and
+            byte values respectively — and a bool is refused by
+            :func:`_render_level` as a `numbers.Real`.
         ValueError: If given an empty sequence, or a level that does not read
             as a number. `pressure_level: []` is not a valid request and asking
             for no levels is not what any caller means; `None` is how a caller
@@ -571,11 +582,11 @@ def _normalize_pressure_level(
     """
     if pressure_level is None:
         return None
-    if isinstance(pressure_level, (str, int, float)):
+    if isinstance(pressure_level, (str, Real)):
         return [_render_level(pressure_level)]
-    if isinstance(pressure_level, (Mapping, bytes, bytearray)) or not isinstance(
-        pressure_level, Sequence
-    ):
+    if isinstance(
+        pressure_level, (Mapping, AbstractSet, bytes, bytearray)
+    ) or not isinstance(pressure_level, Iterable):
         raise TypeError(
             "pressure_level= takes a level or a sequence of levels, not "
             f"{type(pressure_level).__name__}."
@@ -647,7 +658,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         skip_constraints: bool = False,
         request: dict[str, Any] | None = None,
         endpoint: str | None = None,
-        pressure_level: list[str] | str | None = None,
+        pressure_level: Any | None = None,
     ):
         """Initialize an ECMWF backend instance.
 
@@ -690,16 +701,21 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 brackets and may be written as a number, so `500`, `"500"`
                 and `[500]` are the same request.
 
-                Applied to any row whose request carries a level, whether
-                the catalog spells it as `cds_pressure_level` or in the
-                row's `extras` — the CARRA means family does the latter. A
-                single-level variable in the same retrieve is untouched,
-                since giving it a level would make its request invalid
-                rather than broader.
+                Replaces the `pressure_level` of any request that already
+                has one, whether the catalog spelled it as
+                `cds_pressure_level` or in the row's `extras` — the CARRA
+                means family does the latter. A request without that key
+                keeps none: a single-level row would be made invalid rather
+                than broader by acquiring one, and a model-level row is
+                selected by `model_level`, not by this. Such a row is logged
+                rather than silently skipped.
 
-                Raises `ValueError` when combined with `request=`: a raw
-                request is forwarded verbatim and already spells its own
-                level. Defaults to `None`, which keeps each row's own.
+                Defaults to `None`, which keeps each row's own level.
+
+        Raises:
+            ValueError: If `pressure_level=` is combined with `request=`. The
+                raw request is forwarded verbatim, so the override would be
+                accepted and never consulted.
         """
         self.skip_constraints = skip_constraints
         # Per-endpoint cdsapi client cache (one per ENDPOINTS slug). Populated
@@ -725,12 +741,12 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # is `EarthLens('ecmwf', dataset=<id>, request=<dict>)`.
         self._passthrough: dict[str, Any] | None = None
         if request is not None and self.pressure_level is not None:
-            # The passthrough forwards the request verbatim, so an override
-            # would be accepted and then do nothing. A raw request already
-            # spells its own level.
+            # Any `request=` takes the passthrough, an empty one included, and
+            # the passthrough forwards what it is given verbatim - so an
+            # override would be accepted and then never consulted.
             raise ValueError(
-                "pressure_level= does not apply to a raw-request passthrough; "
-                "put the level in the request itself."
+                "pressure_level= does not apply when request= is given: the "
+                "raw request is forwarded as-is, so put the level in it."
             )
         if request is not None:
             dataset = (
@@ -1751,7 +1767,18 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # Keying on the assembled request rather than on the catalog row makes
         # both sources behave alike, and keeps the single-level case safe: such
         # a request never has the key, so it never acquires one.
-        if self.pressure_level is not None and "pressure_level" in request:
-            request["pressure_level"] = list(self.pressure_level)
+        if self.pressure_level is not None:
+            if "pressure_level" in request:
+                request["pressure_level"] = list(self.pressure_level)
+            else:
+                # Silence here would cost a queue slot and return the wrong
+                # thing: a single-level dataset served at the surface, or a
+                # model-level row served at model level 1, with the override
+                # accepted and never used.
+                logger.warning(
+                    f"pressure_level={self.pressure_level} does not apply to "
+                    f"{var_info.cds_variable!r}: it is not requested on "
+                    "pressure levels, so the override was not used."
+                )
 
         return request

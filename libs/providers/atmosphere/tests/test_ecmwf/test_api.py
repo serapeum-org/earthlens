@@ -14,8 +14,10 @@ from __future__ import annotations
 
 import json
 
+import numpy as np
 import pandas as pd
 import pytest
+from loguru import logger
 from pydantic import ValidationError
 
 from earthlens.core import EarthLens
@@ -794,6 +796,34 @@ class TestNormalizePressureLevel:
         with pytest.raises(TypeError):
             ecmwf_backend._normalize_pressure_level(given)
 
+    @pytest.mark.parametrize(
+        ("given", "expected"),
+        [
+            (np.array([500, 850]), ["500", "850"]),
+            (np.int64(500), ["500"]),
+            (np.float64(500.0), ["500"]),
+        ],
+        ids=["array", "int64", "float64"],
+    )
+    def test_numpy_levels_render_like_the_builtins_they_stand_for(
+        self, given, expected
+    ):
+        """An array of levels is a natural thing to hand this."""
+        assert ecmwf_backend._normalize_pressure_level(given) == expected
+
+    @pytest.mark.parametrize(
+        "given", [float("nan"), float("inf"), [float("nan")], ["inf"]]
+    )
+    def test_a_non_finite_level_is_refused(self, given):
+        """`nan` renders as a string CDS would take and never match."""
+        with pytest.raises(ValueError, match="finite"):
+            ecmwf_backend._normalize_pressure_level(given)
+
+    def test_a_set_is_refused_because_its_order_is_unspecified(self):
+        """Levels reach the request in order; a set would vary between runs."""
+        with pytest.raises(TypeError, match="sequence of levels"):
+            ecmwf_backend._normalize_pressure_level({500, 850})
+
     @pytest.mark.parametrize("given", [["banana"], [[500]], ["500a"]])
     def test_a_level_that_is_not_a_number_is_refused(self, given):
         """Levels are hPa; the store would reject these, but not when skipped."""
@@ -865,13 +895,43 @@ class TestPressureLevelKwarg:
                 pressure_level=[],
             )
 
+    def test_a_row_the_override_cannot_reach_is_logged(
+        self, ecmwf_stub, single_level_var_info
+    ):
+        """Silence would cost a queue slot and return the wrong thing."""
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING")
+        try:
+            ecmwf_stub.pressure_level = ["500"]
+            ecmwf_stub._build_request(single_level_var_info)
+        finally:
+            logger.remove(sink_id)
+        assert any("was not used" in message for message in messages), (
+            f"the skipped override went unreported; logged {messages!r}"
+        )
+
+    def test_a_row_the_override_reaches_is_not_logged(
+        self, ecmwf_stub, pressure_level_var_info
+    ):
+        """The warning must not fire on the case the override is built for."""
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING")
+        try:
+            ecmwf_stub.pressure_level = ["500"]
+            ecmwf_stub._build_request(pressure_level_var_info)
+        finally:
+            logger.remove(sink_id)
+        assert not any("was not used" in message for message in messages), (
+            f"a used override was reported as skipped; logged {messages!r}"
+        )
+
     def test_a_bare_instance_has_the_default(self):
         """_build_request reads it for every request; __new__ skips __init__."""
         assert ECMWF.__new__(ECMWF).pressure_level is None
 
     def test_it_is_refused_on_a_raw_request_passthrough(self):
         """The passthrough forwards the request verbatim, so it would do nothing."""
-        with pytest.raises(ValueError, match="raw-request passthrough"):
+        with pytest.raises(ValueError, match="does not apply when request="):
             ECMWF(
                 variables={"reanalysis-era5-single-levels": []},
                 request={"variable": ["2m_temperature"]},
