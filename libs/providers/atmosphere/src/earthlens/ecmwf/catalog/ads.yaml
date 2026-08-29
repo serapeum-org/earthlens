@@ -413,8 +413,10 @@ datasets:
           step: ['0', '12', '15', '18', '21', '3', '6', '9']
       forecast-albedo:
         cds_variable: forecast_albedo
-        nc_variable: forecast_albedo
-        units: unknown
+        nc_variable: fal
+        units: (0 - 1)
+        extras:
+          step: ['0', '12', '15', '18', '21', '3', '6', '9']
       photosynthetically-active-radiation-at-the-surface:
         cds_variable: photosynthetically_active_radiation_at_the_surface
         nc_variable: photosynthetically_active_radiation_at_the_surface
@@ -850,8 +852,8 @@ datasets:
         units: ppb
       co2-column-mean-molar-fraction:
         cds_variable: co2_column_mean_molar_fraction
-        nc_variable: co2_column_mean_molar_fraction
-        units: unknown
+        nc_variable: tcco2
+        units: ppm
       total-column-carbon-monoxide:
         cds_variable: total_column_carbon_monoxide
         nc_variable: total_column_carbon_monoxide
