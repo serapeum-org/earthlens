@@ -88,7 +88,7 @@ you install the meta-package or a thematic distribution directly:
 | `ecmwf` | [Copernicus Climate Data Store (ECMWF)](https://serapeum-org.github.io/earthlens/reference/ecmwf/introduction/) | `cdsapi >=0.7.7` |
 | `ecmwf-modern` | ECMWF (alternate SDK) | `ecmwf-datastores-client >=0.5.1` |
 | `gee` | [Google Earth Engine](https://serapeum-org.github.io/earthlens/reference/gee/introduction/) | `earthengine-api >=1.7.26`, `google-api-python-client >=2.0`, `google-cloud-storage >=2.0`, `Rtree >=1.0.0`, `urllib3 >=1.26` |
-| `eedai` | [Google Earth Engine](https://serapeum-org.github.io/earthlens/reference/gee/usage/) — optional EEDAI fetch path | `pyramids-eo >=0.2.0,<0.3` |
+| `eedai` | [Google Earth Engine](https://serapeum-org.github.io/earthlens/reference/gee/usage/) — optional EEDAI fetch path | `pyramids-eo >=0.5.0,<0.6` |
 | `cmems` | [Copernicus Marine Service](https://serapeum-org.github.io/earthlens/reference/cmems/introduction/) | `copernicusmarine >=2.0.0,<3` |
 | `cmip6` | [WCRP CMIP6](https://serapeum-org.github.io/earthlens/reference/cmip6/introduction/) | *(none — no SDK needed)* |
 | `fdsn` | [FDSN](https://serapeum-org.github.io/earthlens/reference/fdsn/introduction/) | `obspy >=1.5.0` |

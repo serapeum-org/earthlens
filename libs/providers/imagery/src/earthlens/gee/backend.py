@@ -1776,11 +1776,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
             dataset = reader.from_earthengine(
                 var_info.id,
                 bands=list(bands),
-                crs=self.crs,
-                bbox=bbox,
+                window=reader.Window(
+                    bbox=bbox,
+                    crs=self.crs,
+                    shape=self._eedai_grid(bbox, scale),
+                    resample=self.resample,
+                ),
                 geometry=cutline,
-                shape=self._eedai_grid(bbox, scale),
-                resample=self.resample,
                 credentials=credentials,
                 **read_options,
             )
