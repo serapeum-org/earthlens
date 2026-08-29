@@ -668,6 +668,42 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
     return len(tokens) >= 2 and _is_initialism(name, tokens)
 
 
+#: Temporal restatements of a variable the same file also carries in its own
+#: right. The CAMS emission inventories offer `emiss_bio` beside
+#: `emiss_bio_monthly`, both labelled with the species, which leaves the
+#: matcher two candidates for one row and no way to choose.
+_RESTATEMENT_SUFFIXES = ("_monthly", "_annual", "_daily", "_climatology")
+
+
+def _drop_restatements(
+    candidates: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Drop `X_monthly` when the file also offers `X`.
+
+    A temporal restatement is the same quantity on another cadence, so a file
+    carrying both hands the matcher two candidates that are not really a choice
+    — and it declines rather than guess, leaving the row a placeholder. The
+    base is the one a catalog row names.
+
+    Only a restatement whose base is present is dropped: a file offering
+    `emiss_bio_monthly` alone still has one candidate, and it is that one.
+
+    Args:
+        candidates: The data variables the matcher would weigh.
+
+    Returns:
+        The same mapping without restatements of a base it already holds.
+    """
+    return {
+        name: meta
+        for name, meta in candidates.items()
+        if not any(
+            name.lower().endswith(suffix) and name[: -len(suffix)] in candidates
+            for suffix in _RESTATEMENT_SUFFIXES
+        )
+    }
+
+
 def _data_variables(
     nc_meta: dict[str, dict[str, Any]],
 ) -> dict[str, dict[str, Any]]:
@@ -680,9 +716,12 @@ def _data_variables(
         nc_meta: The retrieved `{nc_name: {long_name, units}}` mapping.
 
     Returns:
-        The subset that is not a coordinate, bound, or auxiliary variable.
+        The subset that is not a coordinate, bound, or auxiliary variable, and
+        not a temporal restatement of a base the file also carries.
     """
-    return {name: meta for name, meta in nc_meta.items() if not _is_auxiliary(name)}
+    return _drop_restatements(
+        {name: meta for name, meta in nc_meta.items() if not _is_auxiliary(name)}
+    )
 
 
 def _inline_mapping(line: str) -> dict[str, Any]:

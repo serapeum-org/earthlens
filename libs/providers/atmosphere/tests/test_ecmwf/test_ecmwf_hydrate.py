@@ -363,6 +363,52 @@ _CLAIMED_BLOCK = """      total-precipitation:
 """
 
 
+class TestDropRestatements:
+    """A temporal restatement is the same quantity, not a second candidate."""
+
+    def test_the_monthly_twin_is_dropped_when_the_base_is_present(self):
+        """The CAMS inventories offer emiss_bio beside emiss_bio_monthly."""
+        offered = {
+            "emiss_bio": {"long_name": "acetaldehyde", "units": "kg m-2 s-1"},
+            "emiss_bio_monthly": {"long_name": "acetaldehyde", "units": "kg m-2 s-1"},
+        }
+        assert list(hydrate_mod._data_variables(offered)) == ["emiss_bio"]
+
+    def test_a_row_now_matches_where_it_previously_declined(self):
+        """Two spellings of one quantity left the matcher nothing to choose."""
+        offered = {
+            "emiss_bio": {"long_name": "acetaldehyde", "units": "kg m-2 s-1"},
+            "emiss_bio_monthly": {"long_name": "acetaldehyde", "units": "kg m-2 s-1"},
+        }
+        assert hydrate_mod._match_variables(["acetaldehyde"], offered) == {
+            "acetaldehyde": ("emiss_bio", "kg m-2 s-1")
+        }
+
+    def test_a_restatement_without_its_base_is_kept(self):
+        """It is then the only candidate, and dropping it would lose the row."""
+        offered = {"emiss_bio_monthly": {"long_name": "acetaldehyde", "units": "1"}}
+        assert list(hydrate_mod._data_variables(offered)) == ["emiss_bio_monthly"]
+
+    def test_an_unrelated_name_ending_in_a_cadence_is_kept(self):
+        """Only a restatement of a base the file also holds is dropped."""
+        offered = {
+            "t2m_monthly": {"long_name": "temperature", "units": "K"},
+            "sst": {"long_name": "sea surface temperature", "units": "K"},
+        }
+        assert sorted(hydrate_mod._data_variables(offered)) == ["sst", "t2m_monthly"]
+
+    @pytest.mark.parametrize(
+        "suffix", ["_monthly", "_annual", "_daily", "_climatology"]
+    )
+    def test_every_cadence_suffix_is_reached(self, suffix):
+        """Pins the tuple so an entry cannot be added and never apply."""
+        offered = {
+            "emi": {"long_name": "x", "units": "1"},
+            f"emi{suffix}": {"long_name": "x", "units": "1"},
+        }
+        assert list(hydrate_mod._data_variables(offered)) == ["emi"]
+
+
 class TestIsAuxiliary:
     """Which retrieved variables may stand in for a catalog slug."""
 
