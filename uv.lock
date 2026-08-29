@@ -1227,7 +1227,7 @@ wheels = [
 
 [[package]]
 name = "cleopatra"
-version = "0.34.0"
+version = "0.35.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "hpc-utils" },
@@ -1237,9 +1237,9 @@ dependencies = [
     { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
     { name = "pillow" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f6/f8/b2d1763553033a24936ef453f74dde7a404a00d5d3cb07c989fd9c55ab5c/cleopatra-0.34.0.tar.gz", hash = "sha256:f9b75134b1526398ef8758ed69c823d073d1b53503baa0b38b5430f9f593c8f3", size = 5005267, upload-time = "2026-08-25T23:09:57.28Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/56/85/d580c7ae662b5ead341314a67aee6282aed60ab324cd95ed52f6e7ee4c72/cleopatra-0.35.0.tar.gz", hash = "sha256:f09a56ac34c44c9ffa88db6383235d03cf4921333d7038efbb102aa8a03322c0", size = 5007971, upload-time = "2026-08-29T16:22:09.265Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d0/49/5eff7ede7d7a134efc4c7e973f14d83bf4c3e3ee713cd47cfc48fce68157/cleopatra-0.34.0-py3-none-any.whl", hash = "sha256:c590ced97bef0e763a6e09966816cac2fbbcefca674130c402d9d241a62bdcd0", size = 356234, upload-time = "2026-08-25T23:09:55.915Z" },
+    { url = "https://files.pythonhosted.org/packages/1f/1f/0ca8e48ae53d13e5a3f54744730b90326eab25d650d2377e85250d2fa194/cleopatra-0.35.0-py3-none-any.whl", hash = "sha256:c52d9ed64c3210e1d0f2d3981c280d8d2de3fe03f954d2b785700c98ef036f2d", size = 357224, upload-time = "2026-08-29T16:22:07.726Z" },
 ]
 
 [package.optional-dependencies]
@@ -2250,7 +2250,7 @@ provides-extras = ["argo", "asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf",
 [package.metadata.requires-dev]
 dev = [
     { name = "build", specifier = ">=1.0.0" },
-    { name = "cleopatra", extras = ["tiles"], specifier = ">=0.34.0" },
+    { name = "cleopatra", extras = ["tiles"], specifier = ">=0.35.0" },
     { name = "commitizen", specifier = ">=4.8.4" },
     { name = "coverage" },
     { name = "hypothesis", specifier = ">=6.100" },
@@ -2270,7 +2270,7 @@ dev = [
     { name = "twine", specifier = ">=5.0.0" },
 ]
 docs = [
-    { name = "cleopatra", extras = ["tiles"], specifier = ">=0.34.0" },
+    { name = "cleopatra", extras = ["tiles"], specifier = ">=0.35.0" },
     { name = "imageio-ffmpeg", specifier = ">=0.5" },
     { name = "matplotlib", specifier = ">=3.5" },
     { name = "mike", specifier = ">=2.1.3" },
