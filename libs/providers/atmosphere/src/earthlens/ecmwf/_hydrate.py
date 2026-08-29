@@ -1094,6 +1094,37 @@ def _yaml_inline_list(value: Any) -> str:
     return dumped
 
 
+def _folded_match(
+    cds: str, candidates: dict[str, dict[str, Any]], used: set[str]
+) -> str | None:
+    """Return the one candidate whose name differs from `cds` only in case.
+
+    A catalog slug is always lowercase while a NetCDF short name keeps whatever
+    case the producer chose, so a leaf CDR offers `FAPAR` and `LAI` against
+    slugs `fapar` and `lai`. Those are the same name, but exact equality does
+    not see it, and the row stays a placeholder for a difference that carries
+    no meaning.
+
+    Case is all that may differ: a name reached this way is the requested one
+    spelled differently, not a near neighbour, so `FAPAR_ERR` and `FAPAR_QFLAG`
+    stay out of reach. Two candidates that fold together are ambiguous and both
+    are declined, because guessing between them is the mis-extraction this
+    matcher exists to avoid.
+
+    Args:
+        cds: The slug's `cds_variable` form.
+        candidates: The retrieved data variables.
+        used: Names already claimed in this pass.
+
+    Returns:
+        The single case-insensitive match, or None.
+    """
+    folded = [
+        name for name in candidates if name not in used and name.lower() == cds.lower()
+    ]
+    return folded[0] if len(folded) == 1 else None
+
+
 def _match_variables(
     placeholders: list[str],
     nc_meta: dict[str, dict[str, Any]],
@@ -1149,6 +1180,11 @@ def _match_variables(
         if cds in candidates and cds not in used:
             chosen[slug] = cds
             used.add(cds)
+            continue
+        folded = _folded_match(cds, candidates, used)
+        if folded is not None:
+            chosen[slug] = folded
+            used.add(folded)
 
     _assign_unique_subset(placeholders, candidates, chosen, used)
 

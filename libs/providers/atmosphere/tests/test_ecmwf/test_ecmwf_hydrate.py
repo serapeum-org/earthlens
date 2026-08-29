@@ -1063,6 +1063,45 @@ class TestHydrateStanzaPerVariable:
         assert declined == []
 
 
+class TestFoldedMatching:
+    """Case-only differences between a slug and a NetCDF short name."""
+
+    def test_a_slug_matches_a_name_differing_only_in_case(self):
+        """A leaf CDR spells them FAPAR and LAI; the catalog spells them lowercase."""
+        meta = {
+            "FAPAR": {"long_name": "Fraction of absorbed PAR", "units": "1"},
+            "LAI": {"long_name": "Leaf area index", "units": "m2/m2"},
+        }
+        assert hydrate_mod._match_variables(["fapar", "lai"], meta) == {
+            "fapar": ("FAPAR", "1"),
+            "lai": ("LAI", "m2/m2"),
+        }
+
+    def test_a_near_neighbour_is_not_reached_by_folding(self):
+        """Only case may differ, so an uncertainty band is not a folded match."""
+        candidates = {
+            "FAPAR_ERR": {"long_name": "FAPAR uncertainty", "units": "1"},
+            "LAI": {"long_name": "Leaf area index", "units": "m2/m2"},
+        }
+        assert hydrate_mod._folded_match("fapar", candidates, set()) is None
+
+    def test_two_names_folding_together_are_declined(self):
+        """Guessing between them is the mis-extraction this matcher avoids."""
+        meta = {
+            "Sst": {"long_name": "sea surface temperature", "units": "K"},
+            "SST": {"long_name": "sea surface temperature", "units": "K"},
+        }
+        assert hydrate_mod._match_variables(["sst"], meta) == {}
+
+    def test_an_exact_match_still_wins(self):
+        """Folding is a fallback; it must not disturb a name that matched already."""
+        meta = {
+            "tp": {"long_name": "Total precipitation", "units": "m"},
+            "TP": {"long_name": "other", "units": "mm"},
+        }
+        assert hydrate_mod._match_variables(["tp"], meta)["tp"] == ("tp", "m")
+
+
 class TestBulkHydrateEmpty:
     """Tests for the catalog-wide hydrate driver (retrieve + catalog mocked)."""
 
