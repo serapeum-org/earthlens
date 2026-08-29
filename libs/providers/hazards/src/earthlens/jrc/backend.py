@@ -561,7 +561,11 @@ class JRC(AbstractDataSource):
                 variable = container.get_variable(self._field)
                 cols, rows = variable.columns, variable.rows
                 geo = _helpers.grid_geotransform(cols, rows)
-                window = _helpers.pixel_window(geo, self._bbox, cols, rows)
+                # Widen a point / cell-edge AOI to one pixel so an on-grid point
+                # yields a 1x1 window rather than being reported off-grid (matches
+                # the EFHM path).
+                bbox = widen_degenerate_bbox(self._bbox, geo[1], geo[5])
+                window = _helpers.pixel_window(geo, bbox, cols, rows)
                 if window is None:
                     raise ValueError(
                         f"the AOI {self._bbox} is outside the sea-level grid; "
@@ -572,10 +576,11 @@ class JRC(AbstractDataSource):
                     f"JRC {self._dataset.id}: windowed /vsicurl read of "
                     f"{self._field!r} {win_cols}x{win_rows} at ({col_off}, {row_off})"
                 )
-                array = np.asarray(
-                    variable.read_array(window=[col_off, row_off, win_cols, win_rows]),
-                    dtype="float32",
-                )
+                raw = variable.read_array(window=[col_off, row_off, win_cols, win_rows])
+                # Carry a masked / fill value through as NaN so masked land cells
+                # never leak as the source fill number (the cubes declare no
+                # nodata; missing arrives as NaN).
+                array = np.ma.filled(raw, np.nan).astype("float32")
                 window_geo = _helpers.window_origin(geo, col_off, row_off)
             finally:
                 close_quietly(container)

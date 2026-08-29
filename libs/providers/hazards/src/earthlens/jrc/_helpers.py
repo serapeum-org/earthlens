@@ -213,7 +213,7 @@ def find_cycle_file(cycle_url: str, glob: str, *, http_text=_http_text) -> str:
             so it is read from the listing rather than reconstructed).
     """
     for name in list_directory(cycle_url, http_text=http_text):
-        if not name.endswith("/") and fnmatch.fnmatch(name, glob):
+        if not name.endswith("/") and fnmatch.fnmatchcase(name, glob):
             return name
     raise ValueError(f"no file matching {glob!r} in {cycle_url}.")
 
