@@ -199,8 +199,12 @@ datasets:
     variables:
       incoming-shortwave-radiation:
         cds_variable: incoming_shortwave_radiation
-        nc_variable: incoming_shortwave_radiation
-        units: unknown
+        nc_variable: solar_mon
+        units: W m-2
+        extras:
+          climate_data_record_type: [thematic_climate_data_record]
+          origin: [nasa]
+          product_family: [ceres_ebaf]
       outgoing-longwave-radiation:
         cds_variable: outgoing_longwave_radiation
         nc_variable: olr
@@ -355,12 +359,12 @@ datasets:
     variables:
       fapar:
         cds_variable: fapar
-        nc_variable: fapar
-        units: unknown
+        nc_variable: FAPAR
+        units: '1'
       lai:
         cds_variable: lai
-        nc_variable: lai
-        units: unknown
+        nc_variable: LAI
+        units: ''
   satellite-lake-water-level:
     endpoint: cds
     request_kind: satellite_cdr
@@ -481,12 +485,14 @@ datasets:
         units: unknown
       mole-content-of-ozone-in-atmosphere-layer:
         cds_variable: mole_content_of_ozone_in_atmosphere_layer
-        nc_variable: mole_content_of_ozone_in_atmosphere_layer
-        units: unknown
+        nc_variable: surface_6km_ozone_column
+        units: mol m-2
       atmosphere-mole-content-of-ozone:
         cds_variable: atmosphere_mole_content_of_ozone
-        nc_variable: atmosphere_mole_content_of_ozone
-        units: unknown
+        nc_variable: total_ozone_column
+        units: mol m-2
+        extras:
+          vertical_aggregation: [total_columns_uv]
   satellite-precipitation-microwave:
     endpoint: cds
     request_kind: satellite_cdr
