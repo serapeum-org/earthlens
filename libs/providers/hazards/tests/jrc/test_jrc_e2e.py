@@ -1,4 +1,4 @@
-"""Live end-to-end test for the JRC European flood-hazard backend.
+"""Live end-to-end test for the JRC hazard backend (EFHM + sea-level).
 
 Hits the real, public JRC CEMS-EFAS flood-hazard HTTPS directory (no
 credentials — the EFHM is CC-BY-4.0), reading only the AOI's pixel window over
@@ -85,3 +85,44 @@ class TestEfhmLiveFetch:
             path=str(tmp_path),
         ).download(progress_bar=False)
         assert [p.name for p in paths] == ["efhm_RP10.tif", "efhm_RP500.tif"]
+
+
+class TestSeaLevelLiveFetch:
+    """Live sea-level TWL forecast reads (open HTTPS — no credentials)."""
+
+    def test_medium_term_gridded_writes_geotiff(self, tmp_path: Path):
+        """A latest-cycle North Sea pull lands one georeferenced multi-band GeoTIFF."""
+        paths = EarthLens(
+            data_source="sea-level-forecast",
+            product="medium_term",
+            lat_lim=[51.0, 53.0],
+            lon_lim=[3.0, 5.0],
+            path=str(tmp_path),
+        ).download(progress_bar=False)
+
+        assert len(paths) == 1 and paths[0].exists()
+        from pyramids.dataset import Dataset
+
+        from earthlens.base import close_quietly
+
+        dataset = Dataset.read_file(str(paths[0]))
+        band_count = dataset.band_count
+        epsg = dataset.epsg
+        cell = dataset.geotransform[1]
+        array = np.asarray(dataset.read_array())
+        close_quietly(dataset)
+
+        assert band_count >= 1, "expected one band per forecast step"
+        assert epsg == 4326
+        assert cell == pytest.approx(0.25), (
+            "geotransform must be degrees, not index space"
+        )
+        assert np.isfinite(array).sum() > 0, "the AOI window carried no valid TWL cells"
+
+    def test_subseasonal_coastal_returns_dataframe(self):
+        """The coastal key returns the global per-country summary as a DataFrame."""
+        import pandas as pd
+
+        result = EarthLens(data_source="coastal-forecast").download(progress_bar=False)
+        assert isinstance(result, pd.DataFrame)
+        assert "GID_0" in result.columns and len(result) > 0
