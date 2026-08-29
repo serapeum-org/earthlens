@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12851,17 +12851,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#geometry-for-the-atmospheric-correction" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Geometry for the atmospheric correction
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#cleaning-up-the-frame-edges" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23543,17 +23532,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#geometry-for-the-atmospheric-correction" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Geometry for the atmospheric correction
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#cleaning-up-the-frame-edges" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24429,6 +24407,7 @@ eclipse so much more dramatically.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">zipfile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -24437,30 +24416,16 @@ eclipse so much more dramatically.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pyramids</span>  <span class="c1"># noqa: F401  registers the vendored GDAL below</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">stamp_mark</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_dotenv</span><span class="p">,</span> <span class="n">load_dotenv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.patches</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circle</span><span class="p">,</span> <span class="n">FancyBboxPatch</span><span class="p">,</span> <span class="n">Wedge</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">osgeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdal</span>  <span class="c1"># needs the `import pyramids` above, which vendors it</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyproj</span><span class="w"> </span><span class="kn">import</span> <span class="n">CRS</span><span class="p">,</span> <span class="n">Transformer</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">osgeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdal</span>  <span class="c1"># after pyramids, which puts its vendored GDAL on the path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids_eo.composites</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">night_ir</span><span class="p">,</span>
-    <span class="n">solar_zenith_angle</span><span class="p">,</span>
-    <span class="n">static_image</span><span class="p">,</span>
-    <span class="n">sunz_correct</span><span class="p">,</span>
-    <span class="n">sunz_reduce</span><span class="p">,</span>
-    <span class="n">true_color</span><span class="p">,</span>
-    <span class="n">true_color_with_night_ir</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids_eo.enhance</span><span class="w"> </span><span class="kn">import</span> <span class="n">stretch</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids_eo.resample</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_area</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids_eo.sensors.readers</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_fci_l1c</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyspectral.rayleigh</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rayleigh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyresample</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_area_def</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">satpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scene</span><span class="p">,</span> <span class="n">config</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.ndimage</span><span class="w"> </span><span class="kn">import</span> <span class="n">binary_erosion</span><span class="p">,</span> <span class="n">gaussian_filter</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">cache_dir</span>
@@ -24472,6 +24437,7 @@ eclipse so much more dramatically.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import gc
 import shutil
+import urllib.request
 import warnings
 import zipfile
 from pathlib import Path
@@ -24480,30 +24446,16 @@ import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import pyramids  # noqa: F401  registers the vendored GDAL below
 from cleopatra.glyphs.gridded.array_glyph import FrameLabel
 from cleopatra.styling.watermark import stamp_mark
 from dotenv import find_dotenv, load_dotenv
 from IPython.display import Image, display
 from loguru import logger
 from matplotlib.patches import Circle, FancyBboxPatch, Wedge
-from osgeo import gdal  # needs the `import pyramids` above, which vendors it
-from pyproj import CRS, Transformer
-from pyramids.dataset import Dataset
+from osgeo import gdal  # after pyramids, which puts its vendored GDAL on the path
 from pyramids.dataset.collection import DatasetCollection
-from pyramids_eo.composites import (
-    night_ir,
-    solar_zenith_angle,
-    static_image,
-    sunz_correct,
-    sunz_reduce,
-    true_color,
-    true_color_with_night_ir,
-)
-from pyramids_eo.enhance import stretch
-from pyramids_eo.resample import to_area
-from pyramids_eo.sensors.readers import read_fci_l1c
-from pyspectral.rayleigh import Rayleigh
+from pyresample import create_area_def
+from satpy import Scene, config
 from scipy.ndimage import binary_erosion, gaussian_filter
 
 from earthlens.core import EarthLens, cache_dir
@@ -24832,6 +24784,7 @@ costs no downloads and no resampling.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">SLOTS</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">"2026-08-12 16:30"</span><span class="p">,</span> <span class="s2">"2026-08-12 19:00"</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"10min"</span><span class="p">)</span>  <span class="c1"># 16 cycles</span>
 <span class="n">DATASET</span> <span class="o">=</span> <span class="s2">"mtg-fci-l1c"</span>  <span class="c1"># earthlens catalog key for EO:EUM:DAT:0662, 10-min full disk</span>
 <span class="n">DISC</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"lat_lim"</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">79.0</span><span class="p">,</span> <span class="mf">79.0</span><span class="p">],</span> <span class="s2">"lon_lim"</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">79.0</span><span class="p">,</span> <span class="mf">79.0</span><span class="p">]}</span>  <span class="c1"># the FCI full disk</span>
+<span class="n">COMPOSITE</span> <span class="o">=</span> <span class="s2">"true_color_night_grey"</span>  <span class="c1"># defined below: true colour by day, grey cloud tops by night</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"out"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"eclipse_fci"</span>
 <span class="c1"># Raw granules are staged under the earthlens cache dir (set_cache_dir() /</span>
@@ -24853,57 +24806,112 @@ costs no downloads and no resampling.</p>
 <span class="c1"># 1) NSPER  -- vertical near-side perspective, looking straight down on the N Atlantic.</span>
 <span class="c1"># 2) TPERS  -- *tilted* perspective: the low-angle, curved-limb view a crew in orbit would</span>
 <span class="c1">#    see, with Iberia in the foreground and the shadow riding the northern limb.</span>
-<span class="n">NSPER</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"crs"</span><span class="p">:</span> <span class="p">(</span>
-        <span class="s2">"+proj=nsper +lat_0=60 +lon_0=-10 +h=35785831 "</span>
-        <span class="s2">"+a=6378137 +b=6356752.314 +units=m +no_defs"</span>
-    <span class="p">),</span>
-    <span class="s2">"extent"</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="mf">4.2e6</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.2e6</span><span class="p">,</span> <span class="mf">4.2e6</span><span class="p">,</span> <span class="mf">4.2e6</span><span class="p">),</span>
-    <span class="s2">"width"</span><span class="p">:</span> <span class="mi">1600</span><span class="p">,</span>
-    <span class="s2">"height"</span><span class="p">:</span> <span class="mi">1600</span><span class="p">,</span>
-<span class="p">}</span>
-<span class="n">TPERS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"crs"</span><span class="p">:</span> <span class="p">(</span>
-        <span class="s2">"+proj=tpers +lat_0=45 +lon_0=0 +tilt=28 +azi=0 +h=35785831 "</span>
-        <span class="s2">"+a=6378137 +b=6356752.314 +units=m +no_defs"</span>
-    <span class="p">),</span>
-    <span class="s2">"extent"</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="mf">5.0e6</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.2e6</span><span class="p">,</span> <span class="mf">5.0e6</span><span class="p">,</span> <span class="mf">3.4e6</span><span class="p">),</span>
-    <span class="s2">"width"</span><span class="p">:</span> <span class="mi">1680</span><span class="p">,</span>
-    <span class="s2">"height"</span><span class="p">:</span> <span class="mi">1120</span><span class="p">,</span>
-<span class="p">}</span>
-
-<span class="c1"># The five channels the composite needs: FCI's blue / green / red / veggie bands for true</span>
-<span class="c1"># colour, and the 10.5 um window channel for the night side.</span>
-<span class="n">SOLAR_CHANNELS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"vis_04"</span><span class="p">,</span> <span class="s2">"vis_05"</span><span class="p">,</span> <span class="s2">"vis_06"</span><span class="p">,</span> <span class="s2">"vis_08"</span><span class="p">]</span>
-<span class="n">IR_CHANNEL</span> <span class="o">=</span> <span class="s2">"ir_105"</span>
+<span class="n">NSPER</span> <span class="o">=</span> <span class="n">create_area_def</span><span class="p">(</span>
+    <span class="s2">"eclipse_nsper"</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="s2">"proj"</span><span class="p">:</span> <span class="s2">"nsper"</span><span class="p">,</span>
+        <span class="s2">"lat_0"</span><span class="p">:</span> <span class="mf">60.0</span><span class="p">,</span>
+        <span class="s2">"lon_0"</span><span class="p">:</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">,</span>
+        <span class="s2">"h"</span><span class="p">:</span> <span class="mf">35785831.0</span><span class="p">,</span>
+        <span class="s2">"a"</span><span class="p">:</span> <span class="mf">6378137.0</span><span class="p">,</span>
+        <span class="s2">"b"</span><span class="p">:</span> <span class="mf">6356752.314</span><span class="p">,</span>
+        <span class="s2">"units"</span><span class="p">:</span> <span class="s2">"m"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">1600</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">1600</span><span class="p">,</span>
+    <span class="n">area_extent</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">4.2e6</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.2e6</span><span class="p">,</span> <span class="mf">4.2e6</span><span class="p">,</span> <span class="mf">4.2e6</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">TPERS</span> <span class="o">=</span> <span class="n">create_area_def</span><span class="p">(</span>
+    <span class="s2">"eclipse_tpers"</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="s2">"proj"</span><span class="p">:</span> <span class="s2">"tpers"</span><span class="p">,</span>
+        <span class="s2">"lat_0"</span><span class="p">:</span> <span class="mf">45.0</span><span class="p">,</span>
+        <span class="s2">"lon_0"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">"tilt"</span><span class="p">:</span> <span class="mf">28.0</span><span class="p">,</span>
+        <span class="s2">"azi"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">"h"</span><span class="p">:</span> <span class="mf">35785831.0</span><span class="p">,</span>
+        <span class="s2">"a"</span><span class="p">:</span> <span class="mf">6378137.0</span><span class="p">,</span>
+        <span class="s2">"b"</span><span class="p">:</span> <span class="mf">6356752.314</span><span class="p">,</span>
+        <span class="s2">"units"</span><span class="p">:</span> <span class="s2">"m"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">1680</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">1120</span><span class="p">,</span>
+    <span class="n">area_extent</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">5.0e6</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.2e6</span><span class="p">,</span> <span class="mf">5.0e6</span><span class="p">,</span> <span class="mf">3.4e6</span><span class="p">],</span>
+<span class="p">)</span>
 
 <span class="c1"># EUMETSAT credentials come from the repo-root .env (EUMETSAT_CONSUMER_KEY / _SECRET).</span>
 <span class="c1"># The earthlens backend mints its own token from those same variables, so nothing else</span>
 <span class="c1"># is needed here.</span>
 <span class="n">load_dotenv</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
-<span class="c1"># --- Day/night city-lights ------------------------------------------------------</span>
-<span class="c1"># The night side is painted with NASA Black Marble (VIIRS city lights). `static_image`</span>
-<span class="c1"># downloads it once, caches it, and warps it onto whatever grid it is given, so there is</span>
-<span class="c1"># no composite configuration to write and no dead bundled URL to work around.</span>
-<span class="c1"># Black Marble and the cached lon/lat grid are large, derived caches rather than</span>
-<span class="c1"># notebook outputs, so they live beside the raw granules under the cache dir.</span>
-<span class="n">AUX</span> <span class="o">=</span> <span class="n">cache_dir</span><span class="p">()</span> <span class="o">/</span> <span class="s2">"eclipse_fci"</span> <span class="o">/</span> <span class="s2">"aux"</span>
+<span class="c1"># --- Day/night city-lights setup -------------------------------------------------</span>
+<span class="c1"># The night side is painted with NASA Black Marble (VIIRS city lights). satpy ships this</span>
+<span class="c1"># composite but its bundled download URL is dead, so we fetch the image once from the NASA</span>
+<span class="c1"># Visible Earth mirror, cache it, and point satpy's `_night_background` at the local copy.</span>
+<span class="n">AUX</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aux"</span>
 <span class="n">AUX</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">BLACK_MARBLE</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">"https://eoimages.gsfc.nasa.gov/images/imagerecords/144000/144898/"</span>
-    <span class="s2">"BlackMarble_2016_3km_geo.tif"</span>
+<span class="n">BLACK_MARBLE</span> <span class="o">=</span> <span class="n">AUX</span> <span class="o">/</span> <span class="s2">"BlackMarble_2016_3km_geo.tif"</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">BLACK_MARBLE</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="c1"># A timeout matters here: a hung NASA host would otherwise stall the</span>
+    <span class="c1"># notebook forever. Write to a temp name and rename, so an interrupted</span>
+    <span class="c1"># download is never mistaken for a complete cache entry.</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">"https://eoimages.gsfc.nasa.gov/images/imagerecords/144000/144898/BlackMarble_2016_3km_geo.tif"</span>
+    <span class="n">partial</span> <span class="o">=</span> <span class="n">BLACK_MARBLE</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="n">BLACK_MARBLE</span><span class="o">.</span><span class="n">suffix</span> <span class="o">+</span> <span class="s2">".part"</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">partial</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">handle</span><span class="p">)</span>
+    <span class="n">partial</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">BLACK_MARBLE</span><span class="p">)</span>
+<span class="n">SATPY_CFG</span> <span class="o">=</span> <span class="n">AUX</span> <span class="o">/</span> <span class="s2">"satpy_config"</span>
+<span class="p">(</span><span class="n">SATPY_CFG</span> <span class="o">/</span> <span class="s2">"composites"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">(</span><span class="n">SATPY_CFG</span> <span class="o">/</span> <span class="s2">"composites"</span> <span class="o">/</span> <span class="s2">"visir.yaml"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+    <span class="s2">"sensor_name: visir</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"composites:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"  _night_background:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    compositor: !!python/name:satpy.composites.aux_data.StaticImageCompositor</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    standard_name: night_background</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="sa">f</span><span class="s1">'    filename: "</span><span class="si">{</span><span class="n">BLACK_MARBLE</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s1">"</span><span class="se">\n</span><span class="s1">'</span>
+    <span class="s2">"  _night_background_hires:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    compositor: !!python/name:satpy.composites.aux_data.StaticImageCompositor</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    standard_name: night_background</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="sa">f</span><span class="s1">'    filename: "</span><span class="si">{</span><span class="n">BLACK_MARBLE</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s1">"</span><span class="se">\n</span><span class="s1">'</span>
 <span class="p">)</span>
 
-<span class="c1"># Rayleigh correction, from pyspectral. Molecular scattering goes as lambda^-4, so</span>
-<span class="c1"># without it the disk carries a blue veil -- measured against the previous frames, blue</span>
-<span class="c1"># ran about 37 DN hot before this was applied.</span>
-<span class="n">RAYLEIGH</span> <span class="o">=</span> <span class="n">Rayleigh</span><span class="p">(</span><span class="s2">"Meteosat-12"</span><span class="p">,</span> <span class="s2">"fci"</span><span class="p">)</span>
-<span class="n">RAYLEIGH_UM</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"vis_04"</span><span class="p">:</span> <span class="mf">0.444</span><span class="p">,</span> <span class="s2">"vis_05"</span><span class="p">:</span> <span class="mf">0.510</span><span class="p">,</span> <span class="s2">"vis_06"</span><span class="p">:</span> <span class="mf">0.640</span><span class="p">}</span>
+<span class="c1"># satpy's stock night layer is a three-channel IR false colour (ir_38 / ir_105 / ir_123) in</span>
+<span class="c1"># which cold cloud tops come out cyan. Feeding the same window channel to all three colours</span>
+<span class="c1"># gives neutral grey cloud tops instead, and repeating it as the fourth prerequisite keeps</span>
+<span class="c1"># the alpha channel, so Black Marble's city lights still show through the gaps.</span>
+<span class="p">(</span><span class="n">SATPY_CFG</span> <span class="o">/</span> <span class="s2">"composites"</span> <span class="o">/</span> <span class="s2">"fci.yaml"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+    <span class="s2">"sensor_name: visir/fci</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"composites:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"  night_grey_alpha:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    compositor: !!python/name:satpy.composites.core.GenericCompositor</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    standard_name: night_ir_alpha</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    prerequisites:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"      - name: ir_105</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"      - name: ir_105</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"      - name: ir_105</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"      - name: ir_105</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"  night_grey_with_background:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    compositor: !!python/name:satpy.composites.fill.BackgroundCompositor</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    standard_name: night_ir_with_background</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    prerequisites:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"      - night_grey_alpha</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"      - _night_background</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">COMPOSITE</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    compositor: !!python/name:satpy.composites.fill.DayNightCompositor</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    standard_name: fci_day_night_blend</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    lim_low: 78</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    lim_high: 88</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    prerequisites:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"      - true_color</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"      - night_grey_with_background</span><span class="se">\n</span><span class="s2">"</span>
+<span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">SATPY_CFG</span><span class="p">)])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">SLOTS = pd.date_range("2026-08-12 16:30", "2026-08-12 19:00", freq="10min")  # 16 cycles
 DATASET = "mtg-fci-l1c"  # earthlens catalog key for EO:EUM:DAT:0662, 10-min full disk
 DISC = {"lat_lim": [-79.0, 79.0], "lon_lim": [-79.0, 79.0]}  # the FCI full disk
+COMPOSITE = "true_color_night_grey"  # defined below: true colour by day, grey cloud tops by night
 
 OUT = Path("out") / "eclipse_fci"
 # Raw granules are staged under the earthlens cache dir (set_cache_dir() /
@@ -24925,53 +24933,107 @@ for d in (NSPER_RAW, TPERS_RAW, NSPER_DIR, TPERS_DIR):
 # 1) NSPER  -- vertical near-side perspective, looking straight down on the N Atlantic.
 # 2) TPERS  -- *tilted* perspective: the low-angle, curved-limb view a crew in orbit would
 #    see, with Iberia in the foreground and the shadow riding the northern limb.
-NSPER = {
-    "crs": (
-        "+proj=nsper +lat_0=60 +lon_0=-10 +h=35785831 "
-        "+a=6378137 +b=6356752.314 +units=m +no_defs"
-    ),
-    "extent": (-4.2e6, -4.2e6, 4.2e6, 4.2e6),
-    "width": 1600,
-    "height": 1600,
-}
-TPERS = {
-    "crs": (
-        "+proj=tpers +lat_0=45 +lon_0=0 +tilt=28 +azi=0 +h=35785831 "
-        "+a=6378137 +b=6356752.314 +units=m +no_defs"
-    ),
-    "extent": (-5.0e6, -3.2e6, 5.0e6, 3.4e6),
-    "width": 1680,
-    "height": 1120,
-}
-
-# The five channels the composite needs: FCI's blue / green / red / veggie bands for true
-# colour, and the 10.5 um window channel for the night side.
-SOLAR_CHANNELS = ["vis_04", "vis_05", "vis_06", "vis_08"]
-IR_CHANNEL = "ir_105"
+NSPER = create_area_def(
+    "eclipse_nsper",
+    {
+        "proj": "nsper",
+        "lat_0": 60.0,
+        "lon_0": -10.0,
+        "h": 35785831.0,
+        "a": 6378137.0,
+        "b": 6356752.314,
+        "units": "m",
+    },
+    width=1600,
+    height=1600,
+    area_extent=[-4.2e6, -4.2e6, 4.2e6, 4.2e6],
+)
+TPERS = create_area_def(
+    "eclipse_tpers",
+    {
+        "proj": "tpers",
+        "lat_0": 45.0,
+        "lon_0": 0.0,
+        "tilt": 28.0,
+        "azi": 0.0,
+        "h": 35785831.0,
+        "a": 6378137.0,
+        "b": 6356752.314,
+        "units": "m",
+    },
+    width=1680,
+    height=1120,
+    area_extent=[-5.0e6, -3.2e6, 5.0e6, 3.4e6],
+)
 
 # EUMETSAT credentials come from the repo-root .env (EUMETSAT_CONSUMER_KEY / _SECRET).
 # The earthlens backend mints its own token from those same variables, so nothing else
 # is needed here.
 load_dotenv(find_dotenv(usecwd=True))
 
-# --- Day/night city-lights ------------------------------------------------------
-# The night side is painted with NASA Black Marble (VIIRS city lights). `static_image`
-# downloads it once, caches it, and warps it onto whatever grid it is given, so there is
-# no composite configuration to write and no dead bundled URL to work around.
-# Black Marble and the cached lon/lat grid are large, derived caches rather than
-# notebook outputs, so they live beside the raw granules under the cache dir.
-AUX = cache_dir() / "eclipse_fci" / "aux"
+# --- Day/night city-lights setup -------------------------------------------------
+# The night side is painted with NASA Black Marble (VIIRS city lights). satpy ships this
+# composite but its bundled download URL is dead, so we fetch the image once from the NASA
+# Visible Earth mirror, cache it, and point satpy's `_night_background` at the local copy.
+AUX = OUT / "aux"
 AUX.mkdir(parents=True, exist_ok=True)
-BLACK_MARBLE = (
-    "https://eoimages.gsfc.nasa.gov/images/imagerecords/144000/144898/"
-    "BlackMarble_2016_3km_geo.tif"
+BLACK_MARBLE = AUX / "BlackMarble_2016_3km_geo.tif"
+if not BLACK_MARBLE.exists():
+    # A timeout matters here: a hung NASA host would otherwise stall the
+    # notebook forever. Write to a temp name and rename, so an interrupted
+    # download is never mistaken for a complete cache entry.
+    url = "https://eoimages.gsfc.nasa.gov/images/imagerecords/144000/144898/BlackMarble_2016_3km_geo.tif"
+    partial = BLACK_MARBLE.with_suffix(BLACK_MARBLE.suffix + ".part")
+    with urllib.request.urlopen(url, timeout=120) as response:
+        with open(partial, "wb") as handle:
+            shutil.copyfileobj(response, handle)
+    partial.replace(BLACK_MARBLE)
+SATPY_CFG = AUX / "satpy_config"
+(SATPY_CFG / "composites").mkdir(parents=True, exist_ok=True)
+(SATPY_CFG / "composites" / "visir.yaml").write_text(
+    "sensor_name: visir\n"
+    "composites:\n"
+    "  _night_background:\n"
+    "    compositor: !!python/name:satpy.composites.aux_data.StaticImageCompositor\n"
+    "    standard_name: night_background\n"
+    f'    filename: "{BLACK_MARBLE.resolve().as_posix()}"\n'
+    "  _night_background_hires:\n"
+    "    compositor: !!python/name:satpy.composites.aux_data.StaticImageCompositor\n"
+    "    standard_name: night_background\n"
+    f'    filename: "{BLACK_MARBLE.resolve().as_posix()}"\n'
 )
 
-# Rayleigh correction, from pyspectral. Molecular scattering goes as lambda^-4, so
-# without it the disk carries a blue veil -- measured against the previous frames, blue
-# ran about 37 DN hot before this was applied.
-RAYLEIGH = Rayleigh("Meteosat-12", "fci")
-RAYLEIGH_UM = {"vis_04": 0.444, "vis_05": 0.510, "vis_06": 0.640}</div>
+# satpy's stock night layer is a three-channel IR false colour (ir_38 / ir_105 / ir_123) in
+# which cold cloud tops come out cyan. Feeding the same window channel to all three colours
+# gives neutral grey cloud tops instead, and repeating it as the fourth prerequisite keeps
+# the alpha channel, so Black Marble's city lights still show through the gaps.
+(SATPY_CFG / "composites" / "fci.yaml").write_text(
+    "sensor_name: visir/fci\n"
+    "composites:\n"
+    "  night_grey_alpha:\n"
+    "    compositor: !!python/name:satpy.composites.core.GenericCompositor\n"
+    "    standard_name: night_ir_alpha\n"
+    "    prerequisites:\n"
+    "      - name: ir_105\n"
+    "      - name: ir_105\n"
+    "      - name: ir_105\n"
+    "      - name: ir_105\n"
+    "  night_grey_with_background:\n"
+    "    compositor: !!python/name:satpy.composites.fill.BackgroundCompositor\n"
+    "    standard_name: night_ir_with_background\n"
+    "    prerequisites:\n"
+    "      - night_grey_alpha\n"
+    "      - _night_background\n"
+    f"  {COMPOSITE}:\n"
+    "    compositor: !!python/name:satpy.composites.fill.DayNightCompositor\n"
+    "    standard_name: fci_day_night_blend\n"
+    "    lim_low: 78\n"
+    "    lim_high: 88\n"
+    "    prerequisites:\n"
+    "      - true_color\n"
+    "      - night_grey_with_background\n"
+)
+config.set(config_path=[str(SATPY_CFG)])</div>
 </div>
 </div>
 </div>
@@ -24979,228 +25041,6 @@ RAYLEIGH_UM = {"vis_04": 0.444, "vis_05": 0.510, "vis_06": 0.640}</div>
 </div>
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="geometry-for-the-atmospheric-correction">Geometry for the atmospheric correction<a class="anchor-link" href="#geometry-for-the-atmospheric-correction">¶</a></h3><p>Rayleigh correction needs to know where the Sun and the satellite are for every pixel. The solar zenith comes from pyramids-eo; the satellite angles and the solar azimuth are plain geostationary geometry, computed once for the fixed disc grid.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># --- Viewing and solar geometry -------------------------------------------------------</span>
-<span class="c1"># The Rayleigh model needs three angles per pixel: where the Sun is, where the satellite</span>
-<span class="c1"># is, and the angle between them. pyramids-eo supplies the solar zenith; the rest is</span>
-<span class="c1"># geostationary geometry, so it is computed here.</span>
-
-<span class="n">R_EARTH_KM</span> <span class="o">=</span> <span class="mf">6378.137</span>
-<span class="n">R_GEO_KM</span> <span class="o">=</span> <span class="mf">42164.0</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">satellite_zenith_azimuth</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">sat_lon</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Satellite zenith and azimuth, in degrees, seen from each ground point.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        lat: Latitudes in degrees north.</span>
-<span class="sd">        lon: Longitudes in degrees east, matching `lat`.</span>
-<span class="sd">        sat_lon: Sub-satellite longitude; 0 for Meteosat-12.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        A `(zenith, azimuth)` pair of arrays in degrees.</span>
-<span class="sd">    """</span>
-    <span class="n">la</span><span class="p">,</span> <span class="n">dlon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lon</span> <span class="o">-</span> <span class="n">sat_lon</span><span class="p">)</span>
-    <span class="n">cos_psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">la</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">dlon</span><span class="p">),</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-    <span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">cos_psi</span><span class="p">)</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">R_EARTH_KM</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">R_GEO_KM</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">R_EARTH_KM</span> <span class="o">*</span> <span class="n">R_GEO_KM</span> <span class="o">*</span> <span class="n">cos_psi</span><span class="p">)</span>
-    <span class="n">zenith</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">R_GEO_KM</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)))</span>
-    <span class="n">azimuth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="o">-</span><span class="n">dlon</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">la</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">dlon</span><span class="p">)))</span> <span class="o">%</span> <span class="mf">360.0</span>
-    <span class="k">return</span> <span class="n">zenith</span><span class="p">,</span> <span class="n">azimuth</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">solar_azimuth</span><span class="p">(</span><span class="n">when</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Solar azimuth in degrees clockwise from north (NOAA algorithm).</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        when: Observation time, treated as UTC.</span>
-<span class="sd">        lat: Latitudes in degrees north.</span>
-<span class="sd">        lon: Longitudes in degrees east, matching `lat`.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        The azimuth array in degrees.</span>
-<span class="sd">    """</span>
-    <span class="n">doy</span> <span class="o">=</span> <span class="n">when</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()</span><span class="o">.</span><span class="n">tm_yday</span>
-    <span class="n">hour</span> <span class="o">=</span> <span class="n">when</span><span class="o">.</span><span class="n">hour</span> <span class="o">+</span> <span class="n">when</span><span class="o">.</span><span class="n">minute</span> <span class="o">/</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">when</span><span class="o">.</span><span class="n">second</span> <span class="o">/</span> <span class="mi">3600</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">((</span><span class="mf">360.0</span> <span class="o">/</span> <span class="mf">365.24</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">doy</span> <span class="o">-</span> <span class="mi">81</span><span class="p">))</span>
-    <span class="n">eot</span> <span class="o">=</span> <span class="mf">9.87</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">g</span><span class="p">)</span> <span class="o">-</span> <span class="mf">7.53</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
-    <span class="n">decl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">23.44</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
-
-    <span class="n">la</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
-    <span class="n">hour_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">15.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">hour</span> <span class="o">+</span> <span class="n">lon</span> <span class="o">/</span> <span class="mf">15.0</span> <span class="o">+</span> <span class="n">eot</span> <span class="o">/</span> <span class="mf">60.0</span> <span class="o">-</span> <span class="mf">12.0</span><span class="p">))</span>
-    <span class="n">cos_zenith</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">la</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">decl</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">la</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">decl</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">hour_angle</span><span class="p">),</span>
-        <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
-        <span class="mf">1.0</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">sin_zenith</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">cos_zenith</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mf">1e-12</span><span class="p">))</span>
-    <span class="n">cos_az</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">decl</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">la</span><span class="p">)</span> <span class="o">*</span> <span class="n">cos_zenith</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">la</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin_zenith</span><span class="p">)</span>
-    <span class="n">azimuth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">cos_az</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)))</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">hour_angle</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">360.0</span> <span class="o">-</span> <span class="n">azimuth</span><span class="p">,</span> <span class="n">azimuth</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">relative_azimuth</span><span class="p">(</span><span class="n">sun_az</span><span class="p">,</span> <span class="n">sat_az</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Absolute Sun-to-satellite azimuth difference, folded into 0-180 degrees."""</span>
-    <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sun_az</span> <span class="o">-</span> <span class="n">sat_az</span><span class="p">)</span> <span class="o">%</span> <span class="mf">360.0</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff</span> <span class="o">&gt;</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">360.0</span> <span class="o">-</span> <span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">disc_lonlat</span><span class="p">(</span><span class="n">geo</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Longitude / latitude of every cell centre on the geostationary grid.</span>
-
-<span class="sd">    The grid never moves, so this is computed once and reused for every cycle.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        geo: The dataset geotransform.</span>
-<span class="sd">        crs: The dataset CRS, as WKT.</span>
-<span class="sd">        shape: The `(rows, columns)` of the grid.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        A `(lon, lat)` pair of arrays; off-disc cells are not finite.</span>
-<span class="sd">    """</span>
-    <span class="n">cache</span> <span class="o">=</span> <span class="n">AUX</span> <span class="o">/</span> <span class="s2">"disc_lonlat.npz"</span>
-    <span class="k">if</span> <span class="n">cache</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="n">cached</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cache</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cached</span><span class="p">[</span><span class="s2">"lon"</span><span class="p">],</span> <span class="n">cached</span><span class="p">[</span><span class="s2">"lat"</span><span class="p">]</span>
-    <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">shape</span>
-    <span class="n">xs</span> <span class="o">=</span> <span class="n">geo</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">geo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">ys</span> <span class="o">=</span> <span class="n">geo</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">geo</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
-    <span class="n">grid_x</span><span class="p">,</span> <span class="n">grid_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
-    <span class="n">transformer</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span>
-        <span class="n">CRS</span><span class="o">.</span><span class="n">from_wkt</span><span class="p">(</span><span class="n">crs</span><span class="p">),</span> <span class="n">CRS</span><span class="o">.</span><span class="n">from_epsg</span><span class="p">(</span><span class="mi">4326</span><span class="p">),</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">grid_x</span><span class="p">,</span> <span class="n">grid_y</span><span class="p">)</span>
-    <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">lon</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float32"</span><span class="p">),</span> <span class="n">lat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float32"</span><span class="p">)</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">savez_compressed</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="o">=</span><span class="n">lat</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-4"># --- Viewing and solar geometry -------------------------------------------------------
-# The Rayleigh model needs three angles per pixel: where the Sun is, where the satellite
-# is, and the angle between them. pyramids-eo supplies the solar zenith; the rest is
-# geostationary geometry, so it is computed here.
-
-R_EARTH_KM = 6378.137
-R_GEO_KM = 42164.0
-
-
-def satellite_zenith_azimuth(lat, lon, sat_lon=0.0):
-    """Satellite zenith and azimuth, in degrees, seen from each ground point.
-
-    Args:
-        lat: Latitudes in degrees north.
-        lon: Longitudes in degrees east, matching `lat`.
-        sat_lon: Sub-satellite longitude; 0 for Meteosat-12.
-
-    Returns:
-        A `(zenith, azimuth)` pair of arrays in degrees.
-    """
-    la, dlon = np.deg2rad(lat), np.deg2rad(lon - sat_lon)
-    cos_psi = np.clip(np.cos(la) * np.cos(dlon), -1.0, 1.0)
-    psi = np.arccos(cos_psi)
-    d = np.sqrt(R_EARTH_KM**2 + R_GEO_KM**2 - 2 * R_EARTH_KM * R_GEO_KM * cos_psi)
-    zenith = np.degrees(np.arcsin(np.clip(R_GEO_KM * np.sin(psi) / d, -1.0, 1.0)))
-    azimuth = np.degrees(np.arctan2(np.sin(-dlon), -np.sin(la) * np.cos(dlon))) % 360.0
-    return zenith, azimuth
-
-
-def solar_azimuth(when, lat, lon):
-    """Solar azimuth in degrees clockwise from north (NOAA algorithm).
-
-    Args:
-        when: Observation time, treated as UTC.
-        lat: Latitudes in degrees north.
-        lon: Longitudes in degrees east, matching `lat`.
-
-    Returns:
-        The azimuth array in degrees.
-    """
-    doy = when.timetuple().tm_yday
-    hour = when.hour + when.minute / 60 + when.second / 3600
-    g = np.deg2rad((360.0 / 365.24) * (doy - 81))
-    eot = 9.87 * np.sin(2 * g) - 7.53 * np.cos(g) - 1.5 * np.sin(g)
-    decl = np.deg2rad(23.44) * np.sin(g)
-
-    la = np.deg2rad(lat)
-    hour_angle = np.deg2rad(15.0 * (hour + lon / 15.0 + eot / 60.0 - 12.0))
-    cos_zenith = np.clip(
-        np.sin(la) * np.sin(decl) + np.cos(la) * np.cos(decl) * np.cos(hour_angle),
-        -1.0,
-        1.0,
-    )
-    sin_zenith = np.sqrt(np.maximum(1.0 - cos_zenith**2, 1e-12))
-    cos_az = (np.sin(decl) - np.sin(la) * cos_zenith) / (np.cos(la) * sin_zenith)
-    azimuth = np.degrees(np.arccos(np.clip(cos_az, -1.0, 1.0)))
-    return np.where(hour_angle &gt; 0, 360.0 - azimuth, azimuth)
-
-
-def relative_azimuth(sun_az, sat_az):
-    """Absolute Sun-to-satellite azimuth difference, folded into 0-180 degrees."""
-    diff = np.abs(sun_az - sat_az) % 360.0
-    return np.where(diff &gt; 180.0, 360.0 - diff, diff)
-
-
-def disc_lonlat(geo, crs, shape):
-    """Longitude / latitude of every cell centre on the geostationary grid.
-
-    The grid never moves, so this is computed once and reused for every cycle.
-
-    Args:
-        geo: The dataset geotransform.
-        crs: The dataset CRS, as WKT.
-        shape: The `(rows, columns)` of the grid.
-
-    Returns:
-        A `(lon, lat)` pair of arrays; off-disc cells are not finite.
-    """
-    cache = AUX / "disc_lonlat.npz"
-    if cache.exists():
-        cached = np.load(cache)
-        return cached["lon"], cached["lat"]
-    rows, cols = shape
-    xs = geo[0] + (np.arange(cols) + 0.5) * geo[1]
-    ys = geo[3] + (np.arange(rows) + 0.5) * geo[5]
-    grid_x, grid_y = np.meshgrid(xs, ys)
-    transformer = Transformer.from_crs(
-        CRS.from_wkt(crs), CRS.from_epsg(4326), always_xy=True
-    )
-    lon, lat = transformer.transform(grid_x, grid_y)
-    lon, lat = lon.astype("float32"), lat.astype("float32")
-    np.savez_compressed(cache, lon=lon, lat=lat)
-    return lon, lat</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -25221,7 +25061,7 @@ atmosphere. Neither pass invents imagery — both only attenuate or tint pixels 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -25229,7 +25069,7 @@ atmosphere. Neither pass invents imagery — both only attenuate or tint pixels 
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -25329,7 +25169,7 @@ atmosphere. Neither pass invents imagery — both only attenuate or tint pixels 
     <span class="n">ds</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">path</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">def declip_cyan(rgb, tol=10.0, sigma=22.0, strength=0.9):
+<div class="clipboard-copy-txt" id="cell-4">def declip_cyan(rgb, tol=10.0, sigma=22.0, strength=0.9):
     """Tame the teal ridge along the day/night seam.
 
     At the terminator the `true_color` layer's Rayleigh correction is working at a grazing
@@ -25424,7 +25264,7 @@ def soften_file(path, **kwargs):
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=10">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -25432,7 +25272,7 @@ def soften_file(path, **kwargs):
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -25445,132 +25285,6 @@ def soften_file(path, **kwargs):
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">rendered</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""True when `path` holds a complete frame; an interrupted write leaves a stub."""</span>
     <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">load_channel</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Read one FCI channel onto the common 2 km grid.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        chunks: The cycle's chunk files.</span>
-<span class="sd">        channel: Channel name, e.g. `"vis_06"`.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        An `(array, geotransform, crs)` triple on the 2 km grid.</span>
-<span class="sd">    """</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">read_fci_l1c</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
-    <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">)</span>
-    <span class="n">geo</span><span class="p">,</span> <span class="n">crs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">geotransform</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
-    <span class="k">del</span> <span class="n">dataset</span>
-    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">geo</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">1500</span><span class="p">:</span>  <span class="c1"># the solar bands are 1 km; average them down to 2 km</span>
-        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">2</span>
-        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
-            <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span>
-                <span class="n">array</span><span class="p">[:</span><span class="n">rows</span><span class="p">,</span> <span class="p">:</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">rows</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">cols</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float32"</span><span class="p">)</span>
-        <span class="n">geo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="mi">2</span>
-        <span class="n">geo</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*=</span> <span class="mi">2</span>
-    <span class="k">return</span> <span class="n">array</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">geo</span><span class="p">),</span> <span class="n">crs</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">build_composite</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="n">when</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Build the day/night composite for one cycle, on the geostationary grid.</span>
-
-<span class="sd">    Sun-zenith corrected, Rayleigh corrected true colour by day; grey cloud tops over</span>
-<span class="sd">    Black Marble city lights by night; the two cross-faded by solar zenith angle.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        chunks: The cycle's chunk files.</span>
-<span class="sd">        when: The cycle's nominal time, in UTC.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        A `(frame, geotransform, crs)` triple, where `frame` is `(4, H, W)` RGBA in 0..1.</span>
-<span class="sd">    """</span>
-    <span class="n">bands</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">SOLAR_CHANNELS</span> <span class="o">+</span> <span class="p">[</span><span class="n">IR_CHANNEL</span><span class="p">]:</span>
-        <span class="n">bands</span><span class="p">[</span><span class="n">channel</span><span class="p">],</span> <span class="n">geo</span><span class="p">,</span> <span class="n">crs</span> <span class="o">=</span> <span class="n">load_channel</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
-    <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">disc_lonlat</span><span class="p">(</span><span class="n">geo</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">bands</span><span class="p">[</span><span class="n">IR_CHANNEL</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
-        <span class="n">sza</span> <span class="o">=</span> <span class="n">solar_zenith_angle</span><span class="p">(</span><span class="n">when</span><span class="p">,</span> <span class="n">lat</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="n">lon</span><span class="p">)</span>
-
-    <span class="c1"># Sun-zenith handling, the pair satpy applies as `sunz_corrected` then</span>
-    <span class="c1"># `sunz_reduced`:</span>
-    <span class="c1"># divide out cos(sza) so the disc does not darken toward the terminator, then taper</span>
-    <span class="c1"># the signal back down where illumination is marginal, so deep shadow -- the eclipse</span>
-    <span class="c1"># umbra above all -- reads dark instead of sitting on a grey floor.</span>
-    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">SOLAR_CHANNELS</span><span class="p">:</span>
-        <span class="n">corrected</span> <span class="o">=</span> <span class="n">sunz_correct</span><span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="n">channel</span><span class="p">],</span> <span class="n">sza</span><span class="p">)</span>
-        <span class="n">bands</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sunz_reduce</span><span class="p">(</span><span class="n">corrected</span><span class="p">,</span> <span class="n">sza</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">)</span>
-
-    <span class="n">sat_zenith</span><span class="p">,</span> <span class="n">sat_azimuth</span> <span class="o">=</span> <span class="n">satellite_zenith_azimuth</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span>
-    <span class="n">azidiff</span> <span class="o">=</span> <span class="n">relative_azimuth</span><span class="p">(</span><span class="n">solar_azimuth</span><span class="p">(</span><span class="n">when</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">),</span> <span class="n">sat_azimuth</span><span class="p">)</span>
-    <span class="k">del</span> <span class="n">sat_azimuth</span>
-    <span class="n">red_percent</span> <span class="o">=</span> <span class="n">bands</span><span class="p">[</span><span class="s2">"vis_06"</span><span class="p">]</span> <span class="o">*</span> <span class="mf">100.0</span>
-    <span class="k">for</span> <span class="n">channel</span><span class="p">,</span> <span class="n">wavelength</span> <span class="ow">in</span> <span class="n">RAYLEIGH_UM</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>  <span class="c1"># blocked, to bound peak memory</span>
-        <span class="n">band</span> <span class="o">=</span> <span class="n">bands</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">band</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">512</span><span class="p">):</span>
-            <span class="n">rows</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="mi">512</span><span class="p">,</span> <span class="n">band</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-            <span class="n">haze</span> <span class="o">=</span> <span class="n">RAYLEIGH</span><span class="o">.</span><span class="n">get_reflectance</span><span class="p">(</span>
-                <span class="n">sza</span><span class="p">[</span><span class="n">rows</span><span class="p">],</span>
-                <span class="n">sat_zenith</span><span class="p">[</span><span class="n">rows</span><span class="p">],</span>
-                <span class="n">azidiff</span><span class="p">[</span><span class="n">rows</span><span class="p">],</span>
-                <span class="n">wavelength</span><span class="p">,</span>
-                <span class="n">red_percent</span><span class="p">[</span><span class="n">rows</span><span class="p">],</span>
-            <span class="p">)</span>
-            <span class="n">band</span><span class="p">[</span><span class="n">rows</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
-                <span class="n">band</span><span class="p">[</span><span class="n">rows</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">haze</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">)</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span>
-            <span class="p">)</span>
-    <span class="k">del</span> <span class="n">red_percent</span><span class="p">,</span> <span class="n">sat_zenith</span><span class="p">,</span> <span class="n">azidiff</span>
-    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-
-    <span class="c1"># FCI's 0.51 um band deliberately misses chlorophyll, so vegetation reads brown unless</span>
-    <span class="c1"># some NIR is mixed back in -- hence the NDVI hybrid green rather than the raw band.</span>
-    <span class="n">day</span> <span class="o">=</span> <span class="n">true_color</span><span class="p">(</span>
-        <span class="n">bands</span><span class="p">[</span><span class="s2">"vis_06"</span><span class="p">],</span>
-        <span class="n">bands</span><span class="p">[</span><span class="s2">"vis_04"</span><span class="p">],</span>
-        <span class="n">bands</span><span class="p">[</span><span class="s2">"vis_08"</span><span class="p">],</span>
-        <span class="n">green</span><span class="o">=</span><span class="n">bands</span><span class="p">[</span><span class="s2">"vis_05"</span><span class="p">],</span>
-        <span class="n">green_mode</span><span class="o">=</span><span class="s2">"ndvi_hybrid"</span><span class="p">,</span>
-        <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="c1"># Grey cloud tops rather than a three-channel IR false colour, whose cold tops come</span>
-    <span class="c1"># out cyan; the alpha lets the city lights show through the gaps.</span>
-    <span class="n">brightness_temperature</span> <span class="o">=</span> <span class="n">bands</span><span class="p">[</span><span class="n">IR_CHANNEL</span><span class="p">]</span>
-    <span class="n">opacity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">((</span><span class="mf">273.0</span> <span class="o">-</span> <span class="n">brightness_temperature</span><span class="p">)</span> <span class="o">/</span> <span class="mf">70.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-    <span class="n">opacity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">brightness_temperature</span><span class="p">),</span> <span class="n">opacity</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-    <span class="n">grey</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">((</span><span class="mf">290.0</span> <span class="o">-</span> <span class="n">brightness_temperature</span><span class="p">)</span> <span class="o">/</span> <span class="mf">90.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-    <span class="n">clouds</span> <span class="o">=</span> <span class="n">night_ir</span><span class="p">(</span><span class="mf">0.92</span> <span class="o">*</span> <span class="n">grey</span><span class="p">,</span> <span class="mf">0.92</span> <span class="o">*</span> <span class="n">grey</span><span class="p">,</span> <span class="mf">0.92</span> <span class="o">*</span> <span class="n">grey</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">opacity</span><span class="p">)</span>
-
-    <span class="n">like</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
-        <span class="n">brightness_temperature</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-    <span class="p">)</span>
-    <span class="n">city_lights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
-            <span class="n">static_image</span><span class="p">(</span><span class="n">BLACK_MARBLE</span><span class="p">,</span> <span class="n">like</span><span class="o">=</span><span class="n">like</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="n">AUX</span><span class="p">)</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">,</span>
-        <span class="p">),</span>
-        <span class="n">nan</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">city_lights</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">1.5</span><span class="p">:</span>  <span class="c1"># Black Marble arrives as 0-255 bytes</span>
-        <span class="n">city_lights</span> <span class="o">=</span> <span class="n">city_lights</span> <span class="o">/</span> <span class="mf">255.0</span>
-
-    <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
-        <span class="n">true_color_with_night_ir</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">day</span><span class="p">),</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">clouds</span><span class="p">),</span>
-            <span class="n">city_lights</span><span class="p">,</span>
-            <span class="n">sza</span><span class="p">,</span>
-            <span class="n">lim_low</span><span class="o">=</span><span class="mi">78</span><span class="p">,</span>
-            <span class="n">lim_high</span><span class="o">=</span><span class="mi">88</span><span class="p">,</span>
-            <span class="n">keep_alpha</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="p">)</span>
-    <span class="k">del</span> <span class="n">bands</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">clouds</span><span class="p">,</span> <span class="n">city_lights</span><span class="p">,</span> <span class="n">like</span>
-    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">frame</span><span class="p">,</span> <span class="n">geo</span><span class="p">,</span> <span class="n">crs</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">render_cycle</span><span class="p">(</span><span class="n">slot</span><span class="p">):</span>
@@ -25604,37 +25318,17 @@ def soften_file(path, **kwargs):
                 <span class="n">archive</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
 
         <span class="n">chunks</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">work</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*.nc"</span><span class="p">))</span>
-        <span class="n">frame</span><span class="p">,</span> <span class="n">geo</span><span class="p">,</span> <span class="n">crs</span> <span class="o">=</span> <span class="n">build_composite</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="n">slot</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">())</span>
-        <span class="n">composite</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
-            <span class="n">frame</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        <span class="p">)</span>
+        <span class="n">scene</span> <span class="o">=</span> <span class="n">Scene</span><span class="p">(</span><span class="n">filenames</span><span class="o">=</span><span class="n">chunks</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="s2">"fci_l1c_nc"</span><span class="p">)</span>
+        <span class="n">scene</span><span class="o">.</span><span class="n">load</span><span class="p">([</span><span class="n">COMPOSITE</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">area</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">raw</span><span class="p">:</span>
-            <span class="c1"># Warp in float and tone-map afterwards: one quantisation instead of two.</span>
-            <span class="n">framed</span> <span class="o">=</span> <span class="n">to_area</span><span class="p">(</span>
-                <span class="n">composite</span><span class="p">,</span>
-                <span class="n">area</span><span class="p">[</span><span class="s2">"crs"</span><span class="p">],</span>
-                <span class="n">area</span><span class="p">[</span><span class="s2">"extent"</span><span class="p">],</span>
-                <span class="n">area</span><span class="p">[</span><span class="s2">"width"</span><span class="p">],</span>
-                <span class="n">area</span><span class="p">[</span><span class="s2">"height"</span><span class="p">],</span>
-                <span class="n">method</span><span class="o">=</span><span class="s2">"bilinear"</span><span class="p">,</span>
+            <span class="n">scene</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">area</span><span class="p">,</span> <span class="n">resampler</span><span class="o">=</span><span class="s2">"bilinear"</span><span class="p">)</span><span class="o">.</span><span class="n">save_dataset</span><span class="p">(</span>
+                <span class="n">COMPOSITE</span><span class="p">,</span>
+                <span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
+                <span class="n">writer</span><span class="o">=</span><span class="s2">"geotiff"</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span>
+                <span class="n">enhance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">eight_bit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
-                <span class="n">stretch</span><span class="p">(</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">framed</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">),</span>
-                    <span class="n">kind</span><span class="o">=</span><span class="s2">"crude"</span><span class="p">,</span>
-                    <span class="n">min_stretch</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-                    <span class="n">max_stretch</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span>
-                    <span class="n">gamma</span><span class="o">=</span><span class="mf">1.9</span><span class="p">,</span>
-                    <span class="n">preserve_alpha</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
-            <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
-                <span class="n">eight_bit</span><span class="p">,</span>
-                <span class="n">geo</span><span class="o">=</span><span class="n">framed</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span>
-                <span class="n">epsg</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">framed</span><span class="o">.</span><span class="n">crs</span><span class="p">),</span>
-                <span class="n">no_data_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
-        <span class="k">del</span> <span class="n">frame</span><span class="p">,</span> <span class="n">composite</span>
+        <span class="k">del</span> <span class="n">scene</span>
         <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 
     <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">src</span><span class="p">),</span> <span class="n">dst</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">final</span><span class="p">):</span>
@@ -25642,135 +25336,9 @@ def soften_file(path, **kwargs):
         <span class="n">soften_file</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">final</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">def rendered(path):
+<div class="clipboard-copy-txt" id="cell-5">def rendered(path):
     """True when `path` holds a complete frame; an interrupted write leaves a stub."""
     return path.exists() and path.stat().st_size &gt; (1 &lt;&lt; 20)
-
-
-def load_channel(chunks, channel):
-    """Read one FCI channel onto the common 2 km grid.
-
-    Args:
-        chunks: The cycle's chunk files.
-        channel: Channel name, e.g. `"vis_06"`.
-
-    Returns:
-        An `(array, geotransform, crs)` triple on the 2 km grid.
-    """
-    dataset = read_fci_l1c(chunks, channel)
-    array = np.asarray(dataset.read_array(), dtype="float32")
-    geo, crs = list(dataset.geotransform), str(dataset.crs)
-    del dataset
-    gc.collect()
-
-    if abs(geo[1]) &lt; 1500:  # the solar bands are 1 km; average them down to 2 km
-        rows, cols = array.shape[0] // 2 * 2, array.shape[1] // 2 * 2
-        with np.errstate(invalid="ignore"):
-            array = np.nanmean(
-                array[:rows, :cols].reshape(rows // 2, 2, cols // 2, 2), axis=(1, 3)
-            ).astype("float32")
-        geo[1] *= 2
-        geo[5] *= 2
-    return array, tuple(geo), crs
-
-
-def build_composite(chunks, when):
-    """Build the day/night composite for one cycle, on the geostationary grid.
-
-    Sun-zenith corrected, Rayleigh corrected true colour by day; grey cloud tops over
-    Black Marble city lights by night; the two cross-faded by solar zenith angle.
-
-    Args:
-        chunks: The cycle's chunk files.
-        when: The cycle's nominal time, in UTC.
-
-    Returns:
-        A `(frame, geotransform, crs)` triple, where `frame` is `(4, H, W)` RGBA in 0..1.
-    """
-    bands = {}
-    for channel in SOLAR_CHANNELS + [IR_CHANNEL]:
-        bands[channel], geo, crs = load_channel(chunks, channel)
-    lon, lat = disc_lonlat(geo, crs, bands[IR_CHANNEL].shape)
-
-    with np.errstate(invalid="ignore"):
-        sza = solar_zenith_angle(when, lat=lat, lon=lon)
-
-    # Sun-zenith handling, the pair satpy applies as `sunz_corrected` then
-    # `sunz_reduced`:
-    # divide out cos(sza) so the disc does not darken toward the terminator, then taper
-    # the signal back down where illumination is marginal, so deep shadow -- the eclipse
-    # umbra above all -- reads dark instead of sitting on a grey floor.
-    for channel in SOLAR_CHANNELS:
-        corrected = sunz_correct(bands[channel], sza)
-        bands[channel] = np.asarray(sunz_reduce(corrected, sza), dtype="float32")
-
-    sat_zenith, sat_azimuth = satellite_zenith_azimuth(lat, lon)
-    azidiff = relative_azimuth(solar_azimuth(when, lat, lon), sat_azimuth)
-    del sat_azimuth
-    red_percent = bands["vis_06"] * 100.0
-    for channel, wavelength in RAYLEIGH_UM.items():  # blocked, to bound peak memory
-        band = bands[channel]
-        for start in range(0, band.shape[0], 512):
-            rows = slice(start, min(start + 512, band.shape[0]))
-            haze = RAYLEIGH.get_reflectance(
-                sza[rows],
-                sat_zenith[rows],
-                azidiff[rows],
-                wavelength,
-                red_percent[rows],
-            )
-            band[rows] = np.clip(
-                band[rows] - np.asarray(haze, dtype="float32") / 100.0, 0.0, None
-            )
-    del red_percent, sat_zenith, azidiff
-    gc.collect()
-
-    # FCI's 0.51 um band deliberately misses chlorophyll, so vegetation reads brown unless
-    # some NIR is mixed back in -- hence the NDVI hybrid green rather than the raw band.
-    day = true_color(
-        bands["vis_06"],
-        bands["vis_04"],
-        bands["vis_08"],
-        green=bands["vis_05"],
-        green_mode="ndvi_hybrid",
-        clip=True,
-    )
-
-    # Grey cloud tops rather than a three-channel IR false colour, whose cold tops come
-    # out cyan; the alpha lets the city lights show through the gaps.
-    brightness_temperature = bands[IR_CHANNEL]
-    opacity = np.clip((273.0 - brightness_temperature) / 70.0, 0.0, 1.0)
-    opacity = np.where(np.isfinite(brightness_temperature), opacity, 0.0)
-    grey = np.clip((290.0 - brightness_temperature) / 90.0, 0.0, 1.0)
-    clouds = night_ir(0.92 * grey, 0.92 * grey, 0.92 * grey, alpha=opacity)
-
-    like = Dataset.create_from_array(
-        brightness_temperature, geo=geo, epsg=crs, no_data_value=np.nan
-    )
-    city_lights = np.nan_to_num(
-        np.asarray(
-            static_image(BLACK_MARBLE, like=like, cache_dir=AUX).read_array(),
-            dtype="float32",
-        ),
-        nan=0.0,
-    )
-    if city_lights.max() &gt; 1.5:  # Black Marble arrives as 0-255 bytes
-        city_lights = city_lights / 255.0
-
-    frame = np.asarray(
-        true_color_with_night_ir(
-            np.asarray(day),
-            np.asarray(clouds),
-            city_lights,
-            sza,
-            lim_low=78,
-            lim_high=88,
-            keep_alpha=True,
-        )
-    )
-    del bands, day, clouds, city_lights, like
-    gc.collect()
-    return frame, geo, crs
 
 
 def render_cycle(slot):
@@ -25804,37 +25372,17 @@ def render_cycle(slot):
                 archive.unlink()
 
         chunks = sorted(str(p) for p in work.rglob("*.nc"))
-        frame, geo, crs = build_composite(chunks, slot.to_pydatetime())
-        composite = Dataset.create_from_array(
-            frame, geo=geo, epsg=crs, no_data_value=np.nan
-        )
+        scene = Scene(filenames=chunks, reader="fci_l1c_nc")
+        scene.load([COMPOSITE])
         for area, path in raw:
-            # Warp in float and tone-map afterwards: one quantisation instead of two.
-            framed = to_area(
-                composite,
-                area["crs"],
-                area["extent"],
-                area["width"],
-                area["height"],
-                method="bilinear",
+            scene.resample(area, resampler="bilinear").save_dataset(
+                COMPOSITE,
+                filename=str(path),
+                writer="geotiff",
+                dtype=np.uint8,
+                enhance=True,
             )
-            eight_bit = np.asarray(
-                stretch(
-                    np.asarray(framed.read_array(), dtype="float32"),
-                    kind="crude",
-                    min_stretch=0.0,
-                    max_stretch=1.1,
-                    gamma=1.9,
-                    preserve_alpha=True,
-                )
-            )
-            Dataset.create_from_array(
-                eight_bit,
-                geo=framed.geotransform,
-                epsg=str(framed.crs),
-                no_data_value=0,
-            ).to_file(str(path))
-        del frame, composite
+        del scene
         gc.collect()
 
     for (_, src), dst in zip(raw, final):
@@ -25847,7 +25395,7 @@ def render_cycle(slot):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=11">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -25858,7 +25406,7 @@ def render_cycle(slot):
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=12">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=10">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -25866,7 +25414,7 @@ def render_cycle(slot):
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -25886,7 +25434,7 @@ def render_cycle(slot):
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nsper_frames</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames: </span><span class="si">{</span><span class="n">SLOTS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">%H:%M</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">SLOTS</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">%H:%M</span><span class="si">}</span><span class="s2"> UTC"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">nsper_frames, tpers_frames = [], []
+<div class="clipboard-copy-txt" id="cell-6">nsper_frames, tpers_frames = [], []
 for slot in SLOTS:
     result = render_cycle(slot)
     if result is None:
@@ -25901,7 +25449,7 @@ print(f"{len(nsper_frames)} frames: {SLOTS[0]:%H:%M} -&gt; {SLOTS[-1]:%H:%M} UTC
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=13">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=11">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -25913,7 +25461,7 @@ darkens the middle of the disk around greatest eclipse, then lifts.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=14">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -25924,7 +25472,7 @@ darkens the middle of the disk around greatest eclipse, then lifts.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=15">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=13">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -25932,7 +25480,7 @@ darkens the middle of the disk around greatest eclipse, then lifts.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -26052,7 +25600,7 @@ darkens the middle of the disk around greatest eclipse, then lifts.</p>
 
 <span class="n">_array_glyph</span><span class="o">.</span><span class="n">get_indices2</span> <span class="o">=</span> <span class="n">_domain_cell_count</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">BRAND_DIR = Path("../../../_images/branding/earthlens-brand-kit/logo")
+<div class="clipboard-copy-txt" id="cell-7">BRAND_DIR = Path("../../../_images/branding/earthlens-brand-kit/logo")
 BRAND_MARK = BRAND_DIR / "earthlens-lockup-stacked-overlay-full.png"
 # the plated variant: it carries its own navy scrim, which the transparent one needs over
 # busy imagery -- under the Meteosat mark the background runs mean 99, std 84, p90 254
@@ -26167,7 +25715,7 @@ _array_glyph.get_indices2 = _domain_cell_count</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=16">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=14">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -26175,7 +25723,7 @@ _array_glyph.get_indices2 = _domain_cell_count</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -26215,7 +25763,7 @@ _array_glyph.get_indices2 = _domain_cell_count</div>
 <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 <span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">gif</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-9">dc = DatasetCollection.from_files(
+<div class="clipboard-copy-txt" id="cell-8">dc = DatasetCollection.from_files(
     [str(p) for p in nsper_frames], date_format="%Y%m%d%H%M", date_regex=r"\d{12}"
 )
 labels = [t.strftime("%H:%M UTC") for t in dc.time]
@@ -26250,7 +25798,7 @@ display(Image(filename=gif))</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=17">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=15">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -26264,7 +25812,7 @@ are real, not a crop.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=18">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=16">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -26272,7 +25820,7 @@ are real, not a crop.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-10">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -26312,7 +25860,7 @@ are real, not a crop.</p>
 <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 <span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">gif2</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-10">dc2 = DatasetCollection.from_files(
+<div class="clipboard-copy-txt" id="cell-9">dc2 = DatasetCollection.from_files(
     [str(p) for p in tpers_frames], date_format="%Y%m%d%H%M", date_regex=r"\d{12}"
 )
 labels2 = [t.strftime("%H:%M UTC") for t in dc2.time]
@@ -26347,7 +25895,7 @@ display(Image(filename=gif2))</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=19">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=17">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24288,7 +24288,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'erddap'</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s1">'cwwcNDBCMet'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'station'</span><span class="p">,</span> <span class="s1">'time'</span><span class="p">,</span> <span class="s1">'wtmp'</span><span class="p">],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'station'</span><span class="p">,</span> <span class="s1">'time'</span><span class="p">,</span> <span class="s1">'WTMP'</span><span class="p">],</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2023-01-01'</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s1">'2023-01-01'</span><span class="p">,</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">36.0</span><span class="p">,</span> <span class="mf">38.0</span><span class="p">],</span>
@@ -24308,7 +24308,7 @@ out_dir = Path(tempfile.mkdtemp(prefix='earthlens-erddap-ndbc-'))
 df = EarthLens(
     data_source='erddap',
     dataset='cwwcNDBCMet',
-    variables=['station', 'time', 'wtmp'],
+    variables=['station', 'time', 'WTMP'],
     start='2023-01-01',
     end='2023-01-01',
     lat_lim=[36.0, 38.0],
@@ -24330,7 +24330,7 @@ print('columns:', list(df.columns))</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="peek-at-the-records">Peek at the records<a class="anchor-link" href="#peek-at-the-records">¶</a></h2><p>ERDDAP appends units to the column names (e.g. <code>wtmp (degree_C)</code>).</p>
+<h2 id="peek-at-the-records">Peek at the records<a class="anchor-link" href="#peek-at-the-records">¶</a></h2><p>ERDDAP appends units to the column names (e.g. <code>WTMP (degree_C)</code>).</p>
 </div>
 </div>
 </div>
@@ -24391,7 +24391,7 @@ print('columns:', list(df.columns))</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">wtmp_col</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'wtmp'</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">wtmp_col</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'WTMP'</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">summary</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">wtmp_col</span><span class="p">])</span>
     <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'station'</span><span class="p">)[</span><span class="n">wtmp_col</span><span class="p">]</span>
@@ -24401,7 +24401,7 @@ print('columns:', list(df.columns))</div>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span><span class="si">}</span><span class="s1"> station(s) reported water temperature:'</span><span class="p">)</span>
 <span class="n">summary</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">wtmp_col = [c for c in df.columns if c.startswith('wtmp')][0]
+<div class="clipboard-copy-txt" id="cell-3">wtmp_col = [c for c in df.columns if c.startswith('WTMP')][0]
 summary = (
     df.dropna(subset=[wtmp_col])
     .groupby('station')[wtmp_col]
