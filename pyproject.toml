@@ -153,7 +153,7 @@ dev = [
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-gis[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
-    "cleopatra[tiles] >=0.34.0",
+    "cleopatra[tiles] >=0.35.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     # mypy: the `mypy` pre-commit hook and the lint.yml `static` job type-check src.
@@ -178,7 +178,7 @@ dev = [
     # pulled in here instead -- otherwise the tests that pin its
     # `from_earthengine` signature would skip everywhere and a 0.x contract
     # change would only surface on a live run.
-    "pyramids-eo >=0.2.0,<0.3",
+    "pyramids-eo >=0.5.0,<0.6",
 ]
 # The eclipse showcase notebooks need a heavy geostationary-imagery stack that the
 # rest of the project does not. It is kept out of `dev` deliberately: pulling satpy
@@ -222,7 +222,7 @@ docs = [
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-gis[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
-    "cleopatra[tiles] >=0.34.0",
+    "cleopatra[tiles] >=0.35.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
     # scipy: the satellite showcase blurs the logo's drop shadow with
