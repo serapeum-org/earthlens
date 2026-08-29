@@ -2264,7 +2264,7 @@ dev = [
     { name = "pre-commit", specifier = ">=3.7.1" },
     { name = "pre-commit-hooks", specifier = ">=4.6.0" },
     { name = "pyramids-eo", specifier = ">=0.5.0,<0.6" },
-    { name = "pyramids-gis", extras = ["viz"], specifier = ">=0.54.0" },
+    { name = "pyramids-gis", extras = ["viz"], specifier = ">=0.58.0" },
     { name = "pytest", specifier = ">=8.2.2" },
     { name = "pytest-cov", specifier = ">=5.0.0" },
     { name = "twine", specifier = ">=5.0.0" },
@@ -2284,7 +2284,7 @@ docs = [
     { name = "mkdocs-table-reader-plugin", specifier = ">=3.1.0" },
     { name = "mkdocstrings", specifier = ">=0.24.0" },
     { name = "mkdocstrings-python", specifier = ">=1.7.5" },
-    { name = "pyramids-gis", extras = ["viz"], specifier = ">=0.54.0" },
+    { name = "pyramids-gis", extras = ["viz"], specifier = ">=0.58.0" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "scipy", specifier = ">=1.11" },
 ]
@@ -2415,7 +2415,7 @@ requires-dist = [
     { name = "platformdirs", specifier = ">=3.0.0" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyproj", specifier = ">=3.7.0" },
-    { name = "pyramids-gis", specifier = ">=0.54.0" },
+    { name = "pyramids-gis", specifier = ">=0.58.0" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "requests", specifier = ">=2.28.1" },
@@ -2535,7 +2535,7 @@ requires-dist = [
     { name = "jaxa-earth", marker = "extra == 'jaxa'", specifier = ">=0.1.6,<0.2" },
     { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.52" },
     { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.5.0,<0.6" },
-    { name = "pyramids-gis", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.54.0" },
+    { name = "pyramids-gis", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.58.0" },
     { name = "rtree", marker = "extra == 'gee'", specifier = ">=1.0.0" },
     { name = "sentinelhub", marker = "extra == 'sentinel-hub'", specifier = ">=3.11.5" },
     { name = "urllib3", marker = "extra == 'gee'", specifier = ">=1.26" },
@@ -2610,7 +2610,7 @@ requires-dist = [
     { name = "earthlens-core", extras = ["s3"], marker = "extra == 'nwm'", editable = "libs/core" },
     { name = "erddapy", marker = "extra == 'erddap'", specifier = ">=3.0" },
     { name = "pyobis", marker = "extra == 'obis'", specifier = ">=1.6.1" },
-    { name = "pyramids-gis", extras = ["parquet"], marker = "extra == 'nwm'", specifier = ">=0.54.0" },
+    { name = "pyramids-gis", extras = ["parquet"], marker = "extra == 'nwm'", specifier = ">=0.58.0" },
 ]
 provides-extras = ["argo", "cmems", "erddap", "nwm", "usgs-water", "obis"]
 
