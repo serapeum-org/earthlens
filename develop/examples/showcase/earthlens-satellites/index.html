@@ -24505,10 +24505,7 @@ sees at once.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
@@ -24518,11 +24515,14 @@ sees at once.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.patheffects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pe</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.basemap.tiles</span><span class="w"> </span><span class="kn">import</span> <span class="n">world_texture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.base.animation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gif_from_video</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.globe.textured_globe_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">TexturedGlobeGlyph</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">stamp_mark</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_rgba</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">MPath</span>  <span class="c1"># the glyph path; `Path` is pathlib's</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.mplot3d.art3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Line3DCollection</span><span class="p">,</span> <span class="n">Poly3DCollection</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.ndimage</span><span class="w"> </span><span class="kn">import</span> <span class="n">gaussian_filter</span>
 
 <span class="c1"># Two known-noisy sources, filtered by name rather than by silencing the</span>
 <span class="c1"># kernel: matplotlib re-warns about the 3D axes on every frame, and the tile</span>
@@ -24558,13 +24558,12 @@ sees at once.</p>
 <span class="c1">#: publishes a file named for one basemap containing another's imagery.</span>
 <span class="n">_BASEMAP</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-<span class="c1">#: The spin-independent half of the globe, cached the same way.</span>
-<span class="n">_EARTH_FACE</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="c1">#: One TexturedGlobeGlyph per basemap. The glyph samples the texture onto its</span>
+<span class="c1">#: mesh once and `draw(spin=...)` only rotates it, so the per-frame cost is the</span>
+<span class="c1">#: rotation rather than a million bilinear gathers.</span>
+<span class="n">_GLOBE</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">TexturedGlobeGlyph</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import hashlib
-import os
-import subprocess
-import tempfile
+<div class="clipboard-copy-txt" id="cell-1">import subprocess
 import warnings
 from pathlib import Path
 
@@ -24574,11 +24573,14 @@ import matplotlib.animation as manim
 import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 import numpy as np
+from cleopatra.basemap.tiles import world_texture
+from cleopatra.glyphs.base.animation import gif_from_video
+from cleopatra.glyphs.globe.textured_globe_glyph import TexturedGlobeGlyph
+from cleopatra.styling.watermark import stamp_mark
 from IPython.display import Image, display
 from matplotlib.colors import to_rgba
 from matplotlib.path import Path as MPath  # the glyph path; `Path` is pathlib's
 from mpl_toolkits.mplot3d.art3d import Line3DCollection, Poly3DCollection
-from scipy.ndimage import gaussian_filter
 
 # Two known-noisy sources, filtered by name rather than by silencing the
 # kernel: matplotlib re-warns about the 3D axes on every frame, and the tile
@@ -24614,8 +24616,10 @@ TILT = np.deg2rad(23.44)  # axial tilt
 #: publishes a file named for one basemap containing another's imagery.
 _BASEMAP: dict[tuple, np.ndarray] = {}
 
-#: The spin-independent half of the globe, cached the same way.
-_EARTH_FACE: dict[tuple, tuple] = {}</div>
+#: One TexturedGlobeGlyph per basemap. The glyph samples the texture onto its
+#: mesh once and `draw(spin=...)` only rotates it, so the per-frame cost is the
+#: rotation rather than a million bilinear gathers.
+_GLOBE: dict[str, TexturedGlobeGlyph] = {}</div>
 </div>
 </div>
 </div>
@@ -24766,11 +24770,6 @@ _EARTH_FACE: dict[tuple, tuple] = {}</div>
 <span class="c1">#: is 1024. Ample for the texture below, where 6 would be 4096 for no visible gain.</span>
 <span class="n">BASEMAP_ZOOM</span> <span class="o">=</span> <span class="mi">5</span>
 
-<span class="c1">#: Web Mercator's half-extent in metres and the latitude it stops at. The</span>
-<span class="c1">#: projection never reaches the poles, so the caps repeat the last real row.</span>
-<span class="n">MERC_MAX</span> <span class="o">=</span> <span class="mf">20037508.342789244</span>
-<span class="n">MERC_LAT_MAX</span> <span class="o">=</span> <span class="mf">85.05112877980659</span>
-
 <span class="c1">#: The two tones a `two_tone` basemap is reduced to, and the luminance below</span>
 <span class="c1">#: which a pixel counts as land. DarkMatter draws land darker than water, so the</span>
 <span class="c1">#: test reads inverted from what it looks like it should be.</span>
@@ -24787,10 +24786,11 @@ _EARTH_FACE: dict[tuple, tuple] = {}</div>
 <span class="k">def</span><span class="w"> </span><span class="nf">basemap_texture</span><span class="p">(</span><span class="n">n_lon</span><span class="o">=</span><span class="mi">2880</span><span class="p">,</span> <span class="n">n_lat</span><span class="o">=</span><span class="mi">1440</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""The basemap as an `(n_lat, n_lon, 3)` equirectangular array in 0..1.</span>
 
-<span class="sd">    XYZ tiles arrive in Web Mercator, but a sphere is textured in longitude and</span>
-<span class="sd">    latitude, so the stitched mosaic is resampled onto a lon/lat grid here. The</span>
-<span class="sd">    result is cached under the earthlens cache directory, so the tiles are</span>
-<span class="sd">    fetched once per provider rather than on every run.</span>
+<span class="sd">    `cleopatra.basemap.tiles.world_texture` does the generic half -- fetch the</span>
+<span class="sd">    zoom-level tile grid, stitch it into a Web Mercator mosaic, resample that</span>
+<span class="sd">    onto a lon/lat grid, and cache the result on disk. What stays here is the</span>
+<span class="sd">    part that is about *this* clip: flattening a cartographic basemap onto two</span>
+<span class="sd">    tones, and subtracting an imagery basemap's own colour floor.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n_lon: Width of the returned texture, spanning -180..180 degrees.</span>
@@ -24799,10 +24799,6 @@ _EARTH_FACE: dict[tuple, tuple] = {}</div>
 <span class="sd">    Returns:</span>
 <span class="sd">        numpy.ndarray: The `(n_lat, n_lon, 3)` texture, values in 0..1.</span>
 <span class="sd">    """</span>
-    <span class="c1"># Everything that changes a pixel, in one tuple: it is both the in-session</span>
-    <span class="c1"># memo key and the on-disk cache key. Tuning a constant that is not in here</span>
-    <span class="c1"># would silently serve the texture built before the change -- the failure is</span>
-    <span class="c1"># invisible, and the honest alternative costs a refetch of a thousand tiles.</span>
     <span class="n">settings</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">BASEMAP</span><span class="p">,</span>
         <span class="n">BASEMAP_PROVIDER</span><span class="p">,</span>
@@ -24819,75 +24815,11 @@ _EARTH_FACE: dict[tuple, tuple] = {}</div>
     <span class="k">if</span> <span class="n">settings</span> <span class="ow">in</span> <span class="n">_BASEMAP</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_BASEMAP</span><span class="p">[</span><span class="n">settings</span><span class="p">]</span>
 
-    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache_dir</span>
-
-    <span class="n">cache</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">())</span> <span class="o">/</span> <span class="s2">"basemap-textures"</span>
-    <span class="n">cache</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">blake2s</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">digest_size</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="n">cache</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">BASEMAP_PROVIDER</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span><span class="w"> </span><span class="s1">'_'</span><span class="p">)</span><span class="si">}</span><span class="s2">_z</span><span class="si">{</span><span class="n">BASEMAP_ZOOM</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.npy"</span>
-    <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="n">_BASEMAP</span><span class="p">[</span><span class="n">settings</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">_BASEMAP</span><span class="p">[</span><span class="n">settings</span><span class="p">]</span>
-
-    <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.basemap.tiles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tile</span><span class="p">,</span> <span class="n">fetch_tiles</span><span class="p">,</span> <span class="n">get_provider</span><span class="p">,</span> <span class="n">stitch_tiles</span>
-
-    <span class="n">provider</span> <span class="o">=</span> <span class="n">get_provider</span><span class="p">(</span><span class="n">BASEMAP_PROVIDER</span><span class="p">)</span>
-    <span class="n">side</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">BASEMAP_ZOOM</span>
-    <span class="n">tiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">Tile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">BASEMAP_ZOOM</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">side</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">side</span><span class="p">)]</span>
-    <span class="n">mosaic</span><span class="p">,</span> <span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span><span class="p">)</span> <span class="o">=</span> <span class="n">stitch_tiles</span><span class="p">(</span>
-        <span class="n">fetch_tiles</span><span class="p">(</span><span class="n">tiles</span><span class="p">,</span> <span class="n">provider</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">retries</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
-        <span class="n">tiles</span><span class="p">,</span>
-        <span class="n">BASEMAP_ZOOM</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">mosaic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mosaic</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
-    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">mosaic</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
-
-    <span class="c1"># Every output cell averages the whole contiguous block of source pixels that</span>
-    <span class="c1"># falls inside it, found from the cell's *edges* rather than its centre.</span>
-    <span class="c1">#</span>
-    <span class="c1"># Taking a fixed number of point samples per cell instead was inverted where</span>
-    <span class="c1"># it mattered: Mercator stretches towards the poles, so three samples landed</span>
-    <span class="c1"># on about one source row at the equator (an average of nothing) and skipped</span>
-    <span class="c1"># seven rows out of every eight above 80 degrees, which is precisely where</span>
-    <span class="c1"># the stretch makes aliasing worst. Half the fetched mosaic was never read.</span>
-    <span class="c1">#</span>
-    <span class="c1"># The mosaic's own extent is used, not an assumed full-world one. They agree</span>
-    <span class="c1"># while the tile list is the complete grid -- but a reprojection should read</span>
-    <span class="c1"># its bounds from the thing it is reprojecting.</span>
-    <span class="n">lat_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">90.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="n">n_lat</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="n">MERC_LAT_MAX</span><span class="p">,</span> <span class="n">MERC_LAT_MAX</span>
-    <span class="p">)</span>
-    <span class="n">y_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat_edges</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">MERC_MAX</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
-    <span class="n">row_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">north</span> <span class="o">-</span> <span class="n">y_edges</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">north</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">h</span>
-    <span class="p">)</span>
-    <span class="n">x_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">180.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="n">n_lon</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">180.0</span> <span class="o">*</span> <span class="n">MERC_MAX</span>
-    <span class="n">col_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">x_edges</span> <span class="o">-</span> <span class="n">west</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">east</span> <span class="o">-</span> <span class="n">west</span><span class="p">)</span> <span class="o">*</span> <span class="n">w</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">w</span>
-    <span class="p">)</span>
-
-    <span class="c1"># Where a cell is thinner than one source pixel -- the polar rows, which the</span>
-    <span class="c1"># Mercator clamp collapses onto a single row -- reduceat returns that row on</span>
-    <span class="c1"># its own, which is the right fallback. Dividing by max(width, 1) keeps it.</span>
-    <span class="n">row_start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">row_edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">h</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">col_start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">col_edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">w</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="c1"># float32 divisors: dividing a float32 band by integer counts would promote</span>
-    <span class="c1"># the result to float64, doubling both the resident texture and the cached</span>
-    <span class="c1"># file for precision a 0..1 colour has no use for.</span>
-    <span class="n">row_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">row_edges</span><span class="p">),</span> <span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float32"</span><span class="p">)</span>
-    <span class="n">col_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">col_edges</span><span class="p">),</span> <span class="mi">1</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float32"</span><span class="p">)</span>
-
-    <span class="c1"># One band at a time: the float32 copy of an 8192-square mosaic is 256 MB per</span>
-    <span class="c1"># band, and converting all three at once put three quarters of a gigabyte</span>
-    <span class="c1"># live at the peak for a 47 MB result.</span>
-    <span class="n">bands</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-        <span class="n">band</span> <span class="o">=</span> <span class="n">mosaic</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float32"</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">band</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">1.5</span><span class="p">:</span>
-            <span class="n">band</span> <span class="o">/=</span> <span class="mf">255.0</span>
-        <span class="n">band</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="o">.</span><span class="n">reduceat</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">row_start</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">row_w</span>
-        <span class="n">bands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="o">.</span><span class="n">reduceat</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">col_start</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">col_w</span><span class="p">)</span>
-    <span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">bands</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">world_texture</span><span class="p">(</span><span class="n">BASEMAP_PROVIDER</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="n">BASEMAP_ZOOM</span><span class="p">,</span> <span class="n">n_lon</span><span class="o">=</span><span class="n">n_lon</span><span class="p">,</span> <span class="n">n_lat</span><span class="o">=</span><span class="n">n_lat</span><span class="p">)[</span>
+        <span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">grid</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">1.5</span><span class="p">:</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span> <span class="o">/</span> <span class="mf">255.0</span>
 
     <span class="c1"># DarkMatter paints land near-black and water a lighter grey, the opposite of</span>
     <span class="c1"># how a picture of Earth reads. The tiles are effectively two tones, so they</span>
@@ -24902,119 +24834,47 @@ _EARTH_FACE: dict[tuple, tuple] = {}</div>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">grid</span>
 
+    <span class="c1"># NASA's night lights paint the unlit surface deep blue rather than black, so</span>
+    <span class="c1"># any gain amplifies that into a blue planet. Subtracting each channel's own</span>
+    <span class="c1"># floor puts the background at true black and barely touches the city lights.</span>
     <span class="k">if</span> <span class="n">BASEMAP_BLACK_POINT</span><span class="p">:</span>
-        <span class="n">floor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">BLACK_POINT_PCT</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">-</span> <span class="n">floor</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">BLACK_POINT_PCT</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="n">texture</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-    <span class="c1"># Written aside and renamed, because np.save straight onto the final path</span>
-    <span class="c1"># leaves a truncated array at the exact name the next run trusts if the</span>
-    <span class="c1"># write is interrupted -- and the remedy is knowing to delete a file buried</span>
-    <span class="c1"># in the platform cache directory.</span>
-    <span class="n">tmp</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">".tmp"</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fh</span><span class="p">,</span> <span class="n">texture</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-
+    <span class="n">texture</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float32"</span><span class="p">)</span>
     <span class="n">_BASEMAP</span><span class="p">[</span><span class="n">settings</span><span class="p">]</span> <span class="o">=</span> <span class="n">texture</span>
     <span class="k">return</span> <span class="n">texture</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">sample_texture</span><span class="p">(</span><span class="n">tex</span><span class="p">,</span> <span class="n">lon_g</span><span class="p">,</span> <span class="n">lat_g</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Bilinear sample of an equirectangular texture on a longitude/latitude grid.</span>
-
-<span class="sd">    Nearest-neighbour sampling reads one texel per mesh cell, so at any mesh coarser</span>
-<span class="sd">    than the texture most of the texture is simply skipped and coastlines break into</span>
-<span class="sd">    steps. Interpolating between the four surrounding texels uses the detail that is</span>
-<span class="sd">    there, which is what makes a finer mesh worth paying for.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        tex: `(h, w, 3)` texture in 0..1, spanning -180..180 longitude and 90..-90 latitude.</span>
-<span class="sd">        lon_g: Longitudes to sample, in degrees.</span>
-<span class="sd">        lat_g: Latitudes to sample, in degrees, matching the shape of `lon_g`.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        An `(..., 3)` array of sampled colours in 0..1.</span>
-<span class="sd">    """</span>
-    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">tex</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
-    <span class="n">fx</span> <span class="o">=</span> <span class="p">(</span><span class="n">lon_g</span> <span class="o">+</span> <span class="mf">180.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">360.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">fy</span> <span class="o">=</span> <span class="p">(</span><span class="mf">90.0</span> <span class="o">-</span> <span class="n">lat_g</span><span class="p">)</span> <span class="o">/</span> <span class="mf">180.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">fx</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">fy</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">h</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x0</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">y0</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">h</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">tx</span><span class="p">,</span> <span class="n">ty</span> <span class="o">=</span> <span class="p">(</span><span class="n">fx</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="p">(</span><span class="n">fy</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
-    <span class="n">top</span> <span class="o">=</span> <span class="n">tex</span><span class="p">[</span><span class="n">y0</span><span class="p">,</span> <span class="n">x0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">tx</span><span class="p">)</span> <span class="o">+</span> <span class="n">tex</span><span class="p">[</span><span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">]</span> <span class="o">*</span> <span class="n">tx</span>
-    <span class="n">bot</span> <span class="o">=</span> <span class="n">tex</span><span class="p">[</span><span class="n">y1</span><span class="p">,</span> <span class="n">x0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">tx</span><span class="p">)</span> <span class="o">+</span> <span class="n">tex</span><span class="p">[</span><span class="n">y1</span><span class="p">,</span> <span class="n">x1</span><span class="p">]</span> <span class="o">*</span> <span class="n">tx</span>
-    <span class="k">return</span> <span class="n">top</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">ty</span><span class="p">)</span> <span class="o">+</span> <span class="n">bot</span> <span class="o">*</span> <span class="n">ty</span>
-
-
 <span class="c1">#: How finely the globe is meshed. This is the render's cost driver and it is</span>
-<span class="c1">#: quadratic in the numbers below, so it dominates everything else: at 1920 px</span>
-<span class="c1">#: wide a 1440x720 mesh works out at roughly one screen pixel per cell, which is</span>
-<span class="c1">#: the point past which a finer mesh cannot be seen. It must be defined before</span>
-<span class="c1">#: `textured_earth`, which takes it as a default argument.</span>
+<span class="c1">#: quadratic in the numbers below: at 1920 px wide a 1440x720 mesh works out at</span>
+<span class="c1">#: roughly one screen pixel per cell, which is the point past which a finer mesh</span>
+<span class="c1">#: cannot be seen. The glyph samples the texture onto this mesh once.</span>
 <span class="n">MESH_LON</span><span class="p">,</span> <span class="n">MESH_LAT</span> <span class="o">=</span> <span class="mi">1440</span><span class="p">,</span> <span class="mi">720</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_earth_face</span><span class="p">(</span><span class="n">n_lon</span><span class="p">,</span> <span class="n">n_lat</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""The lon/lat mesh and its lit colours, which are the same in every frame.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">globe_for</span><span class="p">(</span><span class="n">basemap</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The textured-globe glyph for one basemap, built once.</span>
 
-<span class="sd">    Neither the mesh nor the sampled texture depends on `spin` -- rotating the</span>
-<span class="sd">    globe moves where those colours are drawn, not what they are. Sampling is a</span>
-<span class="sd">    million bilinear gathers, so doing it inside the draw loop repeated the</span>
-<span class="sd">    identical work on all 480 frames.</span>
+<span class="sd">    `TexturedGlobeGlyph` samples the texture onto its sphere mesh when it is</span>
+<span class="sd">    constructed, and `draw(spin=...)` re-uses that sampling -- which is why the</span>
+<span class="sd">    glyph is cached per basemap rather than rebuilt per frame.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        n_lon: Mesh columns, spanning -180..180 degrees.</span>
-<span class="sd">        n_lat: Mesh rows, spanning 90..-90 degrees.</span>
+<span class="sd">        basemap: A key of `BASEMAPS`; defaults to the currently selected one.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        tuple: `(lon_grid, lat_grid, face_colours)`, the last already lit and</span>
-<span class="sd">        clipped to 0..1.</span>
+<span class="sd">        cleopatra.glyphs.globe.textured_globe_glyph.TexturedGlobeGlyph: The glyph.</span>
 <span class="sd">    """</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_lon</span><span class="p">,</span> <span class="n">n_lat</span><span class="p">,</span> <span class="n">BASEMAP</span><span class="p">,</span> <span class="n">BRIGHTNESS</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_EARTH_FACE</span><span class="p">:</span>
-        <span class="n">lon_g</span><span class="p">,</span> <span class="n">lat_g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">180.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="n">n_lon</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">90.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="n">n_lat</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">basemap</span> <span class="ow">or</span> <span class="n">BASEMAP</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_GLOBE</span><span class="p">:</span>
+        <span class="n">_GLOBE</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">TexturedGlobeGlyph</span><span class="p">(</span>
+            <span class="n">basemap_texture</span><span class="p">(),</span>
+            <span class="n">tilt_deg</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">TILT</span><span class="p">),</span>
+            <span class="n">n_lon</span><span class="o">=</span><span class="n">MESH_LON</span><span class="p">,</span>
+            <span class="n">n_lat</span><span class="o">=</span><span class="n">MESH_LAT</span><span class="p">,</span>
+            <span class="n">brightness</span><span class="o">=</span><span class="n">BRIGHTNESS</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">rgb</span> <span class="o">=</span> <span class="n">sample_texture</span><span class="p">(</span><span class="n">basemap_texture</span><span class="p">(),</span> <span class="n">lon_g</span><span class="p">,</span> <span class="n">lat_g</span><span class="p">)</span>
-        <span class="c1"># Evenly lit: no light direction, so no terminator and no night side.</span>
-        <span class="c1"># Every longitude reads the same, which keeps a satellite passing over</span>
-        <span class="c1"># the far limb as legible as one crossing the middle.</span>
-        <span class="n">_EARTH_FACE</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lon_g</span><span class="p">,</span> <span class="n">lat_g</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">rgb</span> <span class="o">*</span> <span class="n">BRIGHTNESS</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">_EARTH_FACE</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">textured_earth</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">n_lon</span><span class="o">=</span><span class="n">MESH_LON</span><span class="p">,</span> <span class="n">n_lat</span><span class="o">=</span><span class="n">MESH_LAT</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Earth as an evenly lit, texture-mapped sphere -- real continents, tilted and spun.</span>
-
-<span class="sd">    The mesh is sampled at 1440 x 720 against a 2880 x 1440 basemap. A coarser mesh</span>
-<span class="sd">    was the source of the blockiness: the texture was always this detailed, the</span>
-<span class="sd">    sphere just was not sampling it.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        ax: The 3D axis to draw onto.</span>
-<span class="sd">        spin: Earth's rotation angle for this frame, in radians.</span>
-<span class="sd">        n_lon: Mesh columns spanning -180..180 degrees.</span>
-<span class="sd">        n_lat: Mesh rows spanning 90..-90 degrees.</span>
-<span class="sd">    """</span>
-    <span class="n">lon_g</span><span class="p">,</span> <span class="n">lat_g</span><span class="p">,</span> <span class="n">face</span> <span class="o">=</span> <span class="n">_earth_face</span><span class="p">(</span><span class="n">n_lon</span><span class="p">,</span> <span class="n">n_lat</span><span class="p">)</span>
-    <span class="n">lo</span><span class="p">,</span> <span class="n">la</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lon_g</span><span class="p">)</span> <span class="o">+</span> <span class="n">spin</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat_g</span><span class="p">)</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">la</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lo</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">la</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lo</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">la</span><span class="p">)</span>
-    <span class="n">xr</span><span class="p">,</span> <span class="n">zr</span> <span class="o">=</span> <span class="n">tilt_y</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span>
-        <span class="n">xr</span><span class="p">,</span>
-        <span class="n">y</span><span class="p">,</span>
-        <span class="n">zr</span><span class="p">,</span>
-        <span class="n">facecolors</span><span class="o">=</span><span class="n">face</span><span class="p">,</span>
-        <span class="n">rstride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">cstride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">antialiased</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">shade</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">zorder</span><span class="o">=</span><span class="n">Z_GLOBE</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_GLOBE</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">render_master</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">render</span><span class="p">,</span> <span class="n">n_frames</span><span class="p">,</span> <span class="n">stem</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">bitrate</span><span class="o">=</span><span class="mi">12000</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">160</span><span class="p">):</span>
@@ -25086,11 +24946,6 @@ _EARTH_FACE: dict[tuple, tuple] = {}</div>
     <span class="n">stem</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">master</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">""</span><span class="p">))</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">"-1920"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">web</span><span class="p">,</span> <span class="n">gif</span><span class="p">,</span> <span class="n">webp</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">web_width</span><span class="si">}</span><span class="s2">.mp4"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.gif"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.webp"</span>
 
-    <span class="c1"># The palette is scratch, so it goes to the system temp directory rather</span>
-    <span class="c1"># than beside the published clips: the output directory is tracked, and a</span>
-    <span class="c1"># failed transcode used to strand a stray PNG in it that nothing ignores.</span>
-    <span class="n">palette</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">master</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">_palette.png"</span><span class="p">)</span>
-
     <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="n">exe</span><span class="p">,</span>
@@ -25134,41 +24989,11 @@ _EARTH_FACE: dict[tuple, tuple] = {}</div>
         <span class="p">],</span>
         <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">scale</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"fps=</span><span class="si">{</span><span class="n">gif_fps</span><span class="si">}</span><span class="s2">,scale=</span><span class="si">{</span><span class="n">gif_width</span><span class="si">}</span><span class="s2">:-1:flags=lanczos"</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">exe</span><span class="p">,</span>
-                <span class="s2">"-y"</span><span class="p">,</span>
-                <span class="s2">"-v"</span><span class="p">,</span>
-                <span class="s2">"error"</span><span class="p">,</span>
-                <span class="s2">"-i"</span><span class="p">,</span>
-                <span class="nb">str</span><span class="p">(</span><span class="n">master</span><span class="p">),</span>
-                <span class="s2">"-vf"</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">,palettegen=max_colors=256:stats_mode=full"</span><span class="p">,</span>
-                <span class="n">palette</span><span class="p">,</span>
-            <span class="p">],</span>
-            <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">exe</span><span class="p">,</span>
-                <span class="s2">"-y"</span><span class="p">,</span>
-                <span class="s2">"-v"</span><span class="p">,</span>
-                <span class="s2">"error"</span><span class="p">,</span>
-                <span class="s2">"-i"</span><span class="p">,</span>
-                <span class="nb">str</span><span class="p">(</span><span class="n">master</span><span class="p">),</span>
-                <span class="s2">"-i"</span><span class="p">,</span>
-                <span class="n">palette</span><span class="p">,</span>
-                <span class="s2">"-lavfi"</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2"> [x]; [x][1:v] paletteuse=dither=none:diff_mode=rectangle"</span><span class="p">,</span>
-                <span class="n">gif</span><span class="p">,</span>
-            <span class="p">],</span>
-            <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">finally</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">palette</span><span class="p">):</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">palette</span><span class="p">)</span>
+    <span class="c1"># cleopatra's writer quantises with MAXCOVERAGE over a clip-wide palette,</span>
+    <span class="c1"># which keeps small saturated colours -- the satellites, the swaths, the</span>
+    <span class="c1"># labels -- that median cut spends on the background instead.</span>
+    <span class="n">gif_from_video</span><span class="p">(</span><span class="n">master</span><span class="p">,</span> <span class="n">gif</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="n">gif_fps</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">gif_width</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">web</span><span class="p">,</span> <span class="n">gif</span><span class="p">,</span> <span class="n">webp</span>
 
 
@@ -25344,11 +25169,6 @@ select_basemap(BASEMAP)
 #: is 1024. Ample for the texture below, where 6 would be 4096 for no visible gain.
 BASEMAP_ZOOM = 5
 
-#: Web Mercator's half-extent in metres and the latitude it stops at. The
-#: projection never reaches the poles, so the caps repeat the last real row.
-MERC_MAX = 20037508.342789244
-MERC_LAT_MAX = 85.05112877980659
-
 #: The two tones a `two_tone` basemap is reduced to, and the luminance below
 #: which a pixel counts as land. DarkMatter draws land darker than water, so the
 #: test reads inverted from what it looks like it should be.
@@ -25365,10 +25185,11 @@ BLACK_POINT_PCT = 2.0
 def basemap_texture(n_lon=2880, n_lat=1440):
     """The basemap as an `(n_lat, n_lon, 3)` equirectangular array in 0..1.
 
-    XYZ tiles arrive in Web Mercator, but a sphere is textured in longitude and
-    latitude, so the stitched mosaic is resampled onto a lon/lat grid here. The
-    result is cached under the earthlens cache directory, so the tiles are
-    fetched once per provider rather than on every run.
+    `cleopatra.basemap.tiles.world_texture` does the generic half -- fetch the
+    zoom-level tile grid, stitch it into a Web Mercator mosaic, resample that
+    onto a lon/lat grid, and cache the result on disk. What stays here is the
+    part that is about *this* clip: flattening a cartographic basemap onto two
+    tones, and subtracting an imagery basemap's own colour floor.
 
     Args:
         n_lon: Width of the returned texture, spanning -180..180 degrees.
@@ -25377,10 +25198,6 @@ def basemap_texture(n_lon=2880, n_lat=1440):
     Returns:
         numpy.ndarray: The `(n_lat, n_lon, 3)` texture, values in 0..1.
     """
-    # Everything that changes a pixel, in one tuple: it is both the in-session
-    # memo key and the on-disk cache key. Tuning a constant that is not in here
-    # would silently serve the texture built before the change -- the failure is
-    # invisible, and the honest alternative costs a refetch of a thousand tiles.
     settings = (
         BASEMAP,
         BASEMAP_PROVIDER,
@@ -25397,75 +25214,11 @@ def basemap_texture(n_lon=2880, n_lat=1440):
     if settings in _BASEMAP:
         return _BASEMAP[settings]
 
-    from earthlens.core import cache_dir
-
-    cache = Path(cache_dir()) / "basemap-textures"
-    cache.mkdir(parents=True, exist_ok=True)
-    digest = hashlib.blake2s(repr(settings).encode(), digest_size=8).hexdigest()
-    key = cache / f"{BASEMAP_PROVIDER.replace('.', '_')}_z{BASEMAP_ZOOM}_{digest}.npy"
-    if key.exists():
-        _BASEMAP[settings] = np.load(key)
-        return _BASEMAP[settings]
-
-    from cleopatra.basemap.tiles import Tile, fetch_tiles, get_provider, stitch_tiles
-
-    provider = get_provider(BASEMAP_PROVIDER)
-    side = 2**BASEMAP_ZOOM
-    tiles = [Tile(x, y, BASEMAP_ZOOM) for x in range(side) for y in range(side)]
-    mosaic, (west, south, east, north) = stitch_tiles(
-        fetch_tiles(tiles, provider, max_workers=8, timeout=20, retries=3),
-        tiles,
-        BASEMAP_ZOOM,
-    )
-    mosaic = np.asarray(mosaic)[..., :3]
-    h, w = mosaic.shape[:2]
-
-    # Every output cell averages the whole contiguous block of source pixels that
-    # falls inside it, found from the cell's *edges* rather than its centre.
-    #
-    # Taking a fixed number of point samples per cell instead was inverted where
-    # it mattered: Mercator stretches towards the poles, so three samples landed
-    # on about one source row at the equator (an average of nothing) and skipped
-    # seven rows out of every eight above 80 degrees, which is precisely where
-    # the stretch makes aliasing worst. Half the fetched mosaic was never read.
-    #
-    # The mosaic's own extent is used, not an assumed full-world one. They agree
-    # while the tile list is the complete grid -- but a reprojection should read
-    # its bounds from the thing it is reprojecting.
-    lat_edges = np.clip(
-        np.linspace(90.0, -90.0, n_lat + 1), -MERC_LAT_MAX, MERC_LAT_MAX
-    )
-    y_edges = np.log(np.tan(np.pi / 4 + np.deg2rad(lat_edges) / 2)) * MERC_MAX / np.pi
-    row_edges = np.clip(
-        np.round((north - y_edges) / (north - south) * h).astype(int), 0, h
-    )
-    x_edges = np.linspace(-180.0, 180.0, n_lon + 1) / 180.0 * MERC_MAX
-    col_edges = np.clip(
-        np.round((x_edges - west) / (east - west) * w).astype(int), 0, w
-    )
-
-    # Where a cell is thinner than one source pixel -- the polar rows, which the
-    # Mercator clamp collapses onto a single row -- reduceat returns that row on
-    # its own, which is the right fallback. Dividing by max(width, 1) keeps it.
-    row_start = np.minimum(row_edges[:-1], h - 1)
-    col_start = np.minimum(col_edges[:-1], w - 1)
-    # float32 divisors: dividing a float32 band by integer counts would promote
-    # the result to float64, doubling both the resident texture and the cached
-    # file for precision a 0..1 colour has no use for.
-    row_w = np.maximum(np.diff(row_edges), 1)[:, None].astype("float32")
-    col_w = np.maximum(np.diff(col_edges), 1)[None, :].astype("float32")
-
-    # One band at a time: the float32 copy of an 8192-square mosaic is 256 MB per
-    # band, and converting all three at once put three quarters of a gigabyte
-    # live at the peak for a 47 MB result.
-    bands = []
-    for b in range(3):
-        band = mosaic[..., b].astype("float32")
-        if band.max() &gt; 1.5:
-            band /= 255.0
-        band = np.add.reduceat(band, row_start, axis=0) / row_w
-        bands.append(np.add.reduceat(band, col_start, axis=1) / col_w)
-    grid = np.stack(bands, axis=-1)
+    grid = world_texture(BASEMAP_PROVIDER, zoom=BASEMAP_ZOOM, n_lon=n_lon, n_lat=n_lat)[
+        ..., :3
+    ]
+    if grid.max() &gt; 1.5:
+        grid = grid / 255.0
 
     # DarkMatter paints land near-black and water a lighter grey, the opposite of
     # how a picture of Earth reads. The tiles are effectively two tones, so they
@@ -25480,119 +25233,47 @@ def basemap_texture(n_lon=2880, n_lat=1440):
     else:
         out = grid
 
+    # NASA's night lights paint the unlit surface deep blue rather than black, so
+    # any gain amplifies that into a blue planet. Subtracting each channel's own
+    # floor puts the background at true black and barely touches the city lights.
     if BASEMAP_BLACK_POINT:
-        floor = np.percentile(out.reshape(-1, 3), BLACK_POINT_PCT, axis=0)
-        out = out - floor
+        out = out - np.percentile(out.reshape(-1, 3), BLACK_POINT_PCT, axis=0)
 
-    texture = np.clip(out, 0, 1)
-
-    # Written aside and renamed, because np.save straight onto the final path
-    # leaves a truncated array at the exact name the next run trusts if the
-    # write is interrupted -- and the remedy is knowing to delete a file buried
-    # in the platform cache directory.
-    tmp = key.with_name(key.name + ".tmp")
-    with open(tmp, "wb") as fh:
-        np.save(fh, texture)
-    os.replace(tmp, key)
-
+    texture = np.clip(out, 0, 1).astype("float32")
     _BASEMAP[settings] = texture
     return texture
 
 
-def sample_texture(tex, lon_g, lat_g):
-    """Bilinear sample of an equirectangular texture on a longitude/latitude grid.
-
-    Nearest-neighbour sampling reads one texel per mesh cell, so at any mesh coarser
-    than the texture most of the texture is simply skipped and coastlines break into
-    steps. Interpolating between the four surrounding texels uses the detail that is
-    there, which is what makes a finer mesh worth paying for.
-
-    Args:
-        tex: `(h, w, 3)` texture in 0..1, spanning -180..180 longitude and 90..-90 latitude.
-        lon_g: Longitudes to sample, in degrees.
-        lat_g: Latitudes to sample, in degrees, matching the shape of `lon_g`.
-
-    Returns:
-        An `(..., 3)` array of sampled colours in 0..1.
-    """
-    h, w = tex.shape[:2]
-    fx = (lon_g + 180.0) / 360.0 * (w - 1)
-    fy = (90.0 - lat_g) / 180.0 * (h - 1)
-    x0 = np.clip(np.floor(fx).astype(int), 0, w - 1)
-    y0 = np.clip(np.floor(fy).astype(int), 0, h - 1)
-    x1, y1 = np.clip(x0 + 1, 0, w - 1), np.clip(y0 + 1, 0, h - 1)
-    tx, ty = (fx - x0)[..., None], (fy - y0)[..., None]
-    top = tex[y0, x0] * (1 - tx) + tex[y0, x1] * tx
-    bot = tex[y1, x0] * (1 - tx) + tex[y1, x1] * tx
-    return top * (1 - ty) + bot * ty
-
-
 #: How finely the globe is meshed. This is the render's cost driver and it is
-#: quadratic in the numbers below, so it dominates everything else: at 1920 px
-#: wide a 1440x720 mesh works out at roughly one screen pixel per cell, which is
-#: the point past which a finer mesh cannot be seen. It must be defined before
-#: `textured_earth`, which takes it as a default argument.
+#: quadratic in the numbers below: at 1920 px wide a 1440x720 mesh works out at
+#: roughly one screen pixel per cell, which is the point past which a finer mesh
+#: cannot be seen. The glyph samples the texture onto this mesh once.
 MESH_LON, MESH_LAT = 1440, 720
 
 
-def _earth_face(n_lon, n_lat):
-    """The lon/lat mesh and its lit colours, which are the same in every frame.
+def globe_for(basemap=None):
+    """The textured-globe glyph for one basemap, built once.
 
-    Neither the mesh nor the sampled texture depends on `spin` -- rotating the
-    globe moves where those colours are drawn, not what they are. Sampling is a
-    million bilinear gathers, so doing it inside the draw loop repeated the
-    identical work on all 480 frames.
+    `TexturedGlobeGlyph` samples the texture onto its sphere mesh when it is
+    constructed, and `draw(spin=...)` re-uses that sampling -- which is why the
+    glyph is cached per basemap rather than rebuilt per frame.
 
     Args:
-        n_lon: Mesh columns, spanning -180..180 degrees.
-        n_lat: Mesh rows, spanning 90..-90 degrees.
+        basemap: A key of `BASEMAPS`; defaults to the currently selected one.
 
     Returns:
-        tuple: `(lon_grid, lat_grid, face_colours)`, the last already lit and
-        clipped to 0..1.
+        cleopatra.glyphs.globe.textured_globe_glyph.TexturedGlobeGlyph: The glyph.
     """
-    key = (n_lon, n_lat, BASEMAP, BRIGHTNESS)
-    if key not in _EARTH_FACE:
-        lon_g, lat_g = np.meshgrid(
-            np.linspace(-180.0, 180.0, n_lon), np.linspace(90.0, -90.0, n_lat)
+    name = basemap or BASEMAP
+    if name not in _GLOBE:
+        _GLOBE[name] = TexturedGlobeGlyph(
+            basemap_texture(),
+            tilt_deg=np.rad2deg(TILT),
+            n_lon=MESH_LON,
+            n_lat=MESH_LAT,
+            brightness=BRIGHTNESS,
         )
-        rgb = sample_texture(basemap_texture(), lon_g, lat_g)
-        # Evenly lit: no light direction, so no terminator and no night side.
-        # Every longitude reads the same, which keeps a satellite passing over
-        # the far limb as legible as one crossing the middle.
-        _EARTH_FACE[key] = (lon_g, lat_g, np.clip(rgb * BRIGHTNESS, 0, 1))
-    return _EARTH_FACE[key]
-
-
-def textured_earth(ax, spin, n_lon=MESH_LON, n_lat=MESH_LAT):
-    """Earth as an evenly lit, texture-mapped sphere -- real continents, tilted and spun.
-
-    The mesh is sampled at 1440 x 720 against a 2880 x 1440 basemap. A coarser mesh
-    was the source of the blockiness: the texture was always this detailed, the
-    sphere just was not sampling it.
-
-    Args:
-        ax: The 3D axis to draw onto.
-        spin: Earth's rotation angle for this frame, in radians.
-        n_lon: Mesh columns spanning -180..180 degrees.
-        n_lat: Mesh rows spanning 90..-90 degrees.
-    """
-    lon_g, lat_g, face = _earth_face(n_lon, n_lat)
-    lo, la = np.deg2rad(lon_g) + spin, np.deg2rad(lat_g)
-    x, y, z = np.cos(la) * np.cos(lo), np.cos(la) * np.sin(lo), np.sin(la)
-    xr, zr = tilt_y(x, z)
-    ax.plot_surface(
-        xr,
-        y,
-        zr,
-        facecolors=face,
-        rstride=1,
-        cstride=1,
-        linewidth=0,
-        antialiased=False,
-        shade=False,
-        zorder=Z_GLOBE,
-    )
+    return _GLOBE[name]
 
 
 def render_master(fig, render, n_frames, stem, fps=24, bitrate=12000, dpi=160):
@@ -25664,11 +25345,6 @@ def publish_clip(
     stem = str(master.with_suffix("")).rsplit("-1920", 1)[0]
     web, gif, webp = f"{stem}-{web_width}.mp4", f"{stem}.gif", f"{stem}.webp"
 
-    # The palette is scratch, so it goes to the system temp directory rather
-    # than beside the published clips: the output directory is tracked, and a
-    # failed transcode used to strand a stray PNG in it that nothing ignores.
-    palette = os.path.join(tempfile.gettempdir(), f"{master.stem}_palette.png")
-
     subprocess.run(
         [
             exe,
@@ -25712,41 +25388,11 @@ def publish_clip(
         ],
         check=True,
     )
-    scale = f"fps={gif_fps},scale={gif_width}:-1:flags=lanczos"
-    try:
-        subprocess.run(
-            [
-                exe,
-                "-y",
-                "-v",
-                "error",
-                "-i",
-                str(master),
-                "-vf",
-                f"{scale},palettegen=max_colors=256:stats_mode=full",
-                palette,
-            ],
-            check=True,
-        )
-        subprocess.run(
-            [
-                exe,
-                "-y",
-                "-v",
-                "error",
-                "-i",
-                str(master),
-                "-i",
-                palette,
-                "-lavfi",
-                f"{scale} [x]; [x][1:v] paletteuse=dither=none:diff_mode=rectangle",
-                gif,
-            ],
-            check=True,
-        )
-    finally:
-        if os.path.exists(palette):
-            os.remove(palette)
+    # cleopatra's writer quantises with MAXCOVERAGE over a clip-wide palette,
+    # which keeps small saturated colours -- the satellites, the swaths, the
+    # labels -- that median cut spends on the background instead.
+    gif_from_video(master, gif, fps=gif_fps, width=gif_width)
+
     return web, gif, webp
 
 
@@ -26488,7 +26134,7 @@ def orbit_ring(track, n=240):
 <span class="n">BRAND_MARK</span> <span class="o">=</span> <span class="n">BRAND_DIR</span> <span class="o">/</span> <span class="s2">"earthlens-lockup-stacked-overlay-full-transparent.png"</span>
 <span class="c1"># the transparent variant: this clip is black under the mark (mean luminance 0.8), so the</span>
 <span class="c1"># shadow alone separates it and no plate is needed -- a plate would read as a box on black</span>
-<span class="n">LOGO_FRAC</span> <span class="o">=</span> <span class="mf">0.11</span>  <span class="c1"># of figure width. The geostationary ring sweeps into both</span>
+<span class="n">LOGO_FRAC</span> <span class="o">=</span> <span class="mf">0.18</span>  <span class="c1"># of figure width. The geostationary ring sweeps into both</span>
 <span class="c1"># bottom corners as it turns and grazes the mark at this size -- about 2% of the</span>
 <span class="c1"># mark's box -- but what crosses is one thin orbit line drawn at alpha 0.05-0.25,</span>
 <span class="c1"># passing behind an opaque logo. Sizing down to clear it entirely put the</span>
@@ -26496,141 +26142,19 @@ def orbit_ring(track, n=240):
 <span class="c1"># be reposted without any surrounding attribution, and too small to read there.</span>
 <span class="n">LOGO_MARGIN_Y</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># of figure height -- tucked low, clear of the orbit rings</span>
 <span class="n">LOGO_MARGIN</span> <span class="o">=</span> <span class="mf">0.025</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_mark_with_shadow</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">blur</span><span class="o">=</span><span class="mf">0.065</span><span class="p">,</span> <span class="n">strength</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""The mark pre-composited over a blurred dark copy of itself.</span>
-
-<span class="sd">    A shadow rather than a panel: the mark keeps its transparent background, but the dark halo</span>
-<span class="sd">    gives the near-white wordmark something to sit against. Over sunlit cloud the bare mark</span>
-<span class="sd">    measures ~1 contrast, which is invisible.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        path: Path to the RGBA lockup.</span>
-<span class="sd">        blur: Shadow blur radius, as a fraction of mark width.</span>
-<span class="sd">        strength: Shadow opacity, 0..1.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        tuple: `(rgba, grow)` -- the composited image and how much wider it is than the mark,</span>
-<span class="sd">            so the caller can size the axes by the mark rather than by the padded canvas.</span>
-<span class="sd">    """</span>
-    <span class="n">mark</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">mark</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># no alpha: treat black as transparent</span>
-        <span class="n">mark</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">mark</span><span class="p">,</span> <span class="n">mark</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)])</span>
-    <span class="c1"># Both the padding and the blur are fractions of the *mark*, measured before</span>
-    <span class="c1"># the padding is added. Taking sigma from mark.shape[1] afterwards made the</span>
-    <span class="c1"># effective blur 1.3x the number passed in, and left the pad at 2.3 sigma,</span>
-    <span class="c1"># clipping the shadow's tail. The default is raised to match the sigma the</span>
-    <span class="c1"># mark was tuned against, so it looks the same and now means what it says.</span>
-    <span class="n">width</span> <span class="o">=</span> <span class="n">mark</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">pad</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">width</span> <span class="o">*</span> <span class="n">blur</span> <span class="o">*</span> <span class="mi">3</span><span class="p">))</span>
-    <span class="n">mark</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">mark</span><span class="p">,</span> <span class="p">((</span><span class="n">pad</span><span class="p">,</span> <span class="n">pad</span><span class="p">),</span> <span class="p">(</span><span class="n">pad</span><span class="p">,</span> <span class="n">pad</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
-    <span class="n">shade</span> <span class="o">=</span> <span class="n">gaussian_filter</span><span class="p">(</span><span class="n">mark</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">sigma</span><span class="o">=</span><span class="n">width</span> <span class="o">*</span> <span class="n">blur</span><span class="p">)</span> <span class="o">*</span> <span class="n">strength</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">mark</span><span class="p">)</span>
-    <span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">mark</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">shade</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">mark</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-    <span class="n">share</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">mark</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="mf">1e-6</span><span class="p">))</span>
-    <span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">mark</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">share</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>  <span class="c1"># shadow contributes black</span>
-    <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">mark</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">width</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">stamp_logo</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="n">LOGO_MARGIN</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Draw the earthlens mark in the figure's bottom-right corner.</span>
-
-<span class="sd">    Sized as a fraction of the figure, not in pixels, because the MP4 and the GIF are saved</span>
-<span class="sd">    from the same figure at different dpi -- a pixel size would come out inconsistent.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        fig: The figure to stamp. The mark is added as its own axes, so it sits</span>
-<span class="sd">            above everything already drawn.</span>
-<span class="sd">        frac: Mark width as a fraction of figure width.</span>
-<span class="sd">        margin: Gap from the figure edge, as a fraction of figure width.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        matplotlib.axes.Axes: The inset axes holding the mark.</span>
-<span class="sd">    """</span>
-    <span class="n">rgba</span><span class="p">,</span> <span class="n">grow</span> <span class="o">=</span> <span class="n">_mark_with_shadow</span><span class="p">(</span><span class="n">BRAND_MARK</span><span class="p">)</span>
-    <span class="n">fig_w</span><span class="p">,</span> <span class="n">fig_h</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_size_inches</span><span class="p">()</span>
-    <span class="n">width</span> <span class="o">=</span> <span class="n">frac</span> <span class="o">*</span> <span class="n">grow</span>
-    <span class="n">height</span> <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="p">(</span><span class="n">rgba</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">rgba</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">fig_w</span> <span class="o">/</span> <span class="n">fig_h</span><span class="p">)</span>
-    <span class="n">inset</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">margin</span> <span class="o">-</span> <span class="n">width</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">],</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
-    <span class="n">inset</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-    <span class="n">inset</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">set_alpha</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
-    <span class="n">inset</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rgba</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">"antialiased"</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">inset</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">BRAND_DIR = Path("../../_images/branding/earthlens-brand-kit/logo")
 BRAND_MARK = BRAND_DIR / "earthlens-lockup-stacked-overlay-full-transparent.png"
 # the transparent variant: this clip is black under the mark (mean luminance 0.8), so the
 # shadow alone separates it and no plate is needed -- a plate would read as a box on black
-LOGO_FRAC = 0.11  # of figure width. The geostationary ring sweeps into both
+LOGO_FRAC = 0.18  # of figure width. The geostationary ring sweeps into both
 # bottom corners as it turns and grazes the mark at this size -- about 2% of the
 # mark's box -- but what crosses is one thin orbit line drawn at alpha 0.05-0.25,
 # passing behind an opaque logo. Sizing down to clear it entirely put the
 # wordmark at roughly 50 px in the 720-wide gif, which is the copy most likely to
 # be reposted without any surrounding attribution, and too small to read there.
 LOGO_MARGIN_Y = 0.0  # of figure height -- tucked low, clear of the orbit rings
-LOGO_MARGIN = 0.025
-
-
-def _mark_with_shadow(path, blur=0.065, strength=0.9):
-    """The mark pre-composited over a blurred dark copy of itself.
-
-    A shadow rather than a panel: the mark keeps its transparent background, but the dark halo
-    gives the near-white wordmark something to sit against. Over sunlit cloud the bare mark
-    measures ~1 contrast, which is invisible.
-
-    Args:
-        path: Path to the RGBA lockup.
-        blur: Shadow blur radius, as a fraction of mark width.
-        strength: Shadow opacity, 0..1.
-
-    Returns:
-        tuple: `(rgba, grow)` -- the composited image and how much wider it is than the mark,
-            so the caller can size the axes by the mark rather than by the padded canvas.
-    """
-    mark = plt.imread(path)
-    if mark.shape[2] == 3:  # no alpha: treat black as transparent
-        mark = np.dstack([mark, mark.max(axis=2)])
-    # Both the padding and the blur are fractions of the *mark*, measured before
-    # the padding is added. Taking sigma from mark.shape[1] afterwards made the
-    # effective blur 1.3x the number passed in, and left the pad at 2.3 sigma,
-    # clipping the shadow's tail. The default is raised to match the sigma the
-    # mark was tuned against, so it looks the same and now means what it says.
-    width = mark.shape[1]
-    pad = int(round(width * blur * 3))
-    mark = np.pad(mark, ((pad, pad), (pad, pad), (0, 0)))
-    shade = gaussian_filter(mark[..., 3], sigma=width * blur) * strength
-    out = np.zeros_like(mark)
-    out[..., 3] = np.clip(mark[..., 3] + shade * (1.0 - mark[..., 3]), 0.0, 1.0)
-    share = np.divide(mark[..., 3], np.maximum(out[..., 3], 1e-6))
-    out[..., :3] = mark[..., :3] * share[..., None]  # shadow contributes black
-    return out, mark.shape[1] / width
-
-
-def stamp_logo(fig, frac=LOGO_FRAC, margin=LOGO_MARGIN):
-    """Draw the earthlens mark in the figure's bottom-right corner.
-
-    Sized as a fraction of the figure, not in pixels, because the MP4 and the GIF are saved
-    from the same figure at different dpi -- a pixel size would come out inconsistent.
-
-    Args:
-        fig: The figure to stamp. The mark is added as its own axes, so it sits
-            above everything already drawn.
-        frac: Mark width as a fraction of figure width.
-        margin: Gap from the figure edge, as a fraction of figure width.
-
-    Returns:
-        matplotlib.axes.Axes: The inset axes holding the mark.
-    """
-    rgba, grow = _mark_with_shadow(BRAND_MARK)
-    fig_w, fig_h = fig.get_size_inches()
-    width = frac * grow
-    height = width * (rgba.shape[0] / rgba.shape[1]) * (fig_w / fig_h)
-    inset = fig.add_axes([1.0 - margin - width, LOGO_MARGIN_Y, width, height], zorder=6)
-    inset.set_axis_off()
-    inset.patch.set_alpha(0.0)
-    inset.imshow(rgba, interpolation="antialiased")
-    return inset</div>
+LOGO_MARGIN = 0.025</div>
 </div>
 </div>
 </div>
@@ -26971,7 +26495,24 @@ def stamp_logo(fig, frac=LOGO_FRAC, margin=LOGO_MARGIN):
     <span class="n">t_hours</span> <span class="o">=</span> <span class="n">HOURS</span> <span class="o">*</span> <span class="n">i</span> <span class="o">/</span> <span class="p">(</span><span class="n">N_FRAMES</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">spin</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">t_hours</span> <span class="o">/</span> <span class="mf">23.9344696</span>  <span class="c1"># one sidereal day</span>
 
-    <span class="n">textured_earth</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spin</span><span class="p">)</span>
+    <span class="n">globe</span> <span class="o">=</span> <span class="n">globe_for</span><span class="p">()</span>
+    <span class="n">globe</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spin</span><span class="o">=</span><span class="n">spin</span><span class="p">)</span>
+    <span class="c1"># draw() unconditionally resets the axes to its own unit-sphere framing --</span>
+    <span class="c1"># set_box_aspect((1, 1, 1)) and xlim/ylim/zlim to (-1, 1) -- and to its own</span>
+    <span class="c1"># elev/azim defaults, clobbering the wide scene box and camera angle set</span>
+    <span class="c1"># above. Confirmed by rendering: without this, every layer after the globe</span>
+    <span class="c1"># is drawn inside a (-1, 1) window instead of the intended +-LIM one, so</span>
+    <span class="c1"># the whole composition renders zoomed into the globe with the clock label</span>
+    <span class="c1"># clipped at the frame edge. Reasserted every frame, right after the call</span>
+    <span class="c1"># that clobbers them.</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="n">LIM</span><span class="p">,</span> <span class="n">LIM</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="n">LIM</span><span class="p">,</span> <span class="n">LIM</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="o">-</span><span class="n">LIM</span> <span class="o">*</span> <span class="mf">0.62</span><span class="p">,</span> <span class="n">LIM</span> <span class="o">*</span> <span class="mf">0.62</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_box_aspect</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.62</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="n">elev</span><span class="o">=</span><span class="n">ELEV</span><span class="p">,</span> <span class="n">azim</span><span class="o">=</span><span class="n">AZIM</span><span class="p">)</span>
+    <span class="c1"># The glyph does not take a zorder, and matplotlib's own 3D sorting is off</span>
+    <span class="c1"># here, so the surface is placed on the ladder after it is drawn.</span>
+    <span class="n">globe</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">set_zorder</span><span class="p">(</span><span class="n">Z_GLOBE</span><span class="p">)</span>
 
     <span class="c1"># The orbit paths, faded continuously by depth so the far side of each ring</span>
     <span class="c1"># recedes instead of competing with the near side. 34 rings at similar radii</span>
@@ -27124,7 +26665,7 @@ def stamp_logo(fig, frac=LOGO_FRAC, margin=LOGO_MARGIN):
     <span class="k">return</span> <span class="p">()</span>
 
 
-<span class="n">stamp_logo</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+<span class="n">stamp_mark</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">BRAND_MARK</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="n">LOGO_MARGIN</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">))</span>
 <span class="n">draw_frame</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">fig</span>
 </pre></div>
@@ -27444,7 +26985,24 @@ def draw_frame(i):
     t_hours = HOURS * i / (N_FRAMES - 1)
     spin = 2 * np.pi * t_hours / 23.9344696  # one sidereal day
 
-    textured_earth(ax, spin)
+    globe = globe_for()
+    globe.draw(ax, spin=spin)
+    # draw() unconditionally resets the axes to its own unit-sphere framing --
+    # set_box_aspect((1, 1, 1)) and xlim/ylim/zlim to (-1, 1) -- and to its own
+    # elev/azim defaults, clobbering the wide scene box and camera angle set
+    # above. Confirmed by rendering: without this, every layer after the globe
+    # is drawn inside a (-1, 1) window instead of the intended +-LIM one, so
+    # the whole composition renders zoomed into the globe with the clock label
+    # clipped at the frame edge. Reasserted every frame, right after the call
+    # that clobbers them.
+    ax.set_xlim(-LIM, LIM)
+    ax.set_ylim(-LIM, LIM)
+    ax.set_zlim(-LIM * 0.62, LIM * 0.62)
+    ax.set_box_aspect((1, 1, 0.62))
+    ax.view_init(elev=ELEV, azim=AZIM)
+    # The glyph does not take a zorder, and matplotlib's own 3D sorting is off
+    # here, so the surface is placed on the ladder after it is drawn.
+    globe.surface.set_zorder(Z_GLOBE)
 
     # The orbit paths, faded continuously by depth so the far side of each ring
     # recedes instead of competing with the near side. 34 rings at similar radii
@@ -27597,7 +27155,7 @@ def draw_frame(i):
     return ()
 
 
-stamp_logo(fig)
+stamp_mark(fig, BRAND_MARK, frac=LOGO_FRAC, margin=(LOGO_MARGIN, LOGO_MARGIN_Y))
 draw_frame(0)
 fig</div>
 </div>
