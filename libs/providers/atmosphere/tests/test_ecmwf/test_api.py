@@ -18,7 +18,9 @@ import pandas as pd
 import pytest
 from pydantic import ValidationError
 
+from earthlens.core import EarthLens
 from earthlens.ecmwf import ECMWF, Variable
+from earthlens.ecmwf import backend as ecmwf_backend
 from earthlens.ecmwf import constraints as constraints_module
 
 from ._fakes import captured_request
@@ -691,6 +693,34 @@ class TestBuildRequest:
         )
 
 
+class TestNormalizePressureLevel:
+    """Normalization of the `pressure_level=` override."""
+
+    @pytest.mark.parametrize(
+        ("given", "expected"),
+        [
+            (None, None),
+            ("500", ["500"]),
+            (["500", "850"], ["500", "850"]),
+            ([500, 850], ["500", "850"]),
+            ((500,), ["500"]),
+        ],
+        ids=["none", "bare-string", "strings", "integers", "tuple"],
+    )
+    def test_it_renders_levels_as_a_list_of_strings(self, given, expected):
+        """hPa reads as a number, so `[500]` is the natural thing to write."""
+        result = ecmwf_backend._normalize_pressure_level(given)
+        assert result == expected, f"Expected {expected!r}, got {result!r}"
+
+    def test_no_levels_at_all_is_refused(self):
+        """`pressure_level: []` is not a valid request, and None means decline."""
+        with pytest.raises(ValueError, match="no levels") as exc_info:
+            ecmwf_backend._normalize_pressure_level([])
+        assert "pass None" in str(exc_info.value), (
+            f"the error should name the way to decline; got: {exc_info.value}"
+        )
+
+
 class TestPressureLevelKwarg:
     """The `pressure_level=` retrieval override (#42)."""
 
@@ -718,3 +748,49 @@ class TestPressureLevelKwarg:
             path="out",
         )
         assert backend.pressure_level is None
+
+    def test_an_empty_list_is_refused_at_construction(self):
+        """Better to say so than to send `pressure_level: []` to the store."""
+        with pytest.raises(ValueError, match="no levels"):
+            ECMWF(
+                start="2020-01-01",
+                end="2020-01-02",
+                variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+                lat_lim=[0.0, 1.0],
+                lon_lim=[0.0, 1.0],
+                path="out",
+                pressure_level=[],
+            )
+
+    def test_it_reaches_the_backend_through_the_facade(self):
+        """The facade forwards an unknown keyword, so no core change was needed."""
+        lens = EarthLens(
+            data_source="ecmwf",
+            start="2020-01-01",
+            end="2020-01-02",
+            variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path="out",
+            pressure_level=["300"],
+        )
+        assert lens.pressure_level == ["300"], (
+            f"the facade should forward the override; got {lens.pressure_level!r}"
+        )
+
+    def test_a_misspelled_kwarg_still_earns_its_hint(self):
+        """The facade validates against the signature, so the typo hint must survive."""
+        with pytest.raises(TypeError, match="pressure_level") as exc_info:
+            EarthLens(
+                data_source="ecmwf",
+                start="2020-01-01",
+                end="2020-01-02",
+                variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+                lat_lim=[0.0, 1.0],
+                lon_lim=[0.0, 1.0],
+                path="out",
+                presure_level=["300"],
+            )
+        assert "Did you mean" in str(exc_info.value), (
+            f"the hint is what makes the typo recoverable; got: {exc_info.value}"
+        )

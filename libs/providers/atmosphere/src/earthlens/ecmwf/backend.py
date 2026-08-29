@@ -496,6 +496,41 @@ def _apply_extras_and_strips(request: dict[str, Any], var_info: Variable) -> Non
             request.pop(key, None)
 
 
+def _normalize_pressure_level(
+    pressure_level: list[str] | str | None,
+) -> list[str] | None:
+    """Normalize the `pressure_level=` override to a list of strings.
+
+    CDS spells a level as a string, but hPa reads as a number, so
+    `pressure_level=[500]` is the natural thing to write and would otherwise
+    reach the store as an integer. Each level is rendered rather than required
+    to arrive pre-stringified, and a bare value is wrapped so the single-level
+    case needs no brackets.
+
+    Args:
+        pressure_level: Levels to request, a single level, or None.
+
+    Returns:
+        The levels as a list of strings, or None to keep each row's own level.
+
+    Raises:
+        ValueError: If an empty sequence is given. `pressure_level: []` is not
+            a valid request and asking for no levels is not what any caller
+            means; `None` is how a caller declines to override.
+    """
+    if pressure_level is None:
+        return None
+    if isinstance(pressure_level, str):
+        return [pressure_level]
+    levels = [str(level) for level in pressure_level]
+    if not levels:
+        raise ValueError(
+            "pressure_level= was given no levels; pass None to keep each "
+            "catalog row's own level, or name at least one level to request."
+        )
+    return levels
+
+
 class ECMWF(LazyClientMixin, AbstractDataSource):
     """ECMWF / Copernicus Climate Data Store backend.
 
@@ -605,8 +640,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # rows carry the single level each was audited at, so without this a
         # different level means editing the shipped YAML or building a
         # `Variable` by hand and bypassing the facade.
-        self.pressure_level: list[str] | None = (
-            [pressure_level] if isinstance(pressure_level, str) else pressure_level
+        self.pressure_level: list[str] | None = _normalize_pressure_level(
+            pressure_level
         )
         # Raw-request passthrough (the coverage lever): when `request=` is
         # given, skip the typed catalog / date / grid machinery and forward
@@ -1548,7 +1583,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
            and omits `day` (CDS monthly-means datasets reject
            `day`).
         3. Pressure-level forward — `cds_pressure_level` becomes
-           `pressure_level` on the request.
+           `pressure_level` on the request, unless the retrieval set
+           `pressure_level=`, which replaces it. A row the catalog gives
+           no level keeps none either way.
         4. `var_info.extras` merge — per-row catalog overrides win
            over the template defaults.
         5. `request_kind` strip — drop template-default keys the
