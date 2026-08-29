@@ -37,6 +37,7 @@ from __future__ import annotations
 import os
 import shutil
 import zipfile
+from collections.abc import Mapping, Sequence
 from functools import partial
 from pathlib import Path
 from typing import Any
@@ -496,16 +497,33 @@ def _apply_extras_and_strips(request: dict[str, Any], var_info: Variable) -> Non
             request.pop(key, None)
 
 
+def _render_level(level: str | int | float) -> str:
+    """Render one pressure level the way CDS spells it.
+
+    A whole number written as a float — `500.0`, which is what arithmetic on
+    levels produces — would otherwise reach the store as `"500.0"` and match no
+    level it offers.
+
+    Args:
+        level: A single level.
+
+    Returns:
+        The level as a string.
+    """
+    if isinstance(level, float) and level.is_integer():
+        return str(int(level))
+    return str(level)
+
+
 def _normalize_pressure_level(
-    pressure_level: list[str] | str | None,
+    pressure_level: list[str] | str | int | float | None,
 ) -> list[str] | None:
     """Normalize the `pressure_level=` override to a list of strings.
 
-    CDS spells a level as a string, but hPa reads as a number, so
-    `pressure_level=[500]` is the natural thing to write and would otherwise
-    reach the store as an integer. Each level is rendered rather than required
-    to arrive pre-stringified, and a bare value is wrapped so the single-level
-    case needs no brackets.
+    CDS spells a level as a string, but hPa reads as a number, so `500` and
+    `[500]` are both natural things to write. Each level is rendered rather
+    than required to arrive pre-stringified, and a lone level is wrapped so the
+    single-level case needs no brackets.
 
     Args:
         pressure_level: Levels to request, a single level, or None.
@@ -514,15 +532,23 @@ def _normalize_pressure_level(
         The levels as a list of strings, or None to keep each row's own level.
 
     Raises:
-        ValueError: If an empty sequence is given. `pressure_level: []` is not
-            a valid request and asking for no levels is not what any caller
+        TypeError: If given something that is neither a level nor a sequence of
+            levels. A mapping is refused rather than quietly reduced to its
+            keys, which is what iterating one would do.
+        ValueError: If given an empty sequence. `pressure_level: []` is not a
+            valid request and asking for no levels is not what any caller
             means; `None` is how a caller declines to override.
     """
     if pressure_level is None:
         return None
-    if isinstance(pressure_level, str):
-        return [pressure_level]
-    levels = [str(level) for level in pressure_level]
+    if isinstance(pressure_level, (str, int, float)):
+        return [_render_level(pressure_level)]
+    if isinstance(pressure_level, Mapping) or not isinstance(pressure_level, Sequence):
+        raise TypeError(
+            "pressure_level= takes a level or a sequence of levels, not "
+            f"{type(pressure_level).__name__}."
+        )
+    levels = [_render_level(level) for level in pressure_level]
     if not levels:
         raise ValueError(
             "pressure_level= was given no levels; pass None to keep each "

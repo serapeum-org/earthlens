@@ -742,16 +742,34 @@ class TestNormalizePressureLevel:
         [
             (None, None),
             ("500", ["500"]),
+            (500, ["500"]),
+            (500.0, ["500"]),
             (["500", "850"], ["500", "850"]),
             ([500, 850], ["500", "850"]),
+            ([500.0, 850], ["500", "850"]),
             ((500,), ["500"]),
         ],
-        ids=["none", "bare-string", "strings", "integers", "tuple"],
+        ids=[
+            "none",
+            "bare-string",
+            "bare-int",
+            "bare-float",
+            "strings",
+            "integers",
+            "floats",
+            "tuple",
+        ],
     )
     def test_it_renders_levels_as_a_list_of_strings(self, given, expected):
         """hPa reads as a number, so `[500]` is the natural thing to write."""
         result = ecmwf_backend._normalize_pressure_level(given)
         assert result == expected, f"Expected {expected!r}, got {result!r}"
+
+    @pytest.mark.parametrize("given", [{"a": 1}, {500}, object()])
+    def test_something_that_is_not_a_level_is_refused(self, given):
+        """A mapping would otherwise be reduced to its keys without a word."""
+        with pytest.raises(TypeError, match="sequence of levels"):
+            ecmwf_backend._normalize_pressure_level(given)
 
     def test_no_levels_at_all_is_refused(self):
         """`pressure_level: []` is not a valid request, and None means decline."""
