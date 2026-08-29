@@ -765,6 +765,31 @@ class TestNormalizePressureLevel:
         result = ecmwf_backend._normalize_pressure_level(given)
         assert result == expected, f"Expected {expected!r}, got {result!r}"
 
+    @pytest.mark.parametrize(
+        "given",
+        [True, [True], b"500", bytearray(b"500")],
+        ids=["bool", "bool-in-list", "bytes", "bytearray"],
+    )
+    def test_something_that_only_looks_like_a_number_is_refused(self, given):
+        """A bool is an int subclass and bytes iterate to their byte values."""
+        with pytest.raises(TypeError):
+            ecmwf_backend._normalize_pressure_level(given)
+
+    @pytest.mark.parametrize("given", [["banana"], [[500]], ["500a"]])
+    def test_a_level_that_is_not_a_number_is_refused(self, given):
+        """Levels are hPa; the store would reject these, but not when skipped."""
+        with pytest.raises(ValueError, match="not a pressure level"):
+            ecmwf_backend._normalize_pressure_level(given)
+
+    @pytest.mark.parametrize(
+        ("given", "expected"),
+        [(12.5, ["12.5"]), (-500, ["-500"]), (range(500, 502), ["500", "501"])],
+        ids=["fractional", "negative", "range"],
+    )
+    def test_any_number_shaped_level_is_kept(self, given, expected):
+        """Plausibility is the store's call; this only checks it is a number."""
+        assert ecmwf_backend._normalize_pressure_level(given) == expected
+
     @pytest.mark.parametrize("given", [{"a": 1}, {500}, object()])
     def test_something_that_is_not_a_level_is_refused(self, given):
         """A mapping would otherwise be reduced to its keys without a word."""
@@ -820,6 +845,10 @@ class TestPressureLevelKwarg:
                 path="out",
                 pressure_level=[],
             )
+
+    def test_a_bare_instance_has_the_default(self):
+        """_build_request reads it for every request; __new__ skips __init__."""
+        assert ECMWF.__new__(ECMWF).pressure_level is None
 
     def test_it_is_refused_on_a_raw_request_passthrough(self):
         """The passthrough forwards the request verbatim, so it would do nothing."""

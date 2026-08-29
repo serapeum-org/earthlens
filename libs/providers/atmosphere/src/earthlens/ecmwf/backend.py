@@ -504,15 +504,34 @@ def _render_level(level: str | int | float) -> str:
     levels produces — would otherwise reach the store as `"500.0"` and match no
     level it offers.
 
+    A level is a pressure in hPa, so anything that does not read as a number is
+    refused here rather than sent. The store's own constraint check would catch
+    most of them, but not under `skip_constraints=True` and not offline, and a
+    rejected request says far less than this does.
+
     Args:
         level: A single level.
 
     Returns:
         The level as a string.
+
+    Raises:
+        TypeError: If given a bool, which is an `int` subclass and would
+            otherwise render as `"True"`.
+        ValueError: If the level does not read as a number.
     """
+    if isinstance(level, bool):
+        raise TypeError(f"pressure_level= takes a number, not {level!r}.")
     if isinstance(level, float) and level.is_integer():
         return str(int(level))
-    return str(level)
+    text = str(level)
+    try:
+        float(text)
+    except (TypeError, ValueError):
+        raise ValueError(
+            f"{level!r} is not a pressure level; levels are numbers in hPa."
+        ) from None
+    return text
 
 
 def _normalize_pressure_level(
@@ -543,7 +562,9 @@ def _normalize_pressure_level(
         return None
     if isinstance(pressure_level, (str, int, float)):
         return [_render_level(pressure_level)]
-    if isinstance(pressure_level, Mapping) or not isinstance(pressure_level, Sequence):
+    if isinstance(pressure_level, (Mapping, bytes, bytearray)) or not isinstance(
+        pressure_level, Sequence
+    ):
         raise TypeError(
             "pressure_level= takes a level or a sequence of levels, not "
             f"{type(pressure_level).__name__}."
