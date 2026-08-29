@@ -377,6 +377,9 @@ class TestIsAuxiliary:
             "swe_unc",
             "sla_uncertainty",
             "ice_conc_stddev",
+            "chl_qflags",
+            "sst_error",
+            "wind_sigma",
             "sensor_zenith_angle",
         ],
         ids=[
@@ -388,6 +391,9 @@ class TestIsAuxiliary:
             "uncertainty-unc",
             "uncertainty-spelled-out",
             "spread",
+            "quality-flags-plural",
+            "error-spelled-out",
+            "sigma",
             "viewing-angle",
         ],
     )
@@ -401,6 +407,27 @@ class TestIsAuxiliary:
     def test_a_real_variable_still_reads_as_data(self, name):
         """The filter must not swallow a measurement that merely reads like one."""
         assert not hydrate_mod._is_auxiliary(name), f"{name!r} was filtered out"
+
+    def test_every_suffix_in_the_tuple_actually_filters(self):
+        """Pins the whole tuple, so an entry cannot be added and never reached."""
+        unreached = [
+            suffix
+            for suffix in hydrate_mod._AUXILIARY_SUFFIXES
+            if not hydrate_mod._is_auxiliary(f"quantity{suffix}")
+        ]
+        assert not unreached, f"suffixes that filter nothing: {unreached}"
+
+    @pytest.mark.parametrize("name", ["FAPAR_ERR", "fapar_err", "FaPaR_Err"])
+    def test_the_match_ignores_case(self, name):
+        """Producers vary the case; the filter must not depend on it."""
+        assert hydrate_mod._is_auxiliary(name), f"{name!r} escaped the filter"
+
+    @pytest.mark.parametrize("name", ["err", "unc", "sigma", "flag"])
+    def test_a_bare_word_is_not_a_suffix(self, name):
+        """These are tails, not names; a variable actually called `flag` is data."""
+        assert not hydrate_mod._is_auxiliary(name), (
+            f"{name!r} was filtered although nothing precedes the suffix"
+        )
 
     def test_a_slug_is_not_bound_to_its_own_uncertainty_band(self):
         """The leftover rule pairs on shared words, and a band shares them all."""
