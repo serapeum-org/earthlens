@@ -359,6 +359,16 @@ def _is_auxiliary(name: str) -> bool:
     flags in both spellings (`quality_flag`, `FAPAR_QFLAG`), uncertainty and
     spread bands (`FAPAR_ERR`, `swe_unc`, `ice_conc_stddev`), and solar/sensor
     viewing angles (`SZA`, `sensor_zenith_angle`).
+
+    The suffixes are tails, not names: a variable actually called `flag` or
+    `err` is a measurement and stays one. Matching folds case, since a producer
+    spells `FAPAR_ERR` where another spells `fapar_err`.
+
+    Args:
+        name: A NetCDF short name from the retrieved file.
+
+    Returns:
+        True when the name describes a measurement rather than being one.
     """
     lower = name.lower()
     return (
