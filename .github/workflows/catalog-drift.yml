@@ -83,6 +83,13 @@ jobs:
           PROVIDERS: ${{ inputs.providers || 'all' }}
         run: |
           # --strict exits non-zero when a curated dataset is no longer served.
-          # --json keeps the machine-readable outcome in the log next to the
-          # human table, so a failure can be triaged without a re-run.
-          uv run --locked earthlens datasets audit "$PROVIDERS" --strict
+          #
+          # --no-sync: the pinned python-setup action above already built this
+          # environment, so uv must install nothing here. That closes the
+          # build-time code-execution surface a bare `uv run` leaves open
+          # (sonar githubactions:S8541). Sonar suggests `--no-build` for that,
+          # which cannot work in this workspace: the editable member
+          # distributions have no wheel, so uv refuses with "can't be installed
+          # because it is marked as --no-build but has no binary distribution".
+          # --locked still fails the run if uv.lock has drifted.
+          uv run --locked --no-sync earthlens datasets audit "$PROVIDERS" --strict
