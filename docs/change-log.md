@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.19.0 (2026-08-29)
+
+### Feat
+
+- **ecmwf**: hydrate every placeholder by probing each variable in turn (#1113)
+
+### Fix
+
+- **ecmwf**: keep aggregated outputs unique and faithful to the request (#1112)
+
 ## 0.18.0 (2026-08-23)
 
 ### BREAKING CHANGE
