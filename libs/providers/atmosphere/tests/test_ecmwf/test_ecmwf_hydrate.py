@@ -9,15 +9,25 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from earthlens.ecmwf import _hydrate as hydrate_mod
 from earthlens.ecmwf._hydrate import (
     _claimed_nc_names,
+    _dataset_extras,
+    _fill_variable,
+    _fill_variable_extras,
     _find_file_for_dataset,
+    _hydrate_stanza_per_variable,
+    _indent_of,
+    _inline_mapping,
     _is_initialism,
     _match_variables,
     _pair_is_evidenced,
     _retrieve_with_timeout,
     _rewrite_stanza,
+    _selector_override,
+    _stanza_match,
+    _yaml_inline_list,
     _yaml_value,
     bulk_hydrate_empty,
 )
@@ -53,6 +63,20 @@ _NC_META = {
     "sst": {"long_name": "Sea surface temperature", "units": "K"},
     "t2m": {"long_name": "2 metre temperature", "units": "K"},
 }
+
+_PROBE_BY_CDS = {
+    "2m_temperature": {"t2m": {"long_name": "2 metre temperature", "units": "K"}},
+    "sea_surface_temperature": {
+        "sst": {"long_name": "Sea surface temperature", "units": "K"}
+    },
+    "total_precipitation": {"tp": {"long_name": "Total precipitation", "units": "m"}},
+}
+
+
+def _fake_probe(dataset_id, cds_variable):
+    """Answer a per-variable probe with just that variable, as a real one does."""
+    return dict(_PROBE_BY_CDS.get(cds_variable, {})), {}
+
 
 _TWO_STANZA = """datasets:
   a-dataset:
@@ -537,6 +561,547 @@ def _placeholder_dataset(*slugs):
     )
 
 
+_GLOFAS_STANZA = """datasets:
+  cems-glofas-historical:
+    endpoint: ewds
+    extras:
+      system_version: [version_4_0]
+      timespan: [time_mean]
+    variables:
+      average-river-discharge-in-the-last-24-hours:
+        cds_variable: average_river_discharge_in_the_last_24_hours
+        nc_variable: average_river_discharge_in_the_last_24_hours
+        units: unknown
+      runoff-water-equivalent:
+        cds_variable: runoff_water_equivalent
+        nc_variable: runoff_water_equivalent
+        units: unknown
+      snow-depth-water-equivalent:
+        cds_variable: snow_depth_water_equivalent
+        nc_variable: snow_depth_water_equivalent
+        units: unknown
+      soil-wetness-index:
+        cds_variable: soil_wetness_index
+        nc_variable: soil_wetness_index
+        units: unknown
+"""
+
+_GLOFAS_PROBES = {
+    "average_river_discharge_in_the_last_24_hours": (
+        {"avg_dis": {"long_name": "Average river discharge", "units": "m3 s-1"}},
+        {"timespan": ["time_mean"], "system_version": ["version_4_0"]},
+    ),
+    "runoff_water_equivalent": (
+        {"rowe": {"long_name": "Runoff water equivalent", "units": "kg m-2"}},
+        {"timespan": ["time_mean"], "system_version": ["version_4_0"]},
+    ),
+    "snow_depth_water_equivalent": (
+        {"sd": {"long_name": "Snow depth water equivalent", "units": "kg m-2"}},
+        {"timespan": ["instantaneous"], "system_version": ["version_4_0"]},
+    ),
+    "soil_wetness_index": (
+        {"swir": {"long_name": "Soil wetness index", "units": "1"}},
+        {"timespan": ["instantaneous"], "system_version": ["version_4_0"]},
+    ),
+}
+
+
+_DEMO_HEADER = """datasets:
+  demo-dataset:
+"""
+
+_EXTRAS_STANZA = """datasets:
+  demo-dataset:
+    endpoint: ewds
+    extras:
+      # a comment the reader must skip
+      timespan: [time_mean]
+
+      system_version: [version_4_0]
+    variables:
+      already-overridden:
+        cds_variable: already_overridden
+        nc_variable: already_overridden
+        units: unknown
+        extras:
+          timespan: [stale]
+          keep_me: [yes]
+      no-cds-variable:
+        nc_variable: mystery
+        units: unknown
+"""
+
+
+class TestFillVariable:
+    """Tests for writing a row's nc_variable and units back into the shard."""
+
+    @pytest.mark.parametrize("nc_name", ["no", "yes", "on", "off", "null", "y", "sst"])
+    def test_a_yaml_hostile_short_name_survives(self, nc_name):
+        """Nitrogen monoxide is `no`, which bare YAML reads back as a boolean."""
+        block = (
+            "      a-row:"
+            + chr(10)
+            + "        cds_variable: a"
+            + chr(10)
+            + "        nc_variable: seeded"
+            + chr(10)
+            + "        units: unknown"
+            + chr(10)
+        )
+        out = _fill_variable(block, "a-row", nc_name, "kg kg**-1")
+        parsed = yaml.safe_load("root:" + chr(10) + out.replace("      ", "  "))
+        row = parsed["root"]["a-row"]
+        assert row["nc_variable"] == nc_name, "must stay the string it was given"
+        assert row["units"] == "kg kg**-1"
+
+
+class TestSelectorPlumbing:
+    """Tests for the pieces that turn a probe's selectors into a row override."""
+
+    def test_dataset_extras_skips_comments_and_blank_lines(self):
+        """The dataset-level extras are read past comments and spacing."""
+        block = _stanza_match(_EXTRAS_STANZA, "demo-dataset").group(1)
+        assert _dataset_extras(block) == {
+            "timespan": ["time_mean"],
+            "system_version": ["version_4_0"],
+        }
+
+    @pytest.mark.parametrize(
+        "spelling",
+        [
+            "      timespan: [time_mean]",
+            "      timespan: [ time_mean ]",
+            "      timespan: ['time_mean']",
+            "      timespan:" + chr(10) + "        - time_mean",
+        ],
+    )
+    def test_respelling_the_stanza_list_is_not_a_disagreement(self, spelling):
+        """Selectors compare as values, so formatting cannot fake an override."""
+        block = (
+            "    extras:" + chr(10) + spelling + chr(10) + "    variables:" + chr(10)
+        )
+        extras = _dataset_extras(block)
+        assert extras["timespan"] == ["time_mean"]
+        assert _selector_override({"timespan": ["time_mean"]}, extras) == {}
+
+    def test_a_dataset_level_inline_mapping_is_read_too(self):
+        """The stanza's own extras may be inline; it still parses to values."""
+        block = (
+            "    extras: {timespan: [time_mean]}" + chr(10) + "    variables:" + chr(10)
+        )
+        assert _dataset_extras(block) == {"timespan": ["time_mean"]}
+
+    @pytest.mark.parametrize(
+        "line",
+        [
+            "        extras: {timespan: [x]}",
+            "        extras:",
+            "        extras: not-a-mapping",
+            "        extras: [a, b]",
+        ],
+    )
+    def test_only_a_real_inline_mapping_parses(self, line):
+        """A block key, a scalar or a sequence carries no inline mapping to read."""
+        parsed = _inline_mapping(line)
+        expected = {"timespan": ["x"]} if line.endswith("}") else {}
+        assert parsed == expected
+
+    def test_an_unparseable_extras_region_yields_nothing(self):
+        """Reading half a malformed block would compare selectors against a lie."""
+        block = (
+            "    extras:"
+            + chr(10)
+            + "      timespan: [time_mean]"
+            + chr(10)
+            + "      stray-text-with-no-colon"
+            + chr(10)
+            + "    variables:"
+            + chr(10)
+        )
+        assert _dataset_extras(block) == {}
+
+    @pytest.mark.parametrize(
+        ("shape", "expected"),
+        [
+            ("      area:" + chr(10) + "        north: 50", {"area": {"north": 50}}),
+            (
+                "      timespan:" + chr(10) + "        - time_mean",
+                {"timespan": ["time_mean"]},
+            ),
+            ('      note: "keep # this"', {"note": "keep # this"}),
+            ("      # only a comment", {}),
+        ],
+    )
+    def test_the_extras_region_is_parsed_as_yaml(self, shape, expected):
+        """Nesting, block sequences and quoted hashes all survive the read."""
+        block = "    extras:" + chr(10) + shape + chr(10) + "    variables:" + chr(10)
+        assert _dataset_extras(block) == expected
+
+    def test_extras_running_to_the_end_of_the_block(self):
+        """The reader stops cleanly when the extras are the stanza's last lines."""
+        block = "    extras:" + chr(10) + "      timespan: [time_mean]" + chr(10)
+        assert _dataset_extras(block) == {"timespan": ["time_mean"]}
+
+    def test_a_blank_extras_region_reads_as_nothing(self):
+        """Whitespace under the key is not a mapping to compare selectors against."""
+        block = (
+            "    extras:" + chr(10) + "      " + chr(10) + "    variables:" + chr(10)
+        )
+        assert _dataset_extras(block) == {}
+
+    def test_a_row_whose_cds_variable_is_empty_is_not_indexed(self):
+        """A blank cds_variable gives a probe nothing to ask for."""
+        block = (
+            "      a-row:"
+            + chr(10)
+            + "        cds_variable:"
+            + chr(10)
+            + "        units: unknown"
+            + chr(10)
+        )
+        assert hydrate_mod._slug_cds_variables(block) == {}
+
+    def test_dataset_extras_is_empty_without_the_block(self):
+        """A stanza with no dataset-level extras yields nothing to compare against."""
+        no_extras = """      a-row:
+        units: unknown
+"""
+        assert _dataset_extras(no_extras) == {}
+
+    @pytest.mark.parametrize(
+        ("selectors", "expected"),
+        [
+            ({"timespan": ["instantaneous"]}, {"timespan": ["instantaneous"]}),
+            ({"timespan": ["time_mean"]}, {}),
+            ({"unknown_key": ["x"]}, {}),
+            ({"system_version": ["version_4_0"]}, {}),
+        ],
+    )
+    def test_only_a_differing_declared_selector_is_written(self, selectors, expected):
+        """A selector is an override only when the stanza declares it and disagrees."""
+        block = _stanza_match(_EXTRAS_STANZA, "demo-dataset").group(1)
+        assert _selector_override(selectors, _dataset_extras(block)) == expected
+
+    @pytest.mark.parametrize(
+        ("value", "expected"),
+        [(["a"], "[a]"), (["a", "b"], "[a, b]"), ("unarchived", "unarchived")],
+    )
+    def test_selector_values_render_the_way_the_catalog_writes_them(
+        self, value, expected
+    ):
+        """A list becomes an inline sequence; a scalar stays a scalar."""
+        assert _yaml_inline_list(value) == expected
+
+    def test_an_existing_override_is_merged_not_replaced(self):
+        """A hand-set selector survives unless the probe contradicts it."""
+        block = _stanza_match(_EXTRAS_STANZA, "demo-dataset").group(1)
+        out = _fill_variable_extras(
+            block, "already-overridden", {"timespan": ["instantaneous"]}
+        )
+        document = _DEMO_HEADER + out
+        row = yaml.safe_load(document)["datasets"]["demo-dataset"]["variables"][
+            "already-overridden"
+        ]
+        assert row["extras"]["timespan"] == ["instantaneous"], "probe wins"
+        assert row["extras"]["keep_me"] == [True], "untouched key survives"
+
+    def test_an_inline_mapping_extras_is_merged_not_duplicated(self):
+        """Appending beside an inline mapping would give the row two extras keys."""
+        inline = _EXTRAS_STANZA.replace(
+            "        extras:"
+            + chr(10)
+            + "          timespan: [stale]"
+            + chr(10)
+            + "          keep_me: [yes]",
+            "        extras: {timespan: [stale], keep_me: [yes]}",
+        )
+        block = _stanza_match(inline, "demo-dataset").group(1)
+        out = _fill_variable_extras(
+            block, "already-overridden", {"timespan": ["instantaneous"]}
+        )
+        keys = [
+            line
+            for line in out.splitlines()
+            if line.strip().startswith("extras:") and _indent_of(line) == 8
+        ]
+        assert len(keys) == 1, "a second extras key makes the shard unloadable"
+        row = yaml.safe_load(_DEMO_HEADER + out)["datasets"]["demo-dataset"][
+            "variables"
+        ]["already-overridden"]
+        assert row["extras"]["timespan"] == ["instantaneous"]
+        assert row["extras"]["keep_me"] == [True], "the other inline key survives"
+
+    @pytest.mark.parametrize(
+        ("shape", "existing"),
+        [
+            (
+                "block sequence",
+                "        extras:\n          timespan:\n            - old\n"
+                "          keep_me: [yes]\n",
+            ),
+            (
+                "block mapping",
+                "        extras:\n          timespan: [old]\n          keep_me: [yes]\n",
+            ),
+            ("inline mapping", "        extras: {timespan: [old], keep_me: [yes]}\n"),
+            ("absent", ""),
+        ],
+    )
+    def test_every_extras_shape_survives_an_override(self, tmp_path, shape, existing):
+        """Editing line by line orphans continuation lines; re-emitting cannot."""
+        text = (
+            "datasets:\n  demo:\n    variables:\n"
+            "      a-row:\n        cds_variable: a_row\n        units: unknown\n"
+            + existing
+            + "      b-row:\n        cds_variable: b_row\n        units: unknown\n"
+        )
+        match = _stanza_match(text, "demo")
+        out = _fill_variable_extras(match.group(1), "a-row", {"timespan": ["new"]})
+        doc = text[: match.start()] + "  demo:\n" + out + text[match.end() :]
+        path = tmp_path / "shard.yaml"
+        path.write_text(doc, encoding="utf-8")
+        variables = load_yaml_strict(path)["datasets"]["demo"]["variables"]
+        assert variables["a-row"]["extras"]["timespan"] == ["new"], shape
+        assert "b-row" in variables, "the neighbouring row must survive"
+        if existing:
+            assert variables["a-row"]["extras"]["keep_me"] == [True]
+
+    @pytest.mark.parametrize(
+        "inline", ["        extras: [a, b]" + chr(10), "        extras: null" + chr(10)]
+    )
+    def test_a_non_mapping_inline_extras_is_left_alone(self, inline):
+        """What cannot be merged into must not be replaced; it is not ours to delete."""
+        text = (
+            "datasets:"
+            + chr(10)
+            + "  demo:"
+            + chr(10)
+            + "    variables:"
+            + chr(10)
+            + "      a-row:"
+            + chr(10)
+            + "        cds_variable: a_row"
+            + chr(10)
+            + "        units: unknown"
+            + chr(10)
+            + inline
+        )
+        block = _stanza_match(text, "demo").group(1)
+        assert _fill_variable_extras(block, "a-row", {"timespan": ["new"]}) == block
+
+    def test_an_empty_override_leaves_the_block_alone(self):
+        """Nothing to record means nothing is written."""
+        block = _stanza_match(_EXTRAS_STANZA, "demo-dataset").group(1)
+        assert _fill_variable_extras(block, "already-overridden", {}) == block
+
+    def test_an_absent_slug_leaves_the_block_alone(self):
+        """A slug that is not in the stanza cannot be given an override."""
+        block = _stanza_match(_EXTRAS_STANZA, "demo-dataset").group(1)
+        assert _fill_variable_extras(block, "not-here", {"timespan": ["x"]}) == block
+
+    def test_a_row_without_a_cds_variable_is_declined(self):
+        """A probe needs the request-side name, so a row lacking one is skipped."""
+        out, filled, declined = _hydrate_stanza_per_variable(
+            _EXTRAS_STANZA,
+            "demo-dataset",
+            lambda cds: ({"x": {"long_name": "x", "units": "1"}}, {}),
+        )
+        assert "no-cds-variable" in declined
+
+    def test_a_missing_stanza_is_a_no_op(self):
+        """Hydrating a dataset the shard does not hold changes nothing."""
+        out, filled, declined = _hydrate_stanza_per_variable(
+            _EXTRAS_STANZA, "not-a-dataset", lambda cds: ({}, {})
+        )
+        assert (out, filled, declined) == (_EXTRAS_STANZA, [], [])
+
+
+class TestHydrateStanzaWhole:
+    """Tests for the whole-dataset fallback used when no block names a row."""
+
+    def test_a_timeout_is_recorded_on_the_session(self, monkeypatch):
+        """The deadline is reported as a timeout, not a generic failure."""
+        session = hydrate_mod._ProbeSession("demo-dataset", 1.0)
+
+        def _stall(dataset_id, timeout):
+            raise TimeoutError("stuck")
+
+        monkeypatch.setattr(hydrate_mod, "_retrieve_with_timeout", _stall)
+        out, filled, declined = hydrate_mod._hydrate_stanza_whole(
+            _EXTRAS_STANZA, "demo-dataset", session
+        )
+        assert session.timed_out is True
+        assert (out, filled, declined) == (_EXTRAS_STANZA, [], [])
+
+    def test_a_refusal_is_recorded_without_claiming_a_timeout(self, monkeypatch):
+        """A licence refusal sets the error but leaves timed_out false."""
+        session = hydrate_mod._ProbeSession("demo-dataset", 1.0)
+
+        def _refuse(dataset_id, timeout):
+            raise RuntimeError("licence not accepted")
+
+        monkeypatch.setattr(hydrate_mod, "_retrieve_with_timeout", _refuse)
+        hydrate_mod._hydrate_stanza_whole(_EXTRAS_STANZA, "demo-dataset", session)
+        assert session.timed_out is False
+        assert isinstance(session.error, RuntimeError)
+
+
+class TestRetrieveVariableMeta:
+    """Tests for the credentialed per-variable seam."""
+
+    def test_it_forwards_to_the_ecmwf_deep_sampler(self, monkeypatch):
+        """The seam only delegates, so the credentialed call stays in one place."""
+        import earthlens.ecmwf.cli as ecmwf_cli
+
+        seen = {}
+
+        def _fake(dataset_id, cds_variable):
+            seen["args"] = (dataset_id, cds_variable)
+            return {"t2m": {"units": "K"}}, {"timespan": ["time_mean"]}
+
+        monkeypatch.setattr(ecmwf_cli, "_ecmwf_deep_sample_variable", _fake)
+        meta, selectors = hydrate_mod._retrieve_variable_meta("ds", "2m_temperature")
+        assert seen["args"] == ("ds", "2m_temperature")
+        assert meta == {"t2m": {"units": "K"}}
+        assert selectors == {"timespan": ["time_mean"]}
+
+
+class TestHydrateStanzaPerVariable:
+    """Tests for the per-variable hydration of a whole stanza."""
+
+    def test_every_placeholder_of_a_multi_variable_dataset_is_filled(self):
+        """One probe per row is what lets a four-variable dataset finish."""
+        asked = []
+
+        def probe(cds_variable):
+            asked.append(cds_variable)
+            return _GLOFAS_PROBES[cds_variable]
+
+        out, filled, declined = _hydrate_stanza_per_variable(
+            _GLOFAS_STANZA, "cems-glofas-historical", probe
+        )
+        assert len(asked) == 4, "one probe per placeholder"
+        assert len(filled) == 4
+        assert declined == []
+        variables = yaml.safe_load(out)["datasets"]["cems-glofas-historical"][
+            "variables"
+        ]
+        assert (
+            variables["average-river-discharge-in-the-last-24-hours"]["nc_variable"]
+            == "avg_dis"
+        )
+        assert variables["soil-wetness-index"]["units"] == "1"
+
+    def test_a_selector_the_dataset_default_covers_is_not_written(self):
+        """Discharge runs under the stanza's own timespan, so it needs no override."""
+        out, _, _ = _hydrate_stanza_per_variable(
+            _GLOFAS_STANZA,
+            "cems-glofas-historical",
+            lambda cds: _GLOFAS_PROBES[cds],
+        )
+        variables = yaml.safe_load(out)["datasets"]["cems-glofas-historical"][
+            "variables"
+        ]
+        row = variables["average-river-discharge-in-the-last-24-hours"]
+        assert "extras" not in row
+
+    def test_a_selector_that_differs_becomes_a_per_variable_override(self):
+        """Snow depth is only served under instantaneous, and that is recorded."""
+        out, _, _ = _hydrate_stanza_per_variable(
+            _GLOFAS_STANZA,
+            "cems-glofas-historical",
+            lambda cds: _GLOFAS_PROBES[cds],
+        )
+        variables = yaml.safe_load(out)["datasets"]["cems-glofas-historical"][
+            "variables"
+        ]
+        assert variables["snow-depth-water-equivalent"]["extras"] == {
+            "timespan": ["instantaneous"]
+        }
+        assert variables["soil-wetness-index"]["extras"] == {
+            "timespan": ["instantaneous"]
+        }
+
+    def test_a_row_the_store_cannot_serve_keeps_its_placeholder(self):
+        """A variable no constraints block serves is declined, not guessed at."""
+        out, filled, declined = _hydrate_stanza_per_variable(
+            _GLOFAS_STANZA,
+            "cems-glofas-historical",
+            lambda cds: ({}, {}) if "snow" in cds else _GLOFAS_PROBES[cds],
+        )
+        assert "snow-depth-water-equivalent" in declined
+        assert len(filled) == 3
+        variables = yaml.safe_load(out)["datasets"]["cems-glofas-historical"][
+            "variables"
+        ]
+        assert variables["snow-depth-water-equivalent"]["units"] == "unknown"
+
+    def test_two_rows_cannot_claim_one_netcdf_variable(self):
+        """A name bound earlier in the pass is withheld from later rows."""
+        one = (
+            {"avg_dis": {"long_name": "Average river discharge", "units": "m3 s-1"}},
+            {},
+        )
+        out, filled, declined = _hydrate_stanza_per_variable(
+            _GLOFAS_STANZA, "cems-glofas-historical", lambda cds: one
+        )
+        variables = yaml.safe_load(out)["datasets"]["cems-glofas-historical"][
+            "variables"
+        ]
+        bound = [v["nc_variable"] for v in variables.values()]
+        assert bound.count("avg_dis") == 1, "only the first row may take it"
+        assert len(declined) == 3
+
+    def test_a_stanza_without_placeholders_is_left_alone(self):
+        """Nothing to fill means no probes and no rewrite."""
+        filled_text = _GLOFAS_STANZA.replace("units: unknown", "units: m")
+        out, filled, declined = _hydrate_stanza_per_variable(
+            filled_text, "cems-glofas-historical", lambda cds: ({}, {})
+        )
+        assert out == filled_text
+        assert filled == []
+        assert declined == []
+
+
+class TestFoldedMatching:
+    """Case-only differences between a slug and a NetCDF short name."""
+
+    def test_a_slug_matches_a_name_differing_only_in_case(self):
+        """A leaf CDR spells them FAPAR and LAI; the catalog spells them lowercase."""
+        meta = {
+            "FAPAR": {"long_name": "Fraction of absorbed PAR", "units": "1"},
+            "LAI": {"long_name": "Leaf area index", "units": "m2/m2"},
+        }
+        assert hydrate_mod._match_variables(["fapar", "lai"], meta) == {
+            "fapar": ("FAPAR", "1"),
+            "lai": ("LAI", "m2/m2"),
+        }
+
+    def test_a_near_neighbour_is_not_reached_by_folding(self):
+        """Only case may differ, so an uncertainty band is not a folded match."""
+        candidates = {
+            "FAPAR_ERR": {"long_name": "FAPAR uncertainty", "units": "1"},
+            "LAI": {"long_name": "Leaf area index", "units": "m2/m2"},
+        }
+        assert hydrate_mod._folded_match("fapar", candidates, set()) is None
+
+    def test_two_names_folding_together_are_declined(self):
+        """Guessing between them is the mis-extraction this matcher avoids."""
+        meta = {
+            "Sst": {"long_name": "sea surface temperature", "units": "K"},
+            "SST": {"long_name": "sea surface temperature", "units": "K"},
+        }
+        assert hydrate_mod._match_variables(["sst"], meta) == {}
+
+    def test_an_exact_match_still_wins(self):
+        """Folding is a fallback; it must not disturb a name that matched already."""
+        meta = {
+            "tp": {"long_name": "Total precipitation", "units": "m"},
+            "TP": {"long_name": "other", "units": "mm"},
+        }
+        assert hydrate_mod._match_variables(["tp"], meta)["tp"] == ("tp", "m")
+
+
 class TestBulkHydrateEmpty:
     """Tests for the catalog-wide hydrate driver (retrieve + catalog mocked)."""
 
@@ -555,9 +1120,7 @@ class TestBulkHydrateEmpty:
                 ),
             },
         )
-        monkeypatch.setattr(
-            hydrate_mod, "_retrieve_netcdf_vars", lambda ds: dict(_NC_META)
-        )
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
 
         summary = bulk_hydrate_empty()
         assert summary == {
@@ -566,6 +1129,7 @@ class TestBulkHydrateEmpty:
             "skipped": 0,
             "timed_out": 0,
             "unmatched": 0,
+            "partial": 0,
             "filled": ["reanalysis-era5-single-levels"],
         }
         variables = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"][
@@ -582,10 +1146,10 @@ class TestBulkHydrateEmpty:
             {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
         )
 
-        def _boom(dataset_id):
+        def _boom(dataset_id, cds_variable):
             raise RuntimeError("licence not accepted")
 
-        monkeypatch.setattr(hydrate_mod, "_retrieve_netcdf_vars", _boom)
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _boom)
         summary = bulk_hydrate_empty()
         assert summary["hydrated"] == 0
         assert summary["skipped"] == 1
@@ -602,8 +1166,22 @@ class TestBulkHydrateEmpty:
         )
         monkeypatch.setattr(
             hydrate_mod,
-            "_retrieve_netcdf_vars",
-            lambda ds: {"elevation": {"long_name": "Surface elevation", "units": "m"}},
+            "_retrieve_variable_meta",
+            lambda ds, cds: (
+                {
+                    "elevation": {"long_name": "Surface elevation", "units": "m"},
+                    "orography": {"long_name": "Orography", "units": "m"},
+                },
+                {},
+            ),
+        )
+        monkeypatch.setattr(
+            hydrate_mod,
+            "_retrieve_with_timeout",
+            lambda ds, timeout: {
+                "elevation": {"long_name": "Surface elevation", "units": "m"},
+                "orography": {"long_name": "Orography", "units": "m"},
+            },
         )
         summary = bulk_hydrate_empty()
         assert summary["hydrated"] == 0
@@ -621,9 +1199,7 @@ class TestBulkHydrateEmpty:
             {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
         )
         monkeypatch.setattr(hydrate_mod, "_find_file_for_dataset", lambda *a: None)
-        monkeypatch.setattr(
-            hydrate_mod, "_retrieve_netcdf_vars", lambda ds: dict(_NC_META)
-        )
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
         summary = bulk_hydrate_empty()
         assert summary["unmatched"] == 0
         assert summary["skipped"] == 1
@@ -636,9 +1212,7 @@ class TestBulkHydrateEmpty:
             tmp_path,
             {"other-dataset": _placeholder_dataset("total-precipitation")},
         )
-        monkeypatch.setattr(
-            hydrate_mod, "_retrieve_netcdf_vars", lambda ds: dict(_NC_META)
-        )
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
         summary = bulk_hydrate_empty()
         assert summary["unmatched"] == 0
         assert summary["skipped"] == 1
@@ -655,12 +1229,228 @@ class TestBulkHydrateEmpty:
         )
         monkeypatch.setattr(
             hydrate_mod,
-            "_retrieve_netcdf_vars",
-            lambda ds: {"latitude": {"long_name": "latitude", "units": "degrees"}},
+            "_retrieve_variable_meta",
+            lambda ds, cds: (
+                {"latitude": {"long_name": "latitude", "units": "degrees"}},
+                {},
+            ),
+        )
+        monkeypatch.setattr(
+            hydrate_mod,
+            "_retrieve_with_timeout",
+            lambda ds, timeout: {"latitude": {"long_name": "latitude", "units": "deg"}},
         )
         summary = bulk_hydrate_empty()
         assert summary["unmatched"] == 1
         assert "only coordinates and auxiliaries" in capsys.readouterr().out
+
+    def test_a_dataset_no_block_names_falls_back_to_one_whole_probe(
+        self, tmp_path, monkeypatch
+    ):
+        """A product that does not partition by variable is still hydratable."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        # No constraints block names the row, so every per-variable probe is empty.
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_variable_meta", lambda ds, cds: ({}, {})
+        )
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_with_timeout", lambda ds, timeout: dict(_NC_META)
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["hydrated"] == 1, "the whole-dataset probe finished it"
+        variables = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"][
+            "reanalysis-era5-single-levels"
+        ]["variables"]
+        assert variables["2m-temperature"]["nc_variable"] == "t2m"
+
+    def test_the_fallback_recovers_a_row_the_per_variable_pass_declined(
+        self, tmp_path, monkeypatch
+    ):
+        """A row no block serves is still reachable by name after siblings answer."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        monkeypatch.setattr(
+            hydrate_mod,
+            "_retrieve_variable_meta",
+            lambda ds, cds: ({"latitude": {"long_name": "lat", "units": "deg"}}, {}),
+        )
+
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_with_timeout", lambda ds, timeout: dict(_NC_META)
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["hydrated"] == 1, "the fallback matched it by name"
+        variables = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"][
+            "reanalysis-era5-single-levels"
+        ]["variables"]
+        assert variables["2m-temperature"]["nc_variable"] == "t2m"
+
+    def test_a_rewrite_that_does_not_parse_is_never_written(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        """A splicing bug must cost one dataset's hydration, not the whole shard."""
+        shard = tmp_path / "era5.yaml"
+        shard.write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
+        monkeypatch.setattr(
+            hydrate_mod,
+            "_hydrate_stanza_per_variable",
+            lambda text, ds, probe: (
+                "datasets:"
+                + chr(10)
+                + "  a:"
+                + chr(10)
+                + "    x: 1"
+                + chr(10)
+                + "    x: 2"
+                + chr(10),
+                ["2m-temperature"],
+                [],
+            ),
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["hydrated"] == 0, "a shard that would not load is not written"
+        assert shard.read_text(encoding="utf-8") == _STANZA, "shard untouched"
+        assert "did not parse" in capsys.readouterr().out
+
+    @pytest.mark.parametrize("bad", ["no", "yes", "null", "123", "off"])
+    def test_a_row_that_reloads_as_a_non_string_is_refused(self, bad):
+        """A written value can be valid YAML and still come back the wrong type."""
+        shard = (
+            "datasets:"
+            + chr(10)
+            + "  a-dataset:"
+            + chr(10)
+            + "    variables:"
+            + chr(10)
+            + "      2m-temperature:"
+            + chr(10)
+            + "        nc_variable: "
+            + bad
+            + chr(10)
+            + "        units: K"
+            + chr(10)
+        )
+        assert not hydrate_mod._written_rows_survive(
+            shard, "a-dataset", ["2m-temperature"]
+        ), "a non-string nc_variable breaks the catalog for every later dataset"
+
+    def test_a_pre_existing_bad_row_does_not_block_the_write(self):
+        """Only the rows this pass filled are judged; older defects are not ours."""
+        shard = (
+            "datasets:"
+            + chr(10)
+            + "  a-dataset:"
+            + chr(10)
+            + "    variables:"
+            + chr(10)
+            + "      2m-temperature:"
+            + chr(10)
+            + "        nc_variable: t2m"
+            + chr(10)
+            + "        units: K"
+            + chr(10)
+            + "      untouched:"
+            + chr(10)
+            + "        nc_variable: no"
+            + chr(10)
+            + "        units: '1'"
+            + chr(10)
+        )
+        assert hydrate_mod._written_rows_survive(
+            shard, "a-dataset", ["2m-temperature"]
+        ), "refusing here would cost hydration for a defect the sweep did not cause"
+
+    @pytest.mark.parametrize(
+        ("limit", "expected"),
+        [(1, ["a-dataset"]), (2, ["a-dataset"]), (3, ["a-dataset", "z-dataset"])],
+    )
+    def test_limit_counts_placeholder_rows_not_datasets(self, limit, expected):
+        """One retrieve per row, so a dataset-counting limit would not bound the work."""
+        rows = {"a-dataset": 2, "z-dataset": 5}
+        assert (
+            hydrate_mod._take_rows(["a-dataset", "z-dataset"], rows, limit) == expected
+        )
+
+    def test_limit_larger_than_the_catalog_takes_everything(self):
+        """A budget nothing reaches leaves the worklist whole."""
+        rows = {"a-dataset": 2, "z-dataset": 3}
+        assert hydrate_mod._take_rows(["a-dataset", "z-dataset"], rows, 999) == [
+            "a-dataset",
+            "z-dataset",
+        ]
+
+    def test_limit_never_splits_a_dataset(self):
+        """Half a hydrated stanza is not a useful stopping point, so it is a floor."""
+        rows = {"wide-dataset": 82}
+        assert hydrate_mod._take_rows(["wide-dataset"], rows, 1) == ["wide-dataset"]
+
+    def test_a_dataset_that_stops_midway_says_why(self, tmp_path, monkeypatch, capsys):
+        """A partial fill must not hide the deadline that ended it."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {
+                "reanalysis-era5-single-levels": _placeholder_dataset(
+                    "2m-temperature", "sea-surface-temperature"
+                )
+            },
+        )
+        calls = []
+
+        def _one_then_stall(dataset_id, cds_variable, timeout):
+            calls.append(cds_variable)
+            if len(calls) == 1:
+                return _fake_probe(dataset_id, cds_variable)
+            raise TimeoutError("stuck in the CDS queue")
+
+        monkeypatch.setattr(hydrate_mod, "_probe_with_timeout", _one_then_stall)
+        summary = bulk_hydrate_empty()
+        assert summary["hydrated"] == 1, "the row it did fill still counts"
+        assert summary["partial"] == 1, "and the dataset is flagged for a re-run"
+        assert "timed out" in capsys.readouterr().out
+
+    def test_a_refusal_after_a_partial_fill_is_named_too(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        """A store that declines mid-way is as re-runnable as a deadline."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {
+                "reanalysis-era5-single-levels": _placeholder_dataset(
+                    "2m-temperature", "sea-surface-temperature"
+                )
+            },
+        )
+        seen = []
+
+        def _one_then_refuse(dataset_id, cds_variable, timeout):
+            seen.append(cds_variable)
+            if len(seen) == 1:
+                return _fake_probe(dataset_id, cds_variable)
+            raise RuntimeError("licence not accepted")
+
+        monkeypatch.setattr(hydrate_mod, "_probe_with_timeout", _one_then_refuse)
+        summary = bulk_hydrate_empty()
+        assert summary["partial"] == 1
+        assert "RuntimeError" in capsys.readouterr().out
 
     def test_limit_caps_candidates(self, tmp_path, monkeypatch):
         """A --limit truncates the placeholder worklist."""
@@ -673,7 +1463,9 @@ class TestBulkHydrateEmpty:
                 "other-dataset": _placeholder_dataset("total-precipitation"),
             },
         )
-        monkeypatch.setattr(hydrate_mod, "_retrieve_netcdf_vars", lambda ds: {})
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_variable_meta", lambda ds, cds: ({}, {})
+        )
         summary = bulk_hydrate_empty(limit=1)
         assert summary["candidates"] == 1, "limit applied to the worklist"
 
@@ -691,12 +1483,12 @@ class TestBulkHydrateEmpty:
             },
         )
 
-        def _hydrate_then_abort(dataset_id):
+        def _hydrate_then_abort(dataset_id, cds_variable):
             if dataset_id == "z-dataset":
                 raise KeyboardInterrupt
-            return dict(_NC_META)
+            return _fake_probe(dataset_id, cds_variable)
 
-        monkeypatch.setattr(hydrate_mod, "_retrieve_netcdf_vars", _hydrate_then_abort)
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _hydrate_then_abort)
         with pytest.raises(KeyboardInterrupt):
             bulk_hydrate_empty(timeout=0)
         on_disk = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"]
@@ -715,10 +1507,10 @@ class TestBulkHydrateEmpty:
             {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
         )
 
-        def _stall(dataset_id, timeout):
+        def _stall(dataset_id, cds_variable, timeout):
             raise TimeoutError("stuck in the CDS queue")
 
-        monkeypatch.setattr(hydrate_mod, "_retrieve_with_timeout", _stall)
+        monkeypatch.setattr(hydrate_mod, "_probe_with_timeout", _stall)
         summary = bulk_hydrate_empty()
         assert summary["timed_out"] == 1, "the timed-out dataset is counted"
         assert summary["skipped"] == 1, "a timeout also counts as skipped"

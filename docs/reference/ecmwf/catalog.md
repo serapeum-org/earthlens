@@ -710,6 +710,47 @@ from a live tiny retrieve. Licence-gated and best-effort — a dataset
 whose licence you have not accepted is left untouched rather than
 guessed at.
 
+**One probe per placeholder.** A dataset's constraints partition it into
+blocks, and a variable is only retrievable under the selectors of a block
+that lists it, so the sweep asks for each placeholder variable by name in
+turn rather than probing the dataset once. That is what lets a
+multi-variable dataset finish: a single probe only ever describes whichever
+variable its constraints list first, so a stanza with four placeholders
+could never be completed by one.
+
+Because the probe names the variable it wants, a lone data variable coming
+back identifies that row outright — the correspondence is established by
+the request rather than inferred from the names, and none of the matching
+rules below is consulted. A probe that answers with several data variables,
+or with none, falls through to those rules, which decline rather than guess.
+
+**Per-variable selectors are recorded.** The block that serves a variable
+carries the selectors that variable needs, so where they differ from the
+stanza's own `extras:` the difference is written as a per-variable override.
+GloFAS is the case this exists for — river discharge and runoff are served
+under `timespan: time_mean`, snow depth and soil wetness only under
+`instantaneous`:
+
+```yaml
+      snow-depth-water-equivalent:
+        cds_variable: snow_depth_water_equivalent
+        nc_variable: sd
+        units: kg m-2
+        extras:
+          timespan: [instantaneous]
+```
+
+**Cost.** One retrieve per placeholder row, each under the same per-request
+deadline, so a wide dataset is a long sweep. A dataset whose first probe is
+refused is abandoned rather than retried for every remaining row, and rows
+filled before that are kept — the pass writes each shard as it goes, so
+re-running continues where the last one stopped. Use `--limit` to work
+through the catalog in batches.
+
+A dataset whose constraints do not partition by variable at all has no block
+to look a row up in; those fall back to a single whole-dataset probe and the
+matching rules below.
+
 Matching is deliberately conservative. The confident rules come first: an
 exact short-name match, then a token-subset match against the variable's
 `long_name`. Only a single leftover slug facing a single unused variable
