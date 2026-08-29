@@ -363,6 +363,32 @@ _CLAIMED_BLOCK = """      total-precipitation:
 """
 
 
+class TestErrorSummary:
+    """What a skipped dataset reports about why it stopped."""
+
+    def test_a_licence_refusal_and_a_file_lock_are_distinguishable(self):
+        """Both are PermissionError; only one is something an operator can act on."""
+        lock = hydrate_mod._error_summary(
+            PermissionError("[WinError 32] The process cannot access the file")
+        )
+        licence = hydrate_mod._error_summary(
+            PermissionError("CDS rejected the request for 'x': licence not accepted.")
+        )
+        assert lock != licence, "the two causes still read identically"
+        assert "WinError 32" in lock
+        assert "licence not accepted" in licence
+
+    def test_a_message_free_error_falls_back_to_its_type(self):
+        """Some errors carry nothing; the type is then all there is to say."""
+        assert hydrate_mod._error_summary(RuntimeError()) == "RuntimeError"
+
+    def test_a_long_message_is_truncated(self):
+        """The echo is one line per dataset, not a traceback."""
+        summary = hydrate_mod._error_summary(ValueError("x" * 400))
+        assert len(summary) < 160, f"summary ran to {len(summary)} chars"
+        assert summary.endswith("...")
+
+
 class TestDropRestatements:
     """A temporal restatement is the same quantity, not a second candidate."""
 

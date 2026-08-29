@@ -1598,6 +1598,29 @@ def _written_rows_survive(text: str, dataset_id: str, filled: list[str]) -> bool
     return True
 
 
+def _error_summary(error: BaseException) -> str:
+    """Name an error by its type and what it actually said.
+
+    The type alone is not enough to act on. `PermissionError` is raised both by
+    a store refusing an unaccepted licence and by Windows refusing a file
+    another process holds — the same word for an operator action and a local
+    race — and an operator reading only the type cannot tell which, so they
+    accept licences that were never the problem.
+
+    Args:
+        error: The error a dataset stopped on.
+
+    Returns:
+        The type name, plus the message when there is one.
+    """
+    message = " ".join(str(error).split())
+    if not message:
+        return type(error).__name__
+    if len(message) > 140:
+        message = message[:137] + "..."
+    return f"{type(error).__name__}: {message}"
+
+
 def _hydrated_detail(session: _ProbeSession, declined: list[str]) -> str:
     """Describe what a hydrated dataset left behind, and why it stopped.
 
@@ -1685,7 +1708,7 @@ def _hydrate_one(
         return "timed_out"
     if new_text == file_text[path]:
         if session.error is not None:
-            typer.echo(f"{prefix}: skipped ({type(session.error).__name__})")
+            typer.echo(f"{prefix}: skipped ({_error_summary(session.error)})")
             return "skipped"
         typer.echo(f"{prefix}: retrieved, {_declined_detail(session, declined)}")
         return "unmatched"
