@@ -1,11 +1,12 @@
-"""Catalog loader for the JRC European flood-hazard (EFHM) backend.
+"""Catalog loader for the JRC hazard backend (EFHM + sea-level forecasts).
 
-EFHM is a single product served as one whole-Europe GeoTIFF per return period,
-so the catalog is one `jrc_data_catalog.yaml` at the package root holding
-the dataset row (band, CRS, the return-period list, the URL template) plus the
-CC-BY-4.0 licence / attribution. It loads through the shared strict YAML loader
-and the `(path, mtime)` parse cache, and exposes the row via the inherited
-`AbstractCatalog` surface (`cat["efhm"]`, `get_dataset`, the did-you-mean error).
+The JRC datasets form one small, single-family enumeration, so the catalog is
+one `jrc_data_catalog.yaml` at the package root: the EFHM return-period raster
+row plus the three sea-level TWL forecast rows, each tagged with the `kind` the
+backend dispatches on, and the shared CC-BY-4.0 licence / attribution. It loads
+through the shared strict YAML loader and the `(path, mtime)` parse cache, and
+exposes the rows via the inherited `AbstractCatalog` surface (`cat["efhm"]`,
+`get_dataset`, the did-you-mean error).
 
 `CATALOG_PATH` is the bundled YAML; `clear_catalog_cache` empties the parse
 cache (used by tests that monkey-patch `CATALOG_PATH`).
@@ -28,7 +29,7 @@ _CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
-    """Empty the module-level JRC-flood catalog parse cache."""
+    """Empty the module-level JRC catalog parse cache."""
     _CATALOG_CACHE.clear()
 
 
@@ -36,18 +37,21 @@ class Dataset(BaseModel):
     """One JRC dataset row (EFHM, or a sea-level TWL forecast).
 
     Attributes:
-        id: The catalog key (`"efhm"`).
-        kind: Access-method + output discriminator the backend dispatches on
-            (`"flood_hazard_raster"` for EFHM).
+        id: The catalog key (`"efhm"`, `"sea_level_medium_term"`, …).
+        kind: Access-method + output discriminator the backend dispatches on —
+            `"flood_hazard_raster"` (EFHM), `"sea_level_gridded"`, or
+            `"sea_level_coastal"`.
         title: Human-readable product title.
-        band: The single water-depth band name (`"water_depth"`).
+        band: EFHM — the single water-depth band name (`"water_depth"`).
         long_name: Human-readable band description.
-        units: Physical units of the band (`"m"`).
+        units: Physical units of the values (`"m"`; empty for the tabular
+            coastal summary, whose columns carry mixed units).
         dtype: Pixel data type (`"float32"`).
         crs: Native CRS as an EPSG string (`"EPSG:4326"`).
-        nodata: The raster no-data value.
-        spatial_resolution: Nominal resolution in metres (`90`).
-        base_url: The JRC directory root the return-period files live in.
+        nodata: The raster no-data value, or `None` when the source declares
+            none (the sea-level cubes).
+        spatial_resolution: Nominal resolution in metres.
+        base_url: The JRC directory root the product's files live under.
         filename_template: The per-return-period file-name template
             (`"Europe_RP{rp}_filled_depth.tif"`).
         return_periods: The published return periods in years (EFHM only).
@@ -112,7 +116,7 @@ class Dataset(BaseModel):
 
 
 def _parse_catalog(files: list[Path]) -> dict[str, Any]:
-    """Parse the JRC-flood catalog YAML into `Catalog` construction kwargs.
+    """Parse the JRC catalog YAML into `Catalog` construction kwargs.
 
     Args:
         files: The contributing YAML files (EFHM ships a single file).
@@ -131,7 +135,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     if not datasets_yaml:
         raise ValueError(
             f"{path} is missing or has an empty 'datasets:' block. "
-            "The JRC-flood catalog must list the efhm product."
+            "The JRC catalog must list the efhm product."
         )
     datasets: dict[str, Dataset] = {}
     for key, body in datasets_yaml.items():
@@ -150,11 +154,12 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
 
 
 class Catalog(AbstractCatalog):
-    """Product catalog for the JRC European flood-hazard backend.
+    """Product catalog for the JRC hazard backend.
 
-    Reads the bundled `jrc_data_catalog.yaml` and exposes its single row
-    under the inherited `datasets` field — which supplies the `cat["efhm"]` /
-    `"efhm" in cat` / `len(cat)` surface and the did-you-mean error for free.
+    Reads the bundled `jrc_data_catalog.yaml` and exposes its rows (the EFHM
+    raster plus the sea-level TWL forecasts) under the inherited `datasets`
+    field — which supplies the `cat["efhm"]` / `"efhm" in cat` / `len(cat)`
+    surface and the did-you-mean error for free.
     Instantiate with no arguments; the base `model_post_init` auto-loads via
     `_autoload`, cached by `(path, mtime)`.
 
@@ -177,7 +182,7 @@ class Catalog(AbstractCatalog):
             ```
     """
 
-    _catalog_kind: str = "JRC-flood catalog"
+    _catalog_kind: str = "JRC catalog"
 
     datasets: dict[str, Dataset] = Field(default_factory=dict)
     license_id: str = ""
@@ -191,12 +196,12 @@ class Catalog(AbstractCatalog):
             dict[str, Any]: The parsed field → value map from `_parse_catalog`.
         """
         return load_catalog(
-            CATALOG_PATH, _CATALOG_CACHE, _parse_catalog, provider="JRC-flood"
+            CATALOG_PATH, _CATALOG_CACHE, _parse_catalog, provider="JRC"
         )
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
-        """Read and validate the JRC-flood catalog from disk (cached).
+        """Read and validate the JRC catalog from disk (cached).
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
@@ -210,9 +215,7 @@ class Catalog(AbstractCatalog):
                 block, or the row fails validation.
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
-        payload = load_catalog(
-            path, _CATALOG_CACHE, _parse_catalog, provider="JRC-flood"
-        )
+        payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="JRC")
         return cls(**payload)
 
     def get_catalog(self) -> dict[str, Dataset]:
