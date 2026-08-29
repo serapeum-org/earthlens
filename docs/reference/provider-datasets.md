@@ -43,7 +43,7 @@ or station — not a dataset id), noted as such.
 | Provider | What it serves | Example keys | Datasets |
 |---|---|---|---|
 | `cmems` | Copernicus Marine (multi-server) — physics, biogeochemistry, SST, sea level, waves, wind, sea ice across marine domains | `cmems_mod_glo_phy-cur_anfc_0.083deg_P1D-m`, `ESACCI-GLO-SST-L4-REP-OBS-SST`, `arctic_omi_si_extent` | ~665 curated / 1,251 addressable |
-| `erddap` | Generic ERDDAP client (multi-server) — NOAA CoastWatch/NCEI + Coral Reef Watch curated; any dataset on a curated server | `erdMH1chla8day`, `nceiPH53sstd1day`, `NOAA_DHW` | 4 curated / 3,064 addressable |
+| `erddap` | Generic ERDDAP client (multi-server) — NOAA CoastWatch/NCEI + Coral Reef Watch curated; any dataset on a curated server | `erdMH1chla8day`, `erdPH53sstd8day`, `NOAA_DHW` | 4 curated / 3,064 addressable |
 | `nwm` | NOAA National Water Model — products × operational configurations | products `chrtout`/`ldasout`/`forcing`; configs `short_range`/`medium_range`/`analysis_assim` | 6 products × ~70 configs |
 | `caravan` | Large-sample hydrology extensions — daily streamflow + ERA5-Land forcing + static attributes | `base`, `grdc`, `germany`, `spain` | 7 extensions |
 | `usgs_water` | USGS NWIS water data — parameter-coded (daily, instantaneous, samples, peaks, ratings, …) | `discharge` (00060), `gage_height` (00065), `temperature` (00010) | 12 curated / ~19,675 codes |

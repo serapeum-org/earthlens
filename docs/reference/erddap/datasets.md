@@ -20,14 +20,15 @@ rasters, tabledap tables, test/demo datasets, and missing ids.
 |---|---|---|---|---|
 | `NOAA_DHW` | griddap | raster | `CRW_SSTANOMALY`, `CRW_DHW` | NOAA Coral Reef Watch daily global 5 km SST anomaly + Degree Heating Weeks (current) |
 | `erdMH1chla8day` | griddap | raster | `chlorophyll` | Chlorophyll-a, Aqua MODIS, global 4 km, 8-day composite — **historical, 2003–2022 only** |
-| `nceiPH53sstd1day` | griddap | raster | `sea_surface_temperature` | NCEI AVHRR Pathfinder v5.3 L3-collated SST, daytime, daily (current) |
-| `cwwcNDBCMet` | tabledap | tabular | `station`, `time`, `wtmp` | NDBC standard meteorological buoy time series (current) |
+| `erdPH53sstd8day` | griddap | raster | `sea_surface_temperature` | AVHRR Pathfinder v5.3 (L3C) SST, daytime, global 0.0417°, 8-day composite — **historical, ends 2023-06** |
+| `cwwcNDBCMet` | tabledap | tabular | `station`, `time`, `WTMP` | NDBC standard meteorological buoy time series (current) |
 | `global_hourly_gesla` | tabledap | tabular | `sea_level`, `time`, `latitude`, `longitude`, `station_name`, … | GESLA global tide-gauge sea level (mm), sub-hourly to hourly |
 | `global_hourly_rqds` | tabledap | tabular | `sea_level`, `time`, `latitude`, `longitude`, `station_name`, … | JASL/UHSLC Research Quality tide gauges, hourly |
 | `global_daily_rqds` | tabledap | tabular | `sea_level`, `time`, `latitude`, `longitude`, `station_name`, … | JASL/UHSLC Research Quality tide gauges, daily |
 | `global_daily_fast` | tabledap | tabular | `sea_level`, `time`, `latitude`, `longitude`, `station_name`, … | UHSLC Fast Delivery tide gauges, daily (near-real-time) |
 
-`erdMH1chla8day` is a **historical** record (the Aqua MODIS product stopped updating in mid-2022); request a
+`erdMH1chla8day` and `erdPH53sstd8day` are **historical** records (the Aqua MODIS product stopped updating in
+mid-2022, the Pathfinder composites in mid-2023); request a
 date inside 2003–2022, or a recent-date request returns a clear out-of-coverage error.
 
 The first four rows are U.S. Government public-domain datasets on a public, no-auth server. The four
@@ -39,7 +40,8 @@ with citation. A `latitude`/`longitude` bbox filters the returned stations by lo
 ## Variables
 
 `variables=` is a flat list of variable / column names. For a **griddap** dataset these are grid variable names
-(e.g. `CRW_SSTANOMALY`); for a **tabledap** dataset they are table column names (e.g. `wtmp`). Omit `variables=`
+(e.g. `CRW_SSTANOMALY`); for a **tabledap** dataset they are table column names (e.g. `WTMP`). Names are
+**case-sensitive** — ERDDAP rejects a mis-cased name with a `400 Unrecognized variable`. Omit `variables=`
 to use the row's default set shown above. Each ERDDAP dataset's full variable list is on its own server's dataset
 page (the `/info/<dataset_id>/index.html` endpoint).
 

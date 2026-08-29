@@ -146,7 +146,7 @@ class ERDDAP(AbstractDataSource):
             >>> df = EarthLens(  # doctest: +SKIP
             ...     data_source="erddap",
             ...     dataset="cwwcNDBCMet",
-            ...     variables=["station", "time", "wtmp"],
+            ...     variables=["station", "time", "WTMP"],
             ...     start="2023-01-01",
             ...     end="2023-01-02",
             ...     lat_lim=[36.0, 37.0],
@@ -330,9 +330,9 @@ class ERDDAP(AbstractDataSource):
 
         Returns:
             pd.DataFrame: The result. A populated frame uses ERDDAP's
-                column names, which carry units (e.g. `"wtmp (degree_C)"`);
+                column names, which carry units (e.g. `"WTMP (degree_C)"`);
                 the empty-match fallback instead uses the **bare requested
-                names** (`"wtmp"`), since the unit-suffixed names are only
+                names** (`"WTMP"`), since the unit-suffixed names are only
                 known from a successful response. So `df.columns` differs
                 between a matched and an empty result.
 
