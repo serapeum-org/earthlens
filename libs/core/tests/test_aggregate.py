@@ -1771,35 +1771,71 @@ class TestAggregationMemoryCeiling:
         )
 
 
-def _write_real_nc(path, *, periods=6, freq="D", start="2020-01-01", with_level=False):
-    """Write a small CDS-shaped NetCDF and return it with the array it holds."""
-    import xarray as xr
+def _write_real_nc(path, *, periods=6):
+    """Write a real NetCDF time cube and return the values it holds.
 
-    times = pd.date_range(start, periods=periods, freq=freq)
-    if with_level:
-        data = np.arange(periods * 2 * 2 * 3, dtype="f4").reshape(periods, 2, 2, 3)
-        ds = xr.Dataset(
-            {"t": (("time", "pressure_level", "latitude", "longitude"), data)},
-            coords={
-                "time": times,
-                "pressure_level": [500, 1000],
-                "latitude": [1.0, 0.0],
-                "longitude": [0.0, 1.0, 2.0],
-            },
+    Built entirely through pyramids, which owns NetCDF in this project: a dated
+    GeoTIFF per timestep, collected into a `DatasetCollection` that derives its
+    time axis from those dates, then streamed out by `CubeNetCDFWriter`. The
+    aggregator's own time reader decodes the result, which is the point - the
+    fixture exercises the same path a downloaded cube takes.
+    """
+    import gc
+
+    from pyramids.dataset import Dataset, DatasetCollection
+    from pyramids.netcdf._cube_netcdf_writer import CubeNetCDFWriter
+
+    frames = Path(path).parent / f"{Path(path).stem}_frames"
+    frames.mkdir(parents=True, exist_ok=True)
+    values = np.arange(periods * 2 * 3, dtype="f4").reshape(periods, 2, 3)
+    days = pd.date_range("2020-01-01", periods=periods, freq="D")
+    for index, day in enumerate(days):
+        raster = Dataset.create_from_array(
+            arr=values[index],
+            top_left_corner=(0.0, 2.0),
+            cell_size=1.0,
+            epsg=4326,
         )
-    else:
-        data = np.arange(periods * 2 * 3, dtype="f4").reshape(periods, 2, 3)
-        ds = xr.Dataset(
-            {"t2m": (("time", "latitude", "longitude"), data, {"units": "K"})},
-            coords={
-                "time": times,
-                "latitude": [1.0, 0.0],
-                "longitude": [0.0, 1.0, 2.0],
-            },
-        )
-    ds.to_netcdf(path)
-    ds.close()
-    return data
+        raster.to_file(str(frames / f"t2m_{day:%Y.%m.%d}.tif"))
+        del raster
+    gc.collect()
+    collection = DatasetCollection.from_files(
+        str(frames), glob="*.tif", date_format="%Y.%m.%d"
+    )
+    CubeNetCDFWriter(collection).write(str(path))
+    del collection
+    gc.collect()
+    return values
+
+
+def _open_handles():
+    """Paths this process currently holds open."""
+    import psutil
+
+    return {handle.path for handle in psutil.Process().open_files()}
+
+
+def _handles_on(path, before):
+    """Handles on `path` opened since `before` was taken.
+
+    Compared with `os.path.samefile` rather than by string: Windows reports a
+    mapped drive under its UNC name, so equal paths can spell differently and a
+    string comparison silently never matches.
+    """
+    import os
+
+    import psutil
+
+    found = []
+    for handle in psutil.Process().open_files():
+        if handle.path in before:
+            continue
+        try:
+            if os.path.samefile(handle.path, path):
+                found.append(handle.path)
+        except OSError:
+            continue
+    return found
 
 
 def _single_level_var():
@@ -1810,7 +1846,7 @@ def _single_level_var():
     """
     return SimpleNamespace(
         cds_variable="2m_temperature",
-        nc_variable="t2m",
+        nc_variable="Band_1",
         is_flux=False,
         is_pre_aggregated=False,
     )
@@ -1846,14 +1882,26 @@ class TestAggregateAgainstARealNetCDF:
         np.testing.assert_allclose(summed[0][1], data[0:3].sum(axis=0))
 
     def test_the_source_file_is_released_when_the_run_ends(self, tmp_path):
-        """A leaked handle keeps the file locked, so deleting it is the assertion."""
+        """The descriptor is counted; POSIX would happily unlink an open file."""
         path = tmp_path / "cube.nc"
         _write_real_nc(path)
+        before = _open_handles()
         aggregate_netcdf(
             path, _single_level_var(), AggregationConfig(freq="3D", op="mean")
         )
-        path.unlink()
-        assert not path.exists(), "the aggregator kept a handle on its input"
+        leaked = _handles_on(path, before)
+        assert not leaked, f"the aggregator kept a handle on its input: {leaked}"
+
+    def test_the_handle_check_can_actually_fail(self, tmp_path):
+        """Guards the test above: a check that cannot fail proves nothing."""
+        path = tmp_path / "cube.nc"
+        path.write_bytes(b"not a cube")
+        before = _open_handles()
+        with path.open("rb"):
+            assert _handles_on(path, before), (
+                "an open handle went unseen, so the release test is vacuous"
+            )
+        assert not _handles_on(path, before), "the handle survived its context"
 
     def test_a_date_range_drops_samples_outside_it(self, tmp_path):
         """A CDS cross-product over-covers the request; the trim must be real."""
