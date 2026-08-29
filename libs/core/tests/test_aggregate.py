@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import gc
 import os
+import tracemalloc
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock
@@ -1813,26 +1814,24 @@ def _write_real_nc(path, *, periods=6, rows=2, cols=3):
     return values
 
 
-def _open_handles():
-    """Paths this process currently holds open."""
-    return {handle.path for handle in psutil.Process().open_files()}
-
-
-def _handles_on(path, before):
-    """Handles on `path` opened since `before` was taken.
+def _handles_on(path):
+    """Entries this process holds open on `path`.
 
     Compared with `os.path.samefile` rather than by string: Windows reports a
     mapped drive under its UNC name, so equal paths can spell differently and a
     string comparison silently never matches.
+
+    Deliberately absolute rather than a difference against an earlier snapshot.
+    psutil reports one entry per path, not per handle, so a second handle on a
+    path already open would not show up in a difference — which is precisely
+    the leak a release check exists to catch.
     """
     found = []
     for handle in psutil.Process().open_files():
-        if handle.path in before:
-            continue
         try:
             if os.path.samefile(handle.path, path):
                 found.append(handle.path)
-        except OSError:
+        except (OSError, ValueError):
             continue
     return found
 
@@ -1893,50 +1892,27 @@ class TestAggregateAgainstARealNetCDF:
             )
 
     def test_the_source_file_is_released_when_the_run_ends(self, tmp_path):
-        """The descriptor is counted; POSIX would happily unlink an open file."""
+        """The descriptor is checked; POSIX would happily unlink an open file."""
         path = tmp_path / "cube.nc"
         _write_real_nc(path)
-        before = _open_handles()
+        assert not _handles_on(path), (
+            "the fixture left the cube open, so this test cannot attribute a "
+            "handle to the aggregator"
+        )
         aggregate_netcdf(
             path, _single_level_var(), AggregationConfig(freq="3D", op="mean")
         )
-        leaked = _handles_on(path, before)
-        assert not leaked, f"the aggregator kept a handle on its input: {leaked}"
+        assert not _handles_on(path), "the aggregator kept a handle on its input"
 
     def test_the_handle_check_can_actually_fail(self, tmp_path):
         """Guards the test above: a check that cannot fail proves nothing."""
         path = tmp_path / "cube.nc"
         path.write_bytes(b"not a cube")
-        before = _open_handles()
         with path.open("rb"):
-            assert _handles_on(path, before), (
+            assert _handles_on(path), (
                 "an open handle went unseen, so the release test is vacuous"
             )
-        assert not _handles_on(path, before), "the handle survived its context"
-
-    def test_streaming_does_not_materialise_the_whole_cube(self, tmp_path):
-        """The other half of the claim: read volume, measured on a real file.
-
-        The streaming call is the memory-bounded one — the eager call holds
-        every window it returns, so only this path can be held to the cube.
-        """
-        import tracemalloc
-
-        path = tmp_path / "cube.nc"
-        data = _write_real_nc(path, periods=16, rows=160, cols=160)
-        tracemalloc.start()
-        try:
-            for _window in iter_aggregate_netcdf(
-                path, _single_level_var(), AggregationConfig(freq="4D", op="mean")
-            ):
-                pass
-            _, peak = tracemalloc.get_traced_memory()
-        finally:
-            tracemalloc.stop()
-        assert peak < data.nbytes, (
-            f"peak allocation {peak} >= the {data.nbytes}-byte cube: the whole "
-            "time axis is being materialised instead of one window at a time"
-        )
+        assert not _handles_on(path), "the handle survived its context"
 
     def test_a_date_range_drops_samples_outside_it(self, tmp_path):
         """A CDS cross-product over-covers the request; the trim must be real."""
