@@ -462,6 +462,104 @@ class TestCombinatorialPartitionUnion:
         ).check()
 
 
+class TestCalendarImpossibleDates:
+    """The combinatorial check skips dates that cannot exist on the calendar.
+
+    A daily request spanning several months enumerates `day=[01..31]` against
+    every month, so the cross-product contains impossible dates like June 31.
+    CDS serves such a request by dropping the nonexistent days, but a real
+    `constraints.json` partitions `day` by month length and never lists them, so
+    the cover check must skip them rather than reject the whole request.
+    """
+
+    @staticmethod
+    def _month_length_constraints():
+        """Return entries that partition `day` by month length, like ERA5-SL."""
+        return [
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["2022", "2024"],
+                "month": ["07", "08"],
+                "day": [f"{d:02d}" for d in range(1, 32)],
+                "time": ["00:00"],
+            },
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["2022", "2024"],
+                "month": ["06"],
+                "day": [f"{d:02d}" for d in range(1, 31)],
+                "time": ["00:00"],
+            },
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["2022", "2024"],
+                "month": ["02"],
+                "day": [f"{d:02d}" for d in range(1, 30)],
+                "time": ["00:00"],
+            },
+        ]
+
+    def test_multi_month_daily_request_with_impossible_day_passes(self, monkeypatch):
+        """A June-August daily request enumerating day 31 passes (June 31 dropped)."""
+        _stub_urlopen(monkeypatch, self._month_length_constraints())
+        RequestValidator(
+            "reanalysis-era5-single-levels",
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["2022"],
+                "month": ["06", "07", "08"],
+                "day": [f"{d:02d}" for d in range(1, 32)],
+                "time": ["00:00"],
+            },
+        ).check()
+
+    def test_feb_29_common_year_tolerated(self, monkeypatch):
+        """Feb 29 of a common year passes: it is impossible, so CDS drops it."""
+        _stub_urlopen(monkeypatch, self._month_length_constraints())
+        RequestValidator(
+            "reanalysis-era5-single-levels",
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["2022"],
+                "month": ["02"],
+                "day": [f"{d:02d}" for d in range(1, 30)],
+                "time": ["00:00"],
+            },
+        ).check()
+
+    def test_calendar_valid_but_unserved_date_still_rejected(self, monkeypatch):
+        """A real date no entry serves (year 1850) still raises."""
+        _stub_urlopen(monkeypatch, self._month_length_constraints())
+        validator = RequestValidator(
+            "reanalysis-era5-single-levels",
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["1850"],
+                "month": ["06"],
+                "day": ["15"],
+                "time": ["00:00"],
+            },
+        )
+        with pytest.raises(ValueError, match="year"):
+            validator.check()
+
+    def test_helper_flags_only_impossible_dates(self):
+        """`_impossible_calendar_date` is True only for nonexistent dates."""
+        impossible = constraints_module._impossible_calendar_date
+        assert impossible({"month": "06", "day": "31"}) is True
+        assert impossible({"year": "2022", "month": "02", "day": "29"}) is True
+        assert impossible({"year": "2024", "month": "02", "day": "29"}) is False
+        assert impossible({"year": "2022", "month": "07", "day": "31"}) is False
+        assert impossible({"month": "06"}) is False
+        assert impossible({"month": "all", "day": "31"}) is False
+
+
 class TestDateValidity:
     """Tests for the M17 date sanity check."""
 
