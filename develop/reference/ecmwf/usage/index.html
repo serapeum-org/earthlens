@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2581,6 +2581,17 @@
     <span class="md-ellipsis">
       
         Skipping the pre-flight constraint check
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-a-pressure-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing a pressure level
       
     </span>
   </a>
@@ -23519,6 +23530,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#choosing-a-pressure-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing a pressure level
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#multiple-datasets-and-variables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23646,13 +23668,39 @@ are unavailable:</p>
 </code></pre></div>
 <p><code>skip_constraints</code> is one of the extra keyword arguments the <code>EarthLens</code> facade
 forwards verbatim to the backend constructor.</p>
+<h2 id="choosing-a-pressure-level"><a class="toclink" href="#choosing-a-pressure-level">Choosing a pressure level</a><a class="headerlink" href="#choosing-a-pressure-level" title="Permanent link">#</a></h2>
+<p>Each curated pressure-level row ships the single level it was audited at —
+<code>reanalysis-era5-pressure-levels</code> is catalogued at 1000 hPa. Pass
+<code>pressure_level=</code> to retrieve others, without editing the shipped catalog:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;ecmwf&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;reanalysis-era5-pressure-levels&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">]},</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">pressure_level</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;500&quot;</span><span class="p">,</span> <span class="s2">&quot;850&quot;</span><span class="p">],</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020-01-02&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">],</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<p>A single level needs no brackets, and a level written as a number is accepted:
+<code>pressure_level=500</code> and <code>pressure_level="500"</code> are the same request.</p>
+<p>Only variables the catalog gives a level to are affected — a single-level
+variable in the same retrieve keeps its own request shape, since adding a
+<code>pressure_level</code> to it would make the request invalid rather than broader. The
+override is applied after the catalog's per-row <code>extras</code>, so it also wins for
+the families that carry their level there.</p>
+<p>It does not apply to a raw-request passthrough: a raw request already spells
+its own level, so combining the two raises rather than being ignored.</p>
 <h2 id="multiple-datasets-and-variables"><a class="toclink" href="#multiple-datasets-and-variables">Multiple datasets and variables</a><a class="headerlink" href="#multiple-datasets-and-variables" title="Permanent link">#</a></h2>
 <p>A single request can mix datasets and ask for several variables each; the
 backend fans out one CDS retrieve per <code>(dataset, variable)</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="s2">&quot;reanalysis-era5-single-levels&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2m-temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;total-precipitation&quot;</span><span class="p">],</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="s2">&quot;reanalysis-era5-land&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2m-temperature&quot;</span><span class="p">],</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="s2">&quot;reanalysis-era5-single-levels&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2m-temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;total-precipitation&quot;</span><span class="p">],</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="s2">&quot;reanalysis-era5-land&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2m-temperature&quot;</span><span class="p">],</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="aggregating-the-downloaded-stack"><a class="toclink" href="#aggregating-the-downloaded-stack">Aggregating the downloaded stack</a><a class="headerlink" href="#aggregating-the-downloaded-stack" title="Permanent link">#</a></h2>
 <p>Pass <code>aggregate=</code> to reduce the per-variable NetCDF into windowed composites
@@ -23660,18 +23708,18 @@ backend fans out one CDS retrieve per <code>(dataset, variable)</code>:</p>
 precipitation, evaporation, radiation) the catalog's <code>types: flux</code> marking lets
 <code>op="auto"</code> route to a <code>sum</code>; instantaneous <strong>state</strong> variables route to a
 <code>mean</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;ecmwf&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;reanalysis-era5-single-levels&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;total-precipitation&quot;</span><span class="p">]},</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2022-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2022-01-31&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">75.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">74.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data/era5&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">)</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1MS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">),</span>   <span class="c1"># monthly totals</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;ecmwf&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;reanalysis-era5-single-levels&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;total-precipitation&quot;</span><span class="p">]},</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2022-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2022-01-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">75.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">74.0</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data/era5&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">)</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1MS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">),</span>   <span class="c1"># monthly totals</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="p">)</span>
 </code></pre></div>
 <p>Aggregated GeoTIFFs land under <code>&lt;path&gt;/aggregated/</code>. See
 <a href="../../../aggregation/">Aggregation</a> for the full <code>op="auto"</code> walkthrough and the
