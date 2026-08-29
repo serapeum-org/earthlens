@@ -33,7 +33,7 @@ def clear_catalog_cache() -> None:
 
 
 class Dataset(BaseModel):
-    """One EFHM product row.
+    """One JRC dataset row (EFHM, or a sea-level TWL forecast).
 
     Attributes:
         id: The catalog key (`"efhm"`).
@@ -50,8 +50,25 @@ class Dataset(BaseModel):
         base_url: The JRC directory root the return-period files live in.
         filename_template: The per-return-period file-name template
             (`"Europe_RP{rp}_filled_depth.tif"`).
-        return_periods: The published return periods in years.
+        return_periods: The published return periods in years (EFHM only).
         source_url: The dataset landing page.
+        attribution: The citation this row requires (per dataset; the EFHM row
+            leans on the catalog-level attribution instead).
+        product: Sea-level only — the jeodpp product subdirectory
+            (`"medium_term_forecasts"` / `"subseasonal_forecasts"`).
+        cycle_path_template: Sea-level only — `strftime` layout of the cycle
+            folders under `product` (`"%Y/%m/%d/%H"`).
+        gridded_glob: Sea-level only — glob for the gridded NetCDF in a cycle
+            folder (`"*TWLforecastGridded_*.nc"`).
+        coastal_glob: Sea-level only — glob for the coastal-summary CSV
+            (`"*CoastalForecast_*.csv"`).
+        cadence: Advisory cadence label (`"twice-daily"` / `"weekly"`).
+        horizon_days: Nominal forecast horizon in days.
+        endfls_marker: Name of the 0-byte cycle-complete sentinel (`"endFls"`).
+        default_field: Sea-level gridded — the default variable cropped when a
+            request names none (`"TWL75"`).
+        doi: The dataset DOI (empty until confirmed with the data producer).
+        data_period: Human-readable temporal coverage (`"2022-present"`).
 
     Examples:
         - Read the return periods and band:
@@ -74,12 +91,24 @@ class Dataset(BaseModel):
     units: str = "m"
     dtype: str = "float32"
     crs: str = "EPSG:4326"
-    nodata: float = -9999.0
+    nodata: float | None = -9999.0
     spatial_resolution: float | None = None
     base_url: str = ""
     filename_template: str = "Europe_RP{rp}_filled_depth.tif"
     return_periods: list[int] = Field(default_factory=list)
     source_url: str = ""
+    attribution: str = ""
+    # Sea-level forecast fields (unused by the static EFHM raster row).
+    product: str = ""
+    cycle_path_template: str = ""
+    gridded_glob: str = ""
+    coastal_glob: str = ""
+    cadence: str = ""
+    horizon_days: int | None = None
+    endfls_marker: str = "endFls"
+    default_field: str = ""
+    doi: str = ""
+    data_period: str = ""
 
 
 def _parse_catalog(files: list[Path]) -> dict[str, Any]:
@@ -140,8 +169,8 @@ class Catalog(AbstractCatalog):
             ```python
             >>> from earthlens.jrc import Catalog
             >>> cat = Catalog()
-            >>> list(cat.datasets)
-            ['efhm']
+            >>> sorted(cat.datasets)
+            ['efhm', 'sea_level_medium_term', 'sea_level_subseasonal', 'sea_level_subseasonal_coastal']
             >>> cat.license_id
             'CC-BY-4.0'
 

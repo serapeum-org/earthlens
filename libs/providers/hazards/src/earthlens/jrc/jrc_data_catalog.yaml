@@ -28,3 +28,69 @@ datasets:
     filename_template: "Europe_RP{rp}_filled_depth.tif"
     return_periods: [10, 20, 30, 40, 50, 75, 100, 200, 500]
     source_url: "https://data.jrc.ec.europa.eu/dataset/1d128b6c-a4ee-4858-9e34-6210707f3c81"
+
+  # --- Sea-level (Total Water Level) probabilistic forecasts (Copernicus EMS / EC JRC) ---
+  # Global 0.25° NetCDF-4 cubes read via pyramids.netcdf.NetCDF; a global coastal-summary
+  # CSV rides with the subseasonal product. Licence CC-BY-4.0 (shared, top-level). DOI +
+  # the 2024 methodology-paper citation are pending the data producer's reply (left empty
+  # until confirmed). The gridded field geotransform arrives index-space over /vsicurl;
+  # the backend stamps the CF affine from latitude/longitude until pyramids#1071 lands.
+  sea_level_medium_term:
+    kind: sea_level_gridded
+    title: "JRC medium-term probabilistic sea-level (TWL) forecast — 15-day, twice daily"
+    long_name: Total water level (tide + surge + wave) probabilistic forecast
+    units: m
+    dtype: float32
+    crs: EPSG:4326
+    nodata: null
+    spatial_resolution: 27750
+    base_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven"
+    product: medium_term_forecasts
+    cycle_path_template: "%Y/%m/%d/%H"
+    gridded_glob: "*TWLforecastGridded_*.nc"
+    cadence: twice-daily
+    horizon_days: 15
+    endfls_marker: endFls
+    default_field: TWL75
+    data_period: "2022-present"
+    attribution: "Copernicus Emergency Management Service (CEMS) / EC JRC — probabilistic data-driven sea-level forecasts (2024 methodology; full citation pending)."
+    source_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven/medium_term_forecasts/"
+
+  sea_level_subseasonal:
+    kind: sea_level_gridded
+    title: "JRC subseasonal probabilistic sea-level (TWL) forecast — ~46-day, weekly"
+    long_name: Total water level (tide + surge + wave) probabilistic forecast
+    units: m
+    dtype: float32
+    crs: EPSG:4326
+    nodata: null
+    spatial_resolution: 27750
+    base_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven"
+    product: subseasonal_forecasts
+    cycle_path_template: "%Y/%m/%d/%H"
+    gridded_glob: "*TWLforecastGridded_*.nc"
+    cadence: weekly
+    horizon_days: 46
+    endfls_marker: endFls
+    default_field: TWL75
+    data_period: "2026-present"
+    attribution: "Copernicus Emergency Management Service (CEMS) / EC JRC — probabilistic data-driven sea-level forecasts (2024 methodology; full citation pending)."
+    source_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven/subseasonal_forecasts/"
+
+  sea_level_subseasonal_coastal:
+    kind: sea_level_coastal
+    title: "JRC subseasonal coastal sea-level summary — global, per-country exceedance probabilities"
+    long_name: Per-country coastal total-water-level exceedance-probability summary
+    units: ""
+    crs: EPSG:4326
+    nodata: null
+    base_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven"
+    product: subseasonal_forecasts
+    cycle_path_template: "%Y/%m/%d/%H"
+    coastal_glob: "*CoastalForecast_*.csv"
+    cadence: weekly
+    horizon_days: 46
+    endfls_marker: endFls
+    data_period: "2026-present"
+    attribution: "Copernicus Emergency Management Service (CEMS) / EC JRC — probabilistic data-driven sea-level forecasts (2024 methodology; full citation pending)."
+    source_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven/subseasonal_forecasts/"
