@@ -683,6 +683,14 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # composes `dataset=<id>` into `variables={<id>: []}`, so a passthrough
         # is `EarthLens('ecmwf', dataset=<id>, request=<dict>)`.
         self._passthrough: dict[str, Any] | None = None
+        if request is not None and self.pressure_level is not None:
+            # The passthrough forwards the request verbatim, so an override
+            # would be accepted and then do nothing. A raw request already
+            # spells its own level.
+            raise ValueError(
+                "pressure_level= does not apply to a raw-request passthrough; "
+                "put the level in the request itself."
+            )
         if request is not None:
             dataset = (
                 next(iter(variables))
@@ -1620,7 +1628,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
            `pressure_level=`, which replaces it. A row the catalog gives
            no level keeps none either way.
         4. `var_info.extras` merge — per-row catalog overrides win
-           over the template defaults.
+           over the template defaults, but not over the retrieval's own
+           `pressure_level=`, which is applied after them.
         5. `request_kind` strip — drop template-default keys the
            dataset family rejects (e.g. ORAS5 rejects
            `day`/`time`/`area`). Done after the extras merge so a

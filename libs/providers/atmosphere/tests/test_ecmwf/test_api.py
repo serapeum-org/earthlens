@@ -821,6 +821,16 @@ class TestPressureLevelKwarg:
                 pressure_level=[],
             )
 
+    def test_it_is_refused_on_a_raw_request_passthrough(self):
+        """The passthrough forwards the request verbatim, so it would do nothing."""
+        with pytest.raises(ValueError, match="raw-request passthrough"):
+            ECMWF(
+                variables={"reanalysis-era5-single-levels": []},
+                request={"variable": ["2m_temperature"]},
+                path="out",
+                pressure_level=["500"],
+            )
+
     def test_it_reaches_the_backend_through_the_facade(self):
         """The facade forwards an unknown keyword, so no core change was needed."""
         lens = EarthLens(
