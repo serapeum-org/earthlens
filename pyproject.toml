@@ -124,6 +124,11 @@ all = [
 [dependency-groups]
 dev = [
     "nbval >=0.11.0",
+    # psutil: the aggregator's handle-release test counts the process's open
+    # files before and after a run. Deleting the input proves nothing on POSIX,
+    # which permits unlinking an open file, so the descriptor is counted
+    # directly instead; not a runtime dep.
+    "psutil >=5.9",
     # matplotlib: example notebooks plot with it; not a runtime dep.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
