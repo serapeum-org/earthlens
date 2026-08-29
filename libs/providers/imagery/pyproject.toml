@@ -45,7 +45,7 @@ gee = ["earthengine-api >=1.7.26", "google-api-python-client >=2.0", "google-clo
 jaxa = ["jaxa.earth >=0.1.6,<0.2", "gportal >=0.4,<0.5"]
 openeo = ["openeo >=0.47,<0.52"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
-stac = ["pyramids-gis[stac] >=0.54.0"]
+stac = ["pyramids-gis[stac] >=0.58.0"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
