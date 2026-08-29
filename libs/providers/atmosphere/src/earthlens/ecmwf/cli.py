@@ -219,6 +219,27 @@ def _variable_meta(variable: Any) -> dict[str, Any] | None:
     return {"long_name": long_name, "units": units}
 
 
+def _exposed_variable(container: Any, name: str) -> Any | None:
+    """Return one variable of `container`, or None when it cannot be exposed.
+
+    Not every variable in a NetCDF file can be presented as an array: a string
+    column — an observation table's variable-name or units column — raises
+    rather than returning. That is a property of the one variable, so it is
+    reported as None and the rest of the file is still read.
+
+    Args:
+        container: The pyramids NetCDF container.
+        name: The variable to fetch.
+
+    Returns:
+        The variable, or None when the reader cannot expose it.
+    """
+    try:
+        return container.get_variable(name)
+    except (RuntimeError, ValueError, TypeError):
+        return None
+
+
 def _read_via_pyramids(path: str) -> dict[str, dict[str, Any]]:
     """Read each variable's `long_name` / `units` through pyramids.
 
@@ -244,10 +265,7 @@ def _read_via_pyramids(path: str) -> dict[str, dict[str, Any]]:
     container = NetCDF.read_file(path)
     schema: dict[str, dict[str, Any]] = {}
     for name in container.variable_names or []:
-        try:
-            variable = container.get_variable(name)
-        except Exception:  # noqa: BLE001 — a string column cannot be exposed
-            continue
+        variable = _exposed_variable(container, name)
         meta = _variable_meta(variable) if variable is not None else None
         if meta is not None:
             schema[str(name)] = meta
