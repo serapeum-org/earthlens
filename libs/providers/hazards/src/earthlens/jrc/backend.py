@@ -1,29 +1,33 @@
-"""JRC European flood-hazard backend — `JRC(AbstractDataSource)`.
+"""JRC hazard backend — `JRC(AbstractDataSource)` (EFHM + sea-level forecasts).
 
-`JRC` is a download-and-localise raster backend (`OUTPUT_KIND="raster"`)
-for the JRC European Flood Hazard Map (EFHM): "River flood hazard maps for
-Europe and the Mediterranean Basin". Each cell value is river-flood water depth
-(m) for a chosen return period.
+`JRC` is one backend for the JRC / Copernicus-EMS hazard products, selected by
+dataset and dispatched on the catalog row's `kind` (the `ecmwf`-endpoint /
+`RiskIndicators` pattern):
 
-A request is a bbox (`lat_lim` / `lon_lim`) plus one or more `return_periods`.
-The product is static, so `start` / `end` are accepted for facade parity and
-ignored, and the facade-forwarded `aggregate=` is rejected (return periods are
-not a reducible time axis). Each return period is one whole-Europe EPSG:4326
-GeoTIFF of ~23 GB uncompressed, so the backend never reads it whole: it opens
-the file lazily over GDAL's `/vsicurl` (HTTP range requests), reads **only** the
-AOI's pixel window through `pyramids`, and writes one cropped GeoTIFF per return
-period. An AOI outside the Europe / Mediterranean coverage raises a clear
-`ValueError` rather than writing an empty raster.
+* `flood_hazard_raster` — the European Flood Hazard Map (EFHM): one whole-Europe
+  GeoTIFF of river-flood water depth per return period, cropped to the AOI via a
+  lazy `/vsicurl` windowed read. Static; the request axis is `return_periods`.
+* `sea_level_gridded` — the probabilistic Total Water Level (TWL) forecast cubes
+  (medium-term / subseasonal), global 0.25 deg NetCDF-4 read via
+  `pyramids.netcdf.NetCDF`. The request axis is a forecast `reference_time`
+  (default `"latest"`) plus a bbox and a `field` (default `TWL75`); each cycle is
+  resolved by walking the jeodpp autoindex, gated on the `endFls` sentinel. The
+  variables arrive index-space over `/vsicurl`, so the backend reconstructs the
+  CF affine from the grid shape (interim until pyramids#1071).
+* `sea_level_coastal` — the subseasonal global per-country coastal summary CSV,
+  returned as a `pandas.DataFrame`.
 
-The product is public and CC-BY-4.0 (permissive), so there is no auth module and
-no `LicenseWarning`. The raster read happens through `pyramids` (a windowed
-`read_array`), so this is a genuine pyramids-consuming backend — no `xarray`.
+`OUTPUT_KIND` is set per instance from the resolved row's `kind` (raster for the
+two gridded kinds, tabular for the coastal one); the facade reads it to pick the
+return shape and to reject `aggregate=` (the products carry no reducible time
+axis). All products are public + CC-BY-4.0, so there is no auth and no
+`LicenseWarning`. No `xarray` — raster read/crop is pyramids'.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 
@@ -44,53 +48,61 @@ from earthlens.base.spatial import (
     widen_degenerate_bbox,
     windowed_bbox_crop,
 )
+from earthlens.jrc import _helpers
 from earthlens.jrc._helpers import efhm_url
 from earthlens.jrc.catalog import Catalog, Dataset
 
+if TYPE_CHECKING:
+    import pandas as pd
+
 
 class JRC(AbstractDataSource):
-    """JRC European Flood Hazard Map backend (raster GeoTIFF output).
+    """JRC hazard backend (EFHM raster + sea-level TWL forecasts).
 
-    Fetches the EFHM water-depth grid for one or more return periods, cropped to
-    the request bbox, via lazy `/vsicurl` windowed reads. The request is a
-    search/fetch split: `_search` names one product per return period, `_fetch`
-    realises each (windowed read → crop → GeoTIFF).
+    One class serves every JRC dataset; `__init__` resolves the dataset, copies
+    its `kind` onto `self.OUTPUT_KIND`, and `_search` / `_fetch` dispatch on that
+    kind. EFHM is unchanged (return-period GeoTIFF windowed crop); the sea-level
+    kinds resolve a forecast cycle from the jeodpp autoindex and either crop the
+    gridded NetCDF field or parse the coastal-summary CSV.
 
     Attributes:
-        OUTPUT_KIND: Fixed `"raster"`; each return period yields a gridded
-            GeoTIFF. The facade reads it to gate `aggregate=` (rejected — the
-            return periods are not a temporal axis).
+        OUTPUT_KIND: Set per instance in `__init__` from the resolved row's
+            `kind` — `"raster"` for `flood_hazard_raster` / `sea_level_gridded`
+            (returns `list[Path]`), `"tabular"` for `sea_level_coastal`
+            (returns a `pandas.DataFrame`).
 
     Examples:
-        - A small AOI writes one cropped GeoTIFF per return period (marked
-          `+SKIP` — it hits the live JRC directory):
+        - EFHM (marked `+SKIP` — it hits the live JRC directory):
 
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> paths = EarthLens(  # doctest: +SKIP
-            ...     data_source="jrc-flood",
+            ...     data_source="efhm",
             ...     lat_lim=[51.8, 52.0],
             ...     lon_lim=[4.8, 5.0],
             ...     return_periods=[100],
             ...     path="efhm_out",
-            ... ).download()  # -> [Path('efhm_out/efhm_RP100.tif')]
+            ... ).download()
 
             ```
     """
 
     OUTPUT_KIND: OutputKind = "raster"
 
-    #: Maps a catalog row's `kind` to the instance `OUTPUT_KIND`, set per instance
-    #: in `__init__` so a future non-raster JRC dataset can return another shape
-    #: (the `RiskIndicators` / `NSI` / `ecmwf`-endpoint pattern). EFHM is raster.
-    _KIND_TO_OUTPUT: dict[str, OutputKind] = {"flood_hazard_raster": "raster"}
+    #: Maps a catalog row's `kind` to the instance `OUTPUT_KIND`.
+    _KIND_TO_OUTPUT: dict[str, OutputKind] = {
+        "flood_hazard_raster": "raster",
+        "sea_level_gridded": "raster",
+        "sea_level_coastal": "tabular",
+    }
 
-    AGGREGATE_REFUSAL_REASON = "the JRC flood hazard map is a set of static per-return-period depth grids with no temporal axis, so there is nothing to reduce. Call download() without aggregate="
+    AGGREGATE_REFUSAL_REASON = "the JRC hazard products are static per-return-period depth grids or probabilistic forecast cubes with no reducible time axis, so there is nothing to reduce. Call download() without aggregate="
 
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
 
-    #: The EFHM is time-invariant, so a missing `start` / `end` is legal here.
+    #: The EFHM is static and a forecast cycle is picked by `reference_time`, so
+    #: a missing `start` / `end` is legal for every JRC dataset.
     REQUIRES_TIME_WINDOW = False
 
     def __init__(
@@ -104,46 +116,79 @@ class JRC(AbstractDataSource):
         path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         *,
+        dataset: str | None = None,
+        product: str | None = None,
+        representation: str | None = None,
+        reference_time: str | None = "latest",
+        field: str | None = None,
         catalog: Catalog | None = None,
     ):
-        """Initialise a JRC-flood backend instance.
-
-        The EFHM has a single `water_depth` band, so the backend is facet-only
-        (it declares no `variables` axis); the request axis is `return_periods`.
+        """Initialise a JRC backend instance for the resolved dataset.
 
         Args:
-            start: Accepted for facade parity; ignored (the EFHM is static).
+            start: Accepted for facade parity; ignored (products are static /
+                cycle-selected).
             end: Accepted for facade parity; ignored.
-            lat_lim: `[lat_min, lat_max]` bounding-box latitudes. Required.
-            lon_lim: `[lon_min, lon_max]` bounding-box longitudes. Required.
-            return_periods: One return period, or a list, in years — as ints
-                (`100`) or strings (`"100"` / `"RP100"`). Defaults to `[100]`.
-                Every value must be a published return period.
-            temporal_resolution: Advisory label only (the EFHM is static).
-            path: Output directory for the written GeoTIFF(s).
+            lat_lim: `[lat_min, lat_max]` bounding-box latitudes. Required for
+                the raster kinds; defaulted to global for the coastal kind.
+            lon_lim: `[lon_min, lon_max]` bounding-box longitudes.
+            return_periods: EFHM only — one return period or a list, in years.
+            temporal_resolution: Advisory label only.
+            path: Output directory for the written raster(s).
             fmt: Accepted for facade parity; unused.
-            catalog: Optional pre-built `Catalog` (tests inject a faked one);
-                defaults to the bundled catalog.
+            dataset: Which JRC dataset — a catalog id (`"efhm"`,
+                `"sea_level_medium_term"`, …), the family selector `"sea_level"`
+                (paired with `product` / `representation`), or `None` for EFHM.
+            product: Sea-level family — `"medium_term"` | `"subseasonal"`.
+            representation: Sea-level family — `"gridded"` (default) |
+                `"coastal"` (subseasonal only).
+            reference_time: Sea-level — `"latest"` (default) or an explicit cycle
+                (`"2026-08-26T12"`).
+            field: Sea-level gridded — the variable to crop (defaults to the
+                row's `default_field`, `"TWL75"`).
+            catalog: Optional pre-built `Catalog` (tests inject a faked one).
 
         Raises:
-            ValueError: If the bounding box is missing or a requested return
-                period is not published.
+            ValueError: If the dataset / product / representation combination is
+                invalid, or a required bounding box is missing.
         """
-        if lat_lim is None or lon_lim is None:
-            raise ValueError(
-                "JRC requires a bounding box (lat_lim=[s, n], "
-                "lon_lim=[w, e]) — a hazard-map subset has no default extent."
-            )
-
         self._catalog = catalog if catalog is not None else Catalog()
-        self._dataset: Dataset = self._catalog.get("efhm")
+        self._dataset: Dataset = self._catalog.get(
+            self._resolve_dataset_id(dataset, product, representation)
+        )
         self.OUTPUT_KIND = self._KIND_TO_OUTPUT.get(self._dataset.kind, "raster")
-        self._return_periods = self._resolve_return_periods(return_periods)
+        kind = self._dataset.kind
+
+        self._return_periods: list[int] = []
+        self._reference_time = reference_time
+        self._field = ""
+        variables: list[str]
+
+        if kind == "flood_hazard_raster":
+            if lat_lim is None or lon_lim is None:
+                raise ValueError(
+                    "JRC EFHM requires a bounding box (lat_lim=[s, n], "
+                    "lon_lim=[w, e]) — a hazard-map subset has no default extent."
+                )
+            self._return_periods = self._resolve_return_periods(return_periods)
+            variables = [self._dataset.band]
+        elif kind == "sea_level_gridded":
+            if lat_lim is None or lon_lim is None:
+                raise ValueError(
+                    "JRC sea-level gridded forecasts require a bounding box "
+                    "(lat_lim=[s, n], lon_lim=[w, e])."
+                )
+            self._field = field or self._dataset.default_field or "TWL75"
+            variables = [self._field]
+        else:  # sea_level_coastal — global, no AOI
+            lat_lim = lat_lim if lat_lim is not None else [-90.0, 90.0]
+            lon_lim = lon_lim if lon_lim is not None else [-180.0, 180.0]
+            variables = [self._dataset.id]
 
         super().__init__(
             start=start,
             end=end,
-            variables=[self._dataset.band],
+            variables=variables,
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim,
             lon_lim=lon_lim,
@@ -151,16 +196,61 @@ class JRC(AbstractDataSource):
             path=path,
         )
 
+    def _resolve_dataset_id(
+        self, dataset: str | None, product: str | None, representation: str | None
+    ) -> str:
+        """Resolve the request selectors to a single catalog dataset id.
+
+        Args:
+            dataset: A catalog id, the family selector `"sea_level"`, or `None`.
+            product: `"medium_term"` | `"subseasonal"` (sea-level family).
+            representation: `"gridded"` | `"coastal"` (sea-level family).
+
+        Returns:
+            str: The resolved catalog dataset id.
+
+        Raises:
+            ValueError: If the combination is unknown or invalid.
+        """
+        key = (dataset or "").strip().lower()
+        if key in self._catalog.datasets and key != "sea_level":
+            return key
+        if key in ("", "efhm", "flood", "jrc-flood"):
+            return "efhm"
+        if key == "sea_level":
+            rep = (representation or "gridded").strip().lower()
+            prod = (product or "medium_term").strip().lower()
+            if rep == "coastal":
+                if prod != "subseasonal":
+                    raise ValueError(
+                        "representation='coastal' is only available for "
+                        "product='subseasonal'."
+                    )
+                return "sea_level_subseasonal_coastal"
+            if rep != "gridded":
+                raise ValueError(
+                    f"representation must be 'gridded' or 'coastal', got "
+                    f"{representation!r}."
+                )
+            if prod not in ("medium_term", "subseasonal"):
+                raise ValueError(
+                    f"product must be 'medium_term' or 'subseasonal', got "
+                    f"{product!r}."
+                )
+            return f"sea_level_{prod}"
+        raise ValueError(
+            f"unknown JRC dataset {dataset!r}; available: "
+            f"{sorted(self._catalog.datasets)} (or dataset='sea_level' with "
+            "product= / representation=)."
+        )
+
     def _resolve_return_periods(
         self, return_periods: list[int | str] | int | str | None
     ) -> list[int]:
         """Normalise + validate the requested return periods against the catalog.
 
-        Accepts a single value or a list; each may be an int (`100`) or a string
-        (`"100"` / `"RP100"`, case-insensitive). Defaults to `[100]`.
-
         Args:
-            return_periods: The raw request value.
+            return_periods: The raw request value (int, string, or list).
 
         Returns:
             list[int]: Sorted, de-duplicated return periods to fetch.
@@ -177,9 +267,7 @@ class JRC(AbstractDataSource):
         else:
             requested_raw = [return_periods]
 
-        resolved: list[int] = []
-        for value in requested_raw:
-            resolved.append(self._parse_rp(value))
+        resolved = [self._parse_rp(value) for value in requested_raw]
         unknown = [rp for rp in resolved if rp not in available]
         if unknown:
             raise ValueError(
@@ -216,7 +304,7 @@ class JRC(AbstractDataSource):
             ) from None
 
     def _initialize(self):
-        """No-op initialiser — the EFHM is public + anonymous (no client).
+        """No-op initialiser — every JRC dataset is public + anonymous.
 
         Returns:
             None: The parent binds no `self.client`.
@@ -226,7 +314,10 @@ class JRC(AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Return a degenerate (timeless) extent — the EFHM is static.
+        """Return a degenerate (timeless) extent — the request is not a scan.
+
+        The EFHM is static and a forecast cycle is picked by `reference_time`, so
+        there is no `start` / `end` window to validate.
 
         Args:
             start: Ignored.
@@ -236,7 +327,7 @@ class JRC(AbstractDataSource):
 
         Returns:
             TemporalExtent: A frozen model with `None` bounds and an empty date
-                index (a static hazard map has no time axis).
+                index.
         """
         return self._static_extent(resolution=temporal_resolution or "static")
 
@@ -246,33 +337,18 @@ class JRC(AbstractDataSource):
         return (self.space.west, self.space.south, self.space.east, self.space.north)
 
     def _bbox_overlaps(self, source: Any) -> bool:
-        """Whether the AOI overlaps the source raster's geographic extent.
-
-        Delegates to `earthlens.base.spatial.bbox_overlaps` so an AOI outside the
-        EFHM's Europe / Mediterranean coverage is reported with a clear error
-        before the windowed crop, rather than surfacing as an empty or opaque
-        crop result.
-
-        Args:
-            source: An opened `pyramids.Dataset` exposing `geotransform`,
-                `columns`, and `rows`.
-
-        Returns:
-            bool: `True` when the AOI bbox intersects the raster's extent.
-        """
+        """Whether the AOI overlaps the source raster's geographic extent."""
         return bbox_overlaps(source, self._bbox)
 
     def _is_cached(self, target: Path) -> bool:
         """Whether `target` already holds this exact AOI (AOI-aware skip).
 
-        The output filename encodes the return period but not the AOI, so a bare
-        exists-check would return a previous AOI's raster for a new bbox in the
-        same `path`. The `<target>.aoi` sidecar records the AOI the file was
-        written for (`earthlens.base.cache`); the skip only fires when it matches
-        and `force` is off.
+        The output filename encodes the return period / cycle / field but not the
+        AOI, so a `<target>.aoi` sidecar records the AOI the file was written for;
+        the skip only fires when it matches and `force` is off.
 
         Args:
-            target: The candidate output GeoTIFF path.
+            target: The candidate output path.
 
         Returns:
             bool: `True` when a matching cached output exists and may be reused.
@@ -286,77 +362,101 @@ class JRC(AbstractDataSource):
         progress_bar: bool = True,
         *,
         force: bool = False,
-    ) -> list[Path]:
-        """Fetch the EFHM subset(s) as one AOI-cropped GeoTIFF per return period.
+    ) -> list[Path] | pd.DataFrame:
+        """Fetch the resolved dataset's subset(s).
 
         Args:
-            progress_bar: Accepted for signature parity; one read per period.
+            progress_bar: Accepted for signature parity.
             force: Re-fetch even when a complete output already exists.
 
         Returns:
-            list[Path]: The written GeoTIFF path(s), one per return period.
+            list[pathlib.Path]: One cropped GeoTIFF per return period (EFHM) or
+                per gridded cycle. For the coastal kind, a `pandas.DataFrame` of
+                the global per-country summary instead.
 
         Raises:
-            ValueError: If the AOI is outside the EFHM's Europe / Mediterranean
-                coverage. (An antimeridian-crossing `west > east` AOI is already
-                rejected by `SpatialExtent` at construction.)
+            ValueError: If the AOI is outside coverage, or a requested cycle is
+                missing / not yet complete.
         """
         self._force = force
         products = self._search()
-        return self._fetch(products)
+        results = self._fetch(products)
+        if self._dataset.kind == "sea_level_coastal":
+            return results[0]
+        return results
 
     def _search(self) -> list[RemoteProduct]:
-        """Resolve the request to one `RemoteProduct` per return period.
-
-        No network: each product carries its return period and EFHM URL.
+        """Resolve the request to a download plan (dispatched on `kind`).
 
         Returns:
-            list[RemoteProduct]: The download plan, one per return period.
+            list[RemoteProduct]: One product per return period (EFHM), or the
+                single resolved forecast cycle (sea-level). Sea-level resolution
+                walks the jeodpp autoindex (network).
         """
+        kind = self._dataset.kind
+        if kind == "flood_hazard_raster":
+            return [
+                RemoteProduct(
+                    id=f"efhm_RP{rp}",
+                    metadata={
+                        "rp": rp,
+                        "url": efhm_url(
+                            rp,
+                            base_url=self._dataset.base_url,
+                            template=self._dataset.filename_template,
+                        ),
+                    },
+                )
+                for rp in self._return_periods
+            ]
+
+        cycle_url, cycle_id = _helpers.resolve_cycle(
+            self._dataset.base_url,
+            self._dataset.product,
+            self._dataset.cycle_path_template,
+            self._reference_time,
+            self._dataset.endfls_marker,
+            http_text=_helpers._http_text,
+        )
+        if kind == "sea_level_gridded":
+            name = _helpers.find_cycle_file(
+                cycle_url, self._dataset.gridded_glob, http_text=_helpers._http_text
+            )
+            return [
+                RemoteProduct(
+                    id=f"{self._dataset.id}_{cycle_id}_{self._field}",
+                    metadata={"url": f"/vsicurl/{cycle_url}{name}", "cycle": cycle_id},
+                )
+            ]
+        name = _helpers.find_cycle_file(
+            cycle_url, self._dataset.coastal_glob, http_text=_helpers._http_text
+        )
         return [
             RemoteProduct(
-                id=f"efhm_RP{rp}",
-                metadata={
-                    "rp": rp,
-                    "url": efhm_url(
-                        rp,
-                        base_url=self._dataset.base_url,
-                        template=self._dataset.filename_template,
-                    ),
-                },
+                id=f"{self._dataset.id}_{cycle_id}",
+                metadata={"url": f"{cycle_url}{name}", "cycle": cycle_id},
             )
-            for rp in self._return_periods
         ]
 
-    def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
-        """Windowed-read + crop each return period to one GeoTIFF.
+    def _fetch(self, products: list[RemoteProduct]) -> list[Any]:
+        """Realise each product (dispatched on `kind`).
 
         Args:
             products: The plan from `_search`.
 
         Returns:
-            list[Path]: The written GeoTIFF path(s).
-
-        Raises:
-            ValueError: If the AOI is outside the EFHM coverage for a period.
+            list: Written paths (raster kinds) or a one-element list holding the
+                coastal `DataFrame`.
         """
-        return [self._fetch_one(product) for product in products]
+        kind = self._dataset.kind
+        if kind == "flood_hazard_raster":
+            return [self._fetch_efhm_one(product) for product in products]
+        if kind == "sea_level_gridded":
+            return [self._fetch_gridded_one(product) for product in products]
+        return [self._fetch_coastal(product) for product in products]
 
-    def _fetch_one(self, product: RemoteProduct) -> Path:
-        """Read the AOI window of one return-period GeoTIFF and write the crop.
-
-        Opens the whole-Europe GeoTIFF lazily and windowed-crops it to the AOI
-        with `pyramids.Dataset.crop(bbox=)`, whose fast path reads **only** the
-        AOI's pixel window over `/vsicurl` (HTTP range requests, tuned via
-        `vsicurl_config()` — readdir-suppression + retry/timeout) for an
-        axis-aligned box in the source CRS, carrying the source grid, CRS and
-        no-data through (with the
-        catalog no-data stamped when the source declares none). A point AOI is
-        widened to one pixel so the strict fast path still fires. `crop_to_aoi`
-        then trims the all-touched window to the exact bbox — or to the exact
-        polygon when the request carried an `aoi=` polygon. An in-coverage AOI
-        that is entirely no-data (e.g. open sea) still writes an all-no-data
-        raster rather than raising.
+    def _fetch_efhm_one(self, product: RemoteProduct) -> Path:
+        """Windowed-read + crop one return-period GeoTIFF to the AOI.
 
         Args:
             product: The `RemoteProduct` whose `metadata` carries `rp` + `url`.
@@ -365,8 +465,7 @@ class JRC(AbstractDataSource):
             pathlib.Path: The written GeoTIFF at `<path>/efhm_RP{rp}.tif`.
 
         Raises:
-            ValueError: If the AOI does not overlap the EFHM coverage (an
-                in-coverage AOI is written even when it holds no valid data).
+            ValueError: If the AOI does not overlap the EFHM coverage.
         """
         from pyramids.dataset import Dataset as PyramidsDataset
 
@@ -379,8 +478,6 @@ class JRC(AbstractDataSource):
             logger.info(f"JRC: {target.name} already holds this AOI; skipping.")
             return target
 
-        # Tune the /vsicurl read (readdir-suppression + retry/timeout) for the
-        # duration of the open + windowed crop; a plain read_file installs none.
         with vsicurl_config():
             source = PyramidsDataset.read_file(url)
             try:
@@ -390,31 +487,16 @@ class JRC(AbstractDataSource):
                         f"Mediterranean coverage; no RP{rp} data to write."
                     )
                 logger.info(
-                    f"JRC RP{rp}: windowed /vsicurl crop of {self._bbox} "
-                    f"from {url}"
+                    f"JRC EFHM RP{rp}: windowed /vsicurl crop of {self._bbox}"
                 )
-                # A point / cell-edge AOI (min == max on an axis) is widened to
-                # one source pixel so crop(bbox=)'s fast path yields a 1x1 window
-                # rather than raising on the zero-width box.
                 geo = source.geotransform
                 bbox = widen_degenerate_bbox(self._bbox, geo[1], geo[5])
-                # The windowed fast path reads only the AOI pixel window from the
-                # ~23 GB source; nodata / CRS / grid are carried onto the crop. An
-                # in-coverage but all-no-data AOI keeps an all-no-data window
-                # rather than raising.
                 windowed = windowed_bbox_crop(source, bbox, epsg=4326)
             finally:
                 close_quietly(source)
 
         try:
-            # crop carries the source's own no-data through; when the source
-            # declares none, fall back to the catalog value so the output stays
-            # flagged and a polygon `aoi=` can trim exactly (matching the pre-crop
-            # behaviour).
             windowed = ensure_no_data(windowed, self._dataset.nodata)
-            # crop(bbox=) keeps every pixel the box overlaps (all-touched, up to
-            # one extra pixel per edge); trim to the exact bbox (matching FABDEM)
-            # — or to the exact polygon when the request carried an `aoi=` polygon.
             cropped = crop_to_aoi(
                 windowed,
                 self.space,
@@ -439,3 +521,109 @@ class JRC(AbstractDataSource):
             close_quietly(windowed)
         write_sidecar(target, aoi_tag(self.space))
         return target
+
+    def _fetch_gridded_one(self, product: RemoteProduct) -> Path:
+        """Windowed-read + crop one sea-level TWL field to the AOI.
+
+        Opens the global NetCDF cube lazily over `/vsicurl` with
+        `pyramids.netcdf.NetCDF`, reconstructs the CF affine from the grid shape
+        (the variable arrives index-space; interim until pyramids#1071), reads
+        only the AOI pixel window across every forecast time step, rebuilds a
+        small georeferenced `Dataset`, crops to the exact bbox / polygon, and
+        writes one multi-band GeoTIFF (band = forecast time step).
+
+        Args:
+            product: The `RemoteProduct` whose `metadata` carries the `/vsicurl`
+                URL + cycle id.
+
+        Returns:
+            pathlib.Path: The written GeoTIFF at
+                `<path>/<dataset>_<cycle>_<field>.tif`.
+
+        Raises:
+            ValueError: If the AOI does not overlap the grid.
+        """
+        import numpy as np
+        from pyramids.dataset import Dataset as PyramidsDataset
+        from pyramids.netcdf import NetCDF
+
+        from earthlens.base import close_quietly
+
+        url = product.metadata["url"]
+        target = Path(self.path) / f"{product.id}.tif"
+        if self._is_cached(target):
+            logger.info(f"JRC: {target.name} already holds this AOI; skipping.")
+            return target
+
+        with vsicurl_config():
+            container = NetCDF.read_file(url)
+            try:
+                variable = container.get_variable(self._field)
+                cols, rows = variable.columns, variable.rows
+                geo = _helpers.grid_geotransform(cols, rows)
+                window = _helpers.pixel_window(geo, self._bbox, cols, rows)
+                if window is None:
+                    raise ValueError(
+                        f"the AOI {self._bbox} is outside the sea-level grid; "
+                        f"nothing to write for {self._field!r}."
+                    )
+                col_off, row_off, win_cols, win_rows = window
+                logger.info(
+                    f"JRC {self._dataset.id}: windowed /vsicurl read of "
+                    f"{self._field!r} {win_cols}x{win_rows} at ({col_off}, {row_off})"
+                )
+                array = np.asarray(
+                    variable.read_array(
+                        window=[col_off, row_off, win_cols, win_rows]
+                    ),
+                    dtype="float32",
+                )
+                window_geo = _helpers.window_origin(geo, col_off, row_off)
+            finally:
+                close_quietly(container)
+
+        window_ds = PyramidsDataset.create_from_array(
+            array, geo=window_geo, epsg=4326, no_data_value=float("nan")
+        )
+        try:
+            cropped = crop_to_aoi(
+                window_ds,
+                self.space,
+                bbox=[
+                    self.space.west,
+                    self.space.south,
+                    self.space.east,
+                    self.space.north,
+                ],
+                touch=False,
+            )
+            staged = target.with_name(f"{target.stem}.part{target.suffix}")
+            try:
+                cropped.to_file(str(staged))
+                close_quietly(cropped)
+                staged.replace(target)
+            except BaseException:
+                close_quietly(cropped)
+                staged.unlink(missing_ok=True)
+                raise
+        finally:
+            close_quietly(window_ds)
+        write_sidecar(target, aoi_tag(self.space))
+        return target
+
+    def _fetch_coastal(self, product: RemoteProduct) -> pd.DataFrame:
+        """Fetch + parse the global coastal-summary CSV to a `DataFrame`.
+
+        Args:
+            product: The `RemoteProduct` whose `metadata` carries the CSV URL.
+
+        Returns:
+            pandas.DataFrame: The per-country exceedance-probability summary.
+        """
+        from io import StringIO
+
+        import pandas as pd
+
+        url = product.metadata["url"]
+        logger.info(f"JRC {self._dataset.id}: reading coastal summary {url}")
+        return pd.read_csv(StringIO(_helpers._http_text(url)))
