@@ -91,6 +91,17 @@ def _fake_read_file_masked(_url):
     return _FakeContainer(_FakeMaskedVariable())
 
 
+class _ExplodingDataset:
+    """A cropped dataset whose write fails, to exercise the staging rollback."""
+
+    def to_file(self, path):
+        Path(path).write_bytes(b"partial")
+        raise OSError("disk full")
+
+    def close(self):
+        """Accept the backend's `close_quietly` call."""
+
+
 # --------------------------------------------------------------------------- #
 # Dataset resolution
 # --------------------------------------------------------------------------- #
@@ -528,6 +539,20 @@ class TestGriddedEdges:
         )
         paths = backend.download()
         assert len(paths) == 1 and paths[0].exists()
+
+    def test_failed_write_leaves_no_partial_file(self, tmp_path: Path, monkeypatch):
+        """A write that fails mid-way removes the staged file and re-raises."""
+        backend = self._backend(tmp_path, monkeypatch)
+        monkeypatch.setattr(
+            "earthlens.jrc.backend.crop_to_aoi",
+            lambda *args, **kwargs: _ExplodingDataset(),
+        )
+        with pytest.raises(OSError, match="disk full"):
+            backend.download()
+        assert list(tmp_path.glob("*.part.tif")) == [], (
+            "a staged .part file was left behind"
+        )
+        assert list(tmp_path.glob("*.tif")) == [], "a partial output was left behind"
 
     def test_masked_fill_becomes_nan(self, tmp_path: Path, monkeypatch):
         """A masked source cell is written as NaN, not the numeric fill value."""

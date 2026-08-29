@@ -271,6 +271,25 @@ def pixel_window(
 def window_origin(
     geo: tuple[float, float, float, float, float, float], col_off: int, row_off: int
 ) -> tuple[float, float, float, float, float, float]:
-    """Shift a geotransform's origin to a pixel window's top-left corner."""
+    """Shift a geotransform's origin to a pixel window's top-left corner.
+
+    Args:
+        geo: The source grid's 6-element north-up geotransform.
+        col_off: The window's first column, in source pixels.
+        row_off: The window's first row, in source pixels.
+
+    Returns:
+        tuple: The same transform with its origin moved to the window corner, so
+            the cropped array carries real-world coordinates.
+
+    Examples:
+        - The North Sea window of the global 0.25 deg grid starts at 3E / 53N:
+            ```python
+            >>> from earthlens.jrc._helpers import grid_geotransform, window_origin
+            >>> window_origin(grid_geotransform(1440, 720), 732, 148)
+            (3.0, 0.25, 0.0, 53.0, 0.0, -0.25)
+
+            ```
+    """
     x0, dx, _, y0, _, dy = geo
     return (x0 + col_off * dx, dx, 0.0, y0 + row_off * dy, 0.0, dy)
