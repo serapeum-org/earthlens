@@ -60,6 +60,39 @@ lens = EarthLens(
 `skip_constraints` is one of the extra keyword arguments the `EarthLens` facade
 forwards verbatim to the backend constructor.
 
+## Choosing a pressure level
+
+Each curated pressure-level row ships the single level it was audited at —
+`reanalysis-era5-pressure-levels` is catalogued at 1000 hPa. Pass
+`pressure_level=` to retrieve others, without editing the shipped catalog:
+
+```python
+from earthlens.core import EarthLens
+
+EarthLens(
+    data_source="ecmwf",
+    variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+    pressure_level=["500", "850"],
+    start="2020-01-01",
+    end="2020-01-02",
+    lat_lim=[40.0, 50.0],
+    lon_lim=[0.0, 10.0],
+    path="out",
+).download()
+```
+
+A single level needs no brackets, and a level written as a number is accepted:
+`pressure_level=500` and `pressure_level="500"` are the same request.
+
+Only variables the catalog gives a level to are affected — a single-level
+variable in the same retrieve keeps its own request shape, since adding a
+`pressure_level` to it would make the request invalid rather than broader. The
+override is applied after the catalog's per-row `extras`, so it also wins for
+the families that carry their level there.
+
+It does not apply to a raw-request passthrough: a raw request already spells
+its own level, so combining the two raises rather than being ignored.
+
 ## Multiple datasets and variables
 
 A single request can mix datasets and ask for several variables each; the
