@@ -518,7 +518,9 @@ def _render_level(level: Any) -> str:
     array of levels renders like the builtin it stands for.
 
     A level is a pressure in hPa, so anything that does not read as a finite
-    number is refused here rather than sent. The store's own constraint check
+    number is refused here rather than sent, and one written with surrounding
+    space or in exponent form is rendered from the number it parses to rather
+    than echoed back. The store's own constraint check
     would catch most of them, but not under `skip_constraints=True` and not
     offline, and a rejected request says far less than this does.
 
@@ -541,7 +543,7 @@ def _render_level(level: Any) -> str:
         if not math.isfinite(value):
             raise ValueError(f"{level!r} is not a finite pressure level.")
         return str(int(value)) if value.is_integer() else str(level)
-    text = str(level)
+    text = str(level).strip()
     try:
         value = float(text)
     except (TypeError, ValueError):
@@ -550,7 +552,10 @@ def _render_level(level: Any) -> str:
         ) from None
     if not math.isfinite(value):
         raise ValueError(f"{level!r} is not a finite pressure level.")
-    return text
+    # Rendered from the parsed number rather than echoed, so a level spelled
+    # `" 500 "` or `"1e3"` reaches the store as `"500"` and `"1000"` — both
+    # parse, and neither matches a level as written.
+    return str(int(value)) if value.is_integer() else text
 
 
 def _normalize_pressure_level(

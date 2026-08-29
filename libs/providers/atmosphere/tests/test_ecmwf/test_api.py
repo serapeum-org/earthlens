@@ -829,6 +829,26 @@ class TestNormalizePressureLevel:
         assert ecmwf_backend._normalize_pressure_level(given) == expected
 
     @pytest.mark.parametrize(
+        ("given", "expected"),
+        [(" 500 ", ["500"]), ("1e3", ["1000"]), ([" 850 "], ["850"])],
+        ids=["padded", "exponent", "padded-in-list"],
+    )
+    def test_a_level_is_rendered_from_the_number_it_parses_to(self, given, expected):
+        """Both spellings parse; neither matches a level as written."""
+        assert ecmwf_backend._normalize_pressure_level(given) == expected
+
+    def test_a_generator_of_levels_is_accepted(self):
+        """Any ordered iterable will do; a generator is a natural one."""
+        assert ecmwf_backend._normalize_pressure_level(
+            level for level in (500, 850)
+        ) == ["500", "850"]
+
+    def test_a_generator_yielding_nothing_is_refused(self):
+        """The empty case has to survive being spelled lazily."""
+        with pytest.raises(ValueError, match="no levels"):
+            ecmwf_backend._normalize_pressure_level(level for level in ())
+
+    @pytest.mark.parametrize(
         "given", [float("nan"), float("inf"), [float("nan")], ["inf"]]
     )
     def test_a_non_finite_level_is_refused(self, given):
