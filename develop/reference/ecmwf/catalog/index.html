@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24811,40 +24811,6 @@ Per-row <code>extras</code> override the parent's <code>level_type</code> / <cod
 from a live tiny retrieve. Licence-gated and best-effort — a dataset
 whose licence you have not accepted is left untouched rather than
 guessed at.</p>
-<p><strong>One probe per placeholder.</strong> A dataset's constraints partition it into
-blocks, and a variable is only retrievable under the selectors of a block
-that lists it, so the sweep asks for each placeholder variable by name in
-turn rather than probing the dataset once. That is what lets a
-multi-variable dataset finish: a single probe only ever describes whichever
-variable its constraints list first, so a stanza with four placeholders
-could never be completed by one.</p>
-<p>Because the probe names the variable it wants, a lone data variable coming
-back identifies that row outright — the correspondence is established by
-the request rather than inferred from the names, and none of the matching
-rules below is consulted. A probe that answers with several data variables,
-or with none, falls through to those rules, which decline rather than guess.</p>
-<p><strong>Per-variable selectors are recorded.</strong> The block that serves a variable
-carries the selectors that variable needs, so where they differ from the
-stanza's own <code>extras:</code> the difference is written as a per-variable override.
-GloFAS is the case this exists for — river discharge and runoff are served
-under <code>timespan: time_mean</code>, snow depth and soil wetness only under
-<code>instantaneous</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="w">      </span><span class="nt">snow-depth-water-equivalent</span><span class="p">:</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">        </span><span class="nt">cds_variable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">snow_depth_water_equivalent</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">        </span><span class="nt">nc_variable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sd</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">        </span><span class="nt">units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kg m-2</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">        </span><span class="nt">extras</span><span class="p">:</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">          </span><span class="nt">timespan</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">instantaneous</span><span class="p p-Indicator">]</span>
-</code></pre></div>
-<p><strong>Cost.</strong> One retrieve per placeholder row, each under the same per-request
-deadline, so a wide dataset is a long sweep. A dataset whose first probe is
-refused is abandoned rather than retried for every remaining row, and rows
-filled before that are kept — the pass writes each shard as it goes, so
-re-running continues where the last one stopped. Use <code>--limit</code> to work
-through the catalog in batches.</p>
-<p>A dataset whose constraints do not partition by variable at all has no block
-to look a row up in; those fall back to a single whole-dataset probe and the
-matching rules below.</p>
 <p>Matching is deliberately conservative. The confident rules come first: an
 exact short-name match, then a token-subset match against the variable's
 <code>long_name</code>. Only a single leftover slug facing a single unused variable
@@ -24874,8 +24840,8 @@ the package doesn't yet support:</p>
 <ol>
 <li>
 <p><strong>Surface the gap.</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>ecmwf
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>audit<span class="w"> </span>ecmwf<span class="w"> </span>--coverage
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>ecmwf
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>audit<span class="w"> </span>ecmwf<span class="w"> </span>--coverage
 </code></pre></div>
 </li>
 </ol>
@@ -24887,8 +24853,8 @@ the package doesn't yet support:</p>
 <li>
 <p><strong>Probe a known-good variable</strong> to discover its NetCDF
    short name and units:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>ecmwf<span class="w"> </span>--live<span class="w">      </span><span class="c1"># check every dataset&#39;s request is constructible</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>ecmwf<span class="w"> </span>&lt;dataset-short-name&gt;<span class="w"> </span>--deep
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>ecmwf<span class="w"> </span>--live<span class="w">      </span><span class="c1"># check every dataset&#39;s request is constructible</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>ecmwf<span class="w"> </span>&lt;dataset-short-name&gt;<span class="w"> </span>--deep
 </code></pre></div>
 </li>
 </ol>
@@ -24897,17 +24863,17 @@ the package doesn't yet support:</p>
 <ol>
 <li>
 <p><strong>Author the YAML entry</strong> under <code>datasets:</code>. At minimum:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">datasets</span><span class="p">:</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">&lt;dataset-short-name&gt;</span><span class="p">:</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nt">product_type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">&lt;product-type-from-constraints&gt;</span><span class="p p-Indicator">]</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="nt">request_kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">form</span><span class="w">     </span><span class="c1"># or oceanic_monthly / carra_means</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="nt">endpoint</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cds</span><span class="w">          </span><span class="c1"># omit for CDS; ads / ewds / ecds / xds otherwise</span>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="nt">extras</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="nv">...</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w">        </span><span class="c1"># any gating fields the audit flagged</span>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="nt">variables</span><span class="p">:</span>
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">      </span><span class="s">&quot;&lt;short-code&gt;&quot;</span><span class="p p-Indicator">:</span>
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">        </span><span class="nt">nc_variable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;from the probe&gt;</span>
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">        </span><span class="nt">units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;from the probe&gt;</span>
-<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="w">        </span><span class="nt">types</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">state</span><span class="w">        </span><span class="c1"># or flux for accumulated quantities</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">datasets</span><span class="p">:</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">&lt;dataset-short-name&gt;</span><span class="p">:</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="nt">product_type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">&lt;product-type-from-constraints&gt;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="nt">request_kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">form</span><span class="w">     </span><span class="c1"># or oceanic_monthly / carra_means</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="nt">endpoint</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cds</span><span class="w">          </span><span class="c1"># omit for CDS; ads / ewds / ecds / xds otherwise</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="nt">extras</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="nv">...</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w">        </span><span class="c1"># any gating fields the audit flagged</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="nt">variables</span><span class="p">:</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">      </span><span class="s">&quot;&lt;short-code&gt;&quot;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">        </span><span class="nt">nc_variable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;from the probe&gt;</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">        </span><span class="nt">units</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;from the probe&gt;</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">        </span><span class="nt">types</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">state</span><span class="w">        </span><span class="c1"># or flux for accumulated quantities</span>
 </code></pre></div>
 </li>
 </ol>
@@ -24925,7 +24891,7 @@ add one more variable:</p>
 <ol>
 <li>
 <p>Probe it for <code>nc_variable</code> / <code>units</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>ecmwf<span class="w"> </span>reanalysis-era5-single-levels<span class="w"> </span>--deep
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>ecmwf<span class="w"> </span>reanalysis-era5-single-levels<span class="w"> </span>--deep
 </code></pre></div>
 </li>
 <li>
