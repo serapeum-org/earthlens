@@ -552,11 +552,13 @@ def _normalize_pressure_level(
 
     Raises:
         TypeError: If given something that is neither a level nor a sequence of
-            levels. A mapping is refused rather than quietly reduced to its
-            keys, which is what iterating one would do.
-        ValueError: If given an empty sequence. `pressure_level: []` is not a
-            valid request and asking for no levels is not what any caller
-            means; `None` is how a caller declines to override.
+            levels. A mapping and a `bytes` are refused by name rather than
+            iterated — one yields its keys, the other its byte values — and a
+            bool is refused by :func:`_render_level` as an `int` subclass.
+        ValueError: If given an empty sequence, or a level that does not read
+            as a number. `pressure_level: []` is not a valid request and asking
+            for no levels is not what any caller means; `None` is how a caller
+            declines to override.
     """
     if pressure_level is None:
         return None
@@ -675,11 +677,20 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 `constraints.json` is stale or wrong for the
                 dataset, or when running offline. Defaults to `False`.
             pressure_level: Pressure levels in hPa to retrieve, replacing
-                the level each catalog row carries. A bare string is
-                accepted for the single-level case. Only variables the
-                catalog gives a `cds_pressure_level` are affected, so a
-                single-level variable in the same retrieve is untouched.
-                Defaults to `None`, which keeps each row's own level.
+                the level each catalog row carries. A lone level needs no
+                brackets and may be written as a number, so `500`, `"500"`
+                and `[500]` are the same request.
+
+                Applied to any row whose request carries a level, whether
+                the catalog spells it as `cds_pressure_level` or in the
+                row's `extras` — the CARRA means family does the latter. A
+                single-level variable in the same retrieve is untouched,
+                since giving it a level would make its request invalid
+                rather than broader.
+
+                Raises `ValueError` when combined with `request=`: a raw
+                request is forwarded verbatim and already spells its own
+                level. Defaults to `None`, which keeps each row's own.
         """
         self.skip_constraints = skip_constraints
         # Per-endpoint cdsapi client cache (one per ENDPOINTS slug). Populated
