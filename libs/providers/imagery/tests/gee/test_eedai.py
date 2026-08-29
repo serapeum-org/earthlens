@@ -131,6 +131,8 @@ class TestReaderContract:
             ),
             geometry=None,
             credentials=None,
+            tile_size=256,
+            path="out.tif",
         )
 
     def test_scale_and_shape_are_mutually_exclusive(self):
