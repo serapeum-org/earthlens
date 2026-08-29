@@ -128,9 +128,7 @@ dev = [
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
-    # runtime dep of earthlens itself. 0.52.0 adopts cleopatra 0.31's RgbBands
-    # in the ArrayGlyph constructor (pyramids #972) and its [viz] extra pulls
-    # cleopatra[tiles] >=0.31.0.
+    # runtime dep of earthlens itself.
     "pyramids-gis[viz] >=0.54.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
@@ -150,7 +148,7 @@ dev = [
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-gis[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
-    "cleopatra[tiles] >=0.31.0",
+    "cleopatra[tiles] >=0.34.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     # mypy: the `mypy` pre-commit hook and the lint.yml `static` job type-check src.
@@ -219,7 +217,7 @@ docs = [
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-gis[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
-    "cleopatra[tiles] >=0.31.0",
+    "cleopatra[tiles] >=0.34.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
     # scipy: the satellite showcase blurs the logo's drop shadow with
