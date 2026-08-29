@@ -13,6 +13,7 @@ network. The autouse `_block_real_cdsapi` safeguard in
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -600,6 +601,22 @@ class TestBuildRequest:
             f"{pressure_level_var_info.cds_pressure_level!r}"
         )
 
+    def test_an_extras_none_opt_out_still_wins_over_the_override(self, ecmwf_stub):
+        """A row that opts out of the key must not have one handed back to it."""
+        var_info = Variable(
+            cds_dataset="reanalysis-era5-pressure-levels",
+            cds_variable="temperature",
+            cds_pressure_level=["1000"],
+            nc_variable="t",
+            units="K",
+            product_type=["reanalysis"],
+            extras={"pressure_level": None},
+        )
+        ecmwf_stub.pressure_level = ["500"]
+        assert "pressure_level" not in ecmwf_stub._build_request(var_info), (
+            "the None opt-out was overridden after the relocation"
+        )
+
     def test_the_request_does_not_alias_an_extras_value(self, ecmwf_stub):
         """extras are merged from the row, which is cached for the process."""
         extras = {"pressure_level": ["1000"]}
@@ -854,6 +871,22 @@ class TestNormalizePressureLevel:
         )
 
 
+class _RecordingRetrieve:
+    """Client stub that records each request and writes an empty target."""
+
+    def __init__(self, root):
+        self.root = root
+        self.requests: list[dict] = []
+
+    def retrieve(self, dataset, request, target=None):
+        """Record the request and touch the target the backend asked for."""
+        self.requests.append(request)
+        if target is not None:
+            Path(target).parent.mkdir(parents=True, exist_ok=True)
+            Path(target).write_bytes(b"")
+        return target
+
+
 class TestPressureLevelKwarg:
     """The `pressure_level=` retrieval override (#42)."""
 
@@ -923,6 +956,35 @@ class TestPressureLevelKwarg:
             logger.remove(sink_id)
         assert not any("was not used" in message for message in messages), (
             f"a used override was reported as skipped; logged {messages!r}"
+        )
+
+    def test_it_survives_a_real_download_of_several_variables(self, tmp_path):
+        """Everything else here builds a stub; this proves the real path carries it."""
+        backend = ECMWF(
+            start="2020-01-01",
+            end="2020-01-02",
+            variables={
+                "reanalysis-era5-pressure-levels": ["temperature", "geopotential"]
+            },
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path=tmp_path,
+            skip_constraints=True,
+            pressure_level=[500, 850],
+        )
+        client = _RecordingRetrieve(tmp_path)
+        backend._client_for = lambda endpoint: client
+        backend.download()
+        assert len(client.requests) == 2, (
+            f"expected one retrieve per variable; got {len(client.requests)}"
+        )
+        for request in client.requests:
+            assert request["pressure_level"] == ["500", "850"], (
+                f"the override did not reach the request: {request!r}"
+            )
+        first, second = client.requests
+        assert first["pressure_level"] is not second["pressure_level"], (
+            "two requests of one download share the override list"
         )
 
     def test_a_bare_instance_has_the_default(self):
