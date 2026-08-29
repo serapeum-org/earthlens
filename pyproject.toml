@@ -128,9 +128,7 @@ dev = [
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
-    # runtime dep of earthlens itself. 0.52.0 adopts cleopatra 0.31's RgbBands
-    # in the ArrayGlyph constructor (pyramids #972) and its [viz] extra pulls
-    # cleopatra[tiles] >=0.31.0.
+    # runtime dep of earthlens itself.
     "pyramids-gis[viz] >=0.54.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
