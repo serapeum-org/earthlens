@@ -173,7 +173,7 @@ dev = [
     # pulled in here instead -- otherwise the tests that pin its
     # `from_earthengine` signature would skip everywhere and a 0.x contract
     # change would only surface on a live run.
-    "pyramids-eo >=0.2.0,<0.3",
+    "pyramids-eo >=0.5.0,<0.6",
 ]
 # The eclipse showcase notebooks need a heavy geostationary-imagery stack that the
 # rest of the project does not. It is kept out of `dev` deliberately: pulling satpy

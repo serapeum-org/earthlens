@@ -62,7 +62,7 @@ def import_earthengine_reader() -> ModuleType:
             >>> dataset = reader.from_earthengine(  # doctest: +SKIP
             ...     "USGS/SRTMGL1_003",
             ...     bands=["elevation"],
-            ...     bbox=(31.25, 29.95, 31.3, 30.0),
+            ...     window=reader.Window(bbox=(31.25, 29.95, 31.3, 30.0)),
             ... )
             >>> dataset.shape  # doctest: +SKIP
             (1, 63, 62)
