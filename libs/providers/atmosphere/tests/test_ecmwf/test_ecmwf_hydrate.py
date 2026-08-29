@@ -363,6 +363,54 @@ _CLAIMED_BLOCK = """      total-precipitation:
 """
 
 
+class TestIsAuxiliary:
+    """Which retrieved variables may stand in for a catalog slug."""
+
+    @pytest.mark.parametrize(
+        "name",
+        [
+            "lat_bnds",
+            "pixel_count",
+            "quality_flag",
+            "FAPAR_QFLAG",
+            "FAPAR_ERR",
+            "swe_unc",
+            "sla_uncertainty",
+            "ice_conc_stddev",
+            "sensor_zenith_angle",
+        ],
+        ids=[
+            "bounds",
+            "count",
+            "flag",
+            "cdr-quality-flag",
+            "uncertainty-err",
+            "uncertainty-unc",
+            "uncertainty-spelled-out",
+            "spread",
+            "viewing-angle",
+        ],
+    )
+    def test_a_band_describing_a_measurement_is_not_one(self, name):
+        """An uncertainty or flag band is about a variable, not a variable."""
+        assert hydrate_mod._is_auxiliary(name), f"{name!r} was offered as data"
+
+    @pytest.mark.parametrize(
+        "name", ["t2m", "sst", "glacier_area", "error_estimate", "flagship_index"]
+    )
+    def test_a_real_variable_still_reads_as_data(self, name):
+        """The filter must not swallow a measurement that merely reads like one."""
+        assert not hydrate_mod._is_auxiliary(name), f"{name!r} was filtered out"
+
+    def test_a_slug_is_not_bound_to_its_own_uncertainty_band(self):
+        """The leftover rule pairs on shared words, and a band shares them all."""
+        meta = {"FAPAR_ERR": {"long_name": "FAPAR uncertainty", "units": "1"}}
+        assert hydrate_mod._match_variables(["fapar"], meta) == {}, (
+            "the slug took the uncertainty band, which mis-extracts silently "
+            "at aggregate= time with plausible units"
+        )
+
+
 class TestClaimedNcNames:
     """Tests for the reservation set read out of a stanza's hydrated rows."""
 

@@ -80,6 +80,19 @@ _AUXILIARY_SUFFIXES = (
     "_status",
     "_flag",
     "_flags",
+    # A CDR spells its quality band `FAPAR_QFLAG`, which does not end in
+    # `_flag` - the tail is `qflag` - so the entry above does not reach it.
+    "_qflag",
+    "_qflags",
+    # An uncertainty or spread band describes a measurement rather than being
+    # one. Its long_name names the quantity it belongs to, which is enough for
+    # the leftover rule to pair it with that quantity's slug.
+    "_err",
+    "_error",
+    "_unc",
+    "_uncertainty",
+    "_stddev",
+    "_sigma",
     "_zenith_angle",
     "_azimuth_angle",
     "_covered_hours",
@@ -342,8 +355,10 @@ def _is_auxiliary(name: str) -> bool:
     slug (a wrong `nc_variable` silently mis-extracts at `aggregate=` time).
     Covers the explicit :data:`_COORD_NAMES` and :data:`_AUXILIARY_NAMES`, the
     observation-count prefix `nobs` / `n_obs`, and every :data:`_AUXILIARY_SUFFIXES`
-    tail — cell bounds (`lat_bnds`), counts (`pixel_count`), status/quality flags,
-    and solar/sensor viewing angles (`SZA`, `sensor_zenith_angle`).
+    tail — cell bounds (`lat_bnds`), counts (`pixel_count`), status and quality
+    flags in both spellings (`quality_flag`, `FAPAR_QFLAG`), uncertainty and
+    spread bands (`FAPAR_ERR`, `swe_unc`, `ice_conc_stddev`), and solar/sensor
+    viewing angles (`SZA`, `sensor_zenith_angle`).
     """
     lower = name.lower()
     return (
