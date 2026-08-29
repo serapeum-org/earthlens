@@ -657,12 +657,16 @@ datasets:
     variables:
       surface-upwelling-shortwave-flux:
         cds_variable: surface_upwelling_shortwave_flux
-        nc_variable: surface_upwelling_shortwave_flux
-        units: unknown
+        nc_variable: SRS
+        units: W/m^2
+        extras:
+          product_family: [clara_a2]
       surface-upwelling-longwave-flux:
         cds_variable: surface_upwelling_longwave_flux
-        nc_variable: surface_upwelling_longwave_flux
-        units: unknown
+        nc_variable: SOL
+        units: W m-2
+        extras:
+          product_family: [clara_a2]
       surface-downwelling-shortwave-flux:
         cds_variable: surface_downwelling_shortwave_flux
         nc_variable: surface_downwelling_shortwave_flux

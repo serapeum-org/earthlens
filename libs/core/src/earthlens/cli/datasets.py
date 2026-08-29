@@ -630,13 +630,13 @@ def curate(
     limit: int = typer.Option(
         0,
         "--limit",
-        help="ecmwf --all / gee|ecmwf --fill-empty: only process the first N "
+        help="ecmwf --all: first N datasets. ecmwf --fill-empty: first N placeholder rows. gee --fill-empty: first N "
         "rows (0=all).",
     ),
     timeout: int = typer.Option(
         180,
         "--timeout",
-        help="ecmwf --fill-empty: seconds to wait for each dataset's live "
+        help="ecmwf --fill-empty: seconds to wait for each variable's live "
         "retrieve before skipping it (0 = no deadline).",
     ),
     version: str = typer.Option("", "--version", help="earthdata: collection version."),
@@ -748,7 +748,7 @@ def _run_bulk_curation(
         fill_empty: Run the bulk-hydrate pass (`curate gee/ecmwf --fill-empty`).
         write: Whether the mutating `--write` flag was given.
         limit: Cap on rows processed (0 = all).
-        timeout: Per-dataset retrieve deadline for `--fill-empty` (0 = none).
+        timeout: Per-probe retrieve deadline for `--fill-empty` (0 = none).
 
     Returns:
         True when a bulk pass ran (the caller should return), else False.
@@ -845,7 +845,7 @@ def _curate_fill_empty(
         info: The backend (gee or ecmwf).
         write: `--fill-empty` mutates the catalog, so `--write` is required.
         limit: Only hydrate the first N placeholder rows (None = all).
-        timeout: Per-dataset retrieve deadline in seconds (ecmwf only; 0 = none).
+        timeout: Per-probe retrieve deadline in seconds (ecmwf only; 0 = none).
     """
     if not write:
         raise typer.BadParameter("--fill-empty rewrites the catalog; pass --write")
@@ -858,12 +858,15 @@ def _curate_fill_empty(
 
     timed_out = summary.get("timed_out") or 0
     unmatched = summary.get("unmatched") or 0
+    partial = summary.get("partial") or 0
     tail = f", {timed_out} timed out" if timed_out else ""
     if unmatched:
         tail += f", {unmatched} retrieved with no confident match"
+    if partial:
+        tail += f", {partial} stopped early (re-run to continue)"
     out_console().print(
         f"[green]hydrated {summary['hydrated']}[/green] / "
-        f"{summary['candidates']} placeholder rows "
+        f"{summary['candidates']} datasets "
         f"(skipped {summary['skipped']}{tail})"
     )
 

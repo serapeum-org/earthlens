@@ -1,5 +1,34 @@
 # Change Log
 
+## 0.18.0 (2026-08-23)
+
+### BREAKING CHANGE
+
+- the four inform:* Risk datasets change what they
+return. They read the published release workbook instead of the Scores
+API, so scores come from the current release (Kenya 6.2, against 5.8
+from the workflow the API still serves), the frame gains a source
+column, validity_year carries a real year instead of 0, and workflow_id
+is empty on a workbook row. No signatures change - source="api"
+restores the API behaviour.
+
+### Feat
+
+- **risk_indicators**: serve INFORM's currently published release (#1102)
+- **gee**: read raw assets through the pyramids-eo EEDAI fast-path (#1092)
+- **fdsn**: add optional ShakeMap raster side-output for USGS events (#1094)
+
+### Fix
+
+- **eea_aq**: mask EEA no-data sentinels to NaN (#1107)
+- **ecmwf**: require evidence before the hydrator pairs a lone slug (#1105)
+- **ecmwf**: broaden pre-aggregated detection to flux monthly/daily families (#1101)
+- **aggregate**: stop op="auto" over-counting pre-aggregated CDS datasets (#1095)
+
+### Refactor
+
+- **base**: consolidate the typed availability errors and status extractors (#1106)
+
 ## 0.17.0 (2026-08-22)
 
 ### Feat
