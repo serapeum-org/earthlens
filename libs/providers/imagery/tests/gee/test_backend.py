@@ -1758,11 +1758,16 @@ class _FakeEedaiDataset:
 
 
 class _FakeWindow:
-    """Stand-in for `pyramids_eo.Window`; carries the spatial read spec."""
+    """Stand-in for `pyramids_eo.Window`; carries the spatial read spec.
 
-    def __init__(
-        self, bbox=None, crs="EPSG:4326", scale=None, shape=None, resample="nearest"
-    ):
+    The four fields the backend must supply (`bbox`, `crs`, `shape`,
+    `resample`) are required, so dropping one from the `Window(...)`
+    construction fails loudly here instead of silently inheriting a default
+    that would let the assertion pass anyway. `scale` keeps its `None` default
+    because the backend resolves scale into `shape` and never passes it.
+    """
+
+    def __init__(self, *, bbox, crs, shape, resample, scale=None):
         self.bbox = bbox
         self.crs = crs
         self.scale = scale
