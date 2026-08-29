@@ -1769,3 +1769,131 @@ class TestAggregationMemoryCeiling:
             f"peak allocation {peak} is more than 6x one window ({window}); "
             "windows appear to be accumulating rather than being released"
         )
+
+
+def _write_real_nc(path, *, periods=6, freq="D", start="2020-01-01", with_level=False):
+    """Write a small CDS-shaped NetCDF and return it with the array it holds."""
+    import xarray as xr
+
+    times = pd.date_range(start, periods=periods, freq=freq)
+    if with_level:
+        data = np.arange(periods * 2 * 2 * 3, dtype="f4").reshape(periods, 2, 2, 3)
+        ds = xr.Dataset(
+            {"t": (("time", "pressure_level", "latitude", "longitude"), data)},
+            coords={
+                "time": times,
+                "pressure_level": [500, 1000],
+                "latitude": [1.0, 0.0],
+                "longitude": [0.0, 1.0, 2.0],
+            },
+        )
+    else:
+        data = np.arange(periods * 2 * 3, dtype="f4").reshape(periods, 2, 3)
+        ds = xr.Dataset(
+            {"t2m": (("time", "latitude", "longitude"), data, {"units": "K"})},
+            coords={
+                "time": times,
+                "latitude": [1.0, 0.0],
+                "longitude": [0.0, 1.0, 2.0],
+            },
+        )
+    ds.to_netcdf(path)
+    ds.close()
+    return data
+
+
+def _single_level_var():
+    """The catalog row shape the aggregator reads, duck-typed.
+
+    Core must not import a provider's `Variable`, and the aggregator only ever
+    reads these four attributes off the row.
+    """
+    return SimpleNamespace(
+        cds_variable="2m_temperature",
+        nc_variable="t2m",
+        is_flux=False,
+        is_pre_aggregated=False,
+    )
+
+
+class TestAggregateAgainstARealNetCDF:
+    """Exercises the aggregator against a NetCDF on disk rather than a mock.
+
+    A mock has no memory footprint and no file handle, so a suite built on one
+    cannot observe how much the aggregator reads or whether it releases what it
+    opens - the two things this path most needs to get right.
+    """
+
+    def test_each_window_reduces_the_real_values(self, tmp_path):
+        """The numbers must come from the file, which a mock cannot demonstrate."""
+        path = tmp_path / "cube.nc"
+        data = _write_real_nc(path)
+        result = aggregate_netcdf(
+            path, _single_level_var(), AggregationConfig(freq="3D", op="mean")
+        )
+        assert len(result) == 2
+        np.testing.assert_allclose(result[0][1], data[0:3].mean(axis=0))
+        np.testing.assert_allclose(result[1][1], data[3:6].mean(axis=0))
+
+    def test_a_sum_differs_from_a_mean_on_the_same_cube(self, tmp_path):
+        """Guards against a reduction that silently ignores its op."""
+        path = tmp_path / "cube.nc"
+        data = _write_real_nc(path)
+        var_info = _single_level_var()
+        summed = aggregate_netcdf(
+            path, var_info, AggregationConfig(freq="3D", op="sum")
+        )
+        np.testing.assert_allclose(summed[0][1], data[0:3].sum(axis=0))
+
+    def test_the_source_file_is_released_when_the_run_ends(self, tmp_path):
+        """A leaked handle keeps the file locked, so deleting it is the assertion."""
+        path = tmp_path / "cube.nc"
+        _write_real_nc(path)
+        aggregate_netcdf(
+            path, _single_level_var(), AggregationConfig(freq="3D", op="mean")
+        )
+        path.unlink()
+        assert not path.exists(), "the aggregator kept a handle on its input"
+
+    def test_a_date_range_drops_samples_outside_it(self, tmp_path):
+        """A CDS cross-product over-covers the request; the trim must be real."""
+        path = tmp_path / "cube.nc"
+        data = _write_real_nc(path)
+        result = aggregate_netcdf(
+            path,
+            _single_level_var(),
+            AggregationConfig(freq="3D", op="mean"),
+            date_range=("2020-01-01", "2020-01-03"),
+        )
+        assert len(result) == 1
+        np.testing.assert_allclose(result[0][1], data[0:3].mean(axis=0))
+
+    def test_streaming_yields_the_same_windows_as_the_eager_call(self, tmp_path):
+        """The streaming path exists to bound memory; it must not change answers."""
+        path = tmp_path / "cube.nc"
+        _write_real_nc(path)
+        var_info, config = _single_level_var(), AggregationConfig(freq="3D", op="mean")
+        eager = aggregate_netcdf(path, var_info, config)
+        streamed = list(iter_aggregate_netcdf(path, var_info, config))
+        assert len(streamed) == len(eager)
+        for window, (label, array, _) in zip(streamed, eager, strict=True):
+            assert window.label == label
+            np.testing.assert_allclose(window.array, array)
+
+    def test_writing_produces_one_readable_geotiff_per_window(self, tmp_path):
+        """The written raster is the deliverable, so it must open and match."""
+        from pyramids.dataset import Dataset
+
+        path = tmp_path / "cube.nc"
+        data = _write_real_nc(path)
+        out_dir = tmp_path / "out"
+        out_dir.mkdir()
+        result = aggregate_netcdf(
+            path,
+            _single_level_var(),
+            AggregationConfig(freq="3D", op="mean", out_dir=out_dir),
+        )
+        written = [p for _, _, p in result if p is not None]
+        assert len(written) == 2
+        first = np.asarray(Dataset.read_file(str(written[0])).read_array())
+        np.testing.assert_allclose(np.squeeze(first), data[0:3].mean(axis=0), rtol=1e-5)
