@@ -487,6 +487,10 @@ def _apply_extras_and_strips(request: dict[str, Any], var_info: Variable) -> Non
     key by setting it in `extras`; the `None` opt-out then drops any `extras`
     key explicitly set to `None`.
 
+    A list arriving from `extras` is copied rather than assigned. The catalog
+    row is cached for the life of the process, so sharing it would let an edit
+    to one request rewrite that variable for every later retrieve.
+
     Args:
         request: The request dict assembled so far (mutated in place).
         var_info: The catalog row supplying `extras` and `request_kind`.
@@ -564,9 +568,10 @@ def _normalize_pressure_level(
     """Normalize the `pressure_level=` override to a list of strings.
 
     CDS spells a level as a string, but hPa reads as a number, so `500` and
-    `[500]` are both natural things to write. Each level is rendered rather
-    than required to arrive pre-stringified, and a lone level is wrapped so the
-    single-level case needs no brackets.
+    `[500]` are both natural things to write. Each level is rendered by
+    :func:`_render_level` from the number it parses to rather than echoed, and
+    a lone level is wrapped so the single-level case needs no brackets. Any
+    ordered iterable of levels is accepted, a numpy array included.
 
     Args:
         pressure_level: Levels to request, a single level, or None.
