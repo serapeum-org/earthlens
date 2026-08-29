@@ -305,7 +305,7 @@ nav:
       - Usage: reference/fabdem/usage.md
       - Available datasets: reference/fabdem/datasets.md
       - Reference: reference/fabdem/fabdem.md
-    - JRC European flood hazard (EFHM):
+    - JRC hazards (EFHM + sea-level):
       - Introduction: reference/jrc/introduction.md
       - Usage: reference/jrc/usage.md
       - Available datasets: reference/jrc/datasets.md
@@ -676,10 +676,11 @@ nav:
     - FABDEM (bare-earth DEM):
       - Catalog explorer (no network): examples/fabdem/01_catalog_explorer.ipynb
       - Quickstart & vs Copernicus DEM (live): examples/fabdem/02_fabdem_quickstart.ipynb
-    - JRC European flood hazard (EFHM):
+    - JRC hazards (EFHM + sea-level):
       - Catalog explorer (no network): examples/jrc/01_catalog_explorer.ipynb
       - EFHM quickstart (live): examples/jrc/02_efhm_quickstart.ipynb
       - Return periods (live): examples/jrc/03_return_periods.ipynb
+      - Sea-level TWL forecast (live): examples/jrc/04_sea_level_forecast.ipynb
     - PVGIS (solar radiation / PV):
       - Quickstart — hourly radiation (live): examples/pvgis/01_pvgis_quickstart.ipynb
       - Catalog explorer (no network): examples/pvgis/02_catalog_explorer.ipynb

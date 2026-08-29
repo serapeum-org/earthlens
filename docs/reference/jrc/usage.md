@@ -1,4 +1,4 @@
-# JRC European flood hazard — usage
+# JRC hazards — usage
 
 The `jrc-flood` backend downloads the JRC European Flood Hazard Map (EFHM) for a
 bounding box and one or more return periods, writing one GeoTIFF of water depth
@@ -77,3 +77,41 @@ The `jrc-flood` backend here serves the separate, Europe-focused EFHM product.
 
 The return-period grids are static (a return period is not a time step), so
 passing `aggregate=` is rejected.
+
+## Sea-level (Total Water Level) forecasts
+
+The same backend serves the JRC probabilistic sea-level forecasts. Select the
+gridded product with `product=`; the `coastal-forecast` key returns the global
+per-country summary instead. By default the newest complete forecast cycle is
+used (`reference_time="latest"`); pass an explicit cycle to pin one.
+
+```python
+# gridded medium-term TWL forecast, latest cycle, cropped to the North Sea
+paths = EarthLens(
+    data_source="sea-level-forecast",
+    product="medium_term",           # or "subseasonal"
+    lat_lim=[51.0, 53.0],
+    lon_lim=[3.0, 5.0],
+    path="twl_out",
+).download()
+# -> [Path('twl_out/sea_level_medium_term_<cycle>_TWL75.tif')]  (one band per forecast step)
+
+# a specific cycle + a different field
+EarthLens(
+    data_source="sea-level-forecast",
+    product="subseasonal",
+    reference_time="2026-08-24T00",
+    field="probabilityTWL_01_15-100",
+    lat_lim=[51.0, 53.0],
+    lon_lim=[3.0, 5.0],
+    path="twl_out",
+).download()
+
+# subseasonal global per-country coastal summary -> a pandas.DataFrame
+summary = EarthLens(data_source="coastal-forecast").download()
+summary.head()
+```
+
+As with the EFHM, only the AOI window is read over `/vsicurl`, and `aggregate=`
+is rejected — a forecast cycle is chosen by `reference_time`, not reduced over
+time.
