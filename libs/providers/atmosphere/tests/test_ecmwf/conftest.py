@@ -271,5 +271,4 @@ def ecmwf_stub(tmp_path):
     )
     ecmwf.temporal_resolution = "daily"
     ecmwf.skip_constraints = True
-    ecmwf.pressure_level = None
     return ecmwf

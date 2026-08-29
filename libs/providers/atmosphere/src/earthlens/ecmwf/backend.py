@@ -569,6 +569,13 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
 
+    #: Retrieval-level pressure override, `None` unless a caller sets
+    #: `pressure_level=`. Declared on the class because `_build_request` reads
+    #: it for every request, while a cheap instance built with
+    #: `ECMWF.__new__` - the idiom this module's own docstrings advertise -
+    #: never runs `__init__`.
+    pressure_level: list[str] | None = None
+
     def __init__(
         self,
         start: str | None = None,
@@ -1651,16 +1658,21 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         )
 
         if var_info.cds_pressure_level is not None:
-            # Only a variable the catalog gives a level to takes the override:
-            # a single-level variable has no `pressure_level` in its request
-            # shape, and adding one makes the request invalid rather than
-            # broader.
-            request["pressure_level"] = (
-                self.pressure_level
-                if self.pressure_level is not None
-                else var_info.cds_pressure_level
-            )
+            request["pressure_level"] = var_info.cds_pressure_level
 
         _apply_extras_and_strips(request, var_info)
+
+        # The retrieval's own level is applied last, after extras. A row may
+        # carry its level in either place — the CARRA means rows keep theirs in
+        # `extras` and leave `cds_pressure_level` unset — and extras are merged
+        # with `update`, so an override written before this point would be put
+        # back to the catalog's level for those rows and the caller would be
+        # served a different altitude than they asked for, with no error.
+        #
+        # Keying on the assembled request rather than on the catalog row makes
+        # both sources behave alike, and keeps the single-level case safe: such
+        # a request never has the key, so it never acquires one.
+        if self.pressure_level is not None and "pressure_level" in request:
+            request["pressure_level"] = list(self.pressure_level)
 
         return request

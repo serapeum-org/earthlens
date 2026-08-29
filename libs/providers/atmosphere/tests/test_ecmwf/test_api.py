@@ -574,6 +574,23 @@ class TestBuildRequest:
         ecmwf_stub.pressure_level = ["500"]
         assert "pressure_level" not in ecmwf_stub._build_request(single_level_var_info)
 
+    def test_it_overrides_a_level_carried_in_extras(self, ecmwf_stub):
+        """The CARRA means rows keep their level in extras, merged after the build."""
+        var_info = Variable(
+            cds_dataset="reanalysis-carra-means",
+            cds_variable="cloud_cover",
+            nc_variable="ccl",
+            units="%",
+            product_type=["reanalysis"],
+            extras={"pressure_level": ["1000"], "level_type": "pressure_levels"},
+        )
+        ecmwf_stub.pressure_level = ["500"]
+        request = ecmwf_stub._build_request(var_info)
+        assert request["pressure_level"] == ["500"], (
+            "extras are merged last, so an override applied before them would be "
+            f"put back to the catalog's level; got {request['pressure_level']!r}"
+        )
+
     def test_returns_dict_with_required_keys(self, ecmwf_stub, single_level_var_info):
         """`_build_request` returns a dict carrying every CDS-required key."""
         request = ecmwf_stub._build_request(single_level_var_info)
