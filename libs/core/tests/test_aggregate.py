@@ -28,7 +28,6 @@ import psutil
 import pytest
 from pydantic import ValidationError
 from pyramids.dataset import Dataset, DatasetCollection
-from pyramids.netcdf._cube_netcdf_writer import CubeNetCDFWriter
 
 from earthlens.aggregate import (
     _LEVEL_DIM_CANDIDATES,
@@ -1782,18 +1781,28 @@ class TestAggregationMemoryCeiling:
         )
 
 
-def _write_real_nc(path, *, periods=6, rows=2, cols=3):
+def _write_real_nc(path, *, periods=6, rows=2, cols=3, nan_at=None):
     """Write a real NetCDF time cube and return the values it holds.
 
     Built entirely through pyramids, which owns NetCDF in this project: a dated
     GeoTIFF per timestep, collected into a `DatasetCollection` that derives its
-    time axis from those dates, then streamed out by `CubeNetCDFWriter`. The
+    time axis from those dates, then written out by `to_netcdf`. The
     aggregator's own time reader decodes the result, which is the point - the
     fixture exercises the same path a downloaded cube takes.
+
+    The ramp starts at 1 rather than 0 so a cell cannot be confused with a fill
+    value. `nan_at` puts a NaN in one timestep, which is what `skipna` needs and
+    what a mock cannot supply.
     """
     frames = Path(path).parent / f"{Path(path).stem}_frames"
     frames.mkdir(parents=True, exist_ok=True)
-    values = np.arange(periods * rows * cols, dtype="f4").reshape(periods, rows, cols)
+    values = (
+        np.arange(1, periods * rows * cols + 1, dtype="f4")
+        .reshape(periods, rows, cols)
+        .copy()
+    )
+    if nan_at is not None:
+        values[nan_at] = np.nan
     days = pd.date_range("2020-01-01", periods=periods, freq="D")
     for index, day in enumerate(days):
         raster = Dataset.create_from_array(
@@ -1808,7 +1817,7 @@ def _write_real_nc(path, *, periods=6, rows=2, cols=3):
     collection = DatasetCollection.from_files(
         str(frames), glob="*.tif", date_format="%Y.%m.%d"
     )
-    CubeNetCDFWriter(collection).write(str(path))
+    collection.to_netcdf(str(path))
     del collection
     gc.collect()
     return values
@@ -1831,7 +1840,7 @@ def _handles_on(path):
         try:
             if os.path.samefile(handle.path, path):
                 found.append(handle.path)
-        except (OSError, ValueError):
+        except ValueError:
             continue
     return found
 
@@ -1853,6 +1862,7 @@ def _single_level_var():
     )
 
 
+@pytest.mark.slow
 class TestAggregateAgainstARealNetCDF:
     """Exercises the aggregator against a NetCDF on disk rather than a mock.
 
@@ -1913,6 +1923,62 @@ class TestAggregateAgainstARealNetCDF:
                 "an open handle went unseen, so the release test is vacuous"
             )
         assert not _handles_on(path), "the handle survived its context"
+
+    def test_skipna_ignores_a_nan_a_mock_could_not_supply(self, tmp_path):
+        """`skipna` is what a real cube exercises and a mock cannot."""
+        path = tmp_path / "cube.nc"
+        data = _write_real_nc(path, nan_at=(1, 0, 0))
+        result = aggregate_netcdf(
+            path,
+            _single_level_var(),
+            AggregationConfig(freq="3D", op="mean", skipna=True),
+        )
+        expected = np.nanmean(data[0:3], axis=0)
+        np.testing.assert_allclose(result[0][1], expected)
+        assert not np.isnan(result[0][1][0, 0]), (
+            "skipna=True still produced NaN for the cell holding one"
+        )
+
+    def test_without_skipna_a_nan_carries_into_the_window(self, tmp_path):
+        """The complement: the flag has to change the answer to mean anything."""
+        path = tmp_path / "cube.nc"
+        _write_real_nc(path, nan_at=(1, 0, 0))
+        result = aggregate_netcdf(
+            path,
+            _single_level_var(),
+            AggregationConfig(freq="3D", op="mean", skipna=False),
+        )
+        assert np.isnan(result[0][1][0, 0]), (
+            "skipna=False dropped a NaN it should have propagated"
+        )
+
+    def test_streaming_does_not_materialise_the_whole_cube(self, tmp_path):
+        """The other half of the claim: read volume, measured on a real file.
+
+        Peak allocation tracks the window, not the cube, so the cube is made
+        several times a window to leave the assertion real margin. An earlier
+        version sized them equal and passed only when a sibling test had warmed
+        the allocator first.
+
+        The streaming call is the one that can be held to this: the eager call
+        keeps every window it returns.
+        """
+        path = tmp_path / "cube.nc"
+        data = _write_real_nc(path, periods=96, rows=80, cols=80)
+        tracemalloc.start()
+        try:
+            for _window in iter_aggregate_netcdf(
+                path, _single_level_var(), AggregationConfig(freq="4D", op="mean")
+            ):
+                pass
+            _, peak = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+        assert peak < data.nbytes / 2, (
+            f"peak allocation {peak} is not comfortably below the "
+            f"{data.nbytes}-byte cube: the time axis is being materialised "
+            "rather than streamed a window at a time"
+        )
 
     def test_a_date_range_drops_samples_outside_it(self, tmp_path):
         """A CDS cross-product over-covers the request; the trim must be real."""
