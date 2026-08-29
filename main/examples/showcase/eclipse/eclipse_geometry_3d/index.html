@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24413,8 +24413,15 @@ even at half-scale the Sun barely fits.</p>
 <span class="n">D_SUN</span> <span class="o">=</span> <span class="mf">11.0</span>  <span class="c1"># Sun distance (compressed; clears the satellite orbit)</span>
 <span class="n">D_MOON</span> <span class="o">=</span> <span class="mf">6.0</span>  <span class="c1"># Moon orbit radius: compressed (really 60.3), but kept</span>
 <span class="c1"># outside the geostationary ring, as it really is</span>
-<span class="n">SUN_POS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">D_SUN</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
-<span class="n">SUN</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+<span class="c1">#: Every point below is placed via globe().transform(point, spin=spin_deg-90), which</span>
+<span class="c1">#: matches this notebook's own spin/tilt exactly (verified: rendered marker positions</span>
+<span class="c1">#: agree with the old tilt_y-based placement to 0.01 px) but tilts about a different</span>
+<span class="c1">#: axis. A world constant that pointed along +x now points along -y -- the one fixed</span>
+<span class="c1">#: rotation every transformed point picks up, so the scene stays self-consistent. The</span>
+<span class="c1">#: camera's AZIM absorbs that rotation (AZIM_WIDE/AZIM_0/AZIM_1 below); ELEV is a</span>
+<span class="c1">#: different axis and is untouched.</span>
+<span class="n">SUN_POS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">D_SUN</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+<span class="n">SUN</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
 <span class="n">XLIM</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">15.8</span><span class="p">)</span>  <span class="c1"># left edge clears the Moon's orbit, right edge the Sun's corona</span>
 <span class="n">YZ</span> <span class="o">=</span> <span class="mf">7.0</span>
 
@@ -24453,8 +24460,15 @@ MOON_INCL = np.deg2rad(28.6)  # Moon orbit tilt to the equator; real range 18.3-
 D_SUN = 11.0  # Sun distance (compressed; clears the satellite orbit)
 D_MOON = 6.0  # Moon orbit radius: compressed (really 60.3), but kept
 # outside the geostationary ring, as it really is
-SUN_POS = np.array([D_SUN, 0.0, 0.0])
-SUN = np.array([1.0, 0.0, 0.0])
+#: Every point below is placed via globe().transform(point, spin=spin_deg-90), which
+#: matches this notebook's own spin/tilt exactly (verified: rendered marker positions
+#: agree with the old tilt_y-based placement to 0.01 px) but tilts about a different
+#: axis. A world constant that pointed along +x now points along -y -- the one fixed
+#: rotation every transformed point picks up, so the scene stays self-consistent. The
+#: camera's AZIM absorbs that rotation (AZIM_WIDE/AZIM_0/AZIM_1 below); ELEV is a
+#: different axis and is untouched.
+SUN_POS = np.array([0.0, -D_SUN, 0.0])
+SUN = np.array([0.0, -1.0, 0.0])
 XLIM = (-7.0, 15.8)  # left edge clears the Moon's orbit, right edge the Sun's corona
 YZ = 7.0
 
@@ -24491,13 +24505,11 @@ ECLIPSE_LAT, ECLIPSE_LON = 65.0, -25.0</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">MPath</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.globe.textured_globe_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">TexturedGlobeGlyph</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">MPath</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.ndimage</span><span class="w"> </span><span class="kn">import</span> <span class="n">gaussian_filter</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">tilt_y</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Apply Earth's 23.5° axial tilt (rotation about the y-axis)."""</span>
-    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">TILT</span><span class="p">)</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">TILT</span><span class="p">),</span> <span class="o">-</span><span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">TILT</span><span class="p">)</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">TILT</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">sphere</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">40</span><span class="p">):</span>
@@ -24520,14 +24532,18 @@ ECLIPSE_LAT, ECLIPSE_LON = 65.0, -25.0</div>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">ll_to_xyz</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">spin</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Longitude/latitude (deg) -&gt; tilted 3D coordinates on Earth's surface, rotated by `spin`."""</span>
-    <span class="n">lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span> <span class="o">+</span> <span class="n">spin</span>
-    <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
-    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
-    <span class="n">xr</span><span class="p">,</span> <span class="n">zr</span> <span class="o">=</span> <span class="n">tilt_y</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">xr</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">zr</span>
+<span class="w">    </span><span class="sd">"""Longitude/latitude (deg) -&gt; tilted 3D coordinates on Earth's surface, rotated by `spin`.</span>
+
+<span class="sd">    `spin` is in radians here, this notebook's own convention throughout; the glyph's</span>
+<span class="sd">    own spin is in degrees, and needs the -90 deg shift derived at the top of the notebook.</span>
+<span class="sd">    """</span>
+    <span class="n">lon_r</span><span class="p">,</span> <span class="n">lat_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat_r</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon_r</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat_r</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lon_r</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat_r</span><span class="p">)],</span>
+        <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">globe</span><span class="p">(</span><span class="o">*</span><span class="n">_TRANSFORM_RES</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">spin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">spin</span><span class="p">)</span> <span class="o">-</span> <span class="mf">90.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
 
 
 <span class="n">_ORBIT</span> <span class="o">=</span> <span class="kc">None</span>
@@ -24560,7 +24576,9 @@ ECLIPSE_LAT, ECLIPSE_LON = 65.0, -25.0</div>
         <span class="n">m_hat</span> <span class="o">=</span> <span class="n">SUN_POS</span> <span class="o">+</span> <span class="n">s_near</span> <span class="o">*</span> <span class="n">d</span>
         <span class="n">m_hat</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">m_hat</span><span class="p">)</span>
 
-        <span class="n">axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">TILT</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">TILT</span><span class="p">)])</span>  <span class="c1"># Earth's rotation axis</span>
+        <span class="c1"># Earth's rotation axis, Rz(-90) applied ahead of time to match every other</span>
+        <span class="c1"># point in this scene (see the SUN_POS comment for the full derivation).</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">TILT</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">TILT</span><span class="p">)])</span>
         <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">m_hat</span><span class="p">)</span>  <span class="c1"># perpendicular to both</span>
         <span class="n">u</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">m_hat</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>  <span class="c1"># completes the frame around m_hat</span>
@@ -24607,37 +24625,73 @@ ECLIPSE_LAT, ECLIPSE_LON = 65.0, -25.0</div>
     <span class="k">return</span> <span class="n">_RELIEF</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">textured_earth</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">n_lon</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">n_lat</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Earth as a lit, texture-mapped sphere -- real continents, tilted and spun."""</span>
-    <span class="n">tex</span> <span class="o">=</span> <span class="n">relief_texture</span><span class="p">()</span>
-    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">tex</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
-    <span class="n">lon_g</span><span class="p">,</span> <span class="n">lat_g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">180.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="n">n_lon</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">90.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="n">n_lat</span><span class="p">)</span>
+<span class="c1">#: One glyph per mesh resolution actually used (the close-up varies it with zoom).</span>
+<span class="c1">#: Built once per resolution and reused, exactly the sample-once/rotate-per-frame</span>
+<span class="c1">#: contract the old hand-rolled version could not offer -- it resampled every frame.</span>
+<span class="c1">#: Capped LRU: TexturedGlobeGlyph stores its own full-resolution texture copy per</span>
+<span class="c1">#: instance regardless of n_lon/n_lat, so an unbounded cache over the close-up's</span>
+<span class="c1">#: near-continuous zoom-driven resolution would retain dozens of ~30 MB copies.</span>
+<span class="c1">#: Evicting the least-recently-used entry beyond _GLOBES_MAX only costs a rebuild on</span>
+<span class="c1">#: a future cache miss (deterministic -- same pixels), never a different rendered frame.</span>
+<span class="n">_GLOBES_MAX</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">_GLOBES</span><span class="p">:</span> <span class="n">OrderedDict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">TexturedGlobeGlyph</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+<span class="c1">#: Resolution for every .transform()-only call (the eclipse marker, the geostationary</span>
+<span class="c1">#: ring, the satellites). transform()/rotation_matrix() depend only on tilt_deg and</span>
+<span class="c1">#: spin, never on n_lon/n_lat, so any resolution gives bit-identical output; this one</span>
+<span class="c1">#: is the cheapest possible cache entry and never collides with a resolution</span>
+<span class="c1">#: draw_globe() also needs.</span>
+<span class="n">_TRANSFORM_RES</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">globe</span><span class="p">(</span><span class="n">n_lon</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">n_lat</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The textured, tilted globe at one mesh resolution, built once and cached.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n_lon: Mesh columns spanning -180..180 degrees.</span>
+<span class="sd">        n_lat: Mesh rows spanning 90..-90 degrees.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        cleopatra.glyphs.globe.textured_globe_glyph.TexturedGlobeGlyph: The glyph.</span>
+<span class="sd">    """</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_lon</span><span class="p">,</span> <span class="n">n_lat</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">_GLOBES</span><span class="p">:</span>
+        <span class="n">_GLOBES</span><span class="o">.</span><span class="n">move_to_end</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_GLOBES</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_GLOBES</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">_GLOBES_MAX</span><span class="p">:</span>
+        <span class="n">_GLOBES</span><span class="o">.</span><span class="n">popitem</span><span class="p">(</span><span class="n">last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">_GLOBES</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">TexturedGlobeGlyph</span><span class="p">(</span>
+        <span class="n">relief_texture</span><span class="p">(),</span>
+        <span class="n">tilt_deg</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">TILT</span><span class="p">),</span>
+        <span class="n">n_lon</span><span class="o">=</span><span class="n">n_lon</span><span class="p">,</span>
+        <span class="n">n_lat</span><span class="o">=</span><span class="n">n_lat</span><span class="p">,</span>
+        <span class="n">sun</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">SUN</span><span class="p">),</span>
+        <span class="n">ambient</span><span class="o">=</span><span class="mf">0.13</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(((</span><span class="n">lon_g</span> <span class="o">+</span> <span class="mf">180.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">360.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(((</span><span class="mf">90.0</span> <span class="o">-</span> <span class="n">lat_g</span><span class="p">)</span> <span class="o">/</span> <span class="mf">180.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">h</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">rgb</span> <span class="o">=</span> <span class="n">tex</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
-
-    <span class="n">lo</span><span class="p">,</span> <span class="n">la</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lon_g</span><span class="p">)</span> <span class="o">+</span> <span class="n">spin</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat_g</span><span class="p">)</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">la</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lo</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">la</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lo</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">la</span><span class="p">)</span>
-    <span class="n">xr</span><span class="p">,</span> <span class="n">zr</span> <span class="o">=</span> <span class="n">tilt_y</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-    <span class="n">lit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">xr</span> <span class="o">*</span> <span class="n">SUN</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">SUN</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">zr</span> <span class="o">*</span> <span class="n">SUN</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># day / night</span>
-    <span class="n">face</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">rgb</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.13</span> <span class="o">+</span> <span class="mf">0.87</span> <span class="o">*</span> <span class="n">lit</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span>
-        <span class="n">xr</span><span class="p">,</span>
-        <span class="n">y</span><span class="p">,</span>
-        <span class="n">zr</span><span class="p">,</span>
-        <span class="n">facecolors</span><span class="o">=</span><span class="n">face</span><span class="p">,</span>
-        <span class="n">rstride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">cstride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">antialiased</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">shade</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">zorder</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_GLOBES</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">draw_sun</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">centre</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">elev</span><span class="o">=</span><span class="mf">27.0</span><span class="p">,</span> <span class="n">azim</span><span class="o">=-</span><span class="mf">62.0</span><span class="p">,</span> <span class="n">corona</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">80</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">draw_globe</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">n_lon</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">n_lat</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Draw the globe at one frame's spin, on the ladder this notebook draws at zorder 4.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ax: The 3D axis to draw onto.</span>
+<span class="sd">        spin: Earth's rotation angle for this frame, in radians (this notebook's unit).</span>
+<span class="sd">        n_lon: Mesh columns; the close-up varies this with zoom.</span>
+<span class="sd">        n_lat: Mesh rows; the close-up varies this with zoom.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        TexturedGlobeGlyph.draw() resets ax's box_aspect/xlim/ylim/zlim/view_init to</span>
+<span class="sd">        its own unit-sphere defaults every call. The caller's scene-wide framing must</span>
+<span class="sd">        be (re)asserted after this returns, not before -- both draw() and draw_scene()</span>
+<span class="sd">        already do this at their own tail, after calling draw_globe().</span>
+<span class="sd">    """</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">globe</span><span class="p">(</span><span class="n">n_lon</span><span class="p">,</span> <span class="n">n_lat</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">spin</span><span class="p">)</span> <span class="o">-</span> <span class="mf">90.0</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">set_zorder</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">draw_sun</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">centre</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">elev</span><span class="o">=</span><span class="mf">27.0</span><span class="p">,</span> <span class="n">azim</span><span class="o">=-</span><span class="mf">152.0</span><span class="p">,</span> <span class="n">corona</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">80</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""A photosphere instead of a flat disc: limb darkening, granulation and a corona.</span>
 
 <span class="sd">    Real solar images are bright and near-white at disc centre and redden sharply toward</span>
@@ -24776,13 +24830,11 @@ ECLIPSE_LAT, ECLIPSE_LON = 65.0, -25.0</div>
 
 <span class="n">SATELLITE</span> <span class="o">=</span> <span class="n">_satellite_marker</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">from matplotlib.path import Path as MPath
+<div class="clipboard-copy-txt" id="cell-2">from collections import OrderedDict
+
+from cleopatra.glyphs.globe.textured_globe_glyph import TexturedGlobeGlyph
+from matplotlib.path import Path as MPath
 from scipy.ndimage import gaussian_filter
-
-
-def tilt_y(x, z):
-    """Apply Earth's 23.5° axial tilt (rotation about the y-axis)."""
-    return x * np.cos(TILT) + z * np.sin(TILT), -x * np.sin(TILT) + z * np.cos(TILT)
 
 
 def sphere(c, r, n=40):
@@ -24805,14 +24857,18 @@ def shade(x, y, z, c, rgb, amb=0.12):
 
 
 def ll_to_xyz(lon, lat, spin):
-    """Longitude/latitude (deg) -&gt; tilted 3D coordinates on Earth's surface, rotated by `spin`."""
-    lon = np.deg2rad(lon) + spin
-    lat = np.deg2rad(lat)
-    x = np.cos(lat) * np.cos(lon)
-    y = np.cos(lat) * np.sin(lon)
-    z = np.sin(lat)
-    xr, zr = tilt_y(x, z)
-    return xr, y, zr
+    """Longitude/latitude (deg) -&gt; tilted 3D coordinates on Earth's surface, rotated by `spin`.
+
+    `spin` is in radians here, this notebook's own convention throughout; the glyph's
+    own spin is in degrees, and needs the -90 deg shift derived at the top of the notebook.
+    """
+    lon_r, lat_r = np.deg2rad(lon), np.deg2rad(lat)
+    body = np.stack(
+        [np.cos(lat_r) * np.cos(lon_r), np.cos(lat_r) * np.sin(lon_r), np.sin(lat_r)],
+        axis=-1,
+    )
+    out = globe(*_TRANSFORM_RES).transform(body, spin=np.rad2deg(spin) - 90.0)
+    return out[..., 0], out[..., 1], out[..., 2]
 
 
 _ORBIT = None
@@ -24845,7 +24901,9 @@ def moon_orbit_basis():
         m_hat = SUN_POS + s_near * d
         m_hat /= np.linalg.norm(m_hat)
 
-        axis = np.array([np.sin(TILT), 0.0, np.cos(TILT)])  # Earth's rotation axis
+        # Earth's rotation axis, Rz(-90) applied ahead of time to match every other
+        # point in this scene (see the SUN_POS comment for the full derivation).
+        axis = np.array([0.0, -np.sin(TILT), np.cos(TILT)])
         u = np.cross(axis, m_hat)  # perpendicular to both
         u /= np.linalg.norm(u)
         v = np.cross(m_hat, u)  # completes the frame around m_hat
@@ -24892,37 +24950,73 @@ def relief_texture():
     return _RELIEF
 
 
-def textured_earth(ax, spin, n_lon=200, n_lat=100):
-    """Earth as a lit, texture-mapped sphere -- real continents, tilted and spun."""
-    tex = relief_texture()
-    h, w = tex.shape[:2]
-    lon_g, lat_g = np.meshgrid(
-        np.linspace(-180.0, 180.0, n_lon), np.linspace(90.0, -90.0, n_lat)
+#: One glyph per mesh resolution actually used (the close-up varies it with zoom).
+#: Built once per resolution and reused, exactly the sample-once/rotate-per-frame
+#: contract the old hand-rolled version could not offer -- it resampled every frame.
+#: Capped LRU: TexturedGlobeGlyph stores its own full-resolution texture copy per
+#: instance regardless of n_lon/n_lat, so an unbounded cache over the close-up's
+#: near-continuous zoom-driven resolution would retain dozens of ~30 MB copies.
+#: Evicting the least-recently-used entry beyond _GLOBES_MAX only costs a rebuild on
+#: a future cache miss (deterministic -- same pixels), never a different rendered frame.
+_GLOBES_MAX = 8
+_GLOBES: OrderedDict[tuple[int, int], TexturedGlobeGlyph] = OrderedDict()
+
+#: Resolution for every .transform()-only call (the eclipse marker, the geostationary
+#: ring, the satellites). transform()/rotation_matrix() depend only on tilt_deg and
+#: spin, never on n_lon/n_lat, so any resolution gives bit-identical output; this one
+#: is the cheapest possible cache entry and never collides with a resolution
+#: draw_globe() also needs.
+_TRANSFORM_RES = (2, 2)
+
+
+def globe(n_lon=200, n_lat=100):
+    """The textured, tilted globe at one mesh resolution, built once and cached.
+
+    Args:
+        n_lon: Mesh columns spanning -180..180 degrees.
+        n_lat: Mesh rows spanning 90..-90 degrees.
+
+    Returns:
+        cleopatra.glyphs.globe.textured_globe_glyph.TexturedGlobeGlyph: The glyph.
+    """
+    key = (n_lon, n_lat)
+    if key in _GLOBES:
+        _GLOBES.move_to_end(key)
+        return _GLOBES[key]
+    if len(_GLOBES) &gt;= _GLOBES_MAX:
+        _GLOBES.popitem(last=False)
+    _GLOBES[key] = TexturedGlobeGlyph(
+        relief_texture(),
+        tilt_deg=np.rad2deg(TILT),
+        n_lon=n_lon,
+        n_lat=n_lat,
+        sun=tuple(SUN),
+        ambient=0.13,
     )
-    col = np.clip(((lon_g + 180.0) / 360.0 * (w - 1)).astype(int), 0, w - 1)
-    row = np.clip(((90.0 - lat_g) / 180.0 * (h - 1)).astype(int), 0, h - 1)
-    rgb = tex[row, col]
-
-    lo, la = np.deg2rad(lon_g) + spin, np.deg2rad(lat_g)
-    x, y, z = np.cos(la) * np.cos(lo), np.cos(la) * np.sin(lo), np.sin(la)
-    xr, zr = tilt_y(x, z)
-    lit = np.clip(xr * SUN[0] + y * SUN[1] + zr * SUN[2], 0, 1)  # day / night
-    face = np.clip(rgb * (0.13 + 0.87 * lit)[..., None], 0, 1)
-    ax.plot_surface(
-        xr,
-        y,
-        zr,
-        facecolors=face,
-        rstride=1,
-        cstride=1,
-        linewidth=0,
-        antialiased=False,
-        shade=False,
-        zorder=4,
-    )
+    return _GLOBES[key]
 
 
-def draw_sun(ax, centre, radius, elev=27.0, azim=-62.0, corona=True, alpha=1.0, n=80):
+def draw_globe(ax, spin, n_lon=200, n_lat=100):
+    """Draw the globe at one frame's spin, on the ladder this notebook draws at zorder 4.
+
+    Args:
+        ax: The 3D axis to draw onto.
+        spin: Earth's rotation angle for this frame, in radians (this notebook's unit).
+        n_lon: Mesh columns; the close-up varies this with zoom.
+        n_lat: Mesh rows; the close-up varies this with zoom.
+
+    Note:
+        TexturedGlobeGlyph.draw() resets ax's box_aspect/xlim/ylim/zlim/view_init to
+        its own unit-sphere defaults every call. The caller's scene-wide framing must
+        be (re)asserted after this returns, not before -- both draw() and draw_scene()
+        already do this at their own tail, after calling draw_globe().
+    """
+    g = globe(n_lon, n_lat)
+    g.draw(ax, spin=np.rad2deg(spin) - 90.0)
+    g.surface.set_zorder(4)
+
+
+def draw_sun(ax, centre, radius, elev=27.0, azim=-152.0, corona=True, alpha=1.0, n=80):
     """A photosphere instead of a flat disc: limb darkening, granulation and a corona.
 
     Real solar images are bright and near-white at disc centre and redden sharply toward
@@ -25084,7 +25178,7 @@ SATELLITE = _satellite_marker()</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">moon_phase</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">cam_azim</span><span class="o">=-</span><span class="mi">62</span><span class="p">,</span> <span class="n">moon_pos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rect</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">moon_phase</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">cam_azim</span><span class="o">=-</span><span class="mi">152</span><span class="p">,</span> <span class="n">moon_pos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rect</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""One frame: Sun, spinning tilted Earth, orbiting Moon (+ shadow when aligned), satellites."""</span>
     <span class="k">if</span> <span class="n">rect</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>
@@ -25095,8 +25189,8 @@ SATELLITE = _satellite_marker()</div>
     <span class="c1"># Sun (visual size) + Sun-Earth line</span>
     <span class="n">draw_sun</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">SUN_POS</span><span class="p">,</span> <span class="n">R_SUN_VIS</span><span class="p">,</span> <span class="n">elev</span><span class="o">=</span><span class="mf">27.0</span><span class="p">,</span> <span class="n">azim</span><span class="o">=</span><span class="n">cam_azim</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
-        <span class="n">D_SUN</span><span class="p">,</span>
-        <span class="mi">0</span><span class="p">,</span>
+        <span class="n">SUN_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">SUN_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
         <span class="n">R_SUN_VIS</span> <span class="o">+</span> <span class="mf">1.5</span><span class="p">,</span>
         <span class="s2">"Sun"</span><span class="p">,</span>
         <span class="n">color</span><span class="o">=</span><span class="s2">"#ffd9a0"</span><span class="p">,</span>
@@ -25104,10 +25198,18 @@ SATELLITE = _satellite_marker()</div>
         <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
         <span class="n">weight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">D_SUN</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#666"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">SUN_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">SUN_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">SUN_POS</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">"#666"</span><span class="p">,</span>
+        <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">ls</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span>
+        <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># Earth: real continents, texture-mapped from cleopatra's global relief</span>
-    <span class="n">textured_earth</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">n_lon</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span> <span class="n">n_lat</span><span class="o">=</span><span class="mi">48</span><span class="p">)</span>
+    <span class="n">draw_globe</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">n_lon</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span> <span class="n">n_lat</span><span class="o">=</span><span class="mi">48</span><span class="p">)</span>
 
     <span class="c1"># Moon orbit ring + Moon (orbit inclined so the umbra lands where it really did)</span>
     <span class="n">oa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">160</span><span class="p">)</span>
@@ -25182,15 +25284,25 @@ SATELLITE = _satellite_marker()</div>
 
     <span class="c1"># geostationary satellites (co-rotate with Earth) + orbit ring</span>
     <span class="n">ang</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
-    <span class="n">ox</span><span class="p">,</span> <span class="n">oz</span> <span class="o">=</span> <span class="n">tilt_y</span><span class="p">(</span><span class="n">R_GEO</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">ang</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">ang</span><span class="p">))</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ox</span><span class="p">,</span> <span class="n">R_GEO</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">ang</span><span class="p">),</span> <span class="n">oz</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#555"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">ring_body</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">R_GEO</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">ang</span><span class="p">),</span> <span class="n">R_GEO</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">ang</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">ang</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span>
+    <span class="p">)</span>
+    <span class="n">ox</span><span class="p">,</span> <span class="n">oy</span><span class="p">,</span> <span class="n">oz</span> <span class="o">=</span> <span class="n">globe</span><span class="p">(</span><span class="o">*</span><span class="n">_TRANSFORM_RES</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">ring_body</span><span class="p">,</span> <span class="n">spin</span><span class="o">=-</span><span class="mf">90.0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ox</span><span class="p">,</span> <span class="n">oy</span><span class="p">,</span> <span class="n">oz</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#555"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span>
         <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="s2">"#b06bff"</span><span class="p">,</span> <span class="s2">"Meteosat-12"</span><span class="p">),</span>
         <span class="p">(</span><span class="o">-</span><span class="mf">75.2</span><span class="p">,</span> <span class="s2">"#ff6a3d"</span><span class="p">,</span> <span class="s2">"GOES-East"</span><span class="p">),</span>
     <span class="p">]:</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lon_deg</span><span class="p">)</span> <span class="o">+</span> <span class="n">spin</span>
-        <span class="n">px</span><span class="p">,</span> <span class="n">pz</span> <span class="o">=</span> <span class="n">tilt_y</span><span class="p">(</span><span class="n">R_GEO</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">)</span>
-        <span class="n">py</span> <span class="o">=</span> <span class="n">R_GEO</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">sat_body</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">R_GEO</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lon_deg</span><span class="p">)),</span>
+                <span class="n">R_GEO</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lon_deg</span><span class="p">)),</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">pz</span> <span class="o">=</span> <span class="n">globe</span><span class="p">(</span><span class="o">*</span><span class="n">_TRANSFORM_RES</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+            <span class="n">sat_body</span><span class="p">,</span> <span class="n">spin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">spin</span><span class="p">)</span> <span class="o">-</span> <span class="mf">90.0</span>
+        <span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
             <span class="p">[</span><span class="n">px</span><span class="p">],</span>
             <span class="p">[</span><span class="n">py</span><span class="p">],</span>
@@ -25206,15 +25318,20 @@ SATELLITE = _satellite_marker()</div>
         <span class="p">)</span>
 
     <span class="c1"># the scene is a long, flat corridor, so crop the vertical black; matching box_aspect</span>
-    <span class="c1"># to the ranges keeps equal units per axis, so the spheres stay round</span>
+    <span class="c1"># to the ranges keeps equal units per axis, so the spheres stay round.</span>
+    <span class="c1">#</span>
+    <span class="c1"># The corridor itself moved from the x axis to the y axis: XLIM (Earth left, Sun</span>
+    <span class="c1"># right) described +x under the old tilt_y convention, and the glyph's world is the</span>
+    <span class="c1"># old one rotated -90 deg about z, so the same corridor now runs along -y. See the</span>
+    <span class="c1"># SUN_POS comment at the top of the notebook for the full derivation.</span>
     <span class="n">zlim</span> <span class="o">=</span> <span class="n">YZ</span> <span class="o">*</span> <span class="mf">0.46</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_box_aspect</span><span class="p">((</span><span class="n">XLIM</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">XLIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">YZ</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">zlim</span><span class="p">))</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">*</span><span class="n">XLIM</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="n">YZ</span><span class="p">,</span> <span class="n">YZ</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_box_aspect</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">YZ</span><span class="p">,</span> <span class="n">XLIM</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">XLIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">zlim</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="n">YZ</span><span class="p">,</span> <span class="n">YZ</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="n">XLIM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="n">XLIM</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="o">-</span><span class="n">zlim</span><span class="p">,</span> <span class="n">zlim</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="n">elev</span><span class="o">=</span><span class="mi">27</span><span class="p">,</span> <span class="n">azim</span><span class="o">=</span><span class="n">cam_azim</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">def draw(ax, moon_phase, spin, cam_azim=-62, moon_pos=None, rect=None):
+<div class="clipboard-copy-txt" id="cell-3">def draw(ax, moon_phase, spin, cam_azim=-152, moon_pos=None, rect=None):
     """One frame: Sun, spinning tilted Earth, orbiting Moon (+ shadow when aligned), satellites."""
     if rect is not None:
         ax.set_position(rect)
@@ -25225,8 +25342,8 @@ SATELLITE = _satellite_marker()</div>
     # Sun (visual size) + Sun-Earth line
     draw_sun(ax, SUN_POS, R_SUN_VIS, elev=27.0, azim=cam_azim)
     ax.text(
-        D_SUN,
-        0,
+        SUN_POS[0],
+        SUN_POS[1],
         R_SUN_VIS + 1.5,
         "Sun",
         color="#ffd9a0",
@@ -25234,10 +25351,18 @@ SATELLITE = _satellite_marker()</div>
         ha="center",
         weight="bold",
     )
-    ax.plot([0, D_SUN], [0, 0], [0, 0], color="#666", lw=0.5, ls=(0, (5, 4)), zorder=1)
+    ax.plot(
+        [0, SUN_POS[0]],
+        [0, SUN_POS[1]],
+        [0, SUN_POS[2]],
+        color="#666",
+        lw=0.5,
+        ls=(0, (5, 4)),
+        zorder=1,
+    )
 
     # Earth: real continents, texture-mapped from cleopatra's global relief
-    textured_earth(ax, spin, n_lon=96, n_lat=48)
+    draw_globe(ax, spin, n_lon=96, n_lat=48)
 
     # Moon orbit ring + Moon (orbit inclined so the umbra lands where it really did)
     oa = np.linspace(0, 2 * np.pi, 160)
@@ -25312,15 +25437,25 @@ SATELLITE = _satellite_marker()</div>
 
     # geostationary satellites (co-rotate with Earth) + orbit ring
     ang = np.linspace(0, 2 * np.pi, 120)
-    ox, oz = tilt_y(R_GEO * np.cos(ang), np.zeros_like(ang))
-    ax.plot(ox, R_GEO * np.sin(ang), oz, color="#555", lw=0.5, zorder=3)
+    ring_body = np.stack(
+        [R_GEO * np.cos(ang), R_GEO * np.sin(ang), np.zeros_like(ang)], axis=-1
+    )
+    ox, oy, oz = globe(*_TRANSFORM_RES).transform(ring_body, spin=-90.0).T
+    ax.plot(ox, oy, oz, color="#555", lw=0.5, zorder=3)
     for lon_deg, col, name in [
         (0.0, "#b06bff", "Meteosat-12"),
         (-75.2, "#ff6a3d", "GOES-East"),
     ]:
-        a = np.deg2rad(lon_deg) + spin
-        px, pz = tilt_y(R_GEO * np.cos(a), 0.0)
-        py = R_GEO * np.sin(a)
+        sat_body = np.array(
+            [
+                R_GEO * np.cos(np.deg2rad(lon_deg)),
+                R_GEO * np.sin(np.deg2rad(lon_deg)),
+                0.0,
+            ]
+        )
+        px, py, pz = globe(*_TRANSFORM_RES).transform(
+            sat_body, spin=np.rad2deg(spin) - 90.0
+        )
         ax.scatter(
             [px],
             [py],
@@ -25336,11 +25471,16 @@ SATELLITE = _satellite_marker()</div>
         )
 
     # the scene is a long, flat corridor, so crop the vertical black; matching box_aspect
-    # to the ranges keeps equal units per axis, so the spheres stay round
+    # to the ranges keeps equal units per axis, so the spheres stay round.
+    #
+    # The corridor itself moved from the x axis to the y axis: XLIM (Earth left, Sun
+    # right) described +x under the old tilt_y convention, and the glyph's world is the
+    # old one rotated -90 deg about z, so the same corridor now runs along -y. See the
+    # SUN_POS comment at the top of the notebook for the full derivation.
     zlim = YZ * 0.46
-    ax.set_box_aspect((XLIM[1] - XLIM[0], 2 * YZ, 2 * zlim))
-    ax.set_xlim(*XLIM)
-    ax.set_ylim(-YZ, YZ)
+    ax.set_box_aspect((2 * YZ, XLIM[1] - XLIM[0], 2 * zlim))
+    ax.set_xlim(-YZ, YZ)
+    ax.set_ylim(-XLIM[1], -XLIM[0])
     ax.set_zlim(-zlim, zlim)
     ax.view_init(elev=27, azim=cam_azim)</div>
 </div>
@@ -25698,8 +25838,10 @@ and the diagram cannot drift apart.</p>
 <span class="n">LIM_0</span><span class="p">,</span> <span class="n">LIM_1</span> <span class="o">=</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">2.75</span>  <span class="c1"># half-width of the view box; LIM_0 is animation 1's exactly</span>
 <span class="n">XLIM_0</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">15.8</span><span class="p">)</span>  <span class="c1"># the wide shot is a corridor: Earth left, Sun right</span>
 <span class="n">ZCROP_0</span><span class="p">,</span> <span class="n">ZCROP_1</span> <span class="o">=</span> <span class="mf">0.46</span><span class="p">,</span> <span class="mf">0.62</span>  <span class="c1"># the scene is flat, so crop the vertical black</span>
-<span class="n">AZIM_0</span><span class="p">,</span> <span class="n">AZIM_1</span> <span class="o">=</span> <span class="mf">60.0</span><span class="p">,</span> <span class="mf">51.0</span>  <span class="c1"># animation 1's own -62 deg puts Meteosat-12 behind Earth,</span>
-<span class="n">AZIM_WIDE</span> <span class="o">=</span> <span class="o">-</span><span class="mf">62.0</span>  <span class="c1"># so the run-on frames swing the camera round to AZIM_0</span>
+<span class="c1"># The -90 on each is the same fixed rotation SUN_POS picks up -- see its comment at</span>
+<span class="c1"># the top of the notebook. Only azim moves; elev is a different camera axis.</span>
+<span class="n">AZIM_0</span><span class="p">,</span> <span class="n">AZIM_1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">39.0</span>  <span class="c1"># animation 1's own -152 deg puts Meteosat-12 behind</span>
+<span class="n">AZIM_WIDE</span> <span class="o">=</span> <span class="o">-</span><span class="mf">152.0</span>  <span class="c1"># Earth, so the run-on frames swing the camera round to AZIM_0</span>
 <span class="c1"># before the cut: both meridians are then up immediately</span>
 <span class="n">ELEV_0</span><span class="p">,</span> <span class="n">ELEV_1</span> <span class="o">=</span> <span class="mf">27.0</span><span class="p">,</span> <span class="mf">25.0</span>
 <span class="n">N_CLOSE</span> <span class="o">=</span> <span class="mi">240</span>
@@ -25709,8 +25851,8 @@ and the diagram cannot drift apart.</p>
 
 <span class="c1"># One axes rect cannot compose both a wide corridor and a tight globe, so the rect is</span>
 <span class="c1"># interpolated along with the camera. Each was fitted to fill the 12x8 frame at that stage.</span>
-<span class="n">RECT_WIDE</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.353</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.517</span><span class="p">,</span> <span class="mf">1.763</span><span class="p">,</span> <span class="mf">1.931</span><span class="p">)</span>  <span class="c1"># animation 1's framing, azim -62</span>
-<span class="n">RECT_OPEN</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.462</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.582</span><span class="p">,</span> <span class="mf">1.824</span><span class="p">,</span> <span class="mf">1.998</span><span class="p">)</span>  <span class="c1"># the close-up's first frame, azim +60</span>
+<span class="n">RECT_WIDE</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.353</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.517</span><span class="p">,</span> <span class="mf">1.763</span><span class="p">,</span> <span class="mf">1.931</span><span class="p">)</span>  <span class="c1"># animation 1's framing, azim -152</span>
+<span class="n">RECT_OPEN</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.462</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.582</span><span class="p">,</span> <span class="mf">1.824</span><span class="p">,</span> <span class="mf">1.998</span><span class="p">)</span>  <span class="c1"># the close-up's first frame, azim -30</span>
 <span class="n">RECT_CLOSE</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.251</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.552</span><span class="p">,</span> <span class="mf">1.851</span><span class="p">,</span> <span class="mf">2.010</span><span class="p">)</span>  <span class="c1"># the close-up once it has settled</span>
 
 
@@ -25775,7 +25917,7 @@ and the diagram cannot drift apart.</p>
     <span class="n">r_geo</span><span class="p">,</span>
     <span class="n">lim</span><span class="p">,</span>
     <span class="n">view</span><span class="p">,</span>
-    <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">corridor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">z_crop</span><span class="o">=</span><span class="n">ZCROP_1</span><span class="p">,</span>
     <span class="n">moon_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
     <span class="n">context</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -25837,8 +25979,8 @@ and the diagram cannot drift apart.</p>
             <span class="n">alpha</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">sun_alpha</span> <span class="o">*</span> <span class="mf">2.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)),</span>
         <span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
-            <span class="n">D_SUN</span><span class="p">,</span>
-            <span class="mi">0</span><span class="p">,</span>
+            <span class="n">SUN_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">SUN_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
             <span class="n">R_SUN_VIS</span> <span class="o">*</span> <span class="n">shrink</span> <span class="o">*</span> <span class="mf">1.35</span><span class="p">,</span>
             <span class="s2">"Sun"</span><span class="p">,</span>
             <span class="n">color</span><span class="o">=</span><span class="s2">"#ffd9a0"</span><span class="p">,</span>
@@ -25873,7 +26015,7 @@ and the diagram cannot drift apart.</p>
     <span class="c1"># Earth spans a few dozen pixels in the wide framing and a few hundred in the</span>
     <span class="c1"># close-up, so the mesh follows the zoom instead of always paying for the close-up</span>
     <span class="n">detail</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mi">240</span> <span class="o">*</span> <span class="n">LIM_1</span> <span class="o">/</span> <span class="n">lim</span><span class="p">),</span> <span class="mi">96</span><span class="p">,</span> <span class="mi">240</span><span class="p">))</span>
-    <span class="n">textured_earth</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">n_lon</span><span class="o">=</span><span class="n">detail</span><span class="p">,</span> <span class="n">n_lat</span><span class="o">=</span><span class="n">detail</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">draw_globe</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">n_lon</span><span class="o">=</span><span class="n">detail</span><span class="p">,</span> <span class="n">n_lat</span><span class="o">=</span><span class="n">detail</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
 
     <span class="n">mx</span><span class="p">,</span> <span class="n">my</span><span class="p">,</span> <span class="n">mz</span> <span class="o">=</span> <span class="n">sphere</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">R_MOON</span><span class="p">,</span> <span class="mi">26</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span>
@@ -25969,12 +26111,16 @@ and the diagram cannot drift apart.</p>
         <span class="p">)</span>
 
     <span class="n">ang</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
-    <span class="n">ox</span><span class="p">,</span> <span class="n">oz</span> <span class="o">=</span> <span class="n">tilt_y</span><span class="p">(</span><span class="n">r_geo</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">ang</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">ang</span><span class="p">))</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ox</span><span class="p">,</span> <span class="n">r_geo</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">ang</span><span class="p">),</span> <span class="n">oz</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#666"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">ring_body</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">r_geo</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">ang</span><span class="p">),</span> <span class="n">r_geo</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">ang</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">ang</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span>
+    <span class="p">)</span>
+    <span class="n">ox</span><span class="p">,</span> <span class="n">oy</span><span class="p">,</span> <span class="n">oz</span> <span class="o">=</span> <span class="n">globe</span><span class="p">(</span><span class="o">*</span><span class="n">_TRANSFORM_RES</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">ring_body</span><span class="p">,</span> <span class="n">spin</span><span class="o">=-</span><span class="mf">90.0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ox</span><span class="p">,</span> <span class="n">oy</span><span class="p">,</span> <span class="n">oz</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#666"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">colour</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">SATS</span><span class="p">:</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lon_deg</span><span class="p">)</span> <span class="o">+</span> <span class="n">spin</span>
-        <span class="n">px</span><span class="p">,</span> <span class="n">pz</span> <span class="o">=</span> <span class="n">tilt_y</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">)</span>
-        <span class="n">sub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">px</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">pz</span><span class="p">])</span>
+        <span class="n">sub_body</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lon_deg</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lon_deg</span><span class="p">)),</span> <span class="mf">0.0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">globe</span><span class="p">(</span><span class="o">*</span><span class="n">_TRANSFORM_RES</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">sub_body</span><span class="p">,</span> <span class="n">spin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">spin</span><span class="p">)</span> <span class="o">-</span> <span class="mf">90.0</span><span class="p">)</span>
         <span class="n">sat</span> <span class="o">=</span> <span class="n">sub</span> <span class="o">*</span> <span class="n">r_geo</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
             <span class="p">[</span><span class="n">sat</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
@@ -26049,12 +26195,15 @@ and the diagram cannot drift apart.</p>
                 <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
             <span class="p">)</span>
 
-    <span class="n">x0</span><span class="p">,</span> <span class="n">x1</span> <span class="o">=</span> <span class="n">xlim</span> <span class="k">if</span> <span class="n">xlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="o">-</span><span class="n">lim</span><span class="p">,</span> <span class="n">lim</span><span class="p">)</span>
+    <span class="n">x0</span><span class="p">,</span> <span class="n">x1</span> <span class="o">=</span> <span class="n">corridor</span> <span class="k">if</span> <span class="n">corridor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="o">-</span><span class="n">lim</span><span class="p">,</span> <span class="n">lim</span><span class="p">)</span>
     <span class="n">zlim</span> <span class="o">=</span> <span class="n">lim</span> <span class="o">*</span> <span class="n">z_crop</span>
-    <span class="c1"># matching box_aspect to the ranges keeps equal units per axis, so spheres stay round</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_box_aspect</span><span class="p">((</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">lim</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">zlim</span><span class="p">))</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="n">lim</span><span class="p">,</span> <span class="n">lim</span><span class="p">)</span>
+    <span class="c1"># matching box_aspect to the ranges keeps equal units per axis, so spheres stay round.</span>
+    <span class="c1"># xlim/ylim are swapped from how the wide draw() uses them: the corridor this pair</span>
+    <span class="c1"># describes ran along the old convention's +x, which is the new one's -y (see the</span>
+    <span class="c1"># SUN_POS comment at the top of the notebook).</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_box_aspect</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lim</span><span class="p">,</span> <span class="n">x1</span> <span class="o">-</span> <span class="n">x0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">zlim</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="n">lim</span><span class="p">,</span> <span class="n">lim</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="n">x1</span><span class="p">,</span> <span class="o">-</span><span class="n">x0</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="o">-</span><span class="n">zlim</span><span class="p">,</span> <span class="n">zlim</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="n">elev</span><span class="o">=</span><span class="n">elev</span><span class="p">,</span> <span class="n">azim</span><span class="o">=</span><span class="n">azim</span><span class="p">)</span>
 
@@ -26080,7 +26229,7 @@ and the diagram cannot drift apart.</p>
         <span class="s2">"t_hours"</span><span class="p">:</span> <span class="n">t</span><span class="p">,</span>
         <span class="s2">"spin"</span><span class="p">:</span> <span class="n">spin</span><span class="p">,</span>
         <span class="s2">"moon_pos"</span><span class="p">:</span> <span class="n">moon_for_target</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">gx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">gy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">gz</span><span class="p">[</span><span class="mi">0</span><span class="p">]])),</span>
-        <span class="s2">"xlim"</span><span class="p">:</span> <span class="p">(</span><span class="n">lerp</span><span class="p">(</span><span class="n">XLIM_0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">LIM_1</span><span class="p">),</span> <span class="n">lerp</span><span class="p">(</span><span class="n">XLIM_0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LIM_1</span><span class="p">)),</span>
+        <span class="s2">"corridor"</span><span class="p">:</span> <span class="p">(</span><span class="n">lerp</span><span class="p">(</span><span class="n">XLIM_0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">LIM_1</span><span class="p">),</span> <span class="n">lerp</span><span class="p">(</span><span class="n">XLIM_0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LIM_1</span><span class="p">)),</span>
         <span class="s2">"r_geo"</span><span class="p">:</span> <span class="n">lerp</span><span class="p">(</span><span class="n">RGEO_0</span><span class="p">,</span> <span class="n">RGEO_1</span><span class="p">),</span>
         <span class="s2">"lim"</span><span class="p">:</span> <span class="n">lerp</span><span class="p">(</span><span class="n">LIM_0</span><span class="p">,</span> <span class="n">LIM_1</span><span class="p">),</span>
         <span class="s2">"z_crop"</span><span class="p">:</span> <span class="n">lerp</span><span class="p">(</span><span class="n">ZCROP_0</span><span class="p">,</span> <span class="n">ZCROP_1</span><span class="p">),</span>
@@ -26232,8 +26381,10 @@ MOON_0, MOON_1 = 1.0, 0.50  # how far along its true direction the Moon is *draw
 LIM_0, LIM_1 = 7.0, 2.75  # half-width of the view box; LIM_0 is animation 1's exactly
 XLIM_0 = (-7.0, 15.8)  # the wide shot is a corridor: Earth left, Sun right
 ZCROP_0, ZCROP_1 = 0.46, 0.62  # the scene is flat, so crop the vertical black
-AZIM_0, AZIM_1 = 60.0, 51.0  # animation 1's own -62 deg puts Meteosat-12 behind Earth,
-AZIM_WIDE = -62.0  # so the run-on frames swing the camera round to AZIM_0
+# The -90 on each is the same fixed rotation SUN_POS picks up -- see its comment at
+# the top of the notebook. Only azim moves; elev is a different camera axis.
+AZIM_0, AZIM_1 = -30.0, -39.0  # animation 1's own -152 deg puts Meteosat-12 behind
+AZIM_WIDE = -152.0  # Earth, so the run-on frames swing the camera round to AZIM_0
 # before the cut: both meridians are then up immediately
 ELEV_0, ELEV_1 = 27.0, 25.0
 N_CLOSE = 240
@@ -26243,8 +26394,8 @@ SUN_EXIT = 0.22  # fraction of the fly-in spent fading the Sun out first
 
 # One axes rect cannot compose both a wide corridor and a tight globe, so the rect is
 # interpolated along with the camera. Each was fitted to fill the 12x8 frame at that stage.
-RECT_WIDE = (-0.353, -0.517, 1.763, 1.931)  # animation 1's framing, azim -62
-RECT_OPEN = (-0.462, -0.582, 1.824, 1.998)  # the close-up's first frame, azim +60
+RECT_WIDE = (-0.353, -0.517, 1.763, 1.931)  # animation 1's framing, azim -152
+RECT_OPEN = (-0.462, -0.582, 1.824, 1.998)  # the close-up's first frame, azim -30
 RECT_CLOSE = (-0.251, -0.552, 1.851, 2.010)  # the close-up once it has settled
 
 
@@ -26309,7 +26460,7 @@ def draw_scene(
     r_geo,
     lim,
     view,
-    xlim=None,
+    corridor=None,
     z_crop=ZCROP_1,
     moon_scale=1.0,
     context=1.0,
@@ -26371,8 +26522,8 @@ def draw_scene(
             alpha=float(np.clip(sun_alpha * 2.2, 0.0, 1.0)),
         )
         ax.text(
-            D_SUN,
-            0,
+            SUN_POS[0],
+            SUN_POS[1],
             R_SUN_VIS * shrink * 1.35,
             "Sun",
             color="#ffd9a0",
@@ -26407,7 +26558,7 @@ def draw_scene(
     # Earth spans a few dozen pixels in the wide framing and a few hundred in the
     # close-up, so the mesh follows the zoom instead of always paying for the close-up
     detail = int(np.clip(round(240 * LIM_1 / lim), 96, 240))
-    textured_earth(ax, spin, n_lon=detail, n_lat=detail // 2)
+    draw_globe(ax, spin, n_lon=detail, n_lat=detail // 2)
 
     mx, my, mz = sphere(m, R_MOON, 26)
     ax.plot_surface(
@@ -26503,12 +26654,16 @@ def draw_scene(
         )
 
     ang = np.linspace(0, 2 * np.pi, 200)
-    ox, oz = tilt_y(r_geo * np.cos(ang), np.zeros_like(ang))
-    ax.plot(ox, r_geo * np.sin(ang), oz, color="#666", lw=0.6, zorder=3)
+    ring_body = np.stack(
+        [r_geo * np.cos(ang), r_geo * np.sin(ang), np.zeros_like(ang)], axis=-1
+    )
+    ox, oy, oz = globe(*_TRANSFORM_RES).transform(ring_body, spin=-90.0).T
+    ax.plot(ox, oy, oz, color="#666", lw=0.6, zorder=3)
     for lon_deg, colour, label in SATS:
-        a = np.deg2rad(lon_deg) + spin
-        px, pz = tilt_y(np.cos(a), 0.0)
-        sub = np.array([px, np.sin(a), pz])
+        sub_body = np.array(
+            [np.cos(np.deg2rad(lon_deg)), np.sin(np.deg2rad(lon_deg)), 0.0]
+        )
+        sub = globe(*_TRANSFORM_RES).transform(sub_body, spin=np.rad2deg(spin) - 90.0)
         sat = sub * r_geo
         ax.scatter(
             [sat[0]],
@@ -26583,12 +26738,15 @@ def draw_scene(
                 zorder=10,
             )
 
-    x0, x1 = xlim if xlim is not None else (-lim, lim)
+    x0, x1 = corridor if corridor is not None else (-lim, lim)
     zlim = lim * z_crop
-    # matching box_aspect to the ranges keeps equal units per axis, so spheres stay round
-    ax.set_box_aspect((x1 - x0, 2 * lim, 2 * zlim))
-    ax.set_xlim(x0, x1)
-    ax.set_ylim(-lim, lim)
+    # matching box_aspect to the ranges keeps equal units per axis, so spheres stay round.
+    # xlim/ylim are swapped from how the wide draw() uses them: the corridor this pair
+    # describes ran along the old convention's +x, which is the new one's -y (see the
+    # SUN_POS comment at the top of the notebook).
+    ax.set_box_aspect((2 * lim, x1 - x0, 2 * zlim))
+    ax.set_xlim(-lim, lim)
+    ax.set_ylim(-x1, -x0)
     ax.set_zlim(-zlim, zlim)
     ax.view_init(elev=elev, azim=azim)
 
@@ -26614,7 +26772,7 @@ def frame_params(u):
         "t_hours": t,
         "spin": spin,
         "moon_pos": moon_for_target(np.array([gx[0], gy[0], gz[0]])),
-        "xlim": (lerp(XLIM_0[0], -LIM_1), lerp(XLIM_0[1], LIM_1)),
+        "corridor": (lerp(XLIM_0[0], -LIM_1), lerp(XLIM_0[1], LIM_1)),
         "r_geo": lerp(RGEO_0, RGEO_1),
         "lim": lerp(LIM_0, LIM_1),
         "z_crop": lerp(ZCROP_0, ZCROP_1),
