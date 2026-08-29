@@ -4431,12 +4431,12 @@ datasets:
         units: kg m-2 s-1
       mean-2m-temperature:
         cds_variable: mean_2m_temperature
-        nc_variable: mean_2m_temperature
-        units: unknown
+        nc_variable: tasAdjust
+        units: K
       maximum-2m-temperature:
         cds_variable: maximum_2m_temperature
-        nc_variable: maximum_2m_temperature
-        units: unknown
+        nc_variable: tasmaxAdjust
+        units: K
       minimum-2m-temperature:
         cds_variable: minimum_2m_temperature
         nc_variable: minimum_2m_temperature
