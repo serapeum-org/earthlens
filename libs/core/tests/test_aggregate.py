@@ -1834,9 +1834,19 @@ def _handles_on(path):
     psutil reports one entry per path, not per handle, so a second handle on a
     path already open would not show up in a difference — which is precisely
     the leak a release check exists to catch.
+
+    Enumerating handles is a whole-system call on Windows and fails outright
+    when the machine holds too many (`SystemExtendedHandleInformation buffer
+    too big`). That says nothing about the code under test, so the caller is
+    skipped rather than failed — the same treatment an unreachable service
+    gets elsewhere in this suite.
     """
+    try:
+        handles = psutil.Process().open_files()
+    except (RuntimeError, psutil.Error) as exc:
+        pytest.skip(f"this process's open handles cannot be enumerated: {exc}")
     found = []
-    for handle in psutil.Process().open_files():
+    for handle in handles:
         try:
             if os.path.samefile(handle.path, path):
                 found.append(handle.path)
