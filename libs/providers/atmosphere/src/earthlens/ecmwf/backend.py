@@ -547,6 +547,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         skip_constraints: bool = False,
         request: dict[str, Any] | None = None,
         endpoint: str | None = None,
+        pressure_level: list[str] | str | None = None,
     ):
         """Initialize an ECMWF backend instance.
 
@@ -584,6 +585,12 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 unchecked. Useful when CDS's published
                 `constraints.json` is stale or wrong for the
                 dataset, or when running offline. Defaults to `False`.
+            pressure_level: Pressure levels in hPa to retrieve, replacing
+                the level each catalog row carries. A bare string is
+                accepted for the single-level case. Only variables the
+                catalog gives a `cds_pressure_level` are affected, so a
+                single-level variable in the same retrieve is untouched.
+                Defaults to `None`, which keeps each row's own level.
         """
         self.skip_constraints = skip_constraints
         # Per-endpoint cdsapi client cache (one per ENDPOINTS slug). Populated
@@ -594,6 +601,13 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # poison endpoint routing.
         self._clients: dict[str, Any] = {}
         self._injected_client: Any = None
+        # Retrieval-time override for the catalog's pressure level. The curated
+        # rows carry the single level each was audited at, so without this a
+        # different level means editing the shipped YAML or building a
+        # `Variable` by hand and bypassing the facade.
+        self.pressure_level: list[str] | None = (
+            [pressure_level] if isinstance(pressure_level, str) else pressure_level
+        )
         # Raw-request passthrough (the coverage lever): when `request=` is
         # given, skip the typed catalog / date / grid machinery and forward
         # the raw request to the resolved store's client (see `download`). The
@@ -1600,7 +1614,15 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         )
 
         if var_info.cds_pressure_level is not None:
-            request["pressure_level"] = var_info.cds_pressure_level
+            # Only a variable the catalog gives a level to takes the override:
+            # a single-level variable has no `pressure_level` in its request
+            # shape, and adding one makes the request invalid rather than
+            # broader.
+            request["pressure_level"] = (
+                self.pressure_level
+                if self.pressure_level is not None
+                else var_info.cds_pressure_level
+            )
 
         _apply_extras_and_strips(request, var_info)
 

@@ -18,7 +18,7 @@ import pandas as pd
 import pytest
 from pydantic import ValidationError
 
-from earthlens.ecmwf import Variable
+from earthlens.ecmwf import ECMWF, Variable
 from earthlens.ecmwf import constraints as constraints_module
 
 from ._fakes import captured_request
@@ -549,6 +549,29 @@ class TestApiMonthly:
 class TestBuildRequest:
     """Tests for :meth:`ECMWF._build_request` (M5 — extracted pure builder)."""
 
+    def test_pressure_level_overrides_the_catalog_level(
+        self, ecmwf_stub, pressure_level_var_info
+    ):
+        """The curated row carries one level; a retrieval may want another."""
+        ecmwf_stub.pressure_level = ["500", "850"]
+        request = ecmwf_stub._build_request(pressure_level_var_info)
+        assert request["pressure_level"] == ["500", "850"]
+
+    def test_the_catalog_level_stands_without_an_override(
+        self, ecmwf_stub, pressure_level_var_info
+    ):
+        """Absent the kwarg the row's own level is what gets requested."""
+        ecmwf_stub.pressure_level = None
+        request = ecmwf_stub._build_request(pressure_level_var_info)
+        assert request["pressure_level"] == ["1000"]
+
+    def test_a_single_level_variable_gains_no_pressure_level(
+        self, ecmwf_stub, single_level_var_info
+    ):
+        """Adding one to a single-level request makes it invalid, not broader."""
+        ecmwf_stub.pressure_level = ["500"]
+        assert "pressure_level" not in ecmwf_stub._build_request(single_level_var_info)
+
     def test_returns_dict_with_required_keys(self, ecmwf_stub, single_level_var_info):
         """`_build_request` returns a dict carrying every CDS-required key."""
         request = ecmwf_stub._build_request(single_level_var_info)
@@ -666,3 +689,32 @@ class TestBuildRequest:
             f"explicit `extras[area]` should re-introduce the stripped key; "
             f"got {request.get('area')!r}"
         )
+
+
+class TestPressureLevelKwarg:
+    """The `pressure_level=` retrieval override (#42)."""
+
+    def test_a_bare_string_is_accepted(self):
+        """One level is the common case and should not need a list."""
+        backend = ECMWF(
+            start="2020-01-01",
+            end="2020-01-02",
+            variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path="out",
+            pressure_level="500",
+        )
+        assert backend.pressure_level == ["500"]
+
+    def test_it_defaults_to_leaving_the_catalog_alone(self):
+        """No kwarg means every row keeps the level it was curated at."""
+        backend = ECMWF(
+            start="2020-01-01",
+            end="2020-01-02",
+            variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path="out",
+        )
+        assert backend.pressure_level is None
