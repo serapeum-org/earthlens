@@ -38,11 +38,13 @@ available_datasets:
 - ECMM_Seals
 - ECMM_Sei_whale
 - ECMM_Short_beaked_common_dolphin
+- ECMM_Sperm_whale
 - ECMM_Spinner_dolphin
 - ECMM_Striped_dolphin
 - ECMM_Unidentified_beaked_whales
 - ECMM_White_beaked_dolphin
 - ECMM__Fin_whale
+- ECMM_density_query
 - ETOPO_2022_v1_15s
 - ETOPO_2022_v1_15s_Lon0360
 - FED_Rockfish_Catch
@@ -75,7 +77,6 @@ available_datasets:
 - RREAS_FI_SBAS_obs
 - RREAS_FI_SBAS_sp
 - RREAS_FI_SBAS_tr
-- awsS3NoaaGoes17
 - ccmp_31
 - ccmp_31_LonPM180
 - charmForecast0day
@@ -94,6 +95,8 @@ available_datasets:
 - charmForecast3dayV2
 - charmForecast3dayV2_LonPM180
 - charmForecast3day_LonPM180
+- chirps20GlobalAnnualP05
+- chirps20GlobalAnnualP05_Lon0360
 - chirps20GlobalDailyP05
 - chirps20GlobalDailyP05_Lon0360
 - chirps20GlobalMonthlyP05
@@ -897,10 +900,6 @@ available_datasets:
 - nceiErsstv4_LonPM180
 - nceiErsstv5
 - nceiErsstv5_LonPM180
-- nceiPH53sstd1day
-- nceiPH53sstd1day_Lon0360
-- nceiPH53sstn1day
-- nceiPH53sstn1day_Lon0360
 - ncepNinoSSTwk
 - ncep_gdas_global
 - nesdisBLENDEDsstDLDaily
@@ -1313,6 +1312,7 @@ available_datasets:
 - noaaSanctSound_CI04_07_sonar
 - noaaSanctSound_CI04_08_BB_1h
 - noaaSanctSound_CI04_08_Explosions
+- noaaSanctSound_CI04_08_OL_1h
 - noaaSanctSound_CI04_08_PSD_1h
 - noaaSanctSound_CI04_08_TOL_1h
 - noaaSanctSound_CI04_08_bluewhale
@@ -2804,6 +2804,9 @@ available_datasets:
 - noaacwLEOACSPOSSTL3SCWeekly
 - noaacwLEOACSPOSSTL3SCWeeklyNRT
 - noaacwLEOACSPOSSTL3SnrtCDaily
+- noaacwNPPN20S3ASCIDINEOF2kmDaily
+- noaacwNPPN20S3AkdSCIDINEOF2kmDaily
+- noaacwNPPN20S3AspmSCIDINEOF2kmDaily
 - nodcPH2sstd1day
 - nodcPH2sstd1day_Lon0360
 - nodcPH2sstn1day
@@ -3029,7 +3032,6 @@ available_datasets:
 - sardine_habitat_viirs_Lon0360
 - sardine_habitat_viirs_v2
 - scrippsGliders
-- scrippsGlidersSQ
 - siocalcofiHydroBottle
 - siocalcofiHydroCast
 - srtm15plus

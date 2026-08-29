@@ -97,8 +97,14 @@ jobs:
           # The marker exclusions drop the suites that have their own lane below.
           # The geoBoundaries ADM1 test that segfaults GDAL (#925) skips itself
           # in the test file now, so no --deselect is needed here.
+          report="$RUNNER_TEMP/e2e-shared.xml"
           uv run --locked pytest ${{ matrix.package }} -v \
+            --junitxml="$report" \
             -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat and not caravan"
+          # A lane where every test skipped exercised nothing, yet pytest exits 0
+          # and the check goes green - the blindness that let four lanes run zero
+          # tests for weeks. Fail it instead.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-shared (${{ matrix.package }})"
 
   e2e-caravan:
     runs-on: ubuntu-latest
@@ -126,7 +132,12 @@ jobs:
         # `--locked` makes the run fail rather than silently re-resolve if
         # uv.lock has drifted, so the versions under test are the locked ones.
         run: |
-          uv run --locked pytest -m "e2e and caravan" -v
+          report="$RUNNER_TEMP/e2e-caravan.xml"
+          uv run --locked pytest -m "e2e and caravan" -v --junitxml="$report"
+          # A lane where every test skipped exercised nothing, yet pytest exits 0
+          # and the check goes green - the blindness that let four lanes run zero
+          # tests for weeks. Fail it instead.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-caravan"
 
   e2e-gee:
     runs-on: ubuntu-latest
@@ -152,7 +163,12 @@ jobs:
           GEE_SERVICE_ACCOUNT: ${{ secrets.GEE_SERVICE_ACCOUNT }}
           GEE_SERVICE_KEY: ${{ secrets.GEE_SERVICE_KEY }}
         run: |
-          uv run --locked pytest -m "e2e and gee" -v
+          report="$RUNNER_TEMP/e2e-gee.xml"
+          uv run --locked pytest -m "e2e and gee" -v --junitxml="$report"
+          # A lane where every test skipped exercised nothing, yet pytest exits 0
+          # and the check goes green - the blindness that let four lanes run zero
+          # tests for weeks. Fail it instead.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-gee"
 
   e2e-earthdata:
     runs-on: ubuntu-latest
@@ -182,7 +198,12 @@ jobs:
           # Alternative to username/password: a single EDL bearer token.
           EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
         run: |
-          uv run --locked pytest -m "e2e and earthdata" -v
+          report="$RUNNER_TEMP/e2e-earthdata.xml"
+          uv run --locked pytest -m "e2e and earthdata" -v --junitxml="$report"
+          # A lane where every test skipped exercised nothing, yet pytest exits 0
+          # and the check goes green - the blindness that let four lanes run zero
+          # tests for weeks. Fail it instead.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-earthdata"
 
   e2e-emdat:
     runs-on: ubuntu-latest
@@ -226,7 +247,12 @@ jobs:
       # half needs nothing but network and always runs.
       - name: Run live EM-DAT Dataverse e2e tests
         run: |
-          uv run --locked pytest -m "e2e and emdat and not gdis" -v
+          report="$RUNNER_TEMP/e2e-emdat.xml"
+          uv run --locked pytest -m "e2e and emdat and not gdis" -v --junitxml="$report"
+          # A lane where every test skipped exercised nothing, yet pytest exits 0
+          # and the check goes green - the blindness that let four lanes run zero
+          # tests for weeks. Fail it instead.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-emdat"
 
       # GDIS rides NASA Earthdata Cloud, so it needs an Earthdata Login whose
       # account has also accepted the SEDAC data-use agreement. These tests are
@@ -265,7 +291,12 @@ jobs:
           EUMETSAT_CONSUMER_KEY: ${{ secrets.EUMETSAT_CONSUMER_KEY }}
           EUMETSAT_CONSUMER_SECRET: ${{ secrets.EUMETSAT_CONSUMER_SECRET }}
         run: |
-          uv run --locked pytest -m "e2e and eumetsat" -v
+          report="$RUNNER_TEMP/e2e-eumetsat.xml"
+          uv run --locked pytest -m "e2e and eumetsat" -v --junitxml="$report"
+          # A lane where every test skipped exercised nothing, yet pytest exits 0
+          # and the check goes green - the blindness that let four lanes run zero
+          # tests for weeks. Fail it instead.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-eumetsat"
 
   e2e-stac:
     runs-on: ubuntu-latest
@@ -292,7 +323,12 @@ jobs:
           CDSE_S3_ACCESS_KEY: ${{ secrets.CDSE_S3_ACCESS_KEY }}
           CDSE_S3_SECRET_KEY: ${{ secrets.CDSE_S3_SECRET_KEY }}
         run: |
-          uv run --locked pytest -m "stac and e2e" -v
+          report="$RUNNER_TEMP/e2e-stac.xml"
+          uv run --locked pytest -m "stac and e2e" -v --junitxml="$report"
+          # A lane where every test skipped exercised nothing, yet pytest exits 0
+          # and the check goes green - the blindness that let four lanes run zero
+          # tests for weeks. Fail it instead.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-stac"
 
   e2e-sentinel-hub:
     runs-on: ubuntu-latest
@@ -319,7 +355,12 @@ jobs:
           SENTINELHUB_CLIENT_ID: ${{ secrets.SENTINELHUB_CLIENT_ID }}
           SENTINELHUB_CLIENT_SECRET: ${{ secrets.SENTINELHUB_CLIENT_SECRET }}
         run: |
-          uv run --locked pytest -m "sentinel_hub and e2e" -v
+          report="$RUNNER_TEMP/e2e-sentinel-hub.xml"
+          uv run --locked pytest -m "sentinel_hub and e2e" -v --junitxml="$report"
+          # A lane where every test skipped exercised nothing, yet pytest exits 0
+          # and the check goes green - the blindness that let four lanes run zero
+          # tests for weeks. Fail it instead.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-sentinel-hub"
 
   e2e-nwp:
     runs-on: ubuntu-latest
@@ -346,7 +387,12 @@ jobs:
         # Open Data are anonymous (no secrets); the suite skips anything that is
         # transiently unavailable.
         run: |
-          uv run --locked pytest -m "e2e and nwp" -v
+          report="$RUNNER_TEMP/e2e-nwp.xml"
+          uv run --locked pytest -m "e2e and nwp" -v --junitxml="$report"
+          # A lane where every test skipped exercised nothing, yet pytest exits 0
+          # and the check goes green - the blindness that let four lanes run zero
+          # tests for weeks. Fail it instead.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-nwp"
 
   e2e-asf:
     runs-on: ubuntu-latest
@@ -377,7 +423,12 @@ jobs:
           EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
           EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
         run: |
-          uv run --locked pytest -m "e2e and asf" -v
+          report="$RUNNER_TEMP/e2e-asf.xml"
+          uv run --locked pytest -m "e2e and asf" -v --junitxml="$report"
+          # A lane where every test skipped exercised nothing, yet pytest exits 0
+          # and the check goes green - the blindness that let four lanes run zero
+          # tests for weeks. Fail it instead.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-asf"
 
   e2e-iucn:
     runs-on: ubuntu-latest
@@ -403,7 +454,12 @@ jobs:
         env:
           IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
         run: |
-          uv run --locked pytest -m "e2e and iucn" -v
+          report="$RUNNER_TEMP/e2e-iucn.xml"
+          uv run --locked pytest -m "e2e and iucn" -v --junitxml="$report"
+          # A lane where every test skipped exercised nothing, yet pytest exits 0
+          # and the check goes green - the blindness that let four lanes run zero
+          # tests for weeks. Fail it instead.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-iucn"
 
   e2e-wdpa:
     runs-on: ubuntu-latest
