@@ -1757,8 +1757,23 @@ class _FakeEedaiDataset:
         Path(path).write_bytes(b"eedai-tif")
 
 
+class _FakeWindow:
+    """Stand-in for `pyramids_eo.Window`; carries the spatial read spec."""
+
+    def __init__(
+        self, bbox=None, crs="EPSG:4326", scale=None, shape=None, resample="nearest"
+    ):
+        self.bbox = bbox
+        self.crs = crs
+        self.scale = scale
+        self.shape = shape
+        self.resample = resample
+
+
 class _FakeReaderModule:
     """Stand-in for `pyramids_eo.earthengine`; records `from_earthengine`."""
+
+    Window = _FakeWindow
 
     def __init__(self):
         self.calls: list[tuple[str, dict]] = []
@@ -1769,7 +1784,8 @@ class _FakeReaderModule:
         # Mirror the combinations upstream's `_validate_read_request` rejects,
         # so a plan that produces one fails here instead of passing silently.
         if kwargs.get("tile_size") is not None:
-            if kwargs.get("resample", "nearest") != "nearest":
+            window = kwargs.get("window")
+            if getattr(window, "resample", "nearest") != "nearest":
                 raise ValueError("'tile_size' supports only resample='nearest'")
             if kwargs.get("geometry") is not None:
                 raise ValueError("'tile_size' cannot be combined with a 'geometry'")
@@ -1934,10 +1950,10 @@ class TestExportViaEedai:
         asset_id, kwargs = fake_reader.calls[0]
         assert asset_id == "USGS/SRTMGL1_003"
         assert kwargs["bands"] == ["elevation"]
-        assert kwargs["crs"] == "EPSG:4326"
-        assert kwargs["bbox"] == (31.2, 29.9, 31.3, 30.0)
+        assert kwargs["window"].crs == "EPSG:4326"
+        assert kwargs["window"].bbox == (31.2, 29.9, 31.3, 30.0)
         assert kwargs["geometry"] is None
-        assert kwargs["resample"] == "nearest"
+        assert kwargs["window"].resample == "nearest"
 
     def test_metre_scale_becomes_an_explicit_pixel_grid(self, make_gee, fake_reader):
         """`scale` (metres) is resolved to `shape=(rows, cols)`, not passed through.
@@ -1951,9 +1967,9 @@ class TestExportViaEedai:
             var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
         )
         _asset_id, kwargs = fake_reader.calls[0]
-        assert kwargs["shape"] == gee._eedai_grid(kwargs["bbox"], 90.0)
-        assert "scale" not in kwargs
-        assert all(axis > 1 for axis in kwargs["shape"]), kwargs["shape"]
+        assert kwargs["window"].shape == gee._eedai_grid(kwargs["window"].bbox, 90.0)
+        assert kwargs["window"].scale is None
+        assert all(axis > 1 for axis in kwargs["window"].shape), kwargs["window"].shape
 
     def test_grid_has_square_ground_pixels(self, make_gee):
         """The grid resolves to ~`scale` metres on both axes, not a worst-case bound.
@@ -2008,7 +2024,7 @@ class TestExportViaEedai:
             var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
         )
         _asset_id, kwargs = fake_reader.calls[0]
-        assert kwargs["resample"] == "average"
+        assert kwargs["window"].resample == "average"
 
     def test_api_routes_eligible_requests_to_eedai(self, make_gee, fake_reader):
         """`_api` takes the EEDAI path instead of `getDownloadURL`."""
@@ -2050,7 +2066,7 @@ class TestExportViaEedai:
         )
         _asset_id, kwargs = fake_reader.calls[0]
         assert kwargs["geometry"] is region
-        assert kwargs["bbox"] == region.total_bounds
+        assert kwargs["window"].bbox == region.total_bounds
 
     def test_region_window_and_grid_agree(self, make_gee, fake_reader):
         """The grid is sized for the region's window, not the wider lat/lon bbox.
@@ -2066,10 +2082,12 @@ class TestExportViaEedai:
             var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
         )
         _asset_id, kwargs = fake_reader.calls[0]
-        assert kwargs["bbox"] == region.total_bounds
-        assert kwargs["shape"] == gee._eedai_grid(region.total_bounds, 90.0)
+        assert kwargs["window"].bbox == region.total_bounds
+        assert kwargs["window"].shape == gee._eedai_grid(region.total_bounds, 90.0)
         wide = gee._eedai_grid((31.0, 29.0, 32.0, 30.0), 90.0)
-        assert kwargs["shape"] != wide, "grid was sized from the bbox, not the region"
+        assert kwargs["window"].shape != wide, (
+            "grid was sized from the bbox, not the region"
+        )
 
     def test_oversized_read_is_served_by_tiling(self, make_gee, fake_reader):
         """A window too large for one pass is streamed in tiles, not refused."""
@@ -2571,7 +2589,7 @@ class TestExportViaEedai:
         _asset_id, kwargs = fake_reader.calls[0]
         assert kwargs["geometry"] is not region, "the projected region was reused"
         assert kwargs["geometry"].reprojected_to == "EPSG:4326"
-        assert kwargs["bbox"] == kwargs["geometry"].total_bounds
+        assert kwargs["window"].bbox == kwargs["geometry"].total_bounds
 
     def test_wgs84_region_is_used_as_is(self, make_gee, fake_reader):
         """A region already in EPSG:4326 is not needlessly reprojected."""

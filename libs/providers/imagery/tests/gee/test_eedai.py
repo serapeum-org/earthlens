@@ -120,24 +120,28 @@ class TestReaderContract:
         """
         import inspect
 
-        from_earthengine = _eedai.import_earthengine_reader().from_earthengine
-        inspect.signature(from_earthengine).bind(
+        reader = _eedai.import_earthengine_reader()
+        inspect.signature(reader.from_earthengine).bind(
             "USGS/SRTMGL1_003",
             bands=["elevation"],
-            crs="EPSG:4326",
-            bbox=(31.2, 29.9, 31.3, 30.0),
+            window=reader.Window(
+                bbox=(31.2, 29.9, 31.3, 30.0),
+                crs="EPSG:4326",
+                shape=(124, 107),
+            ),
             geometry=None,
-            shape=(124, 107),
             credentials=None,
         )
 
     def test_scale_and_shape_are_mutually_exclusive(self):
         """The reader rejects `scale` alongside `shape` — the backend sends only shape."""
-        from_earthengine = _eedai.import_earthengine_reader().from_earthengine
+        reader = _eedai.import_earthengine_reader()
         with pytest.raises(ValueError, match="at most one of"):
-            from_earthengine(
+            reader.from_earthengine(
                 "USGS/SRTMGL1_003",
-                bbox=(31.2, 29.9, 31.3, 30.0),
-                scale=90.0,
-                shape=(124, 107),
+                window=reader.Window(
+                    bbox=(31.2, 29.9, 31.3, 30.0),
+                    scale=90.0,
+                    shape=(124, 107),
+                ),
             )
