@@ -56,7 +56,7 @@ Examples:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
@@ -605,7 +605,12 @@ class Variable(FluxableLeaf):
     #: `satellite-precipitation` and `satellite-sea-surface-temperature` do,
     #: and those two are hydrated and unmarked. The mark says this particular
     #: row has more than one candidate and so can never be pinned.
-    unhydratable: str | None = None
+    #:
+    #: Constrained rather than free text: the value is the whole reason a
+    #: later reader trusts the mark, and a typo (`pseudo_slug`) in a free
+    #: string would still be truthy, still skip the row, and never be
+    #: noticed. A new reason is added here first, deliberately.
+    unhydratable: Literal["pseudo-slug"] | None = None
 
     @field_validator("extras", mode="before")
     @classmethod

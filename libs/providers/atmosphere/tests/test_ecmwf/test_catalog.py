@@ -8,6 +8,7 @@ malformed YAML, and the no-MARS-keys invariant on the schema.
 
 from __future__ import annotations
 
+import pydantic
 import pytest
 
 from earthlens.ecmwf import Catalog, Variable
@@ -1185,6 +1186,22 @@ class TestUnhydratableField:
             and not row.unhydratable
         ]
         assert not unmarked, f"pseudo-slug rows left indistinguishable: {unmarked}"
+
+    @pytest.mark.parametrize("typo", ["pseudo_slug", "pseudoslug", "Pseudo-Slug"])
+    def test_a_misspelt_reason_is_refused(self, typo):
+        """A truthy typo would skip the row for good and read as deliberate."""
+        from earthlens.ecmwf.catalog import Variable
+
+        with pytest.raises(pydantic.ValidationError):
+            Variable.model_validate(
+                {
+                    "cds_dataset": "a-dataset",
+                    "cds_variable": "a-variable",
+                    "nc_variable": "v",
+                    "units": "unknown",
+                    "unhydratable": typo,
+                }
+            )
 
     def test_a_resolved_pseudo_slug_row_is_left_alone(self):
         """A dataset serving one variable resolves `all`, so the mark would lie."""

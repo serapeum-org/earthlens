@@ -50,6 +50,13 @@
 #       units:                         Required. Raw ERA5 unit string
 #                                      emitted by CDS (used in the
 #                                      output filename).
+#       unhydratable:                  Optional. Why no live retrieve can
+#                                      ever fill this row, which makes
+#                                      `curate ecmwf --fill-empty` skip
+#                                      it. Only "pseudo-slug" is defined.
+#                                      Omit the key while a row is merely
+#                                      unfilled - a null value reads as
+#                                      absent, not as a mark.
 #
 # Refreshed from all five CADS `/collections` endpoints (CDS + ADS + EWDS +
 # ECDS + XDS) — `available_datasets` is a per-store mapping totalling 174 ids

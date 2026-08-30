@@ -538,7 +538,6 @@ class TestUnhydratableIsReadTheSameWay:
         [
             ("pseudo-slug", True),
             ("pseudo-slug  # all-variables", True),
-            ("nullish", True),
             ("null", False),
             ("Null", False),
             ("NULL", False),
@@ -571,6 +570,16 @@ class TestUnhydratableIsReadTheSameWay:
         assert bool(loaded.unhydratable) is is_terminal, (
             "the sweep and the catalog disagree about whether this row is done"
         )
+
+    @pytest.mark.parametrize("written", ["nullish", "null-ish", "nullary reason"])
+    def test_a_value_merely_starting_with_null_still_marks(self, written):
+        """The exclusion is for the null scalar, not for anything spelt near it."""
+        newline = chr(10)
+        body = (
+            f"        units: unknown{newline}        unhydratable: {written}{newline}"
+        )
+
+        assert hydrate_mod._UNHYDRATABLE.search(body)
 
 
 class TestDropRestatements:
