@@ -2081,6 +2081,29 @@ class TestEedaiCollections:
         assert not plan.can_serve
         assert "scene cap" in plan.reason
 
+    def test_budget_uses_the_output_grid_not_the_native_one(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A finer `scale` than the asset must raise the estimate, not leave it flat.
+
+        Upstream warps every scene onto the output window before stacking them,
+        so sizing the budget from the native grid under-counts exactly when the
+        request asks for more pixels than the asset has.
+        """
+        coarse = self._collection_gee(make_gee, scale=5566.0)
+        fine = self._collection_gee(make_gee, scale=100.0)
+        var_info = coarse.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        # Chosen so one scene's window fits comfortably but the three-scene
+        # stack does not: this must exercise the collection budget, not the
+        # single-scene gate that runs before it.
+        monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 20_000)
+        coarse_plan = coarse._eedai_collection_fits(var_info, 1, self.START, self.END)
+        fine_plan = fine._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert coarse_plan.can_serve, coarse_plan.reason
+        assert not fine_plan.can_serve, (
+            "a much finer scale did not raise the estimated footprint"
+        )
+
     def test_over_the_pixel_budget_declines(self, make_gee, fake_reader, monkeypatch):
         """Scenes that together exceed the single-pass budget are declined."""
         gee = self._collection_gee(make_gee)

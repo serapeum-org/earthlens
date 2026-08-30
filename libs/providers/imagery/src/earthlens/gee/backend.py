@@ -1660,7 +1660,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
         fits, reason = self._eedai_native_fits(var_info, bbox, band_count)
         if not fits:
             return EedaiPlan(False, None, 0, reason)
-        rows, cols = self._eedai_output_grid(bbox, float(native_scale))
+        # Every scene is warped onto the *output* window and the whole set is
+        # held to reduce, so the stack is sized by the output grid - not the
+        # native one. A `scale` finer than the asset makes the output grid the
+        # larger of the two, which is exactly when sizing from native
+        # under-counts what has to fit in memory.
+        native_rows, native_cols = self._eedai_output_grid(bbox, float(native_scale))
+        out_rows, out_cols = self._eedai_output_grid(
+            bbox, float(self.scale or native_scale)
+        )
+        rows = max(native_rows, out_rows)
+        cols = max(native_cols, out_cols)
         total = cost.scene_count * rows * cols * max(band_count, 1)
         if total > _EEDAI_MAX_PIXELS:
             return EedaiPlan(
@@ -1668,8 +1678,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 None,
                 0,
                 (
-                    f"about {total:,} native px across {cost.scene_count:,} scenes, "
-                    f"over the {_EEDAI_MAX_PIXELS:,}-px single-pass budget"
+                    f"about {total:,} px across {cost.scene_count:,} scenes on a "
+                    f"{cols}x{rows} grid, over the {_EEDAI_MAX_PIXELS:,}-px "
+                    "single-pass budget"
                 ),
             )
         return EedaiPlan(True, None, cost.scene_count, "")
