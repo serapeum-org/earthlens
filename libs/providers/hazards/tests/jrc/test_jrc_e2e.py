@@ -100,7 +100,8 @@ class TestSeaLevelLiveFetch:
             path=str(tmp_path),
         ).download(progress_bar=False)
 
-        assert len(paths) == 1 and paths[0].exists()
+        assert len(paths) == 1, f"expected one output, got {paths}"
+        assert paths[0].exists(), f"{paths[0]} was not written"
         from pyramids.dataset import Dataset
 
         from earthlens.base import close_quietly
@@ -141,4 +142,5 @@ class TestSeaLevelLiveFetch:
 
         result = EarthLens(data_source="coastal-forecast").download(progress_bar=False)
         assert isinstance(result, pd.DataFrame)
-        assert "GID_0" in result.columns and len(result) > 0
+        assert "GID_0" in result.columns, f"missing GID_0: {list(result.columns)[:5]}"
+        assert len(result) > 0, "the coastal summary came back empty"

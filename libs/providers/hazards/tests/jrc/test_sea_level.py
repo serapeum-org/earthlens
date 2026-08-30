@@ -390,13 +390,16 @@ class TestGriddedFetch:
             path=tmp_path,
         )
         paths = backend.download()
-        assert len(paths) == 1 and paths[0].exists()
+        assert len(paths) == 1, f"expected one output, got {paths}"
+        assert paths[0].exists(), f"{paths[0]} was not written"
 
         written = PyramidsDataset.read_file(str(paths[0]))
         assert written.band_count == 16
         assert written.epsg == 4326
         origin_x, cell, _, origin_y, _, _ = written.geotransform
-        assert cell == pytest.approx(0.25) and cell != 1.0  # degrees, not index space
+        # degrees, not index space
+        assert cell == pytest.approx(0.25), f"cell size should be 0.25 deg, got {cell}"
+        assert cell != 1.0, "an index-space affine leaked into the output"
         assert origin_x == pytest.approx(3.0, abs=0.25)
         assert origin_y == pytest.approx(53.0, abs=0.25)
         # the window origin (col 732, row 148) is encoded into the data
@@ -902,7 +905,8 @@ class TestGriddedEdges:
         backend = self._backend(tmp_path, monkeypatch)
         first = backend.download()[0]
         again = backend.download()[0]
-        assert first == again and first.exists()
+        assert first == again, f"the cached path changed: {first} -> {again}"
+        assert first.exists(), f"{first} was not written"
 
     def test_out_of_grid_guard(self, tmp_path: Path, monkeypatch):
         """An AOI that maps to no pixels raises a clear coverage error.
@@ -936,7 +940,8 @@ class TestGriddedEdges:
             path=tmp_path,
         )
         paths = backend.download()
-        assert len(paths) == 1 and paths[0].exists()
+        assert len(paths) == 1, f"expected one output, got {paths}"
+        assert paths[0].exists(), f"{paths[0]} was not written"
 
     def test_failed_write_leaves_no_partial_file(self, tmp_path: Path, monkeypatch):
         """A write that fails mid-way removes the staged file and re-raises."""
