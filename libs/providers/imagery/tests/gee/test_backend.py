@@ -347,6 +347,12 @@ def _recording_plan(self, var_info, band_count):
     return result
 
 
+#: A metre-based projected CRS whose domain is one hemisphere. An AOI on the far
+#: side transforms to `inf`, which is the only way to reach the finiteness guard
+#: without hand-building a bbox the backend would never produce.
+_ORTHO_CRS = "+proj=ortho +lat_0=0 +lon_0=0 +datum=WGS84 +units=m"
+
+
 def _plan_for(gee, var_info, bands=1):
     """Return the routing plan the backend would compute for this request."""
     return gee._eedai_single_image_plan(var_info, bands)
@@ -2288,6 +2294,31 @@ class TestEedaiCollections:
         assert len(written) == 3, f"the fallback dropped buckets: {written}"
         assert fake_reader.calls == [], "the declined reducer still reached the reader"
 
+    def test_the_region_is_reprojected_once_across_buckets(self, make_gee, fake_reader):
+        """A many-bucket run must not warp the same region once per bucket.
+
+        The region never changes for the life of a backend, so a daily run over
+        a year would otherwise pay a thousand reprojections of the same
+        `GeoDataFrame` to reach the same lat/lon envelope.
+        """
+        region = _FakePolygonAoi(
+            epsg=32636, total_bounds=(330000.0, 3310000.0, 340000.0, 3320000.0)
+        )
+        gee = self._collection_gee(make_gee, region=region)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        july = dt.datetime(2020, 7, 1)
+        august = dt.datetime(2020, 8, 1)
+        gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        gee._eedai_collection_fits(var_info, 1, july, august)
+        assert region.reprojection_requests == ["EPSG:4326"], (
+            "the second bucket reprojected the region again: "
+            f"{region.reprojection_requests}"
+        )
+        assert [k["bbox"] for _asset, k in fake_reader.cost_calls] == [
+            (31.2, 29.9, 31.3, 30.0),
+            (31.2, 29.9, 31.3, 30.0),
+        ], "the cached reprojection changed the AOI the buckets discovered over"
+
     def test_estimate_is_queried_with_the_bucket_window(self, make_gee, fake_reader):
         """Scene discovery uses the bucket's dates and a lat/lon AOI envelope."""
         gee = self._collection_gee(make_gee)
@@ -2627,6 +2658,56 @@ class TestEedaiProjectedCrs:
         assert min_y > 1_000_000, min_y
         assert max_x > min_x, (min_x, max_x)
         assert max_y > min_y, (min_y, max_y)
+
+    def test_an_aoi_outside_the_projection_is_refused_by_name(self, make_gee):
+        """An AOI the target projection cannot represent must say so.
+
+        An orthographic CRS is metre-based and projected, so it passes the
+        eligibility check, but `transform_bounds` answers `inf` for ground on
+        the far side of the globe. Without the finiteness guard the budget
+        arithmetic raises an opaque `OverflowError` out of `math.ceil` instead
+        of naming the AOI.
+        """
+        gee = make_gee(crs=_ORTHO_CRS, lat_lim=[-10.0, 10.0], lon_lim=[150.0, 160.0])
+        bbox, _cutline = gee._eedai_window()
+        assert not all(math.isfinite(bound) for bound in bbox), (
+            f"the fixture no longer produces a non-finite envelope: {bbox}"
+        )
+        with pytest.raises(ValueError, match="must all be finite"):
+            gee._eedai_output_grid(bbox, 90.0)
+
+    def test_an_aoi_outside_the_projection_falls_back_under_auto(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """`auto` must route that request to Earth Engine, not abort the download.
+
+        The user asked for a download, not for this engine; Earth Engine can
+        still serve an AOI the reader cannot size.
+        """
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = make_gee(crs=_ORTHO_CRS, lat_lim=[-10.0, 10.0], lon_lim=[150.0, 160.0])
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        use_reader, plan = gee._use_eedai(var_info, 1, None, None)
+        assert use_reader is False
+        assert plan is None
+        assert any("could not size" in w for w in warnings), warnings
+
+    def test_an_aoi_outside_the_projection_raises_under_a_forced_engine(
+        self, make_gee, fake_reader
+    ):
+        """Forcing the reader keeps the sizing failure visible."""
+        gee = make_gee(
+            crs=_ORTHO_CRS,
+            lat_lim=[-10.0, 10.0],
+            lon_lim=[150.0, 160.0],
+            engine="eedai",
+        )
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        with pytest.raises(ValueError, match="must all be finite"):
+            gee._use_eedai(var_info, 1, None, None)
 
     def test_window_passes_latlon_through_under_4326(self, make_gee):
         """Under EPSG:4326 the AOI is the lat/lon box, unreprojected."""
@@ -2971,6 +3052,33 @@ class TestForcedEngineRemedies:
 
 class TestExportViaEedai:
     """Tests for `_export_via_eedai` and the `_api` routing."""
+
+    def test_a_collection_export_without_a_bucket_window_raises(
+        self, make_gee, fake_reader
+    ):
+        """A collection needs its window; reading without one is a caller bug.
+
+        `_use_eedai` always supplies it, so reaching the exporter without one
+        means the composite would silently read the reader's default window
+        instead of the bucket's — the wrong dates, written under the bucket's
+        name.
+        """
+        gee = make_gee(
+            start="2020-06-01",
+            end="2020-06-30",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(
+            var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+        )
+        assert plan.can_serve, plan.reason
+        with pytest.raises(ValueError, match="needs a bucket window"):
+            gee._export_via_eedai(
+                var_info, ["precipitation"], 5566.0, "chirps_no_window", plan
+            )
+        assert fake_reader.calls == [], "the guard let the read happen anyway"
 
     def test_writes_the_tif_through_the_reader(self, make_gee, fake_reader):
         """The reader's dataset is written to `<prefix>.tif`."""
