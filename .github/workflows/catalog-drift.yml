@@ -114,7 +114,7 @@ jobs:
           # same blindness this branch fixes elsewhere. Capture the JSON and fail
           # on an errored provider too.
           set +e
-          uv run --locked --no-sync --no-build earthlens datasets audit \n            "$PROVIDERS" --strict --json > "$RUNNER_TEMP/audit.json"
+          uv run --locked --no-sync --no-build earthlens datasets audit "$PROVIDERS" --strict --json > "$RUNNER_TEMP/audit.json"
           drift=$?
           set -e
           cat "$RUNNER_TEMP/audit.json"
