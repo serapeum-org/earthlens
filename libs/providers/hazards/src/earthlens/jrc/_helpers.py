@@ -377,6 +377,74 @@ def band_valid_times(url: str, steps: int) -> list[str]:
     return [f"step_{index + 1}" for index in range(steps)]
 
 
+def _read_grid_coordinates(url: str):
+    """Return the cube's `(longitude, latitude)` arrays, or `None` if unreadable."""
+    try:
+        from osgeo import gdal
+
+        dataset = gdal.OpenEx(url, gdal.OF_MULTIDIM_RASTER)
+        try:
+            root = dataset.GetRootGroup()
+            return (
+                np.asarray(root.OpenMDArray("longitude").ReadAsArray()).ravel(),
+                np.asarray(root.OpenMDArray("latitude").ReadAsArray()).ravel(),
+            )
+        finally:
+            dataset = None
+    except Exception:  # noqa: BLE001 - a missing coordinate is not a crop error
+        return None
+
+
+def verify_grid_against_coordinates(
+    url: str,
+    geo: tuple[float, float, float, float, float, float],
+    cols: int,
+    rows: int,
+    *,
+    tolerance: float = 0.02,
+) -> None:
+    """Check a reconstructed affine against the cube's own CF coordinates.
+
+    `grid_geotransform` derives the origin, cell size and orientation from the
+    grid *shape* alone. This confirms the file really is the global grid that
+    assumes: the coordinate arrays must span the same extent, and the array must
+    be north-up once read (the source stores `latitude` ascending, so this
+    depends on GDAL's CF flip staying in place).
+
+    Args:
+        url: The `/vsicurl/`-prefixed cube URL.
+        geo: The reconstructed geotransform.
+        cols: The variable's column count.
+        rows: The variable's row count.
+        tolerance: Allowed degrees of slack on each edge (half a cell by default).
+
+    Raises:
+        ValueError: If the file's coordinates contradict the reconstructed grid.
+    """
+    coordinates = _read_grid_coordinates(url)
+    if coordinates is None:
+        logger.debug("JRC: could not read the cube's coordinates to verify the grid")
+        return
+    lon, lat = coordinates
+
+    if lon.size != cols or lat.size != rows:
+        raise ValueError(
+            f"the cube's coordinates ({lon.size}x{lat.size}) do not match the "
+            f"variable's grid ({cols}x{rows}); the reconstructed affine cannot be "
+            "trusted."
+        )
+    x0, dx, _, y0, _, dy = geo
+    half = abs(dx) / 2.0
+    west, east = float(lon.min()) - half, float(lon.max()) + half
+    south, north = float(lat.min()) - half, float(lat.max()) + half
+    if abs(west - x0) > tolerance or abs(north - y0) > tolerance:
+        raise ValueError(
+            f"the cube spans lon {west:.3f}..{east:.3f} / lat {south:.3f}.."
+            f"{north:.3f}, which contradicts the assumed global grid starting at "
+            f"({x0}, {y0}). The affine reconstruction needs updating."
+        )
+
+
 def grid_geotransform(
     cols: int, rows: int
 ) -> tuple[float, float, float, float, float, float]:

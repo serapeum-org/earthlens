@@ -657,6 +657,11 @@ class JRC(AbstractDataSource):
                     )
                 cols, rows = variable.columns, variable.rows
                 geo = _helpers.grid_geotransform(cols, rows)
+                # The affine is reconstructed from the grid shape alone, so
+                # cross-check it against the cube's own latitude/longitude before
+                # trusting it: a non-global grid or a changed pyramids y-flip
+                # would otherwise crop the wrong region silently.
+                _helpers.verify_grid_against_coordinates(url, geo, cols, rows)
                 # Widen a point / cell-edge AOI to one pixel so an on-grid point
                 # yields a 1x1 window rather than being reported off-grid (matches
                 # the EFHM path).

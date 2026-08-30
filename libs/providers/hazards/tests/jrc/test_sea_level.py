@@ -422,6 +422,89 @@ class TestCoastalFetch:
 # --------------------------------------------------------------------------- #
 # Cross-cutting guards
 # --------------------------------------------------------------------------- #
+class TestGridVerification:
+    """`verify_grid_against_coordinates` guards the reconstructed affine (M3)."""
+
+    def test_mismatched_coordinate_size_raises(self, monkeypatch):
+        """Coordinates that disagree with the variable's shape are rejected."""
+        monkeypatch.setattr(
+            _helpers, "_read_grid_coordinates", lambda url: (np.zeros(10), np.zeros(5))
+        )
+        with pytest.raises(ValueError, match="do not match the variable"):
+            _helpers.verify_grid_against_coordinates(
+                "u", _helpers.grid_geotransform(1440, 720), 1440, 720
+            )
+
+    def test_non_global_extent_raises(self, monkeypatch):
+        """A cube that is not the assumed global grid is rejected, not cropped."""
+        lon = np.linspace(0.125, 359.875, 1440)  # a 0..360 grid, not -180..180
+        lat = np.linspace(-89.875, 89.875, 720)
+        monkeypatch.setattr(_helpers, "_read_grid_coordinates", lambda url: (lon, lat))
+        with pytest.raises(ValueError, match="contradicts the assumed global grid"):
+            _helpers.verify_grid_against_coordinates(
+                "u", _helpers.grid_geotransform(1440, 720), 1440, 720
+            )
+
+    def test_matching_global_grid_passes(self, monkeypatch):
+        """The real global 0.25 deg coordinates satisfy the reconstruction."""
+        lon = np.linspace(-179.875, 179.875, 1440)
+        lat = np.linspace(-89.875, 89.875, 720)
+        monkeypatch.setattr(_helpers, "_read_grid_coordinates", lambda url: (lon, lat))
+        _helpers.verify_grid_against_coordinates(
+            "u", _helpers.grid_geotransform(1440, 720), 1440, 720
+        )
+
+    def test_unreadable_coordinates_are_tolerated(self, monkeypatch):
+        """A cube without readable coordinates skips the check rather than failing."""
+        monkeypatch.setattr(_helpers, "_read_grid_coordinates", lambda url: None)
+        _helpers.verify_grid_against_coordinates(
+            "u", _helpers.grid_geotransform(1440, 720), 1440, 720
+        )
+
+
+class TestFacadeKeys:
+    """The sea-level facade keys resolve to the right dataset and shape (M7)."""
+
+    @pytest.mark.parametrize(
+        ("key", "extra", "dataset_id", "output_kind", "polygon"),
+        [
+            (
+                "sea-level-forecast",
+                {"product": "medium_term"},
+                "sea_level_medium_term",
+                "raster",
+                True,
+            ),
+            (
+                "sea-level-forecast",
+                {"product": "subseasonal"},
+                "sea_level_subseasonal",
+                "raster",
+                True,
+            ),
+            ("jrc-sea-level", {}, "sea_level_medium_term", "raster", True),
+            ("twl-forecast", {}, "sea_level_medium_term", "raster", True),
+            ("coastal-forecast", {}, "sea_level_subseasonal_coastal", "tabular", False),
+            ("efhm", {"return_periods": [100]}, "efhm", "raster", True),
+        ],
+    )
+    def test_key_routes_to_dataset(self, key, extra, dataset_id, output_kind, polygon):
+        """Each facade key builds the right JRC dataset with the right output shape."""
+        from earthlens.core import EarthLens
+
+        kwargs = {"data_source": key, **extra}
+        if output_kind == "raster":
+            kwargs |= {"lat_lim": [51.0, 53.0], "lon_lim": [3.0, 5.0]}
+        backend = EarthLens(**kwargs).datasource
+        assert backend._dataset.id == dataset_id, (
+            f"{key} routed to {backend._dataset.id}"
+        )
+        assert backend.OUTPUT_KIND == output_kind
+        assert backend.SUPPORTS_POLYGON_AOI is polygon, (
+            f"{key} polygon support should be {polygon}"
+        )
+
+
 class TestGuards:
     """Aggregate rejection, licence, and the no-xarray rule."""
 
