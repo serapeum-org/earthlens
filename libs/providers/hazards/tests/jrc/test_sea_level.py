@@ -448,20 +448,18 @@ class TestGridVerification:
         monkeypatch.setattr(
             _helpers, "_read_grid_coordinates", lambda url: (np.zeros(10), np.zeros(5))
         )
+        geo = _helpers.grid_geotransform(1440, 720)
         with pytest.raises(ValueError, match="do not match the variable"):
-            _helpers.verify_grid_against_coordinates(
-                "u", _helpers.grid_geotransform(1440, 720), 1440, 720
-            )
+            _helpers.verify_grid_against_coordinates("u", geo, 1440, 720)
 
     def test_non_global_extent_raises(self, monkeypatch):
         """A cube that is not the assumed global grid is rejected, not cropped."""
         lon = np.linspace(0.125, 359.875, 1440)  # a 0..360 grid, not -180..180
         lat = np.linspace(-89.875, 89.875, 720)
         monkeypatch.setattr(_helpers, "_read_grid_coordinates", lambda url: (lon, lat))
+        geo = _helpers.grid_geotransform(1440, 720)
         with pytest.raises(ValueError, match="contradicts the assumed global grid"):
-            _helpers.verify_grid_against_coordinates(
-                "u", _helpers.grid_geotransform(1440, 720), 1440, 720
-            )
+            _helpers.verify_grid_against_coordinates("u", geo, 1440, 720)
 
     def test_matching_global_grid_passes(self, monkeypatch):
         """The real global 0.25 deg coordinates satisfy the reconstruction."""
