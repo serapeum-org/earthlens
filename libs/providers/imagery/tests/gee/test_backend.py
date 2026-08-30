@@ -2401,15 +2401,10 @@ class TestEedaiCollections:
         fake_reader.read_error = _reader_error("bands span multiple resolution groups")
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         image = _FakeImage()
+        when = dt.datetime(2020, 6, 1)
+        bucket_end = dt.datetime(2020, 7, 1)
         with pytest.raises(Exception, match="resolution groups"):
-            gee._api(
-                image,
-                var_info,
-                ["precipitation"],
-                dt.datetime(2020, 6, 1),
-                dt.datetime(2020, 6, 1),
-                dt.datetime(2020, 7, 1),
-            )
+            gee._api(image, var_info, ["precipitation"], when, when, bucket_end)
 
     def test_an_empty_bucket_does_not_abort_a_forced_run(self, make_gee, fake_reader):
         """No scenes is a fact about the data, so a forced engine skips the bucket.

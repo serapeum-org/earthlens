@@ -2241,7 +2241,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         try:
             return bool(CRS.from_user_input(region_crs) == CRS.from_user_input(target))
-        except Exception:  # noqa: BLE001 - any parse failure falls back, below
+        except Exception:  # noqa: BLE001
+            # A parse failure on either side falls back to the code check
+            # rather than assuming a match.
             return _same_epsg_code(region_crs, target)
 
     @staticmethod
