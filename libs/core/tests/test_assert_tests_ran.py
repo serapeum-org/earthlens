@@ -231,6 +231,10 @@ class TestBackendGrouping:
             ("tests.test_aggregate.TestReal", ""),
             ("", ""),
             ("weird", ""),
+            ("tests", ""),
+            ("tests.cmems", "cmems"),
+            ("libs.core.tests.cmems.test_mod.TestX", ""),
+            ("tests..test_mod.TestX", ""),
         ],
     )
     def test_backend_is_the_segment_after_tests(self, guard, classname, expected):
@@ -251,6 +255,29 @@ class TestBackendGrouping:
         """The xfail rule applies inside a group too."""
         report = _backend_report(tmp_path / "r.xml", ("gee", "a", "pytest.xfail"))
         assert guard._per_backend(report) == {"gee": (1, 0)}
+
+    def test_reads_a_bare_testsuite_root(self, guard, tmp_path):
+        """A report whose root is `<testsuite>` groups just like a wrapped one."""
+        (tmp_path / "r.xml").write_text(
+            '<testsuite name="s" tests="1" skipped="0">'
+            '<testcase classname="tests.cmems.test_mod.TestX" name="a"/>'
+            "</testsuite>",
+            encoding="utf-8",
+        )
+        assert guard._per_backend(tmp_path / "r.xml") == {"cmems": (1, 0)}, (
+            "a bare testsuite root was missed"
+        )
+
+    def test_a_case_without_a_classname_has_no_backend(self, guard, tmp_path):
+        """A `<testcase>` lacking `classname` falls into the lane-level group."""
+        (tmp_path / "r.xml").write_text(
+            '<testsuites><testsuite name="s" tests="1" skipped="0">'
+            '<testcase name="a"/></testsuite></testsuites>',
+            encoding="utf-8",
+        )
+        assert guard._per_backend(tmp_path / "r.xml") == {"": (1, 0)}, (
+            "a missing classname was mishandled"
+        )
 
 
 class TestDeadBackendDetection:
@@ -292,3 +319,41 @@ class TestDeadBackendDetection:
             tmp_path / "r.xml", ("", "a", "pytest.skip"), ("erddap", "b", None)
         )
         assert guard.main([str(report), "lane"]) == 0, "a lane-level skip was blamed"
+
+    def test_every_silent_backend_is_named(self, guard, tmp_path, capsys):
+        """Two dead backends in one lane are both reported, not just the first."""
+        report = _backend_report(
+            tmp_path / "r.xml",
+            ("cmems", "a", "pytest.skip"),
+            ("gee", "b", "pytest.skip"),
+            ("erddap", "c", None),
+        )
+        assert guard.main([str(report), "lane"]) == 1, "silent backends must fail"
+        out = capsys.readouterr().out
+        assert "cmems" in out and "gee" in out, f"not every dead backend named: {out}"
+        assert out.count("::error::") == 2, f"expected one annotation each: {out}"
+
+    def test_a_wholly_skipped_lane_is_reported_once_at_lane_level(
+        self, guard, tmp_path, capsys
+    ):
+        """With nothing executed the lane-level message stands in for per-backend ones."""
+        report = _backend_report(
+            tmp_path / "r.xml",
+            ("cmems", "a", "pytest.skip"),
+            ("gee", "b", "pytest.skip"),
+        )
+        assert guard.main([str(report), "lane"]) == 1, "a dead lane must fail"
+        out = capsys.readouterr().out
+        assert out.count("::error::") == 1, f"expected a single annotation: {out}"
+        assert "all 2 collected test(s) skipped" in out, f"wrong verdict: {out}"
+
+    def test_an_exempt_backend_alone_still_leaves_the_lane_green(self, guard, tmp_path):
+        """An exemption is per backend, so a second exempt backend is exempt too."""
+        assert "osm" in guard._EXPECTED_EMPTY, "osm should be a declared exemption"
+        report = _backend_report(
+            tmp_path / "r.xml",
+            ("osm", "a", "pytest.skip"),
+            ("wdpa", "b", "pytest.skip"),
+            ("erddap", "c", None),
+        )
+        assert guard.main([str(report), "lane"]) == 0, "declared exemptions failed"

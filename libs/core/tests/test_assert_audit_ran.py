@@ -89,3 +89,47 @@ class TestMain:
         """Anything but a single report path exits 2 with usage on stderr."""
         assert checker.main(argv) == 2, f"expected usage exit for {argv!r}"
         assert "usage:" in capsys.readouterr().err
+
+    def test_mixed_report_counts_audited_and_unsupported(
+        self, checker, tmp_path, capsys
+    ):
+        """The summary line tallies the audited providers apart from the rest."""
+        report = _report(
+            tmp_path / "a.json",
+            {"provider": "erddap", "status": "ok"},
+            {"provider": "hdx", "status": "unsupported"},
+        )
+        assert checker.main([str(report)]) == 0, "a mixed report must pass"
+        assert "1 provider(s) audited, 1 unsupported" in capsys.readouterr().out, (
+            "the audited/unsupported tally is wrong"
+        )
+
+    def test_an_empty_report_passes(self, checker, tmp_path, capsys):
+        """A report listing no provider at all is not turned into a failure here."""
+        report = _report(tmp_path / "a.json")
+        assert checker.main([str(report)]) == 0, "an empty report must not fail"
+        assert "0 provider(s) audited" in capsys.readouterr().out, (
+            "an empty report should still print its tally"
+        )
+
+    def test_every_errored_provider_is_named(self, checker, tmp_path, capsys):
+        """Two failed audits are both reported, not only the first."""
+        report = _report(
+            tmp_path / "a.json",
+            {"provider": "gee", "status": "error", "detail": "401"},
+            {"provider": "cmems", "status": "error", "detail": "timed out"},
+        )
+        assert checker.main([str(report)]) == 1, "errored providers must fail the gate"
+        out = capsys.readouterr().out
+        assert "gee" in out and "cmems" in out, f"not every failure was named: {out}"
+        assert out.count("::error::") == 2, f"expected one annotation each: {out}"
+
+    def test_a_row_without_a_provider_is_still_reported(
+        self, checker, tmp_path, capsys
+    ):
+        """A row missing its provider name reports a placeholder rather than crashing."""
+        report = _report(tmp_path / "a.json", {"status": "error", "detail": "boom"})
+        assert checker.main([str(report)]) == 1, "an errored row must fail the gate"
+        assert "::error::?:" in capsys.readouterr().out, (
+            "the placeholder name is missing"
+        )
