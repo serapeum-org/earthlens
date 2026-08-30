@@ -1,4 +1,4 @@
-"""Unit tests for the JRC-flood catalog loader."""
+"""Unit tests for the JRC catalog loader."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ pytestmark = pytest.mark.jrc
 
 
 class TestCatalog:
-    """Tests for the bundled JRC-flood catalog."""
+    """Tests for the bundled JRC catalog."""
 
     def test_loads_datasets(self):
         """The bundled catalog exposes the EFHM + three sea-level datasets."""

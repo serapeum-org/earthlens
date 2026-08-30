@@ -352,9 +352,14 @@ def band_valid_times(url: str, steps: int) -> list[str]:
         from osgeo import gdal
 
         dataset = gdal.OpenEx(url, gdal.OF_MULTIDIM_RASTER)
-        axis = np.asarray(
-            dataset.GetRootGroup().OpenMDArray("time").ReadAsArray()
-        ).ravel()
+        try:
+            axis = np.asarray(
+                dataset.GetRootGroup().OpenMDArray("time").ReadAsArray()
+            ).ravel()
+        finally:
+            # Release the second remote handle this opens; leaving it to the GC
+            # holds a /vsicurl connection open per fetch.
+            dataset = None
         # Compare the FULL axis, unsliced: a 2-D aggregate field (e.g. a 15-day
         # exceedance probability) has one band while the cube's time axis has
         # many, and slicing first would confidently mislabel it with step 0's
@@ -365,7 +370,10 @@ def band_valid_times(url: str, steps: int) -> list[str]:
                 for v in axis
             ]
     except Exception:  # noqa: BLE001 - naming is best-effort; never fail the fetch
-        logger.debug("JRC: could not read the cube's time axis for band names")
+        logger.warning(
+            "JRC: could not read the cube's time axis; bands fall back to "
+            "positional step_N names."
+        )
     return [f"step_{index + 1}" for index in range(steps)]
 
 

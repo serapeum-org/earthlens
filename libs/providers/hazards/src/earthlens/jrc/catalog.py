@@ -92,6 +92,7 @@ class Dataset(BaseModel):
         "flood_hazard_raster"
     )
     title: str = ""
+    # EFHM-shaped defaults; the sea-level rows leave these unused.
     band: str = "water_depth"
     long_name: str = ""
     units: str = "m"

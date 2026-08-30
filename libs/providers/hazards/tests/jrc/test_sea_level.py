@@ -14,6 +14,17 @@ from earthlens.jrc import JRC, Catalog, _helpers
 
 pytestmark = pytest.mark.jrc
 
+
+@pytest.fixture(autouse=True)
+def _offline_band_names(monkeypatch):
+    """Keep band naming offline: it would otherwise open the real cube."""
+    monkeypatch.setattr(
+        _helpers,
+        "band_valid_times",
+        lambda url, steps: [f"step_{index + 1}" for index in range(steps)],
+    )
+
+
 _COASTAL_CSV = "GID_0,NAME_0,summary_TWL_1_10\nABW,Aruba,2\nNLD,Netherlands,9\n"
 
 
@@ -626,12 +637,14 @@ class TestHelperEdges:
 
     def test_latest_crawl_is_bounded(self, monkeypatch):
         """The 'latest' walk stops after the probe budget instead of crawling on."""
-        probes = {"leaves": 0}
+        probes = {"listings": 0}
 
         def _endless(url):
+            # Count EVERY listing, not just leaves: budgeting leaves alone still
+            # allows thousands of requests across the year/month/day levels.
+            probes["listings"] += 1
             depth = len([p for p in url.strip("/").split("/") if p.isdigit()])
             if depth >= 4:
-                probes["leaves"] += 1
                 return ""  # a complete-looking leaf that never carries endFls
             return "".join(f'<a href="{n:02d}/">{n:02d}/</a>' for n in range(1, 13))
 
@@ -645,12 +658,13 @@ class TestHelperEdges:
                 "endFls",
                 http_text=_endless,
             )
-        assert probes["leaves"] <= 5, (
-            f"the crawl must stop at the budget, probed {probes['leaves']} leaves"
+        assert probes["listings"] <= 5, (
+            f"every listing must be budgeted, issued {probes['listings']} requests"
         )
 
-    def test_band_valid_times_falls_back_when_time_is_unreadable(self):
+    def test_band_valid_times_falls_back_when_time_is_unreadable(self, monkeypatch):
         """An unreadable time axis degrades to positional band names, never raises."""
+        monkeypatch.undo()  # exercise the real helper, not the offline stand-in
         assert _helpers.band_valid_times("/vsicurl/not-a-real-cube.nc", 3) == [
             "step_1",
             "step_2",

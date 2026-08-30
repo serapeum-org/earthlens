@@ -1,8 +1,12 @@
 # JRC hazards — usage
 
-The `jrc-flood` backend downloads the JRC European Flood Hazard Map (EFHM) for a
-bounding box and one or more return periods, writing one GeoTIFF of water depth
-(m) per return period. It needs no credentials (CC-BY-4.0). See
+The `earthlens.jrc` backend serves every JRC hazard product — the European Flood
+Hazard Map (EFHM) and the probabilistic sea-level (Total Water Level) forecasts —
+from one class, selected by dataset. It needs no credentials (CC-BY-4.0).
+
+This page starts with the EFHM (a bounding box plus one or more return periods,
+writing one GeoTIFF of water depth (m) per return period) and covers the
+sea-level products further down. See
 [Introduction](introduction.md) for the transport and
 [Available datasets](datasets.md) for the return periods.
 
@@ -100,7 +104,7 @@ paths = EarthLens(
 EarthLens(
     data_source="sea-level-forecast",
     product="subseasonal",
-    reference_time="2026-08-24T00",
+    reference_time="2026-08-24T00",  # a recent cycle; older ones age out
     field="probabilityTWL_01_15-100",
     lat_lim=[51.0, 53.0],
     lon_lim=[3.0, 5.0],

@@ -1,4 +1,4 @@
-"""Unit tests for the JRC-flood backend (faked pyramids, no network)."""
+"""Unit tests for the JRC backend (faked pyramids, no network)."""
 
 from __future__ import annotations
 

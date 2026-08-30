@@ -1,4 +1,4 @@
-"""Unit tests for the JRC-flood URL helper (no network)."""
+"""Unit tests for the JRC URL helper (no network)."""
 
 from __future__ import annotations
 

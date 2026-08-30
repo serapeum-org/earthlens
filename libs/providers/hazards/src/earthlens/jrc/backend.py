@@ -97,6 +97,10 @@ class JRC(AbstractDataSource):
         "sea_level_coastal": "tabular",
     }
 
+    #: Guard on the cells a single gridded read may materialise (cols x rows x
+    #: forecast steps). A global AOI over a 47-step cube is ~0.5 GB in memory.
+    MAX_WINDOW_CELLS: int = 60_000_000
+
     AGGREGATE_REFUSAL_REASON = "the JRC hazard products are either static per-return-period depth grids or a single forecast cycle whose bands are lead times, not a calendar series to reduce over. Call download() without aggregate=, and reduce the written bands yourself if you need a summary"
 
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
@@ -221,7 +225,10 @@ class JRC(AbstractDataSource):
                     ("field", field),
                     ("reference_time", reference_time),
                 )
-                if value not in (None, "latest")
+                if not (
+                    value is None
+                    or (name == "reference_time" and _helpers._is_latest(value))
+                )
             ]
         else:
             unused = ["return_periods"] if return_periods is not None else []
@@ -441,6 +448,8 @@ class JRC(AbstractDataSource):
             ValueError: If the AOI is outside coverage, or a requested cycle is
                 missing / not yet complete.
         """
+        # `force` is threaded through rather than stashed on the instance so two
+        # concurrent download() calls cannot flip each other's caching behaviour.
         self._force = force
         products = self._search()
         results = self._fetch(products)
@@ -457,6 +466,9 @@ class JRC(AbstractDataSource):
                 walks the jeodpp autoindex (network).
         """
         kind = self._dataset.kind
+        if kind not in self._KIND_TO_OUTPUT:
+            # Guard before any network work, mirroring `_fetch`.
+            raise ValueError(f"unhandled JRC dataset kind {kind!r}.")
         if kind == "flood_hazard_raster":
             return [
                 RemoteProduct(
@@ -656,6 +668,14 @@ class JRC(AbstractDataSource):
                         f"nothing to write for {self._field!r}."
                     )
                 col_off, row_off, win_cols, win_rows = window
+                steps_hint = getattr(variable, "band_count", 1) or 1
+                cells = win_cols * win_rows * steps_hint
+                if cells > self.MAX_WINDOW_CELLS:
+                    raise ValueError(
+                        f"the AOI would materialise {cells:,} cells "
+                        f"({win_cols}x{win_rows} over {steps_hint} steps), above the "
+                        f"{self.MAX_WINDOW_CELLS:,}-cell guard. Request a smaller bbox."
+                    )
                 logger.info(
                     f"JRC {self._dataset.id}: windowed /vsicurl read of "
                     f"{self._field!r} {win_cols}x{win_rows} at ({col_off}, {row_off})"

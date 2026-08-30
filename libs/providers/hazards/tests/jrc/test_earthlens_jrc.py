@@ -1,4 +1,4 @@
-"""Tests for the `EarthLens` facade entries routing to the JRC-flood backend."""
+"""Tests for the `EarthLens` facade entries routing to the JRC backend."""
 
 from __future__ import annotations
 
@@ -19,11 +19,11 @@ _SRC_DIR = Path(earthlens.jrc.__file__).parent
 
 @pytest.mark.unit
 class TestRegistry:
-    """Tests for the JRC-flood entries in `EarthLens.DataSources`."""
+    """Tests for the JRC entries in `EarthLens.DataSources`."""
 
     @pytest.mark.parametrize("key", KEYS)
     def test_keys_present(self, key: str) -> None:
-        """Every JRC-flood key is registered in `EarthLens.DataSources`."""
+        """Every JRC key is registered in `EarthLens.DataSources`."""
         assert key in EarthLens.DataSources
 
     @pytest.mark.parametrize("key", KEYS)
@@ -62,10 +62,10 @@ class TestFacadeConstruction:
 
 @pytest.mark.unit
 class TestNoXarray:
-    """JRC-flood does its raster I/O through pyramids, never xarray."""
+    """JRC does its raster I/O through pyramids, never xarray."""
 
     def test_no_xarray_import(self) -> None:
-        """No JRC-flood src module imports xarray."""
+        """No JRC src module imports xarray."""
         offenders = [
             path.name
             for path in _SRC_DIR.glob("*.py")

@@ -16,7 +16,8 @@ The EFHM is selected by its facade key; the sea-level datasets are selected with
   the default is `[100]`.
 - **Sea-level cadence / horizon:** medium-term is issued twice daily with a
   15-day horizon (2022 → present); subseasonal is weekly with a ~46-day horizon
-  (2026 → present). `reference_time="latest"` (the default) resolves the newest
+  (2026 → present). The server keeps only a **rolling window** of recent cycles,
+  so older dates in those ranges are no longer retrievable. `reference_time="latest"` (the default) resolves the newest
   complete cycle from the JRC autoindex.
 - **Sea-level fields:** each gridded cube exposes many derived 2-D fields
   (`TWL75`, `probability…`, `summary…`); a request crops one, defaulting to
