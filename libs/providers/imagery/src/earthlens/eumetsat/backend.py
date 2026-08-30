@@ -45,7 +45,6 @@ from __future__ import annotations
 import shutil
 import time
 from pathlib import Path
-from typing import Any
 
 from loguru import logger
 from pydantic import SecretStr
@@ -512,9 +511,9 @@ class EUMETSAT(AbstractDataSource):
         every output to `self.root_dir`, and deletes the customisation in
         a `finally` — even on failure — so quota is always freed.
 
-        A `tailor.crs` of `None` means "do not reproject": `projection` is
-        left off the chain altogether rather than sent as null, which is
-        what the native output formats require.
+        A `tailor.crs` of `None` means "do not reproject": `Chain.projection`
+        is `None`, which `Chain.asdict()` drops before the request is built,
+        matching what the native output formats require.
 
         Args:
             product: One `RemoteProduct` from `_search` (its `metadata`
@@ -545,26 +544,27 @@ class EUMETSAT(AbstractDataSource):
         nswe = tailor.nswe or TailorConfig.nswe_from_extent(
             self.space.north, self.space.south, self.space.west, self.space.east
         )
-        chain_kwargs: dict[str, Any] = {
-            "product": dataset.tailor_product_type,
-            "format": tailor.format,
+        # `crs=None` means "do not reproject" (TailorConfig already forbids pairing
+        # it with a native format). `Chain` is a dataclass with `projection: str |
+        # None = None`, and its `asdict()` -- what actually gets serialised into the
+        # request -- drops every `None` field (`eumdac.tailor_models.AsDictMixin`).
+        # So passing `projection=None` here and omitting the argument entirely
+        # produce the identical request; no conditional kwarg-building is needed.
+        chain = eumdac.tailor_models.Chain(
+            product=dataset.tailor_product_type,
+            format=tailor.format,
+            projection=tailor.crs,
             # eumdac types NSWE as Optional[str], but the Data Tailor ROI takes
             # a north/south/west/east list (see TailorConfig.nswe).
-            "roi": eumdac.tailor_models.RegionOfInterest(NSWE=nswe),  # type: ignore[arg-type]
-            "filter": (
+            roi=eumdac.tailor_models.RegionOfInterest(NSWE=nswe),  # type: ignore[arg-type]
+            filter=(
                 eumdac.tailor_models.Filter(bands=list(tailor.filter))
                 if tailor.filter
                 else None
             ),
             # eumdac types quicklook as a Quicklook/dict; the API accepts a truthy flag.
-            "quicklook": tailor.quicklook or None,
-        }
-        # `crs=None` means "do not reproject": leave `projection` out of the chain
-        # rather than sending it as null, which is how eumdac expresses an
-        # unprojected customisation. Native formats reject any projection.
-        if tailor.crs is not None:
-            chain_kwargs["projection"] = tailor.crs
-        chain = eumdac.tailor_models.Chain(**chain_kwargs)
+            quicklook=tailor.quicklook or None,  # type: ignore[arg-type]
+        )
         product_handle = product.metadata["product"]
         # Choose the per-product output subdir *before* submitting, so nothing
         # between the submit and the `try/finally` can raise and orphan the

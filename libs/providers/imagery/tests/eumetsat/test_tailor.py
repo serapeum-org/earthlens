@@ -191,8 +191,14 @@ def test_tailor_default_crs_sends_projection(fake_eumdac, tmp_path):
     assert chain.kwargs["projection"] == "geographic"
 
 
-def test_tailor_crs_none_omits_projection(fake_eumdac, tmp_path):
-    """crs=None leaves projection out of the chain entirely, not set to None."""
+def test_tailor_crs_none_sends_projection_none(fake_eumdac, tmp_path):
+    """crs=None reaches the chain as projection=None.
+
+    eumdac's own `Chain.asdict()` drops `None` fields before the request is
+    built (see `test_eumdac_chain_asdict_drops_none_projection` below), so a
+    `None` projection and an omitted one produce the identical request --
+    there is no need for this backend to distinguish the two.
+    """
     fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("p1")]
     fake_eumdac.tailor.customisation = _FakeCustomisation(
         statuses=["DONE"], outputs=["a.nat"]
@@ -205,9 +211,24 @@ def test_tailor_crs_none_omits_projection(fake_eumdac, tmp_path):
         ),
     )
     _product, chain = fake_eumdac.tailor.submitted[0]
-    assert "projection" not in chain.kwargs
+    assert chain.kwargs["projection"] is None
     assert chain.format == "msgnative"
     assert chain.product == "HRSEVIRI"
+
+
+def test_eumdac_chain_asdict_drops_none_projection():
+    """eumdac's Chain treats an explicit None projection like an omitted one.
+
+    This is the real-`eumdac` contract `_tailor_one` relies on to pass
+    `projection=tailor.crs` unconditionally instead of building the call
+    from a conditional kwargs dict. Skipped when the `eumetsat` extra
+    (`eumdac`) is not installed.
+    """
+    eumdac = pytest.importorskip("eumdac")
+    explicit_none = eumdac.tailor_models.Chain(product="X", projection=None)
+    omitted = eumdac.tailor_models.Chain(product="X")
+    assert explicit_none.asdict() == omitted.asdict()
+    assert "projection" not in explicit_none.asdict()
 
 
 def test_tailor_multiple_products_namespaced_no_collision(fake_eumdac, tmp_path):

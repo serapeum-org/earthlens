@@ -44,12 +44,14 @@ class TailorConfig(BaseModel):
             Maps to `Chain.format`. Defaults to `"geotiff"`.
         crs: Target projection / CRS, e.g. `"geographic"`. Maps to
             `Chain.projection`. Defaults to `"geographic"`. Pass `None`
-            to reproject nothing, which omits `projection` from the
-            chain entirely — required by the native output formats
-            (`"msgnative"`, `"epsnative"`, `"hrit"`,
-            `"hrit_compressed"`), since re-gridding the pixels would
-            stop the result being native. An empty string is still
-            rejected: `None` is explicit, `""` is a mistake.
+            to reproject nothing: `eumdac`'s `Chain.asdict()` drops a
+            `None` projection before the request is built, so this reads
+            server-side exactly like an omitted one. Required by the
+            native output formats (`NATIVE_FORMATS`: `"msgnative"`,
+            `"epsnative"`, `"hrit"`, `"hrit_compressed"`) — enforced at
+            construction time, since re-gridding the pixels would stop
+            the result being native. An empty string is still rejected:
+            `None` is explicit, `""` is a mistake.
         bbox: Optional crop as `(west, south, east, north)` in degrees
             (the GeoJSON / OGC bbox order). When `None`, the backend falls
             back to the request's own spatial extent (`lat_lim` /
