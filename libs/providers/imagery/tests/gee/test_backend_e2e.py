@@ -307,7 +307,8 @@ def test_live_srtm_projected_crs_reads_the_same_ground(tmp_path):
 
     latlon_path = _download_srtm(tmp_path, "eedai")
     utm_path = _download_srtm(tmp_path, "eedai", crs="EPSG:32636")
-    assert utm_path.is_file() and utm_path.stat().st_size > 0, "UTM output missing"
+    assert utm_path.is_file(), "UTM output missing"
+    assert utm_path.stat().st_size > 0, "UTM output is empty"
 
     latlon_values, _latlon_epsg, _latlon_bbox = _open_raster(latlon_path)
     utm_values, utm_epsg, utm_bbox = _open_raster(utm_path)
@@ -317,7 +318,8 @@ def test_live_srtm_projected_crs_reads_the_same_ground(tmp_path):
 
     latlon_finite = latlon_values[np.isfinite(latlon_values)]
     utm_finite = utm_values[np.isfinite(utm_values)]
-    assert latlon_finite.size and utm_finite.size, "a raster has no valid pixels"
+    assert latlon_finite.size, "the lat/lon raster has no valid pixels"
+    assert utm_finite.size, "the UTM raster has no valid pixels"
     # Cairo sits ~20-70 m above sea level; a wrong-ground read would be flat or
     # negative. Compare the distributions, not the means.
     for quantile in (0.05, 0.5, 0.95):
@@ -366,9 +368,8 @@ def test_live_chirps_collection_eedai_matches_ee(tmp_path):
 
     ee_path = _download_chirps(tmp_path, "ee")
     eedai_path = _download_chirps(tmp_path, "eedai")
-    assert eedai_path.is_file() and eedai_path.stat().st_size > 0, (
-        "EEDAI output missing"
-    )
+    assert eedai_path.is_file(), "EEDAI output missing"
+    assert eedai_path.stat().st_size > 0, "EEDAI output is empty"
 
     ee_values, ee_epsg, _ee_bbox = _open_raster(ee_path)
     eedai_values, eedai_epsg, _eedai_bbox = _open_raster(eedai_path)
@@ -376,7 +377,8 @@ def test_live_chirps_collection_eedai_matches_ee(tmp_path):
 
     ee_finite = ee_values[np.isfinite(ee_values)]
     eedai_finite = eedai_values[np.isfinite(eedai_values)]
-    assert ee_finite.size and eedai_finite.size, "a composite has no valid pixels"
+    assert ee_finite.size, "the Earth Engine composite has no valid pixels"
+    assert eedai_finite.size, "the EEDAI composite has no valid pixels"
     # Without real variance the percentile comparison below is satisfied by any
     # reducer, by a single scene, and by a wrong date window alike.
     assert float(np.nanstd(ee_finite)) > 0.5, (

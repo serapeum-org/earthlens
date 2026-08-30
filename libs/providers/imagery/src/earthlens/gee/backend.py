@@ -303,6 +303,67 @@ def _discard_quietly(path: Path) -> None:
             logger.debug(f"Could not remove the staging file {stray}: {exc}")
 
 
+def _consume_quoted(text: str, index: int, quote: str) -> tuple[int, str | None]:
+    """Advance past one character inside a quoted literal.
+
+    Args:
+        text: The whole filter.
+        index: The character being consumed.
+        quote: The quote character that opened the literal.
+
+    Returns:
+        The next index, and the quote still in effect (`None` once it closed).
+    """
+    if text[index] != quote:
+        return index + 1, quote
+    # A doubled quote is an escaped one, not the end of the literal.
+    if text[index + 1 : index + 2] == quote:
+        return index + 2, quote
+    return index + 1, None
+
+
+def _scan_property_filter(text: str) -> tuple[int, str | None]:
+    """Walk a filter, raising on structure that would escape the reader's wrapper.
+
+    Args:
+        text: The stripped filter.
+
+    Returns:
+        The final parenthesis depth, and the quote left open (`None` when every
+        literal was closed).
+
+    Raises:
+        ValueError: It closes a parenthesis it never opened, or carries a bare
+            statement separator or SQL comment outside a literal.
+    """
+    depth = 0
+    quote: str | None = None
+    index = 0
+    while index < len(text):
+        if quote is not None:
+            index, quote = _consume_quoted(text, index, quote)
+            continue
+        char = text[index]
+        if char in "'\"":
+            quote = char
+        elif char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+        elif char == ";" or text.startswith("--", index):
+            raise ValueError(
+                "property_filter must be a single expression; remove the "
+                f"statement separator or comment from {text!r}"
+            )
+        if depth < 0:
+            raise ValueError(
+                "property_filter closes a parenthesis it never opened, which "
+                f"would escape the filter it is combined with: {text!r}"
+            )
+        index += 1
+    return depth, quote
+
+
 def _validate_property_filter(property_filter: object) -> None:
     """Reject a scene filter that would not survive being wrapped by the reader.
 
@@ -336,39 +397,7 @@ def _validate_property_filter(property_filter: object) -> None:
     if not text:
         raise ValueError("property_filter must not be blank; pass None instead.")
 
-    depth = 0
-    quote: str | None = None
-    index = 0
-    while index < len(text):
-        char = text[index]
-        if quote is not None:
-            # A doubled quote is an escaped one inside the literal.
-            if char == quote:
-                if text[index + 1 : index + 2] == quote:
-                    index += 2
-                    continue
-                quote = None
-            index += 1
-            continue
-        if char in "'\"":
-            quote = char
-        elif char == "(":
-            depth += 1
-        elif char == ")":
-            depth -= 1
-            if depth < 0:
-                raise ValueError(
-                    "property_filter closes a parenthesis it never opened, which "
-                    "would escape the filter it is combined with: "
-                    f"{property_filter!r}"
-                )
-        elif char == ";" or text.startswith("--", index):
-            raise ValueError(
-                "property_filter must be a single expression; remove the "
-                f"statement separator or comment from {property_filter!r}"
-            )
-        index += 1
-
+    depth, quote = _scan_property_filter(text)
     if quote is not None:
         raise ValueError(
             f"property_filter has an unterminated quote: {property_filter!r}"

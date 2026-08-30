@@ -2113,7 +2113,8 @@ class TestEedaiCollections:
             var_info, ["elevation"], 90.0, "srtm", _plan_for(gee, var_info)
         )
         _asset_id, kwargs = fake_reader.calls[0]
-        assert "start" not in kwargs and "reducer" not in kwargs
+        assert "start" not in kwargs
+        assert "reducer" not in kwargs
 
     def test_over_the_scene_cap_declines(self, make_gee, fake_reader):
         """More scenes than the cap fall back to Earth Engine's server-side reduce."""
@@ -2165,7 +2166,8 @@ class TestEedaiCollections:
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
         assert not plan.can_serve
-        assert "discovery for" in plan.reason and "failed" in plan.reason
+        assert "discovery for" in plan.reason
+        assert "failed" in plan.reason
 
     def test_no_scenes_is_reported_separately_from_a_failure(
         self, make_gee, fake_reader
@@ -2292,7 +2294,8 @@ class TestEedaiCollections:
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         gee._eedai_collection_fits(var_info, 1, self.START, self.END)
         _asset_id, kwargs = fake_reader.cost_calls[0]
-        assert kwargs["start"] == "2020-06-01" and kwargs["end"] == "2020-06-30"
+        assert kwargs["start"] == "2020-06-01"
+        assert kwargs["end"] == "2020-06-30"
         assert len(kwargs["bbox"]) == 4
 
     def test_mosaic_reducer_is_declined_before_any_network_call(
@@ -2319,7 +2322,8 @@ class TestEedaiCollections:
             update={"default_reducer": "mosaic"}
         )
         plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
-        assert not plan.can_serve and "last-wins" in plan.reason
+        assert not plan.can_serve
+        assert "last-wins" in plan.reason
 
     def test_a_supported_reducer_still_serves(self, make_gee, fake_reader):
         """A statistical reducer is unaffected by the mosaic decline."""
@@ -2396,9 +2400,10 @@ class TestEedaiCollections:
         gee = self._collection_gee(make_gee, engine="eedai")
         fake_reader.read_error = _reader_error("bands span multiple resolution groups")
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        image = _FakeImage()
         with pytest.raises(Exception, match="resolution groups"):
             gee._api(
-                _FakeImage(),
+                image,
                 var_info,
                 ["precipitation"],
                 dt.datetime(2020, 6, 1),
@@ -2416,7 +2421,8 @@ class TestEedaiCollections:
         fake_reader.cost = SimpleNamespace(scene_count=0, min_pixel_size=5566.0)
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         use_reader, plan = gee._use_eedai(var_info, 1, self.START, self.END)
-        assert use_reader is False and plan is None
+        assert use_reader is False
+        assert plan is None
 
     def test_a_forced_run_still_raises_on_an_ineligible_request(
         self, make_gee, fake_reader
@@ -2424,8 +2430,9 @@ class TestEedaiCollections:
         """Skipping empty buckets must not soften the forced-engine contract."""
         gee = self._collection_gee(make_gee, engine="eedai", reducer="mosaic")
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        start, end = self.START, self.END
         with pytest.raises(ValueError, match="cannot serve"):
-            gee._use_eedai(var_info, 1, self.START, self.END)
+            gee._use_eedai(var_info, 1, start, end)
 
     def test_a_sub_day_bucket_never_inverts_its_window(self, make_gee, fake_reader):
         """A bucket shorter than a day must not ask for an end before its start."""
@@ -2458,7 +2465,8 @@ class TestEedaiCollections:
         )
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         use_reader, plan = gee._use_eedai(var_info, 1, self.START, self.END)
-        assert use_reader is False and plan is None
+        assert use_reader is False
+        assert plan is None
         assert any("could not size" in w for w in warnings)
 
     def test_each_bucket_costs_exactly_one_discovery_query(self, make_gee, fake_reader):
@@ -2498,7 +2506,8 @@ class TestEedaiCollections:
         fake_reader.cost = SimpleNamespace(scene_count=7, min_pixel_size=5566.0)
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
-        assert plan.can_serve and plan.tiles == 7
+        assert plan.can_serve
+        assert plan.tiles == 7
 
     def test_discovery_bbox_is_labelled_latlon(self, make_gee, fake_reader):
         """Scene discovery must declare EPSG:4326, since the AOI it sends is lat/lon."""
@@ -2543,7 +2552,8 @@ class TestEedaiCollections:
         august = dt.datetime(2020, 8, 1)
         first = gee._eedai_collection_fits(var_info, 1, june, july)
         second = gee._eedai_collection_fits(var_info, 1, july, august)
-        assert first.can_serve and second.can_serve
+        assert first.can_serve
+        assert second.can_serve
         first_end = fake_reader.cost_calls[0][1]["end"]
         second_start = fake_reader.cost_calls[1][1]["start"]
         assert first_end < second_start, (
@@ -2618,8 +2628,10 @@ class TestEedaiProjectedCrs:
         gee = make_gee(crs="EPSG:32636")
         (min_x, min_y, max_x, max_y), cutline = gee._eedai_window()
         assert cutline is None
-        assert min_x > 100_000 and min_y > 1_000_000, (min_x, min_y)
-        assert max_x > min_x and max_y > min_y
+        assert min_x > 100_000, min_x
+        assert min_y > 1_000_000, min_y
+        assert max_x > min_x, (min_x, max_x)
+        assert max_y > min_y, (min_y, max_y)
 
     def test_window_passes_latlon_through_under_4326(self, make_gee):
         """Under EPSG:4326 the AOI is the lat/lon box, unreprojected."""
@@ -2896,10 +2908,9 @@ class TestEedaiEligibility:
             cloud_mask=_identity_mask,
         )
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        start, end = dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
         with pytest.raises(ValueError, match="engine='eedai' cannot serve"):
-            gee._use_eedai(
-                var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
-            )
+            gee._use_eedai(var_info, 1, start, end)
 
 
 class TestForcedEngineRemedies:
@@ -2944,7 +2955,8 @@ class TestForcedEngineRemedies:
             "about 9,000,000,000 px across 40 scenes on a 3x3 grid, over the "
             "200,000,000-px single-pass budget"
         )
-        assert "coarser scale" in remedy and "property_filter" not in remedy
+        assert "coarser scale" in remedy
+        assert "property_filter" not in remedy
 
     def test_the_forced_error_carries_the_matching_remedy(self, make_gee, fake_reader):
         """The reason and its remedy arrive together in the raised message."""
@@ -2957,10 +2969,9 @@ class TestForcedEngineRemedies:
             reducer="mosaic",
         )
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        start, end = dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
         with pytest.raises(ValueError, match="statistical reducer"):
-            gee._use_eedai(
-                var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
-            )
+            gee._use_eedai(var_info, 1, start, end)
 
 
 class TestExportViaEedai:
