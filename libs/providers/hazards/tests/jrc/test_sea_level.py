@@ -138,6 +138,8 @@ class _FakeVariable:
         self.columns = columns
         self.rows = rows
         self._bands = bands
+        # A real gridded Variable reports both of these.
+        self.band_count = bands
         # pyramids >= 0.58.1 derives this from the cube's CF coordinates.
         self.geotransform = _GLOBAL_GEO
 
@@ -605,6 +607,21 @@ class TestGeographicAffineGuard:
         """The cubes' real CF affine passes."""
         _helpers.require_geographic_affine(_GLOBAL_GEO, 1440, 720, "x")
 
+    def test_small_index_space_variable_is_refused(self):
+        """A coastal-point field's index affine sits inside the domain but is refused."""
+        # The live TWLcoast field: 50x16 with (0,1,0,16,0,-1), which passes an
+        # extent check because 0..50 / 0..16 is inside +-180/+-90.
+        with pytest.raises(ValueError, match="index-space geotransform"):
+            _helpers.require_geographic_affine(
+                (0.0, 1.0, 0.0, 16.0, 0.0, -1.0), 50, 16, "TWLcoast"
+            )
+
+    def test_legitimate_one_degree_grid_is_accepted(self):
+        """A real 1-degree global grid is not mistaken for index space."""
+        _helpers.require_geographic_affine(
+            (-180.0, 1.0, 0.0, 90.0, 0.0, -1.0), 360, 180, "x"
+        )
+
     @pytest.mark.parametrize(
         ("name", "geo"),
         [
@@ -646,6 +663,35 @@ class TestIndexSpaceGuard:
             path=tmp_path,
         )
         with pytest.raises(ValueError, match="north-up|lon/lat"):
+            backend.download()
+
+
+class TestBandCountGuard:
+    """A variable reporting no bands is not a gridded field (M1)."""
+
+    def test_zero_band_variable_is_refused(self, tmp_path: Path, monkeypatch):
+        """band_count 0 must not be treated as a single step."""
+        row = Catalog().get("sea_level_medium_term")
+        http = _FakeHttp(
+            row.base_url,
+            row.product,
+            ("2026", "08", "26", "12"),
+            ["mediumTermTWLforecastGridded_x.nc"],
+        )
+        monkeypatch.setattr(_helpers, "_http_text", http)
+        bandless = _FakeVariable()
+        bandless.band_count = 0
+        monkeypatch.setattr(
+            "pyramids.netcdf.NetCDF.read_file", lambda _url: _FakeContainer(bandless)
+        )
+        backend = JRC(
+            dataset="sea_level",
+            product="medium_term",
+            lat_lim=[51.0, 53.0],
+            lon_lim=[3.0, 5.0],
+            path=tmp_path,
+        )
+        with pytest.raises(ValueError, match="not a gridded forecast field"):
             backend.download()
 
 

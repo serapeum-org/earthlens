@@ -457,6 +457,17 @@ def require_geographic_affine(
             that cannot be longitude / latitude.
     """
     x0, dx, _, y0, _, dy = geo
+    # GDAL's ungeoreferenced affine for an (rows x cols) raster is exactly
+    # (0, 1, 0, rows, 0, -1). A small non-gridded variable (the cube's coastal
+    # -point fields are e.g. 50x16) produces one that also sits inside the
+    # lon/lat domain, so the extent check alone cannot catch it — match the
+    # signature directly.
+    if (x0, dx, dy) == (0.0, 1.0, -1.0) and y0 == float(rows):
+        raise ValueError(
+            f"{dataset_id!r} returned the index-space geotransform {geo} for a "
+            f"{cols}x{rows} variable — this field is not on the lon/lat grid "
+            "(the coastal-point fields report one). Request a gridded field."
+        )
     if dx <= 0 or dy >= 0:
         raise ValueError(
             f"{dataset_id!r} returned a geotransform {geo} that is not north-up "

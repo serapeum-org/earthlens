@@ -715,9 +715,17 @@ class JRC(AbstractDataSource):
                         f"nothing to write for {self._field!r}."
                     )
                 col_off, row_off, win_cols, win_rows = window
-                # A container-like variable reports band_count 0; fall back to the
-                # cube's own step count rather than silently treating it as 1.
-                steps_hint = getattr(variable, "band_count", None) or 1
+                # `or 1` here would do exactly what it must not: a container-like
+                # variable reports 0 bands, and treating that as 1 would under-count
+                # the read by orders of magnitude. A gridded field always reports a
+                # positive band count, so anything else is not one.
+                steps_hint = getattr(variable, "band_count", None)
+                if not steps_hint:
+                    raise ValueError(
+                        f"{self._dataset.id!r} field {self._field!r} reports "
+                        f"{steps_hint!r} bands, so it is not a gridded forecast "
+                        "field. Request a gridded field."
+                    )
                 cells = win_cols * win_rows * steps_hint
                 if cells > self.MAX_WINDOW_CELLS:
                     raise ValueError(
