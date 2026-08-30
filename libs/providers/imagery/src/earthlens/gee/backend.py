@@ -1557,6 +1557,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"{var_info.id} has no native resolution to size the read",
             )
         bbox, _cutline = self._eedai_window()
+        # One scene's window must satisfy the same budgets a single-image read
+        # does - the per-axis cap is about the window's *shape*, which no
+        # scene-count multiple would catch - so the shared gate runs first.
+        fits, reason = self._eedai_native_fits(var_info, bbox, band_count)
+        if not fits:
+            return EedaiPlan(False, None, 0, reason)
         rows, cols = self._eedai_output_grid(bbox, float(native_scale))
         total = cost.scene_count * rows * cols * max(band_count, 1)
         if total > _EEDAI_MAX_PIXELS:
@@ -1569,7 +1575,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     f"over the {_EEDAI_MAX_PIXELS:,}-px single-pass budget"
                 ),
             )
-        return EedaiPlan(True, None, 1, "")
+        return EedaiPlan(True, None, cost.scene_count, "")
 
     def _eedai_verdict(
         self,

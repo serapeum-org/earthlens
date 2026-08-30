@@ -2148,6 +2148,30 @@ class TestEedaiCollections:
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         assert gee._eedai_collection_fits(var_info, 1, self.START, self.END).can_serve
 
+    def test_collection_obeys_the_per_axis_budget(self, make_gee, fake_reader):
+        """A window too tall for one pass is declined, as it is for a single image.
+
+        The per-axis cap is about the window's *shape*, so no scene-count
+        multiple of the area would catch it.
+        """
+        gee = self._collection_gee(
+            make_gee, lat_lim=[0.0, 40.0], lon_lim=[31.2, 31.3], scale=100.0
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY").model_copy(
+            update={"spatial_resolution": 5.0}
+        )
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert not plan.can_serve
+        assert "per-axis budget" in plan.reason
+
+    def test_a_served_collection_reports_its_scene_count(self, make_gee, fake_reader):
+        """The plan carries the real scene count, not a placeholder."""
+        gee = self._collection_gee(make_gee)
+        fake_reader.cost = SimpleNamespace(scene_count=7, min_pixel_size=5566.0)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert plan.can_serve and plan.tiles == 7
+
     def test_discovery_bbox_is_labelled_latlon(self, make_gee, fake_reader):
         """Scene discovery must declare EPSG:4326, since the AOI it sends is lat/lon."""
         gee = self._collection_gee(make_gee)
