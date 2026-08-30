@@ -131,8 +131,16 @@ def main(argv: list[str]) -> int:
         )
     if hard:
         return 1
-    audited = [r for r in rows if r.get("status") == "ok"]
-    print(f"{len(audited)} provider(s) audited, {len(rows) - len(audited)} unsupported")
+    audited = sum(1 for r in rows if r.get("status") == "ok")
+    unsupported = sum(1 for r in rows if r.get("status") == "unsupported")
+    # Counted by status rather than as "everything else": with the transient
+    # branch in place, a provider that timed out is neither audited nor
+    # unsupported, and lumping it in with the latter would understate how much
+    # of the catalogue actually got checked.
+    line = f"{audited} provider(s) audited, {unsupported} unsupported"
+    if transient:
+        line += f", {len(transient)} unreachable this run"
+    print(line)
     return 0
 
 

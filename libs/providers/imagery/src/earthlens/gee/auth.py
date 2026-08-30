@@ -245,7 +245,7 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
     from the key file's `project_id`.
 
     Conforms to the cross-backend
-    :class:`earthlens.base.AbstractAuth` contract (C2): construction
+    :class:`earthlens.base.AbstractAuth` contract: construction
     still authenticates eagerly for backward compatibility, but the
     underlying work lives in :meth:`configure` and is idempotent —
     the second call after :meth:`is_authenticated` returns `True`
