@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -14941,6 +14941,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Quickstart — a">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#native-output-formats-need" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Native output formats need
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -23544,6 +23561,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Quickstart — a">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#native-output-formats-need" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Native output formats need
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -24507,7 +24541,7 @@ cfg</div>
 </tr>
 <tr>
 <td><code>crs</code></td>
-<td>target projection</td>
+<td>target projection, or <code>None</code> for none</td>
 <td><code>Chain.projection</code></td>
 </tr>
 <tr>
@@ -24537,7 +24571,7 @@ cfg</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="roi-mapping-bbox-nswe">ROI mapping — <code>bbox</code> → <code>NSWE</code><a class="anchor-link" href="#roi-mapping-bbox-nswe">¶</a></h2><p>Data Tailor's region-of-interest is an <code>[north, south, west, east]</code> list. <code>TailorConfig</code> stores <code>bbox</code> in the GeoJSON/OGC order <code>(west, south, east, north)</code> and exposes the reordered ROI via <code>.nswe</code>. When no <code>bbox</code> is given, <code>.nswe</code> is <code>None</code> and the backend falls back to the request's own <code>lat_lim</code> / <code>lon_lim</code>.</p>
+<h3 id="native-output-formats-need-crsnone">Native output formats need <code>crs=None</code><a class="anchor-link" href="#native-output-formats-need-crsnone">¶</a></h3><p>A handful of Data Tailor output formats carry their own fixed grid and reject any projection: <code>"msgnative"</code>, <code>"epsnative"</code>, <code>"hrit"</code>, <code>"hrit_compressed"</code>. <code>TailorConfig</code> requires <code>crs=None</code> for these -- it maps to leaving <code>Chain.projection</code> unset -- and rejects the combination of a native <code>format</code> with any other <code>crs</code> at construction time, before a request ever reaches Data Tailor.</p>
 </div>
 </div>
 </div>
@@ -24560,25 +24594,11 @@ cfg</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">examples</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s2">"Central Europe"</span><span class="p">,</span> <span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s2">"British Isles"</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mf">11.0</span><span class="p">,</span> <span class="mf">49.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">61.0</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s2">"no bbox (falls back to lat/lon_lim)"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-<span class="p">]</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">[(</span><span class="n">name</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">TailorConfig</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">)</span><span class="o">.</span><span class="n">nswe</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">],</span>
-    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"region"</span><span class="p">,</span> <span class="s2">"bbox (w, s, e, n)"</span><span class="p">,</span> <span class="s2">".nswe [n, s, w, e]"</span><span class="p">],</span>
-<span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">native_cfg</span> <span class="o">=</span> <span class="n">TailorConfig</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">"msgnative"</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="mf">55.0</span><span class="p">))</span>
+<span class="n">native_cfg</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">examples = [
-    ("Central Europe", (4.0, 48.0, 8.0, 52.0)),
-    ("British Isles", (-11.0, 49.0, 2.0, 61.0)),
-    ("no bbox (falls back to lat/lon_lim)", None),
-]
-pd.DataFrame(
-    [(name, bbox, TailorConfig(bbox=bbox).nswe) for name, bbox in examples],
-    columns=["region", "bbox (w, s, e, n)", ".nswe [n, s, w, e]"],
-)</div>
+<div class="clipboard-copy-txt" id="cell-3">native_cfg = TailorConfig(format="msgnative", crs=None, bbox=(-5.0, 40.0, 15.0, 55.0))
+native_cfg</div>
 </div>
 </div>
 </div>
@@ -24591,34 +24611,12 @@ pd.DataFrame(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="validation-bad-boxes-are-rejected-early">Validation — bad boxes are rejected early<a class="anchor-link" href="#validation-bad-boxes-are-rejected-early">¶</a></h2><p><code>TailorConfig</code> validates <code>bbox</code> at construction: an inverted box (<code>west &gt; east</code> or <code>south &gt; north</code>) or an out-of-range coordinate raises a <code>ValidationError</code> at the call site, rather than failing far away at the live service.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>TailorConfig</code> validates <code>bbox</code> at construction: an inverted box (<code>west &gt; east</code> or <code>south &gt; north</code>) or an out-of-range coordinate raises a <code>pydantic.ValidationError</code> at the call site — e.g. <code>TailorConfig(bbox=(8, 48, 4, 52))</code> fails with <em>"bbox west (8) must be &lt;= east (4)"</em> — rather than failing far away at the live service.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="eligibility-not-every-collection-is-tailorable">Eligibility — not every collection is tailorable<a class="anchor-link" href="#eligibility-not-every-collection-is-tailorable">¶</a></h2><p>Data Tailor supports a fixed registry of product types. A curated catalog row is Data-Tailor-eligible only when it carries a <code>tailor_product_type</code>. Load the catalog and split the collections into eligible vs not.</p>
+<h2 id="roi-mapping-bbox-nswe">ROI mapping — <code>bbox</code> → <code>NSWE</code><a class="anchor-link" href="#roi-mapping-bbox-nswe">¶</a></h2><p>Data Tailor's region-of-interest is an <code>[north, south, west, east]</code> list. <code>TailorConfig</code> stores <code>bbox</code> in the GeoJSON/OGC order <code>(west, south, east, north)</code> and exposes the reordered ROI via <code>.nswe</code>. When no <code>bbox</code> is given, <code>.nswe</code> is <code>None</code> and the backend falls back to the request's own <code>lat_lim</code> / <code>lon_lim</code>.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=11">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -24636,19 +24634,49 @@ pd.DataFrame(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<span class="n">eligible</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">tailor_product_type</span><span class="p">}</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">eligible</span><span class="p">)</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> curated collections are Data-Tailor-eligible"</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">examples</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">"Central Europe"</span><span class="p">,</span> <span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s2">"British Isles"</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mf">11.0</span><span class="p">,</span> <span class="mf">49.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">61.0</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s2">"no bbox (falls back to lat/lon_lim)"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">[(</span><span class="n">name</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">TailorConfig</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">)</span><span class="o">.</span><span class="n">nswe</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"region"</span><span class="p">,</span> <span class="s2">"bbox (w, s, e, n)"</span><span class="p">,</span> <span class="s2">".nswe [n, s, w, e]"</span><span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">cat = Catalog()
-eligible = {k: c for k, c in cat.datasets.items() if c.tailor_product_type}
-print(
-    f"{len(eligible)} of {len(cat.datasets)} curated collections are Data-Tailor-eligible"
+<div class="clipboard-copy-txt" id="cell-4">examples = [
+    ("Central Europe", (4.0, 48.0, 8.0, 52.0)),
+    ("British Isles", (-11.0, 49.0, 2.0, 61.0)),
+    ("no bbox (falls back to lat/lon_lim)", None),
+]
+pd.DataFrame(
+    [(name, bbox, TailorConfig(bbox=bbox).nswe) for name, bbox in examples],
+    columns=["region", "bbox (w, s, e, n)", ".nswe [n, s, w, e]"],
 )</div>
 </div>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="validation-bad-boxes-are-rejected-early">Validation — bad boxes are rejected early<a class="anchor-link" href="#validation-bad-boxes-are-rejected-early">¶</a></h2><p><code>TailorConfig</code> validates <code>bbox</code> at construction: an inverted box (<code>west &gt; east</code> or <code>south &gt; north</code>) or an out-of-range coordinate raises a <code>ValidationError</code> at the call site, rather than failing far away at the live service.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=11">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><code>TailorConfig</code> validates <code>bbox</code> at construction: an inverted box (<code>west &gt; east</code> or <code>south &gt; north</code>) or an out-of-range coordinate raises a <code>pydantic.ValidationError</code> at the call site — e.g. <code>TailorConfig(bbox=(8, 48, 4, 52))</code> fails with <em>"bbox west (8) must be &lt;= east (4)"</em> — rather than failing far away at the live service.</p>
 </div>
 </div>
 </div>
@@ -24659,7 +24687,7 @@ print(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="eligible-collections-by-group">Eligible collections by group<a class="anchor-link" href="#eligible-collections-by-group">¶</a></h3><p>Tally the eligible collections by mission-family <code>group</code> and plot it, so the spread across MSG / MTG / Metop / Sentinel-3 / … is visible at a glance.</p>
+<h2 id="eligibility-not-every-collection-is-tailorable">Eligibility — not every collection is tailorable<a class="anchor-link" href="#eligibility-not-every-collection-is-tailorable">¶</a></h2><p>Data Tailor supports a fixed registry of product types. A curated catalog row is Data-Tailor-eligible only when it carries a <code>tailor_product_type</code>. Load the catalog and split the collections into eligible vs not.</p>
 </div>
 </div>
 </div>
@@ -24682,23 +24710,17 @@ print(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">by_group</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">eligible</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-<span class="n">series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">by_group</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
-
-<span class="n">ax</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"steelblue"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"eligible collections"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Data-Tailor-eligible EUMETSAT collections by group"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+<span class="n">eligible</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">tailor_product_type</span><span class="p">}</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">eligible</span><span class="p">)</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> curated collections are Data-Tailor-eligible"</span>
+<span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">by_group = Counter(c.group.value for c in eligible.values())
-series = pd.Series(dict(sorted(by_group.items()))).sort_values()
-
-ax = series.plot.barh(color="steelblue")
-ax.set_xlabel("eligible collections")
-ax.set_title("Data-Tailor-eligible EUMETSAT collections by group")
-plt.tight_layout()
-plt.show()</div>
+<div class="clipboard-copy-txt" id="cell-5">cat = Catalog()
+eligible = {k: c for k, c in cat.datasets.items() if c.tailor_product_type}
+print(
+    f"{len(eligible)} of {len(cat.datasets)} curated collections are Data-Tailor-eligible"
+)</div>
 </div>
 </div>
 </div>
@@ -24711,7 +24733,7 @@ plt.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="a-sample-of-eligible-rows-and-their-product-type">A sample of eligible rows and their product type<a class="anchor-link" href="#a-sample-of-eligible-rows-and-their-product-type">¶</a></h3><p>Each eligible row maps its friendly key to a Data Tailor <code>tailor_product_type</code> (the id passed as <code>Chain.product</code>). Show a representative sample.</p>
+<h3 id="eligible-collections-by-group">Eligible collections by group<a class="anchor-link" href="#eligible-collections-by-group">¶</a></h3><p>Tally the eligible collections by mission-family <code>group</code> and plot it, so the spread across MSG / MTG / Metop / Sentinel-3 / … is visible at a glance.</p>
 </div>
 </div>
 </div>
@@ -24734,17 +24756,23 @@ plt.show()</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sample</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">eligible</span><span class="o">.</span><span class="n">items</span><span class="p">())[:</span><span class="mi">12</span><span class="p">]</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">output_kind</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">tailor_product_type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">],</span>
-    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"key"</span><span class="p">,</span> <span class="s2">"group"</span><span class="p">,</span> <span class="s2">"output_kind"</span><span class="p">,</span> <span class="s2">"tailor_product_type"</span><span class="p">],</span>
-<span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">by_group</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">eligible</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="n">series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">by_group</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"steelblue"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"eligible collections"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Data-Tailor-eligible EUMETSAT collections by group"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">sample = sorted(eligible.items())[:12]
-pd.DataFrame(
-    [(k, c.group.value, c.output_kind, c.tailor_product_type) for k, c in sample],
-    columns=["key", "group", "output_kind", "tailor_product_type"],
-)</div>
+<div class="clipboard-copy-txt" id="cell-6">by_group = Counter(c.group.value for c in eligible.values())
+series = pd.Series(dict(sorted(by_group.items()))).sort_values()
+
+ax = series.plot.barh(color="steelblue")
+ax.set_xlabel("eligible collections")
+ax.set_title("Data-Tailor-eligible EUMETSAT collections by group")
+plt.tight_layout()
+plt.show()</div>
 </div>
 </div>
 </div>
@@ -24757,7 +24785,7 @@ pd.DataFrame(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>A <code>tailor=</code> request against a <strong>non-eligible</strong> collection (e.g. Sentinel-5P TROPOMI, which this service does not tailor) raises a clear <code>ValueError</code> before any job is submitted — confirm one is <code>None</code>:</p>
+<h3 id="a-sample-of-eligible-rows-and-their-product-type">A sample of eligible rows and their product type<a class="anchor-link" href="#a-sample-of-eligible-rows-and-their-product-type">¶</a></h3><p>Each eligible row maps its friendly key to a Data Tailor <code>tailor_product_type</code> (the id passed as <code>Chain.product</code>). Show a representative sample.</p>
 </div>
 </div>
 </div>
@@ -24780,12 +24808,16 @@ pd.DataFrame(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span>
-    <span class="s2">"s5p-l2-no2 tailor_product_type:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s2">"s5p-l2-no2"</span><span class="p">)</span><span class="o">.</span><span class="n">tailor_product_type</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sample</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">eligible</span><span class="o">.</span><span class="n">items</span><span class="p">())[:</span><span class="mi">12</span><span class="p">]</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">output_kind</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">tailor_product_type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"key"</span><span class="p">,</span> <span class="s2">"group"</span><span class="p">,</span> <span class="s2">"output_kind"</span><span class="p">,</span> <span class="s2">"tailor_product_type"</span><span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">print(
-    "s5p-l2-no2 tailor_product_type:", cat.get_dataset("s5p-l2-no2").tailor_product_type
+<div class="clipboard-copy-txt" id="cell-7">sample = sorted(eligible.items())[:12]
+pd.DataFrame(
+    [(k, c.group.value, c.output_kind, c.tailor_product_type) for k, c in sample],
+    columns=["key", "group", "output_kind", "tailor_product_type"],
 )</div>
 </div>
 </div>
@@ -24794,6 +24826,48 @@ pd.DataFrame(
 </div>
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=18">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>A <code>tailor=</code> request against a <strong>non-eligible</strong> collection (e.g. Sentinel-5P TROPOMI, which this service does not tailor) raises a clear <code>ValueError</code> before any job is submitted — confirm one is <code>None</code>:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=19">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span>
+    <span class="s2">"s5p-l2-no2 tailor_product_type:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s2">"s5p-l2-no2"</span><span class="p">)</span><span class="o">.</span><span class="n">tailor_product_type</span>
+<span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-8">print(
+    "s5p-l2-no2 tailor_product_type:", cat.get_dataset("s5p-l2-no2").tailor_product_type
+)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=20">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -24817,7 +24891,7 @@ pd.DataFrame(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=19">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=21">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
