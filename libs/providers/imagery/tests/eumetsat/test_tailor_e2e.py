@@ -41,6 +41,12 @@ _PROBE_DATE = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=3)).strftime
     "%Y-%m-%d"
 )
 
+#: How long to wait for the native customisation before giving up and skipping.
+#: Well under the e2e lane's wall-clock cap, which the GeoTIFF roundtrip test in
+#: this file already spends most of -- a second unbounded 30-minute poll would
+#: take the whole lane down with it rather than fail this one test.
+_NATIVE_POLL_TIMEOUT_S = 480.0
+
 #: Substrings marking a Data Store download refusal (account not authorised).
 _NOT_AUTHORISED = (
     "403",
@@ -104,13 +110,22 @@ class TestEumetsatDataTailorLive:
         after = len(list(backend._auth.datatailor().customisations))
         assert after <= before, "customisation was not deleted after streaming"
 
-    def test_tailor_native_format_needs_no_projection(self, tmp_path: Path):
+    def test_tailor_native_format_needs_no_projection(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
         """A `crs=None` MSG SEVIRI request comes back as native `.nat`.
 
         Native output cannot be reprojected, so the chain must carry no
         projection at all. Skips (not fails) when the account is not
-        download-authorised for the collection.
+        download-authorised for the collection, and when Data Tailor is still
+        queueing the order at `_NATIVE_POLL_TIMEOUT_S`: the whole lane has to
+        finish inside its wall-clock cap, and the roundtrip test above already
+        spends a large part of it.
         """
+        monkeypatch.setattr(
+            "earthlens.eumetsat.backend.TAILOR_POLL_TIMEOUT_S",
+            _NATIVE_POLL_TIMEOUT_S,
+        )
         el = EarthLens(
             data_source="eumetsat",
             start=_PROBE_DATE,
@@ -127,6 +142,11 @@ class TestEumetsatDataTailorLive:
                 tailor=TailorConfig(
                     format="msgnative", crs=None, bbox=(-5.0, 40.0, 15.0, 55.0)
                 ),
+            )
+        except TimeoutError as exc:
+            pytest.skip(
+                "Data Tailor was still queueing the native order after "
+                f"{_NATIVE_POLL_TIMEOUT_S:.0f}s: {exc}"
             )
         except Exception as exc:  # noqa: BLE001 - classify a download 403 as a skip
             if any(marker in str(exc) for marker in _NOT_AUTHORISED):
