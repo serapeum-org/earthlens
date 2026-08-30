@@ -11,6 +11,7 @@ with a stub that returns a fixed project. The real shipped
 from __future__ import annotations
 
 import datetime as dt
+import inspect
 import math
 import zipfile
 from pathlib import Path
@@ -1805,6 +1806,37 @@ class _FakeWindow:
         self.resample = resample
 
 
+def _bind_to_real_signature(name: str, asset_id: str, kwargs: dict) -> None:
+    """Reject keywords the installed pyramids-eo would not accept.
+
+    A `**kwargs` fake takes any keyword, so a typo here or a renamed parameter
+    upstream would pass the whole unit suite and fail only against the live
+    service. Binding to the real signature — when the optional extra is
+    installed — makes that drift a test failure instead.
+
+    Args:
+        name: The reader function being stood in for.
+        asset_id: The positional asset id the call passed.
+        kwargs: The keyword arguments the call passed.
+
+    Raises:
+        AssertionError: The real function would reject this call.
+    """
+    try:
+        from pyramids_eo import earthengine as _real
+    except ImportError:  # pragma: no cover - the extra is installed in CI
+        return
+    real = getattr(_real, name, None)
+    if real is None:
+        return
+    try:
+        inspect.signature(real).bind(asset_id, **kwargs)
+    except TypeError as exc:
+        raise AssertionError(
+            f"{name}() would reject this call against the installed pyramids-eo: {exc}"
+        ) from exc
+
+
 class _FakeReaderModule:
     """Stand-in for `pyramids_eo.earthengine`; records `from_earthengine`."""
 
@@ -1819,12 +1851,14 @@ class _FakeReaderModule:
         self.cost_error: Exception | None = None
 
     def estimate_earthengine_cost(self, asset_id, **kwargs):
+        _bind_to_real_signature("estimate_earthengine_cost", asset_id, kwargs)
         self.cost_calls.append((asset_id, kwargs))
         if self.cost_error is not None:
             raise self.cost_error
         return self.cost
 
     def from_earthengine(self, asset_id, **kwargs):
+        _bind_to_real_signature("from_earthengine", asset_id, kwargs)
         self.calls.append((asset_id, kwargs))
         # Mirror the combinations upstream's `_validate_read_request` rejects,
         # so a plan that produces one fails here instead of passing silently.
@@ -2127,13 +2161,16 @@ class TestEedaiCollections:
         assert not plan.can_serve
         assert "no native resolution" in plan.reason
 
-    def test_missing_bucket_window_declines(self, make_gee, fake_reader):
-        """A collection verdict without a date window cannot size the read."""
+    def test_missing_bucket_window_raises(self, make_gee, fake_reader):
+        """A missing window is a caller bug, not a reason to fall back silently.
+
+        Declining would turn a programming error into a permanent, invisible
+        downgrade to Earth Engine for the whole run.
+        """
         gee = self._collection_gee(make_gee)
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        plan = gee._eedai_collection_fits(var_info, 1, None, None)
-        assert not plan.can_serve
-        assert "bucket date window" in plan.reason
+        with pytest.raises(ValueError, match="needs a bucket date window"):
+            gee._eedai_collection_fits(var_info, 1, None, None)
 
     def test_estimate_is_queried_with_the_bucket_window(self, make_gee, fake_reader):
         """Scene discovery uses the bucket's dates and a lat/lon AOI envelope."""
@@ -2175,6 +2212,34 @@ class TestEedaiCollections:
         gee = self._collection_gee(make_gee, reducer="median")
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         assert gee._eedai_collection_fits(var_info, 1, self.START, self.END).can_serve
+
+    def test_discovery_uses_the_regions_bounds_not_the_bbox(
+        self, make_gee, fake_reader
+    ):
+        """With a `region`, scenes must be discovered over the ground actually read.
+
+        The region supersedes the lat/lon bbox for the clip, so discovering over
+        the bbox would count scenes for one geometry while the pixel footprint
+        came from another.
+        """
+        region = _FakePolygonAoi(epsg=4326, total_bounds=(10.0, 5.0, 10.5, 5.5))
+        gee = self._collection_gee(make_gee, region=region)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert fake_reader.cost_calls[0][1]["bbox"] == (10.0, 5.0, 10.5, 5.5)
+
+    def test_discovery_brings_a_projected_region_back_to_latlon(
+        self, make_gee, fake_reader
+    ):
+        """A region in another CRS is reprojected before it bounds discovery."""
+        region = _FakePolygonAoi(
+            epsg=32636, total_bounds=(330000.0, 3310000.0, 340000.0, 3320000.0)
+        )
+        gee = self._collection_gee(make_gee, region=region)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        bbox = fake_reader.cost_calls[0][1]["bbox"]
+        assert max(abs(v) for v in bbox) < 200, f"discovery bbox not lat/lon: {bbox}"
 
     def test_repeated_buckets_reuse_one_discovery_query(self, make_gee, fake_reader):
         """The same window must not re-query the catalog for every bucket."""
@@ -2527,16 +2592,23 @@ class TestEedaiEligibility:
         assert gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003"), 1)[0] is True
 
     def test_engine_eedai_rejects_ineligible_request(self, make_gee, fake_reader):
-        """Forcing the reader on a composited request raises `ValueError`."""
+        """Forcing the reader on a server-side-shaped request raises `ValueError`.
+
+        A collection is no longer the example here: the reader composites those
+        now. What stays ineligible is work only Earth Engine can do — a
+        per-image `cloud_mask` runs inside the graph the reader cannot execute.
+        """
         gee = make_gee(
             engine="eedai",
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
+            cloud_mask=_identity_mask,
         )
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        plan = _plan_for(gee, var_info)
         with pytest.raises(ValueError, match="engine='eedai' cannot serve"):
-            gee._use_eedai(var_info, 1)
+            gee._use_eedai(
+                var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+            )
 
 
 class TestExportViaEedai:

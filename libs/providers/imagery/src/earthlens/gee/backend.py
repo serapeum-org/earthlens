@@ -1475,13 +1475,26 @@ class GEE(LazyClientMixin, AbstractDataSource):
     def _eedai_latlon_aoi(self) -> tuple[float, float, float, float]:
         """Return the AOI envelope in EPSG:4326 for EEDA scene discovery.
 
-        Scene discovery queries the Earth Engine catalog in lat/lon, so the
-        AOI is given in EPSG:4326 whatever the output CRS. The request's
-        `space` already holds that lat/lon extent.
+        Scene discovery queries the Earth Engine catalog in lat/lon, so the AOI
+        is given in EPSG:4326 whatever the output CRS.
+
+        It must describe the *same ground the read will window*, or the scene
+        count gating the read would be discovered over one geometry while the
+        pixel footprint is computed over another. A `region` supersedes the
+        lat/lon bbox for the clip, so its bounds are the AOI here too, brought
+        back to lat/lon when the region carries another CRS.
 
         Returns:
             `(min_lon, min_lat, max_lon, max_lat)`.
         """
+        region = self.region
+        if region is not None:
+            latlon = region
+            crs = getattr(region, "crs", None)
+            if crs is not None and not self._same_crs(crs, _EEDAI_NATIVE_CRS):
+                latlon = region.to_crs(_EEDAI_NATIVE_CRS)
+            min_x, min_y, max_x, max_y = (float(v) for v in latlon.total_bounds)
+            return (min_x, min_y, max_x, max_y)
         return (
             self.space.longitude_min,
             self.space.latitude_min,
@@ -1518,8 +1531,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
             (`tile_size` is `None`) or declined with a reason.
         """
         if bucket_start is None or bucket_end is None:
-            return EedaiPlan(
-                False, None, 0, "a collection read needs a bucket date window"
+            # An internal contract violation, not a property of the request: a
+            # decline here would hide the caller's mistake as a permanent,
+            # silent fallback to Earth Engine.
+            raise ValueError(
+                f"a collection read of {var_info.id} needs a bucket date window; "
+                "_api passes one for every bucket"
             )
         reducer = self.reducer or var_info.default_reducer
         if reducer in _EEDAI_UNSUPPORTED_REDUCERS:
