@@ -388,8 +388,8 @@ class TestAffineHelpers:
         cols, rows = 1440, 720
         # Derived from the grid definition, not copied from the code under test.
         expected = (-180.0, 360.0 / cols, 90.0, -180.0 / rows)
-        actual = (_GLOBAL_GEO[0], _GLOBAL_GEO[1], _GLOBAL_GEO[3], _GLOBAL_GEO[5])
-        assert actual == expected, (
+        x0, dx, y0, dy = _GLOBAL_GEO[0], _GLOBAL_GEO[1], _GLOBAL_GEO[3], _GLOBAL_GEO[5]
+        assert (x0, dx, y0, dy) == expected, (
             "the shipped constant no longer matches a 0.25 deg global grid"
         )
         assert (x0, y0) == (-180.0, 90.0), "grid must start at the NW corner"
