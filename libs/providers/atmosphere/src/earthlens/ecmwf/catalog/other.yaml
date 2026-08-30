@@ -1878,7 +1878,7 @@ datasets:
       temperature-anomaly:
         cds_variable: temperature_anomaly
         nc_variable: tasmax
-        units: degrees Celsius
+        units: unknown
         extras:
           region: [global]
       precipitation:
@@ -2337,79 +2337,79 @@ datasets:
       monthly-temperature:
         cds_variable: monthly_temperature
         nc_variable: t
-        units: degC
+        units: unknown
       monthly-daily-minimum-temperature:
         cds_variable: monthly_daily_minimum_temperature
         nc_variable: tn
-        units: degC
+        units: unknown
       monthly-daily-maximum-temperature:
         cds_variable: monthly_daily_maximum_temperature
         nc_variable: tx
-        units: degC
+        units: unknown
       monthly-daily-temperature-range:
         cds_variable: monthly_daily_temperature_range
         nc_variable: dtr
-        units: degC
+        units: unknown
       monthly-maximum-of-daily-maximum-temperature:
         cds_variable: monthly_maximum_of_daily_maximum_temperature
         nc_variable: txx
-        units: degC
+        units: unknown
       monthly-extreme-hot-days:
         cds_variable: monthly_extreme_hot_days
         nc_variable: tx35
-        units: '1'
+        units: unknown
       monthly-very-extreme-hot-days:
         cds_variable: monthly_very_extreme_hot_days
         nc_variable: tx40
-        units: '1'
+        units: unknown
       monthly-tropical-nights:
         cds_variable: monthly_tropical_nights
         nc_variable: tr
-        units: '1'
+        units: unknown
       annual-cooling-degree-days:
         cds_variable: annual_cooling_degree_days
         nc_variable: cd
-        units: degC day
+        units: unknown
       monthly-minimum-of-daily-minimum-temperature:
         cds_variable: monthly_minimum_of_daily_minimum_temperature
         nc_variable: tnn
-        units: degC
+        units: unknown
       monthly-frost-days:
         cds_variable: monthly_frost_days
         nc_variable: fd
-        units: '1'
+        units: unknown
       annual-heating-degree-days:
         cds_variable: annual_heating_degree_days
         nc_variable: hd
-        units: degC day
+        units: unknown
       monthly-precipitation:
         cds_variable: monthly_precipitation
         nc_variable: r
-        units: mm
+        units: unknown
       monthly-wet-days:
         cds_variable: monthly_wet_days
         nc_variable: r01
-        units: '1'
+        units: unknown
       monthly-precipitation-intensity:
         cds_variable: monthly_precipitation_intensity
         nc_variable: sdii
-        units: mm
+        units: unknown
       monthly-maximum-1-day-precipitation:
         cds_variable: monthly_maximum_1_day_precipitation
         nc_variable: rx1day
-        units: mm
+        units: unknown
       monthly-maximum-5-day-precipitation:
         cds_variable: monthly_maximum_5_day_precipitation
         nc_variable: rx5day
-        units: mm
+        units: unknown
       monthly-heavy-precipitation-days:
         cds_variable: monthly_heavy_precipitation_days
         nc_variable: r10
-        units: '1'
+        units: unknown
       monthly-very-heavy-precipitation-days:
         cds_variable: monthly_very_heavy_precipitation_days
         nc_variable: r20
-        units: '1'
+        units: unknown
       monthly-near-surface-specific-humidity:
         cds_variable: monthly_near_surface_specific_humidity
         nc_variable: monthly_near_surface_specific_humidity
@@ -2496,7 +2496,7 @@ datasets:
       monthly-mean-of-daily-accumulated-snowfall-precipitation:
         cds_variable: monthly_mean_of_daily_accumulated_snowfall_precipitation
         nc_variable: prsn
-        units: mm
+        units: unknown
         extras:
           domain: [global]
           origin: [cmip6]
@@ -2519,7 +2519,7 @@ datasets:
       monthly-mean-of-acidity-of-seawater:
         cds_variable: monthly_mean_of_acidity_of_seawater
         nc_variable: ph
-        units: '1'
+        units: unknown
         extras:
           domain: [global]
           origin: [cmip6]
@@ -2605,7 +2605,7 @@ datasets:
       capacity-of-soil-to-store-water:
         cds_variable: capacity_of_soil_to_store_water
         nc_variable: mrsofc
-        units: kg m-2
+        units: unknown
         extras:
           temporal_resolution: [fixed]
       daily-maximum-near-surface-air-temperature:
@@ -3081,7 +3081,7 @@ datasets:
       volumetric-soil-moisture:
         cds_variable: volumetric_soil_moisture
         nc_variable: voltso
-        units: m**3 m**-3
+        units: unknown
       volumetric-transpiration-stress-onset:
         cds_variable: volumetric_transpiration_stress_onset
         nc_variable: volumetric_transpiration_stress_onset
@@ -3975,11 +3975,11 @@ datasets:
       sea-ice-concentration:
         cds_variable: sea_ice_concentration
         nc_variable: sea-ice-concentration
-        units: '1'
+        units: unknown
       sea-surface-temperature:
         cds_variable: sea_surface_temperature
         nc_variable: sea-surface-temperature
-        units: K
+        units: unknown
       2m-temperature:
         cds_variable: 2m_temperature
         nc_variable: temperature_annual-maximum
@@ -4003,15 +4003,15 @@ datasets:
       wind-speed:
         cds_variable: wind_speed
         nc_variable: wind-speed
-        units: m s**-1
+        units: unknown
       zonal-wind-speed:
         cds_variable: zonal_wind_speed
         nc_variable: zonal-wind-speed
-        units: m s**-1
+        units: unknown
       meridional-wind-speed:
         cds_variable: meridional_wind_speed
         nc_variable: meridional-wind-speed
-        units: m s**-1
+        units: unknown
   sis-biodiversity-era5-regional:
     endpoint: cds
     request_kind: form
@@ -5121,35 +5121,35 @@ datasets:
       heat-index:
         cds_variable: heat_index
         nc_variable: HI
-        units: degrees_C
+        units: unknown
         extras:
           temporal_aggregation: [daily]
           version: ['1_0', '2_0']
       humidex:
         cds_variable: humidex
         nc_variable: Humidex
-        units: degrees_C
+        units: unknown
         extras:
           temporal_aggregation: [daily]
           version: ['1_0', '2_0']
       universal-thermal-climate-index:
         cds_variable: universal_thermal_climate_index
         nc_variable: UTCI
-        units: degrees_C
+        units: unknown
         extras:
           temporal_aggregation: [daily]
           version: ['1_0', '2_0']
       wet-bulb-temperature-index:
         cds_variable: wet_bulb_temperature_index
         nc_variable: WBT
-        units: degrees_C
+        units: unknown
         extras:
           temporal_aggregation: [daily]
           version: ['1_0', '2_0']
       wet-bulb-globe-temperature-index:
         cds_variable: wet_bulb_globe_temperature_index
         nc_variable: WBGT
-        units: degrees_C
+        units: unknown
         extras:
           temporal_aggregation: [daily]
           version: ['1_0', '2_0']
@@ -5301,7 +5301,7 @@ datasets:
       2m-air-temperature:
         cds_variable: 2m_air_temperature
         nc_variable: tas_tmean
-        units: Degree Celsius
+        units: unknown
       precipitation:
         cds_variable: precipitation
         nc_variable: pr_tmean
@@ -5791,7 +5791,7 @@ datasets:
       daily-fire-weather-index:
         cds_variable: daily_fire_weather_index
         nc_variable: fwi-daily-proj
-        units: '1'
+        units: unknown
         extras:
           product_type: [single_model]
           time_aggregation: [daily_indicators]
