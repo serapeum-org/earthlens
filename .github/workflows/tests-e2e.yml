@@ -76,12 +76,6 @@ jobs:
         env:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
-          # earthdata and asf DO have dedicated lanes, but the catch-all marker does
-          # not exclude them, so this job collects their tests too. Without these it
-          # collected them only to skip them - 14 skipped in one observed run.
-          EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
-          EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
-          EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
           # These backends have no dedicated lane below, so this catch-all is the
           # only job that collects them. Without their credentials they self-skip
           # and the job still reports success - the suites were never exercised.
@@ -526,4 +520,9 @@ jobs:
         env:
           WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
         run: |
+          # No junit report or masked-lane assertion here, unlike every lane above:
+          # WDPA_TOKEN has not been issued yet, so this lane is expected to skip
+          # wholesale and the guard would fail it every run for something nobody
+          # can act on. The reusable workflow records the same exemption as
+          # `allow_all_skipped: true`.
           uv run --locked pytest -m "e2e and wdpa" -v
