@@ -584,6 +584,45 @@ class TestErrorSummary:
         assert summary.endswith("...")
 
 
+class TestServingBlocksFor:
+    """Fetching a dataset's constraints is best-effort, so it cannot be fatal."""
+
+    def test_the_blocks_serving_a_variable_are_returned(self, monkeypatch):
+        """Only the blocks that list the variable are its serving blocks."""
+        import earthlens.ecmwf.cli as ecmwf_cli
+
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_ecmwf_constraints",
+            lambda dataset: [
+                {"variable": ["t2m"], "year": ["2020"]},
+                {"variable": ["sst"], "year": ["2021"]},
+                {"variable": ["t2m", "sst"], "year": ["2022"]},
+            ],
+        )
+
+        serving = hydrate_mod._serving_blocks_for("a-dataset")
+
+        assert [block["year"] for block in serving("t2m")] == [["2020"], ["2022"]]
+        assert serving("unknown-variable") == []
+
+    @pytest.mark.parametrize(
+        "answer",
+        [
+            lambda dataset: (_ for _ in ()).throw(RuntimeError("constraints 500")),
+            lambda dataset: None,
+        ],
+        ids=["fetch-raises", "no-constraints"],
+    )
+    def test_a_dataset_it_cannot_check_yields_no_blocks(self, monkeypatch, answer):
+        """Refusing every row of an uncheckable dataset would be worse than not checking."""
+        import earthlens.ecmwf.cli as ecmwf_cli
+
+        monkeypatch.setattr(ecmwf_cli, "_ecmwf_constraints", answer)
+
+        assert hydrate_mod._serving_blocks_for("a-dataset")("t2m") == []
+
+
 class TestNumberShapedScalarsAreQuoted:
     """A written scalar's type must be the file's, not the parser's."""
 

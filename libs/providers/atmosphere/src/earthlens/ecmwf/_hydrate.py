@@ -21,6 +21,7 @@ from __future__ import annotations
 import re
 import threading
 from collections.abc import Callable
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -1836,6 +1837,21 @@ def _hydrated_detail(session: _ProbeSession, declined: list[str]) -> str:
     return left
 
 
+def _blocks_serving(
+    rows: list[dict[str, Any]], cds_variable: str
+) -> list[dict[str, Any]]:
+    """Return the constraints blocks among `rows` that serve `cds_variable`.
+
+    Args:
+        rows: The dataset's constraints blocks.
+        cds_variable: The variable a row names.
+
+    Returns:
+        The blocks listing that variable.
+    """
+    return [row for row in rows if cds_variable in (row.get("variable") or [])]
+
+
 def _serving_blocks_for(
     dataset_id: str,
 ) -> Callable[[str], list[dict[str, Any]]]:
@@ -1861,11 +1877,7 @@ def _serving_blocks_for(
         rows = _ecmwf_constraints(dataset_id) or []
     except Exception:  # noqa: BLE001 - an uncheckable dataset is not a failure
         rows = []
-
-    def _serving(cds_variable: str) -> list[dict[str, Any]]:
-        return [row for row in rows if cds_variable in (row.get("variable") or [])]
-
-    return _serving
+    return partial(_blocks_serving, rows)
 
 
 def _hydrate_one(
