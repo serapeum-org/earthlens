@@ -9,6 +9,11 @@ masked-lane guard exists to prevent.
 
 Usage:
     python .github/scripts/assert_audit_ran.py <audit.json>
+
+Exits 0 when no provider errored, and when no report was written at all - the
+caller's own exit code already carries that case. Exits 1 when a provider
+reported `status="error"`, or when the report is not valid JSON. Exits 2 on a
+bad command line.
 """
 
 from __future__ import annotations
@@ -26,9 +31,12 @@ def main(argv: list[str]) -> int:
             JSON emitted by `datasets audit --json`.
 
     Returns:
-        int: 0 when every provider was audited (or the report is unreadable,
-            which the caller's own exit code already covers), 1 when at least
-            one provider reported `status="error"`.
+        int: 0 when no provider reported `status="error"` — providers with
+            `status="unsupported"` have no prober and are only counted — and
+            when no report was written, which the caller's own exit code
+            already covers; 1 when at least one provider errored or the
+            report is not valid JSON; 2 when `argv` is not the single
+            expected argument.
     """
     if len(argv) != 1:
         print(f"usage: {Path(__file__).name} <audit.json>", file=sys.stderr)

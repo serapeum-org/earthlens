@@ -101,6 +101,19 @@ class EarthEngineCredentials(BaseModel):
             True
 
             ```
+        - The key is stored redacted; the value comes back only on request:
+            ```python
+            >>> from earthlens.gee.auth import EarthEngineCredentials
+            >>> creds = EarthEngineCredentials(
+            ...     service_account="sa@p.iam",
+            ...     service_key="/path/to/key.json",
+            ... )
+            >>> creds.service_key
+            SecretStr('**********')
+            >>> creds.service_key.get_secret_value()
+            '/path/to/key.json'
+
+            ```
     """
 
     model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
@@ -131,9 +144,10 @@ def _is_inline_json(service_key: str) -> bool:
     return isinstance(service_key, str) and service_key.lstrip().startswith("{")
 
 
-#: Field names and PEM markers that only ever occur inside credential JSON.
-#: Matched with their surrounding quotes so ordinary prose - an error naming a
-#: `service_account`, say - cannot trip them.
+#: Strings that only ever occur inside credential material. The JSON field
+#: names carry their surrounding quotes so ordinary prose - an error naming a
+#: `service_account`, say - cannot trip them. `PRIVATE KEY` needs no quoting:
+#: it is the PEM armour wrapping the key's `private_key` value.
 _CREDENTIAL_MARKERS = (
     "PRIVATE KEY",
     '"private_key"',
@@ -162,11 +176,14 @@ def _redact(message: str, service_key: str) -> str:
 
     Args:
         message: The text about to be surfaced.
-        service_key: The key path or JSON content to strip.
+        service_key: The key path or JSON content to strip. A value of eight
+            characters or fewer is left in place - too short to be a real key,
+            and short enough to collide with ordinary words in the message.
 
     Returns:
-        str: The message with credential material replaced, or the sentinel
-            alone when any marker survived.
+        str: The message with every form of `service_key` replaced by
+            `<service key redacted>`, or that sentinel alone when a
+            `_CREDENTIAL_MARKERS` entry survived the substitutions.
     """
     cleaned = message
     if isinstance(service_key, str) and len(service_key) > 8:
@@ -184,11 +201,11 @@ def _load_key_dict(service_key: str) -> dict[str, Any] | None:
     Accepts either a filesystem path to the key file or the raw JSON
     string itself; returns `None` when `service_key` is neither (so the
     caller can still proceed with whatever `ee` accepts and only error
-    if `ee` itself rejects it). Distinguishes the two shapes by leading
-    character — a value that starts with `{` is treated as inline JSON,
-    everything else as a path (more robust than calling
-    `Path(...).is_file()` on what may be multi-line JSON content,
-    L2 in pr-diff-review).
+    if `ee` itself rejects it). `_is_inline_json` decides between the two
+    shapes — a leading `{` means inline JSON, anything else a path. That
+    is steadier than `Path(...).is_file()`, which merely answers `False`
+    for multi-line JSON content and so cannot tell inline content apart
+    from a path that does not exist.
 
     Args:
         service_key: Path to the service-account JSON file, or the JSON
@@ -356,10 +373,16 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
     ) -> str:
         """Authenticate the service account and call `ee.Initialize`.
 
+        The key is dispatched by its shape rather than by trial and error:
+        `_is_inline_json` decides whether it reaches
+        `ee.ServiceAccountCredentials` as `key_data=` (inline JSON) or
+        positionally (a filename), so the call that would embed the key in
+        an `open()` failure is never attempted.
+
         Args:
             service_account: The service-account email.
             service_key: Path to the service-account JSON key file, or
-                the JSON content as a string.
+                the JSON content as a string, told apart by a leading `{`.
             project: Cloud project id to scope the calls to. If omitted,
                 the key file's `project_id` is used.
 
@@ -367,9 +390,14 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
             The Cloud project id the connection was initialised with.
 
         Raises:
-            AuthenticationError: If the key cannot be loaded, no project
-                can be resolved, the project is not registered for Earth
-                Engine, or the service account lacks permission on it.
+            AuthenticationError: For every failure — no project could be
+                resolved, the credentials could not be built from the key,
+                the project is not registered for Earth Engine, the service
+                account lacks permission on it, or `ee.Initialize` failed for
+                any other reason. Nothing is chained (`raise ... from None`)
+                and every interpolated detail passes through `_redact`,
+                because an `ee` error can carry the key itself and a chained
+                traceback would print it.
 
         Examples:
             - Initialise from a key file (requires network + a registered project):

@@ -9,7 +9,7 @@ an unrelated pull request.
 **This extends an existing guard rather than introducing the idea.**
 `earthlens.testing.pytest_sessionfinish` already fails a lane that collected
 tests, passed none, and skipped at least one for *upstream availability* -
-it counts skips carrying that module's `live e2e skipped - ` prefix. The two
+it counts skips carrying that module's `live e2e skipped — ` prefix. The two
 partition the problem and never double-fire:
 
 - upstream was down    -> the in-process guard fails the lane, pytest exits
@@ -26,10 +26,12 @@ unless the lane opts out. This carries that from *collected* to *executed*.
 Usage:
     python .github/scripts/assert_tests_ran.py <report.xml> <lane-name>
 
-Exits 0 when at least one test actually executed (passed, failed, or errored),
-or when the report holds no tests at all - "collected nothing" is the exit-5
-case, which the caller has already decided about. Exits 1 when every collected
-test was skipped.
+Exits 0 when every backend in the report executed at least one test (passed,
+failed, or errored), and when the report is missing, truncated, or holds no
+tests at all - "collected nothing" is the exit-5 case, which the caller has
+already decided about. Exits 1 when the lane executed nothing, or when one
+backend inside an otherwise-passing lane contributed only skips without being
+listed in `_EXPECTED_EMPTY`. Exits 2 on a bad command line.
 """
 
 from __future__ import annotations
@@ -84,11 +86,15 @@ def _per_backend(report: Path) -> dict[str, tuple[int, int]]:
     nineteen-test ocean lane, and the sixteen that passed kept the lane green
     for months. Grouping restores the granularity the problem actually has.
 
+    Tests sitting directly under `tests/` belong to no backend and collect
+    under the `""` key, which the caller skips. An xfail counts as executed.
+
     Args:
         report: Path to a pytest `--junitxml` report.
 
     Returns:
-        dict[str, tuple[int, int]]: Executed and skipped counts per backend.
+        dict[str, tuple[int, int]]: Executed and skipped counts per backend,
+            keyed by backend directory name.
     """
     root = ET.parse(report).getroot()
     suites = [root] if root.tag == "testsuite" else root.findall("testsuite")
@@ -105,11 +111,17 @@ def _per_backend(report: Path) -> dict[str, tuple[int, int]]:
 def _totals(report: Path) -> tuple[int, int]:
     """Return `(collected, skipped)` summed over every `<testsuite>`.
 
+    `collected` reads the suite `tests` attribute, but `skipped` is counted
+    from the `<testcase>` elements so an xfail is not mistaken for a skip; a
+    summary-only report with no `<testcase>` elements falls back to the suite
+    attribute, the only signal it carries.
+
     Args:
         report: Path to a pytest `--junitxml` report.
 
     Returns:
-        tuple[int, int]: Total tests collected and total skipped.
+        tuple[int, int]: Total tests collected, and total skipped excluding
+            xfails.
     """
     root = ET.parse(report).getroot()
     suites = [root] if root.tag == "testsuite" else root.findall("testsuite")
@@ -144,8 +156,10 @@ def main(argv: list[str]) -> int:
             and the lane name used in the failure message.
 
     Returns:
-        int: 0 when the lane executed at least one test (or collected none),
-            1 when every collected test was skipped.
+        int: 0 when every backend the lane collected executed at least one
+            test, and when the report is missing, truncated, or empty; 1 when
+            the lane executed nothing or one of its backends contributed only
+            skips; 2 when `argv` is not the two expected arguments.
     """
     if len(argv) != 2:
         print(f"usage: {Path(__file__).name} <report.xml> <lane-name>", file=sys.stderr)
