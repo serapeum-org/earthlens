@@ -295,9 +295,10 @@ jobs:
             echo "no e2e tests collected for the changed area; treating as pass"
             exit 0
           fi
-          # A lane where every test skipped exercised nothing, yet pytest exits
-          # 0 and the check goes green - the blindness that let four lanes run
-          # zero tests for weeks. Fail it unless the lane is declared empty.
+          # earthlens.testing's in-process guard already fails a lane masked by
+          # *upstream* outages, but it counts only skips carrying its
+          # availability prefix - so a lane skipped for missing credentials
+          # exits 0 and reports green. Catch that, unless declared empty.
           if [ "$code" -eq 0 ] && [ "$ALLOW_ALL_SKIPPED" != "true" ]; then
             python .github/scripts/assert_tests_ran.py "$report" "$LANE" || exit 1
           fi

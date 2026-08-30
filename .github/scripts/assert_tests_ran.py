@@ -1,4 +1,4 @@
-"""Fail a CI lane whose tests were all skipped.
+"""Fail a CI lane whose tests were all skipped for a configuration reason.
 
 A lane where every test skips is indistinguishable, in the checks UI, from a
 lane where everything passed: both are a green tick. That is how four e2e
@@ -6,10 +6,22 @@ lanes ran zero tests for an unknown number of weeks while reporting success
 (see #1133), and why the catalog drift in #1129 surfaced only when it broke
 an unrelated pull request.
 
-The e2e workflows already treat "collected nothing" (pytest exit code 5) as a
-failure unless the lane opts out. This extends that from *collected* to
-*executed*: a lane that collects tests but runs none of them is just as blind,
-and fails the same way.
+**This extends an existing guard rather than introducing the idea.**
+`earthlens.testing.pytest_sessionfinish` already fails a lane that collected
+tests, passed none, and skipped at least one for *upstream availability* -
+it counts skips carrying that module's `live e2e skipped - ` prefix. The two
+partition the problem and never double-fire:
+
+- upstream was down    -> the in-process guard fails the lane, pytest exits
+                          non-zero, and this script is never reached
+- nothing was configured -> the skips carry no availability prefix, so that
+                          guard counts zero, pytest exits 0, and the lane
+                          reports green. That is the gap this script closes -
+                          the CMEMS case, where the credentials were simply
+                          never passed in.
+
+The workflows also treat "collected nothing" (pytest exit code 5) as a failure
+unless the lane opts out. This carries that from *collected* to *executed*.
 
 Usage:
     python .github/scripts/assert_tests_ran.py <report.xml> <lane-name>
