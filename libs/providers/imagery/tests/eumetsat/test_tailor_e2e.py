@@ -157,5 +157,6 @@ class TestEumetsatDataTailorLive:
             raise
 
         assert paths, "native tailor download returned no paths"
-        assert paths[0].exists() and paths[0].stat().st_size > 0
+        assert paths[0].exists(), f"{paths[0]} was not written"
+        assert paths[0].stat().st_size > 0, f"{paths[0]} is empty"
         assert paths[0].suffix == ".nat", f"expected a native .nat, got {paths[0].name}"
