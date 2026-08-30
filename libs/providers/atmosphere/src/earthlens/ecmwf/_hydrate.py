@@ -1848,7 +1848,10 @@ def _configured_keys() -> list[str]:
         return []
 
     found: set[str] = set()
-    for _url_default, _url_env, key_env in ENDPOINTS.values():
+    for entry in ENDPOINTS.values():
+        # Indexed rather than unpacked: widening the endpoint tuple must not
+        # break the helper that keeps a failure reportable.
+        key_env = entry[2]
         try:
             key = _resolve_key(key_env)
         except Exception as exc:  # noqa: BLE001 - redaction is never the failure
@@ -2108,9 +2111,10 @@ def bulk_hydrate_empty(
         hydrated some rows and then stopped on a deadline or a refusal — they
         are counted in `hydrated` too, and they are the ones a re-run continues.
     """
-    from earthlens.ecmwf import Catalog
+    from earthlens.ecmwf import Catalog, cli
     from earthlens.ecmwf.catalog import CATALOG_PATH, clear_catalog_cache
 
+    scratch_watermark = len(cli.UNREMOVED_SCRATCH)
     catalog_dir = Path(CATALOG_PATH)
     catalog = Catalog()
     # A row marked `unhydratable` is a placeholder no retrieve can fill, so it
@@ -2154,13 +2158,14 @@ def bulk_hydrate_empty(
             skipped += 1
 
     clear_catalog_cache()
+    # Sliced from the watermark taken before the first probe, so a second sweep
+    # in one process reports its own survivors rather than inheriting the
+    # first's - the list is a module global and nothing clears it.
     # A probe whose granule could not be removed leaves a directory under the
     # cache root. One is a Windows race; hundreds across a sweep is a release
     # regression worth tens of GB, so the count travels with the summary rather
     # than only reaching a log line the operator has already scrolled past.
-    from earthlens.ecmwf import cli
-
-    unremoved = list(cli.UNREMOVED_SCRATCH)
+    unremoved = cli.UNREMOVED_SCRATCH[scratch_watermark:]
     if unremoved:
         typer.echo(
             f"{len(unremoved)} probe scratch director"

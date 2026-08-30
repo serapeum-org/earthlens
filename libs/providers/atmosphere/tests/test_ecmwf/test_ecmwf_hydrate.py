@@ -1709,6 +1709,16 @@ class TestFoldedMatching:
         assert hydrate_mod._match_variables(["tp"], meta)["tp"] == ("tp", "m")
 
 
+def _probe_that_leaks_scratch(dataset, cds_variable):
+    """Stand in for a probe whose scratch directory could not be removed."""
+    from earthlens.ecmwf import cli as ecmwf_cli
+
+    path = "D:/earthlens-cache/probe-7f2a"
+    if path not in ecmwf_cli.UNREMOVED_SCRATCH:
+        ecmwf_cli.UNREMOVED_SCRATCH.append(path)
+    return _fake_probe(dataset, cds_variable)
+
+
 class TestBulkHydrateEmpty:
     """Tests for the catalog-wide hydrate driver (retrieve + catalog mocked)."""
 
@@ -1728,15 +1738,41 @@ class TestBulkHydrateEmpty:
                 )
             },
         )
-        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
         monkeypatch.setattr(
-            ecmwf_cli, "UNREMOVED_SCRATCH", ["D:/earthlens-cache/probe-7f2a"]
+            hydrate_mod, "_retrieve_variable_meta", _probe_that_leaks_scratch
         )
 
         summary = bulk_hydrate_empty()
 
         assert summary["unremoved_scratch"] == ["D:/earthlens-cache/probe-7f2a"]
         assert "probe-7f2a" in capsys.readouterr().out
+
+    def test_an_earlier_sweeps_survivors_are_not_reported_again(
+        self, monkeypatch, tmp_path, capsys
+    ):
+        """The list is a module global; a second sweep must not inherit the first's."""
+        from earthlens.ecmwf import cli as ecmwf_cli
+
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {
+                "reanalysis-era5-single-levels": _placeholder_dataset(
+                    "2m-temperature", "sea-surface-temperature"
+                )
+            },
+        )
+        monkeypatch.setattr(
+            ecmwf_cli, "UNREMOVED_SCRATCH", ["D:/earthlens-cache/from-an-earlier-run"]
+        )
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
+
+        summary = bulk_hydrate_empty()
+
+        assert summary["unremoved_scratch"] == []
+        assert "from-an-earlier-run" not in capsys.readouterr().out
 
     def test_fills_every_placeholder_in_place(self, tmp_path, monkeypatch):
         """Each placeholder dataset is hydrated and written back to its shard."""
