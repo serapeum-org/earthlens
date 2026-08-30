@@ -278,7 +278,21 @@ class _ProbeSession:
     def __call__(
         self, cds_variable: str
     ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
-        """Probe `cds_variable`, or return empty once the session has failed."""
+        """Probe `cds_variable`, or return empty once the session has failed.
+
+        A failure is recorded rather than raised, so the caller keeps the rows
+        already filled in this pass and every later variable of the same dataset
+        short-circuits instead of repeating a refusal that will not change.
+
+        Args:
+            cds_variable: The CDS variable name to retrieve a slice of.
+
+        Returns:
+            The `(metadata, selectors)` pair the probe returned — metadata maps
+            NetCDF short name to `{long_name, units}`, selectors are what the
+            variable is only ever served under. Both empty when this probe
+            failed, or when an earlier one already abandoned the session.
+        """
         if self.error is not None:
             return {}, {}
         try:
@@ -387,7 +401,46 @@ def _quote_if_number_shaped(dumped: str, value: str) -> str:
 
 
 def _yaml_value(value: str) -> str:
-    """Render a string as the scalar YAML would emit after `key: ` (quoting as needed)."""
+    """Render a string as the scalar YAML would emit after `key: `.
+
+    Dumped by the emitter rather than interpolated, so a value that needs
+    quoting gets it and reads back as the same string. A number-shaped scalar
+    the emitter leaves bare is quoted on top of that, because PyYAML's own
+    resolver is not the only one that will ever read the file.
+
+    Args:
+        value: The string to write as a scalar.
+
+    Returns:
+        The scalar text to place after `key: `, quoted where a reader would
+        otherwise give it a type.
+
+    Examples:
+        - An ordinary unit is written as itself:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _yaml_value
+            >>> _yaml_value("W m-2")
+            'W m-2'
+
+            ```
+        - A value YAML would re-read as another type is quoted:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _yaml_value
+            >>> _yaml_value("yes")
+            "'yes'"
+
+            ```
+        - So is one only PyYAML happens to leave alone:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _yaml_value
+            >>> _yaml_value("1e-3")
+            "'1e-3'"
+
+            ```
+    """
     dumped: str = yaml.safe_dump(
         {"x": value}, allow_unicode=True, default_flow_style=False
     )
@@ -1400,9 +1453,16 @@ def _placeholder_slugs(block: str) -> list[str]:
     """Return the slugs still carrying `units: unknown` that a probe could fill.
 
     A row marked `unhydratable:` is left out. It is still a placeholder, but no
-    retrieve can answer it — the marked ones are keyed `all`, which stands for
-    every variable the dataset serves and so resolves to none — and probing it
-    again spends a request and a queue slot to learn what the row already says.
+    retrieve can answer it — the marked rows are keyed `all` or `all-variables`,
+    naming every variable their dataset serves rather than one of them, with
+    more than one candidate to land on — and probing it again spends a request
+    and a queue slot to learn what the row already says.
+
+    Args:
+        block: The stanza text for one dataset, as it stands in the shard.
+
+    Returns:
+        The slugs a probe could still fill, in the order the stanza lists them.
     """
     return [
         match.group("slug")
