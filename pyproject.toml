@@ -180,19 +180,20 @@ dev = [
     # change would only surface on a live run.
     "pyramids-eo >=0.7.0,<0.8",
 ]
-# The eclipse showcase notebooks need a geostationary-imagery stack that the rest of
-# the project does not. It is kept out of `dev` deliberately, so that syncing it on
-# every CI job cannot move the resolved xarray/GDAL line -- which previously broke the
-# pip-audit gate and a pyramids GeoTIFF write on 3.13. These notebooks also need the
-# plotting and credential tooling in `dev`, so run them with
-# `uv sync --group dev --group notebooks`.
+# The eclipse showcase notebooks need the geostationary-imagery pieces of
+# pyramids-eo (read_fci_l1c, the composites, the viewing geometry) plus a few small
+# helpers pyramids-eo does not carry, so they get their own group rather than folding
+# fully into `dev` / `docs`. Run them with `uv sync --group dev --group notebooks`
+# (`dev` supplies the plotting and credential tooling these notebooks also need).
 notebooks = [
     # pyramids-eo: reads raw MTG FCI granules (read_fci_l1c) and builds the day/night
     # composites -- true colour, the sun-zenith pair, Rayleigh correction and the
-    # viewing geometry it needs. 0.7 is the floor: `rayleigh_correct`,
-    # `solar_zenith_azimuth`, `satellite_zenith_azimuth`, `relative_azimuth`,
-    # `sunz_correct` and `sunz_reduce` do not exist before it. This replaces the
-    # satpy / pyresample / pyspectral stack the eclipse notebook used to carry.
+    # viewing geometry it needs. This replaces the satpy / pyresample / pyspectral
+    # stack the eclipse notebook used to carry. 0.7 is the floor for `rayleigh_correct`,
+    # `solar_zenith_azimuth`, `satellite_zenith_azimuth` and `relative_azimuth`, none of
+    # which exist before it (pyramids-eo#91-93); `sunz_correct` / `sunz_reduce`, also
+    # used here, shipped earlier in 0.6.0 (pyramids-eo#86) but the other four still set
+    # the floor. Also declared, at the same version, in `dev` -- see the comment there.
     "pyramids-eo >=0.7.0,<0.8",
     # scipy: feathers the disc edge and softens the limb (ndimage.binary_erosion /
     # gaussian_filter).
