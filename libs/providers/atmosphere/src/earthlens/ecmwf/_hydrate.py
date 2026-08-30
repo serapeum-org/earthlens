@@ -1891,7 +1891,7 @@ def bulk_hydrate_empty(
     # the same word a licence refusal gets.
     rows = {
         key: sum(
-            var.units == "unknown" and not var.unhydratable
+            var.units == "unknown" and not getattr(var, "unhydratable", None)
             for var in ds.variables.values()
         )
         for key, ds in catalog.datasets.items()
