@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Any, cast
 
 import ee
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, SecretStr
 
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
@@ -69,7 +69,8 @@ class EarthEngineCredentials(BaseModel):
         service_account: Service-account email, e.g.
             `my-sa@my-project.iam.gserviceaccount.com`.
         service_key: Path to the JSON key file, or the JSON content
-            as a string. `EarthEngineAuth.initialize` distinguishes
+            as a string, held as a `SecretStr` so it is never echoed in
+            `repr` or logs. `EarthEngineAuth.initialize` distinguishes
             the two by leading character.
         project: Cloud project id; if `None`, falls back to the key
             file's `project_id` field at `configure()` time.
@@ -105,7 +106,11 @@ class EarthEngineCredentials(BaseModel):
     model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
 
     service_account: str
-    service_key: str
+    #: Held as a `SecretStr` so `repr()` and `str()` render `**********`
+    #: instead of the key. A plain `str` is coerced on construction, so
+    #: callers pass a path or JSON content unchanged; the one consumer
+    #: unwraps it with `get_secret_value()`.
+    service_key: SecretStr
     project: str | None = None
 
 
@@ -265,7 +270,9 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
         """
         creds = EarthEngineCredentials(
             service_account=service_account,
-            service_key=service_key,
+            # Wrapped explicitly rather than leaning on pydantic's coercion, so
+            # the annotation and the call agree and mypy can check the field.
+            service_key=SecretStr(service_key),
             project=project,
         )
         super().__init__(creds)
@@ -309,7 +316,7 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
             return
         self.project = self.initialize(
             self._creds.service_account,
-            self._creds.service_key,
+            self._creds.service_key.get_secret_value(),
             self._creds.project,
         )
 

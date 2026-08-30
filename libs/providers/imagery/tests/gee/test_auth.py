@@ -19,6 +19,7 @@ from earthlens.gee import auth as auth_module
 from earthlens.gee.auth import (
     AuthenticationError,
     EarthEngineAuth,
+    EarthEngineCredentials,
     _is_inline_json,
     _load_key_dict,
     _redact,
@@ -72,6 +73,27 @@ class TestLoadKeyDict:
     def test_non_object_json_returns_none(self):
         """Valid JSON that doesn't start with `{` is treated as a (missing) path → None."""
         assert _load_key_dict("[1, 2]") is None
+
+
+class TestEarthEngineCredentials:
+    """Tests for the credentials model's handling of the key value."""
+
+    def test_key_is_not_echoed_in_repr_or_str(self):
+        """The key renders as `SecretStr('**********')`, never as its value."""
+        creds = EarthEngineCredentials(
+            service_account="sa@x.iam", service_key="SUPERSECRET-KEY-VALUE"
+        )
+        assert "SUPERSECRET" not in repr(creds), f"repr leaked the key: {creds!r}"
+        assert "SUPERSECRET" not in str(creds), f"str leaked the key: {creds}"
+
+    def test_a_plain_string_is_still_accepted(self):
+        """Callers pass a path or JSON content unchanged; pydantic coerces it."""
+        creds = EarthEngineCredentials(
+            service_account="sa@x.iam", service_key="C:/k.json"
+        )
+        assert creds.service_key.get_secret_value() == "C:/k.json", (
+            "value not preserved"
+        )
 
 
 class TestIsInlineJson:
