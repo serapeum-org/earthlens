@@ -600,6 +600,73 @@ class TestErrorSummary:
         assert summary.endswith("...")
 
 
+class TestSelectorsAreServeablePerBlock:
+    """A retrieve is answered by one block, so one block must satisfy it all."""
+
+    def test_a_single_block_answering_everything_is_serveable(self):
+        """The ordinary case: the row asks for what one block offers."""
+        serving = [{"product_type": ["forecast"], "year": ["2020"]}]
+
+        assert hydrate_mod._selectors_are_serveable(
+            {"product_type": ["forecast"], "year": ["2020"]}, serving
+        )
+
+    def test_keys_satisfied_by_different_blocks_are_not_serveable(self):
+        """Unioning per key passes this; no single block can answer it."""
+        serving = [
+            {"product_type": ["forecast"], "year": ["2020"]},
+            {"product_type": ["analysis"], "year": ["2021"]},
+        ]
+
+        assert not hydrate_mod._selectors_are_serveable(
+            {"product_type": ["forecast"], "year": ["2021"]}, serving
+        ), "key A from one block and key B from another is not one request"
+
+    def test_a_value_no_block_offers_is_not_serveable(self):
+        """The plain conflict the per-key form also caught."""
+        serving = [{"product_type": ["forecast"]}]
+
+        assert not hydrate_mod._selectors_are_serveable(
+            {"product_type": ["reanalysis"]}, serving
+        )
+
+    def test_a_key_no_block_constrains_is_a_free_choice(self):
+        """Absence everywhere means the dataset does not partition on it."""
+        serving = [{"product_type": ["forecast"]}]
+
+        assert hydrate_mod._selectors_are_serveable(
+            {"product_type": ["forecast"], "day": ["01"]}, serving
+        )
+
+    def test_a_key_the_dataset_partitions_on_elsewhere_is_a_conflict(self):
+        """The serving blocks omitting it does not make it free to send."""
+        serving = [{"product_type": ["forecast"]}]
+
+        assert not hydrate_mod._selectors_are_serveable(
+            {"product_type": ["forecast"], "sensor_on_satellite": ["slstr"]},
+            serving,
+            {"product_type", "sensor_on_satellite"},
+        )
+
+    def test_nothing_to_judge_against_is_permitted(self):
+        """A dataset publishing no constraints is written as before, not refused."""
+        assert hydrate_mod._selectors_are_serveable({"product_type": ["x"]}, [])
+
+    def test_the_lookup_carries_the_datasets_enumerated_keys(self):
+        """The per-block check needs the whole block set, not just the serving ones."""
+        import earthlens.ecmwf.cli as ecmwf_cli
+
+        blocks = [
+            {"variable": ["t2m"], "product_type": ["forecast"]},
+            {"variable": ["sst"], "sensor_on_satellite": ["slstr"]},
+        ]
+        lookup = hydrate_mod._ServingBlocks(blocks)
+
+        assert [b["product_type"] for b in lookup("t2m")] == [["forecast"]]
+        assert lookup.enumerated == {"variable", "product_type", "sensor_on_satellite"}
+        assert ecmwf_cli is not None
+
+
 class TestServingBlocksFor:
     """Fetching a dataset's constraints is best-effort, so it cannot be fatal."""
 

@@ -21,7 +21,6 @@ from __future__ import annotations
 import re
 import threading
 from collections.abc import Callable
-from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -1016,7 +1015,9 @@ def _hydrate_stanza_per_variable(
         override = _selector_override(selectors, dataset_extras)
         blocks = serving(cds_variable) if serving is not None else []
         if blocks and not _selectors_are_serveable(
-            {**dataset_extras, **override}, blocks
+            {**dataset_extras, **override},
+            blocks,
+            getattr(serving, "enumerated", None),
         ):
             # The name was read under a product this row will not ask for, so
             # writing it would ship a request the store cannot answer. A
@@ -1181,39 +1182,62 @@ def _dataset_extras(block: str) -> dict[str, str]:
     return {}
 
 
-def _selectors_are_serveable(
-    effective: dict[str, Any], serving: list[dict[str, Any]]
+def _block_satisfies(
+    effective: dict[str, Any], block: dict[str, Any], enumerated: set[str]
 ) -> bool:
-    """Return True when every selector the row will send is one the store offers.
-
-    A probe reads the variable out of whichever constraints block it sampled,
-    but the row it writes inherits the stanza's selectors for anything
-    :func:`_required_selectors` did not record — and that function records only
-    what is constant across every serving block. A selector that varies is
-    therefore left to the stanza, whose value may not serve this variable at
-    all: the ozone layer row took its name from a 0-6 km column product while
-    the stanza asks for limb profiles, so the shipped row requests a
-    combination the store does not have.
-
-    A key the blocks do not enumerate is not judged — absence there means the
-    dataset does not partition on it, not that the row is wrong.
+    """Whether one constraints block offers every selector the row will send.
 
     Args:
-        effective: The selectors the row will send, stanza merged with the
-            row's own overrides.
-        serving: The constraints blocks that list this variable.
+        effective: The row's selectors, stanza extras merged with its own.
+        block: One constraints block serving the row's variable.
+        enumerated: Every key any block of the dataset constrains. A key this
+            block omits while the dataset partitions on it elsewhere is a
+            conflict, not a free choice.
 
     Returns:
-        True when each enumerated selector shares at least one value with what
-        the serving blocks offer.
+        True when this single block can serve the request.
     """
     for key, want in effective.items():
         if want is None or not isinstance(want, list) or not want:
             continue
-        offered = {value for block in serving for value in (block.get(key) or [])}
-        if offered and not ({str(value) for value in want} & offered):
+        offered = {str(value) for value in (block.get(key) or [])}
+        if not offered:
+            if key in enumerated:
+                return False
+            continue
+        if not ({str(value) for value in want} & offered):
             return False
     return True
+
+
+def _selectors_are_serveable(
+    effective: dict[str, Any],
+    serving: list[dict[str, Any]],
+    enumerated: set[str] | None = None,
+) -> bool:
+    """Whether one serving block can satisfy every selector the row will send.
+
+    Judged per block rather than per key. Unioning each key's values across all
+    serving blocks passes a row whose key A comes from one block and key B from
+    another, when no single block offers both — and a retrieve is one block, so
+    that row returns nothing. A request is serveable only if some one block
+    answers all of it.
+
+    Args:
+        effective: The row's selectors, stanza extras merged with its own.
+        serving: The constraints blocks that serve the row's variable.
+        enumerated: Every key any block of the dataset constrains; defaults to
+            the keys the serving blocks constrain.
+
+    Returns:
+        True when at least one serving block satisfies the whole request, and
+        when there is nothing to judge against.
+    """
+    if not serving:
+        return True
+    if enumerated is None:
+        enumerated = {key for block in serving for key in block}
+    return any(_block_satisfies(effective, block, enumerated) for block in serving)
 
 
 def _selector_override(
@@ -1917,19 +1941,31 @@ def _hydrated_detail(session: _ProbeSession, declined: list[str]) -> str:
     return left
 
 
-def _blocks_serving(
-    rows: list[dict[str, Any]], cds_variable: str
-) -> list[dict[str, Any]]:
-    """Return the constraints blocks among `rows` that serve `cds_variable`.
+class _ServingBlocks:
+    """Lookup from a `cds_variable` to the constraints blocks serving it.
+
+    A class rather than a closure or a bound `partial` because the serveability
+    check needs two things from one object: the blocks for a variable, and every
+    key the *whole* dataset partitions on. A key the serving blocks omit while
+    other blocks enumerate it is a conflict rather than a free choice, and only
+    the full block set can tell those apart.
 
     Args:
-        rows: The dataset's constraints blocks.
-        cds_variable: The variable a row names.
+        rows: The dataset's constraints blocks, empty when unavailable.
 
-    Returns:
-        The blocks listing that variable.
+    Attributes:
+        enumerated: Every key any block of the dataset constrains.
     """
-    return [row for row in rows if cds_variable in (row.get("variable") or [])]
+
+    def __init__(self, rows: list[dict[str, Any]]) -> None:
+        self._rows = rows
+        self.enumerated = {key for block in rows for key in block}
+
+    def __call__(self, cds_variable: str) -> list[dict[str, Any]]:
+        """Return the blocks that list `cds_variable`."""
+        return [
+            row for row in self._rows if cds_variable in (row.get("variable") or [])
+        ]
 
 
 def _serving_blocks_for(
@@ -1957,7 +1993,7 @@ def _serving_blocks_for(
         rows = _ecmwf_constraints(dataset_id) or []
     except Exception:  # noqa: BLE001 - an uncheckable dataset is not a failure
         rows = []
-    return partial(_blocks_serving, rows)
+    return _ServingBlocks(rows)
 
 
 def _hydrate_one(
