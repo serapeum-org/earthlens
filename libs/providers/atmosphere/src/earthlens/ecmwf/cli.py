@@ -396,7 +396,10 @@ def _discard_scratch(scratch: str) -> None:
     """
     import shutil
 
-    shutil.rmtree(scratch, onexc=lambda *_: None)
+    # `ignore_errors`, not `onexc`: the latter is 3.12+ and this package
+    # floors at 3.11, where the keyword raises TypeError from inside the
+    # `finally` that runs after a successful retrieve and read.
+    shutil.rmtree(scratch, ignore_errors=True)
     if Path(scratch).exists():
         UNREMOVED_SCRATCH.append(scratch)
         logger.warning(
