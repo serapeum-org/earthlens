@@ -551,6 +551,22 @@ class TestErrorSummary:
         assert "https://cds.example/api/retrieve/v1" in summary
         assert hydrate_mod._REDACTED not in summary
 
+    def test_an_unimportable_endpoint_table_does_not_raise(self, monkeypatch):
+        """The import is itself a way this fails; an env without the SDK must still report."""
+        import builtins
+
+        real_import = builtins.__import__
+
+        def _refuse(name, *args, **kwargs):
+            if name == "earthlens.ecmwf.endpoints":
+                raise ImportError("no cdsapi in this environment")
+            return real_import(name, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "__import__", _refuse)
+
+        assert hydrate_mod._configured_keys() == []
+        assert hydrate_mod._error_summary(RuntimeError("boom")) == "RuntimeError: boom"
+
     def test_reading_the_keys_never_raises(self, monkeypatch):
         """Redaction must not be what turns a reportable failure unreportable."""
         import earthlens.ecmwf.endpoints as endpoints_mod
@@ -670,6 +686,34 @@ def _scalar_values(code):
     if not value or value.startswith(("'", '"', "{", "&", "*")):
         return []
     return [value]
+
+
+class TestTheEmitterNeverFoldsAScalar:
+    """A folded scalar would break the one line it is spliced into."""
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "a very long selector value " * 5,
+            "x" * 300,
+            "long name with spaces " * 6,
+        ],
+    )
+    def test_a_long_value_stays_on_one_line(self, value):
+        """At the emitter's default 80 columns this folds onto a continuation."""
+        rendered = hydrate_mod._yaml_value(value)
+
+        assert chr(10) not in rendered, "the scalar was folded across lines"
+        assert yaml.safe_load(f"x: {rendered}")["x"] == value
+
+    def test_a_long_item_stays_on_one_line_inside_a_list(self):
+        """The list path renders item by item, so each item carries the risk."""
+        value = "a very long selector value " * 5
+
+        rendered = hydrate_mod._yaml_inline_list([value, "x"])
+
+        assert chr(10) not in rendered
+        assert yaml.safe_load(rendered) == [value, "x"]
 
 
 class TestShippedCatalogHasNoResolverDependentScalars:

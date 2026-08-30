@@ -442,10 +442,14 @@ def _yaml_value(value: str) -> str:
 
             ```
     """
+    # `width` is unbounded because the result is spliced into one `key: value`
+    # line: at the default 80 columns the emitter folds a long scalar onto a
+    # continuation line, and the embedded newline would break both that line
+    # and any inline list built from it.
     dumped: str = yaml.safe_dump(
-        {"x": value}, allow_unicode=True, default_flow_style=False
+        {"x": value}, allow_unicode=True, default_flow_style=False, width=10**6
     )
-    return _quote_if_number_shaped(dumped[len("x: ") :].rstrip(chr(10)), value)
+    return _quote_if_number_shaped(dumped[len("x: ") :].rstrip("\n"), value)
 
 
 def _is_auxiliary(name: str) -> bool:
@@ -1834,7 +1838,14 @@ def _configured_keys() -> list[str]:
     Returns:
         The distinct non-empty key values, or an empty list.
     """
-    from earthlens.ecmwf.endpoints import ENDPOINTS, _resolve_key
+    try:
+        from earthlens.ecmwf.endpoints import ENDPOINTS, _resolve_key
+    except Exception as exc:  # noqa: BLE001 - redaction is never the failure
+        # Inside the guard because the import is itself a way this can fail:
+        # `endpoints` reaches for the CADS SDK, and an environment without it
+        # would otherwise turn every error summary into an ImportError.
+        logger.debug(f"endpoint table unavailable, so no key is redacted: {exc}")
+        return []
 
     found: set[str] = set()
     for _url_default, _url_env, key_env in ENDPOINTS.values():
@@ -2123,7 +2134,7 @@ def bulk_hydrate_empty(
     skipped = 0
     timed_out = 0
     unmatched = 0
-    partial = 0
+    partial_fills = 0
     filled: list[str] = []
     for index, dataset_id in enumerate(empty, start=1):
         prefix = f"[{index}/{total}] {dataset_id}"
@@ -2132,7 +2143,7 @@ def bulk_hydrate_empty(
             hydrated += 1
             filled.append(dataset_id)
             if outcome == "partial":
-                partial += 1
+                partial_fills += 1
         elif outcome == "unmatched":
             unmatched += 1
             skipped += 1
@@ -2162,7 +2173,7 @@ def bulk_hydrate_empty(
         "skipped": skipped,
         "timed_out": timed_out,
         "unmatched": unmatched,
-        "partial": partial,
+        "partial": partial_fills,
         "filled": filled,
         "unremoved_scratch": unremoved,
     }
