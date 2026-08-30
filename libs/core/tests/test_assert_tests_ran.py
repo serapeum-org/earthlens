@@ -330,7 +330,8 @@ class TestDeadBackendDetection:
         )
         assert guard.main([str(report), "lane"]) == 1, "silent backends must fail"
         out = capsys.readouterr().out
-        assert "cmems" in out and "gee" in out, f"not every dead backend named: {out}"
+        assert "cmems" in out, f"cmems is not named among the dead: {out}"
+        assert "gee" in out, f"gee is not named among the dead: {out}"
         assert out.count("::error::") == 2, f"expected one annotation each: {out}"
 
     def test_a_wholly_skipped_lane_is_reported_once_at_lane_level(

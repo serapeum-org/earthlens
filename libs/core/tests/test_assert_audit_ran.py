@@ -56,7 +56,8 @@ class TestMain:
         code = checker.main([str(report)])
         out = capsys.readouterr().out
         assert code == 1, f"an errored audit must fail the gate, got {code}"
-        assert "gee" in out and "401 Unauthorized" in out, f"reason not surfaced: {out}"
+        assert "gee" in out, f"the errored provider is not named: {out}"
+        assert "401 Unauthorized" in out, f"the reason is not surfaced: {out}"
         assert "erddap" not in out, f"a healthy provider was blamed: {out}"
 
     def test_unsupported_is_not_an_error(self, checker, tmp_path):
@@ -146,7 +147,8 @@ class TestMain:
         )
         assert checker.main([str(report)]) == 1, "errored providers must fail the gate"
         out = capsys.readouterr().out
-        assert "gee" in out and "cmems" in out, f"not every failure was named: {out}"
+        assert "gee" in out, f"gee is not named among the failures: {out}"
+        assert "cmems" in out, f"cmems is not named among the failures: {out}"
         assert out.count("::error::") == 2, f"expected one annotation each: {out}"
 
     def test_a_row_without_a_provider_is_still_reported(

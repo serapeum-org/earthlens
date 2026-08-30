@@ -462,8 +462,9 @@ class TestEarthEngineAuthInitialize:
         """Every branch raises `from None`, so no cause can print the key."""
         monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
         monkeypatch.setattr(auth_module.ee, "Initialize", MagicMock(side_effect=error))
+        key = _key_text(project_id="p")
         with pytest.raises(AuthenticationError) as excinfo:
-            EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
+            EarthEngineAuth.initialize("sa@x.iam", key)
         assert excinfo.value.__cause__ is None, "the exception chain was not broken"
 
     def test_an_unparseable_key_uses_the_explicit_project(self, monkeypatch):
