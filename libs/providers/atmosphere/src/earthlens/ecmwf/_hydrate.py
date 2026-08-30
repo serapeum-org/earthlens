@@ -255,6 +255,11 @@ class _ProbeSession:
         timed_out: Whether that failure was the deadline rather than the store.
         offered: Every data variable any probe in this session returned, so a
             dataset that hydrated nothing can report what it was actually given.
+        filtered: Every variable a probe returned that `_data_variables` then
+            removed as a coordinate, bound, or auxiliary. A file offering only
+            `FAPAR_ERR` and `FAPAR_QFLAG` would otherwise report the same
+            "nothing offered" as a store that answered with an empty file, and
+            those call for opposite actions — widen the row, or chase the store.
         answered: How many probes came back describing something. Zero means no
             constraints block names these rows at all, which is a different
             problem from a probe that answered with nothing usable.
@@ -266,6 +271,7 @@ class _ProbeSession:
         self.error: BaseException | None = None
         self.timed_out = False
         self.offered: set[str] = set()
+        self.filtered: set[str] = set()
         self.answered = 0
 
     def __call__(
@@ -278,7 +284,9 @@ class _ProbeSession:
             meta, selectors = _probe_with_timeout(
                 self.dataset_id, cds_variable, self.timeout
             )
-            self.offered.update(_data_variables(meta))
+            data = _data_variables(meta)
+            self.offered.update(data)
+            self.filtered.update(set(meta) - set(data))
             self.answered += bool(meta)
             return meta, selectors
         except TimeoutError as exc:
@@ -1555,7 +1563,9 @@ def _hydrate_stanza_whole(
     except Exception as exc:  # noqa: BLE001 — a licence-gated dataset is skipped
         session.error = exc
         return text, [], []
-    session.offered.update(_data_variables(nc_meta))
+    data = _data_variables(nc_meta)
+    session.offered.update(data)
+    session.filtered.update(set(nc_meta) - set(data))
     match = _stanza_match(text, dataset_id)
     placeholders = _placeholder_slugs(match.group(1)) if match else []
     new_text = _rewrite_stanza(text, dataset_id, nc_meta)
@@ -1578,7 +1588,13 @@ def _declined_detail(session: _ProbeSession, declined: list[str]) -> str:
         A phrase naming either the missing data variables or the declined rows.
     """
     if not session.offered:
-        return "no data variables, only coordinates and auxiliaries"
+        if not session.filtered:
+            return "the store answered with no variables at all"
+        held = sorted(session.filtered)
+        shown = ", ".join(held[:_ECHO_MAX_NAMES])
+        extra = len(held) - _ECHO_MAX_NAMES
+        listed = f"{shown}, +{extra} more" if extra > 0 else shown
+        return f"only coordinates and auxiliaries ({listed})"
     offered = sorted(session.offered)
     shown = ", ".join(offered[:_ECHO_MAX_NAMES])
     extra = len(offered) - _ECHO_MAX_NAMES
@@ -1673,6 +1689,64 @@ def _written_rows_survive(text: str, dataset_id: str, filled: list[str]) -> bool
 #: a paragraph of HTML must not be able to push the next dataset off the screen.
 _SUMMARY_LIMIT = 160
 
+#: What a redacted credential is replaced with, so the line still reads as
+#: having carried one rather than silently losing a span of text.
+_REDACTED = "[redacted]"
+
+#: Credential shapes to strike from an error before it is echoed. The store
+#: raises through `cdsapi`, whose text this repo does not control, and a
+#: sweep's output is routinely pasted into issues and CI logs.
+_CREDENTIAL_PATTERNS = (
+    re.compile(
+        r"(?i)((?:authorization|x-api-key|private-token)\s*[:=]\s*)"
+        r"(?:(?:bearer|basic|token)\s+)?\S+"
+    ),
+    re.compile(r"(?i)([?&](?:api_?key|key|token|access_token)=)[^&\s]+"),
+)
+
+
+def _redact_credentials(message: str) -> str:
+    """Strike anything credential-shaped, and the configured key, from `message`.
+
+    The configured key is matched exactly rather than by pattern: it is the
+    one secret whose value is knowable here, so an exact strike is a
+    guarantee where a pattern is only a guess. The patterns cover the rest.
+
+    Args:
+        message: The upstream error text about to be echoed.
+
+    Returns:
+        The same text with any credential replaced by `_REDACTED`.
+    """
+    for pattern in _CREDENTIAL_PATTERNS:
+        message = pattern.sub(r"\1" + _REDACTED, message)
+    for key in _configured_keys():
+        message = message.replace(key, _REDACTED)
+    return message
+
+
+def _configured_keys() -> list[str]:
+    """Return the CADS keys this machine is configured with, longest first.
+
+    Best-effort and never raising: a redaction pass must not be the thing
+    that turns a reportable failure into an unreportable one. Longest first
+    so a key that contains another is struck whole.
+
+    Returns:
+        The distinct non-empty key values, or an empty list.
+    """
+    from earthlens.ecmwf.endpoints import ENDPOINTS, _resolve_key
+
+    found: set[str] = set()
+    for _url_default, _url_env, key_env in ENDPOINTS.values():
+        try:
+            key = _resolve_key(key_env)
+        except Exception:  # noqa: BLE001 - redaction is never the failure
+            continue
+        if key:
+            found.add(key)
+    return sorted(found, key=len, reverse=True)
+
 
 def _error_summary(error: BaseException) -> str:
     """Name an error by its type and what it actually said.
@@ -1683,6 +1757,10 @@ def _error_summary(error: BaseException) -> str:
     race — and an operator reading only the type cannot tell which, so they
     accept licences that were never the problem.
 
+    The message is redacted first: it comes from `cdsapi`, whose text this
+    repo does not control, and a sweep's output is routinely pasted into issues
+    and CI logs.
+
     Args:
         error: The error a dataset stopped on.
 
@@ -1690,7 +1768,7 @@ def _error_summary(error: BaseException) -> str:
         The type name, plus the message when there is one, capped at
         `_SUMMARY_LIMIT` characters in total so one dataset stays one line.
     """
-    message = " ".join(str(error).split())
+    message = _redact_credentials(" ".join(str(error).split()))
     if not message:
         return type(error).__name__
     summary = f"{type(error).__name__}: {message}"

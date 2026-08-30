@@ -509,6 +509,58 @@ class TestErrorSummary:
         assert "WinError 32" in lock
         assert "licence not accepted" in licence
 
+    @pytest.mark.parametrize(
+        ("raw", "secret"),
+        [
+            ("401: Authorization: Bearer abc123SECRET", "abc123SECRET"),
+            ("Authorization=Basic dXNlcjpwYXNz", "dXNlcjpwYXNz"),
+            ("x-api-key: 9f8e7d6c rejected", "9f8e7d6c"),
+            ("private-token: glpat-XYZ", "glpat-XYZ"),
+            ("GET https://cds/api?api_key=deadbeef&x=1 failed", "deadbeef"),
+            ("GET https://cds/api?token=deadbeef failed", "deadbeef"),
+        ],
+    )
+    def test_a_credential_never_reaches_the_echo(self, raw, secret):
+        """A sweep's output is pasted into issues and CI logs."""
+        summary = hydrate_mod._error_summary(RuntimeError(raw))
+
+        assert secret not in summary
+        assert hydrate_mod._REDACTED in summary
+
+    def test_the_configured_key_is_struck_by_exact_match(self, monkeypatch):
+        """The one secret whose value is knowable is struck outright, not guessed."""
+        monkeypatch.setattr(
+            hydrate_mod, "_configured_keys", lambda: ["s3cr3t-not-token-shaped"]
+        )
+
+        summary = hydrate_mod._error_summary(
+            RuntimeError("store refused (s3cr3t-not-token-shaped)")
+        )
+
+        assert "s3cr3t" not in summary
+        assert hydrate_mod._REDACTED in summary
+
+    def test_an_ordinary_url_survives_redaction(self):
+        """Over-redacting would cost the diagnosis the summary exists to give."""
+        summary = hydrate_mod._error_summary(
+            RuntimeError("403 Forbidden for url: https://cds.example/api/retrieve/v1")
+        )
+
+        assert "https://cds.example/api/retrieve/v1" in summary
+        assert hydrate_mod._REDACTED not in summary
+
+    def test_reading_the_keys_never_raises(self, monkeypatch):
+        """Redaction must not be what turns a reportable failure unreportable."""
+        import earthlens.ecmwf.endpoints as endpoints_mod
+
+        monkeypatch.setattr(
+            endpoints_mod,
+            "_resolve_key",
+            lambda key_env: (_ for _ in ()).throw(OSError("no dotfile")),
+        )
+
+        assert hydrate_mod._configured_keys() == []
+
     def test_a_message_free_error_falls_back_to_its_type(self):
         """Some errors carry nothing; the type is then all there is to say."""
         assert hydrate_mod._error_summary(RuntimeError()) == "RuntimeError"
@@ -1617,7 +1669,32 @@ class TestBulkHydrateEmpty:
         )
         summary = bulk_hydrate_empty()
         assert summary["unmatched"] == 1
-        assert "only coordinates and auxiliaries" in capsys.readouterr().out
+        echoed = capsys.readouterr().out
+        assert "only coordinates and auxiliaries" in echoed
+        assert "latitude" in echoed, "the echo does not say what was held back"
+
+    def test_an_empty_answer_reads_differently_from_an_all_auxiliary_one(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        """One is a row to widen; the other is a store to chase."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_variable_meta", lambda ds, cds: ({}, {})
+        )
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_with_timeout", lambda ds, timeout: {}
+        )
+
+        bulk_hydrate_empty()
+
+        echoed = capsys.readouterr().out
+        assert "no variables at all" in echoed
+        assert "only coordinates and auxiliaries" not in echoed
 
     def test_a_dataset_no_block_names_falls_back_to_one_whole_probe(
         self, tmp_path, monkeypatch
