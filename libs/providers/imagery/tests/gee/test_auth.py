@@ -17,7 +17,8 @@ import pytest
 
 from earthlens.gee import auth as auth_module
 from earthlens.gee.auth import (
-    _CREDENTIAL_MARKERS,
+    _CREDENTIAL_KEY_RE,
+    _PEM_MARKER,
     AuthenticationError,
     EarthEngineAuth,
     EarthEngineCredentials,
@@ -221,28 +222,69 @@ class TestRedact:
         message = "could not build credentials (account='sa@x.iam.gserviceaccount.com')"
         assert _redact(message, json.dumps({"a": 1})) == message, "prose was collapsed"
 
-    @pytest.mark.parametrize("marker", _CREDENTIAL_MARKERS)
-    def test_every_declared_marker_collapses_the_message(self, marker):
-        """Each declared credential marker discards the message it appears in."""
-        result = _redact(f"boom {marker} tail", "unrelated-but-long-enough")
+    @pytest.mark.parametrize("quote", ["'", '"'], ids=["single", "double"])
+    @pytest.mark.parametrize(
+        "field", ["private_key", "client_secret", "refresh_token", "client_email"]
+    )
+    def test_a_quoted_credential_key_collapses_the_message(self, field, quote):
+        """A credential field used as a mapping key collapses, in either quoting.
+
+        JSON writes double quotes and a Python repr writes single ones, and a
+        repr of a credential mapping leaked before both were covered.
+        """
+        result = _redact(f"boom {quote}{field}{quote}: 'x' tail", "unrelated-but-long")
         assert result == "<service key redacted>", (
-            f"marker {marker!r} did not collapse: {result}"
+            f"{quote}{field}{quote} did not collapse: {result}"
+        )
+
+    def test_pem_armour_collapses_the_message(self):
+        """PEM armour carries no quoting and collapses on its own."""
+        result = _redact(
+            f"boom -----BEGIN {_PEM_MARKER}----- tail", "unrelated-but-long"
+        )
+        assert result == "<service key redacted>", (
+            f"PEM armour did not collapse: {result}"
+        )
+
+    def test_the_key_pattern_is_anchored_to_a_mapping_key(self):
+        """The pattern requires the quotes and the colon, not a bare mention."""
+        assert _CREDENTIAL_KEY_RE.search('"private_key": "x"'), (
+            "a JSON key should match"
+        )
+        assert _CREDENTIAL_KEY_RE.search("'private_key': 'x'"), (
+            "a repr key should match"
+        )
+        assert not _CREDENTIAL_KEY_RE.search("the private_key field"), (
+            "prose should not"
         )
 
     @pytest.mark.parametrize(
         "field", ["private_key", "client_secret", "refresh_token", "client_email"]
     )
     def test_unquoted_field_names_are_not_collapsed(self, field):
-        """The markers carry their JSON quotes, so prose naming a field survives."""
+        """A field named in prose, without quotes and a colon, survives."""
         message = f"the {field} field is missing from the key"
         assert _redact(message, "unrelated-but-long-enough") == message, (
             f"prose naming {field} was collapsed"
         )
 
-    def test_a_nine_character_key_is_substituted(self):
-        """One character past the length guard the value is replaced."""
-        result = _redact("the value 123456789 appeared", "123456789")
-        assert "123456789" not in result, "a nine-character key survived"
+    def test_inline_json_one_past_the_length_guard_is_substituted(self):
+        """A JSON value one character past the guard is replaced."""
+        key = '{"a":123}'
+        result = _redact(f"the value {key} appeared", key)
+        assert key not in result, "a ten-character inline key survived"
+
+    def test_a_path_is_left_intact(self):
+        """A path is not secret, and redacting it hid the commonest failure.
+
+        The usual error is a key file that is not where it was said to be, and
+        both workflows pass a path, so blanking it reported
+        `No such file or directory: '<service key redacted>'` - nothing the
+        reader could act on.
+        """
+        path = r"C:\keys\service-account.json"
+        rendered = str(FileNotFoundError(2, "No such file or directory", path))
+        assert "service-account.json" in _redact(rendered, path), "the path was blanked"
 
     def test_redacted_output_carries_no_key_material(self):
         """The end-to-end property: neither the key nor a PEM header survives."""

@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import base64
 import json
+import re
 from pathlib import Path
 from typing import Any, cast
 
@@ -144,53 +145,52 @@ def _is_inline_json(service_key: str) -> bool:
     return isinstance(service_key, str) and service_key.lstrip().startswith("{")
 
 
-#: Strings that only ever occur inside credential material. The JSON field
-#: names carry their surrounding quotes so ordinary prose - an error naming a
-#: `service_account`, say - cannot trip them. `PRIVATE KEY` needs no quoting:
-#: it is the PEM armour wrapping the key's `private_key` value.
-_CREDENTIAL_MARKERS = (
-    "PRIVATE KEY",
-    '"private_key"',
-    '"client_secret"',
-    '"refresh_token"',
-    '"client_email"',
+#: Credential field names, matched only when quoted as a mapping key, so both
+#: JSON ("private_key":) and a Python repr ('private_key':) are caught while
+#: ordinary prose naming a field is not.
+_CREDENTIAL_KEY_RE = re.compile(
+    r"""['"](?:private_key|client_secret|refresh_token|client_email)['"]\s*:"""
 )
+#: PEM armour, which carries no quoting at all.
+_PEM_MARKER = "PRIVATE KEY"
 
 
 def _redact(message: str, service_key: str) -> str:
     """Return `message` with any credential material removed.
 
-    Defence in depth for the error paths. `ee.ServiceAccountCredentials`
-    takes a *filename* positionally, so handing it inline JSON makes Python
-    raise `FileNotFoundError` with the whole key as the "filename" - which a
+    Defence in depth for the error paths. `ee.ServiceAccountCredentials` takes
+    a *filename* positionally, so handing it inline JSON makes Python raise
+    `FileNotFoundError` with the whole key as the "filename" - which a
     traceback then prints. Callers below break the exception chain, and this
     strips the value from anything they do report.
 
-    Substring replacement alone is not enough, and assuming it was is what let
-    a key reach a log in the first place. `OSError.__str__` **reprs** the
+    Only an inline-JSON `service_key` is substituted. A path is not secret, and
+    redacting it made the commonest failure of all - a key file that is not
+    where it was said to be - report `No such file or directory: '<service key
+    redacted>'`, naming nothing the reader can act on. Both workflows pass a
+    path, so that was the usual case.
+
+    Substring replacement alone is not enough either, and assuming it was is
+    what let a key reach a log in the first place. `OSError.__str__` reprs the
     filename, so a multi-line key arrives with its newlines escaped and is no
-    longer byte-identical to the value we hold - exactly the mismatch that
-    defeated the platform's own secret masking. The escaped form is therefore
-    replaced too, and any residual credential marker collapses the message
-    rather than trusting that the substitutions caught everything.
+    longer byte-identical to the value held - the same mismatch that defeated
+    the platform's own secret masking. The escaped form is replaced too, and
+    any residual credential marker collapses the message rather than trusting
+    that the substitutions caught everything.
 
     Args:
         message: The text about to be surfaced.
-        service_key: The key path or JSON content to strip. A value of eight
-            characters or fewer is left in place - too short to be a real key,
-            and short enough to collide with ordinary words in the message.
+        service_key: The key path or JSON content to strip.
 
     Returns:
-        str: The message with every form of `service_key` replaced by
-            `<service key redacted>`, or that sentinel alone when a
-            `_CREDENTIAL_MARKERS` entry survived the substitutions.
+        str: The message with credential material replaced, or
+            `"<service key redacted>"` alone when a marker survived.
     """
     cleaned = message
-    if isinstance(service_key, str) and len(service_key) > 8:
-        # The raw value, and the repr-escaped form an OSError renders it as.
+    if _is_inline_json(service_key) and len(service_key) > 8:
         for form in (service_key, repr(service_key)[1:-1]):
             cleaned = cleaned.replace(form, "<service key redacted>")
-    if any(marker in cleaned for marker in _CREDENTIAL_MARKERS):
+    if _PEM_MARKER in cleaned or _CREDENTIAL_KEY_RE.search(cleaned):
         return "<service key redacted>"
     return cleaned
 
@@ -456,20 +456,24 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
         try:
             ee.Initialize(credentials=credentials, project=resolved_project)
         except ee.EEException as exc:
-            # Redact before classifying *and* before reporting: the classifier
-            # only matches fixed substrings, so it is unaffected, while every
-            # branch below then interpolates text that cannot carry the key.
-            message = _redact(str(exc), service_key)
-            if "not registered to use Earth Engine" in message:
+            # Classify on the raw text and report the redacted one. The needles
+            # are fixed substrings that hold no key material, so classification
+            # is safe on the raw message - whereas classifying on the redacted
+            # text loses the actionable branches whenever a credential marker
+            # collapsed it to the sentinel, which is the one case where naming
+            # the unregistered project or the missing IAM role matters most.
+            raw = str(exc)
+            message = _redact(raw, service_key)
+            if "not registered to use Earth Engine" in raw:
                 raise AuthenticationError(
                     f"Cloud project {resolved_project!r} is not registered "
                     f"to use Earth Engine. Register it at {_REGISTER_URL} "
                     "(pick the noncommercial track if eligible), then retry."
                 ) from None
             if (
-                "does not have required permission" in message
-                or "serviceUsageConsumer" in message
-                or "PERMISSION_DENIED" in message
+                "does not have required permission" in raw
+                or "serviceUsageConsumer" in raw
+                or "PERMISSION_DENIED" in raw
             ):
                 raise AuthenticationError(
                     f"service account {service_account!r} cannot use project "
