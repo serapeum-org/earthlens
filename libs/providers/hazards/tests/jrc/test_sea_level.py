@@ -230,7 +230,7 @@ class _ExplodingDataset:
 # Dataset resolution
 # --------------------------------------------------------------------------- #
 class TestDatasetResolution:
-    """The dataset / product / representation selectors resolve correctly."""
+    """The dataset / product selectors resolve correctly."""
 
     @pytest.mark.parametrize(
         ("kwargs", "expected", "output_kind"),

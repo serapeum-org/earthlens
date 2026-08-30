@@ -54,7 +54,7 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'jrc-flood-hazard': (_JRC, 'JRC', '', {}),
     'european-flood-hazard': (_JRC, 'JRC', '', {}),
     # Sea-level (Total Water Level) probabilistic forecasts — same JRC backend;
-    # dataset='sea_level' selects the family (product / representation pick the row).
+    # dataset='sea_level' selects the family (product picks the row).
     'sea-level-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
     'jrc-sea-level': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
     'coastal-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level_subseasonal_coastal'}),

@@ -147,7 +147,7 @@ class JRC(AbstractDataSource):
             fmt: Accepted for facade parity; unused.
             dataset: Which JRC dataset — a catalog id (`"efhm"`,
                 `"sea_level_medium_term"`, …), the family selector `"sea_level"`
-                (paired with `product` / `representation`), or `None` for EFHM.
+                (paired with `product`), or `None` for EFHM.
             product: Sea-level family — `"medium_term"` | `"subseasonal"`.
                 Selects the gridded cube; the coastal summary is its own dataset
                 (`dataset="sea_level_subseasonal_coastal"`, or the
@@ -156,11 +156,11 @@ class JRC(AbstractDataSource):
                 (`"2026-08-26T12"`).
             field: Sea-level gridded — the variable to crop (defaults to the
                 row's `default_field`, `"TWL75"`).
-            catalog: Optional pre-built `Catalog` (tests inject a faked one).
+            catalog: Optional pre-built `Catalog`; one is loaded when omitted.
 
         Raises:
-            ValueError: If the dataset / product / representation combination is
-                invalid, or a required bounding box is missing.
+            ValueError: If the dataset / product combination is invalid, or a
+                required bounding box is missing.
         """
         self._catalog = catalog if catalog is not None else Catalog()
         self._dataset: Dataset = self._catalog.get(
@@ -337,7 +337,7 @@ class JRC(AbstractDataSource):
         raise ValueError(
             f"unknown JRC dataset {dataset!r}; available: "
             f"{sorted(self._catalog.datasets)} (or dataset='sea_level' with "
-            "product= / representation=)."
+            "product=)."
         )
 
     def _resolve_return_periods(
