@@ -185,6 +185,7 @@ datasets:
         cds_variable: all_variables
         nc_variable: all_variables
         units: unknown
+        unhydratable: pseudo-slug
   satellite-earth-radiation-budget:
     endpoint: cds
     request_kind: satellite_cdr
@@ -225,6 +226,7 @@ datasets:
         cds_variable: all_variables
         nc_variable: all_variables
         units: unknown
+        unhydratable: pseudo-slug
   satellite-fire-burned-area:
     endpoint: cds
     request_kind: satellite_cdr
@@ -715,6 +717,7 @@ datasets:
         cds_variable: all_variables
         nc_variable: all_variables
         units: unknown
+        unhydratable: pseudo-slug
   satellite-terrestrial-water-storage:
     endpoint: cds
     request_kind: satellite_cdr

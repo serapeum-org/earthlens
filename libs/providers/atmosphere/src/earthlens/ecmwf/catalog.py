@@ -599,8 +599,12 @@ class Variable(FluxableLeaf):
     #: a sweep and one that no sweep can ever answer look identical otherwise,
     #: so every re-run pays for the second kind again and an operator reading
     #: the catalog cannot tell which is which. The only value carried today is
-    #: `"pseudo-slug"`: the row is keyed `all`, which stands for every variable
-    #: the dataset serves and so resolves to none of them.
+    #: `"pseudo-slug"`: the row is keyed `all` or `all-variables`, naming every
+    #: variable its dataset serves rather than one of them. Such a row is
+    #: resolvable only where the dataset serves exactly one variable — as
+    #: `satellite-precipitation` and `satellite-sea-surface-temperature` do,
+    #: and those two are hydrated and unmarked. The mark says this particular
+    #: row has more than one candidate and so can never be pinned.
     unhydratable: str | None = None
 
     @field_validator("extras", mode="before")

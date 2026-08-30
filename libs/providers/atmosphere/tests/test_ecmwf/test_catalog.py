@@ -1172,14 +1172,28 @@ class TestUnhydratableField:
         )
         assert row.unhydratable is None
 
-    def test_the_shipped_all_rows_are_marked(self):
-        """A slug naming every variable resolves to none, in every dataset."""
+    def test_every_unfilled_pseudo_slug_row_is_marked(self):
+        """Both spellings count; a filled one needs no mark, having resolved."""
         from earthlens.ecmwf import Catalog
 
         unmarked = [
             f"{name}/{slug}"
             for name, dataset in Catalog().datasets.items()
             for slug, row in dataset.variables.items()
-            if slug == "all" and row.units == "unknown" and not row.unhydratable
+            if slug in {"all", "all-variables"}
+            and row.units == "unknown"
+            and not row.unhydratable
         ]
         assert not unmarked, f"pseudo-slug rows left indistinguishable: {unmarked}"
+
+    def test_a_resolved_pseudo_slug_row_is_left_alone(self):
+        """A dataset serving one variable resolves `all`, so the mark would lie."""
+        from earthlens.ecmwf import Catalog
+
+        catalog = Catalog()
+        for name in ("satellite-precipitation", "satellite-sea-surface-temperature"):
+            row = catalog.datasets[name].variables["all"]
+            assert row.units != "unknown", f"{name}/all is expected to be hydrated"
+            assert row.unhydratable is None, (
+                f"{name}/all resolved to {row.nc_variable!r}, so it is not terminal"
+            )

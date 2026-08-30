@@ -448,8 +448,12 @@ different level set than the rest of its dataset family. Rare.
 retrieve can answer it, and the sweep skips the row rather than spending a
 request and a queue slot to rediscover that.
 
-The only value in use is `pseudo-slug`: the row is keyed `all`, which stands
-for every variable the dataset serves and therefore resolves to none of them.
+The only value in use is `pseudo-slug`: the row is keyed `all` or
+`all-variables`, naming every variable its dataset serves rather than one of
+them. That is resolvable only where the dataset serves exactly one variable —
+`satellite-precipitation` and `satellite-sea-surface-temperature` are hydrated
+that way and carry no mark. The mark records that this row has more than one
+candidate and so can never be pinned to a single variable.
 
 Without this, a placeholder waiting for a sweep and one no sweep can ever
 answer look identical, so every re-run pays for the second kind again.
