@@ -398,7 +398,15 @@ def band_valid_times(url: str, steps: int) -> list[str]:
 
 
 def gdal_module():
-    """Return the vendored `osgeo.gdal` module (an injectable seam for tests)."""
+    """Return the vendored `osgeo.gdal` module.
+
+    Imported through this one accessor so the multidim reads below have a single
+    seam a test can replace, and so `osgeo` is imported lazily (it only resolves
+    once `pyramids` has put its vendored copy on the path).
+
+    Returns:
+        module: The `osgeo.gdal` module.
+    """
     from osgeo import gdal
 
     return gdal

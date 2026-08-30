@@ -46,6 +46,48 @@ _GLOBAL_GEO = (-180.0, 0.25, 0.0, 90.0, 0.0, -0.25)
 _COASTAL_CSV = "GID_0,NAME_0,summary_TWL_1_10\nABW,Aruba,2\nNLD,Netherlands,9\n"
 
 
+class _FakeMDArray:
+    """A CF `time` coordinate returning days since 1950-01-01."""
+
+    def __init__(self, values):
+        self._values = values
+
+    def ReadAsArray(self):  # noqa: N802 - mirrors GDAL's method name
+        return np.asarray(self._values)
+
+
+class _FakeRootGroup:
+    """A root group exposing one named MDArray."""
+
+    def __init__(self, values):
+        self._values = values
+
+    def OpenMDArray(self, name):  # noqa: N802 - mirrors GDAL's method name
+        return _FakeMDArray(self._values)
+
+
+class _FakeMDDataset:
+    """A multidim dataset wrapping a fake root group."""
+
+    def __init__(self, values):
+        self._values = values
+
+    def GetRootGroup(self):  # noqa: N802 - mirrors GDAL's method name
+        return _FakeRootGroup(self._values)
+
+
+class _FakeGdal:
+    """The slice of `osgeo.gdal` that `band_valid_times` touches."""
+
+    OF_MULTIDIM_RASTER = 0
+
+    def __init__(self, values):
+        self._values = values
+
+    def OpenEx(self, url, flags):  # noqa: N802 - mirrors GDAL's method name
+        return _FakeMDDataset(self._values)
+
+
 def _raise_503(url):
     """Stand-in that fails the way a struggling server would."""
     import requests
@@ -480,6 +522,20 @@ class TestNetworkSeams:
                 http_text=_raise_503,
             )
 
+    def test_leaf_probe_respects_an_exhausted_budget(self):
+        """A leaf probe with no budget left returns without listing anything."""
+        calls = {"n": 0}
+
+        def _counting(url):
+            calls["n"] += 1
+            return "endFls"
+
+        assert (
+            _helpers._probe_leaf("https://x/2026/08/26/12/", "endFls", _counting, [0])
+            is None
+        )
+        assert calls["n"] == 0, "an exhausted budget must not issue a request"
+
     def test_exhausted_budget_stops_immediately(self):
         """A walk entered with no budget left issues no request at all."""
         calls = {"n": 0}
@@ -491,6 +547,34 @@ class TestNetworkSeams:
         found = _helpers._descend_newest("https://x/", 4, "endFls", _counting, [0])
         assert found is None, "an exhausted budget must find nothing"
         assert calls["n"] == 0, "an exhausted budget must not issue a request"
+
+
+class TestBandValidTimes:
+    """`band_valid_times` reads the CF time axis through the gdal seam."""
+
+    def test_time_axis_becomes_band_labels(self, monkeypatch):
+        """A field whose bands are the time axis gets real valid times."""
+        monkeypatch.undo()  # exercise the real helper, not the offline stand-in
+        monkeypatch.setattr(
+            _helpers, "gdal_module", lambda: _FakeGdal([27996.0, 27997.0, 27998.0])
+        )
+        assert _helpers.band_valid_times("irrelevant", 3) == [
+            "2026-08-26T00:00",
+            "2026-08-27T00:00",
+            "2026-08-28T00:00",
+        ]
+
+    def test_aggregate_field_keeps_positional_names(self, monkeypatch):
+        """A 2-D aggregate (1 band, 16-step axis) is never mislabelled (H1)."""
+        monkeypatch.undo()
+        monkeypatch.setattr(
+            _helpers, "gdal_module", lambda: _FakeGdal(list(range(27996, 28012)))
+        )
+        assert _helpers.band_valid_times("irrelevant", 1) == ["step_1"]
+
+    def test_gdal_module_returns_the_vendored_gdal(self):
+        """The seam hands back the real GDAL module."""
+        assert hasattr(_helpers.gdal_module(), "OpenEx")
 
 
 class TestIndexSpaceGuard:
