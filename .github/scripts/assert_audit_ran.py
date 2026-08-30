@@ -51,6 +51,18 @@ def main(argv: list[str]) -> int:
         print(f"::error::audit report at {report} is not valid JSON")
         return 1
 
+    # Valid JSON of the wrong shape is not a pass. `{}` would otherwise report
+    # "0 provider(s) audited" and exit 0 - a green gate that verified nothing,
+    # the failure this script exists to prevent - and a list of scalars would
+    # raise AttributeError, which reads as a bug in the checker rather than a
+    # malformed report.
+    if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
+        print(
+            f"::error::audit report at {report} is not a list of provider "
+            f"records (got {type(rows).__name__})",
+        )
+        return 1
+
     errored = [r for r in rows if r.get("status") == "error"]
     for row in errored:
         detail = row.get("detail") or "no detail given"

@@ -78,6 +78,31 @@ class TestMain:
         assert checker.main([str(tmp_path / "a.json")]) == 1, "bad JSON must not pass"
         assert "not valid JSON" in capsys.readouterr().out
 
+    @pytest.mark.parametrize(
+        "payload, kind",
+        [("{}", "dict"), ('"a string"', "str"), ("[1, 2, 3]", "list")],
+        ids=["object", "scalar", "list-of-scalars"],
+    )
+    def test_valid_json_of_the_wrong_shape_fails(
+        self, checker, tmp_path, capsys, payload, kind
+    ):
+        """A report that parses but is not a list of records must not pass.
+
+        `{}` would otherwise report "0 provider(s) audited" and exit 0 - a green
+        gate that verified nothing - and a list of scalars would raise
+        AttributeError, reading as a bug in the checker.
+        """
+        report = tmp_path / "a.json"
+        report.write_text(payload, encoding="utf-8")
+        assert checker.main([str(report)]) == 1, f"{kind} payload must fail"
+        assert "not a list of provider records" in capsys.readouterr().out
+
+    def test_an_empty_list_is_a_legitimate_pass(self, checker, tmp_path):
+        """No providers selected is empty, not malformed."""
+        report = tmp_path / "a.json"
+        report.write_text("[]", encoding="utf-8")
+        assert checker.main([str(report)]) == 0, "an empty list must pass"
+
     def test_missing_report_defers_to_the_caller(self, checker, tmp_path):
         """With no report the audit's own exit code already governs."""
         assert checker.main([str(tmp_path / "absent.json")]) == 0, (
