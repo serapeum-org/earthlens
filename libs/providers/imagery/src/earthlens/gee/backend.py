@@ -1970,26 +1970,25 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """Say so, once, when `property_filter=` cannot apply to this request.
 
         `property_filter` narrows scenes only on the EEDAI *collection* path.
-        A single-image dataset, or a request served by Earth Engine, ignores it,
-        which would otherwise be a silent no-op.
+        This is called on the Earth Engine fallback branch, so reaching it means
+        the filter is being dropped: a single image, an Earth Engine-served
+        request, or - the case that matters most - an eligible collection whose
+        bucket declined (over budget, a discovery failure, an unsupported
+        reducer). Without the notice the user silently gets a composite built
+        from every scene, and a multi-bucket run can mix filtered and unfiltered
+        buckets in one series.
 
         Args:
             var_info: The catalog entry being written (named in the notice).
         """
         if self.property_filter is None or self._property_filter_warned:
             return
-        served_by_reader_collection = (
-            var_info.is_image_collection
-            and self.export_via == "url"
-            and self.engine != "ee"
-        )
-        if served_by_reader_collection:
-            return
         self._property_filter_warned = True
         logger.warning(
-            f"property_filter has no effect for {var_info.id}: it narrows scenes "
-            "on the EEDAI collection path, and this request is a single image or "
-            "is served by Earth Engine (see engine=). It is ignored."
+            f"property_filter has no effect for {var_info.id}: this request is "
+            "served by Earth Engine, which cannot apply it, so the composite is "
+            "built from every scene in the window - cloudy ones included. It "
+            "narrows scenes only on the EEDAI collection path (see engine=)."
         )
 
     def _eedai_credentials(self) -> Any:

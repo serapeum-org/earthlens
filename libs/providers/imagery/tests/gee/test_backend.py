@@ -1885,35 +1885,85 @@ class TestPropertyFilter:
         with pytest.raises(ValueError, match="OGR attribute-filter string"):
             make_gee(property_filter=20)
 
-    def test_property_filter_warns_on_a_single_image(
+    def test_property_filter_warns_when_earth_engine_serves_the_request(
         self, make_gee, fake_reader, monkeypatch
     ):
-        """property_filter on a single-image request is a logged no-op (once)."""
+        """Driven through `_api`: the notice fires on the path that drops the filter."""
         warnings: list[str] = []
         monkeypatch.setattr(
             backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
         )
-        gee = make_gee(property_filter="CLOUDY_PIXEL_PERCENTAGE < 20")
+        gee = make_gee(engine="ee", property_filter="CLOUDY_PIXEL_PERCENTAGE < 20")
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        gee._warn_property_filter_ignored(var_info)
-        gee._warn_property_filter_ignored(var_info)
+        for _ in range(2):
+            gee._api(
+                _FakeImage(),
+                var_info,
+                ["elevation"],
+                dt.datetime(2000, 2, 11),
+                dt.datetime(2000, 1, 1),
+                dt.datetime(2000, 1, 2),
+            )
         assert len([w for w in warnings if "property_filter has no effect" in w]) == 1
 
-    def test_property_filter_not_warned_on_an_eligible_collection(
+    def test_declined_collection_warns_that_the_filter_was_dropped(
         self, make_gee, fake_reader, monkeypatch
     ):
-        """An eligible collection uses the filter, so nothing is warned."""
+        """The case the notice exists for: an eligible collection that declined.
+
+        The filter is silently lost when a bucket falls back, so the composite is
+        built from every scene - cloudy ones included - and a multi-bucket run
+        can mix filtered and unfiltered buckets.
+        """
         warnings: list[str] = []
         monkeypatch.setattr(
             backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
         )
         gee = make_gee(
+            start="2020-06-01",
+            end="2020-06-30",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            property_filter="CLOUDY_PIXEL_PERCENTAGE < 20",
+        )
+        fake_reader.cost = SimpleNamespace(scene_count=5000, min_pixel_size=5566.0)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        gee._api(
+            _FakeImage(),
+            var_info,
+            ["precipitation"],
+            dt.datetime(2020, 6, 1),
+            dt.datetime(2020, 6, 1),
+            dt.datetime(2020, 7, 1),
+        )
+        assert any("property_filter has no effect" in w for w in warnings), (
+            "a declined collection dropped the user's scene filter silently"
+        )
+
+    def test_no_warning_when_the_reader_actually_applies_the_filter(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A served collection uses the filter, so nothing is warned."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = make_gee(
+            start="2020-06-01",
+            end="2020-06-30",
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
             property_filter="CLOUDY_PIXEL_PERCENTAGE < 20",
         )
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        gee._warn_property_filter_ignored(var_info)
+        gee._api(
+            _FakeImage(),
+            var_info,
+            ["precipitation"],
+            dt.datetime(2020, 6, 1),
+            dt.datetime(2020, 6, 1),
+            dt.datetime(2020, 7, 1),
+        )
         assert [w for w in warnings if "property_filter has no effect" in w] == []
 
 
