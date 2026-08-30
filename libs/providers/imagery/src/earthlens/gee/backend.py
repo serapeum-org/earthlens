@@ -1369,6 +1369,25 @@ class GEE(LazyClientMixin, AbstractDataSource):
         cols = max(math.ceil((max_x - min_x) / scale), 1)
         return rows, cols
 
+    @staticmethod
+    def _reader_end(bucket_end: dt.datetime) -> str:
+        """Convert an exclusive bucket end to the inclusive date the reader wants.
+
+        This backend's buckets are half-open, matching Earth Engine's
+        `filterDate`, whose `end` is exclusive. The reader's `end` is
+        *inclusive*: a bare date becomes `startTime < <end + 1 day>`. Passing
+        the exclusive boundary straight through would therefore read one extra
+        day per bucket and make consecutive buckets overlap.
+
+        Args:
+            bucket_end: The bucket's exclusive end.
+
+        Returns:
+            The `YYYY-MM-DD` date the reader should treat as inclusive, so its
+            window covers exactly the same instants as `filterDate`.
+        """
+        return (bucket_end - dt.timedelta(days=1)).strftime("%Y-%m-%d")
+
     def _eedai_latlon_aoi(self) -> tuple[float, float, float, float]:
         """Return the AOI envelope in EPSG:4326 for EEDA scene discovery.
 
@@ -1423,7 +1442,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             cost = reader.estimate_earthengine_cost(
                 var_info.id,
                 start=bucket_start.strftime("%Y-%m-%d"),
-                end=bucket_end.strftime("%Y-%m-%d"),
+                end=self._reader_end(bucket_end),
                 bbox=self._eedai_latlon_aoi(),
                 crs=self.crs,
                 credentials=self._eedai_credentials(),
@@ -2085,7 +2104,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # reducer the Earth Engine path would use.
             composite_kwargs = {
                 "start": bucket_start.strftime("%Y-%m-%d"),
-                "end": bucket_end.strftime("%Y-%m-%d"),
+                "end": self._reader_end(bucket_end),
                 "reducer": self.reducer or var_info.default_reducer,
             }
             if self.property_filter is not None:

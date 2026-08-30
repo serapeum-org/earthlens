@@ -1945,7 +1945,9 @@ class TestEedaiCollections:
         )
         _asset_id, kwargs = fake_reader.calls[0]
         assert kwargs["start"] == "2020-06-01"
-        assert kwargs["end"] == "2020-07-01"
+        # The reader's `end` is inclusive while this backend's bucket end is
+        # exclusive, so the last covered day is what must be sent.
+        assert kwargs["end"] == "2020-06-30"
         assert kwargs["reducer"] == var_info.default_reducer
 
     def test_single_image_read_sends_no_composite_kwargs(self, make_gee, fake_reader):
@@ -2011,8 +2013,41 @@ class TestEedaiCollections:
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         gee._eedai_collection_fits(var_info, 1, self.START, self.END)
         _asset_id, kwargs = fake_reader.cost_calls[0]
-        assert kwargs["start"] == "2020-06-01" and kwargs["end"] == "2020-07-01"
+        assert kwargs["start"] == "2020-06-01" and kwargs["end"] == "2020-06-30"
         assert len(kwargs["bbox"]) == 4
+
+    def test_consecutive_buckets_do_not_overlap(self, make_gee, fake_reader):
+        """Adjacent buckets must not both claim the boundary day.
+
+        The reader's `end` is inclusive and this backend's bucket end is
+        exclusive, so sending the raw boundary would make each bucket read one
+        extra day and overlap the next — a daily bucket would be a two-day
+        reduce.
+        """
+        gee = self._collection_gee(make_gee)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        june = dt.datetime(2020, 6, 1)
+        july = dt.datetime(2020, 7, 1)
+        august = dt.datetime(2020, 8, 1)
+        first = gee._eedai_collection_fits(var_info, 1, june, july)
+        second = gee._eedai_collection_fits(var_info, 1, july, august)
+        assert first.can_serve and second.can_serve
+        first_end = fake_reader.cost_calls[0][1]["end"]
+        second_start = fake_reader.cost_calls[1][1]["start"]
+        assert first_end < second_start, (
+            f"bucket windows overlap: first ends {first_end}, next starts "
+            f"{second_start}"
+        )
+
+    def test_a_single_day_bucket_reads_exactly_that_day(self, make_gee, fake_reader):
+        """A one-day bucket collapses to start == end, not a two-day window."""
+        gee = self._collection_gee(make_gee)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        gee._eedai_collection_fits(
+            var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        kwargs = fake_reader.cost_calls[0][1]
+        assert (kwargs["start"], kwargs["end"]) == ("2020-06-01", "2020-06-01")
 
     def test_property_filter_reaches_estimate_and_composite(
         self, make_gee, fake_reader
