@@ -50,7 +50,7 @@ from earthlens.base.spatial import (
     windowed_bbox_crop,
 )
 from earthlens.jrc import _helpers
-from earthlens.jrc._helpers import efhm_url
+from earthlens.jrc._helpers import _safe_name, efhm_url
 from earthlens.jrc.catalog import Catalog, Dataset
 
 if TYPE_CHECKING:
@@ -194,9 +194,14 @@ class JRC(AbstractDataSource):
             self._field = field or self._dataset.default_field or "TWL75"
             variables = [self._field]
         else:  # sea_level_coastal — a global table; the AOI does not apply
+            if lat_lim is not None or lon_lim is not None:
+                logger.warning(
+                    "JRC: the coastal summary is a global per-country table, so "
+                    "lat_lim / lon_lim are ignored; filter the returned frame."
+                )
             lat_lim = lat_lim if lat_lim is not None else [-90.0, 90.0]
             lon_lim = lon_lim if lon_lim is not None else [-180.0, 180.0]
-            variables = [self._dataset.id]
+            variables = ["coastal_summary"]
 
         super().__init__(
             start=start,
@@ -337,7 +342,7 @@ class JRC(AbstractDataSource):
             if ignored:
                 logger.warning(
                     f"JRC: dataset={dataset!r} names a dataset directly, so "
-                    f"{', '.join(ignored)} is ignored."
+                    f"{', '.join(ignored)} ignored."
                 )
             return key
         if key in ("", "flood", "jrc-flood"):
@@ -539,7 +544,7 @@ class JRC(AbstractDataSource):
             name = _helpers.find_cycle_file(cycle_url, self._dataset.gridded_glob)
             return [
                 RemoteProduct(
-                    id=f"{self._dataset.id}_{cycle_id}_{self._field}",
+                    id=f"{self._dataset.id}_{cycle_id}_{_safe_name(self._field)}",
                     metadata={"url": f"/vsicurl/{cycle_url}{name}", "cycle": cycle_id},
                 )
             ]

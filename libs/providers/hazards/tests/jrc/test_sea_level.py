@@ -31,8 +31,14 @@ def _clear_client_cache() -> None:
 
 
 @pytest.fixture(autouse=True)
-def _offline_band_names(monkeypatch):
-    """Keep band naming offline: it would otherwise open the real cube."""
+def _offline_band_names(request, monkeypatch):
+    """Keep band naming offline: it would otherwise open the real cube.
+
+    Tests marked `real_band_names` opt out so the valid-time labels themselves
+    are asserted somewhere rather than being stubbed everywhere.
+    """
+    if request.node.get_closest_marker("real_band_names"):
+        return
     monkeypatch.setattr(
         _helpers,
         "band_valid_times",
@@ -43,20 +49,22 @@ def _offline_band_names(monkeypatch):
 #: The cubes' real geotransform, as pyramids derives it from their CF coords.
 _GLOBAL_GEO = (-180.0, 0.25, 0.0, 90.0, 0.0, -0.25)
 
-#: The real helper, captured before the autouse fixture swaps it out.
-_REAL_BAND_VALID_TIMES = _helpers.band_valid_times
 
 _COASTAL_CSV = "GID_0,NAME_0,summary_TWL_1_10\nABW,Aruba,2\nNLD,Netherlands,9\n"
 
 
 class _FakeMDArray:
-    """A CF `time` coordinate returning days since 1950-01-01."""
+    """A CF `time` coordinate returning days since a stated epoch."""
 
-    def __init__(self, values):
+    def __init__(self, values, units="days since 1950-01-01"):
         self._values = values
+        self._units = units
 
     def ReadAsArray(self):  # noqa: N802 - mirrors GDAL's method name
         return np.asarray(self._values)
+
+    def GetUnit(self):  # noqa: N802 - mirrors GDAL's method name
+        return self._units
 
 
 class _FakeRootGroup:
@@ -575,9 +583,9 @@ class TestNetworkSeams:
 class TestBandValidTimes:
     """`band_valid_times` reads the CF time axis through the gdal seam."""
 
+    @pytest.mark.real_band_names
     def test_time_axis_becomes_band_labels(self, monkeypatch):
         """A field whose bands are the time axis gets real valid times."""
-        monkeypatch.setattr(_helpers, "band_valid_times", _REAL_BAND_VALID_TIMES)
         monkeypatch.setattr(
             _helpers, "gdal_module", lambda: _FakeGdal([27996.0, 27997.0, 27998.0])
         )
@@ -587,14 +595,15 @@ class TestBandValidTimes:
             "2026-08-28T00:00",
         ]
 
+    @pytest.mark.real_band_names
     def test_aggregate_field_keeps_positional_names(self, monkeypatch):
-        """A 2-D aggregate (1 band, 16-step axis) is never mislabelled (H1)."""
-        monkeypatch.setattr(_helpers, "band_valid_times", _REAL_BAND_VALID_TIMES)
+        """A 2-D aggregate (1 band, 16-step axis) is never mislabelled."""
         monkeypatch.setattr(
             _helpers, "gdal_module", lambda: _FakeGdal(list(range(27996, 28012)))
         )
         assert _helpers.band_valid_times("irrelevant", 1) == ["step_1"]
 
+    @pytest.mark.real_band_names
     def test_gdal_module_returns_the_vendored_gdal(self):
         """The seam hands back the real GDAL module."""
         assert hasattr(_helpers.gdal_module(), "OpenEx")
@@ -664,6 +673,39 @@ class TestIndexSpaceGuard:
         )
         with pytest.raises(ValueError, match="north-up|lon/lat"):
             backend.download()
+
+
+class TestBandNamesReachTheOutput:
+    """The written raster carries the cube's valid times, not just step_N."""
+
+    @pytest.mark.real_band_names
+    def test_written_bands_are_labelled_with_valid_times(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """A gridded fetch stamps the CF valid times onto the output bands."""
+        row = Catalog().get("sea_level_medium_term")
+        http = _FakeHttp(
+            row.base_url,
+            row.product,
+            ("2026", "08", "26", "12"),
+            ["mediumTermTWLforecastGridded_x.nc"],
+        )
+        monkeypatch.setattr(_helpers, "_http_text", http)
+        monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", _fake_read_file)
+        monkeypatch.setattr(
+            _helpers, "gdal_module", lambda: _FakeGdal([27996.0 + n for n in range(16)])
+        )
+        backend = JRC(
+            dataset="sea_level",
+            product="medium_term",
+            lat_lim=[51.0, 53.0],
+            lon_lim=[3.0, 5.0],
+            path=tmp_path,
+        )
+        written = PyramidsDataset.read_file(str(backend.download()[0]))
+        assert written.band_names[0] == "2026-08-26T00:00", (
+            f"expected a CF valid time, got {written.band_names[0]!r}"
+        )
 
 
 class TestBandCountGuard:
@@ -1035,9 +1077,9 @@ class TestHelperEdges:
             f"every listing must be budgeted, issued {probes['listings']} requests"
         )
 
+    @pytest.mark.real_band_names
     def test_band_valid_times_falls_back_when_time_is_unreadable(self, monkeypatch):
         """An unreadable time axis degrades to positional band names, never raises."""
-        monkeypatch.setattr(_helpers, "band_valid_times", _REAL_BAND_VALID_TIMES)
         monkeypatch.setattr(_helpers, "gdal_module", _raise_runtime)
         assert _helpers.band_valid_times("irrelevant", 3) == [
             "step_1",
@@ -1063,11 +1105,31 @@ class TestHelperEdges:
 
     def test_out_of_domain_extent_is_refused(self):
         """An affine whose far corner leaves the lon/lat domain is rejected."""
-        # Origin is a valid coordinate, but the span runs off the globe.
+        # A valid negative origin whose southern edge runs off the globe.
         with pytest.raises(ValueError, match="outside the lon/lat domain"):
             _helpers.require_geographic_affine(
-                (170.0, 0.25, 0.0, 80.0, 0.0, -0.25), 1440, 720, "x"
+                (-180.0, 0.25, 0.0, 0.0, 0.0, -0.25), 1440, 720, "x"
             )
+
+    def test_zero_to_360_longitude_is_named(self):
+        """A 0..360 cube gets a message about the convention, not a vague error."""
+        with pytest.raises(ValueError, match="0..360 longitude convention"):
+            _helpers.require_geographic_affine(
+                (0.125, 0.25, 0.0, 90.0, 0.0, -0.25), 1440, 720, "x"
+            )
+
+    def test_rotated_affine_is_refused(self):
+        """A rotated grid cannot be windowed by bbox, so it is refused."""
+        with pytest.raises(ValueError, match="rotated geotransform"):
+            _helpers.require_geographic_affine(
+                (-180.0, 0.25, 0.1, 90.0, 0.1, -0.25), 1440, 720, "x"
+            )
+
+    def test_cf_epoch_is_read_from_the_units(self):
+        """The epoch comes from the file's units, not a hardcoded constant."""
+        assert _helpers._parse_cf_epoch("days since 2000-01-01").year == 2000
+        assert _helpers._parse_cf_epoch(None).year == 1950
+        assert _helpers._parse_cf_epoch("hours since 2000-01-01").year == 1950
 
     def test_find_cycle_file_is_case_sensitive(self):
         """Glob matching is case-sensitive, so it behaves the same on all platforms."""

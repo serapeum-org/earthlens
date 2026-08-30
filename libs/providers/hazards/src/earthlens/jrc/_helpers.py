@@ -6,8 +6,8 @@ walks the jeodpp autoindex (`YYYY/MM/DD/HH` cycle tree) to resolve a forecast
 cycle — gated on the 0-byte `endFls` sentinel — and reconstructs the global
 pixel window for a requested bbox. The cubes' affine comes from pyramids, which
 derives it from the CF `latitude` / `longitude` coordinates (>= 0.58.1,
-serapeum-org/pyramids#1071); `require_geographic_affine` sanity-checks it. All
-network access
+serapeum-org/pyramids#1071); `require_geographic_affine` sanity-checks it.
+All network access
 goes through the injectable `http_text` seam so tests can fake the autoindex.
 """
 
@@ -55,6 +55,21 @@ def _client():
     return HttpClient(timeout=_HTTP_TIMEOUT)
 
 
+def _safe_name(value: str) -> str:
+    """Reduce a request value to characters that are safe in a filename.
+
+    A `field=` comes from the caller and lands in the written filename, so strip
+    anything that could traverse a path or upset a filesystem.
+
+    Args:
+        value: The raw request value.
+
+    Returns:
+        str: The value with unsafe characters replaced by `_`.
+    """
+    return re.sub(r"[^A-Za-z0-9._-]", "_", value) or "field"
+
+
 def efhm_url(
     rp: int, *, base_url: str = BASE_URL, template: str = FILENAME_TEMPLATE
 ) -> str:
@@ -98,7 +113,7 @@ def _http_text(url: str) -> str:
     return str(_client().get(url).text)
 
 
-def http_bytes(url: str) -> bytes:
+def http_bytes(url: str, *, fetch=None) -> bytes:
     """Return the raw body of a GET, undecoded.
 
     The coastal CSV is served as `text/csv` with **no charset**, so `requests`
@@ -115,6 +130,8 @@ def http_bytes(url: str) -> bytes:
     Raises:
         requests.HTTPError: If the server returns a non-2xx status.
     """
+    if fetch is not None:
+        return bytes(fetch(url))
     return bytes(_client().get(url).content)
 
 
@@ -254,7 +271,17 @@ def _descend_newest(
     if budget[0] <= 0:
         return None
     budget[0] -= 1
-    for name in _numeric_dirs(list_directory(url, http_text=http_text)):
+    try:
+        entries = list_directory(url, http_text=http_text)
+    except requests.HTTPError as exc:
+        # The archive prunes daily, so a directory listed a moment ago can be
+        # gone by the time the walk reaches it. Skip that branch rather than
+        # failing the whole resolve.
+        if getattr(getattr(exc, "response", None), "status_code", None) == 404:
+            logger.debug(f"JRC: {url} disappeared mid-walk; skipping")
+            return None
+        raise
+    for name in _numeric_dirs(entries):
         child = f"{url}{name}/"
         found = (
             _probe_leaf(child, endfls_marker, http_text, budget)
@@ -368,8 +395,34 @@ def find_cycle_file(cycle_url: str, glob: str, *, http_text=None) -> str:
     return matches[0]
 
 
-#: CF epoch of the cubes' `time` coordinate (`days since 1950-01-01`).
+#: Fallback CF epoch when the cube's `time` units cannot be parsed.
 _TIME_EPOCH = datetime(1950, 1, 1)
+
+
+def _parse_cf_epoch(units: str | None) -> datetime:
+    """Parse a CF `days since <date>` unit string into its epoch.
+
+    Args:
+        units: The coordinate's unit string, e.g. `"days since 1950-01-01"`.
+
+    Returns:
+        datetime: The parsed epoch, or the documented 1950-01-01 default when the
+            units are missing or in an unexpected form (band naming is
+            best-effort and must never fail the fetch).
+    """
+    if not units or " since " not in units:
+        return _TIME_EPOCH
+    amount, _, rest = units.partition(" since ")
+    if amount.strip().lower() != "days":
+        logger.warning(f"JRC: unexpected time units {units!r}; band labels may be off")
+        return _TIME_EPOCH
+    stamp = rest.strip().replace("T", " ").split(".")[0]
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(stamp, fmt)
+        except ValueError:
+            continue
+    return _TIME_EPOCH
 
 
 def band_valid_times(url: str, steps: int) -> list[str]:
@@ -393,9 +446,9 @@ def band_valid_times(url: str, steps: int) -> list[str]:
 
         dataset = gdal.OpenEx(url, gdal.OF_MULTIDIM_RASTER)
         try:
-            axis = np.asarray(
-                dataset.GetRootGroup().OpenMDArray("time").ReadAsArray()
-            ).ravel()
+            array = dataset.GetRootGroup().OpenMDArray("time")
+            axis = np.asarray(array.ReadAsArray()).ravel()
+            epoch = _parse_cf_epoch(array.GetUnit())
         finally:
             # Release the second remote handle this opens; leaving it to the GC
             # holds a /vsicurl connection open per fetch.
@@ -406,7 +459,7 @@ def band_valid_times(url: str, steps: int) -> list[str]:
         # timestamp. Only a field whose bands ARE the time axis gets valid times.
         if axis.size == steps:
             return [
-                (_TIME_EPOCH + timedelta(days=float(v))).strftime("%Y-%m-%dT%H:%M")
+                (epoch + timedelta(days=float(v))).strftime("%Y-%m-%dT%H:%M")
                 for v in axis
             ]
     except Exception as exc:  # noqa: BLE001 - naming is best-effort; never fail
@@ -468,20 +521,34 @@ def require_geographic_affine(
             f"{cols}x{rows} variable — this field is not on the lon/lat grid "
             "(the coastal-point fields report one). Request a gridded field."
         )
+    rot_x, rot_y = geo[2], geo[4]
+    if rot_x or rot_y:
+        raise ValueError(
+            f"{dataset_id!r} returned a rotated geotransform {geo}; only an "
+            "axis-aligned north-up grid can be windowed by bbox."
+        )
+    if x0 >= 0.0 and x0 + cols * dx > 180.5:
+        raise ValueError(
+            f"{dataset_id!r} spans {x0}..{x0 + cols * dx}, which looks like a "
+            "0..360 longitude convention; earthlens expects -180..180."
+        )
     if dx <= 0 or dy >= 0:
         raise ValueError(
             f"{dataset_id!r} returned a geotransform {geo} that is not north-up "
             f"(pixel width {dx}, height {dy}); pyramids >= 0.58.1 is required to "
             "georeference the sea-level cubes."
         )
+    # Slack of one cell, not a fixed half-degree, so a coarse grid is not
+    # rejected for legitimately overhanging its first cell.
+    slack = max(abs(dx), abs(dy))
     east, south = x0 + cols * dx, y0 + rows * dy
-    if not (-180.5 <= x0 <= 180.5 and -90.5 <= y0 <= 90.5):
+    if not (-180 - slack <= x0 <= 180 + slack and -90 - slack <= y0 <= 90 + slack):
         raise ValueError(
             f"{dataset_id!r} returned a geotransform {geo} whose origin is not a "
             "lon/lat coordinate (an index-space affine looks like this); pyramids "
             ">= 0.58.1 is required to georeference the sea-level cubes."
         )
-    if not (-180.5 <= east <= 180.5 and -90.5 <= south <= 90.5):
+    if not (-180 - slack <= east <= 180 + slack and -90 - slack <= south <= 90 + slack):
         raise ValueError(
             f"{dataset_id!r} spans {x0}..{east} / {south}..{y0}, which is outside "
             "the lon/lat domain; the grid is not the geographic one expected."

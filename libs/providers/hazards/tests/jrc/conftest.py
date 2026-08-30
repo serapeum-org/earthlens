@@ -27,3 +27,10 @@ def _forbid_network(request, monkeypatch):
 
     monkeypatch.setattr(requests.Session, "request", _blocked)
     monkeypatch.setattr(requests, "get", _blocked)
+
+    # The backend's raster I/O goes through GDAL, not requests, so block that
+    # route too: otherwise a test can still reach the live cube over /vsicurl.
+    if not request.node.get_closest_marker("real_band_names"):
+        from earthlens.jrc import _helpers
+
+        monkeypatch.setattr(_helpers, "gdal_module", _blocked)
