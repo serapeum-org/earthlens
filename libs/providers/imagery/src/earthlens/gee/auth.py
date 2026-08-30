@@ -428,13 +428,16 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
         try:
             ee.Initialize(credentials=credentials, project=resolved_project)
         except ee.EEException as exc:
-            message = str(exc)
+            # Redact before classifying *and* before reporting: the classifier
+            # only matches fixed substrings, so it is unaffected, while every
+            # branch below then interpolates text that cannot carry the key.
+            message = _redact(str(exc), service_key)
             if "not registered to use Earth Engine" in message:
                 raise AuthenticationError(
                     f"Cloud project {resolved_project!r} is not registered "
                     f"to use Earth Engine. Register it at {_REGISTER_URL} "
                     "(pick the noncommercial track if eligible), then retry."
-                ) from exc
+                ) from None
             if (
                 "does not have required permission" in message
                 or "serviceUsageConsumer" in message
@@ -445,16 +448,16 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
                     f"{resolved_project!r}: grant it the "
                     "'roles/serviceusage.serviceUsageConsumer' and "
                     "'roles/earthengine.viewer' IAM roles on that project."
-                ) from exc
+                ) from None
             raise AuthenticationError(
                 f"Earth Engine initialisation failed for project "
                 f"{resolved_project!r}: {message}"
-            ) from exc
+            ) from None
         except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
             raise AuthenticationError(
                 f"Earth Engine initialisation failed for project "
-                f"{resolved_project!r}: {exc}"
-            ) from exc
+                f"{resolved_project!r}: {_redact(str(exc), service_key)}"
+            ) from None
 
         return resolved_project
 
