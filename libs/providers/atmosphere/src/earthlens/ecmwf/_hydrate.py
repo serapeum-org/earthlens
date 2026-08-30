@@ -852,6 +852,7 @@ def _hydrate_stanza_per_variable(
     text: str,
     dataset_id: str,
     probe: Callable[[str], tuple[dict[str, dict[str, Any]], dict[str, Any]]],
+    serving: Callable[[str], list[dict[str, Any]]] | None = None,
 ) -> tuple[str, list[str], list[str]]:
     """Fill every placeholder of one stanza, probing each variable on its own.
 
@@ -901,10 +902,18 @@ def _hydrate_stanza_per_variable(
             declined.append(slug)
             continue
         name, units = chosen
+        override = _selector_override(selectors, dataset_extras)
+        blocks = serving(cds_variable) if serving is not None else []
+        if blocks and not _selectors_are_serveable(
+            {**dataset_extras, **override}, blocks
+        ):
+            # The name was read under a product this row will not ask for, so
+            # writing it would ship a request the store cannot answer. A
+            # placeholder says less but says it truthfully.
+            declined.append(slug)
+            continue
         new_block = _fill_variable(new_block, slug, name, units)
-        new_block = _fill_variable_extras(
-            new_block, slug, _selector_override(selectors, dataset_extras)
-        )
+        new_block = _fill_variable_extras(new_block, slug, override)
         filled.append(slug)
     if new_block == block:
         return text, filled, declined
@@ -1059,6 +1068,41 @@ def _dataset_extras(block: str) -> dict[str, str]:
                 return _inline_mapping(line)
             return _mapping_under(lines, index)
     return {}
+
+
+def _selectors_are_serveable(
+    effective: dict[str, Any], serving: list[dict[str, Any]]
+) -> bool:
+    """Return True when every selector the row will send is one the store offers.
+
+    A probe reads the variable out of whichever constraints block it sampled,
+    but the row it writes inherits the stanza's selectors for anything
+    :func:`_required_selectors` did not record — and that function records only
+    what is constant across every serving block. A selector that varies is
+    therefore left to the stanza, whose value may not serve this variable at
+    all: the ozone layer row took its name from a 0-6 km column product while
+    the stanza asks for limb profiles, so the shipped row requests a
+    combination the store does not have.
+
+    A key the blocks do not enumerate is not judged — absence there means the
+    dataset does not partition on it, not that the row is wrong.
+
+    Args:
+        effective: The selectors the row will send, stanza merged with the
+            row's own overrides.
+        serving: The constraints blocks that list this variable.
+
+    Returns:
+        True when each enumerated selector shares at least one value with what
+        the serving blocks offer.
+    """
+    for key, want in effective.items():
+        if want is None or not isinstance(want, list) or not want:
+            continue
+        offered = {value for block in serving for value in (block.get(key) or [])}
+        if offered and not ({str(value) for value in want} & offered):
+            return False
+    return True
 
 
 def _selector_override(
@@ -1653,6 +1697,38 @@ def _hydrated_detail(session: _ProbeSession, declined: list[str]) -> str:
     return left
 
 
+def _serving_blocks_for(
+    dataset_id: str,
+) -> Callable[[str], list[dict[str, Any]]]:
+    """Return a lookup from `cds_variable` to the constraints blocks serving it.
+
+    The blocks say which selector values the store actually offers for a
+    variable, which is what makes a written row checkable: a name read under
+    one product must not be shipped with selectors belonging to another.
+
+    Fetching them is best-effort. A dataset that publishes no `constraints.json`
+    yields an empty list, and the caller then writes as before rather than
+    refusing every row of a dataset it cannot check.
+
+    Args:
+        dataset_id: The Copernicus dataset id being hydrated.
+
+    Returns:
+        A callable taking a `cds_variable` and returning its serving blocks.
+    """
+    from earthlens.ecmwf.cli import _ecmwf_constraints
+
+    try:
+        rows = _ecmwf_constraints(dataset_id) or []
+    except Exception:  # noqa: BLE001 - an uncheckable dataset is not a failure
+        rows = []
+
+    def _serving(cds_variable: str) -> list[dict[str, Any]]:
+        return [row for row in rows if cds_variable in (row.get("variable") or [])]
+
+    return _serving
+
+
 def _hydrate_one(
     dataset_id: str,
     prefix: str,
@@ -1697,7 +1773,7 @@ def _hydrate_one(
         return blocked
     session = _ProbeSession(dataset_id, timeout)
     new_text, filled, declined = _hydrate_stanza_per_variable(
-        file_text[path], dataset_id, session
+        file_text[path], dataset_id, session, _serving_blocks_for(dataset_id)
     )
     if declined and session.error is None:
         # A row no constraints block names is declined outright by the

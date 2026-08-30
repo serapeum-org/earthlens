@@ -363,6 +363,78 @@ _CLAIMED_BLOCK = """      total-precipitation:
 """
 
 
+class TestSelectorsAreServeable:
+    """A row must not ship selectors the store does not offer for its variable."""
+
+    def test_the_ozone_shape_is_refused(self):
+        """The name came from a 0-6 km column; the row asks for limb profiles."""
+        blocks = [
+            {
+                "variable": ["mole_content_of_ozone_in_atmosphere_layer"],
+                "sensor": ["gome", "gome2_a"],
+                "vertical_aggregation": ["total_and_tropospheric_column_0_6_km_ir"],
+            }
+        ]
+        effective = {
+            "sensor": ["ace"],
+            "vertical_aggregation": ["vertical_profiles_from_limb_sensors"],
+        }
+        assert not hydrate_mod._selectors_are_serveable(effective, blocks)
+
+    def test_a_selector_the_blocks_offer_is_accepted(self):
+        """One shared value is enough - the store can answer the request."""
+        blocks = [{"sensor": ["gome", "gome2_a"]}]
+        assert hydrate_mod._selectors_are_serveable({"sensor": ["gome"]}, blocks)
+
+    def test_a_key_the_blocks_do_not_enumerate_is_not_judged(self):
+        """Absence means the dataset does not partition on it, not that it is wrong."""
+        blocks = [{"sensor": ["gome"]}]
+        assert hydrate_mod._selectors_are_serveable({"area": ["global"]}, blocks)
+
+    @pytest.mark.parametrize("value", [None, []])
+    def test_an_empty_or_stripped_selector_is_not_judged(self, value):
+        """A stripped key sends nothing, so there is nothing to be unserveable."""
+        blocks = [{"day": ["01"]}]
+        assert hydrate_mod._selectors_are_serveable({"day": value}, blocks)
+
+    def test_a_row_whose_selectors_cannot_be_served_is_declined(self):
+        """The whole point: such a row stays a placeholder instead of shipping."""
+        text = (
+            "datasets:\n  a-dataset:\n    extras:\n"
+            "      sensor: [ace]\n"
+            "    variables:\n"
+            "      layer:\n        cds_variable: ozone\n"
+            "        nc_variable: ozone\n        units: unknown\n"
+        )
+        out, filled, declined = hydrate_mod._hydrate_stanza_per_variable(
+            text,
+            "a-dataset",
+            lambda name: ({"col": {"long_name": "ozone", "units": "mol m-2"}}, {}),
+            lambda name: [{"variable": ["ozone"], "sensor": ["gome"]}],
+        )
+        assert filled == [] and declined == ["layer"], (
+            f"expected the row declined; filled={filled} declined={declined}"
+        )
+        assert "units: unknown" in out, "the placeholder should be left as it was"
+
+    def test_a_row_the_store_can_serve_is_still_written(self):
+        """The guard must not refuse the ordinary case it sits in front of."""
+        text = (
+            "datasets:\n  a-dataset:\n    extras:\n"
+            "      sensor: [gome]\n"
+            "    variables:\n"
+            "      layer:\n        cds_variable: ozone\n"
+            "        nc_variable: ozone\n        units: unknown\n"
+        )
+        _, filled, declined = hydrate_mod._hydrate_stanza_per_variable(
+            text,
+            "a-dataset",
+            lambda name: ({"ozone": {"long_name": "ozone", "units": "mol m-2"}}, {}),
+            lambda name: [{"variable": ["ozone"], "sensor": ["gome"]}],
+        )
+        assert filled == ["layer"], f"a serveable row was declined; {declined}"
+
+
 class TestUnhydratableRows:
     """A placeholder no retrieve can answer is not the same as a pending one."""
 
@@ -1484,7 +1556,7 @@ class TestBulkHydrateEmpty:
         monkeypatch.setattr(
             hydrate_mod,
             "_hydrate_stanza_per_variable",
-            lambda text, ds, probe: (
+            lambda text, ds, probe, serving=None: (
                 "datasets:"
                 + chr(10)
                 + "  a:"
