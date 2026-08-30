@@ -57,12 +57,7 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     # dataset='sea_level' selects the family (product / representation pick the row).
     'sea-level-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
     'jrc-sea-level': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
-    'coastal-forecast': (
-        _JRC,
-        'JRC',
-        '',
-        {'dataset': 'sea_level', 'product': 'subseasonal', 'representation': 'coastal'},
-    ),
+    'coastal-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level_subseasonal_coastal'}),
     'twl-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
     'risk-indicators': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'thinkhazard': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),

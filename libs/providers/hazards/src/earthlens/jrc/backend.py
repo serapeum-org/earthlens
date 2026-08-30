@@ -128,7 +128,6 @@ class JRC(AbstractDataSource):
         *,
         dataset: str | None = None,
         product: str | None = None,
-        representation: str | None = None,
         reference_time: str | None = "latest",
         field: str | None = None,
         catalog: Catalog | None = None,
@@ -150,8 +149,9 @@ class JRC(AbstractDataSource):
                 `"sea_level_medium_term"`, …), the family selector `"sea_level"`
                 (paired with `product` / `representation`), or `None` for EFHM.
             product: Sea-level family — `"medium_term"` | `"subseasonal"`.
-            representation: Sea-level family — `"gridded"` (default) |
-                `"coastal"` (subseasonal only).
+                Selects the gridded cube; the coastal summary is its own dataset
+                (`dataset="sea_level_subseasonal_coastal"`, or the
+                `coastal-forecast` facade key).
             reference_time: Sea-level — `"latest"` (default) or an explicit cycle
                 (`"2026-08-26T12"`).
             field: Sea-level gridded — the variable to crop (defaults to the
@@ -164,7 +164,7 @@ class JRC(AbstractDataSource):
         """
         self._catalog = catalog if catalog is not None else Catalog()
         self._dataset: Dataset = self._catalog.get(
-            self._resolve_dataset_id(dataset, product, representation)
+            self._resolve_dataset_id(dataset, product)
         )
         kind = self._dataset.kind
         if kind not in self._KIND_TO_OUTPUT:
@@ -194,7 +194,12 @@ class JRC(AbstractDataSource):
             self._field = field or self._dataset.default_field or "TWL75"
             variables = [self._field]
         else:  # sea_level_coastal — a global table; the AOI does not apply
-            if lat_lim is not None or lon_lim is not None:
+            # The facade substitutes a global default when the caller passes no
+            # AOI, so only a genuinely narrowed box is worth reporting.
+            narrowed = (lat_lim is not None and tuple(lat_lim) != (-90.0, 90.0)) or (
+                lon_lim is not None and tuple(lon_lim) != (-180.0, 180.0)
+            )
+            if narrowed:
                 logger.warning(
                     "JRC: the coastal summary is a global per-country table, so "
                     "lat_lim / lon_lim are ignored; filter the returned frame."
@@ -215,37 +220,27 @@ class JRC(AbstractDataSource):
         )
 
     @staticmethod
-    def _resolve_sea_level_id(product: str | None, representation: str | None) -> str:
-        """Resolve the sea-level family selectors to one catalog dataset id.
+    def _resolve_sea_level_id(product: str | None) -> str:
+        """Resolve the sea-level family selector to one gridded dataset id.
+
+        The coastal summary is a dataset in its own right rather than a mode of
+        the gridded ones, so it is selected by id (or by the `coastal-forecast`
+        facade key) instead of a second selector.
 
         Args:
-            product: `"medium_term"` | `"subseasonal"`.
-            representation: `"gridded"` (default) | `"coastal"`.
+            product: `"medium_term"` (default) | `"subseasonal"`.
 
         Returns:
             str: The resolved catalog dataset id.
 
         Raises:
-            ValueError: If the product / representation pair is not published.
+            ValueError: If the product is not published.
         """
-        rep = (representation or "gridded").strip().lower()
         prod = (product or "medium_term").strip().lower()
-        if rep not in ("gridded", "coastal"):
-            raise ValueError(
-                f"representation must be 'gridded' or 'coastal', got "
-                f"{representation!r}."
-            )
         if prod not in ("medium_term", "subseasonal"):
             raise ValueError(
                 f"product must be 'medium_term' or 'subseasonal', got {product!r}."
             )
-        if rep == "coastal":
-            if prod != "subseasonal":
-                raise ValueError(
-                    "representation='coastal' is only available for "
-                    "product='subseasonal'."
-                )
-            return "sea_level_subseasonal_coastal"
         return f"sea_level_{prod}"
 
     @staticmethod
@@ -311,15 +306,12 @@ class JRC(AbstractDataSource):
             )
         return lat_lim, lon_lim
 
-    def _resolve_dataset_id(
-        self, dataset: str | None, product: str | None, representation: str | None
-    ) -> str:
+    def _resolve_dataset_id(self, dataset: str | None, product: str | None) -> str:
         """Resolve the request selectors to a single catalog dataset id.
 
         Args:
             dataset: A catalog id, the family selector `"sea_level"`, or `None`.
             product: `"medium_term"` | `"subseasonal"` (sea-level family).
-            representation: `"gridded"` | `"coastal"` (sea-level family).
 
         Returns:
             str: The resolved catalog dataset id.
@@ -331,14 +323,7 @@ class JRC(AbstractDataSource):
         if key in self._catalog.datasets and key != "sea_level":
             # An explicit catalog id already pins the row, so the family
             # selectors cannot apply — say so rather than dropping them.
-            ignored = [
-                name
-                for name, value in (
-                    ("product", product),
-                    ("representation", representation),
-                )
-                if value is not None
-            ]
+            ignored = ["product"] if product is not None else []
             if ignored:
                 logger.warning(
                     f"JRC: dataset={dataset!r} names a dataset directly, so "
@@ -348,7 +333,7 @@ class JRC(AbstractDataSource):
         if key in ("", "flood", "jrc-flood"):
             return "efhm"
         if key == "sea_level":
-            return self._resolve_sea_level_id(product, representation)
+            return self._resolve_sea_level_id(product)
         raise ValueError(
             f"unknown JRC dataset {dataset!r}; available: "
             f"{sorted(self._catalog.datasets)} (or dataset='sea_level' with "

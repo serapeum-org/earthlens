@@ -2,7 +2,8 @@
 
 The `earthlens.jrc` backend ships four curated datasets across three `kind`s.
 The EFHM is selected by its facade key; the sea-level datasets are selected with
-`product=` / `representation=` (or by their catalog id via `dataset=`).
+`product=`; the coastal summary is its own dataset, reached by the
+`coastal-forecast` key or `dataset="sea_level_subseasonal_coastal"`.
 
 | Dataset id | Facade key(s) | `kind` | Request axis | Native resolution | CRS | Output | Licence |
 |---|---|---|---|---|---|---|---|

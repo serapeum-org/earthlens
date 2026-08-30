@@ -246,9 +246,7 @@ class TestDatasetResolution:
                 "raster",
             ),
             (
-                dict(
-                    dataset="sea_level", product="subseasonal", representation="coastal"
-                ),
+                dict(dataset="sea_level_subseasonal_coastal"),
                 "sea_level_subseasonal_coastal",
                 "tabular",
             ),
@@ -261,28 +259,12 @@ class TestDatasetResolution:
         assert backend._dataset.id == expected
         assert backend.OUTPUT_KIND == output_kind
 
-    def test_coastal_medium_term_rejected(self):
-        """The coastal representation is only offered for the subseasonal product."""
-        with pytest.raises(ValueError, match="coastal"):
-            JRC(dataset="sea_level", product="medium_term", representation="coastal")
-
     def test_unknown_product_rejected(self):
         """An unknown product is rejected with a clear message."""
         with pytest.raises(ValueError, match="product"):
             JRC(
                 dataset="sea_level",
                 product="seasonal",
-                lat_lim=[51.0, 53.0],
-                lon_lim=[3.0, 5.0],
-            )
-
-    def test_unknown_representation_rejected(self):
-        """An unknown representation is rejected."""
-        with pytest.raises(ValueError, match="representation"):
-            JRC(
-                dataset="sea_level",
-                product="subseasonal",
-                representation="bogus",
                 lat_lim=[51.0, 53.0],
                 lon_lim=[3.0, 5.0],
             )
@@ -506,9 +488,7 @@ class TestCoastalFetch:
         )
 
         backend = JRC(
-            dataset="sea_level",
-            product="subseasonal",
-            representation="coastal",
+            dataset="sea_level_subseasonal_coastal",
             reference_time="latest",
         )
         result = backend.download()
@@ -947,15 +927,7 @@ class TestHelperEdges:
                 dict(dataset="sea_level", product="medium_term", return_periods=[100]),
                 "return_periods",
             ),
-            (
-                dict(
-                    dataset="sea_level",
-                    product="subseasonal",
-                    representation="coastal",
-                    field="TWL75",
-                ),
-                "field",
-            ),
+            (dict(dataset="sea_level_subseasonal_coastal", field="TWL75"), "field"),
         ],
     )
     def test_cross_kind_argument_warns(self, kwargs, expected, caplog):
