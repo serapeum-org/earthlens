@@ -1,0 +1,125 @@
+name: Catalog drift (scheduled)
+
+# Provider catalogs pin third-party dataset ids and variable names, and those
+# drift: upstream renames a dataset, re-cases a column, retires a cadence.
+# Nothing detected that until it broke an unrelated PR's e2e job - see #1129,
+# where CoastWatch retired `nceiPH53sstd1day` and re-cased `wtmp` to `WTMP`.
+#
+# `earthlens datasets audit --strict` already flags curated datasets a provider
+# no longer serves and exits non-zero; this workflow is the missing gate that
+# actually runs it. It names the dead dataset in one line, without downloading
+# a byte - unlike an e2e fetch failure, which reads like ordinary flakiness.
+#
+# SCOPE, so this is not mistaken for more than it is: the audit compares
+# dataset *ids* only. Of the two halves of #1129 it would have caught the
+# retired `nceiPH53sstd1day` and NOT the `wtmp` -> `WTMP` re-casing, because
+# nothing here compares a row's variables against the ones served live. A
+# variable-level audit is tracked in #1148; until it exists, variable drift
+# is still found the hard way, by an e2e fetch failing.
+#
+# Deliberately SCHEDULED, not per-PR: it needs the network and provider
+# credentials, so it would be slow and flaky as a required check, and a
+# contributor should never have their PR blocked because NOAA renamed a
+# dataset. The point is to attribute drift to drift, on a cadence.
+
+permissions:
+  contents: read
+
+# A half-finished audit tells you nothing, so never cancel one in flight. The
+# group deliberately keys on the workflow alone: keyed by run_id it would be
+# unique per run and control nothing, so a manual dispatch could race the cron
+# against the same providers.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+on:
+  schedule:
+    # Monday 05:00 UTC, after Sunday's e2e cron, so a drift report lands next
+    # to the e2e failures it explains.
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+    inputs:
+      providers:
+        description: "Provider(s) to audit: a name, a comma-separated list, or 'all'."
+        required: false
+        default: 'all'
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    # Forks have no credentials; a provider needing auth would fail to list.
+    if: github.repository == 'serapeum-org/earthlens'
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
+        with:
+          python-version: "3.12"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
+          version: "0.11.29"
+
+      - name: Audit curated datasets against live
+        env:
+          # Providers whose listing endpoint needs auth. A provider without a
+          # public listing endpoint self-reports `unsupported` rather than
+          # failing, so passing `all` is safe.
+          CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
+          CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
+          GEE_SERVICE_ACCOUNT: ${{ secrets.GEE_SERVICE_ACCOUNT }}
+          GEE_SERVICE_KEY: ${{ secrets.GEE_SERVICE_KEY }}
+          EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
+          EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
+          EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
+          EUMETSAT_CONSUMER_KEY: ${{ secrets.EUMETSAT_CONSUMER_KEY }}
+          EUMETSAT_CONSUMER_SECRET: ${{ secrets.EUMETSAT_CONSUMER_SECRET }}
+          CDSE_S3_ACCESS_KEY: ${{ secrets.CDSE_S3_ACCESS_KEY }}
+          CDSE_S3_SECRET_KEY: ${{ secrets.CDSE_S3_SECRET_KEY }}
+          SENTINELHUB_CLIENT_ID: ${{ secrets.SENTINELHUB_CLIENT_ID }}
+          SENTINELHUB_CLIENT_SECRET: ${{ secrets.SENTINELHUB_CLIENT_SECRET }}
+          IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
+          WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
+          COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
+          COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
+          OPENAQ_API_KEY: ${{ secrets.OPENAQ_API_KEY }}
+          FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+          GFW_API_KEY: ${{ secrets.GFW_API_KEY }}
+          # Chosen by the dispatch input; the cron path has no inputs, so fall
+          # back to auditing everything.
+          PROVIDERS: ${{ inputs.providers || 'all' }}
+        run: |
+          # --strict exits non-zero when a curated dataset is no longer served.
+          #
+          # --no-sync + --no-build close the build-time code-execution surface a
+          # bare `uv run` leaves open (sonar githubactions:S8541): the pinned
+          # python-setup action above already built this environment, so uv must
+          # install nothing here, and no setup script may run if it tries.
+          #
+          # Both flags are needed. --no-build alone fails outright in this
+          # workspace, because the editable member distributions have no wheel:
+          #   error: Distribution `earthlens==0.19.0 @ editable+.` can't be
+          #   installed because it is marked as `--no-build` but has no binary
+          #   distribution
+          # --no-sync skips the install step entirely, which makes --no-build a
+          # belt-and-braces assertion rather than a fatal constraint.
+          #
+          # --locked still fails the run if uv.lock has drifted.
+          # --strict fails on a curated dataset the provider no longer serves, but
+          # an audit that could not run at all reports status=error with an empty
+          # `broken` list, so the gate would go green having checked nothing - the
+          # same blindness this branch fixes elsewhere. Capture the JSON and fail
+          # on an errored provider too.
+          set +e
+          uv run --locked --no-sync --no-build earthlens datasets audit "$PROVIDERS" --strict --json > "$RUNNER_TEMP/audit.json"
+          drift=$?
+          set -e
+          # Deliberately not `cat`ing the report: a provider's error detail is
+          # whatever its SDK put in the exception, and this log is public.
+          # The checker prints the provider and reason it needs, redaction
+          # being the CLI's job; the full report stays on the runner.
+          python .github/scripts/assert_audit_ran.py "$RUNNER_TEMP/audit.json"
+          exit "$drift"
