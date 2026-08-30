@@ -408,6 +408,30 @@ def _validate_property_filter(property_filter: object) -> None:
         )
 
 
+def _same_epsg_code(region_crs: Any, target: str) -> bool:
+    """Compare a CRS pyproj could not parse against the target by EPSG code.
+
+    The last resort when :meth:`GEE._same_crs`'s object comparison cannot run.
+    A code is trusted only against an explicitly `EPSG:` target, so the
+    authority stays part of the comparison rather than being dropped - which is
+    what made string-parsing the wrong answer in the first place.
+
+    Args:
+        region_crs: The region's CRS object.
+        target: The output CRS.
+
+    Returns:
+        `True` only when the target is an `EPSG:` code the region reports as
+        its own; `False` for anything unparseable or non-EPSG, since
+        reprojecting is the safe answer.
+    """
+    to_epsg = getattr(region_crs, "to_epsg", None)
+    if not callable(to_epsg) or not target.upper().startswith("EPSG:"):
+        return False
+    code = target.split(":", 1)[1]
+    return bool(code.isdigit() and to_epsg() == int(code))
+
+
 def _eedai_remedy(reason: str) -> str:
     """Suggest what to change, given why the reader declined.
 
@@ -2217,16 +2241,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         try:
             return bool(CRS.from_user_input(region_crs) == CRS.from_user_input(target))
-        except Exception:  # noqa: BLE001 - fall back below rather than assume a match
-            pass
-        # A CRS object pyproj cannot parse may still report an EPSG code. Trust
-        # that only against an explicitly EPSG target, so the authority is still
-        # part of the comparison rather than dropped.
-        to_epsg = getattr(region_crs, "to_epsg", None)
-        if not callable(to_epsg) or not target.upper().startswith("EPSG:"):
-            return False
-        code = target.split(":", 1)[1]
-        return bool(code.isdigit() and to_epsg() == int(code))
+        except Exception:  # noqa: BLE001 - any parse failure falls back, below
+            return _same_epsg_code(region_crs, target)
 
     @staticmethod
     def _eedai_grid(
