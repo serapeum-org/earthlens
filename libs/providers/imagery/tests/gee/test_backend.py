@@ -1885,6 +1885,34 @@ class TestPropertyFilter:
         with pytest.raises(ValueError, match="OGR attribute-filter string"):
             make_gee(property_filter=20)
 
+    @pytest.mark.parametrize(
+        "bad, match",
+        [
+            ("   ", "must not be blank"),
+            ("NAME = 'abc", "unbalanced single quotes"),
+            ('NAME = "abc', "unbalanced double quotes"),
+            ("(CLOUD < 20", "unbalanced parentheses"),
+            ("CLOUD < 20; DROP", "single expression"),
+            ("CLOUD < 20 -- rest", "single expression"),
+        ],
+    )
+    def test_malformed_property_filters_are_rejected(self, make_gee, bad, match):
+        """A malformed filter fails at construction, not as an opaque 'no scenes'.
+
+        It is interpolated verbatim into the reader's OGR filter, so a stray
+        quote would otherwise surface as a GDAL error the routing gate reports
+        as a discovery failure.
+        """
+        with pytest.raises(ValueError, match=match):
+            make_gee(property_filter=bad)
+
+    def test_a_well_formed_filter_is_accepted(self, make_gee):
+        """A normal expression, including quotes and parentheses, passes."""
+        gee = make_gee(
+            property_filter="(CLOUDY_PIXEL_PERCENTAGE < 20) AND MGRS_TILE = '36RUU'"
+        )
+        assert gee.property_filter.startswith("(CLOUDY_PIXEL_PERCENTAGE")
+
     def test_property_filter_warns_when_earth_engine_serves_the_request(
         self, make_gee, fake_reader, monkeypatch
     ):
@@ -2367,6 +2395,17 @@ class TestEedaiProjectedCrs:
 
         gee = make_gee(crs="EPSG:32636")
         assert gee._region_in_output_crs(_MinimalAoi()).reprojected_to == "EPSG:32636"
+
+    def test_a_non_epsg_authority_does_not_match_the_same_epsg_number(self, make_gee):
+        """`ESRI:3857` and `EPSG:3857` are different CRSs despite the shared code.
+
+        Comparing only the numeric tail would pass the region through
+        unreprojected, so the bbox and cutline would describe different ground.
+        """
+        region = _FakePolygonAoi(epsg=3857)
+        gee = make_gee(region=region)
+        gee.crs = "ESRI:3857"
+        assert gee._region_in_output_crs(region) is not region
 
     def test_region_reprojects_when_the_target_has_no_epsg_code(self, make_gee):
         """A target CRS with no `AUTH:CODE` form cannot be EPSG-matched, so it warps."""

@@ -294,6 +294,47 @@ def _discard_quietly(path: Path) -> None:
             logger.debug(f"Could not remove the staging file {stray}: {exc}")
 
 
+def _validate_property_filter(property_filter: object) -> None:
+    """Reject a scene filter that cannot be a well-formed OGR expression.
+
+    The string is interpolated verbatim into the reader's attribute filter and
+    is not escaped there, so a malformed fragment either produces an opaque GDAL
+    error or silently neutralises the time and space clauses it is ANDed with.
+    This is a cheap structural check, not a parser: it catches the mistakes that
+    would otherwise surface as "no scenes".
+
+    Args:
+        property_filter: The candidate filter.
+
+    Raises:
+        ValueError: It is not a string, is blank, has unbalanced quotes or
+            parentheses, or carries a statement separator or SQL comment.
+    """
+    if not isinstance(property_filter, str):
+        raise ValueError(
+            "property_filter must be an OGR attribute-filter string "
+            f"(e.g. 'CLOUDY_PIXEL_PERCENTAGE < 20'), got {property_filter!r}"
+        )
+    text = property_filter.strip()
+    if not text:
+        raise ValueError("property_filter must not be blank; pass None instead.")
+    for symbol, name in (("'", "single quotes"), ('"', "double quotes")):
+        if text.count(symbol) % 2:
+            raise ValueError(
+                f"property_filter has unbalanced {name}: {property_filter!r}"
+            )
+    if text.count("(") != text.count(")"):
+        raise ValueError(
+            f"property_filter has unbalanced parentheses: {property_filter!r}"
+        )
+    for token in (";", "--"):
+        if token in text:
+            raise ValueError(
+                f"property_filter must be a single expression; remove {token!r} "
+                f"from {property_filter!r}"
+            )
+
+
 def _reader_errors(reader: Any) -> tuple[type[BaseException], ...]:
     """Return the exception types a scene-discovery failure may raise.
 
@@ -514,7 +555,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `filters` are Earth Engine closures with no string form, so this is
             a separate, reader-only knob; it applies only to the EEDAI
             `image_collection` path and is ignored (with a warning) for a single
-            image or an Earth Engine-served request. Defaults to `None`.
+            image or an Earth Engine-served request. **Build it in code, never
+            from untrusted input**: it is interpolated verbatim into the
+            reader's attribute filter without escaping, so a crafted fragment
+            can neutralise the time and space clauses it is combined with. Only
+            obvious malformations (unbalanced quotes or parentheses, a statement
+            separator, a SQL comment) are rejected here. Defaults to `None`.
 
     Credentials are not constructor arguments — the constructor describes
     only what to fetch. Supply them at the authentication step:
@@ -628,11 +674,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"export_via must be 'url', 'drive', 'gcs', or 'asset', "
                 f"got {export_via!r}"
             )
-        if property_filter is not None and not isinstance(property_filter, str):
-            raise ValueError(
-                "property_filter must be an OGR attribute-filter string "
-                f"(e.g. 'CLOUDY_PIXEL_PERCENTAGE < 20'), got {property_filter!r}"
-            )
+        if property_filter is not None:
+            _validate_property_filter(property_filter)
         if export_via == "drive" and not drive_folder:
             raise ValueError("export_via='drive' requires drive_folder=")
         if export_via == "gcs" and not gcs_bucket:
@@ -1396,6 +1439,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """
         if self.crs.upper() == _EEDAI_NATIVE_CRS:
             return self._eedai_grid(bbox, scale)
+        if not all(math.isfinite(bound) for bound in bbox):
+            # `transform_bounds` returns infinities for an AOI outside the
+            # projection's domain; without this the budget maths would raise an
+            # opaque OverflowError from `math.ceil` instead.
+            raise ValueError(
+                f"the AOI bounds must all be finite, got {bbox!r} in {self.crs}"
+            )
         if not scale or scale <= 0:
             raise ValueError("'scale' must be a positive number of metres.")
         min_x, min_y, max_x, max_y = (float(v) for v in bbox)
@@ -1885,15 +1935,44 @@ class GEE(LazyClientMixin, AbstractDataSource):
             if callable(set_crs):
                 region = set_crs(_EEDAI_NATIVE_CRS)
             return region.to_crs(target)
-        to_epsg = getattr(crs, "to_epsg", None)
-        region_epsg = to_epsg() if callable(to_epsg) else None
-        target_epsg = None
-        if ":" in target:
-            tail = target.rsplit(":", 1)[-1]
-            target_epsg = int(tail) if tail.isdigit() else None
-        if region_epsg is not None and region_epsg == target_epsg:
+        if self._same_crs(crs, target):
             return region
         return region.to_crs(target)
+
+    @staticmethod
+    def _same_crs(region_crs: Any, target: str) -> bool:
+        """Return whether a region's CRS already is the output CRS.
+
+        Compared as CRS objects rather than by string-parsing an `AUTH:CODE`
+        tail: discarding the authority makes a non-EPSG code collide with the
+        EPSG code of the same number (an `ESRI:3857` target would accept an
+        EPSG:3857 region unreprojected), and a PROJ string or WKT target has no
+        code to parse at all, so an already-correct region would be warped
+        needlessly.
+
+        Args:
+            region_crs: The region's own CRS object.
+            target: The output CRS, in any form pyproj accepts.
+
+        Returns:
+            `True` when the two describe the same CRS; `False` when they differ
+            or either cannot be parsed (in which case reprojecting is the safe
+            answer).
+        """
+        from pyproj import CRS
+
+        try:
+            return bool(CRS.from_user_input(region_crs) == CRS.from_user_input(target))
+        except Exception:  # noqa: BLE001 - fall back below rather than assume a match
+            pass
+        # A CRS object pyproj cannot parse may still report an EPSG code. Trust
+        # that only against an explicitly EPSG target, so the authority is still
+        # part of the comparison rather than dropped.
+        to_epsg = getattr(region_crs, "to_epsg", None)
+        if not callable(to_epsg) or not target.upper().startswith("EPSG:"):
+            return False
+        code = target.split(":", 1)[1]
+        return bool(code.isdigit() and to_epsg() == int(code))
 
     @staticmethod
     def _eedai_grid(
