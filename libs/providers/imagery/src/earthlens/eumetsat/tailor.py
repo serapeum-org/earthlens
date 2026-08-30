@@ -40,7 +40,13 @@ class TailorConfig(BaseModel):
         format: Data Tailor output format, e.g. `"geotiff"`, `"netcdf4"`.
             Maps to `Chain.format`. Defaults to `"geotiff"`.
         crs: Target projection / CRS, e.g. `"geographic"`. Maps to
-            `Chain.projection`. Defaults to `"geographic"`.
+            `Chain.projection`. Defaults to `"geographic"`. Pass `None`
+            to reproject nothing, which omits `projection` from the
+            chain entirely — required by the native output formats
+            (`"msgnative"`, `"epsnative"`, `"hrit"`,
+            `"hrit_compressed"`), since re-gridding the pixels would
+            stop the result being native. An empty string is still
+            rejected: `None` is explicit, `""` is a mistake.
         bbox: Optional crop as `(west, south, east, north)` in degrees
             (the GeoJSON / OGC bbox order). When `None`, the backend falls
             back to the request's own spatial extent (`lat_lim` /
@@ -67,30 +73,44 @@ class TailorConfig(BaseModel):
             True
 
             ```
+        - A native-format subset, which must not be reprojected:
+            ```python
+            >>> from earthlens.eumetsat import TailorConfig
+            >>> cfg = TailorConfig(format="msgnative", crs=None)
+            >>> cfg.crs is None
+            True
+
+            ```
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     format: str = DEFAULT_FORMAT
-    crs: str = DEFAULT_CRS
+    crs: str | None = DEFAULT_CRS
     bbox: tuple[float, float, float, float] | None = None
     filter: list[str] | None = None
     quicklook: bool = False
 
     @field_validator("format", "crs")
     @classmethod
-    def _non_empty(cls, value: str) -> str:
+    def _non_empty(cls, value: str | None) -> str | None:
         """Reject an empty `format` / `crs` string.
+
+        A `None` `crs` passes through untouched — it is the explicit way
+        to ask for no reprojection. Only `format` is typed `str`, so
+        `None` can reach here for `crs` alone.
 
         Args:
             value: The candidate `format` or `crs` value.
 
         Returns:
-            The stripped value.
+            The stripped value, or `None` when `crs` is unset.
 
         Raises:
             ValueError: When the value is blank.
         """
+        if value is None:
+            return None
         stripped = value.strip()
         if not stripped:
             raise ValueError("must be a non-empty string")

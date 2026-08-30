@@ -68,6 +68,20 @@ def test_tailorconfig_rejects_blank_format():
         TailorConfig(format="  ")
 
 
+@pytest.mark.parametrize("blank", ["", "  "])
+def test_tailorconfig_rejects_blank_crs(blank):
+    """A blank crs is still rejected; only None means no reprojection."""
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        TailorConfig(crs=blank)
+
+
+def test_tailorconfig_crs_none_is_allowed():
+    """crs=None is valid and survives validation as None."""
+    assert TailorConfig(format="msgnative", crs=None).crs is None
+
+
 def test_nswe_from_extent_orders_bounds():
     """nswe_from_extent returns bounds in [N, S, W, E] order."""
     assert TailorConfig.nswe_from_extent(52, 48, 4, 8) == [52, 48, 4, 8]
@@ -119,6 +133,37 @@ def test_tailor_happy_path_builds_chain_streams_and_deletes(
     # outputs are namespaced under a per-product subdirectory (H1)
     assert {p.parent.name for p in paths} == {"p1"}
     assert (tmp_path / "p1" / "a.tif").read_bytes().startswith(b"TAILORED")
+
+
+def test_tailor_default_crs_sends_projection(fake_eumdac, tmp_path):
+    """The default config still puts a projection on the chain."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    fake_eumdac.tailor.customisation = _FakeCustomisation(
+        statuses=["DONE"], outputs=["a.tif"]
+    )
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    backend.download(progress_bar=False, tailor=TailorConfig())
+    _product, chain = fake_eumdac.tailor.submitted[0]
+    assert chain.kwargs["projection"] == "geographic"
+
+
+def test_tailor_crs_none_omits_projection(fake_eumdac, tmp_path):
+    """crs=None leaves projection out of the chain entirely, not set to None."""
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("p1")]
+    fake_eumdac.tailor.customisation = _FakeCustomisation(
+        statuses=["DONE"], outputs=["a.nat"]
+    )
+    backend = _backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
+    backend.download(
+        progress_bar=False,
+        tailor=TailorConfig(
+            format="msgnative", crs=None, bbox=(-5.0, 40.0, 15.0, 55.0)
+        ),
+    )
+    _product, chain = fake_eumdac.tailor.submitted[0]
+    assert "projection" not in chain.kwargs
+    assert chain.format == "msgnative"
+    assert chain.product == "HRSEVIRI"
 
 
 def test_tailor_multiple_products_namespaced_no_collision(fake_eumdac, tmp_path):

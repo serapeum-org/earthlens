@@ -103,3 +103,39 @@ class TestEumetsatDataTailorLive:
 
         after = len(list(backend._auth.datatailor().customisations))
         assert after <= before, "customisation was not deleted after streaming"
+
+    def test_tailor_native_format_needs_no_projection(self, tmp_path: Path):
+        """A `crs=None` MSG SEVIRI request comes back as native `.nat`.
+
+        Native output cannot be reprojected, so the chain must carry no
+        projection at all. Skips (not fails) when the account is not
+        download-authorised for the collection.
+        """
+        el = EarthLens(
+            data_source="eumetsat",
+            start=_PROBE_DATE,
+            end=_PROBE_DATE,
+            variables={"msg-hrseviri": ["HRSEVIRI"]},
+            lat_lim=[40.0, 55.0],
+            lon_lim=[-5.0, 15.0],
+            path=str(tmp_path),
+        )
+
+        try:
+            paths = el.download(
+                progress_bar=False,
+                tailor=TailorConfig(
+                    format="msgnative", crs=None, bbox=(-5.0, 40.0, 15.0, 55.0)
+                ),
+            )
+        except Exception as exc:  # noqa: BLE001 - classify a download 403 as a skip
+            if any(marker in str(exc) for marker in _NOT_AUTHORISED):
+                pytest.skip(
+                    "credentials are valid but the account is not authorised to "
+                    f"download this collection (accept the licence): {exc}"
+                )
+            raise
+
+        assert paths, "native tailor download returned no paths"
+        assert paths[0].exists() and paths[0].stat().st_size > 0
+        assert paths[0].suffix == ".nat", f"expected a native .nat, got {paths[0].name}"

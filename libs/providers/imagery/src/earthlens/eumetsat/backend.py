@@ -45,6 +45,7 @@ from __future__ import annotations
 import shutil
 import time
 from pathlib import Path
+from typing import Any
 
 from loguru import logger
 from pydantic import SecretStr
@@ -540,21 +541,26 @@ class EUMETSAT(AbstractDataSource):
         nswe = tailor.nswe or TailorConfig.nswe_from_extent(
             self.space.north, self.space.south, self.space.west, self.space.east
         )
-        chain = eumdac.tailor_models.Chain(
-            product=dataset.tailor_product_type,
-            format=tailor.format,
-            projection=tailor.crs,
+        chain_kwargs: dict[str, Any] = {
+            "product": dataset.tailor_product_type,
+            "format": tailor.format,
             # eumdac types NSWE as Optional[str], but the Data Tailor ROI takes
             # a north/south/west/east list (see TailorConfig.nswe).
-            roi=eumdac.tailor_models.RegionOfInterest(NSWE=nswe),  # type: ignore[arg-type]
-            filter=(
+            "roi": eumdac.tailor_models.RegionOfInterest(NSWE=nswe),  # type: ignore[arg-type]
+            "filter": (
                 eumdac.tailor_models.Filter(bands=list(tailor.filter))
                 if tailor.filter
                 else None
             ),
             # eumdac types quicklook as a Quicklook/dict; the API accepts a truthy flag.
-            quicklook=tailor.quicklook or None,  # type: ignore[arg-type]
-        )
+            "quicklook": tailor.quicklook or None,
+        }
+        # `crs=None` means "do not reproject": leave `projection` out of the chain
+        # rather than sending it as null, which is how eumdac expresses an
+        # unprojected customisation. Native formats reject any projection.
+        if tailor.crs is not None:
+            chain_kwargs["projection"] = tailor.crs
+        chain = eumdac.tailor_models.Chain(**chain_kwargs)
         product_handle = product.metadata["product"]
         # Choose the per-product output subdir *before* submitting, so nothing
         # between the submit and the `try/finally` can raise and orphan the

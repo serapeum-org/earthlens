@@ -85,6 +85,8 @@ class _FakeChain:
     """Stand-in for `eumdac.tailor_models.Chain` — records its kwargs."""
 
     def __init__(self, **kwargs: Any) -> None:
+        # Kept verbatim so a test can tell an omitted key from an explicit None.
+        self.kwargs = dict(kwargs)
         self.product = kwargs.get("product")
         self.format = kwargs.get("format")
         self.projection = kwargs.get("projection")
