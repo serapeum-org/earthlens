@@ -594,6 +594,14 @@ class Variable(FluxableLeaf):
     request_kind: str = "form"
     endpoint: str = "cds"
     grid_resolution: float | None = None
+    #: Why a live probe can never fill this row's `units` / `nc_variable`,
+    #: or None while it is merely unfilled. A placeholder that is waiting for
+    #: a sweep and one that no sweep can ever answer look identical otherwise,
+    #: so every re-run pays for the second kind again and an operator reading
+    #: the catalog cannot tell which is which. The only value carried today is
+    #: `"pseudo-slug"`: the row is keyed `all`, which stands for every variable
+    #: the dataset serves and so resolves to none of them.
+    unhydratable: str | None = None
 
     @field_validator("extras", mode="before")
     @classmethod

@@ -1154,3 +1154,32 @@ class TestDenotesTemporalAggregate:
         assert all(t == t.lower() for t in _TEMPORAL_AGGREGATE_TOKENS), (
             "every token is lowercase so matching against lowercased text works"
         )
+
+
+class TestUnhydratableField:
+    """The catalog can say a row is terminal rather than merely unfilled."""
+
+    def test_it_defaults_to_none(self):
+        """Every existing row keeps meaning 'pending' without being touched."""
+        from earthlens.ecmwf.catalog import Variable
+
+        row = Variable(
+            cds_dataset="d",
+            cds_variable="v",
+            nc_variable="n",
+            units="K",
+            product_type=["reanalysis"],
+        )
+        assert row.unhydratable is None
+
+    def test_the_shipped_all_rows_are_marked(self):
+        """A slug naming every variable resolves to none, in every dataset."""
+        from earthlens.ecmwf import Catalog
+
+        unmarked = [
+            f"{name}/{slug}"
+            for name, dataset in Catalog().datasets.items()
+            for slug, row in dataset.variables.items()
+            if slug == "all" and row.units == "unknown" and not row.unhydratable
+        ]
+        assert not unmarked, f"pseudo-slug rows left indistinguishable: {unmarked}"

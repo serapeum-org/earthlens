@@ -440,6 +440,20 @@ is a flat list, not a dict).
 default; use this only when one specific variable should pull a
 different level set than the rest of its dataset family. Rare.
 
+##### `unhydratable`
+
+*Optional.* String. Why a live probe can never fill this row's `units` /
+`nc_variable`. Absent means the row is simply not filled yet, and
+`earthlens datasets curate ecmwf --fill-empty` will try it; present means no
+retrieve can answer it, and the sweep skips the row rather than spending a
+request and a queue slot to rediscover that.
+
+The only value in use is `pseudo-slug`: the row is keyed `all`, which stands
+for every variable the dataset serves and therefore resolves to none of them.
+
+Without this, a placeholder waiting for a sweep and one no sweep can ever
+answer look identical, so every re-run pays for the second kind again.
+
 ##### `request_kind` (per-row)
 
 *Optional.* Per-row override of the parent's `request_kind`. Very

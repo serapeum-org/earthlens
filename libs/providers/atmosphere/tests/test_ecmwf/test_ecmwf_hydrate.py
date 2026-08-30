@@ -363,6 +363,34 @@ _CLAIMED_BLOCK = """      total-precipitation:
 """
 
 
+class TestUnhydratableRows:
+    """A placeholder no retrieve can answer is not the same as a pending one."""
+
+    def test_a_marked_row_is_not_offered_to_a_probe(self):
+        """Probing it again spends a request to learn what the row already says."""
+        block = (
+            "      wanted:\n        nc_variable: x\n        units: unknown\n"
+            "      all:\n        nc_variable: y\n        units: unknown\n"
+            "        unhydratable: pseudo-slug\n"
+        )
+        assert hydrate_mod._placeholder_slugs(block) == ["wanted"], (
+            "a row nothing can fill was queued for a retrieve anyway"
+        )
+
+    def test_an_unmarked_placeholder_is_still_offered(self):
+        """The mark has to be what excludes it, not the slug's name."""
+        block = "      all:\n        nc_variable: y\n        units: unknown\n"
+        assert hydrate_mod._placeholder_slugs(block) == ["all"]
+
+    def test_a_hydrated_row_is_never_offered(self):
+        """Unchanged behaviour: a filled row is not a placeholder."""
+        block = (
+            "      done:\n        nc_variable: z\n        units: K\n"
+            "        unhydratable: pseudo-slug\n"
+        )
+        assert hydrate_mod._placeholder_slugs(block) == []
+
+
 class TestErrorSummary:
     """What a skipped dataset reports about why it stopped."""
 

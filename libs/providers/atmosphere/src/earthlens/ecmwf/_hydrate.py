@@ -105,6 +105,9 @@ _VARIABLE_BLOCK = re.compile(
 )
 #: The placeholder sentinel a seed writes for an un-hydrated variable.
 _UNKNOWN_UNITS = re.compile(r"(?m)^ {8}units:[ \t]*unknown[ \t]*$")
+
+#: A row whose `unhydratable:` names why no retrieve can ever fill it.
+_UNHYDRATABLE = re.compile(r"(?m)^ {8}unhydratable:[ \t]*\S")
 #: The 8-space `nc_variable:` / `units:` keys rewritten inside a var sub-block
 #: (the value after the key is replaced, a single space re-inserted).
 _NC_VARIABLE_LINE = re.compile(r"(?m)^( {8}nc_variable:)[^\n]*$")
@@ -1288,11 +1291,18 @@ def _match_variables(
 
 
 def _placeholder_slugs(block: str) -> list[str]:
-    """Return the slugs of variable sub-blocks still carrying `units: unknown`."""
+    """Return the slugs still carrying `units: unknown` that a probe could fill.
+
+    A row marked `unhydratable:` is left out. It is still a placeholder, but no
+    retrieve can answer it — the marked ones are keyed `all`, which stands for
+    every variable the dataset serves and so resolves to none — and probing it
+    again spends a request and a queue slot to learn what the row already says.
+    """
     return [
         match.group("slug")
         for match in _VARIABLE_BLOCK.finditer(block)
         if _UNKNOWN_UNITS.search(match.group("body"))
+        and not _UNHYDRATABLE.search(match.group("body"))
     ]
 
 
