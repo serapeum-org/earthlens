@@ -136,6 +136,26 @@ def test_tailorconfig_native_check_sees_stripped_values():
         TailorConfig(format="  msgnative  ", crs="  geographic  ")
 
 
+def test_tailorconfig_field_error_masks_the_cross_field_one():
+    """A field-level failure is reported alone; mode="after" never runs.
+
+    pydantic only runs a mode="after" model_validator once every field
+    validator has already succeeded, so an inverted bbox and a native
+    format paired with a projection -- both invalid on their own -- surface
+    only the bbox error here. Fixing it on a second attempt is what then
+    exposes the native/crs mismatch; the two are never reported together.
+    This is pydantic's own contract, not something TailorConfig chooses,
+    but nothing here pinned it before.
+    """
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError) as exc_info:
+        TailorConfig(format="msgnative", crs="geographic", bbox=(8, 48, 4, 52))
+    errors = exc_info.value.errors()
+    locations = [e["loc"] for e in errors]
+    assert locations == [("bbox",)], f"expected only the bbox error, got {locations}"
+
+
 @pytest.mark.parametrize("field", ["format", "crs"])
 def test_tailorconfig_strips_surrounding_whitespace(field):
     """Padding is stripped off format and crs alike."""
