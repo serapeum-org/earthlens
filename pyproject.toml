@@ -325,6 +325,11 @@ files = [
     "libs/providers/imagery/src/earthlens",
     "libs/providers/land/src/earthlens",
     "libs/providers/hazards/src/earthlens",
+    # CI helpers: not shipped in any distribution, but they gate the test
+    # suite, so a type error there fails runs rather than a user's import.
+    # Named individually because mypy skips dot-prefixed directories.
+    ".github/scripts/assert_tests_ran.py",
+    ".github/scripts/assert_audit_ran.py",
 ]
 warn_return_any = true
 warn_unused_configs = false

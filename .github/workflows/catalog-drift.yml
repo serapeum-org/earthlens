@@ -25,9 +25,12 @@ name: Catalog drift (scheduled)
 permissions:
   contents: read
 
-# A half-finished audit tells you nothing, so never cancel one in flight.
+# A half-finished audit tells you nothing, so never cancel one in flight. The
+# group deliberately keys on the workflow alone: keyed by run_id it would be
+# unique per run and control nothing, so a manual dispatch could race the cron
+# against the same providers.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.run_id }}
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 on:

@@ -114,7 +114,7 @@ class TestTotals:
     def test_missing_attributes_default_to_zero(self, guard, tmp_path):
         """A suite without `tests` / `skipped` contributes nothing rather than raising."""
         (tmp_path / "r.xml").write_text(
-            '<testsuites><testsuite name="s"/></testsuites>'
+            '<testsuites><testsuite name="s"/></testsuites>', encoding="utf-8"
         )
         assert guard._totals(tmp_path / "r.xml") == (0, 0), (
             "absent attributes mishandled"
@@ -181,7 +181,8 @@ class TestMain:
     def test_failures_count_as_executed(self, guard, tmp_path):
         """A failing test still ran, so the guard defers to pytest's own exit code."""
         (tmp_path / "r.xml").write_text(
-            '<testsuites><testsuite tests="4" skipped="0" failures="4"/></testsuites>'
+            '<testsuites><testsuite tests="4" skipped="0" failures="4"/></testsuites>',
+            encoding="utf-8",
         )
         assert guard.main([str(tmp_path / "r.xml"), "lane"]) == 0, (
             "failures are executions"
