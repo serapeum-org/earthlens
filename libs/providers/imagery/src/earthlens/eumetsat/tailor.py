@@ -79,7 +79,8 @@ class TailorConfig(BaseModel):
 
             ```
         - A native-format subset, which must not be reprojected — `crs=None`
-          keeps `projection` off the chain, while the default still reprojects:
+          reaches the chain as `projection=None`, which `eumdac` drops the same
+          way it would an omitted one, while the default still reprojects:
             ```python
             >>> from earthlens.eumetsat import TailorConfig
             >>> cfg = TailorConfig(format="msgnative", crs=None)
@@ -101,6 +102,19 @@ class TailorConfig(BaseModel):
             ... except ValidationError as err:
             ...     print(err.errors()[0]["msg"])
             Value error, must be a non-empty string
+
+            ```
+        - Pairing a native format with a real projection is rejected before
+          any request is built, rather than failing after Data Tailor polls
+          it to `FAILED`:
+            ```python
+            >>> from pydantic import ValidationError
+            >>> from earthlens.eumetsat import TailorConfig
+            >>> try:
+            ...     TailorConfig(format="msgnative", crs="geographic")
+            ... except ValidationError as err:
+            ...     print(err.errors()[0]["msg"])
+            Value error, format='msgnative' is a native output format and cannot be reprojected; pass crs=None instead of crs='geographic'
 
             ```
 
