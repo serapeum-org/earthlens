@@ -2471,6 +2471,7 @@ version = "0.19.0"
 source = { editable = "libs/providers/imagery" }
 dependencies = [
     { name = "earthlens-core" },
+    { name = "pyproj" },
 ]
 
 [package.optional-dependencies]
@@ -2521,6 +2522,7 @@ requires-dist = [
     { name = "gportal", marker = "extra == 'jaxa'", specifier = ">=0.4,<0.5" },
     { name = "jaxa-earth", marker = "extra == 'jaxa'", specifier = ">=0.1.6,<0.2" },
     { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.52" },
+    { name = "pyproj", specifier = ">=3.7.0" },
     { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.7.0,<0.8" },
     { name = "pyramids-gis", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.58.0" },
     { name = "rtree", marker = "extra == 'gee'", specifier = ">=1.0.0" },
