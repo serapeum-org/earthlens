@@ -163,6 +163,14 @@ jobs:
           GEE_SERVICE_ACCOUNT: ${{ secrets.GEE_SERVICE_ACCOUNT }}
           GEE_SERVICE_KEY: ${{ secrets.GEE_SERVICE_KEY }}
         run: |
+          # The key reaches CI as JSON, but `ee.ServiceAccountCredentials` takes a
+          # *filename*. Passing the content where a path belongs is what put a
+          # private key into a public log: `open()` failed and the traceback
+          # printed the whole key. Write it to the runner's temp dir (wiped when
+          # the job ends) and hand the code a path, which every call site accepts.
+          printf "%s" "$GEE_SERVICE_KEY" > "$RUNNER_TEMP/gee-key.json"
+          GEE_SERVICE_KEY="$RUNNER_TEMP/gee-key.json"
+          export GEE_SERVICE_KEY
           report="$RUNNER_TEMP/e2e-gee.xml"
           uv run --locked pytest -m "e2e and gee" -v --junitxml="$report"
           # A lane where every test skipped exercised nothing, yet pytest exits 0

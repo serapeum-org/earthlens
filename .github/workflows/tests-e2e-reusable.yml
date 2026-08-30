@@ -269,6 +269,14 @@ jobs:
           # catch-all installs extras: all and targets the whole package.
           # -rs prints each skip's reason, so an upstream-availability skip (see
           # earthlens.testing.pytest_runtest_call) is legible in the log.
+          # The GEE key arrives as JSON, but `ee.ServiceAccountCredentials` takes a
+          # *filename*; handing it the content made `open()` fail and print the key
+          # into a public log. Materialise it and pass a path instead.
+          case "$GEE_SERVICE_KEY" in
+            \{*) printf "%s" "$GEE_SERVICE_KEY" > "$RUNNER_TEMP/gee-key.json"
+                 GEE_SERVICE_KEY="$RUNNER_TEMP/gee-key.json"
+                 export GEE_SERVICE_KEY ;;
+          esac
           pkg="$PKG"
           report="$RUNNER_TEMP/e2e-$LANE.xml"
           set +e
