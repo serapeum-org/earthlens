@@ -42,6 +42,24 @@ _TRANSIENT_MARKERS = (
 )
 
 
+def _detail(row: dict) -> str:
+    """Return a row's `detail` as text, whatever the provider put there.
+
+    The shape guard only establishes that each row is a mapping, so `detail`
+    can be any JSON scalar. Coercing here keeps a malformed report a *reported*
+    failure rather than an `AttributeError` traceback that reads as a bug in
+    this checker.
+
+    Args:
+        row: One provider record from the audit report.
+
+    Returns:
+        str: The detail text, or `""` when the row carries none.
+    """
+    detail = row.get("detail")
+    return "" if detail is None else str(detail)
+
+
 def _looks_transient(detail: str) -> bool:
     """Whether a provider's failure detail reads as a transient reach failure.
 
@@ -109,7 +127,7 @@ def main(argv: list[str]) -> int:
         return 1
 
     errored = [r for r in rows if r.get("status") == "error"]
-    transient = [r for r in errored if _looks_transient(r.get("detail") or "")]
+    transient = [r for r in errored if _looks_transient(_detail(r))]
     hard = [r for r in errored if r not in transient]
 
     # A transient reach failure is not drift and not a defect. This gate spans
@@ -120,13 +138,13 @@ def main(argv: list[str]) -> int:
     for row in transient:
         print(
             f"::warning::{row.get('provider', '?')}: audit could not reach the "
-            f"provider ({row.get('detail') or 'no detail given'}) - drift is "
+            f"provider ({_detail(row) or 'no detail given'}) - drift is "
             f"unverified this run",
         )
     for row in hard:
         print(
             f"::error::{row.get('provider', '?')}: audit could not run "
-            f"({row.get('detail') or 'no detail given'}) - drift is unverified "
+            f"({_detail(row) or 'no detail given'}) - drift is unverified "
             f"for this provider",
         )
     if hard:

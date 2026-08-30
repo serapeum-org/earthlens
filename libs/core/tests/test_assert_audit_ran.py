@@ -168,6 +168,25 @@ class TestMain:
             f"an empty unreachable clause was printed: {out}"
         )
 
+    @pytest.mark.parametrize(
+        "detail, expected",
+        [(502, 0), (None, 1), (True, 1)],
+        ids=["int", "null", "bool"],
+    )
+    def test_a_non_string_detail_does_not_crash(
+        self, checker, tmp_path, detail, expected
+    ):
+        """`detail` is any JSON scalar, so it is coerced rather than assumed text.
+
+        The shape guard only establishes that rows are mappings; a numeric
+        detail previously reached `.lower()` and raised.
+        """
+        report = _report(
+            tmp_path / "a.json",
+            {"provider": "gee", "status": "error", "detail": detail},
+        )
+        assert checker.main([str(report)]) == expected, f"detail={detail!r} mishandled"
+
     def test_unsupported_is_not_an_error(self, checker, tmp_path):
         """A provider with no listing endpoint is expected, not a failure."""
         report = _report(
