@@ -18,6 +18,7 @@ from __future__ import annotations
 import gc
 import os
 import tracemalloc
+import warnings
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock
@@ -1823,6 +1824,46 @@ def _write_real_nc(path, *, periods=6, rows=2, cols=3, nan_at=None):
     return values
 
 
+#: The one enumeration failure that says nothing about the code under test: the
+#: whole-system handle walk cannot fit the machine's current handle count.
+_ENUMERATION_CAPACITY_MARKERS = ("buffer too big", "systemextendedhandleinformation")
+
+
+def _is_enumeration_capacity_failure(error):
+    """Whether `error` is the machine being too busy to enumerate handles."""
+    text = str(error).lower()
+    return any(marker in text for marker in _ENUMERATION_CAPACITY_MARKERS)
+
+
+class TestHandleEnumerationGuard:
+    """What the shared release-check helper tolerates, and what it must not."""
+
+    def test_a_capacity_failure_skips_the_caller(self, monkeypatch, tmp_path):
+        """The machine being too busy says nothing about the code under test."""
+        monkeypatch.setattr(
+            psutil.Process,
+            "open_files",
+            lambda self: (_ for _ in ()).throw(
+                RuntimeError("SystemExtendedHandleInformation buffer too big")
+            ),
+        )
+
+        with pytest.warns(RuntimeWarning, match="handle-release checks skipped"):
+            with pytest.raises(pytest.skip.Exception, match="cannot be enumerated"):
+                _handles_on(tmp_path)
+
+    def test_any_other_enumeration_error_is_raised(self, monkeypatch, tmp_path):
+        """Swallowing it would skip every release check in this file, green."""
+        monkeypatch.setattr(
+            psutil.Process,
+            "open_files",
+            lambda self: (_ for _ in ()).throw(psutil.AccessDenied()),
+        )
+
+        with pytest.raises(psutil.AccessDenied):
+            _handles_on(tmp_path)
+
+
 def _handles_on(path):
     """Entries this process holds open on `path`.
 
@@ -1840,10 +1881,20 @@ def _handles_on(path):
     too big`). That says nothing about the code under test, so the caller is
     skipped rather than failed — the same treatment an unreachable service
     gets elsewhere in this suite.
+
+    Only that capacity failure is tolerated. This is the shared helper for every
+    release check in the file, so swallowing any enumeration error would turn a
+    genuine psutil regression into a green suite with the whole family silently
+    skipped. Anything else is raised, and the skip warns on its way out.
     """
     try:
         handles = psutil.Process().open_files()
     except (RuntimeError, psutil.Error) as exc:
+        if not _is_enumeration_capacity_failure(exc):
+            raise
+        warnings.warn(
+            f"handle-release checks skipped: {exc}", RuntimeWarning, stacklevel=2
+        )
         pytest.skip(f"this process's open handles cannot be enumerated: {exc}")
     found = []
     for handle in handles:
