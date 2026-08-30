@@ -36,8 +36,8 @@ datasets:
   # Global 0.25° NetCDF-4 cubes read via pyramids.netcdf.NetCDF; a global coastal-summary
   # CSV rides with the subseasonal product. Licence CC-BY-4.0 (shared, top-level). DOI +
   # the 2024 methodology-paper citation are pending the data producer's reply (left empty
-  # until confirmed). The gridded field geotransform arrives index-space over /vsicurl;
-  # the backend stamps the CF affine from latitude/longitude until pyramids#1071 lands.
+  # until confirmed). The gridded field's geotransform comes from the cube's own CF
+  # latitude/longitude, which pyramids derives as of 0.58.1.
   sea_level_medium_term:
     kind: sea_level_gridded
     title: "JRC medium-term probabilistic sea-level (TWL) forecast — 15-day, twice daily"

@@ -88,13 +88,6 @@ transfers little of the 13–38 GB cube. Because a forecast cycle is chosen by
 `reference_time` (not a `start`/`end` scan) and carries no reducible time axis,
 `aggregate=` is rejected.
 
-!!! note "Georeferencing (interim)"
-    Over `/vsicurl` the gridded variables currently arrive in index space, so
-    the backend reconstructs the CF affine (`(-180, 0.25, 0, 90, 0, -0.25)`) from
-    the global grid shape. This is a temporary shim until
-    [pyramids#1071](https://github.com/serapeum-org/pyramids/issues/1071) builds
-    the affine from the file's `latitude` / `longitude` coordinates.
-
 ## Licence
 
 Every JRC product here is **CC-BY-4.0** (permissive attribution) — no licence

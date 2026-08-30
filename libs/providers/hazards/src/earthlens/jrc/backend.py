@@ -12,8 +12,8 @@ dataset and dispatched on the catalog row's `kind` (the `ecmwf`-endpoint /
   `pyramids.netcdf.NetCDF`. The request axis is a forecast `reference_time`
   (default `"latest"`) plus a bbox and a `field` (default `TWL75`); each cycle is
   resolved by walking the jeodpp autoindex, gated on the `endFls` sentinel. The
-  variables arrive index-space over `/vsicurl`, so the backend reconstructs the
-  CF affine from the grid shape (interim until pyramids#1071).
+  grid comes from the cube's own CF `latitude` / `longitude` via pyramids
+  (>= 0.58.1).
 * `sea_level_coastal` — the subseasonal global per-country coastal summary CSV,
   returned as a `pandas.DataFrame`.
 
@@ -626,7 +626,7 @@ class JRC(AbstractDataSource):
 
         Opens the global NetCDF cube lazily over `/vsicurl` with
         `pyramids.netcdf.NetCDF`, reconstructs the CF affine from the grid shape
-        (the variable arrives index-space; interim until pyramids#1071), reads
+        (pyramids derives the affine from the cube's CF coordinates), reads
         only the AOI pixel window across every forecast time step, rebuilds a
         small georeferenced `Dataset`, crops to the exact bbox / polygon, and
         writes one multi-band GeoTIFF (band = forecast time step).
