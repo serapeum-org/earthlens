@@ -9,6 +9,7 @@ masked by missing configuration.
 from __future__ import annotations
 
 import importlib.util
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pytest
@@ -96,6 +97,11 @@ def _backend_report(path: Path, *cases: tuple[str, str, str | None]) -> Path:
         encoding="utf-8",
     )
     return path
+
+
+def _raise_parse_error(report):
+    """Stand in for a second junit parse that lands on a truncated report."""
+    raise ET.ParseError("no element found")
 
 
 class TestTotals:
@@ -213,6 +219,27 @@ class TestMain:
         assert code == 0, f"a truncated report must not fail the lane, got {code}"
         assert "incomplete" in capsys.readouterr().out
 
+    def test_a_truncated_second_parse_leaves_a_running_lane_green(
+        self, guard, tmp_path, monkeypatch, capsys
+    ):
+        """The per-backend re-parse failing is the timeout's failure, not the lane's."""
+        monkeypatch.setattr(guard, "_per_backend", _raise_parse_error)
+        report = _report(tmp_path / "r.xml", (10, 2))
+        assert guard.main([str(report), "lane"]) == 0, (
+            "a re-parse failure invented a lane failure"
+        )
+        assert "8 of 10" in capsys.readouterr().out, "the ratio was not still reported"
+
+    def test_a_truncated_second_parse_does_not_fail_a_skipped_lane(
+        self, guard, tmp_path, monkeypatch
+    ):
+        """The exemption lookup's parse is guarded too, so a dead lane is not blamed."""
+        monkeypatch.setattr(guard, "_per_backend", _raise_parse_error)
+        report = _report(tmp_path / "r.xml", (3, 3))
+        assert guard.main([str(report), "lane"]) == 0, (
+            "a re-parse failure was reported as a dead lane"
+        )
+
     @pytest.mark.parametrize("argv", [[], ["only-one"], ["a", "b", "c"]])
     def test_wrong_argument_count_is_a_usage_error(self, guard, argv, capsys):
         """Anything but `<report> <lane>` exits 2 and prints usage to stderr."""
@@ -243,6 +270,14 @@ class TestBackendGrouping:
             # A bare test function has no class segment to drop.
             ("tests.jaxa.test_e2e", "jaxa"),
             ("tests..test_mod.TestX", ""),
+            # The search starts at the *last* `tests`, so a package path that
+            # itself begins with one still resolves the backend, not `libs`.
+            ("tests.libs.core.tests.gee.test_mod.TestX", "gee"),
+            # A backend directory with its own subdirectory still groups under
+            # the backend, which is the level the exemption list speaks about.
+            ("tests.gee.sub.test_mod.TestX", "gee"),
+            # `tests` in the final position leaves nothing after the slice.
+            ("libs.core.tests", ""),
         ],
     )
     def test_backend_is_the_segment_after_tests(self, guard, classname, expected):
@@ -276,6 +311,18 @@ class TestBackendGrouping:
         )
         assert guard._per_backend(tmp_path / "r.xml") == {"argo": (0, 1)}, (
             "a collection-level skip was not attributed to its backend"
+        )
+
+    def test_a_present_classname_wins_over_the_name_fallback(self, guard, tmp_path):
+        """`name` stands in only when `classname` is empty, never overriding it."""
+        (tmp_path / "r.xml").write_text(
+            '<testsuites><testsuite name="s" tests="1" skipped="0">'
+            '<testcase classname="tests.gee.test_mod.TestX" name="tests.argo.test_x"/>'
+            "</testsuite></testsuites>",
+            encoding="utf-8",
+        )
+        assert guard._per_backend(tmp_path / "r.xml") == {"gee": (1, 0)}, (
+            "the name fallback displaced a present classname"
         )
 
     def test_an_xfail_counts_as_executed_per_backend(self, guard, tmp_path):
@@ -340,17 +387,44 @@ class TestDeadBackendDetection:
         )
         assert guard.main([str(report), "lane"]) == 0, "a declared exemption failed"
 
+    @pytest.mark.parametrize("backend", ["wdpa", "mswep", "airnow"])
     def test_a_dedicated_lane_of_an_exempt_backend_passes(
-        self, guard, tmp_path, capsys
+        self, guard, tmp_path, capsys, backend
     ):
         """A lane holding only a declared-empty backend is exempt too."""
         report = _backend_report(
             tmp_path / "r.xml",
-            ("wdpa", "a", "pytest.skip"),
-            ("wdpa", "b", "pytest.skip"),
+            (backend, "a", "pytest.skip"),
+            (backend, "b", "pytest.skip"),
         )
-        assert guard.main([str(report), "e2e-wdpa"]) == 0, "an exempt lane was failed"
+        assert guard.main([str(report), f"e2e-{backend}"]) == 0, (
+            f"the {backend} lane was failed despite its exemption"
+        )
         assert "declared exemption" in capsys.readouterr().out
+
+    def test_an_exempt_backend_does_not_carry_a_dead_neighbour(
+        self, guard, tmp_path, capsys
+    ):
+        """A wholly-skipped lane mixing an exemption with a live backend still fails."""
+        report = _backend_report(
+            tmp_path / "r.xml",
+            ("wdpa", "a", "pytest.skip"),
+            ("cmems", "b", "pytest.skip"),
+        )
+        assert guard.main([str(report), "lane"]) == 1, "a mixed dead lane must fail"
+        assert "::error::" in capsys.readouterr().out, "no annotation for a dead lane"
+
+    def test_a_wholly_skipped_lane_of_backendless_tests_fails(
+        self, guard, tmp_path, capsys
+    ):
+        """No backend at all is not a vacuous exemption, even though `set() <= x`."""
+        report = _backend_report(
+            tmp_path / "r.xml", ("", "a", "pytest.skip"), ("", "b", "pytest.skip")
+        )
+        assert guard.main([str(report), "lane"]) == 1, (
+            "an empty backend set was read as a blanket exemption"
+        )
+        assert "exercised nothing" in capsys.readouterr().out
 
     def test_a_wholly_skipped_unexempt_lane_still_fails(self, guard, tmp_path, capsys):
         """The exemption does not blanket every wholly-skipped lane."""

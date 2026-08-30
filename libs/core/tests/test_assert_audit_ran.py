@@ -37,6 +37,34 @@ def _report(path: Path, *rows: dict) -> Path:
     return path
 
 
+class TestLooksTransient:
+    """Tests for the module-private `_looks_transient` helper."""
+
+    def test_every_declared_marker_is_recognised(self, checker):
+        """Each entry in `_TRANSIENT_MARKERS` is honoured, not only the spelled-out ones."""
+        for marker in checker._TRANSIENT_MARKERS:
+            detail = f"the provider replied: {marker} while listing datasets"
+            assert checker._looks_transient(detail), f"{marker!r} was not recognised"
+
+    @pytest.mark.parametrize(
+        "detail",
+        ["Connection reset by peer", "CONNECTION RESET BY PEER", "Timed Out"],
+        ids=["mixed", "upper", "title"],
+    )
+    def test_matching_ignores_case(self, checker, detail):
+        """Upstream wording varies in case, so the match is case-insensitive."""
+        assert checker._looks_transient(detail), f"{detail!r} should read as transient"
+
+    @pytest.mark.parametrize(
+        "detail",
+        ["", "401 Unauthorized", "dataset 'x' is no longer served", "404 Not Found"],
+        ids=["empty", "unauthorized", "gone", "not-found"],
+    )
+    def test_anything_else_stays_hard(self, checker, detail):
+        """An unexplained or contractual failure is not forgiven as transient."""
+        assert not checker._looks_transient(detail), f"{detail!r} was excused"
+
+
 class TestMain:
     """Tests for the checker's `main` entry point."""
 
@@ -94,14 +122,51 @@ class TestMain:
         assert checker.main([str(report)]) == 1, f"{detail!r} should fail the gate"
         assert "::error::" in capsys.readouterr().out
 
-    def test_a_hard_failure_beside_a_transient_one_still_fails(self, checker, tmp_path):
-        """A forgivable error does not mask an unforgivable one."""
+    def test_a_hard_failure_beside_a_transient_one_still_fails(
+        self, checker, tmp_path, capsys
+    ):
+        """A forgivable error does not mask an unforgivable one, and both are printed."""
         report = _report(
             tmp_path / "a.json",
             {"provider": "gee", "status": "error", "detail": "timed out"},
             {"provider": "cmems", "status": "error", "detail": "401 Unauthorized"},
         )
         assert checker.main([str(report)]) == 1, "a hard failure must still fail"
+        out = capsys.readouterr().out
+        assert "::warning::gee" in out, f"the transient row lost its warning: {out}"
+        assert "::error::cmems" in out, f"the hard row lost its error: {out}"
+        assert "::error::gee" not in out, f"the transient row was escalated: {out}"
+
+    def test_a_transient_only_report_tallies_the_unreachable_separately(
+        self, checker, tmp_path, capsys
+    ):
+        """A provider that timed out is neither audited nor unsupported; it is its own count.
+
+        Counting it as unsupported would overstate how much of the catalogue
+        was actually checked.
+        """
+        report = _report(
+            tmp_path / "a.json",
+            {"provider": "erddap", "status": "ok"},
+            {"provider": "gee", "status": "error", "detail": "504 Gateway Timeout"},
+        )
+        assert checker.main([str(report)]) == 0, "a transient-only report must pass"
+        out = capsys.readouterr().out
+        assert "::warning::gee" in out, f"the unreachable provider is not named: {out}"
+        assert "1 provider(s) audited, 0 unsupported, 1 unreachable this run" in out, (
+            f"the transient row was not tallied on its own: {out}"
+        )
+
+    def test_a_report_with_nothing_unreachable_omits_that_clause(
+        self, checker, tmp_path, capsys
+    ):
+        """The unreachable count appears only when there is one to report."""
+        report = _report(tmp_path / "a.json", {"provider": "erddap", "status": "ok"})
+        assert checker.main([str(report)]) == 0, "an all-ok report must pass"
+        out = capsys.readouterr().out
+        assert "unreachable" not in out, (
+            f"an empty unreachable clause was printed: {out}"
+        )
 
     def test_unsupported_is_not_an_error(self, checker, tmp_path):
         """A provider with no listing endpoint is expected, not a failure."""

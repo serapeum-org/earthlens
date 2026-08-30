@@ -254,8 +254,14 @@ class TestRedact:
         assert _CREDENTIAL_KEY_RE.search("'private_key': 'x'"), (
             "a repr key should match"
         )
+        assert _CREDENTIAL_KEY_RE.search('"private_key" : "x"'), (
+            "whitespace before the colon should still match"
+        )
         assert not _CREDENTIAL_KEY_RE.search("the private_key field"), (
             "prose should not"
+        )
+        assert not _CREDENTIAL_KEY_RE.search('"private_key_id": "x"'), (
+            "the identifier field should not match"
         )
 
     @pytest.mark.parametrize(
@@ -273,6 +279,25 @@ class TestRedact:
         key = '{"a":123}'
         result = _redact(f"the value {key} appeared", key)
         assert key not in result, "a ten-character inline key survived"
+
+    def test_inline_json_at_the_length_guard_is_not_substituted(self):
+        """The guard is exclusive: an eight-character inline value is left alone."""
+        key = '{"a":12}'
+        assert len(key) == 8, "the boundary this test pins has moved"
+        message = f"the value {key} appeared"
+        assert _redact(message, key) == message, "the length guard let a short key in"
+
+    def test_the_private_key_id_field_is_not_a_credential_key(self):
+        """`private_key_id` is a fingerprint, not key material, so it must not collapse.
+
+        The pattern requires the closing quote immediately after the field
+        name; over-collapsing here would discard an actionable message for a
+        value that is safe to print.
+        """
+        message = 'key rejected: "private_key_id": "abc123"'
+        assert _redact(message, r"C:\keys\k.json") == message, (
+            "an identifier field collapsed the whole message"
+        )
 
     def test_a_path_is_left_intact(self):
         """A path is not secret, and redacting it hid the commonest failure.
@@ -489,6 +514,60 @@ class TestEarthEngineAuthInitialize:
         with pytest.raises(AuthenticationError) as excinfo:
             EarthEngineAuth.initialize("sa@x.iam", key)
         assert "SUPERSECRET" not in str(excinfo.value), "key material survived"
+
+    def test_a_registration_failure_is_classified_on_the_raw_message(self, monkeypatch):
+        """Credential material in the message must not cost the registration branch.
+
+        Redaction collapses the whole message on a PEM marker, so classifying
+        on the redacted text would drop back to the generic wording exactly
+        when naming the unregistered project matters most.
+        """
+        marker = "-----BEGIN " + "PRIVATE KEY-----"
+        raw = f"Project p is not registered to use Earth Engine; key was {marker}"
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
+        monkeypatch.setattr(
+            auth_module.ee, "Initialize", MagicMock(side_effect=ee.EEException(raw))
+        )
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
+        rendered = str(excinfo.value)
+        assert "not registered to use Earth Engine" in rendered, (
+            f"the registration branch was lost to redaction: {rendered}"
+        )
+        assert marker not in rendered, f"PEM armour survived: {rendered}"
+
+    def test_a_permission_failure_is_classified_on_the_raw_message(self, monkeypatch):
+        """The IAM branch survives a message that redaction would otherwise collapse."""
+        raw = 'PERMISSION_DENIED while reading {"client_secret": "SUPERSECRET"}'
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
+        monkeypatch.setattr(
+            auth_module.ee, "Initialize", MagicMock(side_effect=ee.EEException(raw))
+        )
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
+        rendered = str(excinfo.value)
+        assert "serviceUsageConsumer" in rendered, (
+            f"the IAM branch was lost to redaction: {rendered}"
+        )
+        assert "SUPERSECRET" not in rendered, f"key material survived: {rendered}"
+
+    def test_a_missing_key_file_still_names_the_path(self, monkeypatch, tmp_path):
+        """The commonest failure of all must stay actionable: name the file.
+
+        Blanking the path reported `No such file or directory: '<service key
+        redacted>'`, which told the reader nothing.
+        """
+        missing = str(tmp_path / "absent-key.json")
+        monkeypatch.setattr(
+            auth_module.ee,
+            "ServiceAccountCredentials",
+            MagicMock(side_effect=FileNotFoundError(2, "No such file", missing)),
+        )
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", missing, project="p")
+        assert "absent-key.json" in str(excinfo.value), (
+            f"the missing path was blanked: {excinfo.value}"
+        )
 
     @pytest.mark.parametrize(
         "error",
