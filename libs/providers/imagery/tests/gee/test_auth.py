@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import base64
 import json
+import traceback
 from unittest.mock import MagicMock
 
 import ee
@@ -120,24 +121,63 @@ class TestEarthEngineAuthInitialize:
         assert project == "override"
         assert init.call_args.kwargs["project"] == "override"
 
-    def test_credentials_fallback_to_key_data(self, monkeypatch):
-        """A `ValueError` from the path form falls back to the `key_data=` form."""
+    def test_inline_json_goes_straight_to_key_data(self, monkeypatch):
+        """Inline JSON is passed as `key_data=`, never positionally as a filename."""
         monkeypatch.setattr(auth_module.ee, "Initialize", MagicMock())
-        creds = MagicMock(side_effect=[ValueError("not a file"), MagicMock()])
+        creds = MagicMock(return_value=MagicMock())
         monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", creds)
         project = EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
         assert project == "p"
-        assert creds.call_count == 2
+        assert creds.call_count == 1
         assert "key_data" in creds.call_args.kwargs
 
-    def test_both_credential_attempts_fail_raises(self, monkeypatch):
-        """If both credential constructions fail, an `AuthenticationError` is raised."""
-        creds = MagicMock(side_effect=[ValueError("nope"), RuntimeError("still nope")])
+    def test_a_path_is_passed_positionally(self, monkeypatch, key_file):
+        """A filesystem path keeps the positional filename form `ee` expects."""
+        monkeypatch.setattr(auth_module.ee, "Initialize", MagicMock())
+        creds = MagicMock(return_value=MagicMock())
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", creds)
+        EarthEngineAuth.initialize("sa@x.iam", key_file)
+        assert creds.call_count == 1
+        assert creds.call_args.args[1] == key_file
+        assert "key_data" not in creds.call_args.kwargs
+
+    def test_credential_failure_raises(self, monkeypatch):
+        """A failed credential construction raises an `AuthenticationError`."""
+        creds = MagicMock(side_effect=RuntimeError("nope"))
         monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", creds)
         with pytest.raises(
             AuthenticationError, match="could not build service-account credentials"
         ):
             EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
+
+    def test_a_failure_never_reports_the_key(self, monkeypatch):
+        """No key material reaches the error text or the chained traceback.
+
+        Pins the defect that put a private key in a public CI log: the key was
+        passed where a filename belonged, so the resulting exception carried it
+        and the traceback printed it.
+        """
+        secret = (
+            "-----BEGIN PRIVATE KEY-----"
+            + chr(10)
+            + "SUPERSECRET"
+            + chr(10)
+            + "-----END PRIVATE KEY-----"
+            + chr(10)
+        )
+        key = _key_text(project_id="p", private_key=secret)
+        creds = MagicMock(side_effect=FileNotFoundError(2, "No such file", key))
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", creds)
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", key)
+        rendered = "".join(
+            traceback.format_exception(
+                type(excinfo.value), excinfo.value, excinfo.value.__traceback__
+            )
+        )
+        assert "SUPERSECRET" not in rendered
+        assert "BEGIN PRIVATE KEY" not in rendered
+        assert excinfo.value.__cause__ is None
 
     def test_not_registered_project_raises_friendly(self, monkeypatch):
         """An "EE not registered" error becomes a registration-pointing AuthenticationError."""

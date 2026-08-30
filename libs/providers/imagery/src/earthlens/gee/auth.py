@@ -109,6 +109,47 @@ class EarthEngineCredentials(BaseModel):
     project: str | None = None
 
 
+def _is_inline_json(service_key: str) -> bool:
+    """Whether `service_key` carries the key's JSON rather than its path.
+
+    The same leading-character rule `_load_key_dict` applies, named once so
+    the credential call and the parse cannot disagree about which shape they
+    were handed.
+
+    Args:
+        service_key: Path to the service-account JSON file, or the JSON
+            content as a string.
+
+    Returns:
+        bool: True when the value is inline JSON.
+    """
+    return isinstance(service_key, str) and service_key.lstrip().startswith("{")
+
+
+def _redact(message: str, service_key: str) -> str:
+    """Return `message` with any service-account key material removed.
+
+    Defence in depth for the error paths. `ee.ServiceAccountCredentials`
+    takes a *filename* positionally, so handing it inline JSON makes Python
+    raise `FileNotFoundError` with the whole key as the "filename" - which a
+    traceback then prints. Callers below break the exception chain, and this
+    strips the value from anything they do report.
+
+    Args:
+        message: The text about to be surfaced.
+        service_key: The key path or JSON content to strip.
+
+    Returns:
+        str: The message with the key value and any PEM block replaced.
+    """
+    cleaned = message
+    if isinstance(service_key, str) and len(service_key) > 8:
+        cleaned = cleaned.replace(service_key, "<service key redacted>")
+    if "PRIVATE KEY" in cleaned:
+        return "<service key redacted>"
+    return cleaned
+
+
 def _load_key_dict(service_key: str) -> dict[str, Any] | None:
     """Return the parsed service-account JSON, or `None` if not parseable.
 
@@ -131,7 +172,7 @@ def _load_key_dict(service_key: str) -> dict[str, Any] | None:
     """
     if not isinstance(service_key, str):
         return None
-    if service_key.lstrip().startswith("{"):
+    if _is_inline_json(service_key):
         try:
             return cast("dict[str, Any]", json.loads(service_key))
         except ValueError:
@@ -330,19 +371,29 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
                 f"field. See {_SERVICE_ACCOUNT_DOCS}."
             )
 
+        # `ee.ServiceAccountCredentials` takes a *filename* positionally, so
+        # inline JSON must go to `key_data=`. Handing the content positionally
+        # makes `open()` raise FileNotFoundError with the whole key as the
+        # "filename", and the traceback then prints the private key - which is
+        # how a key reached a public CI log once. Choose by shape instead of
+        # letting the wrong call fail.
         try:
-            credentials = ee.ServiceAccountCredentials(service_account, service_key)
-        except ValueError:
-            try:
+            if _is_inline_json(service_key):
                 credentials = ee.ServiceAccountCredentials(
                     service_account, key_data=service_key
                 )
-            except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
-                raise AuthenticationError(
-                    "could not build service-account credentials from the "
-                    f"supplied key (account={service_account!r}). Check that "
-                    f"the key file/JSON is valid. See {_SERVICE_ACCOUNT_DOCS}."
-                ) from exc
+            else:
+                credentials = ee.ServiceAccountCredentials(service_account, service_key)
+        except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
+            # `from None`, not `from exc`: the cause's message can embed the
+            # key, and a chained traceback prints it. The detail is preserved
+            # through _redact instead, which cannot echo key material.
+            detail = _redact(str(exc), service_key)
+            raise AuthenticationError(
+                "could not build service-account credentials from the "
+                f"supplied key (account={service_account!r}): {detail}. Check "
+                f"that the key file/JSON is valid. See {_SERVICE_ACCOUNT_DOCS}."
+            ) from None
 
         try:
             ee.Initialize(credentials=credentials, project=resolved_project)
