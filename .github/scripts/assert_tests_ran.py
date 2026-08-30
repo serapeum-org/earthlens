@@ -127,7 +127,7 @@ def _per_backend(report: Path) -> dict[str, tuple[int, int]]:
             # `name` instead, so it would otherwise land in the lane-level
             # bucket and be invisible per backend. That is precisely the shape
             # an uninstalled optional extra produces.
-            where = case.get("classname") or case.get("name", "")
+            where = case.get("classname") or case.get("name") or ""
             slot = counts.setdefault(_backend(where), [0, 0])
             slot[1 if is_skip else 0] += 1
     return {name: (ran, skipped) for name, (ran, skipped) in counts.items()}
