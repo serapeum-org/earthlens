@@ -17,6 +17,7 @@ import pytest
 
 from earthlens.gee import auth as auth_module
 from earthlens.gee.auth import (
+    _CREDENTIAL_MARKERS,
     AuthenticationError,
     EarthEngineAuth,
     EarthEngineCredentials,
@@ -93,6 +94,16 @@ class TestEarthEngineCredentials:
         )
         assert creds.service_key.get_secret_value() == "C:/k.json", (
             "value not preserved"
+        )
+
+    def test_serialisation_does_not_leak_the_key(self):
+        """Neither `model_dump` nor `model_dump_json` renders the key's value."""
+        creds = EarthEngineCredentials(
+            service_account="sa@x.iam", service_key="SUPERSECRET-KEY-VALUE"
+        )
+        assert "SUPERSECRET" not in str(creds.model_dump()), "model_dump leaked the key"
+        assert "SUPERSECRET" not in creds.model_dump_json(), (
+            "model_dump_json leaked the key"
         )
 
 
@@ -209,6 +220,29 @@ class TestRedact:
         """A message that merely mentions a service account is left intact."""
         message = "could not build credentials (account='sa@x.iam.gserviceaccount.com')"
         assert _redact(message, json.dumps({"a": 1})) == message, "prose was collapsed"
+
+    @pytest.mark.parametrize("marker", _CREDENTIAL_MARKERS)
+    def test_every_declared_marker_collapses_the_message(self, marker):
+        """Each declared credential marker discards the message it appears in."""
+        result = _redact(f"boom {marker} tail", "unrelated-but-long-enough")
+        assert result == "<service key redacted>", (
+            f"marker {marker!r} did not collapse: {result}"
+        )
+
+    @pytest.mark.parametrize(
+        "field", ["private_key", "client_secret", "refresh_token", "client_email"]
+    )
+    def test_unquoted_field_names_are_not_collapsed(self, field):
+        """The markers carry their JSON quotes, so prose naming a field survives."""
+        message = f"the {field} field is missing from the key"
+        assert _redact(message, "unrelated-but-long-enough") == message, (
+            f"prose naming {field} was collapsed"
+        )
+
+    def test_a_nine_character_key_is_substituted(self):
+        """One character past the length guard the value is replaced."""
+        result = _redact("the value 123456789 appeared", "123456789")
+        assert "123456789" not in result, "a nine-character key survived"
 
     def test_redacted_output_carries_no_key_material(self):
         """The end-to-end property: neither the key nor a PEM header survives."""
@@ -347,17 +381,20 @@ class TestEarthEngineAuthInitialize:
         ):
             EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
 
-    def test_permission_error_raises_friendly(self, monkeypatch):
-        """A serviceUsage permission error becomes an IAM-role-pointing AuthenticationError."""
+    @pytest.mark.parametrize(
+        "detail",
+        [
+            "Caller does not have required permission on the project",
+            "missing roles/serviceusage.serviceUsageConsumer",
+            "PERMISSION_DENIED: the request was rejected",
+        ],
+        ids=["required-permission", "serviceUsageConsumer", "permission-denied"],
+    )
+    def test_permission_error_raises_friendly(self, monkeypatch, detail):
+        """Each permission-flavoured message becomes an IAM-role-pointing error."""
         monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
         monkeypatch.setattr(
-            auth_module.ee,
-            "Initialize",
-            MagicMock(
-                side_effect=ee.EEException(
-                    "Caller does not have required permission ... serviceUsageConsumer"
-                )
-            ),
+            auth_module.ee, "Initialize", MagicMock(side_effect=ee.EEException(detail))
         )
         with pytest.raises(
             AuthenticationError, match="serviceUsageConsumer|earthengine.viewer"
@@ -381,6 +418,75 @@ class TestEarthEngineAuthInitialize:
         )
         with pytest.raises(AuthenticationError, match="initialisation failed"):
             EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
+
+    def test_an_ee_exception_carrying_the_key_is_redacted(self, monkeypatch):
+        """The `ee.Initialize` branch redacts too, not only the credential branch."""
+        marker = "-----BEGIN " + "PRIVATE KEY-----"
+        key = _key_text(project_id="p", private_key=marker + chr(10) + "SUPERSECRET")
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
+        monkeypatch.setattr(
+            auth_module.ee,
+            "Initialize",
+            MagicMock(side_effect=ee.EEException(f"backend rejected {key}")),
+        )
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", key)
+        rendered = str(excinfo.value)
+        assert "SUPERSECRET" not in rendered, f"key material survived: {rendered}"
+        assert marker not in rendered, f"PEM header survived: {rendered}"
+
+    def test_a_generic_initialisation_failure_is_redacted(self, monkeypatch):
+        """The non-`EEException` branch redacts the key it is handed as well."""
+        key = _key_text(project_id="p", private_key="SUPERSECRET")
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
+        monkeypatch.setattr(
+            auth_module.ee,
+            "Initialize",
+            MagicMock(side_effect=FileNotFoundError(2, "No such file", key)),
+        )
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", key)
+        assert "SUPERSECRET" not in str(excinfo.value), "key material survived"
+
+    @pytest.mark.parametrize(
+        "error",
+        [
+            ee.EEException("Project p is not registered to use Earth Engine"),
+            ee.EEException("Caller does not have required permission"),
+            ee.EEException("something else entirely"),
+            OSError("disk"),
+        ],
+        ids=["not-registered", "permission", "other-ee", "generic"],
+    )
+    def test_every_initialisation_failure_breaks_the_chain(self, monkeypatch, error):
+        """Every branch raises `from None`, so no cause can print the key."""
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
+        monkeypatch.setattr(auth_module.ee, "Initialize", MagicMock(side_effect=error))
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
+        assert excinfo.value.__cause__ is None, "the exception chain was not broken"
+
+    def test_an_unparseable_key_uses_the_explicit_project(self, monkeypatch):
+        """A key that parses to nothing still initialises when `project` is given."""
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
+        init = MagicMock()
+        monkeypatch.setattr(auth_module.ee, "Initialize", init)
+        project = EarthEngineAuth.initialize("sa@x.iam", "neither json nor a file", "p")
+        assert project == "p", "the explicit project did not survive an unparseable key"
+        assert init.call_args.kwargs["project"] == "p"
+
+    def test_inline_json_with_leading_whitespace_uses_key_data(self, monkeypatch):
+        """Whitespace before the brace still routes the key to `key_data=`."""
+        monkeypatch.setattr(auth_module.ee, "Initialize", MagicMock())
+        creds = MagicMock(return_value=MagicMock())
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", creds)
+        project = EarthEngineAuth.initialize(
+            "sa@x.iam", "  " + _key_text(project_id="p")
+        )
+        assert project == "p"
+        assert "key_data" in creds.call_args.kwargs, (
+            "a padded key went in as a filename"
+        )
 
     def test_constructor_sets_attributes(self, key_file, stub_ee):
         """The constructor stores the account and the resolved project."""
