@@ -357,12 +357,40 @@ def _tokens(text: str) -> set[str]:
     return {token for token in re.split(r"[^a-z0-9]+", text.lower()) if token}
 
 
+#: A scalar that reads as a number to some YAML reader. PyYAML's 1.1
+#: resolver calls none of these numbers - it wants a decimal point for a
+#: float, and `08` is not valid octal - so `safe_dump` leaves them bare and
+#: they load back as strings here by luck of the resolver. A YAML 1.2
+#: core-schema loader resolves `1e-3` to a float, and `units: str` would
+#: then coerce it to `'0.001'`. Quote them, so the type is the file's
+#: rather than the parser's.
+_NUMBER_SHAPED = re.compile(
+    r"[+-]?(?:0[0-9]+|[0-9]+(?:\.[0-9]*)?|\.[0-9]+)"
+    r"(?:[eE][+-]?[0-9]+)?"
+)
+
+
+def _quote_if_number_shaped(dumped: str, value: str) -> str:
+    """Quote a scalar the emitter left bare that another reader would type.
+
+    Args:
+        dumped: What the YAML emitter produced for `value`.
+        value: The original string.
+
+    Returns:
+        `dumped`, quoted when it is bare and number-shaped.
+    """
+    if dumped == value and _NUMBER_SHAPED.fullmatch(value):
+        return f"'{value}'"
+    return dumped
+
+
 def _yaml_value(value: str) -> str:
     """Render a string as the scalar YAML would emit after `key: ` (quoting as needed)."""
     dumped: str = yaml.safe_dump(
         {"x": value}, allow_unicode=True, default_flow_style=False
     )
-    return dumped[len("x: ") :].rstrip("\n")
+    return _quote_if_number_shaped(dumped[len("x: ") :].rstrip(chr(10)), value)
 
 
 def _is_auxiliary(name: str) -> bool:
@@ -1221,6 +1249,15 @@ def _yaml_inline_list(value: Any) -> str:
 
             ```
     """
+    if isinstance(value, list):
+        # Rendered item by item so the number-shaped guard reaches each one:
+        # a month list mixing '01' with a bare 08 is one loader change from
+        # meaning two different types in one sequence.
+        rendered = [
+            _yaml_value(item) if isinstance(item, str) else _yaml_inline_list(item)
+            for item in value
+        ]
+        return "[" + ", ".join(rendered) + "]"
     dumped = str(
         yaml.safe_dump(value, default_flow_style=True, allow_unicode=True, width=10**6)
     ).strip()

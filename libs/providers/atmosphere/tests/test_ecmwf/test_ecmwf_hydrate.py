@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import re
 import textwrap
 import time
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -580,6 +582,74 @@ class TestErrorSummary:
             f"summary ran to {len(summary)} chars"
         )
         assert summary.endswith("...")
+
+
+class TestNumberShapedScalarsAreQuoted:
+    """A written scalar's type must be the file's, not the parser's."""
+
+    @pytest.mark.parametrize(
+        "value", ["1e-3", "1e-6", "1e-9", "08", "09", "1.0", "1", "1.", "0755"]
+    )
+    def test_a_number_shaped_string_is_quoted(self, value):
+        """PyYAML leaves `1e-3` and `08` bare; a YAML 1.2 reader would type them."""
+        rendered = hydrate_mod._yaml_value(value)
+
+        assert rendered.startswith("'") and rendered.endswith("'")
+        assert yaml.safe_load(f"x: {rendered}")["x"] == value
+
+    @pytest.mark.parametrize("value", ["K", "W m-2", "(0 - 1)", "2e", "day"])
+    def test_an_ordinary_unit_is_left_bare(self, value):
+        """Quoting everything would churn the catalog for nothing."""
+        assert hydrate_mod._yaml_value(value) == value
+
+    def test_a_month_list_does_not_mix_quoted_and_bare(self):
+        """`['01', 08, 09, '10']` is one loader change from two types in one list."""
+        rendered = hydrate_mod._yaml_inline_list(["01", "07", "08", "09", "10"])
+
+        assert rendered == "['01', '07', '08', '09', '10']"
+        assert yaml.safe_load(rendered) == ["01", "07", "08", "09", "10"]
+
+
+#: Keys whose value the catalog types as a string. `grid_resolution: 0.05` and
+#: `version: 3` are genuinely numeric fields and are none of this check's
+#: business - only a string that a resolver could retype is.
+_STRING_VALUED_KEYS = ("units", "nc_variable", "cds_variable", "unhydratable")
+
+
+def _scalar_values(code):
+    """Every unquoted scalar the catalog means as a string on one line."""
+    match = re.match(r"^\s*([A-Za-z_][\w-]*):[ 	]+(.*)$", code)
+    if not match:
+        return []
+    key, value = match.group(1), match.group(2).strip()
+    if value.startswith("[") and value.endswith("]"):
+        # A selector list: every item is a string, whatever it looks like.
+        items = [item.strip() for item in value[1:-1].split(",")]
+        return [item for item in items if item and not item.startswith(("'", '"'))]
+    if key not in _STRING_VALUED_KEYS:
+        return []
+    if not value or value.startswith(("'", '"', "{", "&", "*")):
+        return []
+    return [value]
+
+
+class TestShippedCatalogHasNoResolverDependentScalars:
+    """What the emitter now refuses must also not already be on disk."""
+
+    def test_no_shard_carries_a_bare_number_shaped_scalar(self):
+        """These load as strings only by luck of PyYAML's 1.1 resolver."""
+        from earthlens.ecmwf.catalog import CATALOG_PATH
+
+        offenders = []
+        for shard in sorted(Path(CATALOG_PATH).glob("*.yaml")):
+            for number, line in enumerate(
+                shard.read_text(encoding="utf-8").splitlines(), 1
+            ):
+                for value in _scalar_values(line.split("#")[0]):
+                    if hydrate_mod._NUMBER_SHAPED.fullmatch(value):
+                        offenders.append(f"{shard.name}:{number}: {line.strip()}")
+
+        assert not offenders, "bare number-shaped scalars: " + "; ".join(offenders)
 
 
 class TestUnhydratableIsReadTheSameWay:

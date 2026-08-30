@@ -5477,28 +5477,28 @@ datasets:
         units: '1'
         extras:
           hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07, e_hypecatch_m08, e_hypecatch_m09, e_hypegrid, lisflood_efas, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+          month: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
       brier-skill-score-below-normal-conditions:
         cds_variable: brier_skill_score_below_normal_conditions
         nc_variable: fairBSSbn
         units: '1'
         extras:
           hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07, e_hypecatch_m08, e_hypecatch_m09, e_hypegrid, lisflood_efas, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+          month: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
       continuous-ranked-probability-skill-score:
         cds_variable: continuous_ranked_probability_skill_score
         nc_variable: fairCRPSS
         units: '1'
         extras:
           hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07, e_hypecatch_m08, e_hypecatch_m09, e_hypegrid, lisflood_efas, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+          month: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
       fair-ranked-probability-skill-score:
         cds_variable: fair_ranked_probability_skill_score
         nc_variable: fairRPSS
         units: '1'
         extras:
           hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07, e_hypecatch_m08, e_hypecatch_m09, e_hypegrid, lisflood_efas, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+          month: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
   sis-hydrology-variables-derived-seasonal-reforecast:
     endpoint: cds
     request_kind: form
@@ -5534,28 +5534,28 @@ datasets:
         units: '1'
         extras:
           hydrological_model: [e_hypecatch_m00, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+          month: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
       brier-skill-score-below-normal-conditions:
         cds_variable: brier_skill_score_below_normal_conditions
         nc_variable: fairBSSbn
         units: '1'
         extras:
           hydrological_model: [e_hypecatch_m00, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+          month: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
       continuous-ranked-probability-skill-score:
         cds_variable: continuous_ranked_probability_skill_score
         nc_variable: fairCRPSS
         units: '1'
         extras:
           hydrological_model: [e_hypecatch_m00, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+          month: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
       fair-ranked-probability-skill-score:
         cds_variable: fair_ranked_probability_skill_score
         nc_variable: fairRPSS
         units: '1'
         extras:
           hydrological_model: [e_hypecatch_m00, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+          month: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
   sis-marine-properties:
     endpoint: cds
     request_kind: form

@@ -546,7 +546,7 @@ datasets:
         cds_variable: depth_average_salinity_of_upper_300m
         nc_variable: sot300
         types: state
-        units: 1e-3
+        units: '1e-3'
       depth-of-14-c-isotherm-seasonal-ocean:
         cds_variable: depth_of_14_c_isotherm
         nc_variable: t14d
@@ -596,7 +596,7 @@ datasets:
         cds_variable: sea_surface_salinity
         nc_variable: sos
         types: state
-        units: 1e-3
+        units: '1e-3'
   seasonal-monthly-single-levels:
     product_type:
     - reanalysis
