@@ -2264,18 +2264,13 @@ class TestEedaiCollections:
         bbox = fake_reader.cost_calls[0][1]["bbox"]
         assert max(abs(v) for v in bbox) < 200, f"discovery bbox not lat/lon: {bbox}"
 
-    def test_repeated_buckets_reuse_one_discovery_query(self, make_gee, fake_reader):
-        """The same window must not re-query the catalog for every bucket."""
-        gee = self._collection_gee(make_gee)
-        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        for _ in range(4):
-            gee._eedai_collection_fits(var_info, 1, self.START, self.END)
-        assert len(fake_reader.cost_calls) == 1, (
-            f"{len(fake_reader.cost_calls)} catalog queries for one window"
-        )
+    def test_each_bucket_costs_exactly_one_discovery_query(self, make_gee, fake_reader):
+        """Discovery is one catalog query per bucket - no more, and no caching.
 
-    def test_distinct_windows_are_queried_separately(self, make_gee, fake_reader):
-        """Different buckets are genuinely different questions, so both are asked."""
+        Each bucket has a distinct window and is visited once, so there is
+        nothing to reuse; this pins the cost so a future change that adds a
+        second query per bucket is visible.
+        """
         gee = self._collection_gee(make_gee)
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         gee._eedai_collection_fits(var_info, 1, self.START, self.END)
@@ -2283,17 +2278,6 @@ class TestEedaiCollections:
             var_info, 1, dt.datetime(2020, 7, 1), dt.datetime(2020, 8, 1)
         )
         assert len(fake_reader.cost_calls) == 2
-
-    def test_a_failed_discovery_is_not_cached(self, make_gee, fake_reader):
-        """A transient outage must not disable the fast path for the rest of the run."""
-        gee = self._collection_gee(make_gee)
-        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        fake_reader.cost_error = OSError("EEDA is unreachable")
-        assert not gee._eedai_collection_fits(
-            var_info, 1, self.START, self.END
-        ).can_serve
-        fake_reader.cost_error = None
-        assert gee._eedai_collection_fits(var_info, 1, self.START, self.END).can_serve
 
     def test_collection_obeys_the_per_axis_budget(self, make_gee, fake_reader):
         """A window too tall for one pass is declined, as it is for a single image.

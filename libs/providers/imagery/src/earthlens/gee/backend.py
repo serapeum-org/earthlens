@@ -748,9 +748,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self._eedai_credential: Any = None  # lazily built in `_eedai_credentials`
         self._cog_warned = False  # one-shot guard for the `cog=` notice
         self._property_filter_warned: set[str] = set()  # per-dataset filter notice
-        #: Scene-discovery results, keyed by the inputs that determine them, so a
-        #: multi-bucket run does not re-query the catalog for a repeated window.
-        self._eedai_cost_cache: dict[tuple[str, str, str], Any] = {}
 
         super().__init__(
             start=start,
@@ -1052,7 +1049,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
         _ = self.client
         self._cog_warned = False  # the cog= notice is once per run, not per object
         self._property_filter_warned = set()  # same, for the property_filter notice
-        self._eedai_cost_cache = {}  # discovery is re-checked once per run
         outputs: list[Path | str | TaskInfo] = []
         assert isinstance(
             self.vars, dict
@@ -1585,41 +1581,37 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return EedaiPlan(False, None, 0, "the EEDAI credential could not be built")
         window_start = bucket_start.strftime("%Y-%m-%d")
         window_end = self._reader_end(bucket_end)
-        # The AOI and property_filter are fixed for the whole run, so the asset
-        # and the bucket window are what identify a discovery result. Without
-        # this a monthly three-year request pays 36 catalog queries before a
-        # single pixel moves, and every served bucket pays again inside the read.
-        cache_key = (var_info.id, window_start, window_end)
-        cached = self._eedai_cost_cache.get(cache_key)
-        if cached is not None:
-            cost = cached
-        else:
-            try:
-                cost = reader.estimate_earthengine_cost(
-                    var_info.id,
-                    start=window_start,
-                    end=window_end,
-                    bbox=self._eedai_latlon_aoi(),
-                    # The AOI handed over is lat/lon, so it must be labelled as
-                    # such: upstream reads `bbox` *in* `crs`, and passing the
-                    # output CRS here would have degrees read as projected metres
-                    # and discover scenes over the wrong ground.
-                    crs=_EEDAI_NATIVE_CRS,
-                    credentials=credentials,
-                    property_filter=self.property_filter,
-                )
-            except _reader_errors(reader) as exc:
-                # A discovery failure is a fallback, not a crash - but it is
-                # worth more than an info line, because a persistent one
-                # silently disables the fast path for the whole run.
-                logger.warning(
-                    f"EEDA scene discovery failed for {var_info.id}: {exc}. This "
-                    "bucket falls back to Earth Engine."
-                )
-                return EedaiPlan(
-                    False, None, 0, f"scene discovery for {var_info.id} failed ({exc})"
-                )
-            self._eedai_cost_cache[cache_key] = cost
+        # One catalog query per bucket, by necessity: every bucket has a
+        # distinct window, and `ReadCost` reports only aggregates, so a single
+        # whole-run discovery cannot be split back into per-bucket counts.
+        # Caching keyed on the window was measured to never hit for this reason
+        # and was removed rather than left in as dead weight. Reducing this to
+        # one query per run needs upstream to expose the per-scene times.
+        try:
+            cost = reader.estimate_earthengine_cost(
+                var_info.id,
+                start=window_start,
+                end=window_end,
+                bbox=self._eedai_latlon_aoi(),
+                # The AOI handed over is lat/lon, so it must be labelled as
+                # such: upstream reads `bbox` *in* `crs`, and passing the
+                # output CRS here would have degrees read as projected metres
+                # and discover scenes over the wrong ground.
+                crs=_EEDAI_NATIVE_CRS,
+                credentials=credentials,
+                property_filter=self.property_filter,
+            )
+        except _reader_errors(reader) as exc:
+            # A discovery failure is a fallback, not a crash - but it is
+            # worth more than an info line, because a persistent one
+            # silently disables the fast path for the whole run.
+            logger.warning(
+                f"EEDA scene discovery failed for {var_info.id}: {exc}. This "
+                "bucket falls back to Earth Engine."
+            )
+            return EedaiPlan(
+                False, None, 0, f"scene discovery for {var_info.id} failed ({exc})"
+            )
         if not cost.scene_count:
             # A legitimate, quiet decline: the window and AOI simply hold no
             # scenes, so there is nothing for the reader to composite.
