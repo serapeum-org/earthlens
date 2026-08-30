@@ -294,6 +294,28 @@ def _discard_quietly(path: Path) -> None:
             logger.debug(f"Could not remove the staging file {stray}: {exc}")
 
 
+def _reader_errors(reader: Any) -> tuple[type[BaseException], ...]:
+    """Return the exception types a scene-discovery failure may raise.
+
+    `pyramids-eo` is an optional extra, so its `ReaderError` cannot be imported
+    at module load; it is resolved from the already-imported reader module here.
+    Transport and argument errors are included because a discovery round-trip
+    can fail as either. `AuthenticationError` is deliberately absent: a
+    credential problem must surface, not silently downgrade the run.
+
+    Args:
+        reader: The imported `pyramids_eo.earthengine` module.
+
+    Returns:
+        The exception classes to treat as a recoverable discovery failure.
+    """
+    errors: list[type[BaseException]] = [OSError, ValueError]
+    upstream = getattr(reader, "ReaderError", None)
+    if isinstance(upstream, type) and issubclass(upstream, BaseException):
+        errors.append(upstream)
+    return tuple(errors)
+
+
 def _validate_filters(
     filters: Iterable[CollectionFilter] | None,
 ) -> tuple[CollectionFilter, ...]:
@@ -1460,6 +1482,22 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 ),
             )
         reader = import_earthengine_reader()
+        # Built outside the discovery `try`, so a credential problem is never
+        # reported as "no scenes". Under a forced engine it raises; under
+        # `auto` it warns and falls back, because `auto`'s contract is to route
+        # a request Earth Engine can still serve rather than to fail it - but
+        # loudly, so a fixable key does not silently disable the fast path.
+        try:
+            credentials = self._eedai_credentials()
+        except AuthenticationError:
+            if self.engine == "eedai":
+                raise
+            logger.warning(
+                f"the EEDAI credential could not be built, so {var_info.id} "
+                "falls back to Earth Engine; fix the service key to use the "
+                "fast path."
+            )
+            return EedaiPlan(False, None, 0, "the EEDAI credential could not be built")
         try:
             cost = reader.estimate_earthengine_cost(
                 var_info.id,
@@ -1471,15 +1509,28 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 # output CRS here would have degrees read as projected metres
                 # and discover scenes over the wrong ground.
                 crs=_EEDAI_NATIVE_CRS,
-                credentials=self._eedai_credentials(),
+                credentials=credentials,
                 property_filter=self.property_filter,
             )
-        except Exception as exc:  # noqa: BLE001 - any discovery failure declines
+        except _reader_errors(reader) as exc:
+            # A discovery failure is a fallback, not a crash - but it is worth
+            # more than an info line, because a persistent one silently disables
+            # the fast path for the whole run.
+            logger.warning(
+                f"EEDA scene discovery failed for {var_info.id}: {exc}. This "
+                "bucket falls back to Earth Engine."
+            )
+            return EedaiPlan(
+                False, None, 0, f"scene discovery for {var_info.id} failed ({exc})"
+            )
+        if not cost.scene_count:
+            # A legitimate, quiet decline: the window and AOI simply hold no
+            # scenes, so there is nothing for the reader to composite.
             return EedaiPlan(
                 False,
                 None,
                 0,
-                f"scene discovery for {var_info.id} found none or failed ({exc})",
+                f"no {var_info.id} scenes in this bucket's window and AOI",
             )
         if cost.scene_count > _EEDAI_MAX_SCENES:
             return EedaiPlan(

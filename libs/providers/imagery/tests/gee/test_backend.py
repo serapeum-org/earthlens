@@ -1981,13 +1981,63 @@ class TestEedaiCollections:
         assert "single-pass budget" in plan.reason
 
     def test_scene_discovery_failure_declines(self, make_gee, fake_reader):
-        """A discovery error (or no scenes) declines rather than crashing."""
+        """A transport-level discovery error declines rather than crashing."""
         gee = self._collection_gee(make_gee)
-        fake_reader.cost_error = RuntimeError("no scenes")
+        fake_reader.cost_error = OSError("EEDA is unreachable")
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
         assert not plan.can_serve
-        assert "found none or failed" in plan.reason
+        assert "discovery for" in plan.reason and "failed" in plan.reason
+
+    def test_no_scenes_is_reported_separately_from_a_failure(
+        self, make_gee, fake_reader
+    ):
+        """An empty window is a quiet decline, not a reported failure."""
+        gee = self._collection_gee(make_gee)
+        fake_reader.cost = SimpleNamespace(scene_count=0, min_pixel_size=5566.0)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert not plan.can_serve
+        assert "no UCSB-CHG/CHIRPS/DAILY scenes" in plan.reason
+        assert "failed" not in plan.reason
+
+    def test_credential_failure_warns_and_falls_back_under_auto(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A bad key must not be reported as "no scenes", nor fail an auto run."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = self._collection_gee(make_gee)
+        monkeypatch.setattr(
+            type(gee),
+            "_eedai_credentials",
+            lambda self: (_ for _ in ()).throw(
+                backend_module.AuthenticationError("bad key")
+            ),
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert not plan.can_serve
+        assert "credential" in plan.reason
+        assert any("credential could not be built" in w for w in warnings)
+
+    def test_credential_failure_raises_under_a_forced_engine(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """`engine="eedai"` asked for the reader, so a bad key is an error."""
+        gee = self._collection_gee(make_gee, engine="eedai")
+        monkeypatch.setattr(
+            type(gee),
+            "_eedai_credentials",
+            lambda self: (_ for _ in ()).throw(
+                backend_module.AuthenticationError("bad key")
+            ),
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        with pytest.raises(backend_module.AuthenticationError):
+            gee._eedai_collection_fits(var_info, 1, self.START, self.END)
 
     def test_collection_without_native_resolution_declines(self, make_gee, fake_reader):
         """A collection whose catalog row has no resolution cannot be sized."""
