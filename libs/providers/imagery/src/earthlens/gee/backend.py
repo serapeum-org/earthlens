@@ -22,6 +22,11 @@ Per `(asset, band-set, time-bucket)` the pipeline is:
   for continuous fields / rates, `median` for cloud-screened optical
   scenes, `mosaic` for tiled / annual static maps. Yields one
   `ee.Image` per bucket.
+* the EEDAI fast-path — a raw read of a materialised asset, or a
+  client-side composite of an `ImageCollection`, served by the pyramids-eo
+  reader in EPSG:4326 or a metre-based projected CRS; see
+  :meth:`_eedai_eligible` for what qualifies and :meth:`_eedai_verdict` for
+  what it costs.
 * :meth:`_api` — export the bucket image via the configured
   `export_via`: `"url"` (the default) computes the request's pixel
   dimensions and refuses if either axis exceeds Earth Engine's 32768-px
@@ -114,7 +119,7 @@ _DEFAULT_HTTP_TIMEOUT_S: float = 300.0
 _EEDAI_NATIVE_CRS: str = "EPSG:4326"
 
 #: Output pixels per side of one streamed tile when an EEDAI read is too big to
-#: materialise in one piece. It is only a ceiling: :meth:`GEE._eedai_plan`
+#: materialise in one piece. It is only a ceiling: :meth:`GEE._eedai_single_image_plan`
 #: shrinks it until one tile's *native* read fits both budgets below, since the
 #: reader materialises that native window in memory per tile.
 _EEDAI_TILE_PIXELS: int = 2048
@@ -742,7 +747,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
         self._eedai_credential: Any = None  # lazily built in `_eedai_credentials`
         self._cog_warned = False  # one-shot guard for the `cog=` notice
-        self._property_filter_warned = False  # one-shot guard for property_filter
+        self._property_filter_warned: set[str] = set()  # per-dataset filter notice
         #: Scene-discovery results, keyed by the inputs that determine them, so a
         #: multi-bucket run does not re-query the catalog for a repeated window.
         self._eedai_cost_cache: dict[tuple[str, str, str], Any] = {}
@@ -1046,7 +1051,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # Trigger the lazy Earth Engine auth/init before any `ee` call.
         _ = self.client
         self._cog_warned = False  # the cog= notice is once per run, not per object
-        self._property_filter_warned = False  # same, for the property_filter notice
+        self._property_filter_warned = set()  # same, for the property_filter notice
         self._eedai_cost_cache = {}  # discovery is re-checked once per run
         outputs: list[Path | str | TaskInfo] = []
         assert isinstance(
@@ -1669,7 +1674,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
     ) -> EedaiPlan:
         """Build the serve/decline verdict, dispatching on the asset kind.
 
-        A single image is sized by :meth:`_eedai_plan`; an image collection is
+        A single image is sized by :meth:`_eedai_single_image_plan`; an image collection is
         sized by :meth:`_eedai_collection_fits`, which counts the scenes the
         reader would fetch and reduce.
 
@@ -1686,9 +1691,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return self._eedai_collection_fits(
                 var_info, band_count, bucket_start, bucket_end
             )
-        return self._eedai_plan(var_info, band_count)
+        return self._eedai_single_image_plan(var_info, band_count)
 
-    def _eedai_plan(self, var_info: Dataset, band_count: int) -> EedaiPlan:
+    def _eedai_single_image_plan(self, var_info: Dataset, band_count: int) -> EedaiPlan:
         """Decide how — or whether — the reader can serve this request.
 
         A window too large to materialise is no longer a dead end: the reader
@@ -1856,7 +1861,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 either ineligible — it needs server-side compute (a reduced
                 collection, a `cloud_mask` or `filters`) or targets a CRS the
                 reader cannot size (not EPSG:4326 or a metre-based projected
-                CRS) — or eligible but declined by :meth:`_eedai_plan`,
+                CRS) — or eligible but declined by :meth:`_eedai_verdict`,
                 which the message names: the asset has no native resolution,
                 the window is behind a polygon cutline, `resample` is not
                 nearest-neighbour, or tiling it would cost more than Earth
@@ -2099,9 +2104,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Args:
             var_info: The catalog entry being written (named in the notice).
         """
-        if self.property_filter is None or self._property_filter_warned:
+        if self.property_filter is None or var_info.id in self._property_filter_warned:
             return
-        self._property_filter_warned = True
+        # Per dataset, not per run: a multi-dataset request can serve one
+        # collection through the reader and drop the filter on another, and a
+        # single global notice would name only the first.
+        self._property_filter_warned.add(var_info.id)
         logger.warning(
             f"property_filter has no effect for {var_info.id}: this request is "
             "served by Earth Engine, which cannot apply it, so the composite is "
@@ -2171,7 +2179,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         case that cannot be sized up front.
 
         This answers only "can one pass hold it?". A window that does not fit
-        is not necessarily refused — :meth:`_eedai_plan` may still serve it by
+        is not necessarily refused — :meth:`_eedai_single_image_plan` may still serve it by
         streaming in tiles — so this reports rather than raises.
 
         Args:

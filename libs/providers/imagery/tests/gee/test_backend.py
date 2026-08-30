@@ -336,7 +336,7 @@ class _WriteWithSidecar:
         self.sidecar.write_text("<PAMDataset/>")
 
 
-_REAL_EEDAI_PLAN = backend_module.GEE._eedai_plan
+_REAL_EEDAI_PLAN = backend_module.GEE._eedai_single_image_plan
 _PLANS_SEEN: list = []
 
 
@@ -349,7 +349,7 @@ def _recording_plan(self, var_info, band_count):
 
 def _plan_for(gee, var_info, bands=1):
     """Return the routing plan the backend would compute for this request."""
-    return gee._eedai_plan(var_info, bands)
+    return gee._eedai_single_image_plan(var_info, bands)
 
 
 def _identity_mask(image):
@@ -2799,7 +2799,7 @@ class TestExportViaEedai:
         """A window too large for one pass is streamed in tiles, not refused."""
         gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        plan = gee._eedai_plan(var_info, 1)
+        plan = gee._eedai_single_image_plan(var_info, 1)
         can_serve, tile_size = plan.can_serve, plan.tile_size
         assert can_serve is True
         assert tile_size is not None
@@ -2810,7 +2810,7 @@ class TestExportViaEedai:
         """The tile shrinks so one tile's native-resolution read stays bounded."""
         gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        plan = gee._eedai_plan(var_info, 1)
+        plan = gee._eedai_single_image_plan(var_info, 1)
         can_serve, tile_size = plan.can_serve, plan.tile_size
         native_ratio = 30.0 / var_info.spatial_resolution
         assert tile_size * native_ratio <= backend_module.EE_MAX_DIMENSION
@@ -2869,7 +2869,7 @@ class TestExportViaEedai:
             lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0, resample="average"
         )
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        plan = gee._eedai_plan(var_info, 1)
+        plan = gee._eedai_single_image_plan(var_info, 1)
         can_serve, tile_size, reason = plan.can_serve, plan.tile_size, plan.reason
         assert can_serve is False
         assert tile_size is None
@@ -2892,7 +2892,7 @@ class TestExportViaEedai:
             resample="average",
         )
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        reason = gee._eedai_plan(var_info, 1).reason
+        reason = gee._eedai_single_image_plan(var_info, 1).reason
         assert "resample" in reason, f"the tunable budget spoke first: {reason}"
         assert "worse than Earth Engine" not in reason
 
@@ -2905,7 +2905,7 @@ class TestExportViaEedai:
         """
         gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        plan = gee._eedai_plan(var_info, 1)
+        plan = gee._eedai_single_image_plan(var_info, 1)
         can_serve, tile_size = plan.can_serve, plan.tile_size
         native_side = tile_size * (30.0 / var_info.spatial_resolution)
         assert native_side <= backend_module.EE_MAX_DIMENSION
@@ -2920,7 +2920,7 @@ class TestExportViaEedai:
         """
         gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=30.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        plan = gee._eedai_plan(var_info, 1)
+        plan = gee._eedai_single_image_plan(var_info, 1)
         can_serve, tile_size, reason = plan.can_serve, plan.tile_size, plan.reason
         assert can_serve is False
         assert tile_size is None
@@ -2938,7 +2938,7 @@ class TestExportViaEedai:
         """
         gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        plan = gee._eedai_plan(var_info, 1)
+        plan = gee._eedai_single_image_plan(var_info, 1)
         can_serve, tile_size, reason = plan.can_serve, plan.tile_size, plan.reason
         assert can_serve is False
         assert tile_size is None
@@ -3015,9 +3015,9 @@ class TestExportViaEedai:
         """
         gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        plan_one = gee._eedai_plan(var_info, 1)
+        plan_one = gee._eedai_single_image_plan(var_info, 1)
         ok_one, tile_one = plan_one.can_serve, plan_one.tile_size
-        plan_many = gee._eedai_plan(var_info, 9)
+        plan_many = gee._eedai_single_image_plan(var_info, 9)
         ok_many, tile_many = plan_many.can_serve, plan_many.tile_size
         assert ok_one is True
         assert (ok_many is False) or (tile_many < tile_one)
@@ -3074,7 +3074,9 @@ class TestExportViaEedai:
         routing decision and the read disagree.
         """
         _PLANS_SEEN.clear()
-        monkeypatch.setattr(backend_module.GEE, "_eedai_plan", _recording_plan)
+        monkeypatch.setattr(
+            backend_module.GEE, "_eedai_single_image_plan", _recording_plan
+        )
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         gee._api(
@@ -3142,7 +3144,7 @@ class TestExportViaEedai:
         monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 25)
         gee = make_gee(lat_lim=[0.0, 3.0], lon_lim=[0.0, 3.0], scale=90.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        plan = gee._eedai_plan(var_info, 1)
+        plan = gee._eedai_single_image_plan(var_info, 1)
         can_serve, tile_size, reason = plan.can_serve, plan.tile_size, plan.reason
         assert can_serve is False
         assert tile_size is None
@@ -3159,7 +3161,7 @@ class TestExportViaEedai:
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003").model_copy(
             update={"spatial_resolution": 1.0}
         )
-        plan = gee._eedai_plan(var_info, 1)
+        plan = gee._eedai_single_image_plan(var_info, 1)
         can_serve, tile_size, reason = plan.can_serve, plan.tile_size, plan.reason
         assert can_serve is False
         assert tile_size is None
@@ -3174,7 +3176,7 @@ class TestExportViaEedai:
         region = _FakePolygonAoi(total_bounds=(0.0, 0.0, 40.0, 40.0))
         gee = make_gee(region=region, scale=5000.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        plan = gee._eedai_plan(var_info, 1)
+        plan = gee._eedai_single_image_plan(var_info, 1)
         can_serve, tile_size, reason = plan.can_serve, plan.tile_size, plan.reason
         assert can_serve is False
         assert tile_size is None

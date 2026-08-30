@@ -264,11 +264,13 @@ def _download_chirps(tmp_path, engine: str):
     el = EarthLens(
         data_source="gee",
         start="2020-06-01",
-        end="2020-06-05",
+        end="2020-06-10",
         variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
         temporal_resolution="raw",
-        lat_lim=[29.95, 30.0],
-        lon_lim=[31.25, 31.3],
+        # Monsoon Kerala, not arid Cairo: a comparison over ~0 mm everywhere
+        # passes whatever the reducer does, so the AOI has to carry real rain.
+        lat_lim=[9.9, 10.1],
+        lon_lim=[76.3, 76.5],
         path=str(tmp_path / engine),
         scale=5566,
         engine=engine,
@@ -306,6 +308,12 @@ def test_live_chirps_collection_eedai_matches_ee(tmp_path):
     ee_finite = ee_values[np.isfinite(ee_values)]
     eedai_finite = eedai_values[np.isfinite(eedai_values)]
     assert ee_finite.size and eedai_finite.size, "a composite has no valid pixels"
+    # Without real variance the percentile comparison below is satisfied by any
+    # reducer, by a single scene, and by a wrong date window alike.
+    assert float(np.nanstd(ee_finite)) > 0.5, (
+        f"the reference composite is nearly flat (std={np.nanstd(ee_finite):.3f} mm); "
+        "this AOI/season cannot distinguish a correct composite from a broken one"
+    )
     for quantile in (0.05, 0.5, 0.95):
         got = float(np.quantile(eedai_finite, quantile))
         want = float(np.quantile(ee_finite, quantile))
@@ -319,38 +327,78 @@ def test_live_chirps_collection_eedai_matches_ee(tmp_path):
 @pytest.mark.skipif(
     not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
 )
-def test_live_collection_property_filter_reads_a_valid_composite(tmp_path):
-    """A cloud-cover property_filter narrows the scenes and still composites (C5).
+def test_live_property_filter_changes_the_scene_selection(tmp_path):
+    """A stricter cloud threshold must select fewer scenes than a permissive one.
 
-    Reads a single 10 m Sentinel-2 band (one resolution group, so no subdataset
-    complication) over a tiny AOI as a cloud-filtered composite through the
-    reader. The point is that pyramids-eo accepts the OGR filter string and
-    returns a valid raster of plausible reflectance — proving the string flows
-    end to end rather than being silently dropped.
+    The earlier version of this test used a single permissive threshold and
+    asserted only that the raster was plausible — which an unfiltered composite
+    satisfies identically. Comparing two thresholds is what actually proves the
+    string reaches upstream and narrows the selection.
     """
-    import numpy as np
+    from earthlens.gee._eedai import credentials_for, import_earthengine_reader
 
+    reader = import_earthengine_reader()
+    credentials = credentials_for(_SERVICE_KEY)
+    aoi = (31.28, 29.98, 31.3, 30.0)
+
+    def scenes(property_filter):
+        """Scene count the catalog reports for one filter."""
+        return reader.estimate_earthengine_cost(
+            "COPERNICUS/S2_SR_HARMONIZED",
+            start="2024-01-01",
+            end="2024-12-30",
+            bbox=aoi,
+            crs="EPSG:4326",
+            credentials=credentials,
+            property_filter=property_filter,
+        ).scene_count
+
+    unfiltered = scenes(None)
+    permissive = scenes("CLOUDY_PIXEL_PERCENTAGE < 95")
+    strict = scenes("CLOUDY_PIXEL_PERCENTAGE < 5")
+    assert unfiltered > 0, "the AOI/window found no Sentinel-2 scenes at all"
+    assert strict < permissive <= unfiltered, (
+        f"the filter did not narrow the selection: unfiltered={unfiltered}, "
+        f"permissive={permissive}, strict={strict}"
+    )
+
+
+@_skip_without_creds
+@pytest.mark.skipif(
+    not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
+)
+def test_live_monthly_buckets_are_disjoint_and_discovered_once(tmp_path):
+    """Monthly buckets each write their own month, and share one catalog query.
+
+    The single-bucket comparison never exercises the multi-bucket path, which is
+    exactly where an inclusive/exclusive mix-up would make consecutive buckets
+    overlap and where the per-bucket discovery cost is paid.
+    """
     el = EarthLens(
         data_source="gee",
-        start="2024-07-01",
-        end="2024-07-20",
-        variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
-        temporal_resolution="raw",
-        reducer="median",
-        lat_lim=[29.98, 30.0],
-        lon_lim=[31.28, 31.3],
+        start="2020-06-01",
+        end="2020-07-31",
+        variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+        temporal_resolution="monthly",
+        reducer="mean",
+        lat_lim=[9.9, 10.1],
+        lon_lim=[76.3, 76.5],
         path=str(tmp_path),
-        scale=10,
+        scale=5566,
         engine="eedai",
-        property_filter="CLOUDY_PIXEL_PERCENTAGE < 90",
     ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
     paths = el.download(progress_bar=False)
-    assert len(paths) == 1, f"expected one composite, got {paths}"
+    names = sorted(p.name for p in paths)
+    assert names == [
+        "UCSB-CHG_CHIRPS_DAILY_precipitation_20200601.tif",
+        "UCSB-CHG_CHIRPS_DAILY_precipitation_20200701.tif",
+    ], names
+    # Two months of monsoon rain differ; identical rasters would mean both
+    # buckets read the same window.
+    import numpy as np
 
-    values, _epsg, _bbox = _open_raster(paths[0])
-    finite = values[np.isfinite(values)]
-    assert finite.size, "the cloud-filtered composite has no valid pixels"
-    # S2 L2A surface reflectance B4 is scaled 0..~10000; a plausible composite
-    # is well inside that, and certainly not all one value.
-    assert 0 <= float(np.nanmin(finite)) and float(np.nanmax(finite)) < 20000
-    assert float(np.nanstd(finite)) > 0, "the composite is a single flat value"
+    june, _e, _b = _open_raster(paths[0])
+    july, _e2, _b2 = _open_raster(paths[1])
+    assert not np.allclose(np.nan_to_num(june), np.nan_to_num(july)), (
+        "the two monthly buckets produced identical rasters"
+    )
