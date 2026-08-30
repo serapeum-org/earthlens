@@ -17,12 +17,15 @@ lazy `eumdac` import) from a `TailorConfig`, the resolved catalog row's
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 #: Default Data Tailor output format (pinned from the live service in `A1`).
 DEFAULT_FORMAT = "geotiff"
 #: Default Data Tailor projection / CRS (pinned from the live service in `A1`).
 DEFAULT_CRS = "geographic"
+#: Data Tailor output formats that carry their own fixed grid and reject any
+#: projection (from the `/epcs/formats` list, `A1`). `crs` must be `None` for these.
+NATIVE_FORMATS = frozenset({"msgnative", "epsnative", "hrit", "hrit_compressed"})
 
 
 class TailorConfig(BaseModel):
@@ -40,7 +43,15 @@ class TailorConfig(BaseModel):
         format: Data Tailor output format, e.g. `"geotiff"`, `"netcdf4"`.
             Maps to `Chain.format`. Defaults to `"geotiff"`.
         crs: Target projection / CRS, e.g. `"geographic"`. Maps to
-            `Chain.projection`. Defaults to `"geographic"`.
+            `Chain.projection`. Defaults to `"geographic"`. Pass `None`
+            to reproject nothing: `eumdac`'s `Chain.asdict()` drops a
+            `None` projection before the request is built, so this reads
+            server-side exactly like an omitted one. Required by the
+            native output formats (`NATIVE_FORMATS`: `"msgnative"`,
+            `"epsnative"`, `"hrit"`, `"hrit_compressed"`) — enforced at
+            construction time, since re-gridding the pixels would stop
+            the result being native. An empty string is still rejected:
+            `None` is explicit, `""` is a mistake.
         bbox: Optional crop as `(west, south, east, north)` in degrees
             (the GeoJSON / OGC bbox order). When `None`, the backend falls
             back to the request's own spatial extent (`lat_lim` /
@@ -67,34 +78,110 @@ class TailorConfig(BaseModel):
             True
 
             ```
+        - A native-format subset, which must not be reprojected — `crs=None`
+          reaches the chain as `projection=None`, which `eumdac` drops the same
+          way it would an omitted one, while the default still reprojects:
+            ```python
+            >>> from earthlens.eumetsat import TailorConfig
+            >>> cfg = TailorConfig(format="msgnative", crs=None)
+            >>> cfg.format
+            'msgnative'
+            >>> print(cfg.crs)
+            None
+            >>> TailorConfig().crs
+            'geographic'
+
+            ```
+        - A blank `crs` is a mistake rather than a request for no
+          reprojection, so it is rejected:
+            ```python
+            >>> from pydantic import ValidationError
+            >>> from earthlens.eumetsat import TailorConfig
+            >>> try:
+            ...     TailorConfig(crs="  ")
+            ... except ValidationError as err:
+            ...     print(err.errors()[0]["msg"])
+            Value error, must be a non-empty string
+
+            ```
+        - Pairing a native format with a real projection is rejected before
+          any request is built, rather than failing after Data Tailor polls
+          it to `FAILED`:
+            ```python
+            >>> from pydantic import ValidationError
+            >>> from earthlens.eumetsat import TailorConfig
+            >>> try:
+            ...     TailorConfig(format="msgnative", crs="geographic")
+            ... except ValidationError as err:
+            ...     print(err.errors()[0]["msg"])
+            Value error, format='msgnative' is a native output format and cannot be reprojected; pass crs=None instead of crs='geographic'
+
+            ```
+
+    See Also:
+        earthlens.eumetsat.backend.EUMETSAT.download: Consumes this via its
+            `tailor=` argument and builds the Data Tailor chain from it.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     format: str = DEFAULT_FORMAT
-    crs: str = DEFAULT_CRS
+    crs: str | None = DEFAULT_CRS
     bbox: tuple[float, float, float, float] | None = None
     filter: list[str] | None = None
     quicklook: bool = False
 
     @field_validator("format", "crs")
     @classmethod
-    def _non_empty(cls, value: str) -> str:
+    def _non_empty(cls, value: str | None) -> str | None:
         """Reject an empty `format` / `crs` string.
+
+        A `None` `crs` passes through untouched — it is the explicit way
+        to ask for no reprojection. Only `format` is typed `str`, so
+        `None` can reach here for `crs` alone.
 
         Args:
             value: The candidate `format` or `crs` value.
 
         Returns:
-            The stripped value.
+            The stripped value, or `None` when `crs` is unset.
 
         Raises:
             ValueError: When the value is blank.
         """
+        if value is None:
+            return None
         stripped = value.strip()
         if not stripped:
             raise ValueError("must be a non-empty string")
         return stripped
+
+    @model_validator(mode="after")
+    def _native_format_forbids_projection(self) -> TailorConfig:
+        """Reject a native output format paired with a non-`None` `crs`.
+
+        A native format (`NATIVE_FORMATS`) carries its own fixed grid and the
+        Data Tailor service rejects any projection on it. Catching the
+        mismatch here, instead of leaving it to the service, avoids
+        submitting a customisation that can only fail after a poll round
+        trip that has been measured to take upward of 30 minutes.
+
+        This only cross-checks `format` against `crs`; whether `format`
+        itself is a real Data Tailor output format is deliberately left to
+        the service to reject, not validated here.
+
+        Returns:
+            TailorConfig: `self`, unchanged, when the combination is valid.
+
+        Raises:
+            ValueError: When `format` is native and `crs` is not `None`.
+        """
+        if self.format in NATIVE_FORMATS and self.crs is not None:
+            raise ValueError(
+                f"format={self.format!r} is a native output format and cannot be "
+                f"reprojected; pass crs=None instead of crs={self.crs!r}"
+            )
+        return self
 
     @field_validator("bbox")
     @classmethod
@@ -140,6 +227,37 @@ class TailorConfig(BaseModel):
         Returns:
             list[float] | None: `[north, south, west, east]`, or `None`
                 when `bbox` is unset.
+
+        Examples:
+            - A bbox is reordered from `(w, s, e, n)` into `[N, S, W, E]`:
+                ```python
+                >>> from earthlens.eumetsat import TailorConfig
+                >>> roi = TailorConfig(bbox=(4, 48, 8, 52)).nswe
+                >>> roi
+                [52.0, 48.0, 4.0, 8.0]
+                >>> roi[0], roi[3]
+                (52.0, 8.0)
+
+                ```
+            - Without a bbox there is no ROI, and the backend falls back to
+              the request's own extent:
+                ```python
+                >>> from earthlens.eumetsat import TailorConfig
+                >>> print(TailorConfig().nswe)
+                None
+
+                ```
+            - A degenerate bbox — a single point — still round-trips:
+                ```python
+                >>> from earthlens.eumetsat import TailorConfig
+                >>> TailorConfig(bbox=(5.0, 50.0, 5.0, 50.0)).nswe
+                [50.0, 50.0, 5.0, 5.0]
+
+                ```
+
+        See Also:
+            TailorConfig.nswe_from_extent: Builds the same list from the
+                request's spatial-extent bounds when no `bbox` is set.
         """
         if self.bbox is None:
             return None
@@ -164,5 +282,28 @@ class TailorConfig(BaseModel):
 
         Returns:
             list[float]: `[north, south, west, east]`.
+
+        Examples:
+            - Bounds are passed through in `[N, S, W, E]` order:
+                ```python
+                >>> from earthlens.eumetsat import TailorConfig
+                >>> TailorConfig.nswe_from_extent(52, 48, 4, 8)
+                [52, 48, 4, 8]
+
+                ```
+            - It is callable on the class, so the backend does not need a
+              config instance to build an ROI:
+                ```python
+                >>> from earthlens.eumetsat import TailorConfig
+                >>> roi = TailorConfig.nswe_from_extent(
+                ...     north=79.0, south=-79.0, west=-79.0, east=79.0
+                ... )
+                >>> roi[0] - roi[1]
+                158.0
+
+                ```
+
+        See Also:
+            TailorConfig.nswe: The same list derived from an explicit `bbox`.
         """
         return [north, south, west, east]

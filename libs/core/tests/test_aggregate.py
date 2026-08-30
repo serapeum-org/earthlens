@@ -1878,14 +1878,15 @@ def _handles_on(path):
 
     Enumerating handles is a whole-system call on Windows and fails outright
     when the machine holds too many (`SystemExtendedHandleInformation buffer
-    too big`). That says nothing about the code under test, so the caller is
-    skipped rather than failed — the same treatment an unreachable service
-    gets elsewhere in this suite.
+    too big`). That says nothing about whether the aggregator released its own
+    handle — failing there would report a defect in code the check never got
+    far enough to observe — so the caller is skipped rather than failed.
 
     Only that capacity failure is tolerated. This is the shared helper for every
-    release check in the file, so swallowing any enumeration error would turn a
-    genuine psutil regression into a green suite with the whole family silently
-    skipped. Anything else is raised, and the skip warns on its way out.
+    release check in the file, so a blanket catch would turn any psutil problem
+    into a silent pass — an `AccessDenied`, say, should surface rather than
+    quietly disarm the release assertion. Anything else is raised, and the skip
+    warns on its way out so it is visible rather than merely absent.
     """
     try:
         handles = psutil.Process().open_files()

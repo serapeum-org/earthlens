@@ -179,6 +179,14 @@ class _FakeEE:
         self.image_log: list = []
         self.export_image = _FakeExportImage()
         self.batch = SimpleNamespace(Export=SimpleNamespace(image=self.export_image))
+        self.authenticate_calls = 0
+        self.initialize_calls: list[dict] = []
+
+    def Authenticate(self):  # noqa: N802 - mirrors the ee API
+        self.authenticate_calls += 1
+
+    def Initialize(self, **kwargs):  # noqa: N802 - mirrors the ee API
+        self.initialize_calls.append(dict(kwargs))
 
     def ImageCollection(self, source):  # noqa: N802
         if isinstance(source, list):
@@ -354,6 +362,25 @@ def _plan_for(gee, var_info, bands=1):
 def _identity_mask(image):
     """A no-op `cloud_mask` used to assert `.map` wiring (returns the image)."""
     return image
+
+
+class _Raiser:
+    """Callable that always raises the exception it was built with."""
+
+    def __init__(self, error: BaseException) -> None:
+        self.error = error
+
+    def __call__(self, *args, **kwargs):
+        raise self.error
+
+
+def _adc_backend(make_gee, monkeypatch):
+    """Return a `GEE` with no service-account credentials, leaving only the ADC path."""
+    gee = make_gee()
+    monkeypatch.delenv("GEE_SERVICE_ACCOUNT", raising=False)
+    monkeypatch.delenv("GEE_SERVICE_KEY", raising=False)
+    monkeypatch.delenv("GEE_PROJECT", raising=False)
+    return gee
 
 
 # -- fixtures ---------------------------------------------------------------
@@ -666,6 +693,75 @@ class TestInit:
         )
         assert result is gee
         assert gee.project == "explicit-proj"  # stubbed EarthEngineAuth echoes project
+
+
+class TestApplicationDefaultFallback:
+    """Tests for `_open_client`'s no-service-account branch (`ee.Authenticate`)."""
+
+    def test_authenticates_against_the_resolved_project(
+        self, fake_ee, make_gee, monkeypatch
+    ):
+        """Without a key pair the backend falls back to application-default credentials."""
+        gee = _adc_backend(make_gee, monkeypatch)
+        gee.authenticate(project="adc-project")
+        assert fake_ee.authenticate_calls == 1, "ee.Authenticate() was not called"
+        assert fake_ee.initialize_calls == [{"project": "adc-project"}], (
+            f"unexpected ee.Initialize call: {fake_ee.initialize_calls}"
+        )
+        assert gee.project == "adc-project", f"project not stored: {gee.project}"
+
+    def test_an_unregistered_project_points_at_registration(
+        self, fake_ee, make_gee, monkeypatch
+    ):
+        """The registration branch is classified on the raw message here too."""
+        monkeypatch.setattr(
+            fake_ee,
+            "Initialize",
+            _Raiser(
+                fake_ee.EEException("Project p is not registered to use Earth Engine")
+            ),
+        )
+        gee = _adc_backend(make_gee, monkeypatch)
+        with pytest.raises(backend_module.AuthenticationError) as excinfo:
+            gee.authenticate(project="p")
+        rendered = str(excinfo.value)
+        assert "Register it at" in rendered, f"no registration pointer: {rendered}"
+        assert excinfo.value.__cause__ is None, "the exception chain was not broken"
+
+    def test_a_failure_never_reports_adc_credential_material(
+        self, fake_ee, make_gee, monkeypatch
+    ):
+        """An ADC file is an `authorized_user` JSON: no PEM armour, but still secret."""
+        raw = (
+            'could not load {"client_secret": "SUPERSECRET", '
+            '"refresh_token": "ALSOSECRET"}'
+        )
+        monkeypatch.setattr(fake_ee, "Initialize", _Raiser(fake_ee.EEException(raw)))
+        gee = _adc_backend(make_gee, monkeypatch)
+        with pytest.raises(backend_module.AuthenticationError) as excinfo:
+            gee.authenticate(project="p")
+        rendered = str(excinfo.value)
+        assert "SUPERSECRET" not in rendered, f"a client secret survived: {rendered}"
+        assert "ALSOSECRET" not in rendered, f"a refresh token survived: {rendered}"
+        assert "<service key redacted>" in rendered, f"nothing was redacted: {rendered}"
+        assert excinfo.value.__cause__ is None, "the exception chain was not broken"
+
+    def test_a_non_ee_failure_is_wrapped_and_unchained(
+        self, fake_ee, make_gee, monkeypatch
+    ):
+        """A failure that is not an `EEException` is wrapped, redacted, and unchained."""
+        monkeypatch.setattr(
+            fake_ee, "Authenticate", _Raiser(OSError('no ADC file: "private_key": "x"'))
+        )
+        gee = _adc_backend(make_gee, monkeypatch)
+        with pytest.raises(
+            backend_module.AuthenticationError, match="initialisation failed"
+        ) as excinfo:
+            gee.authenticate(project="p")
+        assert "<service key redacted>" in str(excinfo.value), (
+            f"the generic branch did not redact: {excinfo.value}"
+        )
+        assert excinfo.value.__cause__ is None, "the exception chain was not broken"
 
 
 class TestCheckInputDates:

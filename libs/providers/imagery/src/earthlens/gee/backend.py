@@ -82,7 +82,7 @@ from earthlens.gee._helpers import (
     split_aoi_for_url,
     wait_for_task,
 )
-from earthlens.gee.auth import AuthenticationError, EarthEngineAuth
+from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
 from earthlens.gee.catalog import Catalog, Dataset
 from earthlens.gee.features import create_feature
 from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
@@ -813,20 +813,32 @@ class GEE(LazyClientMixin, AbstractDataSource):
             ee.Authenticate()
             ee.Initialize(project=project)
         except ee.EEException as exc:
-            message = str(exc)
-            if "not registered to use Earth Engine" in message:
+            # `ee.Authenticate()` falls back to application-default credentials,
+            # and an ADC file is an `authorized_user` JSON - a credential shape
+            # with no PEM armour whose `client_secret` and `refresh_token` would
+            # otherwise reach the log verbatim. Usually nothing was resolved to
+            # substitute here - this branch is taken when the service-account
+            # pair is incomplete - so it is `_redact`'s marker check that does
+            # the work; a key resolved without an account email does land here,
+            # so whatever was resolved is still handed over. Classify on the raw
+            # text, report the redacted one, and break the chain so the cause
+            # cannot print.
+            raw = str(exc)
+            message = _redact(raw, service_key or "")
+            if "not registered to use Earth Engine" in raw:
                 raise AuthenticationError(
                     f"Cloud project {project!r} is not registered to use "
                     "Earth Engine. Register it at "
                     "https://code.earthengine.google.com/register, then retry."
-                ) from exc
+                ) from None
             raise AuthenticationError(
                 f"Earth Engine initialisation failed for project {project!r}: {message}"
-            ) from exc
+            ) from None
         except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
             raise AuthenticationError(
-                f"Earth Engine initialisation failed for project {project!r}: {exc}"
-            ) from exc
+                f"Earth Engine initialisation failed for project {project!r}: "
+                f"{_redact(str(exc), service_key or '')}"
+            ) from None
         self.project = project
         return ee
 

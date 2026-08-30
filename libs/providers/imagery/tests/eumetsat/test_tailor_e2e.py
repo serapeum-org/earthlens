@@ -50,6 +50,30 @@ _NOT_AUTHORISED = (
 )
 
 
+class _RecordSubmitted:
+    """Wrap `_submit_customisation` to record the handle it returns.
+
+    The quota-hygiene check needs to know which customisation *this* test
+    created. Counting the account's customisations cannot tell us: the
+    EUMETSAT account is shared, so a concurrent CI job submitting its own
+    customisation moves the total independently of our cleanup.
+
+    Args:
+        original: The unbound `_submit_customisation` being wrapped.
+        seen: List the submitted handle's id is appended to.
+    """
+
+    def __init__(self, original, seen: list[str]) -> None:
+        self._original = original
+        self._seen = seen
+
+    def __call__(self, datatailor, product, chain):
+        """Submit as usual, recording the resulting customisation's id."""
+        cust = self._original(datatailor, product, chain)
+        self._seen.append(str(cust))
+        return cust
+
+
 @pytest.mark.e2e
 @pytest.mark.eumetsat
 @pytest.mark.skipif(
@@ -59,7 +83,7 @@ _NOT_AUTHORISED = (
 class TestEumetsatDataTailorLive:
     """Submit one live customisation and read the customised GeoTIFF back."""
 
-    def test_tailor_one_customisation_roundtrip(self, tmp_path: Path):
+    def test_tailor_one_customisation_roundtrip(self, tmp_path: Path, monkeypatch):
         """A live `tailor=` request customises to GeoTIFF, opens, and cleans up.
 
         Skips (not fails) when the account is not download-authorised, so the
@@ -76,7 +100,18 @@ class TestEumetsatDataTailorLive:
         )
         backend = el.datasource
         backend._auth.configure()
-        before = len(list(backend._auth.datatailor().customisations))
+        # Record the customisation this test submits. A before/after *count* of
+        # the account's customisations is not a cleanup signal: the EUMETSAT
+        # account is shared, so a concurrent CI job's customisation moves the
+        # total on its own. That raced - a run once failed `assert 4 <= 2`, a
+        # delta of +2 from a test that submits exactly one, with no delete
+        # failure logged.
+        submitted: list[str] = []
+        monkeypatch.setattr(
+            type(backend),
+            "_submit_customisation",
+            _RecordSubmitted(type(backend)._submit_customisation, submitted),
+        )
 
         try:
             paths = el.download(
@@ -101,5 +136,10 @@ class TestEumetsatDataTailorLive:
         raster = Dataset.read_file(str(paths[0]))
         assert raster.rows > 0 and raster.columns > 0
 
-        after = len(list(backend._auth.datatailor().customisations))
-        assert after <= before, "customisation was not deleted after streaming"
+        assert submitted, "the test never submitted a customisation to check"
+        remaining = {str(c) for c in backend._auth.datatailor().customisations}
+        leaked = remaining.intersection(submitted)
+        assert not leaked, (
+            f"customisation(s) {sorted(leaked)} survived streaming - "
+            "_tailor_one's finally-block delete did not free the quota"
+        )
