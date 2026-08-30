@@ -675,7 +675,7 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
 #: right. The CAMS emission inventories offer `emiss_bio` beside
 #: `emiss_bio_monthly`, both labelled with the species, which leaves the
 #: matcher two candidates for one row and no way to choose.
-_RESTATEMENT_SUFFIXES = ("_monthly", "_annual", "_daily", "_climatology")
+_RESTATEMENT_SUFFIXES = ("_monthly",)
 
 
 def _drop_restatements(
@@ -683,7 +683,7 @@ def _drop_restatements(
 ) -> dict[str, dict[str, Any]]:
     """Drop `X_monthly` when the file also offers `X`.
 
-    A temporal restatement is the same quantity on another cadence, so a file
+    A monthly restatement is the same quantity on another cadence, so a file
     carrying both hands the matcher two candidates that are not really a choice
     — and it declines rather than guess, leaving the row a placeholder. The
     base is the one a catalog row names.
@@ -691,17 +691,27 @@ def _drop_restatements(
     Only a restatement whose base is present is dropped: a file offering
     `emiss_bio_monthly` alone still has one candidate, and it is that one.
 
+    `_monthly` is the only suffix ruled on, because it is the only one observed
+    to pair this way. `X` beside `X_climatology` or `X_daily` is not the same
+    quantity restated — an instantaneous field beside a long-term mean, or a
+    field beside a daily statistic of it — and CDS ships each as its own
+    product, so dropping either would discard a variable a row could name.
+
+    Matching folds case on both sides, since a producer spells `EMISS_BIO`
+    beside `emiss_bio_monthly` and the base is the same variable either way.
+
     Args:
         candidates: The data variables the matcher would weigh.
 
     Returns:
         The same mapping without restatements of a base it already holds.
     """
+    folded = {name.lower() for name in candidates}
     return {
         name: meta
         for name, meta in candidates.items()
         if not any(
-            name.lower().endswith(suffix) and name[: -len(suffix)] in candidates
+            name.lower().endswith(suffix) and name.lower()[: -len(suffix)] in folded
             for suffix in _RESTATEMENT_SUFFIXES
         )
     }
@@ -1652,6 +1662,12 @@ def _written_rows_survive(text: str, dataset_id: str, filled: list[str]) -> bool
     return True
 
 
+#: Longest line `_error_summary` will return, composed name and message
+#: together. One dataset is one line of sweep output; a store that answers with
+#: a paragraph of HTML must not be able to push the next dataset off the screen.
+_SUMMARY_LIMIT = 160
+
+
 def _error_summary(error: BaseException) -> str:
     """Name an error by its type and what it actually said.
 
@@ -1665,14 +1681,16 @@ def _error_summary(error: BaseException) -> str:
         error: The error a dataset stopped on.
 
     Returns:
-        The type name, plus the message when there is one.
+        The type name, plus the message when there is one, capped at
+        `_SUMMARY_LIMIT` characters in total so one dataset stays one line.
     """
     message = " ".join(str(error).split())
     if not message:
         return type(error).__name__
-    if len(message) > 140:
-        message = message[:137] + "..."
-    return f"{type(error).__name__}: {message}"
+    summary = f"{type(error).__name__}: {message}"
+    if len(summary) > _SUMMARY_LIMIT:
+        summary = summary[: _SUMMARY_LIMIT - 3] + "..."
+    return summary
 
 
 def _hydrated_detail(session: _ProbeSession, declined: list[str]) -> str:

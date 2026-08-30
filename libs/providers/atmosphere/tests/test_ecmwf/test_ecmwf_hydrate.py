@@ -490,6 +490,10 @@ class TestUnhydratableRows:
         assert hydrate_mod._placeholder_slugs(block) == []
 
 
+class _ExceptionWithAnUnusuallyLongClassNameForOneDataset(Exception):
+    """Stands in for an SDK error whose type name is itself most of a line."""
+
+
 class TestErrorSummary:
     """What a skipped dataset reports about why it stopped."""
 
@@ -509,10 +513,20 @@ class TestErrorSummary:
         """Some errors carry nothing; the type is then all there is to say."""
         assert hydrate_mod._error_summary(RuntimeError()) == "RuntimeError"
 
-    def test_a_long_message_is_truncated(self):
-        """The echo is one line per dataset, not a traceback."""
-        summary = hydrate_mod._error_summary(ValueError("x" * 400))
-        assert len(summary) < 160, f"summary ran to {len(summary)} chars"
+    @pytest.mark.parametrize(
+        "error",
+        [
+            ValueError("x" * 400),
+            _ExceptionWithAnUnusuallyLongClassNameForOneDataset("x" * 400),
+        ],
+        ids=["short-type-name", "long-type-name"],
+    )
+    def test_a_long_message_is_truncated_to_the_documented_cap(self, error):
+        """The cap covers the composed line, so the type name cannot push past it."""
+        summary = hydrate_mod._error_summary(error)
+        assert len(summary) == hydrate_mod._SUMMARY_LIMIT, (
+            f"summary ran to {len(summary)} chars"
+        )
         assert summary.endswith("...")
 
 
@@ -550,16 +564,24 @@ class TestDropRestatements:
         }
         assert sorted(hydrate_mod._data_variables(offered)) == ["sst", "t2m_monthly"]
 
-    @pytest.mark.parametrize(
-        "suffix", ["_monthly", "_annual", "_daily", "_climatology"]
-    )
-    def test_every_cadence_suffix_is_reached(self, suffix):
-        """Pins the tuple so an entry cannot be added and never apply."""
+    @pytest.mark.parametrize("base", ["EMISS_BIO", "emiss_bio"])
+    @pytest.mark.parametrize("twin", ["EMISS_BIO_MONTHLY", "emiss_bio_monthly"])
+    def test_the_two_spellings_need_not_agree_on_case(self, base, twin):
+        """A producer spells the base one way and the restatement another."""
+        offered = {
+            base: {"long_name": "acetaldehyde", "units": "kg m-2 s-1"},
+            twin: {"long_name": "acetaldehyde", "units": "kg m-2 s-1"},
+        }
+        assert list(hydrate_mod._data_variables(offered)) == [base]
+
+    @pytest.mark.parametrize("suffix", ["_annual", "_daily", "_climatology"])
+    def test_a_non_monthly_cadence_sibling_is_kept(self, suffix):
+        """A climatology is a long-term mean, not the field restated."""
         offered = {
             "emi": {"long_name": "x", "units": "1"},
             f"emi{suffix}": {"long_name": "x", "units": "1"},
         }
-        assert list(hydrate_mod._data_variables(offered)) == ["emi"]
+        assert sorted(hydrate_mod._data_variables(offered)) == ["emi", f"emi{suffix}"]
 
 
 class TestIsAuxiliary:
