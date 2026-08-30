@@ -60,6 +60,49 @@ class TestMain:
         assert "401 Unauthorized" in out, f"the reason is not surfaced: {out}"
         assert "erddap" not in out, f"a healthy provider was blamed: {out}"
 
+    @pytest.mark.parametrize(
+        "detail",
+        [
+            "Connection timed out",
+            "502 Bad Gateway",
+            "service unavailable",
+            "read timeout",
+        ],
+    )
+    def test_a_transient_reach_failure_warns_rather_than_fails(
+        self, checker, tmp_path, capsys, detail
+    ):
+        """One of 26 live services being briefly unreachable is not drift."""
+        report = _report(
+            tmp_path / "a.json",
+            {"provider": "gee", "status": "error", "detail": detail},
+        )
+        assert checker.main([str(report)]) == 0, f"{detail!r} should warn, not fail"
+        out = capsys.readouterr().out
+        assert "::warning::" in out, f"expected a warning for {detail!r}: {out}"
+        assert "::error::" not in out, f"a transient failure was escalated: {out}"
+
+    @pytest.mark.parametrize(
+        "detail", ["401 Unauthorized", "no such provider", "invalid key"]
+    )
+    def test_a_hard_failure_still_fails(self, checker, tmp_path, capsys, detail):
+        """A configuration or contract failure is not forgiven."""
+        report = _report(
+            tmp_path / "a.json",
+            {"provider": "gee", "status": "error", "detail": detail},
+        )
+        assert checker.main([str(report)]) == 1, f"{detail!r} should fail the gate"
+        assert "::error::" in capsys.readouterr().out
+
+    def test_a_hard_failure_beside_a_transient_one_still_fails(self, checker, tmp_path):
+        """A forgivable error does not mask an unforgivable one."""
+        report = _report(
+            tmp_path / "a.json",
+            {"provider": "gee", "status": "error", "detail": "timed out"},
+            {"provider": "cmems", "status": "error", "detail": "401 Unauthorized"},
+        )
+        assert checker.main([str(report)]) == 1, "a hard failure must still fail"
+
     def test_unsupported_is_not_an_error(self, checker, tmp_path):
         """A provider with no listing endpoint is expected, not a failure."""
         report = _report(
@@ -142,8 +185,10 @@ class TestMain:
         """Two failed audits are both reported, not only the first."""
         report = _report(
             tmp_path / "a.json",
-            {"provider": "gee", "status": "error", "detail": "401"},
-            {"provider": "cmems", "status": "error", "detail": "timed out"},
+            # Both hard failures: a transient detail would be a warning, which
+            # the transient/hard split covers separately.
+            {"provider": "gee", "status": "error", "detail": "401 Unauthorized"},
+            {"provider": "cmems", "status": "error", "detail": "invalid key"},
         )
         assert checker.main([str(report)]) == 1, "errored providers must fail the gate"
         out = capsys.readouterr().out
