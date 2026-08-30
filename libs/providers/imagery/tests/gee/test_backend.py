@@ -1806,6 +1806,25 @@ class _FakeWindow:
         self.resample = resample
 
 
+def _reader_error(message: str) -> Exception:
+    """Return upstream's own `ReaderError` so the fake fails the way the real one does.
+
+    A stand-in `RuntimeError` would not be in the set the backend catches, so
+    the test would pass for the wrong reason.
+
+    Args:
+        message: The failure text.
+
+    Returns:
+        A `pyramids_eo` `ReaderError` when installed, else `OSError`.
+    """
+    try:
+        from pyramids_eo.errors import ReaderError
+    except ImportError:  # pragma: no cover - the extra is installed in CI
+        return OSError(message)
+    return ReaderError(message)
+
+
 def _bind_to_real_signature(name: str, asset_id: str, kwargs: dict) -> None:
     """Reject keywords the installed pyramids-eo would not accept.
 
@@ -1849,6 +1868,7 @@ class _FakeReaderModule:
         # A small, servable collection by default; tests override per case.
         self.cost = SimpleNamespace(scene_count=3, min_pixel_size=5566.0)
         self.cost_error: Exception | None = None
+        self.read_error: Exception | None = None
 
     def estimate_earthengine_cost(self, asset_id, **kwargs):
         _bind_to_real_signature("estimate_earthengine_cost", asset_id, kwargs)
@@ -1860,6 +1880,8 @@ class _FakeReaderModule:
     def from_earthengine(self, asset_id, **kwargs):
         _bind_to_real_signature("from_earthengine", asset_id, kwargs)
         self.calls.append((asset_id, kwargs))
+        if self.read_error is not None:
+            raise self.read_error
         # Mirror the combinations upstream's `_validate_read_request` rejects,
         # so a plan that produces one fails here instead of passing silently.
         if kwargs.get("tile_size") is not None:
@@ -2278,6 +2300,51 @@ class TestEedaiCollections:
         gee._eedai_collection_fits(var_info, 1, self.START, self.END)
         bbox = fake_reader.cost_calls[0][1]["bbox"]
         assert max(abs(v) for v in bbox) < 200, f"discovery bbox not lat/lon: {bbox}"
+
+    def test_a_late_reader_refusal_falls_back_under_auto(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """The reader can refuse after routing commits; `auto` must not crash.
+
+        A band set spanning resolution groups is refused by the collection
+        reader although the single-image one handles it, and only upstream
+        knows that — so the failure arrives after the credential build and the
+        scene discovery, on a request Earth Engine could serve.
+        """
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = self._collection_gee(make_gee)
+        fake_reader.read_error = _reader_error("bands span multiple resolution groups")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        out = gee._api(
+            _FakeImage(),
+            var_info,
+            ["precipitation"],
+            dt.datetime(2020, 6, 1),
+            dt.datetime(2020, 6, 1),
+            dt.datetime(2020, 7, 1),
+        )
+        assert out is not None, "the bucket produced no output at all"
+        assert any("could not serve" in w for w in warnings)
+
+    def test_a_late_reader_refusal_raises_under_a_forced_engine(
+        self, make_gee, fake_reader
+    ):
+        """`engine="eedai"` asked for the reader, so its refusal is the answer."""
+        gee = self._collection_gee(make_gee, engine="eedai")
+        fake_reader.read_error = _reader_error("bands span multiple resolution groups")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        with pytest.raises(Exception, match="resolution groups"):
+            gee._api(
+                _FakeImage(),
+                var_info,
+                ["precipitation"],
+                dt.datetime(2020, 6, 1),
+                dt.datetime(2020, 6, 1),
+                dt.datetime(2020, 7, 1),
+            )
 
     def test_each_bucket_costs_exactly_one_discovery_query(self, make_gee, fake_reader):
         """Discovery is one catalog query per bucket - no more, and no caching.

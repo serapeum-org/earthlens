@@ -376,25 +376,37 @@ def _validate_property_filter(property_filter: object) -> None:
 
 
 def _reader_errors(reader: Any) -> tuple[type[BaseException], ...]:
-    """Return the exception types a scene-discovery failure may raise.
+    """Return the exception types a reader call may fail with recoverably.
 
     `pyramids-eo` is an optional extra, so its `ReaderError` cannot be imported
-    at module load; it is resolved from the already-imported reader module here.
+    at module load. It is **not** re-exported from `pyramids_eo.earthengine`
+    either, so it is resolved from `pyramids_eo.errors` — looking only at the
+    passed module would silently yield a tuple that never matches, and every
+    recoverable refusal would escape as a crash.
+
     Transport and argument errors are included because a discovery round-trip
     can fail as either. `AuthenticationError` is deliberately absent: a
-    credential problem must surface, not silently downgrade the run.
+    credential problem must surface rather than silently downgrade the run.
 
     Args:
-        reader: The imported `pyramids_eo.earthengine` module.
+        reader: The imported `pyramids_eo.earthengine` module, consulted first
+            in case a future release does re-export the error.
 
     Returns:
-        The exception classes to treat as a recoverable discovery failure.
+        The exception classes to treat as a recoverable reader failure.
     """
     errors: list[type[BaseException]] = [OSError, ValueError]
-    upstream = getattr(reader, "ReaderError", None)
-    if isinstance(upstream, type) and issubclass(upstream, BaseException):
-        errors.append(upstream)
-    return tuple(errors)
+    candidates = [getattr(reader, "ReaderError", None)]
+    try:
+        from pyramids_eo.errors import ReaderError
+
+        candidates.append(ReaderError)
+    except ImportError:  # pragma: no cover - the extra is installed wherever this runs
+        pass
+    for candidate in candidates:
+        if isinstance(candidate, type) and issubclass(candidate, BaseException):
+            errors.append(candidate)
+    return tuple(dict.fromkeys(errors))
 
 
 def _validate_filters(
@@ -1326,15 +1338,30 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
             if use_reader:
                 assert plan is not None  # a yes always carries its plan
-                return self._export_via_eedai(
-                    var_info,
-                    bands,
-                    float(scale),
-                    prefix,
-                    plan,
-                    bucket_start,
-                    bucket_end,
-                )
+                try:
+                    return self._export_via_eedai(
+                        var_info,
+                        bands,
+                        float(scale),
+                        prefix,
+                        plan,
+                        bucket_start,
+                        bucket_end,
+                    )
+                except _reader_errors(import_earthengine_reader()) as exc:
+                    # The reader can still refuse after routing has committed:
+                    # a band set spanning resolution groups is refused by the
+                    # collection reader although the single-image one handles
+                    # it, and only upstream knows that. Under a forced engine
+                    # that refusal is the answer; under `auto` this is a request
+                    # Earth Engine can serve, so falling back keeps the contract
+                    # that `auto` routes rather than fails.
+                    if self.engine == "eedai":
+                        raise
+                    logger.warning(
+                        f"the EEDAI reader could not serve {var_info.id} "
+                        f"({exc}); falling back to Earth Engine for this bucket."
+                    )
         self._warn_cog_ignored(var_info)
         self._warn_property_filter_ignored(var_info)
         # Only the Earth Engine paths need the `ee.Geometry`; the reader clips
