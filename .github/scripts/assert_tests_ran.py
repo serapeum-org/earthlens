@@ -55,16 +55,28 @@ from pathlib import Path
 _EXPECTED_EMPTY = {
     "wdpa": "WDPA_TOKEN not issued yet (awaiting UNEP-WCMC approval)",
     "osm": "the osm-pbf extra is deliberately outside [all]",
+    "mswep": "the GloH2O share is granted per person; CI cannot hold one",
+    "airnow": "AIRNOW_API_KEY has never been issued for this repository",
 }
 
 
 def _backend(classname: str) -> str:
     """Return the backend directory a test belongs to, or `""` for none.
 
-    pytest stamps `classname` as `tests.<backend>.<module>.<Class>`, so the
-    segment after `tests` names the backend. A module sitting directly under
-    `tests/` has no backend directory - its second segment is the module, which
-    starts with `test_` - and groups at lane level instead.
+    pytest's `classname` is the dotted path of the test's module, plus the
+    class when there is one. Its prefix depends on how the lane invoked
+    pytest, and both forms occur in this repository:
+
+        tests.cmems.test_cmems_e2e.TestLive              (a package-scoped lane)
+        libs.providers.imagery.tests.gee.test_auth       (a marker-only lane)
+
+    so the search starts at the last `tests` segment. What follows is
+    `<backend>/<module>` plus an optional class; a module sitting directly
+    under `tests/` has no backend and groups at lane level instead.
+
+    A backend directory is not identified by its name: `test_ecmwf/` is a
+    backend even though it is spelled like a module. Position decides it -
+    anything before the module segment is the directory.
 
     Args:
         classname: The `classname` attribute of a `<testcase>` element.
@@ -73,9 +85,16 @@ def _backend(classname: str) -> str:
         str: The backend directory name, or `""` when the test has none.
     """
     parts = classname.split(".")
-    if len(parts) > 1 and parts[0] == "tests" and not parts[1].startswith("test_"):
-        return parts[1]
-    return ""
+    if "tests" not in parts:
+        return ""
+    parts = parts[len(parts) - 1 - parts[::-1].index("tests") + 1 :]
+    # Drop a trailing class name. A test module is always `test_*`; anything
+    # else in the final position is the class the test lives on.
+    if parts and not parts[-1].startswith("test_"):
+        parts = parts[:-1]
+    # What remains is `<backend>/<module>`, or just `<module>` when the test
+    # sits directly under `tests/`.
+    return parts[0] if len(parts) >= 2 else ""
 
 
 def _per_backend(report: Path) -> dict[str, tuple[int, int]]:
@@ -206,6 +225,16 @@ def main(argv: list[str]) -> int:
                     f"a reason.",
                 )
             return 1
+        return 0
+
+    # A wholly-skipped lane is judged by the same exemptions: a dedicated lane
+    # holds one backend, so if that backend is declared empty the lane is too.
+    # Without this the exemption only reached shared lanes, and a lane devoted
+    # to an exempt backend still failed.
+    present = {name for name in _per_backend(report) if name}
+    if present and present <= set(_EXPECTED_EMPTY):
+        reasons = "; ".join(f"{n}: {_EXPECTED_EMPTY[n]}" for n in sorted(present))
+        print(f"{lane}: every backend present is a declared exemption ({reasons})")
         return 0
 
     print(

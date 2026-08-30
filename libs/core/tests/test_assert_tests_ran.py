@@ -232,8 +232,16 @@ class TestBackendGrouping:
             ("", ""),
             ("weird", ""),
             ("tests", ""),
-            ("tests.cmems", "cmems"),
-            ("libs.core.tests.cmems.test_mod.TestX", ""),
+            # A module directly under tests/ has no backend directory.
+            ("tests.cmems", ""),
+            # A marker-only lane emits the full package path; the search starts
+            # at the last `tests` segment, so the backend still resolves.
+            ("libs.core.tests.cmems.test_mod.TestX", "cmems"),
+            ("libs.providers.imagery.tests.gee.test_auth", "gee"),
+            # A backend directory spelled like a module is still a directory.
+            ("tests.test_ecmwf.test_catalog.TestCatalog", "test_ecmwf"),
+            # A bare test function has no class segment to drop.
+            ("tests.jaxa.test_e2e", "jaxa"),
             ("tests..test_mod.TestX", ""),
         ],
     )
@@ -312,6 +320,33 @@ class TestDeadBackendDetection:
             tmp_path / "r.xml", ("wdpa", "a", "pytest.skip"), ("iucn", "b", None)
         )
         assert guard.main([str(report), "lane"]) == 0, "a declared exemption failed"
+
+    def test_a_dedicated_lane_of_an_exempt_backend_passes(
+        self, guard, tmp_path, capsys
+    ):
+        """A lane holding only a declared-empty backend is exempt too."""
+        report = _backend_report(
+            tmp_path / "r.xml",
+            ("wdpa", "a", "pytest.skip"),
+            ("wdpa", "b", "pytest.skip"),
+        )
+        assert guard.main([str(report), "e2e-wdpa"]) == 0, "an exempt lane was failed"
+        assert "declared exemption" in capsys.readouterr().out
+
+    def test_a_wholly_skipped_unexempt_lane_still_fails(self, guard, tmp_path, capsys):
+        """The exemption does not blanket every wholly-skipped lane."""
+        report = _backend_report(
+            tmp_path / "r.xml",
+            ("cmems", "a", "pytest.skip"),
+            ("cmems", "b", "pytest.skip"),
+        )
+        assert guard.main([str(report), "e2e-cmems"]) == 1, "an unexempt lane must fail"
+
+    @pytest.mark.parametrize("backend", ["mswep", "airnow"])
+    def test_the_structurally_empty_backends_are_declared(self, guard, backend):
+        """mswep and airnow cannot hold credentials in CI, so they are exempt."""
+        assert backend in guard._EXPECTED_EMPTY, f"{backend} should be declared empty"
+        assert guard._EXPECTED_EMPTY[backend], f"{backend} needs a stated reason"
 
     def test_tests_without_a_backend_do_not_form_a_group(self, guard, tmp_path):
         """A module directly under `tests/` is judged at lane level only."""
