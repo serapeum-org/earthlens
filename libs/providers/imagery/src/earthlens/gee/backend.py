@@ -1221,11 +1221,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         `cloud_mask`, and no collection `filters`. The asynchronous sinks
         are Earth Engine-only.
 
-        It is also limited to `crs="EPSG:4326"`. The reader interprets its
-        `bbox` in the *target* CRS, while this backend's AOI is lat/lon; for
-        a projected `crs` those degrees would be read as projected units and
-        silently produce a valid-looking raster of the wrong ground area, so
-        such requests stay on Earth Engine.
+        The output CRS may be `"EPSG:4326"` or a metre-based projected CRS.
+        The reader reads `bbox` in the *target* CRS, so this backend reprojects
+        its lat/lon AOI into that CRS first (see :meth:`_eedai_window`); a
+        geographic CRS other than EPSG:4326, or a projected one whose axis is
+        not in metres, is not sized correctly by the metre `scale` and stays on
+        Earth Engine.
 
         Args:
             var_info: The catalog entry for the dataset being fetched.
@@ -1238,8 +1239,77 @@ class GEE(LazyClientMixin, AbstractDataSource):
             and self.cloud_mask is None
             and not self.filters
             and var_info.ee_type == "image"
-            and self.crs.upper() == _EEDAI_NATIVE_CRS
+            and self._eedai_crs_supported()
         )
+
+    def _eedai_crs_supported(self) -> bool:
+        """Return whether the reader can serve pixels in this backend's `crs`.
+
+        Supported: `"EPSG:4326"` (the lat/lon AOI is passed through), and any
+        projected CRS whose axis unit is metres (the metre `scale` then sizes
+        the grid directly). A non-4326 geographic CRS or a non-metre projected
+        CRS is declined, because the metre `scale` would mis-size its grid.
+
+        Returns:
+            `True` when a read in `self.crs` can be sized correctly.
+        """
+        if self.crs.upper() == _EEDAI_NATIVE_CRS:
+            return True
+        try:
+            from pyproj import CRS
+
+            crs = CRS.from_user_input(self.crs)
+        except Exception:  # noqa: BLE001 - an unparseable CRS is simply not supported
+            return False
+        units = {axis.unit_name.lower() for axis in crs.axis_info}
+        return bool(crs.is_projected and units & {"metre", "meter", "m"})
+
+    def _bbox_to_output_crs(
+        self, latlon_bbox: tuple[float, float, float, float]
+    ) -> tuple[float, float, float, float]:
+        """Reproject a lat/lon AOI envelope into the output CRS.
+
+        Args:
+            latlon_bbox: `(min_lon, min_lat, max_lon, max_lat)` in EPSG:4326.
+
+        Returns:
+            The envelope in `self.crs`; the input is returned unchanged when the
+            output CRS is already EPSG:4326.
+        """
+        if self.crs.upper() == _EEDAI_NATIVE_CRS:
+            return latlon_bbox
+        from pyproj import Transformer
+
+        transformer = Transformer.from_crs(_EEDAI_NATIVE_CRS, self.crs, always_xy=True)
+        # transform_bounds densifies the edges, so a reprojected rectangle that
+        # bows still bounds the whole AOI rather than only its corners.
+        return transformer.transform_bounds(*latlon_bbox)
+
+    def _eedai_output_grid(
+        self, bbox: tuple[float, float, float, float], scale: float
+    ) -> tuple[int, int]:
+        """Size a pixel grid for `bbox` (already in the output CRS) at `scale`.
+
+        Dispatches on the output CRS: EPSG:4326 keeps the geographic grid with
+        its `cos(latitude)` longitude shortening (:meth:`_eedai_grid`); a
+        metre-based projected CRS sizes each axis by its span over the metre
+        `scale` directly.
+
+        Args:
+            bbox: The window `(min_x, min_y, max_x, max_y)` in `self.crs`.
+            scale: Target ground sample distance in metres.
+
+        Returns:
+            `(rows, cols)`, at least one pixel per axis.
+        """
+        if self.crs.upper() == _EEDAI_NATIVE_CRS:
+            return self._eedai_grid(bbox, scale)
+        if not scale or scale <= 0:
+            raise ValueError("'scale' must be a positive number of metres.")
+        min_x, min_y, max_x, max_y = (float(v) for v in bbox)
+        rows = max(math.ceil((max_y - min_y) / scale), 1)
+        cols = max(math.ceil((max_x - min_x) / scale), 1)
+        return rows, cols
 
     def _eedai_plan(self, var_info: Dataset, band_count: int) -> EedaiPlan:
         """Decide how — or whether — the reader can serve this request.
@@ -1314,7 +1384,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     "which Earth Engine aggregates server-side instead"
                 ),
             )
-        native_rows, native_cols = self._eedai_grid(bbox, float(native_scale))
+        native_rows, native_cols = self._eedai_output_grid(bbox, float(native_scale))
         native_total = native_rows * native_cols * max(band_count, 1)
         if native_total > _EEDAI_MAX_NATIVE_PIXELS:
             return EedaiPlan(
@@ -1362,7 +1432,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     "per-tile budget here"
                 ),
             )
-        rows, cols = self._eedai_grid(bbox, scale_m)
+        rows, cols = self._eedai_output_grid(bbox, scale_m)
         tiles = math.ceil(rows / tile_size) * math.ceil(cols / tile_size)
         if tiles > _EEDAI_MAX_TILES:
             return EedaiPlan(
@@ -1399,8 +1469,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Raises:
             ValueError: If `engine="eedai"` was forced and the request is
                 either ineligible — it needs server-side compute (a reduced
-                collection, a `cloud_mask` or `filters`) or targets a projected
-                `crs` — or eligible but declined by :meth:`_eedai_plan`,
+                collection, a `cloud_mask` or `filters`) or targets a CRS the
+                reader cannot size (not EPSG:4326 or a metre-based projected
+                CRS) — or eligible but declined by :meth:`_eedai_plan`,
                 which the message names: the asset has no native resolution,
                 the window is behind a polygon cutline, `resample` is not
                 nearest-neighbour, or tiling it would cost more than Earth
@@ -1416,9 +1487,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     f"engine='eedai' cannot serve {var_info.id}: the EEDAI "
                     "reader materialises pixels from an asset id, so it cannot "
                     "run server-side compute (a reduced collection, cloud_mask "
-                    "or filters) and only writes "
-                    f"crs={_EEDAI_NATIVE_CRS!r} (got {self.crs!r}). Use "
-                    "engine='auto' or engine='ee'."
+                    "or filters), and it reads only EPSG:4326 or a metre-based "
+                    f"projected CRS (got crs={self.crs!r}). Use engine='auto' "
+                    "or engine='ee'."
                 )
             plan = self._eedai_plan(var_info, band_count)
             if not plan.can_serve:
@@ -1452,48 +1523,59 @@ class GEE(LazyClientMixin, AbstractDataSource):
         ground resolution by the ratio of the two extents.
 
         Returns:
-            `(bbox, cutline)` — the lat/lon `(min_x, min_y, max_x, max_y)`
-            window, and the `region` to clip to or `None`.
+            `(bbox, cutline)` — the `(min_x, min_y, max_x, max_y)` window in
+            the output CRS (lat/lon under EPSG:4326, the projection's metres
+            otherwise), and the `region` to clip to or `None`.
         """
-        region = self._region_in_native_crs(self.region)
+        region = self._region_in_output_crs(self.region)
         if region is not None:
             min_x, min_y, max_x, max_y = (float(v) for v in region.total_bounds)
             return (min_x, min_y, max_x, max_y), region
-        return (
+        latlon = (
             self.space.longitude_min,
             self.space.latitude_min,
             self.space.longitude_max,
             self.space.latitude_max,
-        ), None
+        )
+        return self._bbox_to_output_crs(latlon), None
 
-    @staticmethod
-    def _region_in_native_crs(region: Any) -> Any:
-        """Return `region` in the lat/lon CRS the reader's `bbox` is read in.
+    def _region_in_output_crs(self, region: Any) -> Any:
+        """Return `region` in the output CRS the reader's `bbox` is read in.
 
-        The reader reprojects a CRS-carrying `geometry` to the target CRS but
-        takes `bbox` as already being in it. Handing over a projected
-        region's bounds unchanged would therefore window in metres-read-as-
-        degrees while the cutline landed correctly — two different parts of
-        the planet. Reprojecting the region once keeps its bounds and its
-        cutline in the same space.
+        The bbox and the cutline must share one space: the reader sizes the
+        pixel grid from the bbox and clips to the cutline, so a region left in
+        a different CRS would window one patch of ground and clip another.
+        Reprojecting the region into `self.crs` once keeps them aligned.
 
         Args:
             region: The constructor `region`, or `None`.
 
         Returns:
-            The region in EPSG:4326 (`None` passes through). A region with
-            no CRS is assumed to be lat/lon already, matching how the Earth
-            Engine path treats it.
+            The region in `self.crs` (`None` passes through). A region with no
+            CRS is assumed to be lat/lon, matching how the Earth Engine path
+            treats it, and is reprojected only when the output CRS is not
+            EPSG:4326.
         """
         if region is None:
             return None
+        target = self.crs
         crs = getattr(region, "crs", None)
         if crs is None:
-            return region
+            if target.upper() == _EEDAI_NATIVE_CRS:
+                return region
+            set_crs = getattr(region, "set_crs", None)
+            if callable(set_crs):
+                region = set_crs(_EEDAI_NATIVE_CRS)
+            return region.to_crs(target)
         to_epsg = getattr(crs, "to_epsg", None)
-        if callable(to_epsg) and to_epsg() == 4326:
+        region_epsg = to_epsg() if callable(to_epsg) else None
+        target_epsg = None
+        if ":" in target:
+            tail = target.rsplit(":", 1)[-1]
+            target_epsg = int(tail) if tail.isdigit() else None
+        if region_epsg is not None and region_epsg == target_epsg:
             return region
-        return region.to_crs(_EEDAI_NATIVE_CRS)
+        return region.to_crs(target)
 
     @staticmethod
     def _eedai_grid(
@@ -1655,7 +1737,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Args:
             var_info: The catalog entry (for the asset's native resolution).
-            bbox: The lat/lon window the reader would materialise.
+            bbox: The output-CRS window the reader would materialise.
             band_count: How many bands the read asks for. The reader holds
                 every requested band of the window at once, so the budget is
                 spent per band.
@@ -1673,8 +1755,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # The warp holds whichever grid is larger: a `scale` finer than the
         # asset makes the output bigger than the native window. Fold them
         # together before *either* budget is applied.
-        native_rows, native_cols = self._eedai_grid(bbox, float(native_scale))
-        out_rows, out_cols = self._eedai_grid(bbox, float(self.scale or native_scale))
+        native_rows, native_cols = self._eedai_output_grid(bbox, float(native_scale))
+        out_rows, out_cols = self._eedai_output_grid(
+            bbox, float(self.scale or native_scale)
+        )
         rows = max(native_rows, out_rows)
         cols = max(native_cols, out_cols)
         binding = (
@@ -1779,7 +1863,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 window=reader.Window(
                     bbox=bbox,
                     crs=self.crs,
-                    shape=self._eedai_grid(bbox, scale),
+                    shape=self._eedai_output_grid(bbox, scale),
                     resample=self.resample,
                 ),
                 geometry=cutline,

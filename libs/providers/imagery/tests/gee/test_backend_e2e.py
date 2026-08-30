@@ -57,17 +57,20 @@ def test_live_srtm_download(tmp_path):
     assert raster.rows > 0 and raster.columns > 0, f"empty raster grid {raster.shape}"
 
 
-def _download_srtm(tmp_path, engine: str):
+def _download_srtm(tmp_path, engine: str, crs: str | None = None):
     """Fetch the shared tiny SRTM tile through one engine.
 
     Args:
-        tmp_path: Directory to write under; the engine name is appended so two
-            engines' outputs never collide.
+        tmp_path: Directory to write under; the engine (and CRS) name is
+            appended so two fetches' outputs never collide.
         engine: The `engine=` value to force for this fetch.
+        crs: The output CRS, or `None` for the backend default (EPSG:4326).
 
     Returns:
         The written GeoTIFF's path.
     """
+    label = engine if crs is None else f"{engine}-{crs.replace(':', '_')}"
+    kwargs = {} if crs is None else {"crs": crs}
     el = EarthLens(
         data_source="gee",
         start="2000-02-11",
@@ -75,9 +78,10 @@ def _download_srtm(tmp_path, engine: str):
         variables={"USGS/SRTMGL1_003": ["elevation"]},
         lat_lim=[29.95, 30.0],
         lon_lim=[31.25, 31.3],
-        path=str(tmp_path / engine),
+        path=str(tmp_path / label),
         scale=90,
         engine=engine,
+        **kwargs,
     ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
     paths = el.download(progress_bar=False)
     assert len(paths) == 1, f"{engine}: expected one GeoTIFF, got {paths}"
@@ -215,3 +219,41 @@ def test_live_srtm_tiled_read_matches_single_pass(tmp_path, monkeypatch):
     assert np.allclose(
         tiled_values[both_finite], single_values[both_finite], equal_nan=True
     ), "the tiled mosaic differs from the single-pass read"
+
+
+@_skip_without_creds
+@pytest.mark.skipif(
+    not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
+)
+def test_live_srtm_projected_crs_reads_the_same_ground(tmp_path):
+    """A projected-CRS EEDAI read returns the same elevations as an EPSG:4326 one.
+
+    The Cairo AOI is read through the reader twice — once in EPSG:4326, once in
+    UTM zone 36N (EPSG:32636) — and their elevation distributions are compared.
+    If the projected read passed lon/lat where the reader wanted metres it would
+    land in the ocean (a flat nodata/near-zero raster); matching elevations prove
+    the AOI was reprojected into the CRS before reading.
+    """
+    import numpy as np
+
+    latlon_path = _download_srtm(tmp_path, "eedai")
+    utm_path = _download_srtm(tmp_path, "eedai", crs="EPSG:32636")
+    assert utm_path.is_file() and utm_path.stat().st_size > 0, "UTM output missing"
+
+    latlon_values, _latlon_epsg, _latlon_bbox = _open_raster(latlon_path)
+    utm_values, utm_epsg, utm_bbox = _open_raster(utm_path)
+
+    assert utm_epsg == 32636, f"projected read wrote EPSG:{utm_epsg}, not 32636"
+    assert utm_bbox[0] > 100_000, f"UTM bounds are not metric: {utm_bbox}"
+
+    latlon_finite = latlon_values[np.isfinite(latlon_values)]
+    utm_finite = utm_values[np.isfinite(utm_values)]
+    assert latlon_finite.size and utm_finite.size, "a raster has no valid pixels"
+    # Cairo sits ~20-70 m above sea level; a wrong-ground read would be flat or
+    # negative. Compare the distributions, not the means.
+    for quantile in (0.05, 0.5, 0.95):
+        got = float(np.quantile(utm_finite, quantile))
+        want = float(np.quantile(latlon_finite, quantile))
+        assert abs(got - want) < 8.0, (
+            f"UTM q{quantile} {got:.2f} m differs from EPSG:4326 {want:.2f} m"
+        )

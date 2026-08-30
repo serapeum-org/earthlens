@@ -1837,6 +1837,58 @@ class TestEngineOption:
             make_gee(engine="gdal")
 
 
+class TestEedaiProjectedCrs:
+    """C2: the fast-path reads a metre-based projected CRS, not just EPSG:4326."""
+
+    def test_output_grid_delegates_to_the_degree_grid_under_4326(self, make_gee):
+        """Under EPSG:4326 the output grid is the geographic grid, unchanged."""
+        gee = make_gee()
+        bbox = (31.2, 29.9, 31.3, 30.0)
+        assert gee._eedai_output_grid(bbox, 90.0) == gee._eedai_grid(bbox, 90.0)
+
+    def test_output_grid_sizes_by_metres_under_a_projected_crs(self, make_gee):
+        """A projected CRS sizes each axis by its metre span over the scale."""
+        gee = make_gee(crs="EPSG:32636")
+        rows, cols = gee._eedai_output_grid(
+            (300000.0, 3300000.0, 301000.0, 3301000.0), 100.0
+        )
+        assert (rows, cols) == (10, 10)
+
+    def test_output_grid_rejects_a_non_positive_scale_when_projected(self, make_gee):
+        """A projected read still needs a positive metre scale to size a grid."""
+        gee = make_gee(crs="EPSG:32636")
+        with pytest.raises(ValueError, match="positive number of metres"):
+            gee._eedai_output_grid((300000.0, 3300000.0, 301000.0, 3301000.0), 0.0)
+
+    def test_window_reprojects_the_aoi_into_the_projected_crs(self, make_gee):
+        """The lat/lon AOI comes back as projected metres, not degrees."""
+        gee = make_gee(crs="EPSG:32636")
+        (min_x, min_y, max_x, max_y), cutline = gee._eedai_window()
+        assert cutline is None
+        assert min_x > 100_000 and min_y > 1_000_000, (min_x, min_y)
+        assert max_x > min_x and max_y > min_y
+
+    def test_window_passes_latlon_through_under_4326(self, make_gee):
+        """Under EPSG:4326 the AOI is the lat/lon box, unreprojected."""
+        gee = make_gee()
+        bbox, _cutline = gee._eedai_window()
+        assert bbox == (31.2, 29.9, 31.3, 30.0)
+
+    def test_projected_read_hands_the_reader_a_projected_window(
+        self, make_gee, fake_reader
+    ):
+        """The reader receives the projected CRS and a metric bbox, so it reads
+        the right ground rather than lon/lat as metres."""
+        gee = make_gee(engine="eedai", crs="EPSG:32636")
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_utm", _plan_for(gee, var_info)
+        )
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["window"].crs == "EPSG:32636"
+        assert kwargs["window"].bbox[0] > 100_000, kwargs["window"].bbox
+
+
 class TestEedaiEligibility:
     """Tests for `_eedai_eligible` / `_use_eedai`."""
 
@@ -1861,17 +1913,26 @@ class TestEedaiEligibility:
         gee = make_gee(**hooks)
         assert not gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
 
-    def test_projected_crs_is_not_eligible(self, make_gee):
-        """A projected `crs` stays on Earth Engine (the reader takes a CRS bbox)."""
+    def test_projected_metric_crs_is_eligible(self, make_gee):
+        """A metre-based projected `crs` is served by the reader (C2)."""
         gee = make_gee(crs="EPSG:32636")
+        assert gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
+
+    def test_non_metre_geographic_crs_is_not_eligible(self, make_gee):
+        """A geographic CRS other than EPSG:4326 is not sized by a metre scale."""
+        gee = make_gee(crs="EPSG:4269")
+        assert not gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
+
+    def test_unparseable_crs_is_not_eligible(self, make_gee):
+        """A CRS pyproj cannot parse is declined rather than raising."""
+        gee = make_gee(crs="NOT-A-CRS")
         assert not gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
 
     def test_engine_eedai_names_the_crs_limit(self, make_gee, fake_reader):
-        """Forcing the reader with a projected `crs` explains the CRS limit."""
-        gee = make_gee(engine="eedai", crs="EPSG:32636")
+        """Forcing the reader with an unsupported `crs` explains the CRS limit."""
+        gee = make_gee(engine="eedai", crs="EPSG:4269")
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        plan = _plan_for(gee, var_info)
-        with pytest.raises(ValueError, match="EPSG:4326"):
+        with pytest.raises(ValueError, match="metre-based projected CRS"):
             gee._use_eedai(var_info, 1)
 
     def test_batch_sink_is_not_eligible(self, make_gee):
