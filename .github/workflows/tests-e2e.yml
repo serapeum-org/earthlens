@@ -115,7 +115,7 @@ jobs:
           report="$RUNNER_TEMP/e2e-shared.xml"
           uv run --locked pytest ${{ matrix.package }} -v \
             --junitxml="$report" \
-            -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat and not caravan and not earthdata and not eumetsat and not asf"
+            -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat and not caravan and not earthdata and not eumetsat and not asf and not iucn and not wdpa"
           # Complements earthlens.testing's in-process guard, which already fails
           # a lane masked by *upstream* outages. That one counts only skips
           # carrying its availability prefix, so a lane skipped for missing
