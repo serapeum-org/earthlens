@@ -107,6 +107,35 @@ def test_tailorconfig_non_native_format_keeps_default_crs():
     assert TailorConfig(format="geotiff").crs == "geographic"
 
 
+def test_tailorconfig_native_check_is_case_sensitive_by_design():
+    """A case-mismatched native format bypasses the cross-check -- by design.
+
+    format's *legitimacy* is deliberately not validated client-side (see the
+    module docstring's Out of Scope note); Data Tailor's format IDs are
+    lowercase, so "MSGNATIVE" is already an invalid value for an unrelated
+    reason and would be rejected by the service, just after a round trip
+    rather than at construction. Extending NATIVE_FORMATS matching to be
+    case-insensitive would silently paper over that typo instead of
+    surfacing it, which is not this validator's job.
+    """
+    cfg = TailorConfig(format="MSGNATIVE", crs="geographic")
+    assert cfg.format == "MSGNATIVE", "format is passed through, not case-normalised"
+
+
+def test_tailorconfig_native_check_sees_stripped_values():
+    """The cross-field check runs after whitespace stripping, not before.
+
+    field_validator (which strips) and model_validator(mode="after") (which
+    cross-checks) both fire during construction, so a padded native format
+    paired with a padded projection must still be caught -- confirming the
+    stripped, not the raw, values reach the cross-check.
+    """
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError, match="cannot be reprojected"):
+        TailorConfig(format="  msgnative  ", crs="  geographic  ")
+
+
 @pytest.mark.parametrize("field", ["format", "crs"])
 def test_tailorconfig_strips_surrounding_whitespace(field):
     """Padding is stripped off format and crs alike."""
