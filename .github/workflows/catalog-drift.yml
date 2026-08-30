@@ -84,12 +84,18 @@ jobs:
         run: |
           # --strict exits non-zero when a curated dataset is no longer served.
           #
-          # --no-sync: the pinned python-setup action above already built this
-          # environment, so uv must install nothing here. That closes the
-          # build-time code-execution surface a bare `uv run` leaves open
-          # (sonar githubactions:S8541). Sonar suggests `--no-build` for that,
-          # which cannot work in this workspace: the editable member
-          # distributions have no wheel, so uv refuses with "can't be installed
-          # because it is marked as --no-build but has no binary distribution".
+          # --no-sync + --no-build close the build-time code-execution surface a
+          # bare `uv run` leaves open (sonar githubactions:S8541): the pinned
+          # python-setup action above already built this environment, so uv must
+          # install nothing here, and no setup script may run if it tries.
+          #
+          # Both flags are needed. --no-build alone fails outright in this
+          # workspace, because the editable member distributions have no wheel:
+          #   error: Distribution `earthlens==0.19.0 @ editable+.` can't be
+          #   installed because it is marked as `--no-build` but has no binary
+          #   distribution
+          # --no-sync skips the install step entirely, which makes --no-build a
+          # belt-and-braces assertion rather than a fatal constraint.
+          #
           # --locked still fails the run if uv.lock has drifted.
-          uv run --locked --no-sync earthlens datasets audit "$PROVIDERS" --strict
+          uv run --locked --no-sync --no-build             earthlens datasets audit "$PROVIDERS" --strict
