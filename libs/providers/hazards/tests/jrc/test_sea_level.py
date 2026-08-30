@@ -913,6 +913,23 @@ class TestHelperEdges:
         with pytest.raises(ValueError, match="unhandled JRC dataset kind"):
             backend._fetch([])
 
+    def test_explicit_dataset_id_warns_about_family_selectors(self):
+        """Naming a dataset directly reports that product= cannot also apply."""
+        messages = []
+        logger_id = _backend_logger.add(
+            lambda m: messages.append(str(m)), level="WARNING"
+        )
+        try:
+            JRC(
+                dataset="sea_level_medium_term",
+                product="subseasonal",
+                lat_lim=[51.0, 53.0],
+                lon_lim=[3.0, 5.0],
+            )
+        finally:
+            _backend_logger.remove(logger_id)
+        assert any("product" in m for m in messages), f"expected a warning: {messages}"
+
     def test_unhandled_kind_rejected(self):
         """A catalog row with an unhandled kind is refused at construction."""
         catalog = Catalog()
@@ -986,6 +1003,25 @@ class TestHelperEdges:
         """A URL without the four numeric segments cannot yield a cycle id."""
         with pytest.raises(ValueError, match="cycle id"):
             _helpers._cycle_id("https://x/r/2026/08/")
+
+    def test_ambiguous_glob_match_raises(self):
+        """Two files matching one glob is a layout change, not a pick-the-first."""
+        html = (
+            '<a href="mediumTermTWLforecastGridded_a.nc">a</a>'
+            '<a href="mediumTermTWLforecastGridded_b.nc">b</a>'
+        )
+        with pytest.raises(ValueError, match="expected exactly one"):
+            _helpers.find_cycle_file(
+                "https://x/c/", "*TWLforecastGridded_*.nc", http_text=lambda url: html
+            )
+
+    def test_out_of_domain_extent_is_refused(self):
+        """An affine whose far corner leaves the lon/lat domain is rejected."""
+        # Origin is a valid coordinate, but the span runs off the globe.
+        with pytest.raises(ValueError, match="outside the lon/lat domain"):
+            _helpers.require_geographic_affine(
+                (170.0, 0.25, 0.0, 80.0, 0.0, -0.25), 1440, 720, "x"
+            )
 
     def test_find_cycle_file_is_case_sensitive(self):
         """Glob matching is case-sensitive, so it behaves the same on all platforms."""
