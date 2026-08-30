@@ -51,7 +51,25 @@ def _totals(report: Path) -> tuple[int, int]:
     root = ET.parse(report).getroot()
     suites = [root] if root.tag == "testsuite" else root.findall("testsuite")
     collected = sum(int(s.get("tests", 0)) for s in suites)
-    skipped = sum(int(s.get("skipped", 0)) for s in suites)
+
+    # Count skips from the per-testcase elements rather than the suite
+    # attribute. pytest records an expected failure as
+    # `<skipped type="pytest.xfail">` and folds it into the suite's `skipped`
+    # count, but an xfail *ran* - treating it as a skip would fail a lane that
+    # executed everything it had, and tell it to supply credentials it does
+    # not need.
+    skipped = 0
+    saw_cases = False
+    for suite in suites:
+        for case in suite.iter("testcase"):
+            saw_cases = True
+            marker = case.find("skipped")
+            if marker is not None and marker.get("type") != "pytest.xfail":
+                skipped += 1
+    if not saw_cases:
+        # A summary-only report (no <testcase> elements) leaves the attribute
+        # as the only signal available.
+        skipped = sum(int(s.get("skipped", 0)) for s in suites)
     return collected, skipped
 
 

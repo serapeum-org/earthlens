@@ -47,6 +47,30 @@ def _report(path: Path, *suites: tuple[int, int], wrap: bool = True) -> Path:
     return path
 
 
+def _case_report(path: Path, *cases: tuple[str, str | None]) -> Path:
+    """Write a junit report with per-`<testcase>` outcomes and return its path.
+
+    Args:
+        path: File to write.
+        cases: `(name, skip_type)` pairs; `skip_type` is `None` for a test that
+            ran, or the `type` pytest stamps on `<skipped>` — `pytest.skip` for
+            a genuine skip, `pytest.xfail` for an expected failure.
+    """
+    body = "".join(
+        f'<testcase classname="t" name="{name}">'
+        + (f'<skipped type="{kind}" message="m"/>' if kind else "")
+        + "</testcase>"
+        for name, kind in cases
+    )
+    skipped = sum(1 for _, kind in cases if kind)
+    path.write_text(
+        f'<testsuites><testsuite name="s" tests="{len(cases)}" '
+        f'skipped="{skipped}">{body}</testsuite></testsuites>',
+        encoding="utf-8",
+    )
+    return path
+
+
 class TestTotals:
     """Tests for the module-private `_totals` helper."""
 
@@ -69,6 +93,30 @@ class TestTotals:
             "absent attributes mishandled"
         )
 
+    def test_an_xfail_is_not_a_skip(self, guard, tmp_path):
+        """pytest folds `xfail` into the suite's skipped count, but an xfail ran."""
+        report = _case_report(tmp_path / "r.xml", ("a", "pytest.xfail"))
+        assert guard._totals(report) == (1, 0), "an xfail was counted as a skip"
+
+    def test_genuine_skips_are_still_counted(self, guard, tmp_path):
+        """A `pytest.skip` outcome counts, so a credential-less lane still fails."""
+        report = _case_report(
+            tmp_path / "r.xml", ("a", "pytest.skip"), ("b", "pytest.skip")
+        )
+        assert guard._totals(report) == (2, 2), "genuine skips were not counted"
+
+    def test_mixed_outcomes_count_only_real_skips(self, guard, tmp_path):
+        """An xfail beside a skip leaves exactly one skip."""
+        report = _case_report(
+            tmp_path / "r.xml", ("a", "pytest.xfail"), ("b", "pytest.skip"), ("c", None)
+        )
+        assert guard._totals(report) == (3, 1), "mixed outcomes miscounted"
+
+    def test_summary_only_report_falls_back_to_the_attribute(self, guard, tmp_path):
+        """With no `<testcase>` elements the suite attribute is the only signal."""
+        report = _report(tmp_path / "r.xml", (4, 4))
+        assert guard._totals(report) == (4, 4), "the attribute fallback was lost"
+
 
 class TestMain:
     """Tests for the guard's `main` entry point."""
@@ -81,6 +129,13 @@ class TestMain:
         assert code == 1, f"an all-skipped lane must fail, got {code}"
         assert "::error::" in out, f"no GitHub error annotation in: {out}"
         assert "e2e-cmems" in out, f"the lane is not named in: {out}"
+
+    def test_an_all_xfail_lane_passes(self, guard, tmp_path):
+        """A lane whose every test xfailed exercised its tests and must not fail."""
+        report = _case_report(
+            tmp_path / "r.xml", ("a", "pytest.xfail"), ("b", "pytest.xfail")
+        )
+        assert guard.main([str(report), "lane"]) == 0, "an all-xfail lane was failed"
 
     def test_executed_tests_pass(self, guard, tmp_path, capsys):
         """A lane that executed anything passes and reports the ratio."""
