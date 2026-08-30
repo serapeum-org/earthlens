@@ -23,7 +23,7 @@ import os
 from pathlib import Path
 
 import pytest
-from pandas.api.types import is_float_dtype
+from pandas.api.types import is_numeric_dtype
 
 from earthlens.earthlens import EarthLens
 from earthlens.firms.events import ATTRIBUTE_COLUMNS
@@ -71,8 +71,11 @@ class TestFirmsLiveQuery:
         if len(fc):
             # dtype first: a non-numeric column in the frp slot would make the
             # numeric checks below raise instead of assert.
-            assert is_float_dtype(fc["frp"]), (
-                f"frp is {fc['frp'].dtype}, not floating — a non-numeric column "
+            # Numeric, not specifically float: `pd.to_numeric` yields int64
+            # for a window whose FRP values all happen to be integral, and
+            # nothing pins float64. Requiring float would fail on real data.
+            assert is_numeric_dtype(fc["frp"]), (
+                f"frp is {fc['frp'].dtype}, not numeric — a non-numeric column "
                 "has taken its place"
             )
             frp = fc["frp"].dropna()
@@ -81,14 +84,17 @@ class TestFirmsLiveQuery:
                 f"FRP {worst} is below the retrieval noise floor "
                 f"({_FRP_NOISE_FLOOR}) — suspect a unit error"
             )
-            # A column shift is structural, so catch it structurally. The
-            # likeliest shift moves brightness or confidence into the frp slot,
-            # and both are wholly positive — a noise floor and a
-            # share-of-negatives test wave them straight through. Comparing the
-            # columns does not: if frp carries a neighbour's values, they are
-            # equal. This is also scale-free, where a share threshold is not:
-            # one NASA-emitted negative is 9e-6 of a 115k-row frame but 5% of a
-            # twenty-row one, which would fail on window size alone.
+            # The realistic mis-mapping is a rename that points frp at a
+            # neighbouring column, which makes the two identical — FIRMS returns
+            # a header-keyed CSV, so pandas cannot silently slide values between
+            # columns the way a positional parser could. Comparing them catches
+            # that exactly, and is scale-free where a share-of-negatives
+            # threshold is not: one NASA-emitted negative is 9e-6 of a 115k-row
+            # frame but 5% of a twenty-row one, failing on window size alone.
+            #
+            # It does not catch a hypothetical row-offset shift; nothing in this
+            # parsing path can produce one. `frp` being absent entirely is
+            # covered by the ATTRIBUTE_COLUMNS loop above.
             for other in ("brightness_k", "confidence_pct"):
                 if other in fc.columns and len(fc) > 1:
                     assert not fc["frp"].equals(fc[other]), (
