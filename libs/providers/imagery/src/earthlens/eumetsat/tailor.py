@@ -166,6 +166,10 @@ class TailorConfig(BaseModel):
         submitting a customisation that can only fail after a poll round
         trip that has been measured to take upward of 30 minutes.
 
+        This only cross-checks `format` against `crs`; whether `format`
+        itself is a real Data Tailor output format is deliberately left to
+        the service to reject, not validated here.
+
         Returns:
             TailorConfig: `self`, unchanged, when the combination is valid.
 

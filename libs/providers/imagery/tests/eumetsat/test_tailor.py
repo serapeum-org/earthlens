@@ -110,13 +110,13 @@ def test_tailorconfig_non_native_format_keeps_default_crs():
 def test_tailorconfig_native_check_is_case_sensitive_by_design():
     """A case-mismatched native format bypasses the cross-check -- by design.
 
-    format's *legitimacy* is deliberately not validated client-side (see the
-    module docstring's Out of Scope note); Data Tailor's format IDs are
-    lowercase, so "MSGNATIVE" is already an invalid value for an unrelated
-    reason and would be rejected by the service, just after a round trip
-    rather than at construction. Extending NATIVE_FORMATS matching to be
-    case-insensitive would silently paper over that typo instead of
-    surfacing it, which is not this validator's job.
+    format's *legitimacy* is deliberately not validated client-side (see
+    `TailorConfig._native_format_forbids_projection`'s own docstring); Data
+    Tailor's format IDs are lowercase, so "MSGNATIVE" is already an invalid
+    value for an unrelated reason and would be rejected by the service, just
+    after a round trip rather than at construction. Extending
+    NATIVE_FORMATS matching to be case-insensitive would silently paper over
+    that typo instead of surfacing it, which is not this validator's job.
     """
     cfg = TailorConfig(format="MSGNATIVE", crs="geographic")
     assert cfg.format == "MSGNATIVE", "format is passed through, not case-normalised"
