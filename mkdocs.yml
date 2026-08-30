@@ -59,14 +59,23 @@ theme:
 # from their stored outputs, not from these files.
 exclude_docs: |
   examples/*/out/
+  examples/*/*/out/
   examples/*/data/
+  examples/*/*/data/
   examples/*/_nb_out/
+  examples/*/*/_nb_out/
   examples/*/_overture_out/
+  examples/*/*/_overture_out/
   examples/*/*_out/
+  examples/*/*/*_out/
   examples/*/*_output/
+  examples/*/*/*_output/
   examples/*/ohsome_log/
+  examples/*/*/ohsome_log/
   examples/*/insar_stack*/
+  examples/*/*/insar_stack*/
   examples/*/soilgrids_*/
+  examples/*/*/soilgrids_*/
   # Branding: publish the curated kit only. Everything loose beside it — the
   # zip of the kit, the exploration variants, and the duplicates of files the
   # kit already ships — stays out. These globs are single-level on purpose, so
@@ -523,9 +532,10 @@ nav:
       - Danube true-colour time-lapse: examples/showcases/danube_truecolour_timelapse.ipynb
       - Rhine-Danube low flow, 2026: examples/showcases/rhine_danube_lowflow_2026.ipynb
       - Rhine Landsat, wet year vs 2026 drought: examples/showcases/rhine_landsat_wetyear_vs_2026.ipynb
-      - Total solar eclipse 2026, geometry (3D): examples/showcase/eclipse_geometry_3d.ipynb
-      - Total solar eclipse 2026 from Meteosat-12 (MTG FCI): examples/showcase/solar_eclipse_2026_eumetsat_fci.ipynb
-      - Total solar eclipse 2026 from GOES-19: examples/showcase/solar_eclipse_2026_goes.ipynb
+      - Every satellite earthlens can reach (3D): examples/showcase/earthlens-satellites.ipynb
+      - Total solar eclipse 2026, geometry (3D): examples/showcase/eclipse/eclipse_geometry_3d.ipynb
+      - Total solar eclipse 2026 from Meteosat-12 (MTG FCI): examples/showcase/eclipse/solar_eclipse_2026_eumetsat_fci.ipynb
+      - Total solar eclipse 2026 from GOES-19: examples/showcase/eclipse/solar_eclipse_2026_goes.ipynb
     - June 2026 European heat wave:
       - Full case study: examples/heatwave/european_heatwave_2026.ipynb
       - True-colour time-lapse: examples/heatwave/european_heatwave_timelapse_2026.ipynb

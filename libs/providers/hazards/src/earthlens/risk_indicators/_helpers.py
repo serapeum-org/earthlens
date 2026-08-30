@@ -24,12 +24,18 @@ the A1 gate captures).
 
 from __future__ import annotations
 
+import os
+import re
 import time
+import warnings
+from pathlib import Path
 from typing import cast
+from urllib.parse import urljoin, urlsplit
 
 import geopandas as gpd
 import pandas as pd
 import requests
+from loguru import logger
 from pyramids.feature.collection import FeatureCollection
 
 from earthlens.base.http import HttpClient
@@ -41,6 +47,42 @@ THINKHAZARD_BASE = "https://thinkhazard.org/en"
 #: INFORM Risk (JRC) public REST base (no auth). Country scores live under
 #: `/countries/Scores/?WorkflowId={id}&IndicatorId={ind}`.
 INFORM_BASE = "https://drmkc.jrc.ec.europa.eu/inform-index/API/InformAPI"
+
+#: INFORM site root, for resolving the relative workbook links on the results page.
+INFORM_SITE = "https://drmkc.jrc.ec.europa.eu"
+
+#: The page that publishes each INFORM Risk release as a spreadsheet. The API
+#: and this page can disagree - the API stopped serving the 2026 workflows while
+#: this page kept publishing the 2026 release - so the workbook is the source of
+#: record for "the current release".
+INFORM_RESULTS_PAGE = f"{INFORM_SITE}/inform-index/INFORM-Risk/Results-and-data"
+
+#: Matches a release workbook link, capturing its year and version so the newest
+#: can be picked when the page lists more than one (`INFORM_Risk_2026_v072.xlsx`).
+#: The trend workbook on the same page has a different stem and does not match.
+INFORM_RELEASE_LINK = re.compile(
+    r"""href=["']([^"']*?INFORM_Risk_(\d{4})_v(\d+)\.xlsx[^"']*)["']""",
+    re.IGNORECASE,
+)
+
+#: Release years outside this range are ignored, so a stray or malformed link
+#: cannot win the "newest" comparison against a real release.
+INFORM_RELEASE_YEARS = range(2010, 2100)
+
+#: Sheet holding the country scores; its name carries the release year.
+INFORM_RELEASE_SHEET = re.compile(r"^INFORM Risk (\d{4})", re.IGNORECASE)
+
+#: The score sheet's header sits on the second row; the first is a banner.
+INFORM_RELEASE_HEADER_ROW = 1
+
+#: A data row's ISO3. The published sheet puts a units legend directly under the
+#: header (`(a-z)`, `(0-10)`, …), so rows are kept on this shape rather than on
+#: whether their score happens to parse as a number.
+INFORM_ISO3_SHAPE = re.compile(r"^[A-Za-z]{3}$")
+
+#: Leading bytes of any `.xlsx` (a zip container), so a login or error page
+#: saved under the workbook's name is rejected instead of parsed.
+XLSX_MAGIC = b"PK\x03\x04"
 
 #: GFW Data API base. SQL queries live under
 #: `/dataset/{dataset}/{version}/query/json`; admin geometry under
@@ -82,6 +124,28 @@ _TRANSIENT_ERRORS: tuple[type[requests.RequestException], ...] = (
 )
 
 
+def _client(timeout: float) -> HttpClient:
+    """Build the retrying HTTP client every request in this module shares.
+
+    Args:
+        timeout: Per-request timeout in seconds.
+
+    Returns:
+        HttpClient: Configured to retry 5xx and transient transport errors with
+            exponential back-off, and to raise on a 4xx.
+    """
+    return HttpClient(
+        user_agent=_USER_AGENT,
+        timeout=timeout,
+        max_retries=_HTTP_RETRIES,
+        backoff_factor=_HTTP_RETRY_BACKOFF,
+        status_forcelist=tuple(range(500, 600)),
+        retry_on_exceptions=_TRANSIENT_ERRORS,
+        raise_for_status=True,
+        sleep=lambda seconds: time.sleep(seconds),
+    )
+
+
 def _request_json(
     url: str,
     *,
@@ -110,16 +174,7 @@ def _request_json(
         requests.RequestException: When the GET still fails after the retries
             (the last error is re-raised; a 4xx fails fast without retrying).
     """
-    client = HttpClient(
-        user_agent=_USER_AGENT,
-        timeout=timeout,
-        max_retries=_HTTP_RETRIES,
-        backoff_factor=_HTTP_RETRY_BACKOFF,
-        status_forcelist=tuple(range(500, 600)),
-        retry_on_exceptions=_TRANSIENT_ERRORS,
-        raise_for_status=True,
-        sleep=lambda seconds: time.sleep(seconds),
-    )
+    client = _client(timeout)
     return cast("dict | list", client.get_json(url, params=params, headers=headers))
 
 
@@ -134,7 +189,14 @@ THINKHAZARD_COLUMNS: list[str] = [
 ]
 
 #: Canonical column order for an INFORM country-score table.
-INFORM_COLUMNS: list[str] = ["iso3", "indicator_id", "indicator_score", "validity_year"]
+INFORM_COLUMNS: list[str] = [
+    "iso3",
+    "indicator_id",
+    "indicator_score",
+    "validity_year",
+    "workflow_id",
+    "source",
+]
 
 #: ThinkHazard hazard-level title -> mnemonic. The all-hazards list returns the
 #: mnemonic (`"HIG"`) while the single-hazard report returns the title word
@@ -204,8 +266,8 @@ def inform_query(
     """Fetch INFORM country scores for one indicator (public, no key).
 
     Args:
-        workflow_id: The INFORM model WorkflowId (e.g. `505` for INFORM Risk
-            2026).
+        workflow_id: The INFORM model WorkflowId (e.g. `503` for INFORM Risk
+            Mid 2025).
         indicator_id: The indicator id (`"INFORM"`, `"HA"`, `"VU"`, `"CC"`).
         base: The INFORM API base URL (overridable for tests).
         timeout: Per-request timeout in seconds.
@@ -222,6 +284,248 @@ def inform_query(
     return cast(
         "list", _request_json(url, params=params, headers=_headers(), timeout=timeout)
     )
+
+
+def _inform_frame(columns: dict[str, object]) -> pd.DataFrame:
+    """Build an INFORM score table with the dtypes both channels share.
+
+    The API and the workbook produce the same columns from different raw shapes
+    (JSON scalars against spreadsheet cells), so the dtypes are pinned here -
+    otherwise the two channels return frames that compare and concatenate badly.
+
+    Args:
+        columns: Column name to values, as accepted by the `DataFrame`
+            constructor.
+
+    Returns:
+        pd.DataFrame: Columns :data:`INFORM_COLUMNS`, re-indexed from zero.
+    """
+    frame = pd.DataFrame(columns, columns=INFORM_COLUMNS).reset_index(drop=True)
+    return frame.astype(
+        {
+            "iso3": "string",
+            "indicator_id": "string",
+            "indicator_score": "Float64",
+            "validity_year": "Int64",
+            "workflow_id": "Int64",
+            "source": "string",
+        }
+    )
+
+
+def filter_iso3(frame: pd.DataFrame, country: str | None) -> pd.DataFrame:
+    """Filter a score table to one ISO3, case- and whitespace-insensitively.
+
+    Args:
+        frame: A table carrying an `iso3` column.
+        country: The ISO3 to keep; `None` keeps every row.
+
+    Returns:
+        pd.DataFrame: The filtered table, re-indexed from zero.
+    """
+    if country is None:
+        return frame.reset_index(drop=True)
+    matches = frame["iso3"].astype("string").str.upper() == country.strip().upper()
+    filtered = frame[matches.fillna(False)].reset_index(drop=True)
+    filtered.attrs = dict(frame.attrs)
+    return filtered
+
+
+#: Discovered release per results page, so four datasets in one process scrape
+#: the page once - the JRC host drops connections under rapid repeat requests.
+_RELEASE_CACHE: dict[str, tuple[str, int]] = {}
+
+
+def clear_release_cache() -> None:
+    """Forget the discovered release URLs, so the next call re-reads the page."""
+    _RELEASE_CACHE.clear()
+
+
+def inform_release_url(
+    *, page: str = INFORM_RESULTS_PAGE, timeout: float = _HTTP_TIMEOUT
+) -> tuple[str, int]:
+    """Find the newest INFORM Risk release workbook published on the JRC site.
+
+    The answer is memoised per page for the life of the process
+    (:func:`clear_release_cache` forgets it): a run pulling all four Risk
+    datasets would otherwise hit the results page four times, and the host drops
+    connections under rapid repeat requests.
+
+    Args:
+        page: The results page to read (overridable for tests).
+        timeout: Per-request timeout in seconds.
+
+    Returns:
+        tuple[str, int]: The absolute workbook URL and its release year.
+
+    Raises:
+        ValueError: If the page carries no plausible release-workbook link,
+            which means the page layout changed and the pattern needs
+            revisiting, or if a link points off the INFORM site.
+        requests.RequestException: If the page cannot be fetched.
+    """
+    if page in _RELEASE_CACHE:
+        return _RELEASE_CACHE[page]
+    html = _client(timeout).get(page).text
+    candidates = [
+        hit
+        for hit in INFORM_RELEASE_LINK.findall(html)
+        if int(hit[1]) in INFORM_RELEASE_YEARS
+    ]
+    if not candidates:
+        raise ValueError(
+            f"No INFORM Risk release workbook link found on {page}; the page "
+            "layout may have changed."
+        )
+    href, year, _version = max(candidates, key=lambda hit: (int(hit[1]), int(hit[2])))
+    url = urljoin(page, href)
+    if urlsplit(url).netloc.lower() != urlsplit(INFORM_SITE).netloc.lower():
+        raise ValueError(
+            f"Release workbook link on {page} points off the INFORM site: {url}"
+        )
+    _RELEASE_CACHE[page] = (url, int(year))
+    return url, int(year)
+
+
+def inform_download_release(
+    url: str, dest: Path | str, *, timeout: float = _HTTP_TIMEOUT
+) -> Path:
+    """Download a release workbook, reusing an already-cached copy.
+
+    A cached copy is checked, not just counted: a truncated or half-written file
+    (or an error page saved under the workbook's name) is re-downloaded rather
+    than handed to the parser. Releases are versioned in the file name, so a new
+    release lands beside the old one instead of having to invalidate it.
+
+    Args:
+        url: The workbook URL from :func:`inform_release_url`.
+        dest: Local path to write. An existing, valid file is reused.
+        timeout: Per-request timeout in seconds.
+
+    Returns:
+        Path: The local workbook path.
+
+    Raises:
+        requests.RequestException: If the download fails after its retries.
+        ValueError: If the response is not a zip container, i.e. not an xlsx.
+    """
+    path = Path(dest)
+    if is_xlsx(path):
+        return path
+    # Downloaded under a per-process name, then moved into place: two runs
+    # sharing a cache directory cannot write the same temp file, and the move is
+    # atomic, so a reader never sees a partial workbook.
+    staged = path.with_suffix(f"{path.suffix}.{os.getpid()}.part")
+    staged.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        _client(timeout).download(url, staged, progress=False, expect_magic=XLSX_MAGIC)
+        os.replace(staged, path)
+    finally:
+        staged.unlink(missing_ok=True)
+    return path
+
+
+def is_xlsx(path: Path) -> bool:
+    """Report whether `path` is a readable file that starts like an xlsx.
+
+    Args:
+        path: The candidate file.
+
+    Returns:
+        bool: True when the file exists and begins with the zip magic bytes.
+    """
+    try:
+        with path.open("rb") as handle:
+            return handle.read(len(XLSX_MAGIC)) == XLSX_MAGIC
+    except OSError:
+        return False
+
+
+def inform_release_to_frame(
+    workbook: Path | str,
+    column: str,
+    *,
+    indicator_id: str,
+    country: str | None = None,
+    release_year: int | None = None,
+) -> pd.DataFrame:
+    """Reshape one score column of a release workbook into the score table.
+
+    The workbook's country sheet carries every dimension side by side, so one
+    download serves the composite index and all three dimensions - `column`
+    picks which. Scores come back as `object` (blanks and footnote markers sit
+    among the numbers), so they are coerced and non-numeric rows dropped.
+
+    Args:
+        workbook: Local path to the release `.xlsx`.
+        column: The sheet column holding this indicator's score, e.g.
+            `INFORM RISK` or `LACK OF COPING CAPACITY`.
+        indicator_id: The indicator id to record in the frame (`INFORM`, `HA`,
+            `VU`, `CC`), so a workbook row is comparable with an API row.
+        country: Optional ISO3 to filter to a single country (case-insensitive).
+        release_year: The release year to record; read from the sheet name when
+            omitted.
+
+    Returns:
+        pd.DataFrame: Columns :data:`INFORM_COLUMNS`, one row per country.
+
+    Raises:
+        ValueError: If no country sheet matches, or the sheet has no `column`.
+        ImportError: If `openpyxl` is missing (pandas needs it to read xlsx).
+    """
+    with warnings.catch_warnings():
+        # openpyxl warns twice per read about drawing/conditional-formatting
+        # extensions it drops; neither touches the score cells.
+        warnings.simplefilter("ignore", UserWarning)
+        with pd.ExcelFile(workbook) as excel:
+            sheets = [
+                name
+                for name in excel.sheet_names
+                if INFORM_RELEASE_SHEET.match(name.strip())
+            ]
+            if not sheets:
+                raise ValueError(
+                    f"No INFORM Risk score sheet in {Path(workbook).name}; sheets "
+                    f"are {list(excel.sheet_names)}."
+                )
+            sheet = sheets[0]
+            frame = excel.parse(sheet, header=INFORM_RELEASE_HEADER_ROW)
+
+    matched = INFORM_RELEASE_SHEET.match(sheet.strip())
+    # The sheet is what was actually parsed, so its year wins over the caller's
+    # (which comes from the file name and can disagree with the contents).
+    year = int(matched.group(1)) if matched else (release_year or 0)
+    frame.columns = [str(name).strip() for name in frame.columns]
+    if column not in frame.columns or "ISO3" not in frame.columns:
+        raise ValueError(
+            f"Sheet {sheet!r} has no {column!r} / 'ISO3' column; found "
+            f"{frame.columns.tolist()[:8]}..."
+        )
+    iso3 = frame["ISO3"].astype("string").str.strip().str.upper()
+    is_country = iso3.str.fullmatch(INFORM_ISO3_SHAPE.pattern).fillna(False)
+    scores = pd.to_numeric(frame[column], errors="coerce")
+    served = int(is_country.sum())
+    keep = is_country & scores.notna()
+    missing = served - int(keep.sum())
+    if missing:
+        logger.warning(
+            f"INFORM {year} release: {missing} of {served} countries carry no "
+            f"numeric {column!r} score and were dropped."
+        )
+    table = _inform_frame(
+        {
+            "iso3": iso3[keep],
+            "indicator_id": indicator_id,
+            "indicator_score": scores[keep],
+            "validity_year": year,
+            "workflow_id": pd.NA,
+            "source": "release",
+        }
+    )
+    # The count of what the workbook served, before any country filter, so an
+    # empty result can be diagnosed the same way the API path is.
+    table.attrs["served_rows"] = served
+    return filter_iso3(table, country)
 
 
 def gfw_query(
@@ -372,13 +676,22 @@ def thinkhazard_to_frame(
     return frame.reindex(columns=THINKHAZARD_COLUMNS)
 
 
-def inform_to_frame(payload: list, *, country: str | None = None) -> pd.DataFrame:
+def inform_to_frame(
+    payload: list, *, country: str | None = None, workflow_id: int | None = None
+) -> pd.DataFrame:
     """Reshape INFORM country scores into the canonical score table.
+
+    INFORM leaves `ValidityYear` at `0` on every row, so the payload itself does
+    not say which model release produced it. `workflow_id` is stamped into each
+    row to close that gap: a written table is then attributable to one release
+    rather than being indistinguishable from a pull of any other.
 
     Args:
         payload: The score rows from :func:`inform_query`.
         country: Optional ISO3 to filter to a single country (case-insensitive);
             `None` keeps every country.
+        workflow_id: The WorkflowId the payload was fetched with, recorded in
+            the `workflow_id` column; `None` leaves the column empty.
 
     Returns:
         pd.DataFrame: Columns :data:`INFORM_COLUMNS` — one row per country (or
@@ -390,13 +703,17 @@ def inform_to_frame(payload: list, *, country: str | None = None) -> pd.DataFram
             "indicator_id": row.get("IndicatorId"),
             "indicator_score": row.get("IndicatorScore"),
             "validity_year": row.get("ValidityYear"),
+            "workflow_id": workflow_id,
+            "source": "api",
         }
         for row in (payload or [])
     ]
-    frame = pd.DataFrame(records, columns=INFORM_COLUMNS)
-    if country is not None:
-        frame = frame[frame["iso3"].str.upper() == country.strip().upper()]
-    return frame.reset_index(drop=True)
+    frame = _inform_frame(
+        {name: [row[name] for row in records] for name in INFORM_COLUMNS}
+    )
+    frame["iso3"] = frame["iso3"].str.strip().str.upper()
+    frame.attrs["served_rows"] = len(frame)
+    return filter_iso3(frame, country)
 
 
 def gfw_geostore_to_feature_collection(payload: dict) -> FeatureCollection:

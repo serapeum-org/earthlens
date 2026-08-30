@@ -78,6 +78,14 @@ from earthlens.base.spatial import (
     widen_degenerate_bbox,
     windowed_bbox_crop,
 )
+from earthlens.base.upstream import (
+    UpstreamUnavailableError,
+    exception_chain,
+    http_status,
+    is_http_status,
+    response_status,
+    status_in_message,
+)
 
 __all__ = [
     "AbstractAuth",
@@ -100,6 +108,7 @@ __all__ = [
     "SpatialExtent",
     "TemporalExtent",
     "Timeout",
+    "UpstreamUnavailableError",
     "WHOLE_WINDOW",
     "aoi_tag",
     "bbox_overlaps",
@@ -113,7 +122,10 @@ __all__ = [
     "end_is_date_only",
     "ensure_no_data",
     "estimate_pixel_dims",
+    "exception_chain",
     "expand_bare_date_end",
+    "http_status",
+    "is_http_status",
     "is_network_unreachable",
     "load_catalog",
     "load_providers",
@@ -124,8 +136,10 @@ __all__ = [
     "region_affinity",
     "resolve_aoi",
     "resolve_cadence",
+    "response_status",
     "retry_login_forcing_ipv4",
     "safe_filename",
+    "status_in_message",
     "SingleSecretAuth",
     "sidecar_is_fresh",
     "sidecar_path",

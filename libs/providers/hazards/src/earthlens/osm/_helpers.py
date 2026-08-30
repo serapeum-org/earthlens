@@ -32,13 +32,14 @@ the shared biodiversity home so the backend imports the one warning class.
 
 from __future__ import annotations
 
-from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any, cast
 
 import geopandas as gpd
 import pandas as pd
 from pyramids.feature.collection import FeatureCollection
 from shapely.geometry import LineString, Point, Polygon, box
+
+from earthlens.base import exception_chain, is_http_status, response_status
 
 # `LicenseWarning` is shared across the ODbL / restrictive-license backends; it
 # lives in the biodiversity cluster's helper module (overture re-exports the same
@@ -74,6 +75,15 @@ class OhsomeResponseError(RuntimeError):
     HTTP `status_code`, the response `content_type`, and a short `body_preview`
     so a caller (and the logs) can tell those cases apart, instead of guessing
     behind a decoder error (`#930`).
+
+    Deliberately a plain `RuntimeError`, **not** an
+    `earthlens.base.UpstreamUnavailableError`: this is a broad "response we could
+    not use" catch-all, and its `OhsomeUnavailableError` subtype can carry a
+    non-transient status (a `404` / `600` from a bad filter is an earthlens
+    defect, not an outage). The transient-vs-real triage is the osm backend's own
+    job (`ohsome_http_status` + the e2e `_skip_on_network` helper); subclassing
+    the shared availability type would let `is_upstream_unavailable` mask those
+    deliberate failures as skips.
     """
 
     def __init__(
@@ -136,31 +146,6 @@ class OhsomeUnavailableError(OhsomeResponseError):
         )
 
 
-def _exception_chain(exc: Exception) -> Iterator[Exception]:
-    """Yield `exc` and its `__cause__` / `__context__` predecessors, once each.
-
-    Cycle-guarded (a self-referential `__context__` terminates instead of
-    looping), so callers can walk the whole chain the SDK may bury an HTTP status
-    or a `JSONDecodeError` in.
-
-    Args:
-        exc: The exception to walk from.
-
-    Yields:
-        Exception: `exc`, then each predecessor, skipping any already seen.
-    """
-    seen: set[int] = set()
-    current: Exception | None = exc
-    while current is not None and id(current) not in seen:
-        seen.add(id(current))
-        yield current
-        # `__cause__` / `__context__` are `BaseException | None`; keep walking only
-        # while the predecessor is an ordinary `Exception` (a `KeyboardInterrupt`
-        # or `SystemExit` in the chain is never an ohsome response failure).
-        predecessor = current.__cause__ or current.__context__
-        current = predecessor if isinstance(predecessor, Exception) else None
-
-
 def ohsome_http_status(exc: Exception) -> int | None:
     """Best-effort HTTP status behind an `ohsome` SDK failure.
 
@@ -192,12 +177,12 @@ def ohsome_http_status(exc: Exception) -> int | None:
 
             ```
     """
-    for node in _exception_chain(exc):
+    for node in exception_chain(exc):
         error_code = getattr(node, "error_code", None)
-        if _is_http_status(error_code):
+        if is_http_status(error_code):
             return error_code
-        status = getattr(getattr(node, "response", None), "status_code", None)
-        if _is_http_status(status):
+        status = response_status(node)
+        if status is not None:
             return status
     return None
 
@@ -217,10 +202,32 @@ def ohsome_error_response(exc: Exception) -> requests.Response | None:
     Returns:
         requests.Response | None: The offending response, or `None` when none is
             recoverable from the chain.
+
+    Examples:
+        - The buried response is recovered, so its status is readable:
+            ```python
+            >>> import requests
+            >>> from earthlens.osm import ohsome_error_response
+            >>> resp = requests.Response()
+            >>> resp.status_code = 503
+            >>> err = requests.HTTPError("service unavailable")
+            >>> err.response = resp
+            >>> ohsome_error_response(err).status_code
+            503
+
+            ```
+        - A bare transport error carries no response:
+            ```python
+            >>> import requests
+            >>> from earthlens.osm import ohsome_error_response
+            >>> ohsome_error_response(requests.ConnectionError("boom")) is None
+            True
+
+            ```
     """
-    for node in _exception_chain(exc):
+    for node in exception_chain(exc):
         response = getattr(node, "response", None)
-        if response is not None and _is_http_status(
+        if response is not None and is_http_status(
             getattr(response, "status_code", None)
         ):
             return cast("requests.Response", response)
@@ -246,7 +253,7 @@ def ohsome_response_is_non_json(exc: Exception) -> bool:
     # variants without importing them, guarded by `ValueError` (every real
     # variant subclasses it) so an unrelated same-named class is not a false
     # positive.
-    for node in _exception_chain(exc):
+    for node in exception_chain(exc):
         if isinstance(node, ValueError) and type(node).__name__ == "JSONDecodeError":
             return True
     return False
@@ -277,23 +284,6 @@ def ohsome_body_preview(
     except Exception:  # noqa: BLE001 - a body we cannot decode is simply no preview
         return None
     return text[:limit]
-
-
-def _is_http_status(value: object) -> bool:
-    """Return whether `value` is a real integer HTTP status (not a `bool`).
-
-    `bool` is a subclass of `int`, so a plain `isinstance(value, int)` would
-    accept `True` / `False` and report a nonsensical status `1` / `0`; this
-    excludes them.
-
-    Args:
-        value: A candidate status pulled off an exception (`error_code` or a
-            response's `status_code`).
-
-    Returns:
-        bool: `True` when `value` is an `int` and not a `bool`.
-    """
-    return isinstance(value, int) and not isinstance(value, bool)
 
 
 def bbox_swne(space: SpatialExtent) -> tuple[float, float, float, float]:

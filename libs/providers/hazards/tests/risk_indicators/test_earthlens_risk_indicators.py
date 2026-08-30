@@ -63,6 +63,17 @@ class TestFacadeConstruction:
         )
         assert el.datasource._country == "KEN"
 
+    def test_facade_forwards_workflow_id(self, fake_http, tmp_path: Path) -> None:
+        """`workflow_id=` reaches the backend and replaces the catalog pin."""
+        EarthLens(
+            data_source="inform",
+            variables=["inform:risk"],
+            country="KEN",
+            workflow_id=493,
+            path=tmp_path,
+        ).download()
+        assert fake_http.calls[0]["params"]["WorkflowId"] == 493
+
     def test_facade_thinkhazard_download_returns_dataframe(
         self, fake_http, tmp_path: Path
     ) -> None:

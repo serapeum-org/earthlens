@@ -120,7 +120,7 @@ class TestRequestJsonRetry:
         returns_404 = _ReturnsResponse(_HttpError(404))
         monkeypatch.setattr(_helpers.requests, "get", returns_404)
         with pytest.raises(_helpers.requests.HTTPError):
-            _helpers.inform_query(505, "INFORM")
+            _helpers.inform_query(503, "INFORM")
         assert returns_404.calls == 1
 
     def test_timeout_is_retried(self, monkeypatch):
@@ -203,11 +203,11 @@ class TestInformQuery:
 
     def test_url_and_params(self, monkeypatch):
         """The query passes WorkflowId and IndicatorId, no key header."""
-        rec = _Recorder(_load("inform_scores_505_INFORM.json"))
+        rec = _Recorder(_load("inform_scores_wf505_2026.json"))
         monkeypatch.setattr(_helpers.requests, "get", rec)
-        _helpers.inform_query(505, "INFORM")
+        _helpers.inform_query(503, "INFORM")
         assert rec.url.endswith("/countries/Scores/")
-        assert rec.params == {"WorkflowId": 505, "IndicatorId": "INFORM"}
+        assert rec.params == {"WorkflowId": 503, "IndicatorId": "INFORM"}
         assert _helpers.GFW_KEY_HEADER not in rec.headers
 
 
@@ -294,20 +294,38 @@ class TestThinkhazardToFrame:
         assert df.iloc[0]["level_title"] == "High"
 
 
+class _TextResponse:
+    """A stand-in for the HTML response the results page returns."""
+
+    def __init__(self, text: str) -> None:
+        self.text = text
+
+
+def _write_stub_workbook(self, url, dest, **kwargs):
+    """Stand in for `HttpClient.download`, writing a zip-shaped stub."""
+    Path(dest).write_bytes(b"PK\x03\x04 stand-in")
+    return Path(dest)
+
+
+def _explode_download(self, *args, **kwargs):
+    """Stand in for `HttpClient.download` where no download should happen."""
+    raise AssertionError("the cached workbook should not be re-downloaded")
+
+
 class TestInformToFrame:
     """inform_to_frame renames columns and filters by country."""
 
     def test_filter_to_country(self):
         """Filtering to KEN keeps a single row with its score."""
         df = _helpers.inform_to_frame(
-            _load("inform_scores_505_INFORM.json"), country="KEN"
+            _load("inform_scores_wf505_2026.json"), country="KEN"
         )
         assert list(df.columns) == _helpers.INFORM_COLUMNS
         assert len(df) == 1 and df.iloc[0]["iso3"] == "KEN"
 
     def test_no_filter_keeps_all(self):
         """Without a country filter every row is kept."""
-        rows = _load("inform_scores_505_INFORM.json")
+        rows = _load("inform_scores_wf505_2026.json")
         df = _helpers.inform_to_frame(rows)
         assert len(df) == len(rows)
 
@@ -370,3 +388,214 @@ class TestResolveAdminAndEmpty:
         """empty_canonical returns a zero-row frame with the given columns."""
         df = _helpers.empty_canonical(["a", "b"])
         assert df.empty and list(df.columns) == ["a", "b"]
+
+
+class TestInformRelease:
+    """Discovery and parsing of the published INFORM Risk release workbook."""
+
+    def test_release_url_picks_the_newest_link(self, monkeypatch):
+        """The newest year and version win when the page lists several workbooks."""
+        html = (
+            '<a href="/inform-index/Portals/0/InfoRM/2025/INFORM_Risk_2025_v050.xlsx">2025</a>'
+            '<a href="/inform-index/Portals/0/InfoRM/2026/INFORM_Risk_2026_v072.xlsx">2026</a>'
+            '<a href="/inform-index/Portals/0/InfoRM/2026/INFORM2026_TREND_2017_2026_v72_ALL.xlsx">trend</a>'
+        )
+        monkeypatch.setattr(
+            _helpers.HttpClient, "get", lambda self, url, **kwargs: _TextResponse(html)
+        )
+        url, year = _helpers.inform_release_url()
+        assert url.endswith("/INFORM_Risk_2026_v072.xlsx")
+        assert url.startswith(_helpers.INFORM_SITE)
+        assert year == 2026
+
+    def test_release_url_without_a_link_raises(self, monkeypatch):
+        """A page carrying no workbook link is reported, not silently empty."""
+        monkeypatch.setattr(
+            _helpers.HttpClient,
+            "get",
+            lambda self, url, **kwargs: _TextResponse("<p>no downloads</p>"),
+        )
+        with pytest.raises(ValueError, match="No INFORM Risk release workbook"):
+            _helpers.inform_release_url()
+
+    def test_download_reuses_a_cached_workbook(self, monkeypatch, release_workbook):
+        """An already-downloaded workbook is reused instead of re-fetched."""
+        monkeypatch.setattr(_helpers.HttpClient, "download", _explode_download)
+        assert (
+            _helpers.inform_download_release("https://x/wb.xlsx", release_workbook)
+            == release_workbook
+        )
+
+    def test_download_fetches_on_a_cache_miss(self, monkeypatch, tmp_path):
+        """A missing workbook is streamed, with the xlsx magic bytes demanded."""
+        seen: dict[str, object] = {}
+        monkeypatch.setattr(
+            _helpers.HttpClient,
+            "download",
+            lambda self, url, dest, **kwargs: (
+                seen.update(
+                    url=url, staged=Path(dest), magic=kwargs.get("expect_magic")
+                ),
+                _write_stub_workbook(self, url, dest, **kwargs),
+            )[1],
+        )
+        target = tmp_path / "INFORM_Risk_2026_v072.xlsx"
+        assert _helpers.inform_download_release("https://x/wb.xlsx", target) == target
+        assert seen["url"] == "https://x/wb.xlsx"
+        # The stream lands on a per-process temp and is moved into place, so two
+        # runs sharing a cache cannot write the same file.
+        assert seen["staged"] != target
+        assert seen["magic"] == _helpers.XLSX_MAGIC
+        assert not list(target.parent.glob("*.part"))
+
+    def test_release_frame_without_a_score_sheet_raises(self, tmp_path):
+        """A workbook with no year-named sheet is reported with what it does have."""
+        from openpyxl import Workbook
+
+        book = Workbook()
+        book.active.title = "Something Else"
+        path = tmp_path / "wrong.xlsx"
+        book.save(path)
+        with pytest.raises(ValueError, match="No INFORM Risk score sheet"):
+            _helpers.inform_release_to_frame(path, "INFORM RISK", indicator_id="INFORM")
+
+    def test_release_url_is_scraped_once_per_process(self, monkeypatch):
+        """Four datasets in one run read the results page once, not four times."""
+        calls: list[str] = []
+
+        def _count(self, url, **kwargs):
+            calls.append(url)
+            return _TextResponse(
+                '<a href="/inform-index/Portals/0/InfoRM/2026/INFORM_Risk_2026_v072.xlsx">x</a>'
+            )
+
+        monkeypatch.setattr(_helpers.HttpClient, "get", _count)
+        first = _helpers.inform_release_url()
+        second = _helpers.inform_release_url()
+        assert first == second
+        assert len(calls) == 1
+
+    def test_release_url_ignores_an_implausible_year(self, monkeypatch):
+        """A malformed year cannot win the newest-release comparison."""
+        html = (
+            '<a href="/inform-index/Portals/0/InfoRM/2026/INFORM_Risk_2026_v072.xlsx">a</a>'
+            '<a href="/inform-index/Portals/0/InfoRM/9999/INFORM_Risk_9999_v001.xlsx">b</a>'
+        )
+        monkeypatch.setattr(
+            _helpers.HttpClient, "get", lambda self, url, **kwargs: _TextResponse(html)
+        )
+        url, year = _helpers.inform_release_url()
+        assert year == 2026
+        assert url.endswith("INFORM_Risk_2026_v072.xlsx")
+
+    def test_release_url_rejects_an_off_site_link(self, monkeypatch):
+        """A workbook link pointing elsewhere is refused rather than downloaded."""
+        html = '<a href="https://example.invalid/INFORM_Risk_2026_v072.xlsx">x</a>'
+        monkeypatch.setattr(
+            _helpers.HttpClient, "get", lambda self, url, **kwargs: _TextResponse(html)
+        )
+        with pytest.raises(ValueError, match="points off the INFORM site"):
+            _helpers.inform_release_url()
+
+    def test_release_url_accepts_single_quotes(self, monkeypatch):
+        """The link pattern does not depend on the page quoting style."""
+        html = "<a href='/inform-index/Portals/0/InfoRM/2026/INFORM_Risk_2026_v072.xlsx'>x</a>"
+        monkeypatch.setattr(
+            _helpers.HttpClient, "get", lambda self, url, **kwargs: _TextResponse(html)
+        )
+        url, _year = _helpers.inform_release_url()
+        assert url.endswith("INFORM_Risk_2026_v072.xlsx")
+
+    def test_download_replaces_a_corrupt_cached_file(self, monkeypatch, tmp_path):
+        """A truncated or non-xlsx cached file is re-downloaded, not parsed."""
+        target = tmp_path / "INFORM_Risk_2026_v072.xlsx"
+        target.write_bytes(b"<html>login</html>")
+        monkeypatch.setattr(_helpers.HttpClient, "download", _write_stub_workbook)
+        assert _helpers.inform_download_release("https://x/wb.xlsx", target) == target
+        assert _helpers.is_xlsx(target)
+
+    def test_is_xlsx_reports_a_missing_or_wrong_file(self, tmp_path):
+        """The cache check answers for a missing file and a non-zip alike."""
+        assert _helpers.is_xlsx(tmp_path / "absent.xlsx") is False
+        wrong = tmp_path / "wrong.xlsx"
+        wrong.write_bytes(b"not a zip")
+        assert _helpers.is_xlsx(wrong) is False
+
+    def test_release_frame_shapes_the_scores(self, release_workbook):
+        """A parsed workbook carries the canonical columns and the release year."""
+        df = _helpers.inform_release_to_frame(
+            release_workbook, "INFORM RISK", indicator_id="INFORM"
+        )
+        assert list(df.columns) == _helpers.INFORM_COLUMNS
+        assert set(df["iso3"]) == {"KEN", "ZMB"}
+        assert (df["validity_year"] == 2026).all()
+        assert (df["source"] == "release").all()
+        assert df["workflow_id"].isna().all()
+
+    def test_release_frame_drops_non_numeric_scores(self, release_workbook):
+        """A country whose score is a footnote marker is dropped, not coerced to NaN."""
+        df = _helpers.inform_release_to_frame(
+            release_workbook, "INFORM RISK", indicator_id="INFORM"
+        )
+        assert "NOW" not in set(df["iso3"])
+
+    def test_release_frame_drops_the_units_legend(self, release_workbook):
+        """The legend row under the header is excluded by row shape, not by luck."""
+        df = _helpers.inform_release_to_frame(
+            release_workbook, "INFORM RISK", indicator_id="INFORM"
+        )
+        assert not [iso for iso in df["iso3"] if not str(iso).isalpha()]
+        assert df.attrs["served_rows"] == 3
+
+    def test_release_frame_reports_dropped_countries(
+        self, release_workbook, captured_warnings
+    ):
+        """A country dropped for an unparseable score is reported, not silently lost."""
+        _helpers.inform_release_to_frame(
+            release_workbook, "INFORM RISK", indicator_id="INFORM"
+        )
+        assert "carry no numeric" in "".join(captured_warnings)
+
+    def test_release_frame_upper_cases_iso3(self, tmp_path, make_release_workbook):
+        """A lower-case ISO3 in the sheet is stored upper-cased."""
+        workbook = make_release_workbook(tmp_path / "wb.xlsx", [("Kenya", "ken", 6.2)])
+        df = _helpers.inform_release_to_frame(
+            workbook, "INFORM RISK", indicator_id="INFORM"
+        )
+        assert df.iloc[0]["iso3"] == "KEN"
+
+    def test_both_channels_share_dtypes(self, release_workbook):
+        """An API frame and a workbook frame are comparable, not just similar."""
+        api = _helpers.inform_to_frame(
+            [{"Iso3": "KEN", "IndicatorId": "INFORM", "IndicatorScore": 5.8}],
+            workflow_id=503,
+        )
+        release = _helpers.inform_release_to_frame(
+            release_workbook, "INFORM RISK", indicator_id="INFORM"
+        )
+        assert api.dtypes.to_dict() == release.dtypes.to_dict()
+
+    def test_release_frame_filters_country(self, release_workbook):
+        """A country filter keeps the one matching row."""
+        df = _helpers.inform_release_to_frame(
+            release_workbook, "INFORM RISK", indicator_id="INFORM", country="ken"
+        )
+        assert len(df) == 1
+        assert df.iloc[0]["indicator_score"] == 6.2
+
+    def test_release_frame_reads_any_dimension(self, release_workbook):
+        """Each dimension is a column of the same sheet, tagged with its indicator."""
+        df = _helpers.inform_release_to_frame(
+            release_workbook,
+            "LACK OF COPING CAPACITY",
+            indicator_id="CC",
+            country="KEN",
+        )
+        assert df.iloc[0]["indicator_id"] == "CC"
+
+    def test_release_frame_unknown_column_raises(self, release_workbook):
+        """A missing score column names what it looked for."""
+        with pytest.raises(ValueError, match="has no 'NOT A COLUMN'"):
+            _helpers.inform_release_to_frame(
+                release_workbook, "NOT A COLUMN", indicator_id="INFORM"
+            )

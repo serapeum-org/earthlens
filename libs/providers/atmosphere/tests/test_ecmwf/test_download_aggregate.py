@@ -26,8 +26,8 @@ pytestmark = [pytest.mark.unit]
 def aggregate_recorder(monkeypatch):
     """Replace `aggregate_netcdf` in the backend module with a recorder.
 
-    Yields a list that captures `(nc_path, var_info, config)` tuples
-    in the order `ECMWF.download` calls into the aggregator. Tests
+    Yields a list that captures `(nc_path, var_info, config, date_range)`
+    tuples in the order `ECMWF.download` calls into the aggregator. Tests
     inspect the list to verify what was forwarded.
 
     Yields:
@@ -36,9 +36,9 @@ def aggregate_recorder(monkeypatch):
     """
     calls: list[tuple] = []
 
-    def _recorder(nc_path, var_info, config):
+    def _recorder(nc_path, var_info, config, date_range=None):
         """Append the call args; mimic the real return shape."""
-        calls.append((nc_path, var_info, config))
+        calls.append((nc_path, var_info, config, date_range))
         return []
 
     monkeypatch.setattr(
@@ -90,7 +90,7 @@ class TestDownloadAggregateIntegration:
         assert len(aggregate_recorder) == 1, (
             f"Expected exactly 1 aggregator call, got {len(aggregate_recorder)}"
         )
-        nc_path, var_info, eff_cfg = aggregate_recorder[0]
+        nc_path, var_info, eff_cfg, date_range = aggregate_recorder[0]
         assert (
             nc_path == tmp_path / "2m_temperature_reanalysis-era5-single-levels.nc"
         ), f"Aggregator received wrong nc_path: {nc_path}"
@@ -102,6 +102,13 @@ class TestDownloadAggregateIntegration:
             f"Aggregator received wrong freq: {eff_cfg.freq!r}"
         )
         assert eff_cfg.op == "mean", f"Aggregator received wrong op: {eff_cfg.op!r}"
+        assert date_range == (
+            stubbed_download.time.start_date,
+            stubbed_download.time.end_date,
+        ), (
+            f"Aggregator should receive the request window as date_range; "
+            f"got {date_range}"
+        )
 
     def test_default_out_dir_is_root_dir_aggregated(
         self, stubbed_download, aggregate_recorder, tmp_path
@@ -111,7 +118,7 @@ class TestDownloadAggregateIntegration:
         assert cfg.out_dir is None
         stubbed_download.download(progress_bar=False, aggregate=cfg)
 
-        _, _, eff_cfg = aggregate_recorder[0]
+        _, _, eff_cfg, _ = aggregate_recorder[0]
         assert eff_cfg.out_dir == tmp_path / "aggregated", (
             f"Default out_dir should be <root_dir>/aggregated; got {eff_cfg.out_dir}"
         )
@@ -124,7 +131,7 @@ class TestDownloadAggregateIntegration:
         cfg = AggregationConfig(freq="1D", out_dir=explicit)
         stubbed_download.download(progress_bar=False, aggregate=cfg)
 
-        _, _, eff_cfg = aggregate_recorder[0]
+        _, _, eff_cfg, _ = aggregate_recorder[0]
         assert eff_cfg.out_dir == explicit, (
             f"Explicit out_dir should be preserved; got {eff_cfg.out_dir}"
         )
@@ -147,7 +154,7 @@ class TestDownloadAggregateIntegration:
 
         seen = []
 
-        def _flaky(nc_path, var_info, config):
+        def _flaky(nc_path, var_info, config, date_range=None):
             """Crash on the first variable; succeed on the rest."""
             seen.append(var_info.cds_variable)
             if var_info.cds_variable == "2m_temperature":
@@ -190,7 +197,7 @@ class TestDownloadAggregateIntegration:
 
         recorder: list = []
 
-        def _record(nc_path, var_info, config):
+        def _record(nc_path, var_info, config, date_range=None):
             recorder.append((nc_path, var_info.cds_variable))
             return []
 
@@ -230,7 +237,7 @@ class TestDownloadAggregateIntegration:
 
         recorder: list = []
 
-        def _record(nc_path, var_info, config):
+        def _record(nc_path, var_info, config, date_range=None):
             recorder.append((nc_path, var_info, config))
             return []
 

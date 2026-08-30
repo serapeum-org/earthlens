@@ -21,11 +21,17 @@ from __future__ import annotations
 import hashlib
 import re
 import urllib.error
-from collections.abc import Generator, Iterator
+from collections.abc import Generator
 from typing import NoReturn
 
 import pytest
 
+from earthlens.base import (
+    UpstreamUnavailableError,
+    exception_chain,
+    response_status,
+    status_in_message,
+)
 from earthlens.config import set_cache_dir, set_output_dir
 
 
@@ -115,55 +121,6 @@ except ImportError:  # pragma: no cover - requests is always present under test
     _NETWORK_EXC = (ConnectionError, TimeoutError, urllib.error.URLError)
 
 
-def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
-    """Yield `exc` then each linked `__cause__` / `__context__`, cycle-safe.
-
-    Args:
-        exc: The exception to walk.
-
-    Yields:
-        Each exception in the chain, most recent first.
-    """
-    seen: set[int] = set()
-    current: BaseException | None = exc
-    while current is not None and id(current) not in seen:
-        seen.add(id(current))
-        yield current
-        # Honour `raise … from None`: an explicit cause wins; otherwise follow
-        # the implicit context unless the author suppressed it (matching
-        # Python's own traceback display), so a deliberately surfaced failure is
-        # not reclassified via a context it asked to hide.
-        if current.__cause__ is not None:
-            current = current.__cause__
-        elif current.__suppress_context__:
-            current = None
-        else:
-            current = current.__context__
-
-
-def _http_status(exc: BaseException) -> int | None:
-    """Return the HTTP status `exc` carries, from its type, a `response`, or text.
-
-    Handles the two stdlib/SDK shapes: `urllib.error.HTTPError` carries the status
-    on `.code`, `requests.HTTPError` on `.response.status_code`. Falls back to
-    parsing a leading `NNN Server/Client Error` out of the message.
-
-    Args:
-        exc: The exception to inspect.
-
-    Returns:
-        The status code, or `None` if none is discernible.
-    """
-    if isinstance(exc, urllib.error.HTTPError):
-        return exc.code
-    response = getattr(exc, "response", None)
-    code = getattr(response, "status_code", None)
-    if isinstance(code, int):
-        return code
-    match = re.match(r"\s*(\d{3})\s+(?:server|client)\s+error", str(exc), re.IGNORECASE)
-    return int(match.group(1)) if match else None
-
-
 def is_upstream_unavailable(exc: BaseException) -> str | None:
     """Classify `exc` as an external-service availability failure, or not.
 
@@ -181,15 +138,41 @@ def is_upstream_unavailable(exc: BaseException) -> str | None:
     Returns:
         A human-readable skip reason, or `None` when `exc` is not an availability
         problem.
+
+    Examples:
+        - A dropped connection is an availability failure, named by its type:
+            ```python
+            >>> import requests
+            >>> from earthlens.testing import is_upstream_unavailable
+            >>> is_upstream_unavailable(requests.ConnectionError("boom"))
+            'upstream unreachable (ConnectionError)'
+
+            ```
+        - A request error is not, so it stays a real failure:
+            ```python
+            >>> from earthlens.testing import is_upstream_unavailable
+            >>> is_upstream_unavailable(ValueError("does not match any constraint")) is None
+            True
+
+            ```
     """
-    for link in _exception_chain(exc):
-        # Status first: a `urllib.error.HTTPError` is also a `URLError` (in
+    for link in exception_chain(exc):
+        # A backend that already judged its own failure an availability problem
+        # raised the shared typed error; honour that verdict directly rather than
+        # re-deriving it from a status or message.
+        if isinstance(link, UpstreamUnavailableError):
+            return f"upstream unavailable ({type(link).__name__})"
+        # Status next: a `urllib.error.HTTPError` is also a `URLError` (in
         # `_NETWORK_EXC`), so classifying it by type would skip a real 4xx as
         # "unreachable". A definite non-transient status (400 / 403 / 404 / ...)
         # is authoritative: the request reached the service and got a real
         # answer, so it stays a failure and a deeper transient link (e.g. an
-        # earlier retry's connection error) does not override it.
-        status = _http_status(link)
+        # earlier retry's connection error) does not override it. The message
+        # parse is anchored, so a response body echoed by a pytest-rewritten
+        # `AssertionError` cannot spoof a status mid-string.
+        status = response_status(link)
+        if status is None:
+            status = status_in_message(str(link), anchored=True)
         if status is not None:
             if status in _TRANSIENT_HTTP_STATUS:
                 return f"upstream returned HTTP {status}"
