@@ -549,6 +549,19 @@ class Variable(FluxableLeaf):
             appears under several spellings across the catalog and
             sibling rows of a stanza may disagree where the granule
             does. Compare by parsing, not by string equality.
+        unhydratable: Why a live retrieve can never fill this row's
+            `units` / `nc_variable`, or `None` while it is merely unfilled.
+            A placeholder waiting for a sweep and one no sweep can answer
+            look identical otherwise, so every re-run pays for the second
+            kind again and a reader cannot tell which is which. The only
+            value is `"pseudo-slug"`: the row is keyed `all` or
+            `all-variables`, naming every variable its dataset serves
+            rather than one of them, which resolves only where the dataset
+            serves exactly one — as `satellite-precipitation` and
+            `satellite-sea-surface-temperature` do, and those two are
+            hydrated and unmarked. Constrained to that one value because a
+            typo in a free string would still be truthy, still skip the
+            row, and never be noticed.
         cds_pressure_level: Optional list of pressure levels (as
             strings, e.g. `["1000"]`) for pressure-level datasets.
         product_type: CDS `product_type` request parameter. Picks
@@ -598,22 +611,6 @@ class Variable(FluxableLeaf):
     request_kind: str = "form"
     endpoint: str = "cds"
     grid_resolution: float | None = None
-    #: Why a live probe can never fill this row's `units` / `nc_variable`,
-    #: or None while it is merely unfilled. A placeholder that is waiting for
-    #: a sweep and one that no sweep can ever answer look identical otherwise,
-    #: so every re-run pays for the second kind again and an operator reading
-    #: the catalog cannot tell which is which. The only value carried today is
-    #: `"pseudo-slug"`: the row is keyed `all` or `all-variables`, naming every
-    #: variable its dataset serves rather than one of them. Such a row is
-    #: resolvable only where the dataset serves exactly one variable — as
-    #: `satellite-precipitation` and `satellite-sea-surface-temperature` do,
-    #: and those two are hydrated and unmarked. The mark says this particular
-    #: row has more than one candidate and so can never be pinned.
-    #:
-    #: Constrained rather than free text: the value is the whole reason a
-    #: later reader trusts the mark, and a typo (`pseudo_slug`) in a free
-    #: string would still be truthy, still skip the row, and never be
-    #: noticed. A new reason is added here first, deliberately.
     unhydratable: Literal["pseudo-slug"] | None = None
 
     @field_validator("extras", mode="before")
