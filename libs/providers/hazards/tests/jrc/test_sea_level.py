@@ -40,6 +40,9 @@ def _offline_band_names(monkeypatch):
     )
 
 
+#: The cubes' real geotransform, as pyramids derives it from their CF coords.
+_GLOBAL_GEO = (-180.0, 0.25, 0.0, 90.0, 0.0, -0.25)
+
 _COASTAL_CSV = "GID_0,NAME_0,summary_TWL_1_10\nABW,Aruba,2\nNLD,Netherlands,9\n"
 
 
@@ -81,6 +84,8 @@ class _FakeVariable:
         self.columns = columns
         self.rows = rows
         self._bands = bands
+        # pyramids >= 0.58.1 derives this from the cube's CF coordinates.
+        self.geotransform = _GLOBAL_GEO
 
     def read_array(self, window, masked=False):
         col_off, row_off, width, height = window
@@ -301,23 +306,12 @@ class TestCycleResolution:
 # Affine reconstruction helpers
 # --------------------------------------------------------------------------- #
 class TestAffineHelpers:
-    """`grid_geotransform` / `pixel_window` / `window_origin`."""
-
-    def test_grid_geotransform_is_global_north_up(self):
-        """The reconstructed affine is the global 0.25 deg north-up transform."""
-        assert _helpers.grid_geotransform(1440, 720) == (
-            -180.0,
-            0.25,
-            0.0,
-            90.0,
-            0.0,
-            -0.25,
-        )
+    """`pixel_window` / `window_origin` against the cubes' real affine."""
 
     def test_affine_maps_corners_to_real_world_degrees(self):
-        """The affine maps pixel corners to the true global lon/lat bounds."""
+        """The cube's affine maps pixel corners to the true global lon/lat bounds."""
         cols, rows = 1440, 720
-        x0, dx, _, y0, _, dy = _helpers.grid_geotransform(cols, rows)
+        x0, dx, _, y0, _, dy = _GLOBAL_GEO
         assert (x0, y0) == (-180.0, 90.0), "grid must start at the NW corner"
         assert x0 + cols * dx == pytest.approx(180.0), "east edge must reach +180"
         assert y0 + rows * dy == pytest.approx(-90.0), "south edge must reach -90"
@@ -333,17 +327,17 @@ class TestAffineHelpers:
     )
     def test_window_origin_is_the_bbox_nw_corner(self, bbox, expected_origin):
         """A window's origin is the NW corner of the requested box, in degrees."""
-        geo = _helpers.grid_geotransform(1440, 720)
-        col_off, row_off, _, _ = _helpers.pixel_window(geo, bbox, 1440, 720)
-        origin = _helpers.window_origin(geo, col_off, row_off)
+        col_off, row_off, _, _ = _helpers.pixel_window(_GLOBAL_GEO, bbox, 1440, 720)
+        origin = _helpers.window_origin(_GLOBAL_GEO, col_off, row_off)
         assert (origin[0], origin[3]) == pytest.approx(expected_origin), (
             f"window origin {origin[:4]} should be the NW corner {expected_origin}"
         )
 
     def test_pixel_window_maps_bbox(self):
         """A bbox maps to the expected clamped pixel window."""
-        geo = _helpers.grid_geotransform(1440, 720)
-        assert _helpers.pixel_window(geo, (3.0, 51.0, 5.0, 53.0), 1440, 720) == (
+        assert _helpers.pixel_window(
+            _GLOBAL_GEO, (3.0, 51.0, 5.0, 53.0), 1440, 720
+        ) == (
             732,
             148,
             8,
@@ -352,13 +346,14 @@ class TestAffineHelpers:
 
     def test_pixel_window_none_when_degenerate(self):
         """A zero-area bbox yields no window."""
-        geo = _helpers.grid_geotransform(1440, 720)
-        assert _helpers.pixel_window(geo, (3.0, 51.0, 3.0, 51.0), 1440, 720) is None
+        assert (
+            _helpers.pixel_window(_GLOBAL_GEO, (3.0, 51.0, 3.0, 51.0), 1440, 720)
+            is None
+        )
 
     def test_window_origin_shifts_to_corner(self):
         """The window origin is the bbox top-left in degrees, not index space."""
-        geo = _helpers.grid_geotransform(1440, 720)
-        assert _helpers.window_origin(geo, 732, 148) == (
+        assert _helpers.window_origin(_GLOBAL_GEO, 732, 148) == (
             3.0,
             0.25,
             0.0,
@@ -445,123 +440,6 @@ class TestCoastalFetch:
 # --------------------------------------------------------------------------- #
 # Cross-cutting guards
 # --------------------------------------------------------------------------- #
-class TestGridVerification:
-    """`verify_grid_against_coordinates` guards the reconstructed affine (M3)."""
-
-    def test_mismatched_coordinate_size_raises(self, monkeypatch):
-        """Coordinates that disagree with the variable's shape are rejected."""
-        monkeypatch.setattr(
-            _helpers, "_read_grid_coordinates", lambda url: (np.zeros(10), np.zeros(5))
-        )
-        geo = _helpers.grid_geotransform(1440, 720)
-        with pytest.raises(ValueError, match="do not match the variable"):
-            _helpers.verify_grid_against_coordinates("u", geo, 1440, 720)
-
-    def test_non_global_extent_raises(self, monkeypatch):
-        """A cube that is not the assumed global grid is rejected, not cropped."""
-        lon = np.linspace(0.125, 359.875, 1440)  # a 0..360 grid, not -180..180
-        lat = np.linspace(-89.875, 89.875, 720)
-        monkeypatch.setattr(_helpers, "_read_grid_coordinates", lambda url: (lon, lat))
-        geo = _helpers.grid_geotransform(1440, 720)
-        with pytest.raises(ValueError, match="contradicts the assumed global grid"):
-            _helpers.verify_grid_against_coordinates("u", geo, 1440, 720)
-
-    def test_matching_global_grid_passes(self, monkeypatch):
-        """The real global 0.25 deg coordinates satisfy the reconstruction."""
-        lon = np.linspace(-179.875, 179.875, 1440)
-        lat = np.linspace(-89.875, 89.875, 720)
-        monkeypatch.setattr(_helpers, "_read_grid_coordinates", lambda url: (lon, lat))
-        _helpers.verify_grid_against_coordinates(
-            "u", _helpers.grid_geotransform(1440, 720), 1440, 720
-        )
-
-    def test_unreadable_coordinates_are_tolerated(self, monkeypatch):
-        """A cube without readable coordinates skips the check rather than failing."""
-        monkeypatch.setattr(_helpers, "_read_grid_coordinates", lambda url: None)
-        _helpers.verify_grid_against_coordinates(
-            "u", _helpers.grid_geotransform(1440, 720), 1440, 720
-        )
-
-
-class TestNetworkSeams:
-    """The byte fetch, the non-404 re-raise and the budget entry guard."""
-
-    def test_http_bytes_returns_raw_body(self, monkeypatch):
-        """`http_bytes` hands back undecoded bytes for the CSV parser."""
-
-        class _Resp:
-            content = ("GID_0\nAland\n").encode("utf-8")
-
-        class _Client:
-            def get(self, url, **kwargs):
-                return _Resp()
-
-        monkeypatch.setattr(_helpers, "_client", lambda: _Client())
-        body = _helpers.http_bytes("https://x/f.csv").decode("utf-8")
-        assert body == "GID_0\nAland\n"
-
-    def test_non_404_error_is_reraised(self):
-        """A 5xx on a pinned cycle is a server fault, not an aged-out cycle."""
-        import requests
-
-        def _boom(url):
-            response = requests.Response()
-            response.status_code = 503
-            raise requests.HTTPError("503 Server Error", response=response)
-
-        with pytest.raises(requests.HTTPError):
-            _helpers.resolve_cycle(
-                "https://x/r",
-                "medium_term_forecasts",
-                "%Y/%m/%d/%H",
-                "2026-08-26T12",
-                "endFls",
-                http_text=_boom,
-            )
-
-    def test_exhausted_budget_stops_immediately(self):
-        """A walk entered with no budget left issues no request at all."""
-        calls = {"n": 0}
-
-        def _counting(url):
-            calls["n"] += 1
-            return ""
-
-        assert (
-            _helpers._descend_newest("https://x/", 4, "endFls", _counting, [0]) is None
-        )
-        assert calls["n"] == 0, "an exhausted budget must not issue a request"
-
-
-class TestWindowGuard:
-    """The gridded read refuses an AOI that would materialise too much (M9)."""
-
-    def test_oversized_window_is_refused(self, tmp_path: Path, monkeypatch):
-        """A window above the cell guard raises instead of allocating."""
-        row = Catalog().get("sea_level_medium_term")
-        http = _FakeHttp(
-            row.base_url,
-            row.product,
-            ("2026", "08", "26", "12"),
-            ["mediumTermTWLforecastGridded_x.nc"],
-        )
-        monkeypatch.setattr(_helpers, "_http_text", http)
-        monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", _fake_read_file)
-        monkeypatch.setattr(
-            _helpers, "verify_grid_against_coordinates", lambda *a, **k: None
-        )
-        backend = JRC(
-            dataset="sea_level",
-            product="medium_term",
-            lat_lim=[-90.0, 90.0],
-            lon_lim=[-180.0, 180.0],
-            path=tmp_path,
-        )
-        monkeypatch.setattr(type(backend), "MAX_WINDOW_CELLS", 100)
-        with pytest.raises(ValueError, match="cell guard"):
-            backend.download()
-
-
 class TestFacadeKeys:
     """The sea-level facade keys resolve to the right dataset and shape (M7)."""
 

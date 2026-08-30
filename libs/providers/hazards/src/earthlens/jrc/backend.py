@@ -672,12 +672,16 @@ class JRC(AbstractDataSource):
                         f"{self._dataset.default_field or 'TWL75'!r}."
                     )
                 cols, rows = variable.columns, variable.rows
-                geo = _helpers.grid_geotransform(cols, rows)
-                # The affine is reconstructed from the grid shape alone, so
-                # cross-check it against the cube's own latitude/longitude before
-                # trusting it: a non-global grid or a changed pyramids y-flip
-                # would otherwise crop the wrong region silently.
-                _helpers.verify_grid_against_coordinates(url, geo, cols, rows)
+                # pyramids >= 0.58.1 derives the affine from the cube's own CF
+                # latitude/longitude (serapeum-org/pyramids#1071), so the grid is
+                # read from the file rather than assumed from its shape.
+                geo = variable.geotransform
+                if geo[1] == 1.0 and geo[5] == -1.0:
+                    raise ValueError(
+                        f"{self._dataset.id!r} returned an index-space geotransform "
+                        f"{geo}; pyramids >= 0.58.1 is required to georeference the "
+                        "sea-level cubes."
+                    )
                 # Widen a point / cell-edge AOI to one pixel so an on-grid point
                 # yields a 1x1 window rather than being reported off-grid (matches
                 # the EFHM path).

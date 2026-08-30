@@ -4,9 +4,9 @@ The EFHM half serves one whole-Europe GeoTIFF per return period at a
 deterministic `{BASE_URL}/Europe_RP{rp}_filled_depth.tif`. The sea-level half
 walks the jeodpp autoindex (`YYYY/MM/DD/HH` cycle tree) to resolve a forecast
 cycle — gated on the 0-byte `endFls` sentinel — and reconstructs the global
-0.25 deg north-up affine the gridded NetCDF variables need (they arrive
-index-space over `/vsicurl`; this is the interim until pyramids#1071 builds the
-affine from the CF `latitude` / `longitude` coordinates). All network access
+pixel window for a requested bbox. (The cubes' affine itself now comes from
+pyramids, which derives it from the CF `latitude` / `longitude` coordinates as of
+0.58.1 — serapeum-org/pyramids#1071.) All network access
 goes through the injectable `http_text` seam so tests can fake the autoindex.
 """
 
@@ -404,94 +404,6 @@ def gdal_module():
     return gdal
 
 
-def _read_grid_coordinates(url: str):
-    """Return the cube's `(longitude, latitude)` arrays, or `None` if unreadable."""
-    try:
-        gdal = gdal_module()
-
-        dataset = gdal.OpenEx(url, gdal.OF_MULTIDIM_RASTER)
-        try:
-            root = dataset.GetRootGroup()
-            return (
-                np.asarray(root.OpenMDArray("longitude").ReadAsArray()).ravel(),
-                np.asarray(root.OpenMDArray("latitude").ReadAsArray()).ravel(),
-            )
-        finally:
-            dataset = None
-    except Exception:  # noqa: BLE001 - a missing coordinate is not a crop error
-        return None
-
-
-def verify_grid_against_coordinates(
-    url: str,
-    geo: tuple[float, float, float, float, float, float],
-    cols: int,
-    rows: int,
-    *,
-    tolerance: float = 0.02,
-) -> None:
-    """Check a reconstructed affine against the cube's own CF coordinates.
-
-    `grid_geotransform` derives the origin, cell size and orientation from the
-    grid *shape* alone. This confirms the file really is the global grid that
-    assumes: the coordinate arrays must span the same extent, and the array must
-    be north-up once read (the source stores `latitude` ascending, so this
-    depends on GDAL's CF flip staying in place).
-
-    Args:
-        url: The `/vsicurl/`-prefixed cube URL.
-        geo: The reconstructed geotransform.
-        cols: The variable's column count.
-        rows: The variable's row count.
-        tolerance: Allowed degrees of slack on each edge (half a cell by default).
-
-    Raises:
-        ValueError: If the file's coordinates contradict the reconstructed grid.
-    """
-    coordinates = _read_grid_coordinates(url)
-    if coordinates is None:
-        logger.debug("JRC: could not read the cube's coordinates to verify the grid")
-        return
-    lon, lat = coordinates
-
-    if lon.size != cols or lat.size != rows:
-        raise ValueError(
-            f"the cube's coordinates ({lon.size}x{lat.size}) do not match the "
-            f"variable's grid ({cols}x{rows}); the reconstructed affine cannot be "
-            "trusted."
-        )
-    x0, dx, _, y0, _, _ = geo
-    half = abs(dx) / 2.0
-    west, east = float(lon.min()) - half, float(lon.max()) + half
-    south, north = float(lat.min()) - half, float(lat.max()) + half
-    if abs(west - x0) > tolerance or abs(north - y0) > tolerance:
-        raise ValueError(
-            f"the cube spans lon {west:.3f}..{east:.3f} / lat {south:.3f}.."
-            f"{north:.3f}, which contradicts the assumed global grid starting at "
-            f"({x0}, {y0}). The affine reconstruction needs updating."
-        )
-
-
-def grid_geotransform(
-    cols: int, rows: int
-) -> tuple[float, float, float, float, float, float]:
-    """Build the global north-up affine from a gridded variable's shape.
-
-    Interim reconstruction until pyramids#1071 builds the affine from the CF
-    `latitude` / `longitude` coordinates: the sea-level cubes are global
-    (lon -180..180, lat 90..-90), so the geotransform follows from the shape.
-
-    Args:
-        cols: Grid column count (1440 at 0.25 deg).
-        rows: Grid row count (720 at 0.25 deg).
-
-    Returns:
-        tuple: The 6-element north-up geotransform
-            `(-180, 360/cols, 0, 90, 0, -180/rows)`.
-    """
-    return (-180.0, 360.0 / cols, 0.0, 90.0, 0.0, -180.0 / rows)
-
-
 def pixel_window(
     geo: tuple[float, float, float, float, float, float],
     bbox,
@@ -501,7 +413,7 @@ def pixel_window(
     """Map an AOI bbox to a clamped pixel window on a north-up grid.
 
     Args:
-        geo: The source geotransform (`grid_geotransform`).
+        geo: The source grid's geotransform (from pyramids).
         bbox: `(west, south, east, north)` in degrees.
         cols: Grid column count.
         rows: Grid row count.
@@ -539,8 +451,8 @@ def window_origin(
     Examples:
         - The North Sea window of the global 0.25 deg grid starts at 3E / 53N:
             ```python
-            >>> from earthlens.jrc._helpers import grid_geotransform, window_origin
-            >>> window_origin(grid_geotransform(1440, 720), 732, 148)
+            >>> from earthlens.jrc._helpers import window_origin
+            >>> window_origin((-180.0, 0.25, 0.0, 90.0, 0.0, -0.25), 732, 148)
             (3.0, 0.25, 0.0, 53.0, 0.0, -0.25)
 
             ```
