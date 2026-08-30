@@ -563,10 +563,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
             collections. Defaults to `None` (no extra filters).
         engine: Which layer materialises the pixels for `export_via="url"`.
             `"auto"` (the default) uses the pyramids-eo EEDAI reader when
-            the request is a raw read of a materialised asset — no reducer
-            over a collection, no `cloud_mask`, no `filters`, and
-            `crs="EPSG:4326"` — and the `[eedai]` extra is installed,
-            falling back to Earth Engine's
+            nothing server-side has to shape the image — no `cloud_mask`,
+            no `filters` — and the `[eedai]` extra is installed. That covers
+            a raw read of a materialised `ee_type="image"` asset *and* an
+            `ee_type="image_collection"` composited client-side per time
+            bucket, in `crs="EPSG:4326"` or any metre-based projected CRS.
+            A collection is additionally sized before it is served: too many
+            scenes, too large a stack, or the `mosaic` reducer (whose
+            client-side meaning differs from Earth Engine's last-wins) sends
+            it back to Earth Engine. It falls back to Earth Engine's
             `getDownloadURL` otherwise. `"ee"` always uses `getDownloadURL`
             (the historical behaviour). `"eedai"` forces the reader and
             raises if the request is not eligible. The EEDAI path reads
