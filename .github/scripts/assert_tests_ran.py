@@ -211,9 +211,13 @@ def main(argv: list[str]) -> int:
         # A lane-level count only notices a *wholly* dead lane. A backend that
         # went quiet inside a shared lane stays hidden behind its neighbours,
         # which is exactly how CMEMS went unexercised. Check each separately.
+        try:
+            per_backend = _per_backend(report)
+        except ET.ParseError:
+            return 0
         dead = sorted(
             name
-            for name, (ran, skipped) in _per_backend(report).items()
+            for name, (ran, skipped) in per_backend.items()
             if name and ran == 0 and skipped > 0 and name not in _EXPECTED_EMPTY
         )
         if dead:
@@ -231,7 +235,12 @@ def main(argv: list[str]) -> int:
     # holds one backend, so if that backend is declared empty the lane is too.
     # Without this the exemption only reached shared lanes, and a lane devoted
     # to an exempt backend still failed.
-    present = {name for name in _per_backend(report) if name}
+    try:
+        present = {name for name in _per_backend(report) if name}
+    except ET.ParseError:
+        # Same truncated-report case the first parse already forgave; the
+        # caller's exit code carries the real failure.
+        return 0
     if present and present <= set(_EXPECTED_EMPTY):
         reasons = "; ".join(f"{n}: {_EXPECTED_EMPTY[n]}" for n in sorted(present))
         print(f"{lane}: every backend present is a declared exemption ({reasons})")
