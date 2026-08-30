@@ -41,6 +41,15 @@ from pathlib import Path
 #: Backends whose tests are expected to contribute only skips, with the reason.
 #: A lane is not failed on their account. Keep this list short and evidenced -
 #: an entry here is a backend nobody is watching.
+#:
+#: Deliberately NOT pre-seeded from a survey of what currently lacks
+#: credentials. This guard is expected to turn several lanes red on the first
+#: runs after it lands, and that is the point: a backend with no credentials in
+#: CI is not being tested, and the whole reason this file exists is that the
+#: previous arrangement reported success instead of saying so. Adding entries
+#: up front to quiet the board would recreate exactly that. Each red is either
+#: fixed by supplying the credential or recorded here with a reason someone
+#: stands behind.
 _EXPECTED_EMPTY = {
     "wdpa": "WDPA_TOKEN not issued yet (awaiting UNEP-WCMC approval)",
     "osm": "the osm-pbf extra is deliberately outside [all]",
