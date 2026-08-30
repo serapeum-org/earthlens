@@ -3292,56 +3292,64 @@ datasets:
           time: ['06_00', 09_00, '12_00', '15_00', '18_00']
       2m-relative-humidity-derived:
         cds_variable: 2m_relative_humidity_derived
-        nc_variable: 2m_relative_humidity_derived
-        units: unknown
+        nc_variable: Derived_Relative_Humidity_2m_Max_24h
+        units: '%'
+        extras:
+          version: ['2_0']
       2m-temperature:
         cds_variable: 2m_temperature
-        nc_variable: 2m_temperature
-        units: unknown
+        nc_variable: Temperature_Air_2m_Max_24h
+        units: K
       cloud-cover:
         cds_variable: cloud_cover
-        nc_variable: cloud_cover
-        units: unknown
+        nc_variable: Cloud_Cover_Mean
+        units: (0-1)
       liquid-precipitation-duration-fraction:
         cds_variable: liquid_precipitation_duration_fraction
-        nc_variable: liquid_precipitation_duration_fraction
-        units: unknown
+        nc_variable: Precipitation_Rain_Duration_Fraction
+        units: '1.0'
       precipitation-duration-fraction:
         cds_variable: precipitation_duration_fraction
-        nc_variable: precipitation_duration_fraction
-        units: unknown
+        nc_variable: Precipitation_Duration_Fraction
+        units: '1.0'
+        extras:
+          version: ['2_0']
       precipitation-flux:
         cds_variable: precipitation_flux
-        nc_variable: precipitation_flux
-        units: unknown
+        nc_variable: Precipitation_Flux
+        units: mm d-1
       reference-evapotranspiration:
         cds_variable: reference_evapotranspiration
-        nc_variable: reference_evapotranspiration
-        units: unknown
+        nc_variable: ReferenceET_PenmanMonteith_FAO56
+        units: mm d-1
+        extras:
+          version: ['2_0']
       snow-thickness:
         cds_variable: snow_thickness
-        nc_variable: snow_thickness
-        units: unknown
+        nc_variable: Snow_Thickness_Mean
+        units: cm
       snow-thickness-lwe:
         cds_variable: snow_thickness_lwe
-        nc_variable: snow_thickness_lwe
-        units: unknown
+        nc_variable: Snow_Thickness_LWE_Mean
+        units: cm
       solar-radiation-flux:
         cds_variable: solar_radiation_flux
-        nc_variable: solar_radiation_flux
-        units: unknown
+        nc_variable: Solar_Radiation_Flux
+        units: J m-2 d-1
       solid-precipitation-duration-fraction:
         cds_variable: solid_precipitation_duration_fraction
-        nc_variable: solid_precipitation_duration_fraction
-        units: unknown
+        nc_variable: Precipitation_Solid_Duration_Fraction
+        units: '1.0'
       vapour-pressure:
         cds_variable: vapour_pressure
-        nc_variable: vapour_pressure
-        units: unknown
+        nc_variable: Vapour_Pressure_Mean
+        units: hPa
       vapour-pressure-deficit-at-maximum-temperature:
         cds_variable: vapour_pressure_deficit_at_maximum_temperature
-        nc_variable: vapour_pressure_deficit_at_maximum_temperature
-        units: unknown
+        nc_variable: Vapour_Pressure_Deficit_at_Maximum_Temperature
+        units: hPa
+        extras:
+          version: ['2_0']
   sis-agrometeorological-indicators-timeseries:
     endpoint: cds
     request_kind: cams_date
@@ -5999,20 +6007,20 @@ datasets:
         units: unknown
       mean-sea-level:
         cds_variable: mean_sea_level
-        nc_variable: mean_sea_level
-        units: unknown
+        nc_variable: MSL_absolute
+        units: m
       tidal-range:
         cds_variable: tidal_range
-        nc_variable: tidal_range
-        units: unknown
+        nc_variable: TR_absolute
+        units: m
       highest-astronomical-tide:
         cds_variable: highest_astronomical_tide
-        nc_variable: highest_astronomical_tide
-        units: unknown
+        nc_variable: HAT_absolute
+        units: m
       lowest-astronomical-tide:
         cds_variable: lowest_astronomical_tide
-        nc_variable: lowest_astronomical_tide
-        units: unknown
+        nc_variable: LAT_absolute
+        units: m
       annual-mean-of-highest-high-water:
         cds_variable: annual_mean_of_highest_high_water
         nc_variable: annual_mean_of_highest_high_water
