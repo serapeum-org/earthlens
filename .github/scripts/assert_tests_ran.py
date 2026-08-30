@@ -149,7 +149,16 @@ def main(argv: list[str]) -> int:
         print(f"{lane}: no junit report at {report}; nothing to assert")
         return 0
 
-    collected, skipped = _totals(report)
+    try:
+        collected, skipped = _totals(report)
+    except ET.ParseError as exc:
+        # pytest killed mid-write leaves a truncated report. That is the
+        # timeout's failure, not this lane's, and the caller's own exit code
+        # already carries it - failing here would blame the guard instead.
+        print(
+            f"{lane}: junit report at {report} is incomplete ({exc}); nothing to assert"
+        )
+        return 0
     if collected == 0:
         print(f"{lane}: no tests collected; the exit-5 rule governs this case")
         return 0

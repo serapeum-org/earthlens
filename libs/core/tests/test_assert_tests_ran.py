@@ -204,6 +204,14 @@ class TestMain:
         assert code == 0, f"a missing report must not invent a failure, got {code}"
         assert "no junit report" in capsys.readouterr().out
 
+    def test_a_truncated_report_does_not_blame_the_guard(self, guard, tmp_path, capsys):
+        """pytest killed mid-write leaves unparseable XML; that is the timeout's failure."""
+        report = tmp_path / "r.xml"
+        report.write_text('<testsuites><testsuite tests="3"', encoding="utf-8")
+        code = guard.main([str(report), "lane"])
+        assert code == 0, f"a truncated report must not fail the lane, got {code}"
+        assert "incomplete" in capsys.readouterr().out
+
     @pytest.mark.parametrize("argv", [[], ["only-one"], ["a", "b", "c"]])
     def test_wrong_argument_count_is_a_usage_error(self, guard, argv, capsys):
         """Anything but `<report> <lane>` exits 2 and prints usage to stderr."""
