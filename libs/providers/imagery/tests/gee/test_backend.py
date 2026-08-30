@@ -1923,11 +1923,16 @@ class TestPropertyFilter:
         "bad, match",
         [
             ("   ", "must not be blank"),
-            ("NAME = 'abc", "unbalanced single quotes"),
-            ('NAME = "abc', "unbalanced double quotes"),
-            ("(CLOUD < 20", "unbalanced parentheses"),
+            ("NAME = 'abc", "unterminated quote"),
+            ('NAME = "abc', "unterminated quote"),
+            ("(CLOUD < 20", "unclosed"),
             ("CLOUD < 20; DROP", "single expression"),
             ("CLOUD < 20 -- rest", "single expression"),
+            # Balanced totals, reversed order: this escapes the wrapper upstream
+            # puts around the fragment and neutralises the time/space clauses.
+            ("1=1) OR (1=1", "never opened"),
+            ("A > 0) OR (system:index LIKE '%'", "never opened"),
+            (")(", "never opened"),
         ],
     )
     def test_malformed_property_filters_are_rejected(self, make_gee, bad, match):
@@ -1940,12 +1945,22 @@ class TestPropertyFilter:
         with pytest.raises(ValueError, match=match):
             make_gee(property_filter=bad)
 
-    def test_a_well_formed_filter_is_accepted(self, make_gee):
-        """A normal expression, including quotes and parentheses, passes."""
-        gee = make_gee(
-            property_filter="(CLOUDY_PIXEL_PERCENTAGE < 20) AND MGRS_TILE = '36RUU'"
-        )
-        assert gee.property_filter.startswith("(CLOUDY_PIXEL_PERCENTAGE")
+    @pytest.mark.parametrize(
+        "good",
+        [
+            "(CLOUDY_PIXEL_PERCENTAGE < 20) AND MGRS_TILE = '36RUU'",
+            "CLOUDY_PIXEL_PERCENTAGE < 20",
+            "((A > 1) AND (B < 2)) OR C = 3",
+            # A separator or comment marker inside a quoted literal is data,
+            # not a second statement, so it must not be rejected.
+            "PRODUCT_ID = 'a;b'",
+            "PRODUCT_ID = 'a--b'",
+            "NAME = 'O''Brien'",
+        ],
+    )
+    def test_well_formed_filters_are_accepted(self, make_gee, good):
+        """Legitimate expressions, including quoted separators, pass."""
+        assert make_gee(property_filter=good).property_filter == good
 
     def test_property_filter_warns_when_earth_engine_serves_the_request(
         self, make_gee, fake_reader, monkeypatch

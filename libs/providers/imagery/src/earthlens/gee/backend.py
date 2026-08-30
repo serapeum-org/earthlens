@@ -300,20 +300,28 @@ def _discard_quietly(path: Path) -> None:
 
 
 def _validate_property_filter(property_filter: object) -> None:
-    """Reject a scene filter that cannot be a well-formed OGR expression.
+    """Reject a scene filter that would not survive being wrapped by the reader.
 
-    The string is interpolated verbatim into the reader's attribute filter and
-    is not escaped there, so a malformed fragment either produces an opaque GDAL
-    error or silently neutralises the time and space clauses it is ANDed with.
-    This is a cheap structural check, not a parser: it catches the mistakes that
-    would otherwise surface as "no scenes".
+    Upstream splices the value in as `f"{time_filter} AND ({property_filter})"`
+    without escaping, so a fragment that closes the wrapper early escapes it:
+    `1=1) OR (1=1` becomes `time AND (1=1) OR (1=1)`, and the time and space
+    clauses stop constraining anything. Counting parentheses does not catch
+    that - the totals balance - so nesting depth is tracked instead, and depth
+    must never go negative.
+
+    Quoted literals are skipped while scanning, so a `;` or `--` inside a string
+    value is allowed while a bare one is not.
+
+    This is a structural check, not a parser, and it is not a security boundary:
+    build the filter in code, never from untrusted input.
 
     Args:
         property_filter: The candidate filter.
 
     Raises:
-        ValueError: It is not a string, is blank, has unbalanced quotes or
-            parentheses, or carries a statement separator or SQL comment.
+        ValueError: It is not a string, is blank, closes a parenthesis it never
+            opened, leaves one open, has an unterminated quote, or carries a
+            bare statement separator or SQL comment.
     """
     if not isinstance(property_filter, str):
         raise ValueError(
@@ -323,21 +331,48 @@ def _validate_property_filter(property_filter: object) -> None:
     text = property_filter.strip()
     if not text:
         raise ValueError("property_filter must not be blank; pass None instead.")
-    for symbol, name in (("'", "single quotes"), ('"', "double quotes")):
-        if text.count(symbol) % 2:
+
+    depth = 0
+    quote: str | None = None
+    index = 0
+    while index < len(text):
+        char = text[index]
+        if quote is not None:
+            # A doubled quote is an escaped one inside the literal.
+            if char == quote:
+                if text[index + 1 : index + 2] == quote:
+                    index += 2
+                    continue
+                quote = None
+            index += 1
+            continue
+        if char in "'\"":
+            quote = char
+        elif char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth < 0:
+                raise ValueError(
+                    "property_filter closes a parenthesis it never opened, which "
+                    "would escape the filter it is combined with: "
+                    f"{property_filter!r}"
+                )
+        elif char == ";" or text.startswith("--", index):
             raise ValueError(
-                f"property_filter has unbalanced {name}: {property_filter!r}"
+                "property_filter must be a single expression; remove the "
+                f"statement separator or comment from {property_filter!r}"
             )
-    if text.count("(") != text.count(")"):
+        index += 1
+
+    if quote is not None:
         raise ValueError(
-            f"property_filter has unbalanced parentheses: {property_filter!r}"
+            f"property_filter has an unterminated quote: {property_filter!r}"
         )
-    for token in (";", "--"):
-        if token in text:
-            raise ValueError(
-                f"property_filter must be a single expression; remove {token!r} "
-                f"from {property_filter!r}"
-            )
+    if depth:
+        raise ValueError(
+            f"property_filter leaves {depth} parenthesis/es unclosed: {property_filter!r}"
+        )
 
 
 def _reader_errors(reader: Any) -> tuple[type[BaseException], ...]:
