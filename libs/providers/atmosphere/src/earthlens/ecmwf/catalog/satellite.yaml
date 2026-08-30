@@ -523,7 +523,9 @@ datasets:
         # `num_covered_hours`, an auxiliary coverage counter, because it was the
         # only unmatched data variable in the probe. That is a precipitation CDR,
         # so aggregate= would have reduced the hours-covered field and written it
-        # out as rainfall. Left as a placeholder pending a real per-variable probe.
+        # out as rainfall. The per-variable probe has since run and cannot pin it
+        # either - `all` is not one of the variables the file offers - hence the
+        # mark below, which stops a re-run paying for the same answer.
         nc_variable: all
         units: unknown
         unhydratable: pseudo-slug
