@@ -200,12 +200,8 @@ datasets:
     variables:
       incoming-shortwave-radiation:
         cds_variable: incoming_shortwave_radiation
-        nc_variable: solar_mon
-        units: W m-2
-        extras:
-          climate_data_record_type: [thematic_climate_data_record]
-          origin: [nasa]
-          product_family: [ceres_ebaf]
+        nc_variable: incoming_shortwave_radiation
+        units: unknown
       outgoing-longwave-radiation:
         cds_variable: outgoing_longwave_radiation
         nc_variable: olr

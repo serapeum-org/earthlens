@@ -1214,3 +1214,45 @@ class TestUnhydratableField:
             assert row.unhydratable is None, (
                 f"{name}/all resolved to {row.nc_variable!r}, so it is not terminal"
             )
+
+
+class TestShippedCatalogInvariants:
+    """Properties every shipped row must hold, not only rows a sweep just wrote.
+
+    The serveability guard runs at write time, so it protects the catalog only
+    for as long as nobody edits it by hand or with a pre-guard tool. These check
+    what is actually on disk.
+    """
+
+    def test_a_placeholder_row_names_no_variable(self):
+        """`units: unknown` has one meaning: nothing has been curated here yet.
+
+        A row keeping a probed `nc_variable` while losing its `units` reads as
+        uncurated to the sweep but still feeds `aggregate=`, and un-reserves the
+        name in the leftover rule so a later sweep can hand it to another slug.
+        """
+        from earthlens.ecmwf import Catalog
+
+        divergent = [
+            f"{name}/{slug} -> {row.nc_variable}"
+            for name, dataset in Catalog().datasets.items()
+            for slug, row in dataset.variables.items()
+            if row.units == "unknown" and str(row.nc_variable) != str(row.cds_variable)
+        ]
+
+        assert not divergent, (
+            "placeholder rows carrying a probed nc_variable: " + "; ".join(divergent)
+        )
+
+    def test_a_curated_row_names_a_variable_and_a_unit(self):
+        """The converse: a row that has lost the sentinel has both halves filled."""
+        from earthlens.ecmwf import Catalog
+
+        incomplete = [
+            f"{name}/{slug}"
+            for name, dataset in Catalog().datasets.items()
+            for slug, row in dataset.variables.items()
+            if row.units != "unknown" and not str(row.nc_variable).strip()
+        ]
+
+        assert not incomplete, f"curated rows with no nc_variable: {incomplete}"
