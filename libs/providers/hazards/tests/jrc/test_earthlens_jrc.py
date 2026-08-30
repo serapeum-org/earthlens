@@ -65,7 +65,7 @@ class TestNoXarray:
     """JRC does its raster I/O through pyramids, never xarray."""
 
     def test_no_xarray_import(self) -> None:
-        """No JRC src module imports xarray."""
+        """Importing the JRC backend never pulls xarray in."""
         offenders = [
             path.name
             for path in _SRC_DIR.glob("*.py")

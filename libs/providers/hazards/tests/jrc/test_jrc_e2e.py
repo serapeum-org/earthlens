@@ -29,17 +29,25 @@ _LAT_LIM = [51.8, 52.0]
 _LON_LIM = [4.8, 5.0]
 
 
+#: The two product trees the e2e tests read from; both must answer.
+_PROBE_URLS = (
+    "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-EFAS/flood_hazard/",
+    "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/"
+    "probabilistic_data_driven/",
+)
+
+
 def _jrc_reachable() -> bool:
-    """Return whether the JRC jeodpp host answers a quick request."""
-    try:
-        request = urllib.request.Request(
-            "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-EFAS/flood_hazard/",
-            method="HEAD",
-        )
-        with urllib.request.urlopen(request, timeout=15) as response:
-            return response.status == 200
-    except (urllib.error.URLError, OSError):
-        return False
+    """Return whether both JRC product trees answer a quick request."""
+    for url in _PROBE_URLS:
+        try:
+            request = urllib.request.Request(url, method="HEAD")
+            with urllib.request.urlopen(request, timeout=15) as response:
+                if response.status != 200:
+                    return False
+        except (urllib.error.URLError, OSError):
+            return False
+    return True
 
 
 @pytest.fixture(autouse=True)

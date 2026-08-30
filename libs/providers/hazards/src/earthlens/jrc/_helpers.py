@@ -46,7 +46,9 @@ def _client():
     pool) across the whole directory walk instead of building one per request.
 
     Returns:
-        earthlens.base.http.HttpClient: The shared client.
+        earthlens.base.http.HttpClient: The shared client. Process-wide by design
+            (one pooled session for the whole directory walk); call
+            `_client.cache_clear()` to drop it, which the tests do between cases.
     """
     from earthlens.base.http import HttpClient
 
@@ -407,10 +409,10 @@ def band_valid_times(url: str, steps: int) -> list[str]:
                 (_TIME_EPOCH + timedelta(days=float(v))).strftime("%Y-%m-%dT%H:%M")
                 for v in axis
             ]
-    except Exception:  # noqa: BLE001 - naming is best-effort; never fail the fetch
+    except Exception as exc:  # noqa: BLE001 - naming is best-effort; never fail
         logger.warning(
-            "JRC: could not read the cube's time axis; bands fall back to "
-            "positional step_N names."
+            f"JRC: could not read the cube's time axis ({type(exc).__name__}: "
+            f"{exc}); bands fall back to positional step_N names."
         )
     return [f"step_{index + 1}" for index in range(steps)]
 

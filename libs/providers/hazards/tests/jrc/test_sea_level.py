@@ -43,6 +43,9 @@ def _offline_band_names(monkeypatch):
 #: The cubes' real geotransform, as pyramids derives it from their CF coords.
 _GLOBAL_GEO = (-180.0, 0.25, 0.0, 90.0, 0.0, -0.25)
 
+#: The real helper, captured before the autouse fixture swaps it out.
+_REAL_BAND_VALID_TIMES = _helpers.band_valid_times
+
 _COASTAL_CSV = "GID_0,NAME_0,summary_TWL_1_10\nABW,Aruba,2\nNLD,Netherlands,9\n"
 
 
@@ -572,7 +575,7 @@ class TestBandValidTimes:
 
     def test_time_axis_becomes_band_labels(self, monkeypatch):
         """A field whose bands are the time axis gets real valid times."""
-        monkeypatch.undo()  # exercise the real helper, not the offline stand-in
+        monkeypatch.setattr(_helpers, "band_valid_times", _REAL_BAND_VALID_TIMES)
         monkeypatch.setattr(
             _helpers, "gdal_module", lambda: _FakeGdal([27996.0, 27997.0, 27998.0])
         )
@@ -584,7 +587,7 @@ class TestBandValidTimes:
 
     def test_aggregate_field_keeps_positional_names(self, monkeypatch):
         """A 2-D aggregate (1 band, 16-step axis) is never mislabelled (H1)."""
-        monkeypatch.undo()
+        monkeypatch.setattr(_helpers, "band_valid_times", _REAL_BAND_VALID_TIMES)
         monkeypatch.setattr(
             _helpers, "gdal_module", lambda: _FakeGdal(list(range(27996, 28012)))
         )
@@ -971,7 +974,7 @@ class TestHelperEdges:
 
     def test_band_valid_times_falls_back_when_time_is_unreadable(self, monkeypatch):
         """An unreadable time axis degrades to positional band names, never raises."""
-        monkeypatch.undo()  # exercise the real helper, not the offline stand-in
+        monkeypatch.setattr(_helpers, "band_valid_times", _REAL_BAND_VALID_TIMES)
         monkeypatch.setattr(_helpers, "gdal_module", _raise_runtime)
         assert _helpers.band_valid_times("irrelevant", 3) == [
             "step_1",

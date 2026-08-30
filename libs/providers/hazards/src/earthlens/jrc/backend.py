@@ -324,6 +324,21 @@ class JRC(AbstractDataSource):
         """
         key = (dataset or "").strip().lower()
         if key in self._catalog.datasets and key != "sea_level":
+            # An explicit catalog id already pins the row, so the family
+            # selectors cannot apply — say so rather than dropping them.
+            ignored = [
+                name
+                for name, value in (
+                    ("product", product),
+                    ("representation", representation),
+                )
+                if value is not None
+            ]
+            if ignored:
+                logger.warning(
+                    f"JRC: dataset={dataset!r} names a dataset directly, so "
+                    f"{', '.join(ignored)} is ignored."
+                )
             return key
         if key in ("", "flood", "jrc-flood"):
             return "efhm"
@@ -475,6 +490,10 @@ class JRC(AbstractDataSource):
         # Stashed for the fetch helpers to read. One backend instance is one
         # request, so this is not shared across concurrent downloads.
         self._force = force
+        # NOTE: the cache check lives in the per-product fetch, after _search has
+        # resolved the cycle. Resolving is a handful of small listings against a
+        # pooled session, and the cycle id is part of the output name, so it has
+        # to be known before a cached file can be identified.
         products = self._search()
         results = self._fetch(products)
         if self._dataset.kind == "sea_level_coastal":
