@@ -1,5 +1,8 @@
-# JRC European Flood Hazard Map (EFHM) catalog — a single product served as
-# one whole-Europe GeoTIFF per return period.
+# JRC hazards catalog — the European Flood Hazard Map (EFHM) plus the
+# probabilistic sea-level (Total Water Level) forecasts. Each row carries the
+# `kind` the backend dispatches on: `flood_hazard_raster` (a whole-Europe GeoTIFF
+# per return period), `sea_level_gridded` (a global 0.25 deg NetCDF forecast
+# cube) or `sea_level_coastal` (a global per-country summary CSV).
 #
 # "River flood hazard maps for Europe and the Mediterranean Basin" (JRC /
 # Copernicus Emergency Management Service). Each cell value is river-flood water
@@ -39,6 +42,9 @@ datasets:
     kind: sea_level_gridded
     title: "JRC medium-term probabilistic sea-level (TWL) forecast — 15-day, twice daily"
     long_name: Total water level (tide + surge + wave) probabilistic forecast
+    # units/dtype describe `default_field` (a water level in m). The same cube
+    # also carries exceedance-probability fields (%) and 1-10 severity flags,
+    # which a `field=` request may select instead.
     units: m
     dtype: float32
     crs: EPSG:4326
@@ -52,7 +58,9 @@ datasets:
     horizon_days: 15
     endfls_marker: endFls
     default_field: TWL75
-    data_period: "2022-present"
+    # The server keeps a rolling window (roughly the last few weeks of
+    # cycles), so older dates in this range are no longer retrievable.
+    data_period: "2022-present (rolling retention)"
     attribution: "Copernicus Emergency Management Service (CEMS) / EC JRC — probabilistic data-driven sea-level forecasts (2024 methodology; full citation pending)."
     source_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven/medium_term_forecasts/"
 
@@ -60,6 +68,9 @@ datasets:
     kind: sea_level_gridded
     title: "JRC subseasonal probabilistic sea-level (TWL) forecast — ~46-day, weekly"
     long_name: Total water level (tide + surge + wave) probabilistic forecast
+    # units/dtype describe `default_field` (a water level in m). The same cube
+    # also carries exceedance-probability fields (%) and 1-10 severity flags,
+    # which a `field=` request may select instead.
     units: m
     dtype: float32
     crs: EPSG:4326
@@ -73,7 +84,7 @@ datasets:
     horizon_days: 46
     endfls_marker: endFls
     default_field: TWL75
-    data_period: "2026-present"
+    data_period: "2026-present (rolling retention)"
     attribution: "Copernicus Emergency Management Service (CEMS) / EC JRC — probabilistic data-driven sea-level forecasts (2024 methodology; full citation pending)."
     source_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven/subseasonal_forecasts/"
 
@@ -91,6 +102,6 @@ datasets:
     cadence: weekly
     horizon_days: 46
     endfls_marker: endFls
-    data_period: "2026-present"
+    data_period: "2026-present (rolling retention)"
     attribution: "Copernicus Emergency Management Service (CEMS) / EC JRC — probabilistic data-driven sea-level forecasts (2024 methodology; full citation pending)."
     source_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven/subseasonal_forecasts/"

@@ -19,8 +19,9 @@ dataset and dispatched on the catalog row's `kind` (the `ecmwf`-endpoint /
 
 `OUTPUT_KIND` is set per instance from the resolved row's `kind` (raster for the
 two gridded kinds, tabular for the coastal one); the facade reads it to pick the
-return shape and to reject `aggregate=` (the products carry no reducible time
-axis). All products are public + CC-BY-4.0, so there is no auth and no
+return shape and to reject `aggregate=` (a static hazard map and a single
+forecast cycle are neither a calendar series to reduce over). All products are
+public + CC-BY-4.0, so there is no auth and no
 `LicenseWarning`. No `xarray` — raster read/crop is pyramids'.
 """
 
@@ -96,7 +97,7 @@ class JRC(AbstractDataSource):
         "sea_level_coastal": "tabular",
     }
 
-    AGGREGATE_REFUSAL_REASON = "the JRC hazard products are static per-return-period depth grids or probabilistic forecast cubes with no reducible time axis, so there is nothing to reduce. Call download() without aggregate="
+    AGGREGATE_REFUSAL_REASON = "the JRC hazard products are either static per-return-period depth grids or a single forecast cycle whose bands are lead times, not a calendar series to reduce over. Call download() without aggregate=, and reduce the written bands yourself if you need a summary"
 
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
@@ -167,6 +168,8 @@ class JRC(AbstractDataSource):
         # the base class warn when a polygon is handed to the global coastal table.
         self.SUPPORTS_POLYGON_AOI = kind != "sea_level_coastal"
 
+        self._warn_cross_kind_arguments(kind, return_periods, field, reference_time)
+
         self._return_periods: list[int] = []
         self._reference_time = reference_time
         self._field = ""
@@ -194,6 +197,39 @@ class JRC(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
+
+    @staticmethod
+    def _warn_cross_kind_arguments(kind, return_periods, field, reference_time) -> None:
+        """Warn when an argument that belongs to another kind was passed.
+
+        The selectors are shared by every JRC dataset, so a `return_periods=` sent
+        to a forecast (or a `field=` / non-default `reference_time=` sent to the
+        static EFHM) would otherwise be dropped without a word.
+
+        Args:
+            kind: The resolved dataset's kind.
+            return_periods: The EFHM-only return-period selector, if given.
+            field: The gridded-only field selector, if given.
+            reference_time: The sea-level-only cycle selector, if given.
+        """
+        if kind == "flood_hazard_raster":
+            unused = [
+                name
+                for name, value in (
+                    ("field", field),
+                    ("reference_time", reference_time),
+                )
+                if value not in (None, "latest")
+            ]
+        else:
+            unused = ["return_periods"] if return_periods is not None else []
+            if kind == "sea_level_coastal" and field is not None:
+                unused.append("field")
+        if unused:
+            logger.warning(
+                f"JRC: {', '.join(unused)} does not apply to a "
+                f"{kind!r} dataset and is ignored."
+            )
 
     @staticmethod
     def _require_bbox(
@@ -434,21 +470,16 @@ class JRC(AbstractDataSource):
             self._dataset.cycle_path_template,
             self._reference_time,
             self._dataset.endfls_marker,
-            http_text=_helpers._http_text,
         )
         if kind == "sea_level_gridded":
-            name = _helpers.find_cycle_file(
-                cycle_url, self._dataset.gridded_glob, http_text=_helpers._http_text
-            )
+            name = _helpers.find_cycle_file(cycle_url, self._dataset.gridded_glob)
             return [
                 RemoteProduct(
                     id=f"{self._dataset.id}_{cycle_id}_{self._field}",
                     metadata={"url": f"/vsicurl/{cycle_url}{name}", "cycle": cycle_id},
                 )
             ]
-        name = _helpers.find_cycle_file(
-            cycle_url, self._dataset.coastal_glob, http_text=_helpers._http_text
-        )
+        name = _helpers.find_cycle_file(cycle_url, self._dataset.coastal_glob)
         return [
             RemoteProduct(
                 id=f"{self._dataset.id}_{cycle_id}",
@@ -498,6 +529,8 @@ class JRC(AbstractDataSource):
             logger.info(f"JRC: {target.name} already holds this AOI; skipping.")
             return target
 
+        # Tune the /vsicurl read (readdir-suppression + retry/timeout) for the
+        # duration of the open + windowed crop; a plain read_file installs none.
         with vsicurl_config():
             source = PyramidsDataset.read_file(url)
             try:
@@ -507,13 +540,21 @@ class JRC(AbstractDataSource):
                         f"Mediterranean coverage; no RP{rp} data to write."
                     )
                 logger.info(f"JRC EFHM RP{rp}: windowed /vsicurl crop of {self._bbox}")
+                # A point / cell-edge AOI (min == max on an axis) is widened to
+                # one source pixel so crop(bbox=)'s fast path yields a 1x1 window
+                # rather than raising on the zero-width box.
                 geo = source.geotransform
                 bbox = widen_degenerate_bbox(self._bbox, geo[1], geo[5])
+                # The windowed fast path reads only the AOI pixel window from the
+                # ~23 GB source; nodata / CRS / grid are carried onto the crop.
                 windowed = windowed_bbox_crop(source, bbox, epsg=4326)
             finally:
                 close_quietly(source)
 
         try:
+            # crop carries the source's own no-data through; when the source
+            # declares none, fall back to the catalog value so the output stays
+            # flagged and a polygon `aoi=` can trim exactly.
             nodata = (
                 self._dataset.nodata if self._dataset.nodata is not None else -9999.0
             )

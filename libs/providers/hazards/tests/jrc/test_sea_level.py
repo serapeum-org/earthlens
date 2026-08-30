@@ -418,7 +418,7 @@ class TestGuards:
             lat_lim=[51.0, 53.0],
             lon_lim=[3.0, 5.0],
         )
-        with pytest.raises(Exception, match="aggregate="):
+        with pytest.raises(NotImplementedError, match="aggregate="):
             backend.download(aggregate="mean")
 
     def test_licence_is_permissive(self):

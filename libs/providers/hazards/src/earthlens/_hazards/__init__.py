@@ -22,7 +22,7 @@ _NSI = "earthlens.nsi"
 _JRC = "earthlens.jrc"
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 37 data-source keys.
+#: distribution's 38 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
