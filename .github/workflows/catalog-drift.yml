@@ -10,6 +10,13 @@ name: Catalog drift (scheduled)
 # actually runs it. It names the dead dataset in one line, without downloading
 # a byte - unlike an e2e fetch failure, which reads like ordinary flakiness.
 #
+# SCOPE, so this is not mistaken for more than it is: the audit compares
+# dataset *ids* only. Of the two halves of #1129 it would have caught the
+# retired `nceiPH53sstd1day` and NOT the `wtmp` -> `WTMP` re-casing, because
+# nothing here compares a row's variables against the ones served live. A
+# variable-level audit is tracked in #1148; until it exists, variable drift
+# is still found the hard way, by an e2e fetch failing.
+#
 # Deliberately SCHEDULED, not per-PR: it needs the network and provider
 # credentials, so it would be slow and flaky as a required check, and a
 # contributor should never have their PR blocked because NOAA renamed a
