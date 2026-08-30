@@ -68,6 +68,113 @@ def test_tailorconfig_rejects_blank_format():
         TailorConfig(format="  ")
 
 
+@pytest.mark.parametrize("blank", ["", "  "])
+def test_tailorconfig_rejects_blank_crs(blank):
+    """A blank crs is still rejected; only None means no reprojection."""
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        TailorConfig(crs=blank)
+
+
+def test_tailorconfig_crs_none_is_allowed():
+    """crs=None is valid and survives validation as None."""
+    assert TailorConfig(format="msgnative", crs=None).crs is None
+
+
+@pytest.mark.parametrize(
+    "native_format", ["msgnative", "epsnative", "hrit", "hrit_compressed"]
+)
+def test_tailorconfig_rejects_native_format_with_projection(native_format):
+    """A native format cannot carry a projection -- crs must be None."""
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError, match="cannot be reprojected"):
+        TailorConfig(format=native_format, crs="geographic")
+
+
+@pytest.mark.parametrize(
+    "native_format", ["msgnative", "epsnative", "hrit", "hrit_compressed"]
+)
+def test_tailorconfig_native_format_with_crs_none_is_valid(native_format):
+    """Every native format pairs cleanly with crs=None."""
+    cfg = TailorConfig(format=native_format, crs=None)
+    assert cfg.crs is None, f"{native_format} should validate with crs=None"
+
+
+def test_tailorconfig_non_native_format_keeps_default_crs():
+    """A non-native format is unaffected by the native/crs cross-check."""
+    assert TailorConfig(format="geotiff").crs == "geographic"
+
+
+def test_tailorconfig_native_check_is_case_sensitive_by_design():
+    """A case-mismatched native format bypasses the cross-check -- by design.
+
+    format's *legitimacy* is deliberately not validated client-side (see
+    `TailorConfig._native_format_forbids_projection`'s own docstring); Data
+    Tailor's format IDs are lowercase, so "MSGNATIVE" is already an invalid
+    value for an unrelated reason and would be rejected by the service, just
+    after a round trip rather than at construction. Extending
+    NATIVE_FORMATS matching to be case-insensitive would silently paper over
+    that typo instead of surfacing it, which is not this validator's job.
+    """
+    cfg = TailorConfig(format="MSGNATIVE", crs="geographic")
+    assert cfg.format == "MSGNATIVE", "format is passed through, not case-normalised"
+
+
+def test_tailorconfig_native_check_sees_stripped_values():
+    """The cross-field check runs after whitespace stripping, not before.
+
+    field_validator (which strips) and model_validator(mode="after") (which
+    cross-checks) both fire during construction, so a padded native format
+    paired with a padded projection must still be caught -- confirming the
+    stripped, not the raw, values reach the cross-check.
+    """
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError, match="cannot be reprojected"):
+        TailorConfig(format="  msgnative  ", crs="  geographic  ")
+
+
+def test_tailorconfig_field_error_masks_the_cross_field_one():
+    """A field-level failure is reported alone; mode="after" never runs.
+
+    pydantic only runs a mode="after" model_validator once every field
+    validator has already succeeded, so an inverted bbox and a native
+    format paired with a projection -- both invalid on their own -- surface
+    only the bbox error here. Fixing it on a second attempt is what then
+    exposes the native/crs mismatch; the two are never reported together.
+    This is pydantic's own contract, not something TailorConfig chooses,
+    but nothing here pinned it before.
+    """
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError) as exc_info:
+        TailorConfig(format="msgnative", crs="geographic", bbox=(8, 48, 4, 52))
+    errors = exc_info.value.errors()
+    locations = [e["loc"] for e in errors]
+    assert locations == [("bbox",)], f"expected only the bbox error, got {locations}"
+
+
+@pytest.mark.parametrize("field", ["format", "crs"])
+def test_tailorconfig_strips_surrounding_whitespace(field):
+    """Padding is stripped off format and crs alike."""
+    cfg = TailorConfig(**{field: "  geographic  " if field == "crs" else "  geotiff  "})
+    expected = "geographic" if field == "crs" else "geotiff"
+    got = getattr(cfg, field)
+    assert got == expected, f"{field} should be stripped to {expected!r}, got {got!r}"
+
+
+def test_tailorconfig_rejects_none_format():
+    """Only crs may be None; format stays a required string."""
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError) as exc_info:
+        TailorConfig(format=None)
+    kinds = [e["type"] for e in exc_info.value.errors()]
+    assert "string_type" in kinds, f"expected a string_type error, got {kinds}"
+
+
 def test_nswe_from_extent_orders_bounds():
     """nswe_from_extent returns bounds in [N, S, W, E] order."""
     assert TailorConfig.nswe_from_extent(52, 48, 4, 8) == [52, 48, 4, 8]
@@ -119,6 +226,58 @@ def test_tailor_happy_path_builds_chain_streams_and_deletes(
     # outputs are namespaced under a per-product subdirectory (H1)
     assert {p.parent.name for p in paths} == {"p1"}
     assert (tmp_path / "p1" / "a.tif").read_bytes().startswith(b"TAILORED")
+
+
+def test_tailor_default_crs_sends_projection(fake_eumdac, tmp_path):
+    """The default config still puts a projection on the chain."""
+    fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
+    fake_eumdac.tailor.customisation = _FakeCustomisation(
+        statuses=["DONE"], outputs=["a.tif"]
+    )
+    backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    backend.download(progress_bar=False, tailor=TailorConfig())
+    _product, chain = fake_eumdac.tailor.submitted[0]
+    assert chain.kwargs["projection"] == "geographic"
+
+
+def test_tailor_crs_none_sends_projection_none(fake_eumdac, tmp_path):
+    """crs=None reaches the chain as projection=None.
+
+    eumdac's own `Chain.asdict()` drops `None` fields before the request is
+    built (see `test_eumdac_chain_asdict_drops_none_projection` below), so a
+    `None` projection and an omitted one produce the identical request --
+    there is no need for this backend to distinguish the two.
+    """
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("p1")]
+    fake_eumdac.tailor.customisation = _FakeCustomisation(
+        statuses=["DONE"], outputs=["a.nat"]
+    )
+    backend = _backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
+    backend.download(
+        progress_bar=False,
+        tailor=TailorConfig(
+            format="msgnative", crs=None, bbox=(-5.0, 40.0, 15.0, 55.0)
+        ),
+    )
+    _product, chain = fake_eumdac.tailor.submitted[0]
+    assert chain.kwargs["projection"] is None
+    assert chain.format == "msgnative"
+    assert chain.product == "HRSEVIRI"
+
+
+def test_eumdac_chain_asdict_drops_none_projection():
+    """eumdac's Chain treats an explicit None projection like an omitted one.
+
+    This is the real-`eumdac` contract `_tailor_one` relies on to pass
+    `projection=tailor.crs` unconditionally instead of building the call
+    from a conditional kwargs dict. Skipped when the `eumetsat` extra
+    (`eumdac`) is not installed.
+    """
+    eumdac = pytest.importorskip("eumdac")
+    explicit_none = eumdac.tailor_models.Chain(product="X", projection=None)
+    omitted = eumdac.tailor_models.Chain(product="X")
+    assert explicit_none.asdict() == omitted.asdict()
+    assert "projection" not in explicit_none.asdict()
 
 
 def test_tailor_multiple_products_namespaced_no_collision(fake_eumdac, tmp_path):
