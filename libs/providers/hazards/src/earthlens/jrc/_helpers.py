@@ -138,7 +138,9 @@ def http_bytes(url: str, *, fetch: Callable[[str], bytes] | None = None) -> byte
     return bytes(_client().get(url).content)
 
 
-def list_directory(url: str, *, http_text=None) -> list[str]:
+def list_directory(
+    url: str, *, http_text: Callable[[str], str] | None = None
+) -> list[str]:
     """List the entries of a jeodpp autoindex directory.
 
     Args:
