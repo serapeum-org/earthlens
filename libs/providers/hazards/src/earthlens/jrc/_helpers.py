@@ -16,6 +16,7 @@ from __future__ import annotations
 import fnmatch
 import math
 import re
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from functools import lru_cache
 
@@ -113,7 +114,7 @@ def _http_text(url: str) -> str:
     return str(_client().get(url).text)
 
 
-def http_bytes(url: str, *, fetch=None) -> bytes:
+def http_bytes(url: str, *, fetch: Callable[[str], bytes] | None = None) -> bytes:
     """Return the raw body of a GET, undecoded.
 
     The coastal CSV is served as `text/csv` with **no charset**, so `requests`
@@ -123,6 +124,8 @@ def http_bytes(url: str, *, fetch=None) -> bytes:
 
     Args:
         url: The file URL to fetch.
+        fetch: Injectable byte fetcher; the shared `HttpClient` is used when
+            omitted.
 
     Returns:
         bytes: The undecoded response body.

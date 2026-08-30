@@ -642,11 +642,11 @@ class JRC(AbstractDataSource):
         """Windowed-read + crop one sea-level TWL field to the AOI.
 
         Opens the global NetCDF cube lazily over `/vsicurl` with
-        `pyramids.netcdf.NetCDF`, reconstructs the CF affine from the grid shape
-        (pyramids derives the affine from the cube's CF coordinates), reads
-        only the AOI pixel window across every forecast time step, rebuilds a
-        small georeferenced `Dataset`, crops to the exact bbox / polygon, and
-        writes one multi-band GeoTIFF (band = forecast time step).
+        `pyramids.netcdf.NetCDF`, which derives the CF affine from the cube's
+        `latitude` / `longitude` coordinates, reads only the AOI pixel window
+        across every forecast time step, rebuilds a small georeferenced
+        `Dataset`, crops to the exact bbox / polygon, and writes one multi-band
+        GeoTIFF (band = forecast time step).
 
         Args:
             product: The `RemoteProduct` whose `metadata` carries the `/vsicurl`
