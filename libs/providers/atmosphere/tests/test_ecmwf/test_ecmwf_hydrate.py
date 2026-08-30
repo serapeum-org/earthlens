@@ -758,6 +758,30 @@ class TestDropRestatements:
         assert sorted(hydrate_mod._data_variables(offered)) == ["emi", f"emi{suffix}"]
 
 
+#: One name a producer actually spells for each auxiliary suffix. Independent
+#: data rather than `f"quantity{suffix}"`, which would only re-assert that
+#: `endswith` works — a suffix nothing is named after could be added and pass.
+_SUFFIX_SPELLINGS = {
+    "_bnds": "lat_bnds",
+    "_bounds": "time_bounds",
+    "_count": "pixel_count",
+    "_status": "retrieval_status",
+    "_flag": "quality_flag",
+    "_flags": "surface_flags",
+    "_qflag": "FAPAR_QFLAG",
+    "_qflags": "LAI_QFLAGS",
+    "_err": "FAPAR_ERR",
+    "_error": "standard_error",
+    "_unc": "swe_unc",
+    "_uncertainty": "sst_uncertainty",
+    "_stddev": "ice_conc_stddev",
+    "_sigma": "aod_sigma",
+    "_zenith_angle": "sensor_zenith_angle",
+    "_azimuth_angle": "solar_azimuth_angle",
+    "_covered_hours": "num_covered_hours",
+}
+
+
 class TestIsAuxiliary:
     """Which retrieved variables may stand in for a catalog slug."""
 
@@ -797,20 +821,50 @@ class TestIsAuxiliary:
         assert hydrate_mod._is_auxiliary(name), f"{name!r} was offered as data"
 
     @pytest.mark.parametrize(
-        "name", ["t2m", "sst", "glacier_area", "error_estimate", "flagship_index"]
+        "name",
+        [
+            "t2m",
+            "sst",
+            "glacier_area",
+            # A suffix is a tail, so the same word leading a name is a variable.
+            "error_estimate",
+            "flagship_index",
+            "uncertainty_budget",
+            "count_of_wet_days",
+            "status_of_forest",
+            # And the bare word is a measurement in its own right.
+            "err",
+            "flag",
+            "count",
+            "sigma",
+        ],
     )
     def test_a_real_variable_still_reads_as_data(self, name):
-        """The filter must not swallow a measurement that merely reads like one."""
+        """A suffix is a tail; the same word leading or alone is a measurement."""
         assert not hydrate_mod._is_auxiliary(name), f"{name!r} was filtered out"
 
-    def test_every_suffix_in_the_tuple_actually_filters(self):
-        """Pins the whole tuple, so an entry cannot be added and never reached."""
-        unreached = [
-            suffix
-            for suffix in hydrate_mod._AUXILIARY_SUFFIXES
-            if not hydrate_mod._is_auxiliary(f"quantity{suffix}")
+    @pytest.mark.parametrize(("suffix", "spelt"), sorted(_SUFFIX_SPELLINGS.items()))
+    def test_each_suffix_filters_a_name_a_producer_spells(self, suffix, spelt):
+        """Grounded in a real spelling, so it cannot pass by rebuilding the tuple."""
+        assert spelt.lower().endswith(suffix)
+        assert hydrate_mod._is_auxiliary(spelt), f"{spelt!r} escaped the filter"
+
+    def test_every_suffix_has_such_a_name(self):
+        """Adding a suffix must mean naming the variable that motivated it."""
+        assert set(_SUFFIX_SPELLINGS) == set(hydrate_mod._AUXILIARY_SUFFIXES)
+
+    def test_no_shipped_variable_is_filtered_by_the_widening(self):
+        """The real false-positive check: nothing curated must read as auxiliary."""
+        from earthlens.ecmwf import Catalog
+
+        swallowed = [
+            f"{name}/{slug}"
+            for name, dataset in Catalog().datasets.items()
+            for slug, row in dataset.variables.items()
+            if row.units != "unknown" and hydrate_mod._is_auxiliary(row.nc_variable)
         ]
-        assert not unreached, f"suffixes that filter nothing: {unreached}"
+
+        assert not swallowed, f"curated rows the filter would now reject: {swallowed}"
 
     @pytest.mark.parametrize("name", ["FAPAR_ERR", "fapar_err", "FaPaR_Err"])
     def test_the_match_ignores_case(self, name):
