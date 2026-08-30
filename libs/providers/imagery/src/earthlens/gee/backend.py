@@ -1423,6 +1423,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
         transformer = Transformer.from_crs(_EEDAI_NATIVE_CRS, self.crs, always_xy=True)
         # transform_bounds densifies the edges, so a reprojected rectangle that
         # bows still bounds the whole AOI rather than only its corners.
+        #
+        # Known asymmetry for a *large* projected AOI: upstream converts this
+        # window back to EPSG:4326 with a four-corner transform, which
+        # under-estimates the reach of an edge that bows outward. Measured on a
+        # 10 deg x 10 deg AOI, the requested northern edge came back ~0.023 deg
+        # short, so a poleward strip can read as nodata, while ~0.5 deg of
+        # unrequested ground is added on each side. Small AOIs (the common case)
+        # are affected at the ~0.002 deg level. Fixing it properly needs the
+        # densified back-transform upstream; see the roadmap's PE follow-up.
         return transformer.transform_bounds(*latlon_bbox)
 
     def _eedai_output_grid(

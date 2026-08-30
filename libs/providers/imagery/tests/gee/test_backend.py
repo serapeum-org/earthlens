@@ -2491,6 +2491,27 @@ class TestEedaiProjectedCrs:
         gee = make_gee(crs="EPSG:32636", region=region)
         assert gee._region_in_output_crs(region).reprojected_to == "EPSG:32636"
 
+    def test_region_and_window_agree_under_a_projected_crs(self, make_gee, fake_reader):
+        """End to end: the cutline and the bbox must land in the same space.
+
+        A region left in another CRS would window one patch of ground and clip
+        another, which produces a valid-looking raster of the wrong place.
+        """
+        region = _FakePolygonAoi(epsg=4326, total_bounds=(31.2, 29.9, 31.3, 30.0))
+        gee = make_gee(crs="EPSG:32636", region=region)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_utm_region", _plan_for(gee, var_info)
+        )
+        _asset_id, kwargs = fake_reader.calls[0]
+        cutline = kwargs["geometry"]
+        assert cutline is not region, "the lat/lon region reached the reader unchanged"
+        assert cutline.reprojected_to == "EPSG:32636"
+        assert kwargs["window"].bbox == tuple(cutline.total_bounds), (
+            "the window and the cutline describe different ground"
+        )
+        assert kwargs["window"].crs == "EPSG:32636"
+
     def test_projected_read_hands_the_reader_a_projected_window(
         self, make_gee, fake_reader
     ):
