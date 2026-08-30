@@ -57,6 +57,8 @@ from pathlib import Path
 _EXPECTED_EMPTY = {
     "wdpa": "WDPA_TOKEN not issued yet (awaiting UNEP-WCMC approval)",
     "osm": "the osm-pbf extra is deliberately outside [all]",
+    "argo": "argopy pins xarray>=2025.7 and openeo pins <2025.1.2, so the argo "
+    "extra cannot join [all] and its SDK is never installed",
     "mswep": "the GloH2O share is granted per person; CI cannot hold one",
     "airnow": "AIRNOW_API_KEY has never been issued for this repository",
 }

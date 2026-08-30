@@ -435,7 +435,7 @@ class TestDeadBackendDetection:
         )
         assert guard.main([str(report), "e2e-cmems"]) == 1, "an unexempt lane must fail"
 
-    @pytest.mark.parametrize("backend", ["mswep", "airnow"])
+    @pytest.mark.parametrize("backend", ["mswep", "airnow", "argo"])
     def test_the_structurally_empty_backends_are_declared(self, guard, backend):
         """mswep and airnow cannot hold credentials in CI, so they are exempt."""
         assert backend in guard._EXPECTED_EMPTY, f"{backend} should be declared empty"
