@@ -528,8 +528,9 @@ class TestEarthEngineAuthInitialize:
         monkeypatch.setattr(
             auth_module.ee, "Initialize", MagicMock(side_effect=ee.EEException(raw))
         )
+        key = _key_text(project_id="p")
         with pytest.raises(AuthenticationError) as excinfo:
-            EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
+            EarthEngineAuth.initialize("sa@x.iam", key)
         rendered = str(excinfo.value)
         assert "not registered to use Earth Engine" in rendered, (
             f"the registration branch was lost to redaction: {rendered}"
@@ -543,8 +544,9 @@ class TestEarthEngineAuthInitialize:
         monkeypatch.setattr(
             auth_module.ee, "Initialize", MagicMock(side_effect=ee.EEException(raw))
         )
+        key = _key_text(project_id="p")
         with pytest.raises(AuthenticationError) as excinfo:
-            EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
+            EarthEngineAuth.initialize("sa@x.iam", key)
         rendered = str(excinfo.value)
         assert "serviceUsageConsumer" in rendered, (
             f"the IAM branch was lost to redaction: {rendered}"
