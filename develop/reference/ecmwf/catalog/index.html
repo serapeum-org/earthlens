@@ -24586,20 +24586,6 @@ is a flat list, not a dict).</p>
 <code>pressure_level</code>. Most pressure-level variables inherit the parent
 default; use this only when one specific variable should pull a
 different level set than the rest of its dataset family. Rare.</p>
-<h5 id="unhydratable"><a class="toclink" href="#unhydratable"><code>unhydratable</code></a><a class="headerlink" href="#unhydratable" title="Permanent link">#</a></h5>
-<p><em>Optional.</em> String. Why a live probe can never fill this row's <code>units</code> /
-<code>nc_variable</code>. Absent means the row is simply not filled yet, and
-<code>earthlens datasets curate ecmwf --fill-empty</code> will try it; present means no
-retrieve can answer it, and the sweep skips the row rather than spending a
-request and a queue slot to rediscover that.</p>
-<p>The only value in use is <code>pseudo-slug</code>: the row is keyed <code>all</code> or
-<code>all-variables</code>, naming every variable its dataset serves rather than one of
-them. That is resolvable only where the dataset serves exactly one variable —
-<code>satellite-precipitation</code> and <code>satellite-sea-surface-temperature</code> are hydrated
-that way and carry no mark. The mark records that this row has more than one
-candidate and so can never be pinned to a single variable.</p>
-<p>Without this, a placeholder waiting for a sweep and one no sweep can ever
-answer look identical, so every re-run pays for the second kind again.</p>
 <h5 id="request_kind-per-row"><a class="toclink" href="#request_kind-per-row"><code>request_kind</code> (per-row)</a><a class="headerlink" href="#request_kind-per-row" title="Permanent link">#</a></h5>
 <p><em>Optional.</em> Per-row override of the parent's <code>request_kind</code>. Very
 rare — usually the whole dataset shares one request-shape category,
