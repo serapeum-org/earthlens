@@ -178,29 +178,33 @@ dev = [
     # pulled in here instead -- otherwise the tests that pin its
     # `from_earthengine` signature would skip everywhere and a 0.x contract
     # change would only surface on a live run.
-    "pyramids-eo >=0.5.0,<0.6",
+    "pyramids-eo >=0.7.0,<0.8",
 ]
-# The eclipse showcase notebooks need a heavy geostationary-imagery stack that the
-# rest of the project does not. It is kept out of `dev` deliberately: pulling satpy
-# into the group every CI job syncs moves the resolved xarray/GDAL line, which broke
-# the pip-audit gate and a pyramids GeoTIFF write on 3.13. These notebooks also need
-# the plotting and credential tooling in `dev`, so run them with
-# `uv sync --group dev --group notebooks`.
+# The eclipse showcase notebooks need the geostationary-imagery pieces of
+# pyramids-eo (read_fci_l1c, the composites, the viewing geometry) plus a few small
+# helpers pyramids-eo does not carry, so they get their own group rather than folding
+# fully into `dev` / `docs`. Run them with `uv sync --group dev --group notebooks`
+# (`dev` supplies the plotting and credential tooling these notebooks also need).
 notebooks = [
-    # satpy + pyresample: build the day/night true-colour composites from raw MTG FCI
-    # and GOES ABI granules and resample them into the two perspective views.
-    "satpy >=0.55",
-    "pyresample >=1.28",
-    # pyspectral: satpy's `true_color` Rayleigh correction is an optional satpy
-    # dependency, so it has to be asked for by name. It downloads its own look-up
-    # tables (several hundred MB) on first use.
-    "pyspectral >=0.13",
+    # pyramids-eo: reads raw MTG FCI granules (read_fci_l1c) and builds the day/night
+    # composites -- true colour, the sun-zenith pair, Rayleigh correction and the
+    # viewing geometry it needs. This replaces the satpy / pyresample / pyspectral
+    # stack the eclipse notebook used to carry. 0.7 is the floor for `rayleigh_correct`,
+    # `solar_zenith_azimuth`, `satellite_zenith_azimuth` and `relative_azimuth`, none of
+    # which exist before it (pyramids-eo#91-93); `sunz_correct` / `sunz_reduce`, also
+    # used here, shipped earlier in 0.6.0 (pyramids-eo#86) but the other four still set
+    # the floor. Also declared, at the same version, in `dev` -- see the comment there.
+    "pyramids-eo >=0.7.0,<0.8",
     # scipy: feathers the disc edge and softens the limb (ndimage.binary_erosion /
     # gaussian_filter).
     "scipy >=1.11",
     # imageio-ffmpeg: the geometry notebook calls get_ffmpeg_exe() to encode its
     # clip; it was only ever present transitively.
     "imageio-ffmpeg >=0.5",
+    # python-dotenv: the eclipse notebook loads its EUMETSAT credentials from the
+    # repo-root .env, so `uv sync --group dev --group notebooks` has to supply it --
+    # `dev` does not, and the `docs` / `notebook` groups are a different profile.
+    "python-dotenv >=1.0",
 ]
 docs = [
     "mkdocs >=1.5.3",
@@ -227,8 +231,8 @@ docs = [
     "python-dotenv >=1.0",
     # scipy: the satellite showcase blurs the logo's drop shadow with
     # ndimage.gaussian_filter. Also in `notebooks`, for the eclipse notebooks --
-    # but that group carries satpy, pyresample and pyspectral, and this notebook
-    # needs none of them, so it must not be the only place these are declared.
+    # but that group carries the heavier geostationary stack this notebook does not
+    # need, so it must not be the only place these are declared.
     "scipy >=1.11",
     # imageio-ffmpeg: get_ffmpeg_exe() supplies the encoder every clip is
     # written with, so the docs build needs it to execute the notebook.

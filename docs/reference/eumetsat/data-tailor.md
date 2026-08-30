@@ -49,7 +49,21 @@ paths = el.download(
 `TailorConfig` fields:
 
 - `format` — Data Tailor output format (default `"geotiff"`).
-- `crs` — target projection (default `"geographic"`).
+- `crs` — target projection (default `"geographic"`), or `None` to leave the
+  grid unprojected. A handful of output formats carry their own fixed grid
+  and reject any projection — `"msgnative"`, `"epsnative"`, `"hrit"`,
+  `"hrit_compressed"` — and `TailorConfig` requires `crs=None` for those:
+
+  ```python
+  tailor=TailorConfig(
+      format="msgnative",     # a native format: no reprojection allowed
+      crs=None,                # -> Chain.projection is left unset
+      bbox=(-5.0, 40.0, 15.0, 55.0),
+  )
+  ```
+
+  Pairing a native `format` with a non-`None` `crs` raises at construction,
+  before any request reaches Data Tailor.
 - `bbox` — optional `(west, south, east, north)` crop. When omitted, the
   request's own `lat_lim` / `lon_lim` become the ROI.
 - `filter` — optional list of band / layer names to keep.
