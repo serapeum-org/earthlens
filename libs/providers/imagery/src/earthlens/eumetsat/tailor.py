@@ -181,6 +181,37 @@ class TailorConfig(BaseModel):
         Returns:
             list[float] | None: `[north, south, west, east]`, or `None`
                 when `bbox` is unset.
+
+        Examples:
+            - A bbox is reordered from `(w, s, e, n)` into `[N, S, W, E]`:
+                ```python
+                >>> from earthlens.eumetsat import TailorConfig
+                >>> roi = TailorConfig(bbox=(4, 48, 8, 52)).nswe
+                >>> roi
+                [52.0, 48.0, 4.0, 8.0]
+                >>> roi[0], roi[3]
+                (52.0, 8.0)
+
+                ```
+            - Without a bbox there is no ROI, and the backend falls back to
+              the request's own extent:
+                ```python
+                >>> from earthlens.eumetsat import TailorConfig
+                >>> print(TailorConfig().nswe)
+                None
+
+                ```
+            - A degenerate bbox — a single point — still round-trips:
+                ```python
+                >>> from earthlens.eumetsat import TailorConfig
+                >>> TailorConfig(bbox=(5.0, 50.0, 5.0, 50.0)).nswe
+                [50.0, 50.0, 5.0, 5.0]
+
+                ```
+
+        See Also:
+            TailorConfig.nswe_from_extent: Builds the same list from the
+                request's spatial-extent bounds when no `bbox` is set.
         """
         if self.bbox is None:
             return None
@@ -205,5 +236,28 @@ class TailorConfig(BaseModel):
 
         Returns:
             list[float]: `[north, south, west, east]`.
+
+        Examples:
+            - Bounds are passed through in `[N, S, W, E]` order:
+                ```python
+                >>> from earthlens.eumetsat import TailorConfig
+                >>> TailorConfig.nswe_from_extent(52, 48, 4, 8)
+                [52, 48, 4, 8]
+
+                ```
+            - It is callable on the class, so the backend does not need a
+              config instance to build an ROI:
+                ```python
+                >>> from earthlens.eumetsat import TailorConfig
+                >>> roi = TailorConfig.nswe_from_extent(
+                ...     north=79.0, south=-79.0, west=-79.0, east=79.0
+                ... )
+                >>> roi[0] - roi[1]
+                158.0
+
+                ```
+
+        See Also:
+            TailorConfig.nswe: The same list derived from an explicit `bbox`.
         """
         return [north, south, west, east]
