@@ -16,6 +16,7 @@ import fnmatch
 import math
 import re
 from datetime import datetime, timedelta
+from functools import lru_cache
 
 import numpy as np
 import requests
@@ -34,6 +35,21 @@ _HTTP_TIMEOUT: float = 60.0
 
 #: Captures the `href` targets in the jeodpp Apache autoindex.
 _HREF = re.compile(r'href="([^"]+)"')
+
+
+@lru_cache(maxsize=1)
+def _client():
+    """Return the process-wide `HttpClient` used for every jeodpp request.
+
+    Cached so one `latest` resolve reuses a single session (and its connection
+    pool) across the whole directory walk instead of building one per request.
+
+    Returns:
+        earthlens.base.http.HttpClient: The shared client.
+    """
+    from earthlens.base.http import HttpClient
+
+    return HttpClient(timeout=_HTTP_TIMEOUT)
 
 
 def efhm_url(
@@ -76,9 +92,27 @@ def _http_text(url: str) -> str:
     Raises:
         requests.HTTPError: If the server returns a non-2xx status.
     """
-    from earthlens.base.http import HttpClient
+    return str(_client().get(url).text)
 
-    return HttpClient(timeout=_HTTP_TIMEOUT).get(url).text
+
+def http_bytes(url: str) -> bytes:
+    """Return the raw body of a GET, undecoded.
+
+    The coastal CSV is served as `text/csv` with **no charset**, so `requests`
+    falls back to ISO-8859-1 and silently mangles the UTF-8 country names
+    (`Côte d'Ivoire`, `São Tomé and Príncipe`, `Åland`). Handing the bytes to the
+    parser lets it decode UTF-8 properly.
+
+    Args:
+        url: The file URL to fetch.
+
+    Returns:
+        bytes: The undecoded response body.
+
+    Raises:
+        requests.HTTPError: If the server returns a non-2xx status.
+    """
+    return bytes(_client().get(url).content)
 
 
 def list_directory(url: str, *, http_text=_http_text) -> list[str]:
@@ -164,10 +198,12 @@ def _parse_reference_time(value) -> datetime:
     )
 
 
-#: Cap on the cycle folders inspected while resolving `"latest"`. Without it a
+#: Cap on the directory listings issued while resolving `"latest"`. Without it a
 #: renamed sentinel or a publishing pause turns the walk into a crawl of the whole
-#: multi-year archive, one un-cached request per directory.
-MAX_CYCLE_PROBES: int = 40
+#: multi-year archive. This bounds EVERY listing (year/month/day levels included),
+#: not just the leaf probes — budgeting leaves alone still allows thousands of
+#: requests across the intermediate levels.
+MAX_CYCLE_PROBES: int = 60
 
 
 def _descend_newest(
@@ -187,6 +223,9 @@ def _descend_newest(
         tuple[str, str] | None: `(cycle_url, cycle_id)` for the newest complete
             cycle, or `None` when none was found within the budget.
     """
+    if budget[0] <= 0:
+        return None
+    budget[0] -= 1
     for name in _numeric_dirs(list_directory(url, http_text=http_text)):
         child = f"{url}{name}/"
         if level == 1:
@@ -199,6 +238,8 @@ def _descend_newest(
             found = _descend_newest(child, level - 1, endfls_marker, http_text, budget)
             if found is not None:
                 return found
+            if budget[0] <= 0:
+                return None
     return None
 
 
@@ -247,9 +288,12 @@ def resolve_cycle(
     try:
         entries = list_directory(cycle_url, http_text=http_text)
     except requests.HTTPError as exc:
-        # The archive keeps a rolling window, so a pinned cycle that has aged out
-        # (or a mistyped hour) 404s. Surface the ValueError the API documents
-        # rather than leaking the transport error.
+        # Only a 404 means "no such cycle" (the archive keeps a rolling window, so
+        # an aged-out or mistyped cycle is the common case). A 403/429/5xx is a
+        # live server problem and must not be reported as a missing cycle.
+        status = getattr(getattr(exc, "response", None), "status_code", None)
+        if status is not None and status != 404:
+            raise
         raise ValueError(
             f"cycle {dt.strftime(cycle_path_template)} is not published at "
             f"{cycle_url} — it may have aged out of the archive's retention "
@@ -308,16 +352,17 @@ def band_valid_times(url: str, steps: int) -> list[str]:
         from osgeo import gdal
 
         dataset = gdal.OpenEx(url, gdal.OF_MULTIDIM_RASTER)
-        values = [
-            float(v)
-            for v in np.asarray(
-                dataset.GetRootGroup().OpenMDArray("time").ReadAsArray()
-            ).ravel()[:steps]
-        ]
-        if len(values) == steps:
+        axis = np.asarray(
+            dataset.GetRootGroup().OpenMDArray("time").ReadAsArray()
+        ).ravel()
+        # Compare the FULL axis, unsliced: a 2-D aggregate field (e.g. a 15-day
+        # exceedance probability) has one band while the cube's time axis has
+        # many, and slicing first would confidently mislabel it with step 0's
+        # timestamp. Only a field whose bands ARE the time axis gets valid times.
+        if axis.size == steps:
             return [
-                (_TIME_EPOCH + timedelta(days=v)).strftime("%Y-%m-%dT%H:%M")
-                for v in values
+                (_TIME_EPOCH + timedelta(days=float(v))).strftime("%Y-%m-%dT%H:%M")
+                for v in axis
             ]
     except Exception:  # noqa: BLE001 - naming is best-effort; never fail the fetch
         logger.debug("JRC: could not read the cube's time axis for band names")

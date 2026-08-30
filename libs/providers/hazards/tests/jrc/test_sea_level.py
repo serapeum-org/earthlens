@@ -392,6 +392,9 @@ class TestCoastalFetch:
             ["subSeasonalCoastalForecast_202608240000-202610090000.csv"],
         )
         monkeypatch.setattr(_helpers, "_http_text", http)
+        monkeypatch.setattr(
+            _helpers, "http_bytes", lambda url: http(url).encode("utf-8")
+        )
 
         backend = JRC(
             dataset="sea_level",
@@ -464,10 +467,16 @@ class TestHelperEdges:
                 seen["url"] = url
                 return _Resp()
 
-        monkeypatch.setattr("earthlens.base.http.HttpClient", _Client)
+        monkeypatch.setattr(_helpers, "_client", lambda: _Client())
         assert "12/" in _helpers._http_text("https://x/")
         assert seen["url"] == "https://x/", f"unexpected URL fetched: {seen}"
-        assert seen["timeout"] is not None, "the client should be given a timeout"
+
+    def test_shared_client_is_reused_and_has_a_timeout(self):
+        """One cached client serves every request, and it carries a timeout."""
+        _helpers._client.cache_clear()
+        client = _helpers._client()
+        assert _helpers._client() is client, "the client must be reused, not rebuilt"
+        assert getattr(client, "timeout", None), "the client needs a timeout"
 
     def test_list_directory_normalizes_and_filters(self):
         """A missing trailing slash is added and parent / sort links are dropped."""

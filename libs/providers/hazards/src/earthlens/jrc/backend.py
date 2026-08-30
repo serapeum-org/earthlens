@@ -175,11 +175,13 @@ class JRC(AbstractDataSource):
         self._field = ""
 
         if kind == "flood_hazard_raster":
-            self._require_bbox(lat_lim, lon_lim, "EFHM")
+            lat_lim, lon_lim = self._require_bbox(lat_lim, lon_lim, "EFHM")
             self._return_periods = self._resolve_return_periods(return_periods)
             variables = [self._dataset.band]
         elif kind == "sea_level_gridded":
-            self._require_bbox(lat_lim, lon_lim, "sea-level gridded forecasts")
+            lat_lim, lon_lim = self._require_bbox(
+                lat_lim, lon_lim, "sea-level gridded forecasts"
+            )
             self._field = field or self._dataset.default_field or "TWL75"
             variables = [self._field]
         else:  # sea_level_coastal — a global table; the AOI does not apply
@@ -234,13 +236,19 @@ class JRC(AbstractDataSource):
     @staticmethod
     def _require_bbox(
         lat_lim: list[float] | None, lon_lim: list[float] | None, what: str
-    ) -> None:
+    ) -> tuple[list[float], list[float]]:
         """Reject a request whose kind needs an AOI but was given none.
+
+        Returns the pair so the caller binds non-optional bounds (the type
+        checker cannot narrow `None` away across a helper that returns nothing).
 
         Args:
             lat_lim: The requested latitudes, or `None`.
             lon_lim: The requested longitudes, or `None`.
             what: The product name to quote in the message.
+
+        Returns:
+            tuple[list[float], list[float]]: The validated `(lat_lim, lon_lim)`.
 
         Raises:
             ValueError: If either bound is missing.
@@ -250,6 +258,7 @@ class JRC(AbstractDataSource):
                 f"JRC {what} require a bounding box (lat_lim=[s, n], "
                 "lon_lim=[w, e]) — a subset has no default extent."
             )
+        return lat_lim, lon_lim
 
     def _resolve_dataset_id(
         self, dataset: str | None, product: str | None, representation: str | None
@@ -709,10 +718,12 @@ class JRC(AbstractDataSource):
         Returns:
             pandas.DataFrame: The per-country exceedance-probability summary.
         """
-        from io import StringIO
+        from io import BytesIO
 
         import pandas as pd
 
         url = product.metadata["url"]
         logger.info(f"JRC {self._dataset.id}: reading coastal summary {url}")
-        return pd.read_csv(StringIO(_helpers._http_text(url)))
+        # Read the bytes and decode explicitly: the server omits the charset, so
+        # letting requests guess mangles the UTF-8 country names.
+        return pd.read_csv(BytesIO(_helpers.http_bytes(url)), encoding="utf-8")
