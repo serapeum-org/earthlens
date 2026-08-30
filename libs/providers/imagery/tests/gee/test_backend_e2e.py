@@ -13,6 +13,8 @@ queue.
 
 from __future__ import annotations
 
+import datetime as dt
+import functools
 import os
 
 import pytest
@@ -55,6 +57,73 @@ def test_live_srtm_download(tmp_path):
     raster = Dataset.read_file(str(target))
     assert raster.shape[0] == 1, f"expected 1 band, got shape {raster.shape}"
     assert raster.rows > 0 and raster.columns > 0, f"empty raster grid {raster.shape}"
+
+
+def _counted_estimate(real, calls, asset_id, **kwargs):
+    """Record one scene-discovery call, then make it for real.
+
+    Bound with `functools.partial` over the reader's own function, so the query
+    still goes to the live catalog and only its count and arguments are
+    observed.
+
+    Args:
+        real: The reader's `estimate_earthengine_cost`.
+        calls: The list the call's keyword arguments are appended to.
+        asset_id: The asset being discovered.
+        **kwargs: The discovery window, AOI and filter.
+
+    Returns:
+        Whatever the reader returned.
+    """
+    calls.append(kwargs)
+    return real(asset_id, **kwargs)
+
+
+def _record_discovery(monkeypatch):
+    """Instrument the reader's scene discovery for the duration of a test.
+
+    Args:
+        monkeypatch: The pytest fixture that undoes the patch afterwards.
+
+    Returns:
+        list[dict]: Appended to, in order, as discovery queries are made.
+    """
+    from earthlens.gee._eedai import import_earthengine_reader
+
+    reader = import_earthengine_reader()
+    calls: list[dict] = []
+    monkeypatch.setattr(
+        reader,
+        "estimate_earthengine_cost",
+        functools.partial(_counted_estimate, reader.estimate_earthengine_cost, calls),
+    )
+    return calls
+
+
+def _s2_backend(tmp_path, property_filter):
+    """A GEE backend over one small Sentinel-2 window, with the given filter.
+
+    Args:
+        tmp_path: The test's output directory.
+        property_filter: The `property_filter` string, or `None`.
+
+    Returns:
+        The `GEE` backend the facade bound, authenticated against the live
+        service account.
+    """
+    el = EarthLens(
+        data_source="gee",
+        start="2024-01-01",
+        end="2024-12-30",
+        variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+        lat_lim=[29.98, 30.0],
+        lon_lim=[31.28, 31.3],
+        path=str(tmp_path),
+        scale=10,
+        engine="eedai",
+        property_filter=property_filter,
+    ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
+    return el.datasource
 
 
 def _download_srtm(tmp_path, engine: str, crs: str | None = None):
@@ -288,7 +357,7 @@ def test_live_chirps_collection_eedai_matches_ee(tmp_path):
     """A collection composited through the reader matches Earth Engine's reduce.
 
     CHIRPS DAILY is an ImageCollection; the default `mean` reducer collapses the
-    five-day window to one image. Earth Engine reduces server-side, the reader
+    ten-day window to one image. Earth Engine reduces server-side, the reader
     downloads the scenes and reduces client-side — so the check is a physical
     agreement of the precipitation distribution, proving C1 routes the composite
     correctly rather than reading a single scene.
@@ -327,39 +396,38 @@ def test_live_chirps_collection_eedai_matches_ee(tmp_path):
 @pytest.mark.skipif(
     not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
 )
-def test_live_property_filter_changes_the_scene_selection(tmp_path):
-    """A stricter cloud threshold must select fewer scenes than a permissive one.
+def test_live_property_filter_narrows_the_selection_through_the_backend(
+    tmp_path, monkeypatch
+):
+    """A stricter cloud threshold must select fewer scenes, driven by earthlens.
 
-    The earlier version of this test used a single permissive threshold and
-    asserted only that the raster was plausible — which an unfiltered composite
-    satisfies identically. Comparing two thresholds is what actually proves the
-    string reaches upstream and narrows the selection.
+    Calling the reader's estimator directly would only prove that *upstream's*
+    filter narrows a selection, which is upstream's test to own — a regression
+    that dropped `property_filter` on the way out of this backend would leave it
+    green. So the string is set on the constructor and the counts are read off
+    the backend's own routing decision, with the queries it makes recorded.
     """
-    from earthlens.gee._eedai import credentials_for, import_earthengine_reader
-
-    reader = import_earthengine_reader()
-    credentials = credentials_for(_SERVICE_KEY)
-    aoi = (31.28, 29.98, 31.3, 30.0)
-
-    def scenes(property_filter):
-        """Scene count the catalog reports for one filter."""
-        return reader.estimate_earthengine_cost(
-            "COPERNICUS/S2_SR_HARMONIZED",
-            start="2024-01-01",
-            end="2024-12-30",
-            bbox=aoi,
-            crs="EPSG:4326",
-            credentials=credentials,
-            property_filter=property_filter,
-        ).scene_count
-
-    unfiltered = scenes(None)
-    permissive = scenes("CLOUDY_PIXEL_PERCENTAGE < 95")
-    strict = scenes("CLOUDY_PIXEL_PERCENTAGE < 5")
-    assert unfiltered > 0, "the AOI/window found no Sentinel-2 scenes at all"
-    assert strict < permissive <= unfiltered, (
-        f"the filter did not narrow the selection: unfiltered={unfiltered}, "
-        f"permissive={permissive}, strict={strict}"
+    start, end = dt.datetime(2024, 1, 1), dt.datetime(2024, 12, 31)
+    counts = {}
+    calls = _record_discovery(monkeypatch)
+    for label, property_filter in (
+        ("unfiltered", None),
+        ("permissive", "CLOUDY_PIXEL_PERCENTAGE < 95"),
+        ("strict", "CLOUDY_PIXEL_PERCENTAGE < 5"),
+    ):
+        gee = _s2_backend(tmp_path, property_filter)
+        var_info = gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        plan = gee._eedai_collection_fits(var_info, 1, start, end)
+        assert plan.can_serve, f"{label}: {plan.reason}"
+        counts[label] = plan.tiles
+    assert [c.get("property_filter") for c in calls] == [
+        None,
+        "CLOUDY_PIXEL_PERCENTAGE < 95",
+        "CLOUDY_PIXEL_PERCENTAGE < 5",
+    ], f"the backend did not forward each filter to discovery: {calls}"
+    assert counts["unfiltered"] > 0, "the AOI/window found no Sentinel-2 scenes at all"
+    assert counts["strict"] < counts["permissive"] <= counts["unfiltered"], (
+        f"the filter did not narrow the selection: {counts}"
     )
 
 
@@ -367,13 +435,18 @@ def test_live_property_filter_changes_the_scene_selection(tmp_path):
 @pytest.mark.skipif(
     not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
 )
-def test_live_monthly_buckets_are_disjoint_and_discovered_once(tmp_path):
-    """Monthly buckets each write their own month, and share one catalog query.
+def test_live_monthly_buckets_are_disjoint_and_cost_one_query_each(
+    tmp_path, monkeypatch
+):
+    """Monthly buckets each write their own month, at one catalog query apiece.
 
     The single-bucket comparison never exercises the multi-bucket path, which is
     exactly where an inclusive/exclusive mix-up would make consecutive buckets
-    overlap and where the per-bucket discovery cost is paid.
+    overlap. Discovery is per bucket by construction — each has its own window —
+    so the count is pinned here rather than assumed: a routing change that
+    re-discovered per band, or per read attempt, would show up as more.
     """
+    calls = _record_discovery(monkeypatch)
     el = EarthLens(
         data_source="gee",
         start="2020-06-01",
@@ -402,3 +475,10 @@ def test_live_monthly_buckets_are_disjoint_and_discovered_once(tmp_path):
     assert not np.allclose(np.nan_to_num(june), np.nan_to_num(july)), (
         "the two monthly buckets produced identical rasters"
     )
+    assert len(calls) == 2, (
+        f"two buckets must cost exactly two discovery queries: {len(calls)}"
+    )
+    assert [(c["start"], c["end"]) for c in calls] == [
+        ("2020-06-01", "2020-06-30"),
+        ("2020-07-01", "2020-07-31"),
+    ], calls

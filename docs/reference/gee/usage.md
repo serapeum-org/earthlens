@@ -201,10 +201,12 @@ image, or a request Earth Engine ends up serving, ignores it and says so in
 a warning. **Build it in code, never from untrusted input**: it reaches the
 catalog query without escaping.
 
-One caveat worth knowing: the reader is given no nodata value, because
-neither the driver nor the catalog declares one, so its statistical reducers
-fold a scene's fill pixels into the result where Earth Engine would mask
-them. The two agree wherever the scenes carry no fill over the AOI.
+One caveat worth knowing: the reader takes each band's nodata from the
+scene's own dataset and the EEDAI driver declares none, so its statistical
+reducers fold a scene's fill pixels into the result where Earth Engine would
+mask them. The two agree wherever the scenes carry no fill over the AOI. There
+is no way to supply the fill from here — the composite read takes no `nodata`
+argument — so pass `engine="ee"` when you need Earth Engine's masking exactly.
 
 What you gain: no 32768-px synchronous cap and no HTTP/zip round-trip,
 so `auto_split` is unnecessary. What to know before switching:

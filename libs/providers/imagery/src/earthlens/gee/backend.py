@@ -379,6 +379,54 @@ def _validate_property_filter(property_filter: object) -> None:
         )
 
 
+def _eedai_remedy(reason: str) -> str:
+    """Suggest what to change, given why the reader declined.
+
+    Routing collections here made the decline reasons stop being only about
+    size, so the one fixed "use a smaller bbox" suffix started pointing at the
+    wrong dial - nothing about a bbox fixes an unsupported reducer or a missing
+    credential. Matched most specific first, since the reasons overlap in
+    wording (a stack over the pixel budget also names its scene count).
+
+    Args:
+        reason: The declined plan's reason.
+
+    Returns:
+        A remedy sentence to append to the forced-engine error.
+    """
+    if "last-wins" in reason:
+        return (
+            "Pass a statistical reducer (mean/median/min/max/sum), or "
+            "engine='ee' to keep Earth Engine's mosaic semantics."
+        )
+    if "credential" in reason:
+        return "Fix the service key or service account, or use engine='ee'."
+    if "no native resolution" in reason:
+        return (
+            "The catalog row has no resolution to size a read from; use "
+            "engine='ee', or curate the dataset's spatial_resolution."
+        )
+    if "single-pass budget" in reason:
+        return (
+            "Use a coarser scale, a smaller bbox, a shorter bucket "
+            "(temporal_resolution), or engine='ee'."
+        )
+    if "scene cap" in reason:
+        return (
+            "Narrow the date window, shorten the bucket (temporal_resolution), "
+            "add a property_filter, or use engine='ee' so Earth Engine reduces "
+            "the scenes server-side."
+        )
+    if "cutline" in reason:
+        return "Drop the region cutline, or use engine='ee'."
+    if "resample" in reason:
+        return f"Use resample={_EEDAI_TILING_RESAMPLE!r}, or engine='ee'."
+    return (
+        "Use a smaller bbox, a coarser scale, engine='ee' (with auto_split=True "
+        "to tile), or export_via='drive'."
+    )
+
+
 def _reader_errors(reader: Any) -> tuple[type[BaseException], ...]:
     """Return the exception types a reader call may fail with recoverably.
 
@@ -501,7 +549,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
         fmt: `strptime` format for `start` / `end`. Defaults to `"%Y-%m-%d"`.
         scale: Output pixel size in metres. If omitted, each dataset's
             nominal `spatial_resolution` is used.
-        crs: Output CRS (EPSG code string). Defaults to `"EPSG:4326"`.
+        crs: Output CRS, in any form pyproj accepts. Defaults to
+            `"EPSG:4326"`. This also selects the EEDAI fast path: it serves
+            EPSG:4326 and any projected CRS whose axis unit is metres (because
+            `scale` is metres), and declines anything else — a non-4326
+            geographic CRS, or a projected one in feet. Declining is quiet
+            under `engine="auto"` (Earth Engine serves the request instead) and
+            an error under `engine="eedai"`.
         reducer: Override the per-dataset `default_reducer` for the
             temporal composite (`mean` / `median` / `min` / `max` /
             `mode` / `mosaic` / `sum`). `None` (the default) uses each
@@ -583,7 +637,14 @@ class GEE(LazyClientMixin, AbstractDataSource):
             A collection is additionally sized before it is served: too many
             scenes, too large a stack, or the `mosaic` reducer (whose
             client-side meaning differs from Earth Engine's last-wins) sends
-            it back to Earth Engine. It falls back to Earth Engine's
+            it back to Earth Engine. One difference is worth knowing when a
+            collection *is* served: the reader reduces client-side with no
+            nodata value, because the EEDAI driver declares none, so a scene's
+            fill pixels are folded into a `mean` / `median` / `min` / `max` /
+            `sum` composite where Earth Engine would have masked them. The two
+            agree wherever the scenes carry no fill over the AOI; pass
+            `engine="ee"` when you need Earth Engine's masking exactly. It
+            falls back to Earth Engine's
             `getDownloadURL` otherwise. `"ee"` always uses `getDownloadURL`
             (the historical behaviour). `"eedai"` forces the reader and
             raises if the request is not eligible. The EEDAI path reads
@@ -810,6 +871,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self.property_filter = property_filter
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
         self._eedai_credential: Any = None  # lazily built in `_eedai_credentials`
+        #: Region reprojections, keyed by target CRS. A large `GeoDataFrame` on
+        #: a many-bucket run would otherwise be warped once per bucket per use.
+        self._region_cache: dict[str, Any] = {}
         self._cog_warned = False  # one-shot guard for the `cog=` notice
         self._property_filter_warned: set[str] = set()  # per-dataset filter notice
 
@@ -1425,11 +1489,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """Return whether this request is a raw read the EEDAI reader can serve.
 
         The pyramids-eo reader materialises pixels from a real asset id; it
-        cannot execute an Earth Engine computation graph. So it can only
-        stand in for `getDownloadURL` when nothing server-side shapes the
-        image: a single materialised `ee_type="image"` asset, no per-image
-        `cloud_mask`, and no collection `filters`. The asynchronous sinks
-        are Earth Engine-only.
+        cannot execute an Earth Engine computation graph. So it can only stand
+        in for `getDownloadURL` when nothing server-side shapes the image: no
+        per-image `cloud_mask` and no collection `filters`. The asynchronous
+        sinks are Earth Engine-only.
 
         A single `ee_type="image"` asset is read directly; an
         `ee_type="image_collection"` is composited client-side by the reader
@@ -1590,7 +1653,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
             latlon = region
             crs = getattr(region, "crs", None)
             if crs is not None and not self._same_crs(crs, _EEDAI_NATIVE_CRS):
-                latlon = region.to_crs(_EEDAI_NATIVE_CRS)
+                latlon = self._region_cache.get(_EEDAI_NATIVE_CRS)
+                if latlon is None:
+                    latlon = region.to_crs(_EEDAI_NATIVE_CRS)
+                    self._region_cache[_EEDAI_NATIVE_CRS] = latlon
             min_x, min_y, max_x, max_y = (float(v) for v in latlon.total_bounds)
             return (min_x, min_y, max_x, max_y)
         return (
@@ -1962,15 +2028,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Raises:
             ValueError: If `engine="eedai"` was forced and the request is
-                either ineligible — it needs server-side compute (a reduced
-                collection, a `cloud_mask` or `filters`) or targets a CRS the
-                reader cannot size (not EPSG:4326 or a metre-based projected
-                CRS) — or eligible but declined by :meth:`_eedai_verdict`,
-                which the message names: the asset has no native resolution,
-                the window is behind a polygon cutline, `resample` is not
-                nearest-neighbour, or tiling it would cost more than Earth
-                Engine would (too coarse a `scale` over a fine asset, too many
-                native pixels, or too many tiles).
+                either ineligible — it needs server-side compute (a
+                `cloud_mask` or `filters`) or targets a CRS the reader cannot
+                size (not EPSG:4326 or a metre-based projected CRS) — or
+                eligible but declined by :meth:`_eedai_verdict`, which the
+                message names. For a single image: no native resolution, a
+                polygon cutline, a non-nearest `resample`, or tiling costing
+                more than Earth Engine would. For a collection: an unsupported
+                reducer, more scenes than the cap, or a stack over the
+                single-pass budget. A bucket that merely holds no scenes is
+                skipped rather than raised, since that is a property of the
+                data and not of the request.
         """
         if self.engine == "ee":
             return False, None
@@ -1997,9 +2065,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     )
                     return False, None
                 raise ValueError(
-                    f"engine='eedai' cannot serve {var_info.id}: {plan.reason}. Use a "
-                    "smaller bbox, engine='ee' (with auto_split=True to tile), or "
-                    "export_via='drive'."
+                    f"engine='eedai' cannot serve {var_info.id}: {plan.reason}. "
+                    f"{_eedai_remedy(plan.reason)}"
                 )
             return True, plan
         if not (eligible and eedai_available()):
@@ -2067,33 +2134,46 @@ class GEE(LazyClientMixin, AbstractDataSource):
             The region in `self.crs` (`None` passes through). A region with no
             CRS is assumed to be lat/lon, matching how the Earth Engine path
             treats it, and is reprojected only when the output CRS is not
-            EPSG:4326.
+            EPSG:4326. The result is memoised per target CRS, since `region`
+            never changes for the life of the backend and a many-bucket run
+            would otherwise warp the same geometry once per bucket.
         """
         if region is None:
             return None
         target = self.crs
+        cached = self._region_cache.get(target)
+        if cached is not None:
+            return cached
         crs = getattr(region, "crs", None)
         if crs is None:
             if target.upper() == _EEDAI_NATIVE_CRS:
+                self._region_cache[target] = region
                 return region
             set_crs = getattr(region, "set_crs", None)
             if callable(set_crs):
                 region = set_crs(_EEDAI_NATIVE_CRS)
-            return region.to_crs(target)
+            assumed = region.to_crs(target)
+            self._region_cache[target] = assumed
+            return assumed
         if self._same_crs(crs, target):
+            self._region_cache[target] = region
             return region
-        return region.to_crs(target)
+        reprojected = region.to_crs(target)
+        self._region_cache[target] = reprojected
+        return reprojected
 
     @staticmethod
     def _same_crs(region_crs: Any, target: str) -> bool:
         """Return whether a region's CRS already is the output CRS.
 
         Compared as CRS objects rather than by string-parsing an `AUTH:CODE`
-        tail: discarding the authority makes a non-EPSG code collide with the
-        EPSG code of the same number (an `ESRI:3857` target would accept an
-        EPSG:3857 region unreprojected), and a PROJ string or WKT target has no
-        code to parse at all, so an already-correct region would be warped
-        needlessly.
+        tail. Parsing the code answers the wrong question twice: it drops the
+        authority, so any non-EPSG code collides with the EPSG code of the same
+        number, and it has nothing to read at all when the target is a PROJ
+        string or WKT — under which an already-correct region gets warped
+        needlessly. Comparing objects lets PROJ decide, which also gets the
+        genuinely-equal cases right: `ESRI:102100` and `EPSG:3857` describe one
+        CRS and compare equal, where the codes never would.
 
         Args:
             region_crs: The region's own CRS object.
@@ -2370,9 +2450,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         `getDownloadURL` round-trip, so Earth Engine's 32768-px synchronous
         cap (and `auto_split`) does not apply.
 
-        The reader sizes its output in the units of `crs` (degrees, since
-        this path is EPSG:4326-only), whereas `scale` here is Earth Engine's
-        metres. :meth:`_eedai_grid` reconciles the two by turning `scale`
+        The reader sizes its output in the units of `crs` - degrees under
+        EPSG:4326, the projection's metres otherwise - whereas `scale` here is
+        always Earth Engine's metres. :meth:`_eedai_output_grid` reconciles the
+        two by turning `scale`
         into an explicit `shape` over the same window
         :meth:`_eedai_window` hands the reader, so the grid and the read
         window always describe the same ground area.
@@ -2428,12 +2509,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # The reader composites the scenes in this window with the same
             # reducer the Earth Engine path would use.
             #
-            # Caveat: the reader is given no `nodata`, because neither the EEDAI
-            # driver nor this catalog declares one, so its statistical reducers
-            # run unmasked and fold a scene's fill pixels into the result where
+            # Caveat: the reader takes each band's nodata from the scene's own
+            # dataset, and EEDAI declares none, so its statistical reducers run
+            # unmasked and fold a scene's fill pixels into the result where
             # Earth Engine would mask them. The values agree wherever the scenes
-            # carry no fill over the AOI. Supplying a per-band fill (upstream
-            # pyramids-eo#63) is what would close the gap.
+            # carry no fill over the AOI. There is no caller-side remedy today -
+            # the composite read takes no `nodata` argument - so closing this
+            # needs the driver (or upstream) to declare the fill. Stated in the
+            # constructor docstring and the usage guide rather than left here,
+            # since it is a user-visible difference, not an implementation note.
             composite_kwargs = {
                 "start": bucket_start.strftime("%Y-%m-%d"),
                 "end": self._reader_end(bucket_end, bucket_start),

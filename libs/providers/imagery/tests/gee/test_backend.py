@@ -1747,6 +1747,11 @@ class _FakePolygonAoi:
         self.crs = _FakeCrs(epsg) if epsg is not None else None
         self.reprojected_to = None
         self.assumed_crs = None
+        # Every CRS `to_crs` was asked for, in order. The returned fake carries
+        # fixed bounds, so this is the only record of *which* CRS was requested
+        # - without it a test that only inspects the result cannot tell a
+        # reprojection to the right CRS from one to the wrong CRS.
+        self.reprojection_requests: list[str] = []
 
     def set_crs(self, crs):
         out = _FakePolygonAoi(epsg=4326, total_bounds=self.total_bounds)
@@ -1756,6 +1761,7 @@ class _FakePolygonAoi:
     def to_crs(self, crs):
         # A real reprojection moves the coordinates, so the result carries the
         # fake's default lat/lon bounds rather than the source's.
+        self.reprojection_requests.append(crs)
         out = _FakePolygonAoi(epsg=4326)
         out.reprojected_to = crs
         out.assumed_crs = self.assumed_crs
@@ -2232,6 +2238,54 @@ class TestEedaiCollections:
         with pytest.raises(ValueError, match="needs a bucket date window"):
             gee._eedai_collection_fits(var_info, 1, None, None)
 
+    def test_a_monthly_download_runs_end_to_end_through_the_reader(
+        self, make_gee, fake_reader
+    ):
+        """The whole `download()` path, not just the pieces, must route per bucket.
+
+        Every other case here calls the routing helpers directly, which is how a
+        per-bucket cost that only *looked* amortised survived review: the count
+        of discovery queries and the bucket windows are only observable from a
+        real multi-bucket run.
+        """
+        gee = self._collection_gee(
+            make_gee,
+            start="2020-06-01",
+            end="2020-08-31",
+            temporal_resolution="monthly",
+        )
+        written = gee.download(progress_bar=False)
+        assert len(written) == 3, f"one file per month expected, got {written}"
+        assert all(Path(p).is_file() for p in written), written
+        assert len(fake_reader.calls) == 3, (
+            "each month must be composited by the reader, not by Earth Engine"
+        )
+        assert len(fake_reader.cost_calls) == 3, (
+            "scene discovery costs one query per bucket, no more and no fewer: "
+            f"{len(fake_reader.cost_calls)}"
+        )
+        windows = [(k["start"], k["end"]) for _asset, k in fake_reader.calls]
+        assert windows == [
+            ("2020-06-01", "2020-06-30"),
+            ("2020-07-01", "2020-07-31"),
+            ("2020-08-01", "2020-08-31"),
+        ], windows
+
+    def test_a_monthly_download_falls_back_whole_when_the_reader_declines(
+        self, make_gee, fake_reader
+    ):
+        """A declined collection must still write every bucket, via Earth Engine."""
+        gee = self._collection_gee(
+            make_gee,
+            start="2020-06-01",
+            end="2020-08-31",
+            temporal_resolution="monthly",
+            reducer="mosaic",
+        )
+        written = gee.download(progress_bar=False)
+        assert len(written) == 3, f"the fallback dropped buckets: {written}"
+        assert fake_reader.calls == [], "the declined reducer still reached the reader"
+
     def test_estimate_is_queried_with_the_bucket_window(self, make_gee, fake_reader):
         """Scene discovery uses the bucket's dates and a lat/lon AOI envelope."""
         gee = self._collection_gee(make_gee)
@@ -2298,8 +2352,14 @@ class TestEedaiCollections:
         gee = self._collection_gee(make_gee, region=region)
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert region.reprojection_requests == ["EPSG:4326"], (
+            "discovery must reproject the region to lat/lon, and only there: "
+            f"{region.reprojection_requests}"
+        )
         bbox = fake_reader.cost_calls[0][1]["bbox"]
-        assert max(abs(v) for v in bbox) < 200, f"discovery bbox not lat/lon: {bbox}"
+        assert bbox == (31.2, 29.9, 31.3, 30.0), (
+            f"discovery did not use the reprojected region's bounds: {bbox}"
+        )
 
     def test_a_late_reader_refusal_falls_back_under_auto(
         self, make_gee, fake_reader, monkeypatch
@@ -2463,8 +2523,8 @@ class TestEedaiCollections:
         plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
         kwargs = fake_reader.cost_calls[0][1]
         assert kwargs["crs"] == "EPSG:4326"
-        assert max(abs(v) for v in kwargs["bbox"]) < 200, (
-            f"discovery bbox {kwargs['bbox']} is not lat/lon"
+        assert kwargs["bbox"] == (31.2, 29.9, 31.3, 30.0), (
+            f"discovery bbox {kwargs['bbox']} is not the request's lat/lon box"
         )
         assert plan.can_serve, plan.reason
 
@@ -2605,16 +2665,60 @@ class TestEedaiProjectedCrs:
         gee = make_gee(crs="EPSG:32636")
         assert gee._region_in_output_crs(_MinimalAoi()).reprojected_to == "EPSG:32636"
 
-    def test_a_non_epsg_authority_does_not_match_the_same_epsg_number(self, make_gee):
-        """`ESRI:3857` and `EPSG:3857` are different CRSs despite the shared code.
+    def test_an_unparseable_target_never_takes_the_epsg_shortcut(self, make_gee):
+        """A target PROJ cannot parse falls to the code check, which declines it.
 
-        Comparing only the numeric tail would pass the region through
-        unreprojected, so the bbox and cutline would describe different ground.
+        The fallback trusts `to_epsg()` only against an `EPSG:` target, so a
+        region reporting 3857 does not slip through an `ESRI:3857` target on the
+        shared number alone - the bbox and cutline would describe different
+        ground.
         """
         region = _FakePolygonAoi(epsg=3857)
         gee = make_gee(region=region)
-        gee.crs = "ESRI:3857"
+        gee.crs = "ESRI:3857"  # PROJ raises CRSError on this one; ESRI:102100 is real
         assert gee._region_in_output_crs(region) is not region
+
+    def test_a_proj_string_region_matching_the_target_is_not_reprojected(
+        self, make_gee
+    ):
+        """PROJ decides equality, so an equivalent PROJ string needs no warp.
+
+        This is the branch the CRS-object comparison exists for: neither side
+        can be answered by parsing an `AUTH:CODE` tail, and warping a region
+        that is already in the output CRS costs a full reprojection for nothing.
+        """
+        from pyproj import CRS
+
+        region = _FakePolygonAoi(epsg=4326)
+        region.crs = CRS.from_user_input("+proj=utm +zone=36 +datum=WGS84")
+        gee = make_gee(crs="EPSG:32636", region=region)
+        assert gee._region_in_output_crs(region) is region
+        assert region.reprojection_requests == []
+
+    def test_a_real_crs_differing_from_the_target_is_reprojected(self, make_gee):
+        """The same object comparison must still warp a genuinely different CRS."""
+        from pyproj import CRS
+
+        region = _FakePolygonAoi(epsg=4326)
+        region.crs = CRS.from_user_input("EPSG:4326")
+        gee = make_gee(crs="EPSG:32636", region=region)
+        assert gee._region_in_output_crs(region).reprojected_to == "EPSG:32636"
+
+    def test_a_non_epsg_authority_naming_the_same_crs_is_not_reprojected(
+        self, make_gee
+    ):
+        """`ESRI:102100` and `EPSG:3857` are one CRS, so PROJ answers "no warp".
+
+        Parsing the code would have called them different on the authority
+        alone; the object comparison gets it right.
+        """
+        from pyproj import CRS
+
+        region = _FakePolygonAoi(epsg=3857)
+        region.crs = CRS.from_user_input("ESRI:102100")
+        gee = make_gee(region=region)
+        gee.crs = "EPSG:3857"
+        assert gee._region_in_output_crs(region) is region
 
     def test_region_reprojects_when_the_target_has_no_epsg_code(self, make_gee):
         """A target CRS with no `AUTH:CODE` form cannot be EPSG-matched, so it warps."""
@@ -2793,6 +2897,67 @@ class TestEedaiEligibility:
         )
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         with pytest.raises(ValueError, match="engine='eedai' cannot serve"):
+            gee._use_eedai(
+                var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+            )
+
+
+class TestForcedEngineRemedies:
+    """M2: a forced-engine error must suggest the dial that actually applies."""
+
+    @pytest.mark.parametrize(
+        ("reason", "expected"),
+        [
+            ("the reducer 'mosaic' is last-wins upstream", "statistical reducer"),
+            ("the EEDAI credential could not be built", "service key"),
+            ("X has no native resolution to size the read", "spatial_resolution"),
+            (
+                "about 9,000,000,000 px across 40 scenes on a 3x3 grid, over the "
+                "200,000,000-px single-pass budget",
+                "coarser scale",
+            ),
+            (
+                "900 scenes in this bucket, over the 500-scene cap - Earth Engine "
+                "reduces this server-side",
+                "property_filter",
+            ),
+            ("too large, and it cannot be tiled behind a cutline", "cutline"),
+            (
+                "too large, and it cannot be tiled with resample='bilinear'",
+                "resample='nearest'",
+            ),
+            ("32,769 px on the longest axis", "smaller bbox"),
+        ],
+    )
+    def test_each_reason_gets_its_own_remedy(self, reason, expected):
+        """Every decline reason names a change that would fix that reason.
+
+        A single fixed suffix used to tell a user with an unsupported reducer to
+        shrink their bbox, which cannot help — the remedies only earn their
+        place by differing.
+        """
+        assert expected in backend_module._eedai_remedy(reason)
+
+    def test_a_stack_over_budget_is_not_read_as_a_scene_cap(self):
+        """The pixel-budget reason names scenes too, so the order must hold."""
+        remedy = backend_module._eedai_remedy(
+            "about 9,000,000,000 px across 40 scenes on a 3x3 grid, over the "
+            "200,000,000-px single-pass budget"
+        )
+        assert "coarser scale" in remedy and "property_filter" not in remedy
+
+    def test_the_forced_error_carries_the_matching_remedy(self, make_gee, fake_reader):
+        """The reason and its remedy arrive together in the raised message."""
+        gee = make_gee(
+            engine="eedai",
+            start="2020-06-01",
+            end="2020-06-30",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            reducer="mosaic",
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        with pytest.raises(ValueError, match="statistical reducer"):
             gee._use_eedai(
                 var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
             )
