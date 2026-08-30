@@ -9,13 +9,23 @@ from __future__ import annotations
 
 import base64
 import json
+import traceback
 from unittest.mock import MagicMock
 
 import ee
 import pytest
 
 from earthlens.gee import auth as auth_module
-from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _load_key_dict
+from earthlens.gee.auth import (
+    _CREDENTIAL_KEY_RE,
+    _PEM_MARKER,
+    AuthenticationError,
+    EarthEngineAuth,
+    EarthEngineCredentials,
+    _is_inline_json,
+    _load_key_dict,
+    _redact,
+)
 
 
 def _key_text(**extra) -> str:
@@ -65,6 +75,249 @@ class TestLoadKeyDict:
     def test_non_object_json_returns_none(self):
         """Valid JSON that doesn't start with `{` is treated as a (missing) path → None."""
         assert _load_key_dict("[1, 2]") is None
+
+
+class TestEarthEngineCredentials:
+    """Tests for the credentials model's handling of the key value."""
+
+    def test_key_is_not_echoed_in_repr_or_str(self):
+        """The key renders as `SecretStr('**********')`, never as its value."""
+        creds = EarthEngineCredentials(
+            service_account="sa@x.iam", service_key="SUPERSECRET-KEY-VALUE"
+        )
+        assert "SUPERSECRET" not in repr(creds), f"repr leaked the key: {creds!r}"
+        assert "SUPERSECRET" not in str(creds), f"str leaked the key: {creds}"
+
+    def test_a_plain_string_is_still_accepted(self):
+        """Callers pass a path or JSON content unchanged; pydantic coerces it."""
+        creds = EarthEngineCredentials(
+            service_account="sa@x.iam", service_key="C:/k.json"
+        )
+        assert creds.service_key.get_secret_value() == "C:/k.json", (
+            "value not preserved"
+        )
+
+    def test_serialisation_does_not_leak_the_key(self):
+        """Neither `model_dump` nor `model_dump_json` renders the key's value."""
+        creds = EarthEngineCredentials(
+            service_account="sa@x.iam", service_key="SUPERSECRET-KEY-VALUE"
+        )
+        assert "SUPERSECRET" not in str(creds.model_dump()), "model_dump leaked the key"
+        assert "SUPERSECRET" not in creds.model_dump_json(), (
+            "model_dump_json leaked the key"
+        )
+
+
+class TestIsInlineJson:
+    """Tests for the module-private `_is_inline_json` helper."""
+
+    @pytest.mark.parametrize(
+        "value",
+        ['{"type": "service_account"}', '   {"a": 1}'],
+        ids=["plain", "leading-spaces"],
+    )
+    def test_json_content_is_inline(self, value):
+        """A value whose first non-space character is a brace is inline JSON."""
+        assert _is_inline_json(value) is True, f"should be inline JSON: {value!r}"
+
+    @pytest.mark.parametrize(
+        "value",
+        [r"C:\\keys\\k.json", "/etc/keys/k.json", "./k.json", "k.json", "", "[1, 2]"],
+        ids=["windows", "posix", "relative", "bare", "empty", "json-array"],
+    )
+    def test_everything_else_is_a_path(self, value):
+        """Anything not starting with a brace is treated as a path, arrays included."""
+        assert _is_inline_json(value) is False, f"should not be inline JSON: {value!r}"
+
+    @pytest.mark.parametrize(
+        "value", [None, 123, b"{}", {"a": 1}], ids=["none", "int", "bytes", "dict"]
+    )
+    def test_non_string_is_not_inline(self, value):
+        """A non-string never counts as inline JSON, and does not raise."""
+        assert _is_inline_json(value) is False, f"non-str should be False: {value!r}"
+
+    def test_agrees_with_load_key_dict(self):
+        """The shape rule matches what `_load_key_dict` parses, so the two cannot disagree."""
+        content = _key_text(project_id="p")
+        assert _is_inline_json(content) is True
+        assert _load_key_dict(content) is not None, "inline JSON should parse"
+
+
+class TestRedact:
+    """Tests for the module-private `_redact` helper.
+
+    Pins the containment half of the fix that stopped a service-account key
+    reaching a traceback.
+    """
+
+    def test_key_value_is_replaced(self):
+        """The key's own text is swapped for the sentinel."""
+        key = _key_text(project_id="p")
+        result = _redact(f"failed opening {key} oops", key)
+        assert key not in result, "the key value survived redaction"
+        assert "<service key redacted>" in result, f"no sentinel in: {result}"
+
+    def test_every_occurrence_is_replaced(self):
+        """A key repeated in one message is redacted throughout."""
+        key = _key_text(project_id="p")
+        result = _redact(f"{key} and again {key}", key)
+        assert key not in result, "a repeated occurrence survived"
+
+    def test_pem_block_collapses_the_whole_message(self):
+        """Any residual PEM material discards the message rather than trusting it."""
+        marker = "-----BEGIN " + "PRIVATE KEY-----"
+        result = _redact(f"boom {marker} tail", "unrelated-but-long-enough")
+        assert result == "<service key redacted>", (
+            f"expected full collapse, got: {result}"
+        )
+
+    def test_clean_message_is_untouched(self):
+        """A message with neither the key nor PEM material passes through verbatim."""
+        message = "could not reach the Earth Engine endpoint"
+        assert _redact(message, _key_text()) == message, "a clean message was altered"
+
+    @pytest.mark.parametrize(
+        "short", ["", "a", "12345678"], ids=["empty", "one-char", "eight-chars"]
+    )
+    def test_short_keys_are_not_substituted(self, short):
+        """A short value is not substituted, so a common substring is not mangled."""
+        message = "12345678 is part of the identifier"
+        assert _redact(message, short) == message, "a short key triggered substitution"
+
+    @pytest.mark.parametrize("value", [None, 123, b"key"], ids=["none", "int", "bytes"])
+    def test_non_string_key_does_not_raise(self, value):
+        """A non-string key leaves the message alone instead of raising."""
+        message = "nothing sensitive here"
+        assert _redact(message, value) == message, f"non-str key mishandled: {value!r}"
+
+    @pytest.mark.parametrize("indent", [None, 2], ids=["compact", "pretty"])
+    @pytest.mark.parametrize("kind", ["service_account", "authorized_user"])
+    def test_repr_escaped_keys_are_still_redacted(self, kind, indent):
+        """A key rendered through `OSError.__str__` is redacted despite the escaping.
+
+        `OSError` reprs its filename, so a multi-line key is no longer
+        byte-identical to the value held and a plain substring replace cannot
+        match it - the same mismatch that defeated the platform's masking. A
+        key without a PEM header has no second line of defence, so both shapes
+        are pinned here.
+        """
+        marker = "-----BEGIN " + "PRIVATE KEY-----"
+        payload = (
+            {"type": "service_account", "private_key": f"{marker}{chr(10)}SUPERSECRET"}
+            if kind == "service_account"
+            else {
+                "type": "authorized_user",
+                "client_secret": "SUPERSECRET",
+                "refresh_token": "ALSOSECRET",
+            }
+        )
+        key = json.dumps(payload, indent=indent)
+        rendered = str(FileNotFoundError(2, "No such file", key))
+        result = _redact(rendered, key)
+        assert "SUPERSECRET" not in result, f"key material survived: {result}"
+        assert "ALSOSECRET" not in result, f"key material survived: {result}"
+
+    def test_ordinary_prose_is_not_collapsed(self):
+        """A message that merely mentions a service account is left intact."""
+        message = "could not build credentials (account='sa@x.iam.gserviceaccount.com')"
+        assert _redact(message, json.dumps({"a": 1})) == message, "prose was collapsed"
+
+    @pytest.mark.parametrize("quote", ["'", '"'], ids=["single", "double"])
+    @pytest.mark.parametrize(
+        "field", ["private_key", "client_secret", "refresh_token", "client_email"]
+    )
+    def test_a_quoted_credential_key_collapses_the_message(self, field, quote):
+        """A credential field used as a mapping key collapses, in either quoting.
+
+        JSON writes double quotes and a Python repr writes single ones, and a
+        repr of a credential mapping leaked before both were covered.
+        """
+        result = _redact(f"boom {quote}{field}{quote}: 'x' tail", "unrelated-but-long")
+        assert result == "<service key redacted>", (
+            f"{quote}{field}{quote} did not collapse: {result}"
+        )
+
+    def test_pem_armour_collapses_the_message(self):
+        """PEM armour carries no quoting and collapses on its own."""
+        result = _redact(
+            f"boom -----BEGIN {_PEM_MARKER}----- tail", "unrelated-but-long"
+        )
+        assert result == "<service key redacted>", (
+            f"PEM armour did not collapse: {result}"
+        )
+
+    def test_the_key_pattern_is_anchored_to_a_mapping_key(self):
+        """The pattern requires the quotes and the colon, not a bare mention."""
+        assert _CREDENTIAL_KEY_RE.search('"private_key": "x"'), (
+            "a JSON key should match"
+        )
+        assert _CREDENTIAL_KEY_RE.search("'private_key': 'x'"), (
+            "a repr key should match"
+        )
+        assert _CREDENTIAL_KEY_RE.search('"private_key" : "x"'), (
+            "whitespace before the colon should still match"
+        )
+        assert not _CREDENTIAL_KEY_RE.search("the private_key field"), (
+            "prose should not"
+        )
+        assert not _CREDENTIAL_KEY_RE.search('"private_key_id": "x"'), (
+            "the identifier field should not match"
+        )
+
+    @pytest.mark.parametrize(
+        "field", ["private_key", "client_secret", "refresh_token", "client_email"]
+    )
+    def test_unquoted_field_names_are_not_collapsed(self, field):
+        """A field named in prose, without quotes and a colon, survives."""
+        message = f"the {field} field is missing from the key"
+        assert _redact(message, "unrelated-but-long-enough") == message, (
+            f"prose naming {field} was collapsed"
+        )
+
+    def test_inline_json_one_past_the_length_guard_is_substituted(self):
+        """A JSON value one character past the guard is replaced."""
+        key = '{"a":123}'
+        result = _redact(f"the value {key} appeared", key)
+        assert key not in result, "a ten-character inline key survived"
+
+    def test_inline_json_at_the_length_guard_is_not_substituted(self):
+        """The guard is exclusive: an eight-character inline value is left alone."""
+        key = '{"a":12}'
+        assert len(key) == 8, "the boundary this test pins has moved"
+        message = f"the value {key} appeared"
+        assert _redact(message, key) == message, "the length guard let a short key in"
+
+    def test_the_private_key_id_field_is_not_a_credential_key(self):
+        """`private_key_id` is a fingerprint, not key material, so it must not collapse.
+
+        The pattern requires the closing quote immediately after the field
+        name; over-collapsing here would discard an actionable message for a
+        value that is safe to print.
+        """
+        message = 'key rejected: "private_key_id": "abc123"'
+        assert _redact(message, r"C:\keys\k.json") == message, (
+            "an identifier field collapsed the whole message"
+        )
+
+    def test_a_path_is_left_intact(self):
+        """A path is not secret, and redacting it hid the commonest failure.
+
+        The usual error is a key file that is not where it was said to be, and
+        both workflows pass a path, so blanking it reported
+        `No such file or directory: '<service key redacted>'` - nothing the
+        reader could act on.
+        """
+        path = r"C:\keys\service-account.json"
+        rendered = str(FileNotFoundError(2, "No such file or directory", path))
+        assert "service-account.json" in _redact(rendered, path), "the path was blanked"
+
+    def test_redacted_output_carries_no_key_material(self):
+        """The end-to-end property: neither the key nor a PEM header survives."""
+        marker = "-----BEGIN " + "PRIVATE KEY-----"
+        key = _key_text(project_id="p", private_key=f"{marker}\nSECRET\n")
+        result = _redact(f"open() failed on {key}", key)
+        assert "SECRET" not in result, f"key material survived: {result}"
+        assert marker not in result, f"PEM header survived: {result}"
 
 
 class TestAuthenticationError:
@@ -120,24 +373,63 @@ class TestEarthEngineAuthInitialize:
         assert project == "override"
         assert init.call_args.kwargs["project"] == "override"
 
-    def test_credentials_fallback_to_key_data(self, monkeypatch):
-        """A `ValueError` from the path form falls back to the `key_data=` form."""
+    def test_inline_json_goes_straight_to_key_data(self, monkeypatch):
+        """Inline JSON is passed as `key_data=`, never positionally as a filename."""
         monkeypatch.setattr(auth_module.ee, "Initialize", MagicMock())
-        creds = MagicMock(side_effect=[ValueError("not a file"), MagicMock()])
+        creds = MagicMock(return_value=MagicMock())
         monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", creds)
         project = EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
         assert project == "p"
-        assert creds.call_count == 2
+        assert creds.call_count == 1
         assert "key_data" in creds.call_args.kwargs
 
-    def test_both_credential_attempts_fail_raises(self, monkeypatch):
-        """If both credential constructions fail, an `AuthenticationError` is raised."""
-        creds = MagicMock(side_effect=[ValueError("nope"), RuntimeError("still nope")])
+    def test_a_path_is_passed_positionally(self, monkeypatch, key_file):
+        """A filesystem path keeps the positional filename form `ee` expects."""
+        monkeypatch.setattr(auth_module.ee, "Initialize", MagicMock())
+        creds = MagicMock(return_value=MagicMock())
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", creds)
+        EarthEngineAuth.initialize("sa@x.iam", key_file)
+        assert creds.call_count == 1
+        assert creds.call_args.args[1] == key_file
+        assert "key_data" not in creds.call_args.kwargs
+
+    def test_credential_failure_raises(self, monkeypatch):
+        """A failed credential construction raises an `AuthenticationError`."""
+        creds = MagicMock(side_effect=RuntimeError("nope"))
         monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", creds)
         with pytest.raises(
             AuthenticationError, match="could not build service-account credentials"
         ):
             EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
+
+    def test_a_failure_never_reports_the_key(self, monkeypatch):
+        """No key material reaches the error text or the chained traceback.
+
+        Pins the defect that put a private key in a public CI log: the key was
+        passed where a filename belonged, so the resulting exception carried it
+        and the traceback printed it.
+        """
+        # Assembled rather than written whole: the repository's gitleaks gate
+        # scans source text and matches a literal PEM header, so spelling one
+        # out here would fail CI on the very test that proves keys stay out of
+        # tracebacks. The runtime value is identical, so `_redact`'s PEM branch
+        # is still the thing under test - do not "tidy" this back into one
+        # string.
+        marker = "-----BEGIN " + "PRIVATE KEY-----"
+        secret = marker + chr(10) + "SUPERSECRET" + chr(10) + marker + chr(10)
+        key = _key_text(project_id="p", private_key=secret)
+        creds = MagicMock(side_effect=FileNotFoundError(2, "No such file", key))
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", creds)
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", key)
+        rendered = "".join(
+            traceback.format_exception(
+                type(excinfo.value), excinfo.value, excinfo.value.__traceback__
+            )
+        )
+        assert "SUPERSECRET" not in rendered
+        assert marker not in rendered
+        assert excinfo.value.__cause__ is None
 
     def test_not_registered_project_raises_friendly(self, monkeypatch):
         """An "EE not registered" error becomes a registration-pointing AuthenticationError."""
@@ -156,17 +448,20 @@ class TestEarthEngineAuthInitialize:
         ):
             EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
 
-    def test_permission_error_raises_friendly(self, monkeypatch):
-        """A serviceUsage permission error becomes an IAM-role-pointing AuthenticationError."""
+    @pytest.mark.parametrize(
+        "detail",
+        [
+            "Caller does not have required permission on the project",
+            "missing roles/serviceusage.serviceUsageConsumer",
+            "PERMISSION_DENIED: the request was rejected",
+        ],
+        ids=["required-permission", "serviceUsageConsumer", "permission-denied"],
+    )
+    def test_permission_error_raises_friendly(self, monkeypatch, detail):
+        """Each permission-flavoured message becomes an IAM-role-pointing error."""
         monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
         monkeypatch.setattr(
-            auth_module.ee,
-            "Initialize",
-            MagicMock(
-                side_effect=ee.EEException(
-                    "Caller does not have required permission ... serviceUsageConsumer"
-                )
-            ),
+            auth_module.ee, "Initialize", MagicMock(side_effect=ee.EEException(detail))
         )
         with pytest.raises(
             AuthenticationError, match="serviceUsageConsumer|earthengine.viewer"
@@ -190,6 +485,132 @@ class TestEarthEngineAuthInitialize:
         )
         with pytest.raises(AuthenticationError, match="initialisation failed"):
             EarthEngineAuth.initialize("sa@x.iam", _key_text(project_id="p"))
+
+    def test_an_ee_exception_carrying_the_key_is_redacted(self, monkeypatch):
+        """The `ee.Initialize` branch redacts too, not only the credential branch."""
+        marker = "-----BEGIN " + "PRIVATE KEY-----"
+        key = _key_text(project_id="p", private_key=marker + chr(10) + "SUPERSECRET")
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
+        monkeypatch.setattr(
+            auth_module.ee,
+            "Initialize",
+            MagicMock(side_effect=ee.EEException(f"backend rejected {key}")),
+        )
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", key)
+        rendered = str(excinfo.value)
+        assert "SUPERSECRET" not in rendered, f"key material survived: {rendered}"
+        assert marker not in rendered, f"PEM header survived: {rendered}"
+
+    def test_a_generic_initialisation_failure_is_redacted(self, monkeypatch):
+        """The non-`EEException` branch redacts the key it is handed as well."""
+        key = _key_text(project_id="p", private_key="SUPERSECRET")
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
+        monkeypatch.setattr(
+            auth_module.ee,
+            "Initialize",
+            MagicMock(side_effect=FileNotFoundError(2, "No such file", key)),
+        )
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", key)
+        assert "SUPERSECRET" not in str(excinfo.value), "key material survived"
+
+    def test_a_registration_failure_is_classified_on_the_raw_message(self, monkeypatch):
+        """Credential material in the message must not cost the registration branch.
+
+        Redaction collapses the whole message on a PEM marker, so classifying
+        on the redacted text would drop back to the generic wording exactly
+        when naming the unregistered project matters most.
+        """
+        marker = "-----BEGIN " + "PRIVATE KEY-----"
+        raw = f"Project p is not registered to use Earth Engine; key was {marker}"
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
+        monkeypatch.setattr(
+            auth_module.ee, "Initialize", MagicMock(side_effect=ee.EEException(raw))
+        )
+        key = _key_text(project_id="p")
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", key)
+        rendered = str(excinfo.value)
+        assert "not registered to use Earth Engine" in rendered, (
+            f"the registration branch was lost to redaction: {rendered}"
+        )
+        assert marker not in rendered, f"PEM armour survived: {rendered}"
+
+    def test_a_permission_failure_is_classified_on_the_raw_message(self, monkeypatch):
+        """The IAM branch survives a message that redaction would otherwise collapse."""
+        raw = 'PERMISSION_DENIED while reading {"client_secret": "SUPERSECRET"}'
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
+        monkeypatch.setattr(
+            auth_module.ee, "Initialize", MagicMock(side_effect=ee.EEException(raw))
+        )
+        key = _key_text(project_id="p")
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", key)
+        rendered = str(excinfo.value)
+        assert "serviceUsageConsumer" in rendered, (
+            f"the IAM branch was lost to redaction: {rendered}"
+        )
+        assert "SUPERSECRET" not in rendered, f"key material survived: {rendered}"
+
+    def test_a_missing_key_file_still_names_the_path(self, monkeypatch, tmp_path):
+        """The commonest failure of all must stay actionable: name the file.
+
+        Blanking the path reported `No such file or directory: '<service key
+        redacted>'`, which told the reader nothing.
+        """
+        missing = str(tmp_path / "absent-key.json")
+        monkeypatch.setattr(
+            auth_module.ee,
+            "ServiceAccountCredentials",
+            MagicMock(side_effect=FileNotFoundError(2, "No such file", missing)),
+        )
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", missing, project="p")
+        assert "absent-key.json" in str(excinfo.value), (
+            f"the missing path was blanked: {excinfo.value}"
+        )
+
+    @pytest.mark.parametrize(
+        "error",
+        [
+            ee.EEException("Project p is not registered to use Earth Engine"),
+            ee.EEException("Caller does not have required permission"),
+            ee.EEException("something else entirely"),
+            OSError("disk"),
+        ],
+        ids=["not-registered", "permission", "other-ee", "generic"],
+    )
+    def test_every_initialisation_failure_breaks_the_chain(self, monkeypatch, error):
+        """Every branch raises `from None`, so no cause can print the key."""
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
+        monkeypatch.setattr(auth_module.ee, "Initialize", MagicMock(side_effect=error))
+        key = _key_text(project_id="p")
+        with pytest.raises(AuthenticationError) as excinfo:
+            EarthEngineAuth.initialize("sa@x.iam", key)
+        assert excinfo.value.__cause__ is None, "the exception chain was not broken"
+
+    def test_an_unparseable_key_uses_the_explicit_project(self, monkeypatch):
+        """A key that parses to nothing still initialises when `project` is given."""
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", MagicMock())
+        init = MagicMock()
+        monkeypatch.setattr(auth_module.ee, "Initialize", init)
+        project = EarthEngineAuth.initialize("sa@x.iam", "neither json nor a file", "p")
+        assert project == "p", "the explicit project did not survive an unparseable key"
+        assert init.call_args.kwargs["project"] == "p"
+
+    def test_inline_json_with_leading_whitespace_uses_key_data(self, monkeypatch):
+        """Whitespace before the brace still routes the key to `key_data=`."""
+        monkeypatch.setattr(auth_module.ee, "Initialize", MagicMock())
+        creds = MagicMock(return_value=MagicMock())
+        monkeypatch.setattr(auth_module.ee, "ServiceAccountCredentials", creds)
+        project = EarthEngineAuth.initialize(
+            "sa@x.iam", "  " + _key_text(project_id="p")
+        )
+        assert project == "p"
+        assert "key_data" in creds.call_args.kwargs, (
+            "a padded key went in as a filename"
+        )
 
     def test_constructor_sets_attributes(self, key_file, stub_ee):
         """The constructor stores the account and the resolved project."""

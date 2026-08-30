@@ -511,6 +511,10 @@ class EUMETSAT(AbstractDataSource):
         every output to `self.root_dir`, and deletes the customisation in
         a `finally` — even on failure — so quota is always freed.
 
+        A `tailor.crs` of `None` means "do not reproject": `Chain.projection`
+        is `None`, which `Chain.asdict()` drops before the request is built,
+        matching what the native output formats require.
+
         Args:
             product: One `RemoteProduct` from `_search` (its `metadata`
                 carries the raw `eumdac` product handle and catalog row).
@@ -540,6 +544,12 @@ class EUMETSAT(AbstractDataSource):
         nswe = tailor.nswe or TailorConfig.nswe_from_extent(
             self.space.north, self.space.south, self.space.west, self.space.east
         )
+        # `crs=None` means "do not reproject" (TailorConfig already forbids pairing
+        # it with a native format). `Chain` is a dataclass with `projection: str |
+        # None = None`, and its `asdict()` -- what actually gets serialised into the
+        # request -- drops every `None` field (`eumdac.tailor_models.AsDictMixin`).
+        # So passing `projection=None` here and omitting the argument entirely
+        # produce the identical request; no conditional kwarg-building is needed.
         chain = eumdac.tailor_models.Chain(
             product=dataset.tailor_product_type,
             format=tailor.format,
