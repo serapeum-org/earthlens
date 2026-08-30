@@ -10,6 +10,7 @@ import importlib
 import pathlib
 import shutil
 import sys
+import tempfile
 import types
 from types import SimpleNamespace
 
@@ -346,35 +347,62 @@ class TestDeepProber:
         assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
 
     def test_a_probe_survives_a_scratch_it_cannot_remove(self, monkeypatch, tmp_path):
-        """A read that worked must not be lost to a file the OS still holds."""
-        captured: dict = {}
+        """The probe must tolerate a scratch directory that will not delete.
 
-        def _fake_retrieve(client, dataset, request, target, endpoint):
-            pathlib.Path(target).write_bytes(b"probe")
-            captured["target"] = pathlib.Path(target)
-
-        monkeypatch.setattr(ecmwf_helpers, "_retrieve_with_retry", _fake_retrieve)
+        Asserted on the flag rather than by staging a real undeletable file: the
+        failure is Windows-only, so a file-holding test passes on POSIX whether
+        or not the fix is present, while this fails everywhere if the flag goes.
+        """
+        monkeypatch.setattr(
+            ecmwf_helpers,
+            "_retrieve_with_retry",
+            lambda client, dataset, request, target, endpoint: pathlib.Path(
+                target
+            ).write_bytes(b"probe"),
+        )
         monkeypatch.setattr(ecmwf_endpoints, "open_client", lambda endpoint: object())
         monkeypatch.setattr(
             ecmwf_cli, "_read_netcdf_var_meta", lambda path: {"x": {"units": "K"}}
         )
         monkeypatch.setenv("EARTHLENS_CACHE_DIR", str(tmp_path))
-        holder: list = []
-        real_read = ecmwf_cli._read_netcdf_var_meta
 
-        def _leak(path):
-            holder.append(open(path, "rb"))
-            return real_read(path)
+        real_tempdir = tempfile.TemporaryDirectory
+        seen: dict = {}
 
-        monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", _leak)
-        try:
-            result = ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
-        finally:
-            for handle in holder:
-                handle.close()
-        assert result == {"x": {"units": "K"}}, (
-            "a scratch directory that could not be removed discarded the read"
+        def _recording_tempdir(*args, **kwargs):
+            seen["ignore_cleanup_errors"] = kwargs.get("ignore_cleanup_errors")
+            return real_tempdir(*args, **kwargs)
+
+        monkeypatch.setattr(tempfile, "TemporaryDirectory", _recording_tempdir)
+        result = ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
+        assert result == {"x": {"units": "K"}}
+        assert seen["ignore_cleanup_errors"] is True, (
+            "the probe no longer asks TemporaryDirectory to tolerate cleanup "
+            "errors, so an undeletable scratch will discard a successful read"
         )
+
+    def test_the_reader_releases_its_container(self, monkeypatch, tmp_path):
+        """The handle has to be let go, which is what keeps the scratch removable."""
+        closed: list = []
+
+        class _Container:
+            variable_names = ["t2m"]
+
+            def get_variable(self, name):
+                return SimpleNamespace(
+                    band_units=["K"], global_attributes={"long_name": "temperature"}
+                )
+
+            def close(self):
+                closed.append(True)
+
+        module = SimpleNamespace(
+            NetCDF=SimpleNamespace(read_file=lambda p: _Container())
+        )
+        monkeypatch.setitem(sys.modules, "pyramids.netcdf", module)
+        schema = ecmwf_cli._read_via_pyramids(str(tmp_path / "cube.nc"))
+        assert schema == {"t2m": {"long_name": "temperature", "units": "K"}}
+        assert closed == [True], "the container was left open"
 
     def test_read_netcdf_var_meta_prefers_pyramids(self, monkeypatch, tmp_path):
         """pyramids owns NetCDF reading, so its answer is the one used."""
