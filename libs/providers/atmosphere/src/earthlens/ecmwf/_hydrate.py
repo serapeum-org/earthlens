@@ -106,8 +106,14 @@ _VARIABLE_BLOCK = re.compile(
 #: The placeholder sentinel a seed writes for an un-hydrated variable.
 _UNKNOWN_UNITS = re.compile(r"(?m)^ {8}units:[ \t]*unknown[ \t]*$")
 
-#: A row whose `unhydratable:` names why no retrieve can ever fill it.
-_UNHYDRATABLE = re.compile(r"(?m)^ {8}unhydratable:[ \t]*\S")
+#: A row whose `unhydratable:` names why no retrieve can ever fill it. The
+#: null spellings are excluded on purpose: the field is `str | None`, so
+#: pydantic loads `unhydratable: null` as `None` - "pending, try it" - and a
+#: regex that matched it would have the sweep skip a row the catalog holds
+#: unmarked. Only a value that survives as a string means the row is terminal.
+_UNHYDRATABLE = re.compile(
+    r"(?m)^ {8}unhydratable:[ \t]*(?!(?:~|null|Null|NULL)[ \t]*(?:#[^\n]*)?$)\S"
+)
 #: The 8-space `nc_variable:` / `units:` keys rewritten inside a var sub-block
 #: (the value after the key is replaced, a single space re-inserted).
 _NC_VARIABLE_LINE = re.compile(r"(?m)^( {8}nc_variable:)[^\n]*$")

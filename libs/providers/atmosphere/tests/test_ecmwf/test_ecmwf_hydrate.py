@@ -530,6 +530,49 @@ class TestErrorSummary:
         assert summary.endswith("...")
 
 
+class TestUnhydratableIsReadTheSameWay:
+    """The regex and the pydantic model read one row's mark identically."""
+
+    @pytest.mark.parametrize(
+        ("written", "is_terminal"),
+        [
+            ("pseudo-slug", True),
+            ("pseudo-slug  # all-variables", True),
+            ("nullish", True),
+            ("null", False),
+            ("Null", False),
+            ("NULL", False),
+            ("~", False),
+            ("~   ", False),
+            ("null  # pending", False),
+            ("", False),
+            ("   ", False),
+        ],
+    )
+    def test_both_readers_agree_on_every_spelling(self, written, is_terminal):
+        """A null loads as None - pending - so the sweep must not skip the row."""
+        from earthlens.ecmwf.catalog import Variable
+
+        newline = chr(10)
+        body = (
+            f"        units: unknown{newline}        unhydratable: {written}{newline}"
+        )
+        loaded = Variable.model_validate(
+            {
+                "cds_dataset": "a-dataset",
+                "cds_variable": "a-variable",
+                "nc_variable": "v",
+                "units": "unknown",
+                **yaml.safe_load(f"unhydratable: {written}"),
+            }
+        )
+
+        assert bool(hydrate_mod._UNHYDRATABLE.search(body)) is is_terminal
+        assert bool(loaded.unhydratable) is is_terminal, (
+            "the sweep and the catalog disagree about whether this row is done"
+        )
+
+
 class TestDropRestatements:
     """A temporal restatement is the same quantity, not a second candidate."""
 

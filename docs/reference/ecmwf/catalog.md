@@ -448,6 +448,11 @@ different level set than the rest of its dataset family. Rare.
 retrieve can answer it, and the sweep skips the row rather than spending a
 request and a queue slot to rediscover that.
 
+Write the key only when the row is terminal. `unhydratable: null` (and `~`,
+and an empty value) load as absent, so they mean *pending* — the sweep will
+still probe such a row. There is no spelling of the key that means "skip me"
+other than a reason string.
+
 The only value in use is `pseudo-slug`: the row is keyed `all` or
 `all-variables`, naming every variable its dataset serves rather than one of
 them. That is resolvable only where the dataset serves exactly one variable —
