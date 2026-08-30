@@ -89,6 +89,8 @@ class _FakeChain:
         self.kwargs = dict(kwargs)
         self.product = kwargs.get("product")
         self.format = kwargs.get("format")
+        # .get() collapses an omitted key and an explicit None to the same value, so
+        # this cannot tell the two apart -- use .kwargs (above) for that distinction.
         self.projection = kwargs.get("projection")
         self.roi = kwargs.get("roi")
         self.filter = kwargs.get("filter")
