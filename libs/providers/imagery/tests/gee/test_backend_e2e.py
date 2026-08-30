@@ -188,10 +188,10 @@ def test_live_srtm_tiled_read_matches_single_pass(tmp_path, monkeypatch):
     # still applies, so the tile maths under test is the shipped one.
     monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 20_000)
     tiled_calls: list[int] = []
-    original_plan = backend_module.GEE._eedai_plan
+    original_plan = backend_module.GEE._eedai_single_image_plan
     monkeypatch.setattr(
         backend_module.GEE,
-        "_eedai_plan",
+        "_eedai_single_image_plan",
         lambda self, var_info, band_count: _record_plan(
             original_plan(self, var_info, band_count), tiled_calls
         ),
