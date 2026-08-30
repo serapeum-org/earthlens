@@ -126,8 +126,20 @@ def _is_inline_json(service_key: str) -> bool:
     return isinstance(service_key, str) and service_key.lstrip().startswith("{")
 
 
+#: Field names and PEM markers that only ever occur inside credential JSON.
+#: Matched with their surrounding quotes so ordinary prose - an error naming a
+#: `service_account`, say - cannot trip them.
+_CREDENTIAL_MARKERS = (
+    "PRIVATE KEY",
+    '"private_key"',
+    '"client_secret"',
+    '"refresh_token"',
+    '"client_email"',
+)
+
+
 def _redact(message: str, service_key: str) -> str:
-    """Return `message` with any service-account key material removed.
+    """Return `message` with any credential material removed.
 
     Defence in depth for the error paths. `ee.ServiceAccountCredentials`
     takes a *filename* positionally, so handing it inline JSON makes Python
@@ -135,17 +147,28 @@ def _redact(message: str, service_key: str) -> str:
     traceback then prints. Callers below break the exception chain, and this
     strips the value from anything they do report.
 
+    Substring replacement alone is not enough, and assuming it was is what let
+    a key reach a log in the first place. `OSError.__str__` **reprs** the
+    filename, so a multi-line key arrives with its newlines escaped and is no
+    longer byte-identical to the value we hold - exactly the mismatch that
+    defeated the platform's own secret masking. The escaped form is therefore
+    replaced too, and any residual credential marker collapses the message
+    rather than trusting that the substitutions caught everything.
+
     Args:
         message: The text about to be surfaced.
         service_key: The key path or JSON content to strip.
 
     Returns:
-        str: The message with the key value and any PEM block replaced.
+        str: The message with credential material replaced, or the sentinel
+            alone when any marker survived.
     """
     cleaned = message
     if isinstance(service_key, str) and len(service_key) > 8:
-        cleaned = cleaned.replace(service_key, "<service key redacted>")
-    if "PRIVATE KEY" in cleaned:
+        # The raw value, and the repr-escaped form an OSError renders it as.
+        for form in (service_key, repr(service_key)[1:-1]):
+            cleaned = cleaned.replace(form, "<service key redacted>")
+    if any(marker in cleaned for marker in _CREDENTIAL_MARKERS):
         return "<service key redacted>"
     return cleaned
 

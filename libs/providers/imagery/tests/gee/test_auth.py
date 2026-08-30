@@ -156,6 +156,38 @@ class TestRedact:
         message = "nothing sensitive here"
         assert _redact(message, value) == message, f"non-str key mishandled: {value!r}"
 
+    @pytest.mark.parametrize("indent", [None, 2], ids=["compact", "pretty"])
+    @pytest.mark.parametrize("kind", ["service_account", "authorized_user"])
+    def test_repr_escaped_keys_are_still_redacted(self, kind, indent):
+        """A key rendered through `OSError.__str__` is redacted despite the escaping.
+
+        `OSError` reprs its filename, so a multi-line key is no longer
+        byte-identical to the value held and a plain substring replace cannot
+        match it - the same mismatch that defeated the platform's masking. A
+        key without a PEM header has no second line of defence, so both shapes
+        are pinned here.
+        """
+        marker = "-----BEGIN " + "PRIVATE KEY-----"
+        payload = (
+            {"type": "service_account", "private_key": f"{marker}{chr(10)}SUPERSECRET"}
+            if kind == "service_account"
+            else {
+                "type": "authorized_user",
+                "client_secret": "SUPERSECRET",
+                "refresh_token": "ALSOSECRET",
+            }
+        )
+        key = json.dumps(payload, indent=indent)
+        rendered = str(FileNotFoundError(2, "No such file", key))
+        result = _redact(rendered, key)
+        assert "SUPERSECRET" not in result, f"key material survived: {result}"
+        assert "ALSOSECRET" not in result, f"key material survived: {result}"
+
+    def test_ordinary_prose_is_not_collapsed(self):
+        """A message that merely mentions a service account is left intact."""
+        message = "could not build credentials (account='sa@x.iam.gserviceaccount.com')"
+        assert _redact(message, json.dumps({"a": 1})) == message, "prose was collapsed"
+
     def test_redacted_output_carries_no_key_material(self):
         """The end-to-end property: neither the key nor a PEM header survives."""
         marker = "-----BEGIN " + "PRIVATE KEY-----"
