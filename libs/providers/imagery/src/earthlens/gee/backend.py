@@ -149,6 +149,14 @@ _EEDAI_MAX_NATIVE_PIXELS: int = 4_000_000_000
 #: native resolution into memory before downsampling.
 _EEDAI_MAX_PIXELS: int = 200_000_000
 
+#: Reducers the reader must not serve, because its client-side result would not
+#: match Earth Engine's server-side one. `mosaic` is the clear case: Earth
+#: Engine's is last-wins (later scenes paint over earlier), while the reader
+#: without a nodata value returns the *first* scene of the stack wholesale. It
+#: is also the most common `default_reducer` in the catalog, so this decline is
+#: what keeps a composite from silently becoming "the earliest scene".
+_EEDAI_UNSUPPORTED_REDUCERS: frozenset[str] = frozenset({"mosaic"})
+
 #: Most scenes a collection composite may fetch through the reader in one bucket.
 #: Each scene is a separate download the reader holds in memory to reduce, so a
 #: long time series is routed to Earth Engine's server-side reduce instead.
@@ -1437,6 +1445,20 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return EedaiPlan(
                 False, None, 0, "a collection read needs a bucket date window"
             )
+        reducer = self.reducer or var_info.default_reducer
+        if reducer in _EEDAI_UNSUPPORTED_REDUCERS:
+            # Checked before the network call: no point discovering scenes for a
+            # composite the reader cannot reproduce.
+            return EedaiPlan(
+                False,
+                None,
+                0,
+                (
+                    f"reducer={reducer!r} does not mean the same thing client-side: "
+                    "Earth Engine's is last-wins, while the reader returns the first "
+                    "scene of the stack, so Earth Engine composites this instead"
+                ),
+            )
         reader = import_earthengine_reader()
         try:
             cost = reader.estimate_earthengine_cost(
@@ -2106,6 +2128,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 )
             # The reader composites the scenes in this window with the same
             # reducer the Earth Engine path would use.
+            #
+            # Caveat: the reader is given no `nodata`, because neither the EEDAI
+            # driver nor this catalog declares one, so its statistical reducers
+            # run unmasked and fold a scene's fill pixels into the result where
+            # Earth Engine would mask them. The values agree wherever the scenes
+            # carry no fill over the AOI. Supplying a per-band fill (upstream
+            # pyramids-eo#63) is what would close the gap.
             composite_kwargs = {
                 "start": bucket_start.strftime("%Y-%m-%d"),
                 "end": self._reader_end(bucket_end),

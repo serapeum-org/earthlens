@@ -2016,6 +2016,38 @@ class TestEedaiCollections:
         assert kwargs["start"] == "2020-06-01" and kwargs["end"] == "2020-06-30"
         assert len(kwargs["bbox"]) == 4
 
+    def test_mosaic_reducer_is_declined_before_any_network_call(
+        self, make_gee, fake_reader
+    ):
+        """`mosaic` means last-wins in Earth Engine but first-scene in the reader.
+
+        It is also the most common `default_reducer` in the catalog, so serving
+        it would quietly turn many composites into "the earliest scene".
+        """
+        gee = self._collection_gee(make_gee, reducer="mosaic")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert not plan.can_serve
+        assert "last-wins" in plan.reason
+        assert fake_reader.cost_calls == [], (
+            "the unsupported reducer should be caught before scene discovery"
+        )
+
+    def test_a_dataset_defaulting_to_mosaic_is_declined(self, make_gee, fake_reader):
+        """The decline follows the catalog's own default, not just an override."""
+        gee = self._collection_gee(make_gee)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY").model_copy(
+            update={"default_reducer": "mosaic"}
+        )
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert not plan.can_serve and "last-wins" in plan.reason
+
+    def test_a_supported_reducer_still_serves(self, make_gee, fake_reader):
+        """A statistical reducer is unaffected by the mosaic decline."""
+        gee = self._collection_gee(make_gee, reducer="median")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        assert gee._eedai_collection_fits(var_info, 1, self.START, self.END).can_serve
+
     def test_discovery_bbox_is_labelled_latlon(self, make_gee, fake_reader):
         """Scene discovery must declare EPSG:4326, since the AOI it sends is lat/lon."""
         gee = self._collection_gee(make_gee)
