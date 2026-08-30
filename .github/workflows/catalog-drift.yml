@@ -117,6 +117,9 @@ jobs:
           uv run --locked --no-sync --no-build earthlens datasets audit "$PROVIDERS" --strict --json > "$RUNNER_TEMP/audit.json"
           drift=$?
           set -e
-          cat "$RUNNER_TEMP/audit.json"
+          # Deliberately not `cat`ing the report: a provider's error detail is
+          # whatever its SDK put in the exception, and this log is public.
+          # The checker prints the provider and reason it needs, redaction
+          # being the CLI's job; the full report stays on the runner.
           python .github/scripts/assert_audit_ran.py "$RUNNER_TEMP/audit.json"
           exit "$drift"
