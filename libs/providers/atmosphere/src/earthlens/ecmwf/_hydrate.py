@@ -27,6 +27,7 @@ from typing import Any
 
 import typer
 import yaml
+from loguru import logger
 
 #: Seconds to wait for one dataset's live retrieve before abandoning it. A
 #: single request stuck in the CDS queue would otherwise wedge the whole pass,
@@ -1839,8 +1840,13 @@ def _configured_keys() -> list[str]:
     for _url_default, _url_env, key_env in ENDPOINTS.values():
         try:
             key = _resolve_key(key_env)
-        except Exception:  # noqa: BLE001 - redaction is never the failure
-            continue
+        except Exception as exc:  # noqa: BLE001 - redaction is never the failure
+            # Not silent: an unreadable key is one this pass cannot strike,
+            # so an operator who later finds a secret in a pasted log has
+            # something saying which source went unread. The value is never
+            # logged, only the name of the variable that would hold it.
+            logger.debug(f"{key_env} unreadable, so it is not redacted: {exc}")
+            key = None
         if key:
             found.add(key)
     return sorted(found, key=len, reverse=True)
