@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23558,17 +23558,17 @@ rasters, tabledap tables, test/demo datasets, and missing ids.</p>
 <td>Chlorophyll-a, Aqua MODIS, global 4 km, 8-day composite — <strong>historical, 2003–2022 only</strong></td>
 </tr>
 <tr>
-<td><code>nceiPH53sstd1day</code></td>
+<td><code>erdPH53sstd8day</code></td>
 <td>griddap</td>
 <td>raster</td>
 <td><code>sea_surface_temperature</code></td>
-<td>NCEI AVHRR Pathfinder v5.3 L3-collated SST, daytime, daily (current)</td>
+<td>AVHRR Pathfinder v5.3 (L3C) SST, daytime, global 0.0417°, 8-day composite — <strong>historical, ends 2023-06</strong></td>
 </tr>
 <tr>
 <td><code>cwwcNDBCMet</code></td>
 <td>tabledap</td>
 <td>tabular</td>
-<td><code>station</code>, <code>time</code>, <code>wtmp</code></td>
+<td><code>station</code>, <code>time</code>, <code>WTMP</code></td>
 <td>NDBC standard meteorological buoy time series (current)</td>
 </tr>
 <tr>
@@ -23601,7 +23601,8 @@ rasters, tabledap tables, test/demo datasets, and missing ids.</p>
 </tr>
 </tbody>
 </table>
-<p><code>erdMH1chla8day</code> is a <strong>historical</strong> record (the Aqua MODIS product stopped updating in mid-2022); request a
+<p><code>erdMH1chla8day</code> and <code>erdPH53sstd8day</code> are <strong>historical</strong> records (the Aqua MODIS product stopped updating in
+mid-2022, the Pathfinder composites in mid-2023); request a
 date inside 2003–2022, or a recent-date request returns a clear out-of-coverage error.</p>
 <p>The first four rows are U.S. Government public-domain datasets on a public, no-auth server. The four
 <code>global_*</code> rows are coastal tide-gauge extreme-sea-level series on the University of Hawaii Sea Level Center
@@ -23610,7 +23611,8 @@ with citation. A <code>latitude</code>/<code>longitude</code> bbox filters the r
 ~85 % of GESLA-3; the full GESLA-3 archive zip at <code>https://gesla.org</code> is the fallback for the remainder.</p>
 <h2 id="variables"><a class="toclink" href="#variables">Variables</a><a class="headerlink" href="#variables" title="Permanent link">#</a></h2>
 <p><code>variables=</code> is a flat list of variable / column names. For a <strong>griddap</strong> dataset these are grid variable names
-(e.g. <code>CRW_SSTANOMALY</code>); for a <strong>tabledap</strong> dataset they are table column names (e.g. <code>wtmp</code>). Omit <code>variables=</code>
+(e.g. <code>CRW_SSTANOMALY</code>); for a <strong>tabledap</strong> dataset they are table column names (e.g. <code>WTMP</code>). Names are
+<strong>case-sensitive</strong> — ERDDAP rejects a mis-cased name with a <code>400 Unrecognized variable</code>. Omit <code>variables=</code>
 to use the row's default set shown above. Each ERDDAP dataset's full variable list is on its own server's dataset
 page (the <code>/info/&lt;dataset_id&gt;/index.html</code> endpoint).</p>
 <h2 id="adding-a-server"><a class="toclink" href="#adding-a-server">Adding a server</a><a class="headerlink" href="#adding-a-server" title="Permanent link">#</a></h2>
