@@ -209,7 +209,7 @@ datasets:
       outgoing-longwave-radiation:
         cds_variable: outgoing_longwave_radiation
         nc_variable: olr
-        units: unknown
+        units: W m-2
       outgoing-shortwave-radiation:
         cds_variable: outgoing_shortwave_radiation
         nc_variable: outgoing_shortwave_radiation
@@ -499,11 +499,11 @@ datasets:
         units: unknown
       mole-content-of-ozone-in-atmosphere-layer:
         cds_variable: mole_content_of_ozone_in_atmosphere_layer
-        nc_variable: surface_6km_ozone_column
+        nc_variable: mole_content_of_ozone_in_atmosphere_layer
         units: unknown
       atmosphere-mole-content-of-ozone:
         cds_variable: atmosphere_mole_content_of_ozone
-        nc_variable: total_ozone_column
+        nc_variable: atmosphere_mole_content_of_ozone
         units: unknown
         extras:
           vertical_aggregation: [total_columns_uv]
@@ -701,19 +701,19 @@ datasets:
         units: unknown
       surface-downwelling-longwave-flux:
         cds_variable: surface_downwelling_longwave_flux
-        nc_variable: SDL
+        nc_variable: surface_downwelling_longwave_flux
         units: unknown
       surface-net-downward-shortwave-flux:
         cds_variable: surface_net_downward_shortwave_flux
-        nc_variable: SNS
+        nc_variable: surface_net_downward_shortwave_flux
         units: unknown
       surface-net-downward-longwave-flux:
         cds_variable: surface_net_downward_longwave_flux
-        nc_variable: SNL
+        nc_variable: surface_net_downward_longwave_flux
         units: unknown
       surface-net-downward-radiative-flux:
         cds_variable: surface_net_downward_radiative_flux
-        nc_variable: SRB
+        nc_variable: surface_net_downward_radiative_flux
         units: unknown
       all-variables:
         cds_variable: all_variables

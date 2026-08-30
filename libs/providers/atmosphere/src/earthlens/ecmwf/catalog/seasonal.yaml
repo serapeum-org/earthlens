@@ -59,7 +59,7 @@ datasets:
         cds_variable: land_sea_mask
         nc_variable: lsm
         types: state
-        units: unknown
+        units: (0 - 1)
       maximum-2m-temperature-in-the-last-24-hours-seasonal-orig:
         cds_variable: maximum_2m_temperature_in_the_last_24_hours
         nc_variable: mx2t24
@@ -84,7 +84,7 @@ datasets:
         cds_variable: orography
         nc_variable: orog
         types: state
-        units: unknown
+        units: m
       runoff-seasonal-orig:
         cds_variable: runoff
         nc_variable: ro
@@ -464,27 +464,27 @@ datasets:
         cds_variable: geopotential
         nc_variable: z
         types: state
-        units: unknown
+        units: m**2 s**-2
       specific-humidity-seasonal-orig-p:
         cds_variable: specific_humidity
         nc_variable: q
         types: state
-        units: unknown
+        units: kg kg**-1
       temperature-seasonal-orig-p:
         cds_variable: temperature
         nc_variable: t
         types: state
-        units: unknown
+        units: K
       u-component-of-wind-seasonal-orig-p:
         cds_variable: u_component_of_wind
         nc_variable: u
         types: state
-        units: unknown
+        units: m s**-1
       v-component-of-wind-seasonal-orig-p:
         cds_variable: v_component_of_wind
         nc_variable: v
         types: state
-        units: unknown
+        units: m s**-1
   seasonal-postprocessed-pressure-levels:
     product_type:
     - reanalysis

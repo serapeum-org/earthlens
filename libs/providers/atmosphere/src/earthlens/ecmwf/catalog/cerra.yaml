@@ -14,197 +14,197 @@ datasets:
         cds_variable: albedo
         nc_variable: al
         types: state
-        units: unknown
+        units: '%'
       evaporation-cerra:
         cds_variable: evaporation
         nc_variable: eva
         types: flux
-        units: unknown
+        units: kg m**-2
       2m-relative-humidity-cerra:
         cds_variable: 2m_relative_humidity
         nc_variable: r2
         types: state
-        units: unknown
+        units: '%'
       10m-wind-speed-cerra:
         cds_variable: 10m_wind_speed
         nc_variable: si10
         types: state
-        units: unknown
+        units: m s**-1
       2m-temperature-cerra:
         cds_variable: 2m_temperature
         nc_variable: t2m
         types: state
-        units: unknown
+        units: K
       10m-wind-direction-cerra:
         cds_variable: 10m_wind_direction
         nc_variable: wdir10
         types: state
-        units: unknown
+        units: Degree true
       snow-depth-cerra:
         cds_variable: snow_depth
         nc_variable: sde
         types: state
-        units: unknown
+        units: m
       total-precipitation-cerra:
         cds_variable: total_precipitation
         nc_variable: tp
         types: flux
-        units: unknown
+        units: kg m**-2
       surface-pressure-cerra:
         cds_variable: surface_pressure
         nc_variable: sp
         types: state
-        units: unknown
+        units: Pa
       high-cloud-cover-cerra:
         cds_variable: high_cloud_cover
         nc_variable: hcc
         types: state
-        units: unknown
+        units: '%'
       snow-density-cerra:
         cds_variable: snow_density
         nc_variable: rsn
         types: state
-        units: unknown
+        units: kg m**-3
       orography-cerra:
         cds_variable: orography
         nc_variable: orog
         types: state
-        units: unknown
+        units: m
       low-cloud-cover-cerra:
         cds_variable: low_cloud_cover
         nc_variable: lcc
         types: state
-        units: unknown
+        units: '%'
       medium-cloud-cover-cerra:
         cds_variable: medium_cloud_cover
         nc_variable: mcc
         types: state
-        units: unknown
+        units: '%'
       total-cloud-cover-cerra:
         cds_variable: total_cloud_cover
         nc_variable: tcc
         types: state
-        units: unknown
+        units: '%'
       mean-sea-level-pressure-cerra:
         cds_variable: mean_sea_level_pressure
         nc_variable: msl
         types: state
-        units: unknown
+        units: Pa
       skin-temperature-cerra:
         cds_variable: skin_temperature
         nc_variable: skt
         types: state
-        units: unknown
+        units: K
       surface-roughness-cerra:
         cds_variable: surface_roughness
         nc_variable: sr
         types: state
-        units: unknown
+        units: m
       land-sea-mask-cerra:
         cds_variable: land_sea_mask
         nc_variable: lsm
         types: state
-        units: unknown
+        units: (0 - 1)
       liquid-volumetric-soil-moisture-cerra:
         cds_variable: liquid_volumetric_soil_moisture
         nc_variable: liqvsm
         types: state
-        units: unknown
+        units: m**3 m**-3
       volumetric-soil-moisture-cerra:
         cds_variable: volumetric_soil_moisture
         nc_variable: vsw
         types: state
-        units: unknown
+        units: m**3 m**-3
       soil-temperature-cerra:
         cds_variable: soil_temperature
         nc_variable: sot
         types: state
-        units: unknown
+        units: K
       snow-depth-water-equivalent-cerra:
         cds_variable: snow_depth_water_equivalent
         nc_variable: sd
         types: state
-        units: unknown
+        units: kg m**-2
       momentum-flux-at-the-surface-u-component-cerra:
         cds_variable: momentum_flux_at_the_surface_u_component
         nc_variable: tisemf
         types: flux
-        units: unknown
+        units: N m**-2 s
       momentum-flux-at-the-surface-v-component-cerra:
         cds_variable: momentum_flux_at_the_surface_v_component
         nc_variable: tisnmf
         types: flux
-        units: unknown
+        units: N m**-2 s
       time-integrated-surface-direct-short-wave-radiation-flux-cerra:
         cds_variable: time_integrated_surface_direct_short_wave_radiation_flux
         nc_variable: tidirswrf
         types: flux
-        units: unknown
+        units: J m**-2
       surface-solar-radiation-downwards-cerra:
         cds_variable: surface_solar_radiation_downwards
         nc_variable: ssrd
         types: flux
-        units: unknown
+        units: J m**-2
       surface-net-solar-radiation-cerra:
         cds_variable: surface_net_solar_radiation
         nc_variable: ssr
         types: flux
-        units: unknown
+        units: J m**-2
       surface-net-thermal-radiation-cerra:
         cds_variable: surface_net_thermal_radiation
         nc_variable: str
         types: flux
-        units: unknown
+        units: J m**-2
       10m-wind-gust-since-previous-post-processing-cerra:
         cds_variable: 10m_wind_gust_since_previous_post_processing
         nc_variable: fg10
         types: state
-        units: unknown
+        units: m s**-1
       maximum-2m-temperature-since-previous-post-processing-cerra:
         cds_variable: maximum_2m_temperature_since_previous_post_processing
         nc_variable: mx2t
         types: state
-        units: unknown
+        units: K
       minimum-2m-temperature-since-previous-post-processing-cerra:
         cds_variable: minimum_2m_temperature_since_previous_post_processing
         nc_variable: mn2t
         types: state
-        units: unknown
+        units: K
       snow-fall-water-equivalent-cerra:
         cds_variable: snow_fall_water_equivalent
         nc_variable: sf
         types: flux
-        units: unknown
+        units: kg m**-2
       surface-latent-heat-flux-cerra:
         cds_variable: surface_latent_heat_flux
         nc_variable: slhf
         types: flux
-        units: unknown
+        units: J m**-2
       surface-net-solar-radiation-clear-sky-cerra:
         cds_variable: surface_net_solar_radiation_clear_sky
         nc_variable: ssrc
         types: flux
-        units: unknown
+        units: J m**-2
       surface-net-thermal-radiation-clear-sky-cerra:
         cds_variable: surface_net_thermal_radiation_clear_sky
         nc_variable: strc
         types: flux
-        units: unknown
+        units: J m**-2
       surface-sensible-heat-flux-cerra:
         cds_variable: surface_sensible_heat_flux
         nc_variable: sshf
         types: flux
-        units: unknown
+        units: J m**-2
       surface-thermal-radiation-downwards-cerra:
         cds_variable: surface_thermal_radiation_downwards
         nc_variable: strd
         types: flux
-        units: unknown
+        units: J m**-2
       total-column-integrated-water-vapour-cerra:
         cds_variable: total_column_integrated_water_vapour
         nc_variable: tcwv
         types: state
-        units: unknown
+        units: kg m**-2
   reanalysis-cerra-height-levels:
     product_type:
     - reanalysis
@@ -219,52 +219,52 @@ datasets:
         cds_variable: pressure
         nc_variable: pres
         types: state
-        units: unknown
+        units: Pa
       relative-humidity-cerra-h:
         cds_variable: relative_humidity
         nc_variable: r
         types: state
-        units: unknown
+        units: '%'
       wind-speed-cerra-h:
         cds_variable: wind_speed
         nc_variable: si100
         types: state
-        units: unknown
+        units: m s**-1
       temperature-cerra-h:
         cds_variable: temperature
         nc_variable: t
         types: state
-        units: unknown
+        units: K
       wind-direction-cerra-h:
         cds_variable: wind_direction
         nc_variable: wdir
         types: state
-        units: unknown
+        units: Degree true
       turbulent-kinetic-energy-cerra-h:
         cds_variable: turbulent_kinetic_energy
         nc_variable: tke
         types: state
-        units: unknown
+        units: J kg**-1
       specific-cloud-ice-water-content-cerra-h:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
-        units: unknown
+        units: kg kg**-1
       specific-cloud-liquid-water-content-cerra-h:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
-        units: unknown
+        units: kg kg**-1
       specific-rain-water-content-cerra-h:
         cds_variable: specific_rain_water_content
         nc_variable: crwc
         types: state
-        units: unknown
+        units: kg kg**-1
       specific-snow-water-content-cerra-h:
         cds_variable: specific_snow_water_content
         nc_variable: cswc
         types: state
-        units: unknown
+        units: kg kg**-1
   reanalysis-cerra-pressure-levels:
     product_type:
     - reanalysis
@@ -279,57 +279,57 @@ datasets:
         cds_variable: relative_humidity
         nc_variable: r
         types: state
-        units: unknown
+        units: '%'
       temperature-cerra-p:
         cds_variable: temperature
         nc_variable: t
         types: state
-        units: unknown
+        units: K
       u-component-of-wind-cerra-p:
         cds_variable: u_component_of_wind
         nc_variable: u
         types: state
-        units: unknown
+        units: m s**-1
       v-component-of-wind-cerra-p:
         cds_variable: v_component_of_wind
         nc_variable: v
         types: state
-        units: unknown
+        units: m s**-1
       geopotential-cerra-p:
         cds_variable: geopotential
         nc_variable: z
         types: state
-        units: unknown
+        units: m**2 s**-2
       cloud-cover-cerra-p:
         cds_variable: cloud_cover
         nc_variable: ccl
         types: state
-        units: unknown
+        units: '%'
       specific-cloud-ice-water-content-cerra-p:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
-        units: unknown
+        units: kg kg**-1
       specific-cloud-liquid-water-content-cerra-p:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
-        units: unknown
+        units: kg kg**-1
       specific-rain-water-content-cerra-p:
         cds_variable: specific_rain_water_content
         nc_variable: crwc
         types: state
-        units: unknown
+        units: kg kg**-1
       specific-snow-water-content-cerra-p:
         cds_variable: specific_snow_water_content
         nc_variable: cswc
         types: state
-        units: unknown
+        units: kg kg**-1
       turbulent-kinetic-energy-cerra-p:
         cds_variable: turbulent_kinetic_energy
         nc_variable: tke
         types: state
-        units: unknown
+        units: J kg**-1
   reanalysis-cerra-model-levels:
     product_type:
     - reanalysis
@@ -474,7 +474,7 @@ datasets:
         cds_variable: lake_depth
         nc_variable: dl
         types: state
-        units: unknown
+        units: m
       lake-mix-layer-temperature-cerra-land:
         cds_variable: lake_mix_layer_temperature
         nc_variable: lmlt
@@ -499,7 +499,7 @@ datasets:
         cds_variable: land_sea_mask
         nc_variable: lsm
         types: state
-        units: unknown
+        units: (0 - 1)
       liquid-volumetric-soil-moisture-cerra-land:
         cds_variable: liquid_volumetric_soil_moisture
         nc_variable: liqvsm
@@ -514,7 +514,7 @@ datasets:
         cds_variable: orography
         nc_variable: orog
         types: state
-        units: unknown
+        units: m
       surface-roughness-cerra-land:
         cds_variable: surface_roughness
         nc_variable: sr
@@ -534,7 +534,7 @@ datasets:
         cds_variable: total_precipitation
         nc_variable: tp
         types: flux
-        units: unknown
+        units: kg m**-2
       volumetric-soil-moisture-cerra-land:
         cds_variable: volumetric_soil_moisture
         nc_variable: vsw
@@ -544,9 +544,9 @@ datasets:
         cds_variable: volumetric_transpiration_stress_onset
         nc_variable: vtso
         types: state
-        units: unknown
+        units: m**3 m**-3
       volumetric-wilting-point-cerra-land:
         cds_variable: volumetric_wilting_point
         nc_variable: vwp
         types: state
-        units: unknown
+        units: m**3 m**-3
