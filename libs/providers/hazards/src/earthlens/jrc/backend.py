@@ -244,7 +244,12 @@ class JRC(AbstractDataSource):
         return f"sea_level_{prod}"
 
     @staticmethod
-    def _warn_cross_kind_arguments(kind, return_periods, field, reference_time) -> None:
+    def _warn_cross_kind_arguments(
+        kind: str,
+        return_periods: list[int | str] | int | str | None,
+        field: str | None,
+        reference_time: str | None,
+    ) -> None:
         """Warn when an argument that belongs to another kind was passed.
 
         The selectors are shared by every JRC dataset, so a `return_periods=` sent

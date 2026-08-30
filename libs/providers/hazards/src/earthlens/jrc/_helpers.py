@@ -16,7 +16,7 @@ from __future__ import annotations
 import fnmatch
 import math
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from datetime import datetime, timedelta
 from functools import lru_cache
 
@@ -192,25 +192,27 @@ def _cycle_id(url: str) -> str:
     return f"{year}{month}{day}T{hour}"
 
 
-def _is_latest(value) -> bool:
+def _is_latest(value: datetime | str | None) -> bool:
     """Whether a `reference_time` means 'the newest complete cycle'."""
     return value is None or (
         isinstance(value, str) and value.strip().lower() in ("", "latest")
     )
 
 
-def _parse_reference_time(value) -> datetime:
+def _parse_reference_time(value: datetime | str | None) -> datetime:
     """Parse an explicit `reference_time` to a `datetime`.
 
     Args:
         value: A `datetime`, or a string such as `"2026-08-26T12"`,
-            `"2026-08-26 12"`, `"2026-08-26"`, or `"20260826T12"`.
+            `"2026-08-26 12"`, `"2026-08-26"`, or `"20260826T12"`. `None` is
+            accepted by the signature (the caller screens it with `_is_latest`)
+            but does not parse.
 
     Returns:
         datetime: The parsed cycle timestamp.
 
     Raises:
-        ValueError: If the value cannot be parsed.
+        ValueError: If the value cannot be parsed (`None` included).
     """
     if isinstance(value, datetime):
         return value
@@ -234,7 +236,10 @@ MAX_CYCLE_PROBES: int = 60
 
 
 def _probe_leaf(
-    url: str, endfls_marker: str, http_text, budget: list[int]
+    url: str,
+    endfls_marker: str,
+    http_text: Callable[[str], str],
+    budget: list[int],
 ) -> tuple[str, str] | None:
     """Spend one budget unit checking whether a cycle folder is complete.
 
@@ -257,7 +262,11 @@ def _probe_leaf(
 
 
 def _descend_newest(
-    url: str, level: int, endfls_marker: str, http_text, budget: list[int]
+    url: str,
+    level: int,
+    endfls_marker: str,
+    http_text: Callable[[str], str],
+    budget: list[int],
 ) -> tuple[str, str] | None:
     """Depth-first descend `level` numeric dirs, returning the newest complete cycle.
 
@@ -304,10 +313,10 @@ def resolve_cycle(
     base_url: str,
     product: str,
     cycle_path_template: str,
-    reference_time,
+    reference_time: datetime | str | None,
     endfls_marker: str,
     *,
-    http_text=None,
+    http_text: Callable[[str], str] | None = None,
 ) -> tuple[str, str]:
     """Resolve a forecast cycle to its directory URL, gated on `endFls`.
 
@@ -367,7 +376,9 @@ def resolve_cycle(
     return cycle_url, dt.strftime("%Y%m%dT%H")
 
 
-def find_cycle_file(cycle_url: str, glob: str, *, http_text=None) -> str:
+def find_cycle_file(
+    cycle_url: str, glob: str, *, http_text: Callable[[str], str] | None = None
+) -> str:
     """Return the name of the file in `cycle_url` matching `glob`.
 
     Args:
@@ -562,7 +573,7 @@ def require_geographic_affine(
 
 def pixel_window(
     geo: tuple[float, float, float, float, float, float],
-    bbox,
+    bbox: Sequence[float],
     cols: int,
     rows: int,
 ) -> tuple[int, int, int, int] | None:
