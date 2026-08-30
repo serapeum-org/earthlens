@@ -7,6 +7,7 @@ distribution (issue #863).
 from __future__ import annotations
 
 import importlib
+import pathlib
 import shutil
 import sys
 import types
@@ -16,9 +17,11 @@ import pytest
 import yaml
 from typer.testing import CliRunner
 
+import earthlens.ecmwf._helpers as ecmwf_helpers
 import earthlens.ecmwf._hydrate as hydrate_mod
 import earthlens.ecmwf._seed as seed_mod
 import earthlens.ecmwf.cli as ecmwf_cli
+import earthlens.ecmwf.endpoints as ecmwf_endpoints
 import earthlens.ecmwf.endpoints as endpoints
 from earthlens.cli.adapter import list_backends, load_catalog
 from earthlens.cli.app import app
@@ -341,6 +344,37 @@ class TestDeepProber:
         ).to_netcdf(path)
         meta = ecmwf_cli._read_netcdf_var_meta(str(path))
         assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
+
+    def test_a_probe_survives_a_scratch_it_cannot_remove(self, monkeypatch, tmp_path):
+        """A read that worked must not be lost to a file the OS still holds."""
+        captured: dict = {}
+
+        def _fake_retrieve(client, dataset, request, target, endpoint):
+            pathlib.Path(target).write_bytes(b"probe")
+            captured["target"] = pathlib.Path(target)
+
+        monkeypatch.setattr(ecmwf_helpers, "_retrieve_with_retry", _fake_retrieve)
+        monkeypatch.setattr(ecmwf_endpoints, "open_client", lambda endpoint: object())
+        monkeypatch.setattr(
+            ecmwf_cli, "_read_netcdf_var_meta", lambda path: {"x": {"units": "K"}}
+        )
+        monkeypatch.setenv("EARTHLENS_CACHE_DIR", str(tmp_path))
+        holder: list = []
+        real_read = ecmwf_cli._read_netcdf_var_meta
+
+        def _leak(path):
+            holder.append(open(path, "rb"))
+            return real_read(path)
+
+        monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", _leak)
+        try:
+            result = ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
+        finally:
+            for handle in holder:
+                handle.close()
+        assert result == {"x": {"units": "K"}}, (
+            "a scratch directory that could not be removed discarded the read"
+        )
 
     def test_read_netcdf_var_meta_prefers_pyramids(self, monkeypatch, tmp_path):
         """pyramids owns NetCDF reading, so its answer is the one used."""

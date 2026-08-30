@@ -418,8 +418,18 @@ def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str
     # under EARTHLENS_CACHE_DIR when set - a data volume, not the system disk -
     # and through TemporaryDirectory so each is removed once it has been read
     # rather than accumulating until something runs out of space.
+    #
+    # Cleanup errors are ignored deliberately. On Windows a reader that has not
+    # yet released the file makes removing the directory raise, and that raise
+    # would otherwise discard a retrieve and a read that both succeeded - and
+    # arrive as a PermissionError, the same class the store raises for an
+    # unaccepted licence, which is a wrong answer to an operator asking why a
+    # dataset failed. A file left behind costs disk; a lost result costs the
+    # row and sends the operator after the wrong cause.
     scratch_root = os.environ.get("EARTHLENS_CACHE_DIR") or None
-    with tempfile.TemporaryDirectory(dir=scratch_root) as scratch:
+    with tempfile.TemporaryDirectory(
+        dir=scratch_root, ignore_cleanup_errors=True
+    ) as scratch:
         target = Path(scratch) / "probe.nc"
         endpoint = _endpoint_for(dataset)
         client = open_client(endpoint)
