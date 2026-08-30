@@ -264,11 +264,21 @@ def _read_via_pyramids(path: str) -> dict[str, dict[str, Any]]:
 
     container = NetCDF.read_file(path)
     schema: dict[str, dict[str, Any]] = {}
-    for name in container.variable_names or []:
-        variable = _exposed_variable(container, name)
-        meta = _variable_meta(variable) if variable is not None else None
-        if meta is not None:
-            schema[str(name)] = meta
+    try:
+        for name in container.variable_names or []:
+            variable = _exposed_variable(container, name)
+            meta = _variable_meta(variable) if variable is not None else None
+            if meta is not None:
+                schema[str(name)] = meta
+    finally:
+        # Released before returning: the probe reads inside a temporary
+        # directory, and on Windows a still-open handle makes removing that
+        # directory fail — which surfaces as a PermissionError on the dataset,
+        # indistinguishable from a licence refusal, after the data has already
+        # been retrieved and read.
+        close = getattr(container, "close", None)
+        if callable(close):
+            close()
     return schema
 
 
