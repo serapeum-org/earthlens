@@ -676,12 +676,7 @@ class JRC(AbstractDataSource):
                 # latitude/longitude (serapeum-org/pyramids#1071), so the grid is
                 # read from the file rather than assumed from its shape.
                 geo = variable.geotransform
-                if geo[1] == 1.0 and geo[5] == -1.0:
-                    raise ValueError(
-                        f"{self._dataset.id!r} returned an index-space geotransform "
-                        f"{geo}; pyramids >= 0.58.1 is required to georeference the "
-                        "sea-level cubes."
-                    )
+                _helpers.require_geographic_affine(geo, cols, rows, self._dataset.id)
                 # Widen a point / cell-edge AOI to one pixel so an on-grid point
                 # yields a 1x1 window rather than being reported off-grid (matches
                 # the EFHM path).
@@ -711,7 +706,9 @@ class JRC(AbstractDataSource):
                 raw = variable.read_array(
                     window=[col_off, row_off, win_cols, win_rows], masked=True
                 )
-                array = np.ma.filled(raw, np.nan).astype("float32")
+                # Cast first: filling an integer array with NaN raises, and the
+                # cube's categorical fields (severity flags) are integer-stored.
+                array = np.ma.filled(np.ma.asarray(raw).astype("float32"), np.nan)
                 window_geo = _helpers.window_origin(geo, col_off, row_off)
                 # The cube's time axis becomes the output's band axis, so carry the
                 # valid times across or the bands are unidentifiable.

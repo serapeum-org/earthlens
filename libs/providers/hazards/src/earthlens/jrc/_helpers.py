@@ -416,6 +416,51 @@ def gdal_module():
     return gdal
 
 
+def require_geographic_affine(
+    geo: tuple[float, float, float, float, float, float],
+    cols: int,
+    rows: int,
+    dataset_id: str,
+) -> None:
+    """Reject an affine that is not a plausible north-up geographic grid.
+
+    pyramids >= 0.58.1 derives the affine from the cube's CF coordinates. If that
+    ever regresses — or a future row is not a lon/lat grid — the crop would place
+    the window at the wrong coordinates with no other symptom, so check the shape
+    of the transform rather than only its pixel sizes: degrees per pixel, a
+    north-up row order, and an extent that stays inside the lon/lat domain.
+
+    Args:
+        geo: The variable's 6-element geotransform.
+        cols: The variable's column count.
+        rows: The variable's row count.
+        dataset_id: The catalog id, for the message.
+
+    Raises:
+        ValueError: If the affine is index-space, south-up, or spans an extent
+            that cannot be longitude / latitude.
+    """
+    x0, dx, _, y0, _, dy = geo
+    if dx <= 0 or dy >= 0:
+        raise ValueError(
+            f"{dataset_id!r} returned a geotransform {geo} that is not north-up "
+            f"(pixel width {dx}, height {dy}); pyramids >= 0.58.1 is required to "
+            "georeference the sea-level cubes."
+        )
+    east, south = x0 + cols * dx, y0 + rows * dy
+    if not (-180.5 <= x0 <= 180.5 and -90.5 <= y0 <= 90.5):
+        raise ValueError(
+            f"{dataset_id!r} returned a geotransform {geo} whose origin is not a "
+            "lon/lat coordinate (an index-space affine looks like this); pyramids "
+            ">= 0.58.1 is required to georeference the sea-level cubes."
+        )
+    if not (-180.5 <= east <= 180.5 and -90.5 <= south <= 90.5):
+        raise ValueError(
+            f"{dataset_id!r} spans {x0}..{east} / {south}..{y0}, which is outside "
+            "the lon/lat domain; the grid is not the geographic one expected."
+        )
+
+
 def pixel_window(
     geo: tuple[float, float, float, float, float, float],
     bbox,

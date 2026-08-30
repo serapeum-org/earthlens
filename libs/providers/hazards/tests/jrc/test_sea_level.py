@@ -175,6 +175,17 @@ def _fake_read_file(_url, variable=None):
     return _FakeContainer(variable if variable is not None else _FakeVariable())
 
 
+class _FakeIntVariable(_FakeVariable):
+    """A categorical field stored as integers, as the severity flags are."""
+
+    def read_array(self, window, masked=False):
+        _, _, width, height = window
+        data = np.full((self._bands, height, width), 3, dtype="int16")
+        mask = np.zeros_like(data, dtype=bool)
+        mask[:, 0, 0] = True
+        return np.ma.masked_array(data, mask=mask)
+
+
 class _FakeMaskedVariable(_FakeVariable):
     """A variable whose window read masks one cell with a numeric fill value."""
 
@@ -577,6 +588,28 @@ class TestBandValidTimes:
         assert hasattr(_helpers.gdal_module(), "OpenEx")
 
 
+class TestGeographicAffineGuard:
+    """`require_geographic_affine` rejects an affine that is not a lon/lat grid."""
+
+    def test_cf_affine_is_accepted(self):
+        """The cubes' real CF affine passes."""
+        _helpers.require_geographic_affine(_GLOBAL_GEO, 1440, 720, "x")
+
+    @pytest.mark.parametrize(
+        ("name", "geo"),
+        [
+            ("flipped index space", (0.0, 1.0, 0.0, 720.0, 0.0, -1.0)),
+            ("gdal identity", (0.0, 1.0, 0.0, 0.0, 0.0, 1.0)),
+            ("south-up", (-180.0, 0.25, 0.0, -90.0, 0.0, 0.25)),
+            ("projected metres", (2_000_000.0, 1000.0, 0.0, 5_000_000.0, 0.0, -1000.0)),
+        ],
+    )
+    def test_non_geographic_affine_is_refused(self, name, geo):
+        """Index-space, south-up and projected affines are all rejected."""
+        with pytest.raises(ValueError):
+            _helpers.require_geographic_affine(geo, 1440, 720, "x")
+
+
 class TestIndexSpaceGuard:
     """An un-georeferenced variable is refused, naming the pyramids requirement."""
 
@@ -602,7 +635,7 @@ class TestIndexSpaceGuard:
             lon_lim=[3.0, 5.0],
             path=tmp_path,
         )
-        with pytest.raises(ValueError, match="index-space geotransform"):
+        with pytest.raises(ValueError, match="north-up|lon/lat"):
             backend.download()
 
 
@@ -1030,6 +1063,32 @@ class TestGriddedEdges:
             "a staged .part file was left behind"
         )
         assert list(tmp_path.glob("*.tif")) == [], "a partial output was left behind"
+
+    def test_integer_field_is_cast_before_filling(self, tmp_path: Path, monkeypatch):
+        """An integer-stored field is cast to float before the NaN fill (H3)."""
+        row = Catalog().get("sea_level_medium_term")
+        http = _FakeHttp(
+            row.base_url,
+            row.product,
+            ("2026", "08", "26", "12"),
+            ["mediumTermTWLforecastGridded_x.nc"],
+        )
+        monkeypatch.setattr(_helpers, "_http_text", http)
+        monkeypatch.setattr(
+            "pyramids.netcdf.NetCDF.read_file",
+            lambda _url: _FakeContainer(_FakeIntVariable()),
+        )
+        backend = JRC(
+            dataset="sea_level",
+            product="medium_term",
+            lat_lim=[51.0, 53.0],
+            lon_lim=[3.0, 5.0],
+            path=tmp_path,
+        )
+        written = PyramidsDataset.read_file(str(backend.download()[0]))
+        band0 = np.asarray(written.read_array())[0]
+        assert np.isnan(band0).any(), "the masked cell must become NaN"
+        assert (band0[np.isfinite(band0)] == 3).all(), "values must survive the cast"
 
     def test_masked_fill_becomes_nan(self, tmp_path: Path, monkeypatch):
         """A masked source cell is written as NaN, not the numeric fill value."""
