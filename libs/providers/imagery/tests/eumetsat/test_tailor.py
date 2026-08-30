@@ -82,6 +82,25 @@ def test_tailorconfig_crs_none_is_allowed():
     assert TailorConfig(format="msgnative", crs=None).crs is None
 
 
+@pytest.mark.parametrize("field", ["format", "crs"])
+def test_tailorconfig_strips_surrounding_whitespace(field):
+    """Padding is stripped off format and crs alike."""
+    cfg = TailorConfig(**{field: "  geographic  " if field == "crs" else "  geotiff  "})
+    expected = "geographic" if field == "crs" else "geotiff"
+    got = getattr(cfg, field)
+    assert got == expected, f"{field} should be stripped to {expected!r}, got {got!r}"
+
+
+def test_tailorconfig_rejects_none_format():
+    """Only crs may be None; format stays a required string."""
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError) as exc_info:
+        TailorConfig(format=None)
+    kinds = [e["type"] for e in exc_info.value.errors()]
+    assert "string_type" in kinds, f"expected a string_type error, got {kinds}"
+
+
 def test_nswe_from_extent_orders_bounds():
     """nswe_from_extent returns bounds in [N, S, W, E] order."""
     assert TailorConfig.nswe_from_extent(52, 48, 4, 8) == [52, 48, 4, 8]

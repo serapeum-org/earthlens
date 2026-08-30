@@ -73,14 +73,35 @@ class TailorConfig(BaseModel):
             True
 
             ```
-        - A native-format subset, which must not be reprojected:
+        - A native-format subset, which must not be reprojected — `crs=None`
+          keeps `projection` off the chain, while the default still reprojects:
             ```python
             >>> from earthlens.eumetsat import TailorConfig
             >>> cfg = TailorConfig(format="msgnative", crs=None)
-            >>> cfg.crs is None
-            True
+            >>> cfg.format
+            'msgnative'
+            >>> print(cfg.crs)
+            None
+            >>> TailorConfig().crs
+            'geographic'
 
             ```
+        - A blank `crs` is a mistake rather than a request for no
+          reprojection, so it is rejected:
+            ```python
+            >>> from pydantic import ValidationError
+            >>> from earthlens.eumetsat import TailorConfig
+            >>> try:
+            ...     TailorConfig(crs="  ")
+            ... except ValidationError as err:
+            ...     print(err.errors()[0]["msg"])
+            Value error, must be a non-empty string
+
+            ```
+
+    See Also:
+        earthlens.eumetsat.backend.EUMETSAT.download: Consumes this via its
+            `tailor=` argument and builds the Data Tailor chain from it.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")

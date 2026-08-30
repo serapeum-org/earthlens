@@ -512,6 +512,10 @@ class EUMETSAT(AbstractDataSource):
         every output to `self.root_dir`, and deletes the customisation in
         a `finally` — even on failure — so quota is always freed.
 
+        A `tailor.crs` of `None` means "do not reproject": `projection` is
+        left off the chain altogether rather than sent as null, which is
+        what the native output formats require.
+
         Args:
             product: One `RemoteProduct` from `_search` (its `metadata`
                 carries the raw `eumdac` product handle and catalog row).
