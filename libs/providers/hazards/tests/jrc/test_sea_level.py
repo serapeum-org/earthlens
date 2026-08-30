@@ -368,10 +368,11 @@ class TestAffineHelpers:
     def test_affine_maps_corners_to_real_world_degrees(self):
         """A 0.25 deg global grid's affine spans exactly the lon/lat domain."""
         cols, rows = 1440, 720
-        # Derived from the grid definition, not copied from the code under test.
-        expected = (-180.0, 360.0 / cols, 90.0, -180.0 / rows)
         x0, dx, y0, dy = _GLOBAL_GEO[0], _GLOBAL_GEO[1], _GLOBAL_GEO[3], _GLOBAL_GEO[5]
-        assert (x0, dx, y0, dy) == expected, (
+        corner_affine = (x0, dx, y0, dy)
+        # The expectation is derived from the grid definition, not copied from
+        # the code under test.
+        assert corner_affine == (-180.0, 360.0 / cols, 90.0, -180.0 / rows), (
             "the shipped constant no longer matches a 0.25 deg global grid"
         )
         assert (x0, y0) == (-180.0, 90.0), "grid must start at the NW corner"
@@ -391,7 +392,8 @@ class TestAffineHelpers:
         """A window's origin is the NW corner of the requested box, in degrees."""
         col_off, row_off, _, _ = _helpers.pixel_window(_GLOBAL_GEO, bbox, 1440, 720)
         origin = _helpers.window_origin(_GLOBAL_GEO, col_off, row_off)
-        assert (origin[0], origin[3]) == pytest.approx(expected_origin), (
+        nw_corner = (origin[0], origin[3])
+        assert nw_corner == pytest.approx(expected_origin), (
             f"window origin {origin[:4]} should be the NW corner {expected_origin}"
         )
 
