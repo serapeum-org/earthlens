@@ -1745,10 +1745,19 @@ class _FakePolygonAoi:
         self.total_bounds = total_bounds
         self.crs = _FakeCrs(epsg) if epsg is not None else None
         self.reprojected_to = None
+        self.assumed_crs = None
+
+    def set_crs(self, crs):
+        out = _FakePolygonAoi(epsg=4326, total_bounds=self.total_bounds)
+        out.assumed_crs = crs
+        return out
 
     def to_crs(self, crs):
+        # A real reprojection moves the coordinates, so the result carries the
+        # fake's default lat/lon bounds rather than the source's.
         out = _FakePolygonAoi(epsg=4326)
         out.reprojected_to = crs
+        out.assumed_crs = self.assumed_crs
         return out
 
 
@@ -1978,6 +1987,16 @@ class TestEedaiCollections:
         assert not plan.can_serve
         assert "found none or failed" in plan.reason
 
+    def test_collection_without_native_resolution_declines(self, make_gee, fake_reader):
+        """A collection whose catalog row has no resolution cannot be sized."""
+        gee = self._collection_gee(make_gee)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY").model_copy(
+            update={"spatial_resolution": None}
+        )
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert not plan.can_serve
+        assert "no native resolution" in plan.reason
+
     def test_missing_bucket_window_declines(self, make_gee, fake_reader):
         """A collection verdict without a date window cannot size the read."""
         gee = self._collection_gee(make_gee)
@@ -2060,6 +2079,63 @@ class TestEedaiProjectedCrs:
         gee = make_gee()
         bbox, _cutline = gee._eedai_window()
         assert bbox == (31.2, 29.9, 31.3, 30.0)
+
+    def test_crsless_region_is_assumed_latlon_then_reprojected(self, make_gee):
+        """A region with no CRS is taken as lat/lon, then reprojected to the target."""
+        region = _FakePolygonAoi(epsg=None)
+        gee = make_gee(crs="EPSG:32636", region=region)
+        out = gee._region_in_output_crs(region)
+        assert out.assumed_crs == "EPSG:4326", (
+            "the CRS-less region was not assumed 4326"
+        )
+        assert out.reprojected_to == "EPSG:32636", (
+            "it was not reprojected to the target"
+        )
+
+    def test_crsless_region_passes_through_under_4326(self, make_gee):
+        """Under EPSG:4326 a CRS-less region needs no reprojection at all."""
+        region = _FakePolygonAoi(epsg=None)
+        gee = make_gee(region=region)
+        assert gee._region_in_output_crs(region) is region
+
+    def test_region_without_set_crs_is_reprojected_directly(self, make_gee):
+        """An AOI object lacking `set_crs` still reaches `to_crs` rather than failing."""
+
+        class _MinimalAoi:
+            """An AOI exposing only what the reprojection strictly needs."""
+
+            crs = None
+            total_bounds = (31.2, 29.9, 31.3, 30.0)
+
+            def __init__(self):
+                self.reprojected_to = None
+
+            def to_crs(self, crs):
+                out = _MinimalAoi()
+                out.reprojected_to = crs
+                return out
+
+        gee = make_gee(crs="EPSG:32636")
+        assert gee._region_in_output_crs(_MinimalAoi()).reprojected_to == "EPSG:32636"
+
+    def test_region_reprojects_when_the_target_has_no_epsg_code(self, make_gee):
+        """A target CRS with no `AUTH:CODE` form cannot be EPSG-matched, so it warps."""
+        region = _FakePolygonAoi(epsg=4326)
+        gee = make_gee(region=region)
+        gee.crs = "+proj=utm +zone=36 +datum=WGS84"
+        assert gee._region_in_output_crs(region).reprojected_to == gee.crs
+
+    def test_region_already_in_the_target_crs_is_not_reprojected(self, make_gee):
+        """A region whose EPSG already matches the target is passed through."""
+        region = _FakePolygonAoi(epsg=32636)
+        gee = make_gee(crs="EPSG:32636", region=region)
+        assert gee._region_in_output_crs(region) is region
+
+    def test_region_in_another_crs_is_reprojected(self, make_gee):
+        """A region in a different EPSG is reprojected to the output CRS."""
+        region = _FakePolygonAoi(epsg=3857)
+        gee = make_gee(crs="EPSG:32636", region=region)
+        assert gee._region_in_output_crs(region).reprojected_to == "EPSG:32636"
 
     def test_projected_read_hands_the_reader_a_projected_window(
         self, make_gee, fake_reader

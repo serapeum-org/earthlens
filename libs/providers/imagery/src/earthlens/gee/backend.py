@@ -1652,6 +1652,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
             var_info: The catalog entry for the dataset being fetched.
             band_count: How many bands the read asks for; the reader holds
                 them all, so they divide the per-tile budget.
+            bucket_start: Inclusive start of the bucket's date window, needed
+                to size an `image_collection` read (the reader composites the
+                scenes it selects). `None` for a single-image read.
+            bucket_end: Exclusive end of that window.
 
         Returns:
             `(use_reader, plan)`. The plan is built here — after the
@@ -2038,9 +2042,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
             bands: Band ids to read.
             scale: Output pixel size in metres.
             prefix: Output filename stem (no extension).
-            plan: The :class:`EedaiPlan` verdict from :meth:`_eedai_plan`,
+            plan: The :class:`EedaiPlan` verdict from :meth:`_eedai_verdict`,
                 computed once by the caller so the routing decision and the
                 read it performs cannot disagree.
+            bucket_start: Inclusive start of the bucket's date window. Required
+                for an `image_collection`, whose scenes the reader composites;
+                ignored for a single image.
+            bucket_end: Exclusive end of that window.
 
         Returns:
             The :class:`pathlib.Path` of the written GeoTIFF.
