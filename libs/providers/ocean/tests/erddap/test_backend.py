@@ -28,7 +28,7 @@ def _table_backend(tmp_path: Path, variables=None) -> ERDDAP:
         lat_lim=[36.0, 37.0],
         lon_lim=[-123.0, -122.0],
         dataset=TABLEDAP_ID,
-        variables=variables or ["station", "time", "wtmp"],
+        variables=variables or ["station", "time", "WTMP"],
         path=str(tmp_path),
     )
 
@@ -102,7 +102,7 @@ class TestConstructionAndOutputKind:
                 lat_lim=[0.0, 1.0],
                 lon_lim=[0.0, 1.0],
                 dataset=TABLEDAP_ID,
-                variables={TABLEDAP_ID: ["wtmp"]},
+                variables={TABLEDAP_ID: ["WTMP"]},
                 path=str(tmp_path),
             )
 
@@ -124,7 +124,7 @@ class TestTabledap:
 
     def test_download_returns_dataframe(self, tmp_path, fake_erddapy):
         """download() returns the frame and wires the erddapy request."""
-        fake_erddapy.frame = pd.DataFrame({"station": ["46042"], "wtmp": [12.3]})
+        fake_erddapy.frame = pd.DataFrame({"station": ["46042"], "WTMP": [12.3]})
         backend = _table_backend(tmp_path)
         result = backend.download()
 
@@ -134,20 +134,20 @@ class TestTabledap:
         assert client.server.endswith("/erddap")
         assert client.protocol == "tabledap"
         assert client.dataset_id == TABLEDAP_ID
-        assert client.variables == ["station", "time", "wtmp"]
+        assert client.variables == ["station", "time", "WTMP"]
         assert client.constraints == build_constraints(
             backend.space, backend.time, "tabledap"
         )
 
     def test_download_writes_csv(self, tmp_path, fake_erddapy):
         """The frame is also written to disk as CSV."""
-        fake_erddapy.frame = pd.DataFrame({"station": ["46042"], "wtmp": [12.3]})
+        fake_erddapy.frame = pd.DataFrame({"station": ["46042"], "WTMP": [12.3]})
         _table_backend(tmp_path).download()
         assert (tmp_path / f"{TABLEDAP_ID}.csv").is_file()
 
     def test_download_writes_parquet(self, tmp_path, fake_erddapy, monkeypatch):
         """output_format='parquet' writes a .parquet file."""
-        fake_erddapy.frame = pd.DataFrame({"station": ["46042"], "wtmp": [12.3]})
+        fake_erddapy.frame = pd.DataFrame({"station": ["46042"], "WTMP": [12.3]})
         written: dict = {}
         monkeypatch.setattr(
             pd.DataFrame,
@@ -171,11 +171,11 @@ class TestTabledap:
         fake_erddapy.error = requests.exceptions.HTTPError(
             "Error 404: Your query produced no matching results."
         )
-        backend = _table_backend(tmp_path, variables=["time", "wtmp"])
+        backend = _table_backend(tmp_path, variables=["time", "WTMP"])
         # The warning echoes the bbox so a typo'd extent is debuggable.
         with pytest.warns(UserWarning, match=r"matched no rows over bbox \[-123.0"):
             result = backend.download()
-        assert list(result.columns) == ["time", "wtmp"]
+        assert list(result.columns) == ["time", "WTMP"]
         assert len(result) == 0
 
     def test_other_http_error_propagates(self, tmp_path, fake_erddapy):

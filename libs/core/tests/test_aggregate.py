@@ -1834,9 +1834,25 @@ def _handles_on(path):
     psutil reports one entry per path, not per handle, so a second handle on a
     path already open would not show up in a difference — which is precisely
     the leak a release check exists to catch.
+
+    Skips when the enumeration itself is unavailable. On Windows psutil raises
+    `RuntimeError: SystemExtendedHandleInformation buffer too big` once the
+    machine holds enough handles system-wide, which says nothing about whether
+    the aggregator released its own. Failing there would report a defect in
+    code the check never got far enough to observe.
     """
+    try:
+        open_files = psutil.Process().open_files()
+    except (RuntimeError, psutil.Error) as err:
+        # Narrow to the one documented failure. A blanket catch would turn any
+        # psutil problem into a silent pass, which is the shape of bug this
+        # check exists to catch - an AccessDenied, say, should surface rather
+        # than quietly disarm the release assertion.
+        if "SystemExtendedHandleInformation" not in str(err):
+            raise
+        pytest.skip(f"psutil cannot enumerate this process's open files: {err}")
     found = []
-    for handle in psutil.Process().open_files():
+    for handle in open_files:
         try:
             if os.path.samefile(handle.path, path):
                 found.append(handle.path)

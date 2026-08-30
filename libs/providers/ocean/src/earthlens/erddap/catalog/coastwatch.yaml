@@ -21,14 +21,18 @@ datasets:
     title: Chlorophyll-a, Aqua MODIS, NPP, Global, 4km, 8-day composite (2003-2022, historical)
     license_note: NASA OBPG / NOAA CoastWatch, U.S. Government public domain
 
-  nceiPH53sstd1day:
+  erdPH53sstd8day:
     server_url: https://coastwatch.pfeg.noaa.gov/erddap
-    dataset_id: nceiPH53sstd1day
+    dataset_id: erdPH53sstd8day
     protocol: griddap
     dim_names: [time, latitude, longitude]
     variables:
       - sea_surface_temperature
-    title: AVHRR Pathfinder Version 5.3 L3-Collated SST, daytime, daily
+    # Historical record: CoastWatch retired the `nceiPH53*` ids in favour of
+    # `erdPH53*`, and dropped the daily cadence entirely - only 8-day and
+    # monthly composites remain. This one covers 1981-08 to 2023-06; a
+    # later-date request returns a clear out-of-coverage ValueError.
+    title: SST, AVHRR Pathfinder Ver 5.3 (L3C), daytime, global, 0.0417 deg, 8-day composite (1981-2023, historical)
     license_note: NOAA NCEI AVHRR Pathfinder, U.S. Government public domain
 
   cwwcNDBCMet:
@@ -38,6 +42,6 @@ datasets:
     variables:
       - station
       - time
-      - wtmp
+      - WTMP
     title: NDBC Standard Meteorological Buoy Data
     license_note: NOAA NDBC, U.S. Government public domain
