@@ -115,21 +115,23 @@ def http_bytes(url: str) -> bytes:
     return bytes(_client().get(url).content)
 
 
-def list_directory(url: str, *, http_text=_http_text) -> list[str]:
+def list_directory(url: str, *, http_text=None) -> list[str]:
     """List the entries of a jeodpp autoindex directory.
 
     Args:
         url: The directory URL (a trailing slash is added when missing).
-        http_text: Injectable text fetcher (tests pass a fake).
+        http_text: Injectable text fetcher; resolved at call time (never as a
+            default) so replacing the module-level `_http_text` takes effect.
 
     Returns:
         list[str]: Entry names — subdirectories keep their trailing `/`; the
             parent link and the column-sort query links are dropped.
     """
+    fetch = http_text if http_text is not None else _http_text
     if not url.endswith("/"):
         url += "/"
     names: list[str] = []
-    for href in _HREF.findall(http_text(url)):
+    for href in _HREF.findall(fetch(url)):
         href = href.strip()
         if not href or href.startswith(("?", "/", "..")):
             continue
@@ -270,7 +272,7 @@ def resolve_cycle(
     reference_time,
     endfls_marker: str,
     *,
-    http_text=_http_text,
+    http_text=None,
 ) -> tuple[str, str]:
     """Resolve a forecast cycle to its directory URL, gated on `endFls`.
 
@@ -292,6 +294,7 @@ def resolve_cycle(
         ValueError: If no complete cycle is found, or a requested one is
             missing / not yet complete.
     """
+    http_text = http_text if http_text is not None else _http_text
     root = f"{base_url.rstrip('/')}/{product}"
     if _is_latest(reference_time):
         budget = [MAX_CYCLE_PROBES]
@@ -327,7 +330,7 @@ def resolve_cycle(
     return cycle_url, dt.strftime("%Y%m%dT%H")
 
 
-def find_cycle_file(cycle_url: str, glob: str, *, http_text=_http_text) -> str:
+def find_cycle_file(cycle_url: str, glob: str, *, http_text=None) -> str:
     """Return the name of the file in `cycle_url` matching `glob`.
 
     Args:
@@ -342,6 +345,7 @@ def find_cycle_file(cycle_url: str, glob: str, *, http_text=_http_text) -> str:
         ValueError: If no file matches (the filename embeds a start-end range,
             so it is read from the listing rather than reconstructed).
     """
+    http_text = http_text if http_text is not None else _http_text
     for name in list_directory(cycle_url, http_text=http_text):
         if not name.endswith("/") and fnmatch.fnmatchcase(name, glob):
             return name
