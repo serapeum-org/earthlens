@@ -816,10 +816,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # `ee.Authenticate()` falls back to application-default credentials,
             # and an ADC file is an `authorized_user` JSON - a credential shape
             # with no PEM armour whose `client_secret` and `refresh_token` would
-            # otherwise reach the log verbatim. No key is passed on this branch,
-            # so there is no value to substitute; `_redact` still collapses the
-            # message on a credential marker. Classify on the raw text, report
-            # the redacted one, and break the chain so the cause cannot print.
+            # otherwise reach the log verbatim. Usually nothing was resolved to
+            # substitute here - this branch is taken when the service-account
+            # pair is incomplete - so it is `_redact`'s marker check that does
+            # the work; a key resolved without an account email does land here,
+            # so whatever was resolved is still handed over. Classify on the raw
+            # text, report the redacted one, and break the chain so the cause
+            # cannot print.
             raw = str(exc)
             message = _redact(raw, service_key or "")
             if "not registered to use Earth Engine" in raw:

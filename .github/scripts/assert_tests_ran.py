@@ -27,11 +27,13 @@ Usage:
     python .github/scripts/assert_tests_ran.py <report.xml> <lane-name>
 
 Exits 0 when every backend in the report executed at least one test (passed,
-failed, or errored), and when the report is missing, truncated, or holds no
-tests at all - "collected nothing" is the exit-5 case, which the caller has
-already decided about. Exits 1 when the lane executed nothing, or when one
-backend inside an otherwise-passing lane contributed only skips without being
-listed in `_EXPECTED_EMPTY`. Exits 2 on a bad command line.
+failed, or errored); when every backend the report names is listed in
+`_EXPECTED_EMPTY`, so a lane devoted to a declared-empty backend is not failed
+for being empty; and when the report is missing, truncated, or holds no tests
+at all - "collected nothing" is the exit-5 case, which the caller has already
+decided about. Exits 1 when a backend not listed in `_EXPECTED_EMPTY`
+contributed only skips, whether it sat beside passing neighbours or the whole
+lane was skipped. Exits 2 on a bad command line.
 """
 
 from __future__ import annotations
@@ -79,7 +81,9 @@ def _backend(classname: str) -> str:
     anything before the module segment is the directory.
 
     Args:
-        classname: The `classname` attribute of a `<testcase>` element.
+        classname: A `<testcase>` element's `classname`, or its `name` when
+            `classname` is empty - a collection-level skip carries the same
+            dotted module path there instead.
 
     Returns:
         str: The backend directory name, or `""` when the test has none.
@@ -182,9 +186,12 @@ def main(argv: list[str]) -> int:
 
     Returns:
         int: 0 when every backend the lane collected executed at least one
-            test, and when the report is missing, truncated, or empty; 1 when
-            the lane executed nothing or one of its backends contributed only
-            skips; 2 when `argv` is not the two expected arguments.
+            test, when every backend the report names is a declared
+            `_EXPECTED_EMPTY` exemption, and when the report is missing,
+            truncated, or empty; 1 when a backend outside `_EXPECTED_EMPTY`
+            contributed only skips, whether it sat beside passing neighbours
+            or the whole lane was skipped; 2 when `argv` is not the two
+            expected arguments.
     """
     if len(argv) != 2:
         print(f"usage: {Path(__file__).name} <report.xml> <lane-name>", file=sys.stderr)
@@ -220,6 +227,10 @@ def main(argv: list[str]) -> int:
         try:
             per_backend = _per_backend(report)
         except ET.ParseError:
+            # The report is re-read here, so a file still being written can
+            # fail this parse even though the first one succeeded. Same
+            # verdict as there: the caller's exit code carries the real
+            # failure, and the lane did execute tests.
             return 0
         dead = sorted(
             name

@@ -151,7 +151,8 @@ def _is_inline_json(service_key: str) -> bool:
 _CREDENTIAL_KEY_RE = re.compile(
     r"""['"](?:private_key|client_secret|refresh_token|client_email)['"]\s*:"""
 )
-#: PEM armour, which carries no quoting at all.
+#: The distinctive fragment of PEM armour, which carries no quoting at all and
+#: is therefore invisible to the mapping-key pattern above.
 _PEM_MARKER = "PRIVATE KEY"
 
 
@@ -168,7 +169,9 @@ def _redact(message: str, service_key: str) -> str:
     redacting it made the commonest failure of all - a key file that is not
     where it was said to be - report `No such file or directory: '<service key
     redacted>'`, naming nothing the reader can act on. Both workflows pass a
-    path, so that was the usual case.
+    path, so that was the usual case. Nor is a value of eight characters or
+    fewer substituted: no key is that short, and blanking such a needle would
+    corrupt incidental text without hiding anything.
 
     Substring replacement alone is not enough either, and assuming it was is
     what let a key reach a log in the first place. `OSError.__str__` reprs the
@@ -176,15 +179,20 @@ def _redact(message: str, service_key: str) -> str:
     longer byte-identical to the value held - the same mismatch that defeated
     the platform's own secret masking. The escaped form is replaced too, and
     any residual credential marker collapses the message rather than trusting
-    that the substitutions caught everything.
+    that the substitutions caught everything. The markers are `_PEM_MARKER`
+    for armoured key material and `_CREDENTIAL_KEY_RE` for a quoted credential
+    field name, and they are checked whatever `service_key` holds — which is
+    what protects the paths that pass no key at all.
 
     Args:
         message: The text about to be surfaced.
-        service_key: The key path or JSON content to strip.
+        service_key: The key path or JSON content to strip; `""` when the
+            caller holds no key, leaving only the marker check.
 
     Returns:
         str: The message with credential material replaced, or
-            `"<service key redacted>"` alone when a marker survived.
+            `"<service key redacted>"` alone when `_PEM_MARKER` or
+            `_CREDENTIAL_KEY_RE` still matches what is left.
     """
     cleaned = message
     if _is_inline_json(service_key) and len(service_key) > 8:
@@ -394,10 +402,15 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
                 resolved, the credentials could not be built from the key,
                 the project is not registered for Earth Engine, the service
                 account lacks permission on it, or `ee.Initialize` failed for
-                any other reason. Nothing is chained (`raise ... from None`)
-                and every interpolated detail passes through `_redact`,
-                because an `ee` error can carry the key itself and a chained
-                traceback would print it.
+                any other reason. Which of those an `ee.EEException` is gets
+                decided by matching its raw text, whose needles are fixed
+                substrings holding no key material, while only the
+                `_redact`-ed text is interpolated into what is raised — so a
+                message `_redact` collapsed to the sentinel still reaches the
+                branch that names the unregistered project or the missing IAM
+                role, instead of degrading to the catch-all. Nothing is
+                chained (`raise ... from None`), because an `ee` error can
+                carry the key itself and a chained traceback would print it.
 
         Examples:
             - Initialise from a key file (requires network + a registered project):

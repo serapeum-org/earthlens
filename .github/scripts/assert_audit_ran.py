@@ -10,10 +10,14 @@ masked-lane guard exists to prevent.
 Usage:
     python .github/scripts/assert_audit_ran.py <audit.json>
 
-Exits 0 when no provider errored, and when no report was written at all - the
-caller's own exit code already carries that case. Exits 1 when a provider
-reported `status="error"`, or when the report is not valid JSON. Exits 2 on a
-bad command line.
+Exits 0 when no provider errored; when every error reads as a transient reach
+failure, which is printed as a warning instead, because a gate fanning out
+over this many live services would otherwise go red whenever one of them is
+briefly slow; and when no report was written at all - the caller's own exit
+code already carries that case. Exits 1 when a provider reported
+`status="error"` for any other reason, or when the report is not valid JSON or
+not the list of provider records the audit emits. Exits 2 on a bad command
+line.
 """
 
 from __future__ import annotations
@@ -41,30 +45,41 @@ _TRANSIENT_MARKERS = (
 def _looks_transient(detail: str) -> bool:
     """Whether a provider's failure detail reads as a transient reach failure.
 
+    A case-insensitive substring match against `_TRANSIENT_MARKERS`. A row
+    that carries no detail at all matches nothing and so counts as a hard
+    error - an unexplained failure is not something to warn about and move on
+    from.
+
     Args:
         detail: The `detail` field of an audit row.
 
     Returns:
-        bool: True when the text matches a known transient marker.
+        bool: True when the text contains a known transient marker.
     """
     lowered = detail.lower()
     return any(marker in lowered for marker in _TRANSIENT_MARKERS)
 
 
 def main(argv: list[str]) -> int:
-    """Report any provider whose audit errored.
+    """Report any provider whose audit errored, failing on the hard ones.
+
+    Every errored provider is printed. A provider whose detail reads as a
+    transient reach failure is printed as a warning and does not change the
+    exit code; anything else is an error that fails the gate, because drift
+    went unverified for a reason that will not fix itself.
 
     Args:
         argv: Command-line arguments after the program name: the path to the
             JSON emitted by `datasets audit --json`.
 
     Returns:
-        int: 0 when no provider reported `status="error"` — providers with
-            `status="unsupported"` have no prober and are only counted — and
-            when no report was written, which the caller's own exit code
-            already covers; 1 when at least one provider errored or the
-            report is not valid JSON; 2 when `argv` is not the single
-            expected argument.
+        int: 0 when no provider reported `status="error"`, when every such
+            error looks transient - providers with `status="unsupported"`
+            have no prober and are only counted - and when no report was
+            written, which the caller's own exit code already covers; 1 when
+            a provider errored for a non-transient reason, or the report is
+            not valid JSON or not a list of provider records; 2 when `argv`
+            is not the single expected argument.
     """
     if len(argv) != 1:
         print(f"usage: {Path(__file__).name} <audit.json>", file=sys.stderr)
