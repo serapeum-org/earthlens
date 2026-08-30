@@ -462,6 +462,85 @@ class TestGridVerification:
         )
 
 
+class TestNetworkSeams:
+    """The byte fetch, the non-404 re-raise and the budget entry guard."""
+
+    def test_http_bytes_returns_raw_body(self, monkeypatch):
+        """`http_bytes` hands back undecoded bytes for the CSV parser."""
+
+        class _Resp:
+            content = ("GID_0\nAland\n").encode("utf-8")
+
+        class _Client:
+            def get(self, url, **kwargs):
+                return _Resp()
+
+        monkeypatch.setattr(_helpers, "_client", lambda: _Client())
+        body = _helpers.http_bytes("https://x/f.csv").decode("utf-8")
+        assert body == "GID_0\nAland\n"
+
+    def test_non_404_error_is_reraised(self):
+        """A 5xx on a pinned cycle is a server fault, not an aged-out cycle."""
+        import requests
+
+        def _boom(url):
+            response = requests.Response()
+            response.status_code = 503
+            raise requests.HTTPError("503 Server Error", response=response)
+
+        with pytest.raises(requests.HTTPError):
+            _helpers.resolve_cycle(
+                "https://x/r",
+                "medium_term_forecasts",
+                "%Y/%m/%d/%H",
+                "2026-08-26T12",
+                "endFls",
+                http_text=_boom,
+            )
+
+    def test_exhausted_budget_stops_immediately(self):
+        """A walk entered with no budget left issues no request at all."""
+        calls = {"n": 0}
+
+        def _counting(url):
+            calls["n"] += 1
+            return ""
+
+        assert (
+            _helpers._descend_newest("https://x/", 4, "endFls", _counting, [0]) is None
+        )
+        assert calls["n"] == 0, "an exhausted budget must not issue a request"
+
+
+class TestWindowGuard:
+    """The gridded read refuses an AOI that would materialise too much (M9)."""
+
+    def test_oversized_window_is_refused(self, tmp_path: Path, monkeypatch):
+        """A window above the cell guard raises instead of allocating."""
+        row = Catalog().get("sea_level_medium_term")
+        http = _FakeHttp(
+            row.base_url,
+            row.product,
+            ("2026", "08", "26", "12"),
+            ["mediumTermTWLforecastGridded_x.nc"],
+        )
+        monkeypatch.setattr(_helpers, "_http_text", http)
+        monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", _fake_read_file)
+        monkeypatch.setattr(
+            _helpers, "verify_grid_against_coordinates", lambda *a, **k: None
+        )
+        backend = JRC(
+            dataset="sea_level",
+            product="medium_term",
+            lat_lim=[-90.0, 90.0],
+            lon_lim=[-180.0, 180.0],
+            path=tmp_path,
+        )
+        monkeypatch.setattr(type(backend), "MAX_WINDOW_CELLS", 100)
+        with pytest.raises(ValueError, match="cell guard"):
+            backend.download()
+
+
 class TestFacadeKeys:
     """The sea-level facade keys resolve to the right dataset and shape (M7)."""
 
@@ -675,6 +754,18 @@ class TestHelperEdges:
         assert expected in messages, (
             f"expected a warning naming {expected!r}: {messages}"
         )
+
+    def test_search_rejects_an_unhandled_kind(self):
+        """`_search` refuses a bad kind before doing any network work."""
+        backend = JRC(
+            dataset="sea_level",
+            product="medium_term",
+            lat_lim=[51.0, 53.0],
+            lon_lim=[3.0, 5.0],
+        )
+        backend._dataset = backend._dataset.model_copy(update={"kind": "mystery"})
+        with pytest.raises(ValueError, match="unhandled JRC dataset kind"):
+            backend._search()
 
     def test_fetch_rejects_an_unhandled_kind(self):
         """`_fetch` refuses a kind that slipped past construction."""
