@@ -1092,6 +1092,59 @@ class TestHelperEdges:
         with pytest.raises(ValueError, match="cycle id"):
             _helpers._cycle_id("https://x/r/2026/08/")
 
+    def test_http_bytes_uses_the_injected_fetch(self):
+        """The `fetch=` seam bypasses the shared client entirely."""
+        body = _helpers.http_bytes("https://x/f.csv", fetch=lambda url: b"GID_0")
+        assert body == b"GID_0", f"the injected fetch was not used: {body!r}"
+
+    def test_pruned_directory_is_skipped_mid_walk(self):
+        """A 404 from a directory pruned during the walk is skipped, not fatal."""
+        import requests
+
+        def _pruned(url):
+            depth = len([p for p in url.strip("/").split("/") if p.isdigit()])
+            if depth == 0:
+                return '<a href="2026/">2026/</a>'
+            response = requests.Response()
+            response.status_code = 404
+            raise requests.HTTPError("404", response=response)
+
+        with pytest.raises(ValueError, match="no complete cycle"):
+            _helpers.resolve_cycle(
+                "https://x/r",
+                "medium_term_forecasts",
+                "%Y/%m/%d/%H",
+                "latest",
+                "endFls",
+                http_text=_pruned,
+            )
+
+    def test_non_404_during_the_walk_is_reraised(self):
+        """A 5xx mid-walk is a server fault and must not be swallowed."""
+        import requests
+
+        def _boom(url):
+            depth = len([p for p in url.strip("/").split("/") if p.isdigit()])
+            if depth == 0:
+                return '<a href="2026/">2026/</a>'
+            response = requests.Response()
+            response.status_code = 503
+            raise requests.HTTPError("503", response=response)
+
+        with pytest.raises(requests.HTTPError):
+            _helpers.resolve_cycle(
+                "https://x/r",
+                "medium_term_forecasts",
+                "%Y/%m/%d/%H",
+                "latest",
+                "endFls",
+                http_text=_boom,
+            )
+
+    def test_unparseable_time_units_fall_back_to_the_default_epoch(self):
+        """An unrecognised date in the units falls back rather than raising."""
+        assert _helpers._parse_cf_epoch("days since not-a-date").year == 1950
+
     def test_ambiguous_glob_match_raises(self):
         """Two files matching one glob is a layout change, not a pick-the-first."""
         html = (
@@ -1109,6 +1162,18 @@ class TestHelperEdges:
         with pytest.raises(ValueError, match="outside the lon/lat domain"):
             _helpers.require_geographic_affine(
                 (-180.0, 0.25, 0.0, 0.0, 0.0, -0.25), 1440, 720, "x"
+            )
+
+    def test_field_name_is_sanitised_for_the_filename(self):
+        """A path-traversing field name cannot escape the output directory."""
+        assert _helpers._safe_name("../../etc/passwd") == ".._.._etc_passwd"
+        assert _helpers._safe_name("!!!") == "___"
+
+    def test_origin_outside_the_lonlat_domain_is_refused(self):
+        """An origin that is not a lon/lat coordinate at all is rejected."""
+        with pytest.raises(ValueError, match="origin is not a"):
+            _helpers.require_geographic_affine(
+                (-500.0, 0.25, 0.0, 90.0, 0.0, -0.25), 10, 10, "x"
             )
 
     def test_zero_to_360_longitude_is_named(self):
