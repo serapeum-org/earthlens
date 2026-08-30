@@ -4,9 +4,10 @@ The EFHM half serves one whole-Europe GeoTIFF per return period at a
 deterministic `{BASE_URL}/Europe_RP{rp}_filled_depth.tif`. The sea-level half
 walks the jeodpp autoindex (`YYYY/MM/DD/HH` cycle tree) to resolve a forecast
 cycle — gated on the 0-byte `endFls` sentinel — and reconstructs the global
-pixel window for a requested bbox. (The cubes' affine itself now comes from
-pyramids, which derives it from the CF `latitude` / `longitude` coordinates as of
-0.58.1 — serapeum-org/pyramids#1071.) All network access
+pixel window for a requested bbox. The cubes' affine comes from pyramids, which
+derives it from the CF `latitude` / `longitude` coordinates (>= 0.58.1,
+serapeum-org/pyramids#1071); `require_geographic_affine` sanity-checks it. All
+network access
 goes through the injectable `http_text` seam so tests can fake the autoindex.
 """
 
@@ -292,7 +293,9 @@ def resolve_cycle(
 
     Raises:
         ValueError: If no complete cycle is found, or a requested one is
-            missing / not yet complete.
+            missing / not yet complete (a 404 on a pinned cycle).
+        requests.HTTPError: If the server fails for any other reason (403, 429,
+            5xx) — those are not reported as a missing cycle.
     """
     http_text = http_text if http_text is not None else _http_text
     root = f"{base_url.rstrip('/')}/{product}"
@@ -302,7 +305,7 @@ def resolve_cycle(
         if found is None:
             raise ValueError(
                 f"no complete cycle (with {endfls_marker!r}) found under {root} "
-                f"within the newest {MAX_CYCLE_PROBES} cycle folders; the archive "
+                f"within a budget of {MAX_CYCLE_PROBES} directory listings; the archive "
                 "may be mid-publish or the sentinel may have been renamed."
             )
         return found
@@ -346,10 +349,21 @@ def find_cycle_file(cycle_url: str, glob: str, *, http_text=None) -> str:
             so it is read from the listing rather than reconstructed).
     """
     http_text = http_text if http_text is not None else _http_text
-    for name in list_directory(cycle_url, http_text=http_text):
-        if not name.endswith("/") and fnmatch.fnmatchcase(name, glob):
-            return name
-    raise ValueError(f"no file matching {glob!r} in {cycle_url}.")
+    matches = [
+        name
+        for name in list_directory(cycle_url, http_text=http_text)
+        if not name.endswith("/") and fnmatch.fnmatchcase(name, glob)
+    ]
+    if not matches:
+        raise ValueError(f"no file matching {glob!r} in {cycle_url}.")
+    if len(matches) > 1:
+        # A cycle should publish exactly one file per glob; more than one means
+        # the layout changed and picking the first would be a silent guess.
+        raise ValueError(
+            f"{len(matches)} files match {glob!r} in {cycle_url} ({matches}); "
+            "expected exactly one."
+        )
+    return matches[0]
 
 
 #: CF epoch of the cubes' `time` coordinate (`days since 1950-01-01`).

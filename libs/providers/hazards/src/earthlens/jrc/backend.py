@@ -101,7 +101,12 @@ class JRC(AbstractDataSource):
     #: forecast steps). A global AOI over a 47-step cube is ~0.5 GB in memory.
     MAX_WINDOW_CELLS: int = 60_000_000
 
-    AGGREGATE_REFUSAL_REASON = "the JRC hazard products are either static per-return-period depth grids or a single forecast cycle whose bands are lead times, not a calendar series to reduce over. Call download() without aggregate=, and reduce the written bands yourself if you need a summary"
+    AGGREGATE_REFUSAL_REASON = (
+        "the JRC hazard products are either static per-return-period depth grids "
+        "or a single forecast cycle whose bands are lead times, not a calendar "
+        "series to reduce over. Call download() without aggregate=, and reduce the "
+        "written bands yourself if you need a summary"
+    )
 
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
@@ -320,7 +325,7 @@ class JRC(AbstractDataSource):
         key = (dataset or "").strip().lower()
         if key in self._catalog.datasets and key != "sea_level":
             return key
-        if key in ("", "efhm", "flood", "jrc-flood"):
+        if key in ("", "flood", "jrc-flood"):
             return "efhm"
         if key == "sea_level":
             return self._resolve_sea_level_id(product, representation)
@@ -463,9 +468,12 @@ class JRC(AbstractDataSource):
         Raises:
             ValueError: If the AOI is outside coverage, or a requested cycle is
                 missing / not yet complete.
+            NotImplementedError: If a non-`None` `aggregate=` is passed (the
+                products carry no reducible calendar axis).
+            requests.HTTPError: If the JRC server fails while resolving a cycle.
         """
-        # `force` is threaded through rather than stashed on the instance so two
-        # concurrent download() calls cannot flip each other's caching behaviour.
+        # Stashed for the fetch helpers to read. One backend instance is one
+        # request, so this is not shared across concurrent downloads.
         self._force = force
         products = self._search()
         results = self._fetch(products)
@@ -688,7 +696,9 @@ class JRC(AbstractDataSource):
                         f"nothing to write for {self._field!r}."
                     )
                 col_off, row_off, win_cols, win_rows = window
-                steps_hint = getattr(variable, "band_count", 1) or 1
+                # A container-like variable reports band_count 0; fall back to the
+                # cube's own step count rather than silently treating it as 1.
+                steps_hint = getattr(variable, "band_count", None) or 1
                 cells = win_cols * win_rows * steps_hint
                 if cells > self.MAX_WINDOW_CELLS:
                     raise ValueError(
@@ -737,8 +747,14 @@ class JRC(AbstractDataSource):
             )
             staged = target.with_name(f"{target.stem}.part{target.suffix}")
             try:
-                if len(band_names) == getattr(cropped, "band_count", 0):
+                written_bands = getattr(cropped, "band_count", 0)
+                if len(band_names) == written_bands:
                     cropped.band_names = band_names
+                else:
+                    logger.warning(
+                        f"JRC {self._dataset.id}: {len(band_names)} band labels for "
+                        f"{written_bands} written bands; leaving them unnamed."
+                    )
                 cropped.to_file(str(staged))
                 close_quietly(cropped)
                 staged.replace(target)

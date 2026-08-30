@@ -1,7 +1,8 @@
 """Catalog loader for the JRC hazard backend (EFHM + sea-level forecasts).
 
-The JRC datasets form one small, single-family enumeration, so the catalog is
-one `jrc_data_catalog.yaml` at the package root: the EFHM return-period raster
+The JRC datasets are few enough to live in one `jrc_data_catalog.yaml` at the
+package root (rather than a sharded `catalog/` directory), even though they span
+three access kinds: the EFHM return-period raster
 row plus the three sea-level TWL forecast rows, each tagged with the `kind` the
 backend dispatches on, and the shared CC-BY-4.0 licence / attribution. It loads
 through the shared strict YAML loader and the `(path, mtime)` parse cache, and

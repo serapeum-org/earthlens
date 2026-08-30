@@ -371,9 +371,16 @@ class TestAffineHelpers:
     """`pixel_window` / `window_origin` against the cubes' real affine."""
 
     def test_affine_maps_corners_to_real_world_degrees(self):
-        """The cube's affine maps pixel corners to the true global lon/lat bounds."""
+        """A 0.25 deg global grid's affine spans exactly the lon/lat domain."""
         cols, rows = 1440, 720
-        x0, dx, _, y0, _, dy = _GLOBAL_GEO
+        # Derived from the grid definition, not copied from the code under test.
+        x0, dx, y0, dy = -180.0, 360.0 / cols, 90.0, -180.0 / rows
+        assert (x0, dx, y0, dy) == (
+            _GLOBAL_GEO[0],
+            _GLOBAL_GEO[1],
+            _GLOBAL_GEO[3],
+            _GLOBAL_GEO[5],
+        ), "the shipped constant no longer matches a 0.25 deg global grid"
         assert (x0, y0) == (-180.0, 90.0), "grid must start at the NW corner"
         assert x0 + cols * dx == pytest.approx(180.0), "east edge must reach +180"
         assert y0 + rows * dy == pytest.approx(-90.0), "south edge must reach -90"
@@ -917,11 +924,13 @@ class TestHelperEdges:
             JRC(dataset="not-a-dataset", lat_lim=[51.0, 53.0], lon_lim=[3.0, 5.0])
 
     def test_aged_out_cycle_raises_value_error(self):
-        """A 404 on a pinned cycle surfaces as the documented ValueError."""
+        """A real 404 on a pinned cycle surfaces as the documented ValueError."""
         import requests
 
         def _gone(url):
-            raise requests.HTTPError(f"404 Client Error: Not Found for url: {url}")
+            response = requests.Response()
+            response.status_code = 404
+            raise requests.HTTPError("404 Client Error: Not Found", response=response)
 
         with pytest.raises(ValueError, match="not published"):
             _helpers.resolve_cycle(
@@ -1008,12 +1017,21 @@ class TestGriddedEdges:
         )
 
     def test_cached_output_is_reused(self, tmp_path: Path, monkeypatch):
-        """A second download of the same AOI reuses the cached crop."""
+        """A second download of the same AOI skips the read and reuses the file."""
         backend = self._backend(tmp_path, monkeypatch)
         first = backend.download()[0]
+        stamp = first.stat().st_mtime_ns
+        reads = {"n": 0}
+
+        def _counting_read(_url):
+            reads["n"] += 1
+            return _FakeContainer(_FakeVariable())
+
+        monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", _counting_read)
         again = backend.download()[0]
         assert first == again, f"the cached path changed: {first} -> {again}"
-        assert first.exists(), f"{first} was not written"
+        assert reads["n"] == 0, "a cache hit must not re-open the cube"
+        assert again.stat().st_mtime_ns == stamp, "the cached file was rewritten"
 
     def test_out_of_grid_guard(self, tmp_path: Path, monkeypatch):
         """An AOI that maps to no pixels raises a clear coverage error.
