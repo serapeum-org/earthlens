@@ -205,6 +205,40 @@ class JRC(AbstractDataSource):
         )
 
     @staticmethod
+    def _resolve_sea_level_id(product: str | None, representation: str | None) -> str:
+        """Resolve the sea-level family selectors to one catalog dataset id.
+
+        Args:
+            product: `"medium_term"` | `"subseasonal"`.
+            representation: `"gridded"` (default) | `"coastal"`.
+
+        Returns:
+            str: The resolved catalog dataset id.
+
+        Raises:
+            ValueError: If the product / representation pair is not published.
+        """
+        rep = (representation or "gridded").strip().lower()
+        prod = (product or "medium_term").strip().lower()
+        if rep not in ("gridded", "coastal"):
+            raise ValueError(
+                f"representation must be 'gridded' or 'coastal', got "
+                f"{representation!r}."
+            )
+        if prod not in ("medium_term", "subseasonal"):
+            raise ValueError(
+                f"product must be 'medium_term' or 'subseasonal', got {product!r}."
+            )
+        if rep == "coastal":
+            if prod != "subseasonal":
+                raise ValueError(
+                    "representation='coastal' is only available for "
+                    "product='subseasonal'."
+                )
+            return "sea_level_subseasonal_coastal"
+        return f"sea_level_{prod}"
+
+    @staticmethod
     def _warn_cross_kind_arguments(kind, return_periods, field, reference_time) -> None:
         """Warn when an argument that belongs to another kind was passed.
 
@@ -289,25 +323,7 @@ class JRC(AbstractDataSource):
         if key in ("", "efhm", "flood", "jrc-flood"):
             return "efhm"
         if key == "sea_level":
-            rep = (representation or "gridded").strip().lower()
-            prod = (product or "medium_term").strip().lower()
-            if rep == "coastal":
-                if prod != "subseasonal":
-                    raise ValueError(
-                        "representation='coastal' is only available for "
-                        "product='subseasonal'."
-                    )
-                return "sea_level_subseasonal_coastal"
-            if rep != "gridded":
-                raise ValueError(
-                    f"representation must be 'gridded' or 'coastal', got "
-                    f"{representation!r}."
-                )
-            if prod not in ("medium_term", "subseasonal"):
-                raise ValueError(
-                    f"product must be 'medium_term' or 'subseasonal', got {product!r}."
-                )
-            return f"sea_level_{prod}"
+            return self._resolve_sea_level_id(product, representation)
         raise ValueError(
             f"unknown JRC dataset {dataset!r}; available: "
             f"{sorted(self._catalog.datasets)} (or dataset='sea_level' with "

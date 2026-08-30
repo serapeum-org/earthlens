@@ -206,6 +206,29 @@ def _parse_reference_time(value) -> datetime:
 MAX_CYCLE_PROBES: int = 60
 
 
+def _probe_leaf(
+    url: str, endfls_marker: str, http_text, budget: list[int]
+) -> tuple[str, str] | None:
+    """Spend one budget unit checking whether a cycle folder is complete.
+
+    Args:
+        url: The candidate cycle directory (trailing `/`).
+        endfls_marker: The cycle-complete sentinel to look for.
+        http_text: Injectable text fetcher.
+        budget: The shared remaining-listing allowance, decremented in place.
+
+    Returns:
+        tuple[str, str] | None: `(cycle_url, cycle_id)` when the cycle carries the
+            sentinel, otherwise `None`.
+    """
+    if budget[0] <= 0:
+        return None
+    budget[0] -= 1
+    if endfls_marker in list_directory(url, http_text=http_text):
+        return url, _cycle_id(url)
+    return None
+
+
 def _descend_newest(
     url: str, level: int, endfls_marker: str, http_text, budget: list[int]
 ) -> tuple[str, str] | None:
@@ -228,18 +251,15 @@ def _descend_newest(
     budget[0] -= 1
     for name in _numeric_dirs(list_directory(url, http_text=http_text)):
         child = f"{url}{name}/"
-        if level == 1:
-            if budget[0] <= 0:
-                return None
-            budget[0] -= 1
-            if endfls_marker in list_directory(child, http_text=http_text):
-                return child, _cycle_id(child)
-        else:
-            found = _descend_newest(child, level - 1, endfls_marker, http_text, budget)
-            if found is not None:
-                return found
-            if budget[0] <= 0:
-                return None
+        found = (
+            _probe_leaf(child, endfls_marker, http_text, budget)
+            if level == 1
+            else _descend_newest(child, level - 1, endfls_marker, http_text, budget)
+        )
+        if found is not None:
+            return found
+        if budget[0] <= 0:
+            return None
     return None
 
 
@@ -433,7 +453,7 @@ def verify_grid_against_coordinates(
             f"variable's grid ({cols}x{rows}); the reconstructed affine cannot be "
             "trusted."
         )
-    x0, dx, _, y0, _, dy = geo
+    x0, dx, _, y0, _, _ = geo
     half = abs(dx) / 2.0
     west, east = float(lon.min()) - half, float(lon.max()) + half
     south, north = float(lat.min()) - half, float(lat.max()) + half

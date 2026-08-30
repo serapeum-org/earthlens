@@ -16,6 +16,21 @@ pytestmark = pytest.mark.jrc
 
 
 @pytest.fixture(autouse=True)
+def _isolated_http_client():
+    """Drop the cached `HttpClient` so one test's stub cannot leak into the next."""
+    _clear_client_cache()
+    yield
+    _clear_client_cache()
+
+
+def _clear_client_cache() -> None:
+    """Drop the cached client if it is still the real (cached) helper."""
+    clear = getattr(_helpers._client, "cache_clear", None)
+    if clear is not None:
+        clear()
+
+
+@pytest.fixture(autouse=True)
 def _offline_band_names(monkeypatch):
     """Keep band naming offline: it would otherwise open the real cube."""
     monkeypatch.setattr(
