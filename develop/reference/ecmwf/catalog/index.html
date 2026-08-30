@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24586,6 +24586,16 @@ is a flat list, not a dict).</p>
 <code>pressure_level</code>. Most pressure-level variables inherit the parent
 default; use this only when one specific variable should pull a
 different level set than the rest of its dataset family. Rare.</p>
+<h5 id="unhydratable"><a class="toclink" href="#unhydratable"><code>unhydratable</code></a><a class="headerlink" href="#unhydratable" title="Permanent link">#</a></h5>
+<p><em>Optional.</em> String. Why a live probe can never fill this row's <code>units</code> /
+<code>nc_variable</code>. Absent means the row is simply not filled yet, and
+<code>earthlens datasets curate ecmwf --fill-empty</code> will try it; present means no
+retrieve can answer it, and the sweep skips the row rather than spending a
+request and a queue slot to rediscover that.</p>
+<p>The only value in use is <code>pseudo-slug</code>: the row is keyed <code>all</code>, which stands
+for every variable the dataset serves and therefore resolves to none of them.</p>
+<p>Without this, a placeholder waiting for a sweep and one no sweep can ever
+answer look identical, so every re-run pays for the second kind again.</p>
 <h5 id="request_kind-per-row"><a class="toclink" href="#request_kind-per-row"><code>request_kind</code> (per-row)</a><a class="headerlink" href="#request_kind-per-row" title="Permanent link">#</a></h5>
 <p><em>Optional.</em> Per-row override of the parent's <code>request_kind</code>. Very
 rare — usually the whole dataset shares one request-shape category,
