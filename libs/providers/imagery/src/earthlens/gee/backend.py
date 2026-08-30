@@ -154,6 +154,10 @@ _EEDAI_MAX_NATIVE_PIXELS: int = 4_000_000_000
 #: native resolution into memory before downsampling.
 _EEDAI_MAX_PIXELS: int = 200_000_000
 
+#: Marks a decline caused by the *data* rather than the request, so a forced
+#: `engine="eedai"` skips the bucket instead of failing the whole download.
+_EEDAI_NO_SCENES: str = "no scenes"
+
 #: Reducers the reader must not serve, because its client-side result would not
 #: match Earth Engine's server-side one. `mosaic` is the clear case: Earth
 #: Engine's is last-wins (later scenes paint over earlier), while the reader
@@ -395,7 +399,10 @@ def _reader_errors(reader: Any) -> tuple[type[BaseException], ...]:
     Returns:
         The exception classes to treat as a recoverable reader failure.
     """
-    errors: list[type[BaseException]] = [OSError, ValueError]
+    # `ValueError` is deliberately absent: upstream raises it for an invalid
+    # *option combination*, which means this backend built the call wrongly — a
+    # bug to surface, not a transient to fall back from.
+    errors: list[type[BaseException]] = [OSError]
     candidates = [getattr(reader, "ReaderError", None)]
     try:
         from pyramids_eo.errors import ReaderError
@@ -457,9 +464,14 @@ class EedaiPlan(NamedTuple):
         can_serve: Whether the reader takes this read at all.
         tile_size: Output pixels per tile side when the read is streamed, or
             `None` for a single pass (and when `can_serve` is `False`).
-        tiles: How many tiles the streamed read is cut into; `1` for a single
-            pass. Carried here so the exporter never re-derives it — a second
-            derivation is free to disagree with the one that was routed on.
+        tiles: How many units the read is made of, which depends on its kind.
+            For a streamed single-image read it is the number of tiles the
+            window is cut into (`1` for a single pass); for a collection
+            composite it is the number of scenes the reader will fetch and
+            reduce. Carried here so the exporter never re-derives it — a second
+            derivation is free to disagree with the one that was routed on. It
+            is only a tile count when `tile_size` is set, which a collection
+            plan never does.
         reason: Why the reader declined, empty when it did not.
     """
 
@@ -1458,11 +1470,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """
         if self.crs.upper() == _EEDAI_NATIVE_CRS:
             return True
-        try:
-            from pyproj import CRS
+        from pyproj import CRS
+        from pyproj.exceptions import CRSError
 
+        try:
             crs = CRS.from_user_input(self.crs)
-        except Exception:  # noqa: BLE001 - an unparseable CRS is simply not supported
+        except CRSError:
+            # Only an unparseable CRS is "unsupported". An import failure or any
+            # other error is a broken environment, which must surface rather
+            # than be reported as a CRS this backend cannot serve.
             return False
         units = {axis.unit_name.lower() for axis in crs.axis_info}
         return bool(crs.is_projected and units & {"metre", "meter", "m"})
@@ -1494,7 +1510,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # short, so a poleward strip can read as nodata, while ~0.5 deg of
         # unrequested ground is added on each side. Small AOIs (the common case)
         # are affected at the ~0.002 deg level. Fixing it properly needs the
-        # densified back-transform upstream; see the roadmap's PE follow-up.
+        # densified back-transform upstream: serapeum-org/pyramids-eo#97.
         return transformer.transform_bounds(*latlon_bbox)
 
     def _eedai_output_grid(
@@ -1531,7 +1547,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         return rows, cols
 
     @staticmethod
-    def _reader_end(bucket_end: dt.datetime) -> str:
+    def _reader_end(bucket_end: dt.datetime, bucket_start: dt.datetime) -> str:
         """Convert an exclusive bucket end to the inclusive date the reader wants.
 
         This backend's buckets are half-open, matching Earth Engine's
@@ -1542,12 +1558,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Args:
             bucket_end: The bucket's exclusive end.
+            bucket_start: The bucket's inclusive start, used to clamp a bucket
+                shorter than a day rather than invert its window.
 
         Returns:
             The `YYYY-MM-DD` date the reader should treat as inclusive, so its
             window covers exactly the same instants as `filterDate`.
         """
-        return (bucket_end - dt.timedelta(days=1)).strftime("%Y-%m-%d")
+        # A bucket shorter than a day — a time-bearing `fmt` can leave one at
+        # the end of a range — would otherwise produce an end before its start,
+        # spending a discovery round-trip on a window that cannot match.
+        return max(bucket_end - dt.timedelta(days=1), bucket_start).strftime("%Y-%m-%d")
 
     def _eedai_latlon_aoi(self) -> tuple[float, float, float, float]:
         """Return the AOI envelope in EPSG:4326 for EEDA scene discovery.
@@ -1647,7 +1668,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
             return EedaiPlan(False, None, 0, "the EEDAI credential could not be built")
         window_start = bucket_start.strftime("%Y-%m-%d")
-        window_end = self._reader_end(bucket_end)
+        window_end = self._reader_end(bucket_end, bucket_start)
         # One catalog query per bucket, by necessity: every bucket has a
         # distinct window, and `ReadCost` reports only aggregates, so a single
         # whole-run discovery cannot be split back into per-bucket counts.
@@ -1680,13 +1701,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 False, None, 0, f"scene discovery for {var_info.id} failed ({exc})"
             )
         if not cost.scene_count:
-            # A legitimate, quiet decline: the window and AOI simply hold no
-            # scenes, so there is nothing for the reader to composite.
+            # A property of the data, not of the request: this window and AOI
+            # simply hold no scenes. Marked so a forced engine skips the bucket
+            # rather than aborting a run whose earlier buckets wrote fine —
+            # "raises if the request is not eligible" is about the request, and
+            # this one is.
             return EedaiPlan(
                 False,
                 None,
                 0,
-                f"no {var_info.id} scenes in this bucket's window and AOI",
+                f"{_EEDAI_NO_SCENES}: no {var_info.id} scenes in this bucket's "
+                "window and AOI",
             )
         if cost.scene_count > _EEDAI_MAX_SCENES:
             return EedaiPlan(
@@ -1962,6 +1987,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 )
             plan = self._eedai_verdict(var_info, band_count, bucket_start, bucket_end)
             if not plan.can_serve:
+                if plan.reason.startswith(_EEDAI_NO_SCENES):
+                    # Nothing to read here, but the request itself is fine, so
+                    # let the Earth Engine path write this bucket rather than
+                    # aborting the run.
+                    logger.info(
+                        f"{var_info.id}: {plan.reason}; this bucket falls through "
+                        "to Earth Engine."
+                    )
+                    return False, None
                 raise ValueError(
                     f"engine='eedai' cannot serve {var_info.id}: {plan.reason}. Use a "
                     "smaller bbox, engine='ee' (with auto_split=True to tile), or "
@@ -1970,7 +2004,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return True, plan
         if not (eligible and eedai_available()):
             return False, None
-        plan = self._eedai_verdict(var_info, band_count, bucket_start, bucket_end)
+        try:
+            plan = self._eedai_verdict(var_info, band_count, bucket_start, bucket_end)
+        except ValueError as exc:
+            # Sizing refused the request — a non-finite projected envelope, say.
+            # Under `auto` that is a reason to let Earth Engine serve it, not to
+            # abort the download. A forced engine has already raised above.
+            logger.warning(
+                f"the EEDAI reader could not size {var_info.id} ({exc}); "
+                "falling back to Earth Engine."
+            )
+            return False, None
         if not plan.can_serve:
             logger.info(
                 f"Serving {var_info.id} through Earth Engine rather than the EEDAI "
@@ -2392,7 +2436,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # pyramids-eo#63) is what would close the gap.
             composite_kwargs = {
                 "start": bucket_start.strftime("%Y-%m-%d"),
-                "end": self._reader_end(bucket_end),
+                "end": self._reader_end(bucket_end, bucket_start),
                 "reducer": self.reducer or var_info.default_reducer,
             }
             if self.property_filter is not None:

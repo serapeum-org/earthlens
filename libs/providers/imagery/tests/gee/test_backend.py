@@ -2346,6 +2346,61 @@ class TestEedaiCollections:
                 dt.datetime(2020, 7, 1),
             )
 
+    def test_an_empty_bucket_does_not_abort_a_forced_run(self, make_gee, fake_reader):
+        """No scenes is a fact about the data, so a forced engine skips the bucket.
+
+        Raising would kill a long run at the first month with no imagery, after
+        every earlier bucket had already been written.
+        """
+        gee = self._collection_gee(make_gee, engine="eedai")
+        fake_reader.cost = SimpleNamespace(scene_count=0, min_pixel_size=5566.0)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        use_reader, plan = gee._use_eedai(var_info, 1, self.START, self.END)
+        assert use_reader is False and plan is None
+
+    def test_a_forced_run_still_raises_on_an_ineligible_request(
+        self, make_gee, fake_reader
+    ):
+        """Skipping empty buckets must not soften the forced-engine contract."""
+        gee = self._collection_gee(make_gee, engine="eedai", reducer="mosaic")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        with pytest.raises(ValueError, match="cannot serve"):
+            gee._use_eedai(var_info, 1, self.START, self.END)
+
+    def test_a_sub_day_bucket_never_inverts_its_window(self, make_gee, fake_reader):
+        """A bucket shorter than a day must not ask for an end before its start."""
+        gee = self._collection_gee(make_gee)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        gee._eedai_collection_fits(
+            var_info,
+            1,
+            dt.datetime(2020, 6, 3, 0, 0),
+            dt.datetime(2020, 6, 3, 12, 0),
+        )
+        kwargs = fake_reader.cost_calls[0][1]
+        assert kwargs["start"] <= kwargs["end"], (
+            f"inverted window: {kwargs['start']}..{kwargs['end']}"
+        )
+
+    def test_a_sizing_refusal_falls_back_under_auto(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """Sizing that raises must route to Earth Engine, not abort the download."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = self._collection_gee(make_gee)
+        monkeypatch.setattr(
+            type(gee),
+            "_eedai_verdict",
+            lambda *a, **k: (_ for _ in ()).throw(ValueError("bounds are not finite")),
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        use_reader, plan = gee._use_eedai(var_info, 1, self.START, self.END)
+        assert use_reader is False and plan is None
+        assert any("could not size" in w for w in warnings)
+
     def test_each_bucket_costs_exactly_one_discovery_query(self, make_gee, fake_reader):
         """Discovery is one catalog query per bucket - no more, and no caching.
 
@@ -2658,6 +2713,28 @@ class TestEedaiEligibility:
         """A geographic CRS other than EPSG:4326 is not sized by a metre scale."""
         gee = make_gee(crs="EPSG:4269")
         assert not gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
+
+    def test_a_broken_pyproj_is_not_reported_as_an_unsupported_crs(
+        self, make_gee, monkeypatch
+    ):
+        """An import failure is a broken environment, not a CRS we cannot serve.
+
+        Swallowing it would silently route every projected request to Earth
+        Engine with nothing to point at.
+        """
+        import builtins
+
+        real_import = builtins.__import__
+
+        def _explode(name, *args, **kwargs):
+            if name == "pyproj":
+                raise ImportError("pyproj is not installed")
+            return real_import(name, *args, **kwargs)
+
+        gee = make_gee(crs="EPSG:32636")
+        monkeypatch.setattr(builtins, "__import__", _explode)
+        with pytest.raises(ImportError):
+            gee._eedai_crs_supported()
 
     def test_unparseable_crs_is_not_eligible(self, make_gee):
         """A CRS pyproj cannot parse is declined rather than raising."""
