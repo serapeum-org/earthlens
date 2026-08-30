@@ -108,7 +108,7 @@ class TestSeaLevelLiveFetch:
         dataset = Dataset.read_file(str(paths[0]))
         band_count = dataset.band_count
         epsg = dataset.epsg
-        cell = dataset.geotransform[1]
+        origin_x, cell, _, origin_y, _, _ = dataset.geotransform
         array = np.asarray(dataset.read_array())
         close_quietly(dataset)
 
@@ -118,6 +118,22 @@ class TestSeaLevelLiveFetch:
             "geotransform must be degrees, not index space"
         )
         assert np.isfinite(array).sum() > 0, "the AOI window carried no valid TWL cells"
+        # Ground truth, not the code's own constant: the origin must be the NW
+        # corner actually requested, and the field must be oriented north-up. A
+        # N/S flip or a 180-degree longitude shift would still satisfy the
+        # cell-size and CRS assertions above, so pin the origin explicitly.
+        assert origin_x == pytest.approx(3.0, abs=0.25), (
+            f"west edge should be ~3E, got {origin_x}"
+        )
+        assert origin_y == pytest.approx(53.0, abs=0.25), (
+            f"north edge should be ~53N, got {origin_y}"
+        )
+        # This AOI straddles the Dutch coast: a north-up read has both land
+        # (NaN) and sea (finite) cells. A vertical flip lands in open ocean and
+        # loses the NaNs entirely.
+        band = array[0] if array.ndim == 3 else array
+        assert np.isnan(band).any(), "expected land cells (NaN) in a coastal AOI"
+        assert np.isfinite(band).any(), "expected sea cells (finite) in a coastal AOI"
 
     def test_subseasonal_coastal_returns_dataframe(self):
         """The coastal key returns the global per-country summary as a DataFrame."""

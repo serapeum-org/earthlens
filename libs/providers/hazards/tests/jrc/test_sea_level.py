@@ -282,6 +282,32 @@ class TestAffineHelpers:
             -0.25,
         )
 
+    def test_affine_maps_corners_to_real_world_degrees(self):
+        """The affine maps pixel corners to the true global lon/lat bounds."""
+        cols, rows = 1440, 720
+        x0, dx, _, y0, _, dy = _helpers.grid_geotransform(cols, rows)
+        assert (x0, y0) == (-180.0, 90.0), "grid must start at the NW corner"
+        assert x0 + cols * dx == pytest.approx(180.0), "east edge must reach +180"
+        assert y0 + rows * dy == pytest.approx(-90.0), "south edge must reach -90"
+        assert dy < 0, "row order must be north-up (a S/N flip inverts dy)"
+
+    @pytest.mark.parametrize(
+        ("bbox", "expected_origin"),
+        [
+            ((3.0, 51.0, 5.0, 53.0), (3.0, 53.0)),
+            ((-180.0, 88.0, -178.0, 90.0), (-180.0, 90.0)),
+            ((178.0, -90.0, 180.0, -88.0), (178.0, -88.0)),
+        ],
+    )
+    def test_window_origin_is_the_bbox_nw_corner(self, bbox, expected_origin):
+        """A window's origin is the NW corner of the requested box, in degrees."""
+        geo = _helpers.grid_geotransform(1440, 720)
+        col_off, row_off, _, _ = _helpers.pixel_window(geo, bbox, 1440, 720)
+        origin = _helpers.window_origin(geo, col_off, row_off)
+        assert (origin[0], origin[3]) == pytest.approx(expected_origin), (
+            f"window origin {origin[:4]} should be the NW corner {expected_origin}"
+        )
+
     def test_pixel_window_maps_bbox(self):
         """A bbox maps to the expected clamped pixel window."""
         geo = _helpers.grid_geotransform(1440, 720)
@@ -485,10 +511,90 @@ class TestHelperEdges:
                 http_text=lambda url: '<a href="other.txt">o</a>',
             )
 
+    def test_non_gridded_field_rejected(self, tmp_path: Path, monkeypatch):
+        """A field that is not on the lat/lon grid is refused with a clear message."""
+        row = Catalog().get("sea_level_medium_term")
+        http = _FakeHttp(
+            row.base_url,
+            row.product,
+            ("2026", "08", "26", "12"),
+            ["mediumTermTWLforecastGridded_x.nc"],
+        )
+        monkeypatch.setattr(_helpers, "_http_text", http)
+        monkeypatch.setattr(
+            "pyramids.netcdf.NetCDF.read_file",
+            lambda _url: _FakeContainer(object()),  # no columns/rows -> not gridded
+        )
+        backend = JRC(
+            dataset="sea_level",
+            product="medium_term",
+            field="summaryTWLcoast_01_15",
+            lat_lim=[51.0, 53.0],
+            lon_lim=[3.0, 5.0],
+            path=tmp_path,
+        )
+        with pytest.raises(ValueError, match="not a gridded field"):
+            backend.download()
+
+    def test_unhandled_kind_rejected(self):
+        """A catalog row with an unhandled kind is refused at construction."""
+        catalog = Catalog()
+        row = catalog.get("efhm").model_copy(update={"kind": "not_a_kind"})
+        catalog = catalog.model_copy(update={"datasets": {"efhm": row}})
+        with pytest.raises(ValueError, match="unhandled kind"):
+            JRC(catalog=catalog, lat_lim=[51.0, 53.0], lon_lim=[3.0, 5.0])
+
     def test_unknown_dataset_rejected(self):
         """An unknown dataset selector raises."""
         with pytest.raises(ValueError, match="unknown JRC dataset"):
             JRC(dataset="not-a-dataset", lat_lim=[51.0, 53.0], lon_lim=[3.0, 5.0])
+
+    def test_aged_out_cycle_raises_value_error(self):
+        """A 404 on a pinned cycle surfaces as the documented ValueError."""
+        import requests
+
+        def _gone(url):
+            raise requests.HTTPError(f"404 Client Error: Not Found for url: {url}")
+
+        with pytest.raises(ValueError, match="not published"):
+            _helpers.resolve_cycle(
+                "https://x/r",
+                "medium_term_forecasts",
+                "%Y/%m/%d/%H",
+                "2026-01-01T12",
+                "endFls",
+                http_text=_gone,
+            )
+
+    def test_latest_crawl_is_bounded(self, monkeypatch):
+        """The 'latest' walk stops after the probe budget instead of crawling on."""
+        probes = {"leaves": 0}
+
+        def _endless(url):
+            depth = len([p for p in url.strip("/").split("/") if p.isdigit()])
+            if depth >= 4:
+                probes["leaves"] += 1
+                return ""  # a complete-looking leaf that never carries endFls
+            return "".join(f'<a href="{n:02d}/">{n:02d}/</a>' for n in range(1, 13))
+
+        monkeypatch.setattr(_helpers, "MAX_CYCLE_PROBES", 5)
+        with pytest.raises(ValueError, match="no complete cycle"):
+            _helpers.resolve_cycle(
+                "https://x/r",
+                "medium_term_forecasts",
+                "%Y/%m/%d/%H",
+                "latest",
+                "endFls",
+                http_text=_endless,
+            )
+        assert probes["leaves"] <= 5, (
+            f"the crawl must stop at the budget, probed {probes['leaves']} leaves"
+        )
+
+    def test_cycle_id_rejects_a_short_path(self):
+        """A URL without the four numeric segments cannot yield a cycle id."""
+        with pytest.raises(ValueError, match="cycle id"):
+            _helpers._cycle_id("https://x/r/2026/08/")
 
     def test_find_cycle_file_is_case_sensitive(self):
         """Glob matching is case-sensitive, so it behaves the same on all platforms."""
