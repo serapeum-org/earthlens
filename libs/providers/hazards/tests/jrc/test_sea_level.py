@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+from loguru import logger as _backend_logger
 from pyramids.dataset import Dataset as PyramidsDataset
 
 from earthlens.jrc import JRC, Catalog, _helpers
@@ -536,6 +537,54 @@ class TestHelperEdges:
         with pytest.raises(ValueError, match="not a gridded field"):
             backend.download()
 
+    @pytest.mark.parametrize(
+        ("kwargs", "expected"),
+        [
+            (dict(dataset="efhm", field="TWL75"), "field"),
+            (
+                dict(dataset="sea_level", product="medium_term", return_periods=[100]),
+                "return_periods",
+            ),
+            (
+                dict(
+                    dataset="sea_level",
+                    product="subseasonal",
+                    representation="coastal",
+                    field="TWL75",
+                ),
+                "field",
+            ),
+        ],
+    )
+    def test_cross_kind_argument_warns(self, kwargs, expected, caplog):
+        """A selector belonging to another kind is reported, not silently dropped."""
+        import logging
+
+        from _pytest.logging import LogCaptureHandler
+
+        handler = LogCaptureHandler()
+        logger_id = _backend_logger.add(handler, level="WARNING", format="{message}")
+        try:
+            JRC(lat_lim=[51.0, 53.0], lon_lim=[3.0, 5.0], **kwargs)
+        finally:
+            _backend_logger.remove(logger_id)
+        messages = " ".join(r.getMessage() for r in handler.records)
+        assert expected in messages, (
+            f"expected a warning naming {expected!r}: {messages}"
+        )
+
+    def test_fetch_rejects_an_unhandled_kind(self):
+        """`_fetch` refuses a kind that slipped past construction."""
+        backend = JRC(
+            dataset="sea_level",
+            product="medium_term",
+            lat_lim=[51.0, 53.0],
+            lon_lim=[3.0, 5.0],
+        )
+        backend._dataset = backend._dataset.model_copy(update={"kind": "mystery"})
+        with pytest.raises(ValueError, match="unhandled JRC dataset kind"):
+            backend._fetch([])
+
     def test_unhandled_kind_rejected(self):
         """A catalog row with an unhandled kind is refused at construction."""
         catalog = Catalog()
@@ -591,6 +640,14 @@ class TestHelperEdges:
             f"the crawl must stop at the budget, probed {probes['leaves']} leaves"
         )
 
+    def test_band_valid_times_falls_back_when_time_is_unreadable(self):
+        """An unreadable time axis degrades to positional band names, never raises."""
+        assert _helpers.band_valid_times("/vsicurl/not-a-real-cube.nc", 3) == [
+            "step_1",
+            "step_2",
+            "step_3",
+        ]
+
     def test_cycle_id_rejects_a_short_path(self):
         """A URL without the four numeric segments cannot yield a cycle id."""
         with pytest.raises(ValueError, match="cycle id"):
@@ -636,7 +693,12 @@ class TestGriddedEdges:
         assert first == again and first.exists()
 
     def test_out_of_grid_guard(self, tmp_path: Path, monkeypatch):
-        """An AOI that maps to no pixels raises a clear coverage error."""
+        """An AOI that maps to no pixels raises a clear coverage error.
+
+        The shipped grid is global, so no real AOI can miss it; the guard exists
+        for a future non-global row (and for a degenerate window), which is why
+        `pixel_window` is forced to `None` here rather than fed a real bbox.
+        """
         backend = self._backend(tmp_path, monkeypatch)
         monkeypatch.setattr(_helpers, "pixel_window", lambda *args, **kwargs: None)
         with pytest.raises(ValueError, match="outside the sea-level grid"):
