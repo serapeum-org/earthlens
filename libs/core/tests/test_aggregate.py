@@ -1844,6 +1844,12 @@ def _handles_on(path):
     try:
         open_files = psutil.Process().open_files()
     except (RuntimeError, psutil.Error) as err:
+        # Narrow to the one documented failure. A blanket catch would turn any
+        # psutil problem into a silent pass, which is the shape of bug this
+        # check exists to catch - an AccessDenied, say, should surface rather
+        # than quietly disarm the release assertion.
+        if "SystemExtendedHandleInformation" not in str(err):
+            raise
         pytest.skip(f"psutil cannot enumerate this process's open files: {err}")
     found = []
     for handle in open_files:
