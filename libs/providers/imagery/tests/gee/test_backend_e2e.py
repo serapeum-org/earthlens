@@ -313,3 +313,44 @@ def test_live_chirps_collection_eedai_matches_ee(tmp_path):
             f"EEDAI composite q{quantile} {got:.3f} mm differs from Earth Engine "
             f"{want:.3f} mm"
         )
+
+
+@_skip_without_creds
+@pytest.mark.skipif(
+    not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
+)
+def test_live_collection_property_filter_reads_a_valid_composite(tmp_path):
+    """A cloud-cover property_filter narrows the scenes and still composites (C5).
+
+    Reads a single 10 m Sentinel-2 band (one resolution group, so no subdataset
+    complication) over a tiny AOI as a cloud-filtered composite through the
+    reader. The point is that pyramids-eo accepts the OGR filter string and
+    returns a valid raster of plausible reflectance — proving the string flows
+    end to end rather than being silently dropped.
+    """
+    import numpy as np
+
+    el = EarthLens(
+        data_source="gee",
+        start="2024-07-01",
+        end="2024-07-20",
+        variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+        temporal_resolution="raw",
+        reducer="median",
+        lat_lim=[29.98, 30.0],
+        lon_lim=[31.28, 31.3],
+        path=str(tmp_path),
+        scale=10,
+        engine="eedai",
+        property_filter="CLOUDY_PIXEL_PERCENTAGE < 90",
+    ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
+    paths = el.download(progress_bar=False)
+    assert len(paths) == 1, f"expected one composite, got {paths}"
+
+    values, _epsg, _bbox = _open_raster(paths[0])
+    finite = values[np.isfinite(values)]
+    assert finite.size, "the cloud-filtered composite has no valid pixels"
+    # S2 L2A surface reflectance B4 is scaled 0..~10000; a plausible composite
+    # is well inside that, and certainly not all one value.
+    assert 0 <= float(np.nanmin(finite)) and float(np.nanmax(finite)) < 20000
+    assert float(np.nanstd(finite)) > 0, "the composite is a single flat value"

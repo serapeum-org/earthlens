@@ -1868,6 +1868,46 @@ class TestEngineOption:
             make_gee(engine="gdal")
 
 
+class TestPropertyFilter:
+    """C5: the reader-only property_filter string, its validation and warnings."""
+
+    def test_non_string_property_filter_is_rejected(self, make_gee):
+        """A non-string property_filter fails fast at construction."""
+        with pytest.raises(ValueError, match="OGR attribute-filter string"):
+            make_gee(property_filter=20)
+
+    def test_property_filter_warns_on_a_single_image(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """property_filter on a single-image request is a logged no-op (once)."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = make_gee(property_filter="CLOUDY_PIXEL_PERCENTAGE < 20")
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._warn_property_filter_ignored(var_info)
+        gee._warn_property_filter_ignored(var_info)
+        assert len([w for w in warnings if "property_filter has no effect" in w]) == 1
+
+    def test_property_filter_not_warned_on_an_eligible_collection(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """An eligible collection uses the filter, so nothing is warned."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            property_filter="CLOUDY_PIXEL_PERCENTAGE < 20",
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        gee._warn_property_filter_ignored(var_info)
+        assert [w for w in warnings if "property_filter has no effect" in w] == []
+
+
 class TestEedaiCollections:
     """C1: an eligible ImageCollection is composited through the reader per bucket."""
 
@@ -1954,6 +1994,34 @@ class TestEedaiCollections:
         _asset_id, kwargs = fake_reader.cost_calls[0]
         assert kwargs["start"] == "2020-06-01" and kwargs["end"] == "2020-07-01"
         assert len(kwargs["bbox"]) == 4
+
+    def test_property_filter_reaches_estimate_and_composite(
+        self, make_gee, fake_reader
+    ):
+        """A property_filter narrows the scene estimate and the composite read."""
+        gee = self._collection_gee(
+            make_gee, property_filter="CLOUDY_PIXEL_PERCENTAGE < 20"
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        gee._export_via_eedai(
+            var_info, ["precipitation"], 5566.0, "chirps", plan, self.START, self.END
+        )
+        _cid, cost_kwargs = fake_reader.cost_calls[0]
+        assert cost_kwargs["property_filter"] == "CLOUDY_PIXEL_PERCENTAGE < 20"
+        _rid, read_kwargs = fake_reader.calls[0]
+        assert read_kwargs["property_filter"] == "CLOUDY_PIXEL_PERCENTAGE < 20"
+
+    def test_no_property_filter_sends_none_to_the_reader(self, make_gee, fake_reader):
+        """Without a property_filter the composite read carries no such kwarg."""
+        gee = self._collection_gee(make_gee)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        gee._export_via_eedai(
+            var_info, ["precipitation"], 5566.0, "chirps", plan, self.START, self.END
+        )
+        _rid, read_kwargs = fake_reader.calls[0]
+        assert "property_filter" not in read_kwargs
 
 
 class TestEedaiProjectedCrs:

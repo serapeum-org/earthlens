@@ -478,6 +478,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
             than the point-sampling default; keep `"nearest"` for
             categorical data such as land cover. Ignored on the Earth Engine
             path, which resamples server-side.
+        property_filter: An OGR attribute-filter string on a collection's own
+            scene properties (e.g. `"CLOUDY_PIXEL_PERCENTAGE < 20"`), narrowing
+            which scenes the EEDAI collection composite reads. earthlens's
+            `filters` are Earth Engine closures with no string form, so this is
+            a separate, reader-only knob; it applies only to the EEDAI
+            `image_collection` path and is ignored (with a warning) for a single
+            image or an Earth Engine-served request. Defaults to `None`.
 
     Credentials are not constructor arguments — the constructor describes
     only what to fetch. Supply them at the authentication step:
@@ -582,6 +589,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         engine: Literal["auto", "ee", "eedai"] = "auto",
         cog: bool = False,
         resample: str = "nearest",
+        property_filter: str | None = None,
     ):
         # Validate the cheap (no-I/O) config first so user typos surface
         # before the ~3.3 s cold-cache catalog parse below.
@@ -589,6 +597,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
             raise ValueError(
                 f"export_via must be 'url', 'drive', 'gcs', or 'asset', "
                 f"got {export_via!r}"
+            )
+        if property_filter is not None and not isinstance(property_filter, str):
+            raise ValueError(
+                "property_filter must be an OGR attribute-filter string "
+                f"(e.g. 'CLOUDY_PIXEL_PERCENTAGE < 20'), got {property_filter!r}"
             )
         if export_via == "drive" and not drive_folder:
             raise ValueError("export_via='drive' requires drive_folder=")
@@ -650,9 +663,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self.cog = bool(cog)
         #: Resampling kernel the EEDAI reader warps with (`nearest` by default).
         self.resample = resample
+        #: OGR attribute-filter string narrowing collection scenes on the EEDAI
+        #: path (e.g. `"CLOUDY_PIXEL_PERCENTAGE < 20"`); Earth Engine ignores it.
+        self.property_filter = property_filter
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
         self._eedai_credential: Any = None  # lazily built in `_eedai_credentials`
         self._cog_warned = False  # one-shot guard for the `cog=` notice
+        self._property_filter_warned = False  # one-shot guard for property_filter
 
         super().__init__(
             start=start,
@@ -953,6 +970,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # Trigger the lazy Earth Engine auth/init before any `ee` call.
         _ = self.client
         self._cog_warned = False  # the cog= notice is once per run, not per object
+        self._property_filter_warned = False  # same, for the property_filter notice
         outputs: list[Path | str | TaskInfo] = []
         assert isinstance(
             self.vars, dict
@@ -1205,6 +1223,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     bucket_end,
                 )
         self._warn_cog_ignored(var_info)
+        self._warn_property_filter_ignored(var_info)
         # Only the Earth Engine paths need the `ee.Geometry`; the reader clips
         # to its own bbox / cutline.
         region = self._ee_region()
@@ -1408,6 +1427,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 bbox=self._eedai_latlon_aoi(),
                 crs=self.crs,
                 credentials=self._eedai_credentials(),
+                property_filter=self.property_filter,
             )
         except Exception as exc:  # noqa: BLE001 - any discovery failure declines
             return EedaiPlan(
@@ -1846,6 +1866,32 @@ class GEE(LazyClientMixin, AbstractDataSource):
             "plain GeoTIFF is written instead."
         )
 
+    def _warn_property_filter_ignored(self, var_info: Dataset) -> None:
+        """Say so, once, when `property_filter=` cannot apply to this request.
+
+        `property_filter` narrows scenes only on the EEDAI *collection* path.
+        A single-image dataset, or a request served by Earth Engine, ignores it,
+        which would otherwise be a silent no-op.
+
+        Args:
+            var_info: The catalog entry being written (named in the notice).
+        """
+        if self.property_filter is None or self._property_filter_warned:
+            return
+        served_by_reader_collection = (
+            var_info.is_image_collection
+            and self.export_via == "url"
+            and self.engine != "ee"
+        )
+        if served_by_reader_collection:
+            return
+        self._property_filter_warned = True
+        logger.warning(
+            f"property_filter has no effect for {var_info.id}: it narrows scenes "
+            "on the EEDAI collection path, and this request is a single image or "
+            "is served by Earth Engine (see engine=). It is ignored."
+        )
+
     def _eedai_credentials(self) -> Any:
         """Return the pyramids-eo credential for EEDAI reads, built once.
 
@@ -2034,6 +2080,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "end": bucket_end.strftime("%Y-%m-%d"),
                 "reducer": self.reducer or var_info.default_reducer,
             }
+            if self.property_filter is not None:
+                composite_kwargs["property_filter"] = self.property_filter
         read_options: dict[str, Any] = {}
         tile_size = plan.tile_size
         if tile_size is not None:
