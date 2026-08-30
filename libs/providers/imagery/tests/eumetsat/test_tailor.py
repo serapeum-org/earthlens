@@ -82,6 +82,31 @@ def test_tailorconfig_crs_none_is_allowed():
     assert TailorConfig(format="msgnative", crs=None).crs is None
 
 
+@pytest.mark.parametrize(
+    "native_format", ["msgnative", "epsnative", "hrit", "hrit_compressed"]
+)
+def test_tailorconfig_rejects_native_format_with_projection(native_format):
+    """A native format cannot carry a projection -- crs must be None."""
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError, match="cannot be reprojected"):
+        TailorConfig(format=native_format, crs="geographic")
+
+
+@pytest.mark.parametrize(
+    "native_format", ["msgnative", "epsnative", "hrit", "hrit_compressed"]
+)
+def test_tailorconfig_native_format_with_crs_none_is_valid(native_format):
+    """Every native format pairs cleanly with crs=None."""
+    cfg = TailorConfig(format=native_format, crs=None)
+    assert cfg.crs is None, f"{native_format} should validate with crs=None"
+
+
+def test_tailorconfig_non_native_format_keeps_default_crs():
+    """A non-native format is unaffected by the native/crs cross-check."""
+    assert TailorConfig(format="geotiff").crs == "geographic"
+
+
 @pytest.mark.parametrize("field", ["format", "crs"])
 def test_tailorconfig_strips_surrounding_whitespace(field):
     """Padding is stripped off format and crs alike."""

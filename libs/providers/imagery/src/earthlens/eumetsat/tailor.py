@@ -17,12 +17,15 @@ lazy `eumdac` import) from a `TailorConfig`, the resolved catalog row's
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 #: Default Data Tailor output format (pinned from the live service in `A1`).
 DEFAULT_FORMAT = "geotiff"
 #: Default Data Tailor projection / CRS (pinned from the live service in `A1`).
 DEFAULT_CRS = "geographic"
+#: Data Tailor output formats that carry their own fixed grid and reject any
+#: projection (from the `/epcs/formats` list, `A1`). `crs` must be `None` for these.
+NATIVE_FORMATS = frozenset({"msgnative", "epsnative", "hrit", "hrit_compressed"})
 
 
 class TailorConfig(BaseModel):
@@ -136,6 +139,29 @@ class TailorConfig(BaseModel):
         if not stripped:
             raise ValueError("must be a non-empty string")
         return stripped
+
+    @model_validator(mode="after")
+    def _native_format_forbids_projection(self) -> TailorConfig:
+        """Reject a native output format paired with a non-`None` `crs`.
+
+        A native format (`NATIVE_FORMATS`) carries its own fixed grid and the
+        Data Tailor service rejects any projection on it. Catching the
+        mismatch here, instead of leaving it to the service, avoids
+        submitting a customisation that can only fail after a poll round
+        trip that has been measured to take upward of 30 minutes.
+
+        Returns:
+            TailorConfig: `self`, unchanged, when the combination is valid.
+
+        Raises:
+            ValueError: When `format` is native and `crs` is not `None`.
+        """
+        if self.format in NATIVE_FORMATS and self.crs is not None:
+            raise ValueError(
+                f"format={self.format!r} is a native output format and cannot be "
+                f"reprojected; pass crs=None instead of crs={self.crs!r}"
+            )
+        return self
 
     @field_validator("bbox")
     @classmethod
