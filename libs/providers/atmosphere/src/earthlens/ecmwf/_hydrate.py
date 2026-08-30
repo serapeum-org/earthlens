@@ -1885,8 +1885,15 @@ def bulk_hydrate_empty(
 
     catalog_dir = Path(CATALOG_PATH)
     catalog = Catalog()
+    # A row marked `unhydratable` is a placeholder no retrieve can fill, so it
+    # is not outstanding work: counting it would select a dataset with nothing
+    # to do, spend the `--limit` row budget on it, and report it as `skipped` —
+    # the same word a licence refusal gets.
     rows = {
-        key: sum(var.units == "unknown" for var in ds.variables.values())
+        key: sum(
+            var.units == "unknown" and not var.unhydratable
+            for var in ds.variables.values()
+        )
         for key, ds in catalog.datasets.items()
     }
     empty = sorted(key for key, count in rows.items() if count)

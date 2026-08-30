@@ -438,6 +438,33 @@ class TestSelectorsAreServeable:
 class TestUnhydratableRows:
     """A placeholder no retrieve can answer is not the same as a pending one."""
 
+    def test_a_dataset_whose_only_placeholder_is_marked_is_not_counted(self):
+        """Counting it would select a dataset with nothing a retrieve could do."""
+        from earthlens.ecmwf import Catalog
+
+        catalog = Catalog()
+        marked_only = [
+            name
+            for name, ds in catalog.datasets.items()
+            if any(v.units == "unknown" for v in ds.variables.values())
+            and not any(
+                v.units == "unknown" and not v.unhydratable
+                for v in ds.variables.values()
+            )
+        ]
+        assert marked_only, "expected at least one all-marked dataset in the catalog"
+        outstanding = {
+            name: sum(
+                v.units == "unknown" and not v.unhydratable
+                for v in ds.variables.values()
+            )
+            for name, ds in catalog.datasets.items()
+        }
+        for name in marked_only:
+            assert outstanding[name] == 0, (
+                f"{name} has only marked placeholders but still counts as work"
+            )
+
     def test_a_marked_row_is_not_offered_to_a_probe(self):
         """Probing it again spends a request to learn what the row already says."""
         block = (
