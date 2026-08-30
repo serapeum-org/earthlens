@@ -260,6 +260,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-greenland-ice-sheet-velocity:
     endpoint: cds
     request_kind: satellite_cdr
@@ -277,6 +278,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-humidity-profiles:
     endpoint: cds
     request_kind: satellite_cdr
@@ -290,6 +292,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-ice-sheet-elevation-change:
     endpoint: cds
     request_kind: satellite_cdr
@@ -307,6 +310,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-ice-sheet-mass-balance:
     endpoint: cds
     request_kind: satellite_cdr
@@ -315,6 +319,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-ist-sst-global:
     endpoint: cds
     request_kind: satellite_cdr
@@ -330,6 +335,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-ist-sst-polar:
     endpoint: cds
     request_kind: satellite_cdr
@@ -345,6 +351,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-lai-fapar:
     endpoint: cds
     request_kind: satellite_cdr
@@ -381,6 +388,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-lake-water-temperature:
     endpoint: cds
     request_kind: satellite_cdr
@@ -393,6 +401,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-land-cover:
     endpoint: cds
     request_kind: satellite_cdr
@@ -406,6 +415,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-land-surface-temperature:
     endpoint: cds
     request_kind: satellite_cdr
@@ -514,6 +524,7 @@ datasets:
         # out as rainfall. Left as a placeholder pending a real per-variable probe.
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-precipitation-microwave-infrared:
     endpoint: cds
     request_kind: satellite_cdr
@@ -527,6 +538,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-sea-ice-concentration:
     endpoint: cds
     request_kind: satellite_cdr
@@ -544,6 +556,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-sea-ice-drift:
     endpoint: cds
     request_kind: satellite_cdr
@@ -557,6 +570,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-sea-ice-edge-type:
     endpoint: cds
     request_kind: satellite_cdr
@@ -619,6 +633,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-snow-cover-extent:
     endpoint: cds
     request_kind: satellite_cdr
@@ -651,6 +666,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-surface-radiation-budget:
     endpoint: cds
     request_kind: satellite_cdr
@@ -722,6 +738,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-total-column-water-vapour-ocean:
     endpoint: cds
     request_kind: satellite_cdr
@@ -738,6 +755,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-upper-troposphere-humidity:
     endpoint: cds
     request_kind: satellite_cdr

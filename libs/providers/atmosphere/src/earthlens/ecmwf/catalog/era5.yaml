@@ -1104,6 +1104,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   reanalysis-era5-land-timeseries:
     endpoint: cds
     request_kind: cams_date

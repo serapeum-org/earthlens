@@ -2916,6 +2916,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   reanalysis-uerra-europe-height-levels:
     endpoint: cds
     request_kind: form
@@ -4902,6 +4903,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   sis-european-wind-storm-reanalysis:
     endpoint: cds
     request_kind: form
@@ -4919,6 +4921,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   sis-european-wind-storm-synthetic-events:
     endpoint: cds
     request_kind: form
