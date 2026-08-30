@@ -98,13 +98,18 @@ jobs:
           # The geoBoundaries ADM1 test that segfaults GDAL (#925) skips itself
           # in the test file now, so no --deselect is needed here.
           #
-          # The exclusions must name every backend with a dedicated lane below,
-          # and match tests-e2e-reusable.yml's per-theme catchall_marker. They
-          # had drifted: earthdata, eumetsat and asf gained lanes there but were
-          # never excluded here, so this job collected their tests a second time
-          # - and, until their credentials were added, only to skip them (one
-          # run reported 2 passed, 14 skipped). Running them twice also doubled
-          # the concurrent Earthdata Login token mints, the call that
+          # ONE rule: exclude exactly the backends that have a dedicated job in
+          # THIS file, so every backend runs in exactly one lane. Do not sync
+          # this list with tests-e2e-reusable.yml's per-theme catchall_marker -
+          # that file has its own lanes (ecmwf and osm among them) and copying
+          # its exclusions here would drop those backends from the cron
+          # entirely, since this workflow has no dedicated job for them.
+          #
+          # The list had drifted: earthdata, eumetsat and asf gained jobs here
+          # but were never excluded, so the catch-all collected their tests a
+          # second time - and, before their credentials were wired, only to skip
+          # them (one run reported 2 passed, 14 skipped). Running them twice also
+          # doubled the concurrent Earthdata Login token mints, the call that
           # intermittently times out from CI.
           report="$RUNNER_TEMP/e2e-shared.xml"
           uv run --locked pytest ${{ matrix.package }} -v \

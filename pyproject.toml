@@ -262,6 +262,11 @@ packages = []
 [tool.ruff]
 line-length = 88
 target-version = "py311"  # requires-python floors at 3.11
+# ruff skips dot-prefixed directories by default, so the CI helper scripts were
+# invisible to a repo-wide `ruff check .` even though they gate the test suite.
+# mypy names them individually for the same reason.
+extend-include = [".github/scripts/*.py"]
+force-exclude = false
 
 [tool.ruff.format]
 # black had skip-string-normalization = true → preserve existing quotes.
