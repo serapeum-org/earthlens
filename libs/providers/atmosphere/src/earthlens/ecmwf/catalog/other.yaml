@@ -5827,18 +5827,25 @@ datasets:
       data_format: null
       area: null
     variables:
+      # All six season-endpoint indicators come back as one array the file
+      # names `beginning_end_of_season` (units `day`), whose long_name reads
+      # "Beginning/End of season, i.e. first date/last date of the longest
+      # continuous period ... of natural, groomed or managed snow". The
+      # granule does not distinguish them, so `cds_variable` is what selects
+      # which endpoint and which snow kind a retrieve returns - repeating one
+      # `nc_variable` across the six rows is the file's shape, not a mistake.
       start-of-the-longest-period-with-groomed-snow:
         cds_variable: start_of_the_longest_period_with_groomed_snow
-        nc_variable: start_of_the_longest_period_with_groomed_snow
-        units: unknown
+        nc_variable: beginning_end_of_season
+        units: day
       start-of-the-longest-period-with-managed-snow:
         cds_variable: start_of_the_longest_period_with_managed_snow
-        nc_variable: start_of_the_longest_period_with_managed_snow
-        units: unknown
+        nc_variable: beginning_end_of_season
+        units: day
       start-of-the-longest-period-with-natural-snow:
         cds_variable: start_of_the_longest_period_with_natural_snow
-        nc_variable: start_of_the_longest_period_with_natural_snow
-        units: unknown
+        nc_variable: beginning_end_of_season
+        units: day
       end-of-the-longest-period-with-groomed-snow:
         cds_variable: end_of_the_longest_period_with_groomed_snow
         nc_variable: beginning_end_of_season
