@@ -122,7 +122,13 @@ def _per_backend(report: Path) -> dict[str, tuple[int, int]]:
         for case in suite.iter("testcase"):
             marker = case.find("skipped")
             is_skip = marker is not None and marker.get("type") != "pytest.xfail"
-            slot = counts.setdefault(_backend(case.get("classname", "")), [0, 0])
+            # A collection-level skip - `pytest.importorskip` at module scope,
+            # say - has an empty `classname` and carries the module path in
+            # `name` instead, so it would otherwise land in the lane-level
+            # bucket and be invisible per backend. That is precisely the shape
+            # an uninstalled optional extra produces.
+            where = case.get("classname") or case.get("name", "")
+            slot = counts.setdefault(_backend(where), [0, 0])
             slot[1 if is_skip else 0] += 1
     return {name: (ran, skipped) for name, (ran, skipped) in counts.items()}
 

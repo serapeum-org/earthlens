@@ -259,6 +259,25 @@ class TestBackendGrouping:
         )
         assert guard._per_backend(report) == {"cmems": (0, 1), "erddap": (2, 0)}
 
+    def test_a_collection_level_skip_is_attributed_to_its_backend(
+        self, guard, tmp_path
+    ):
+        """A module-scope skip has no classname and carries the path in `name`.
+
+        `pytest.importorskip` at module scope produces exactly this, which is
+        the shape an uninstalled optional extra takes.
+        """
+        (tmp_path / "r.xml").write_text(
+            '<testsuites><testsuite name="s" tests="1" skipped="1">'
+            '<testcase classname="" name="tests.argo.test_x">'
+            '<skipped type="pytest.skip" message="m"/></testcase>'
+            "</testsuite></testsuites>",
+            encoding="utf-8",
+        )
+        assert guard._per_backend(tmp_path / "r.xml") == {"argo": (0, 1)}, (
+            "a collection-level skip was not attributed to its backend"
+        )
+
     def test_an_xfail_counts_as_executed_per_backend(self, guard, tmp_path):
         """The xfail rule applies inside a group too."""
         report = _backend_report(tmp_path / "r.xml", ("gee", "a", "pytest.xfail"))
