@@ -141,7 +141,7 @@ datasets:
       co2:
         cds_variable: co2
         nc_variable: co2
-        units: unknown
+        units: 1e-6
       xco2:
         cds_variable: xco2
         nc_variable: xco2
@@ -417,8 +417,10 @@ datasets:
     variables:
       land-surface-temperature:
         cds_variable: land_surface_temperature
-        nc_variable: land_surface_temperature
-        units: unknown
+        nc_variable: lst
+        units: kelvin
+        extras:
+          observation_time: [day, night]
   satellite-methane:
     endpoint: cds
     request_kind: satellite_cdr
@@ -435,7 +437,7 @@ datasets:
       ch4:
         cds_variable: ch4
         nc_variable: ch4
-        units: unknown
+        units: 1e-9
       xch4:
         cds_variable: xch4
         nc_variable: xch4
@@ -628,12 +630,12 @@ datasets:
     variables:
       snow-cover-fraction-viewable:
         cds_variable: snow_cover_fraction_viewable
-        nc_variable: snow_cover_fraction_viewable
-        units: unknown
+        nc_variable: scfv
+        units: percent
       snow-cover-fraction-on-ground:
         cds_variable: snow_cover_fraction_on_ground
-        nc_variable: snow_cover_fraction_on_ground
-        units: unknown
+        nc_variable: scfg
+        units: percent
   satellite-snow-water-equivalent:
     endpoint: cds
     request_kind: satellite_cdr
@@ -679,20 +681,20 @@ datasets:
         units: unknown
       surface-downwelling-longwave-flux:
         cds_variable: surface_downwelling_longwave_flux
-        nc_variable: surface_downwelling_longwave_flux
-        units: unknown
+        nc_variable: SDL
+        units: W/m2
       surface-net-downward-shortwave-flux:
         cds_variable: surface_net_downward_shortwave_flux
-        nc_variable: surface_net_downward_shortwave_flux
-        units: unknown
+        nc_variable: SNS
+        units: W m-2
       surface-net-downward-longwave-flux:
         cds_variable: surface_net_downward_longwave_flux
-        nc_variable: surface_net_downward_longwave_flux
-        units: unknown
+        nc_variable: SNL
+        units: W m-2
       surface-net-downward-radiative-flux:
         cds_variable: surface_net_downward_radiative_flux
-        nc_variable: surface_net_downward_radiative_flux
-        units: unknown
+        nc_variable: SRB
+        units: W m-2
       all-variables:
         cds_variable: all_variables
         nc_variable: all_variables
