@@ -98,4 +98,15 @@ jobs:
           # belt-and-braces assertion rather than a fatal constraint.
           #
           # --locked still fails the run if uv.lock has drifted.
-          uv run --locked --no-sync --no-build             earthlens datasets audit "$PROVIDERS" --strict
+          # --strict fails on a curated dataset the provider no longer serves, but
+          # an audit that could not run at all reports status=error with an empty
+          # `broken` list, so the gate would go green having checked nothing - the
+          # same blindness this branch fixes elsewhere. Capture the JSON and fail
+          # on an errored provider too.
+          set +e
+          uv run --locked --no-sync --no-build earthlens datasets audit \n            "$PROVIDERS" --strict --json > "$RUNNER_TEMP/audit.json"
+          drift=$?
+          set -e
+          cat "$RUNNER_TEMP/audit.json"
+          python .github/scripts/assert_audit_ran.py "$RUNNER_TEMP/audit.json"
+          exit "$drift"
