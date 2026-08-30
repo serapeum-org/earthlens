@@ -16,6 +16,7 @@ from types import SimpleNamespace
 
 import pytest
 import yaml
+from loguru import logger
 from typer.testing import CliRunner
 
 import earthlens.ecmwf._helpers as ecmwf_helpers
@@ -263,6 +264,26 @@ def _stub_client(monkeypatch, captured=None, seen_endpoints=None):
     monkeypatch.setattr(endpoints, "open_client", _open_client)
 
 
+def _refuse_to_remove(path, **kwargs):
+    """Stand in for a Windows reader that still holds the granule."""
+
+
+def _stub_probe_transport(monkeypatch, tmp_path):
+    """Point a probe at a local write instead of a store, scratch under `tmp_path`."""
+    monkeypatch.setattr(
+        ecmwf_helpers,
+        "_retrieve_with_retry",
+        lambda client, dataset, request, target, endpoint: pathlib.Path(
+            target
+        ).write_bytes(b"probe"),
+    )
+    monkeypatch.setattr(ecmwf_endpoints, "open_client", lambda endpoint: object())
+    monkeypatch.setattr(
+        ecmwf_cli, "_read_netcdf_var_meta", lambda path: {"x": {"units": "K"}}
+    )
+    monkeypatch.setenv("EARTHLENS_CACHE_DIR", str(tmp_path))
+
+
 class TestDeepProber:
     """Tests for the credentialed ecmwf `--deep` sampler."""
 
@@ -347,39 +368,44 @@ class TestDeepProber:
         assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
 
     def test_a_probe_survives_a_scratch_it_cannot_remove(self, monkeypatch, tmp_path):
-        """The probe must tolerate a scratch directory that will not delete.
+        """A removal that fails must not discard a retrieve and read that worked."""
+        _stub_probe_transport(monkeypatch, tmp_path)
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+        monkeypatch.setattr(shutil, "rmtree", _refuse_to_remove)
 
-        Asserted on the flag rather than by staging a real undeletable file: the
-        failure is Windows-only, so a file-holding test passes on POSIX whether
-        or not the fix is present, while this fails everywhere if the flag goes.
-        """
-        monkeypatch.setattr(
-            ecmwf_helpers,
-            "_retrieve_with_retry",
-            lambda client, dataset, request, target, endpoint: pathlib.Path(
-                target
-            ).write_bytes(b"probe"),
+        assert ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]}) == {
+            "x": {"units": "K"}
+        }
+
+    def test_an_unremovable_scratch_is_named_and_counted(self, monkeypatch, tmp_path):
+        """Silent tolerance would leave a sweep's tens of GB unattributable."""
+        _stub_probe_transport(monkeypatch, tmp_path)
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+        monkeypatch.setattr(shutil, "rmtree", _refuse_to_remove)
+        warnings: list[str] = []
+        sink = logger.add(warnings.append, level="WARNING")
+
+        try:
+            ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
+        finally:
+            logger.remove(sink)
+
+        assert len(ecmwf_cli.UNREMOVED_SCRATCH) == 1, "the survivor was not counted"
+        left = ecmwf_cli.UNREMOVED_SCRATCH[0]
+        assert pathlib.Path(left).exists()
+        assert any(left in message for message in warnings), (
+            "the path that could not be removed was never named"
         )
-        monkeypatch.setattr(ecmwf_endpoints, "open_client", lambda endpoint: object())
-        monkeypatch.setattr(
-            ecmwf_cli, "_read_netcdf_var_meta", lambda path: {"x": {"units": "K"}}
-        )
-        monkeypatch.setenv("EARTHLENS_CACHE_DIR", str(tmp_path))
 
-        real_tempdir = tempfile.TemporaryDirectory
-        seen: dict = {}
+    def test_a_removable_scratch_leaves_nothing_behind(self, monkeypatch, tmp_path):
+        """The ordinary path still removes the granule and reports no survivor."""
+        _stub_probe_transport(monkeypatch, tmp_path)
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
 
-        def _recording_tempdir(*args, **kwargs):
-            seen["ignore_cleanup_errors"] = kwargs.get("ignore_cleanup_errors")
-            return real_tempdir(*args, **kwargs)
+        ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
 
-        monkeypatch.setattr(tempfile, "TemporaryDirectory", _recording_tempdir)
-        result = ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
-        assert result == {"x": {"units": "K"}}
-        assert seen["ignore_cleanup_errors"] is True, (
-            "the probe no longer asks TemporaryDirectory to tolerate cleanup "
-            "errors, so an undeletable scratch will discard a successful read"
-        )
+        assert ecmwf_cli.UNREMOVED_SCRATCH == []
+        assert list(tmp_path.iterdir()) == [], "the probe scratch was left on disk"
 
     def test_the_reader_releases_its_container(self, monkeypatch, tmp_path):
         """The handle has to be let go, which is what keeps the scratch removable."""

@@ -1401,6 +1401,32 @@ class TestFoldedMatching:
 class TestBulkHydrateEmpty:
     """Tests for the catalog-wide hydrate driver (retrieve + catalog mocked)."""
 
+    def test_the_scratch_a_sweep_could_not_remove_reaches_the_summary(
+        self, monkeypatch, tmp_path, capsys
+    ):
+        """A silent tolerance leaves accumulating disk with nothing to attribute it to."""
+        from earthlens.ecmwf import cli as ecmwf_cli
+
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {
+                "reanalysis-era5-single-levels": _placeholder_dataset(
+                    "2m-temperature", "sea-surface-temperature"
+                )
+            },
+        )
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
+        monkeypatch.setattr(
+            ecmwf_cli, "UNREMOVED_SCRATCH", ["D:/earthlens-cache/probe-7f2a"]
+        )
+
+        summary = bulk_hydrate_empty()
+
+        assert summary["unremoved_scratch"] == ["D:/earthlens-cache/probe-7f2a"]
+        assert "probe-7f2a" in capsys.readouterr().out
+
     def test_fills_every_placeholder_in_place(self, tmp_path, monkeypatch):
         """Each placeholder dataset is hydrated and written back to its shard."""
         (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
@@ -1427,6 +1453,7 @@ class TestBulkHydrateEmpty:
             "unmatched": 0,
             "partial": 0,
             "filled": ["reanalysis-era5-single-levels"],
+            "unremoved_scratch": [],
         }
         variables = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"][
             "reanalysis-era5-single-levels"

@@ -12,6 +12,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, cast
 
+from loguru import logger
+
 from earthlens.cli.toolkit import (
     COVERAGE_BUCKETS,
     get_json,
@@ -380,6 +382,28 @@ def _deep_sample_request(
     return request
 
 
+#: Probe scratch directories a sweep could not remove, newest last. Read by
+#: the sweep summary so accumulating disk is attributable to a run rather than
+#: discovered later as unexplained directories under the cache root.
+UNREMOVED_SCRATCH: list[str] = []
+
+
+def _discard_scratch(scratch: str) -> None:
+    """Remove a probe's scratch directory, surviving a reader that still holds it.
+
+    Args:
+        scratch: The directory `_retrieve_probe` wrote its granule into.
+    """
+    import shutil
+
+    shutil.rmtree(scratch, onexc=lambda *_: None)
+    if Path(scratch).exists():
+        UNREMOVED_SCRATCH.append(scratch)
+        logger.warning(
+            f"probe scratch left on disk (a reader still holds it): {scratch}"
+        )
+
+
 def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str, Any]]:
     """Retrieve one tiny slice and read each NetCDF variable's metadata.
 
@@ -419,17 +443,18 @@ def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str
     # and through TemporaryDirectory so each is removed once it has been read
     # rather than accumulating until something runs out of space.
     #
-    # Cleanup errors are ignored deliberately. On Windows a reader that has not
-    # yet released the file makes removing the directory raise, and that raise
-    # would otherwise discard a retrieve and a read that both succeeded - and
-    # arrive as a PermissionError, the same class the store raises for an
-    # unaccepted licence, which is a wrong answer to an operator asking why a
-    # dataset failed. A file left behind costs disk; a lost result costs the
-    # row and sends the operator after the wrong cause.
+    # A failed removal must not discard a retrieve and a read that both
+    # succeeded. On Windows a reader that has not yet released the file makes
+    # removing the directory raise, and that raise arrives as a PermissionError
+    # - the same class the store raises for an unaccepted licence, which is a
+    # wrong answer to an operator asking why a dataset failed. So the removal
+    # is tolerated, but not silently: each survivor is named in a warning and
+    # counted, because a systemic release regression across a full sweep is
+    # hundreds of these and tens of GB, and a silent tolerance would leave an
+    # operator with neither the disk nor a reason for where it went.
     scratch_root = os.environ.get("EARTHLENS_CACHE_DIR") or None
-    with tempfile.TemporaryDirectory(
-        dir=scratch_root, ignore_cleanup_errors=True
-    ) as scratch:
+    scratch = tempfile.mkdtemp(dir=scratch_root)
+    try:
         target = Path(scratch) / "probe.nc"
         endpoint = _endpoint_for(dataset)
         client = open_client(endpoint)
@@ -443,6 +468,8 @@ def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str
                         shutil.copyfileobj(src, dst)
                     target = inner
         return _read_netcdf_var_meta(str(target))
+    finally:
+        _discard_scratch(scratch)
 
 
 def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:

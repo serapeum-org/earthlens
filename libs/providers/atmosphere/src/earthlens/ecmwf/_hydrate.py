@@ -1944,6 +1944,19 @@ def bulk_hydrate_empty(
             skipped += 1
 
     clear_catalog_cache()
+    # A probe whose granule could not be removed leaves a directory under the
+    # cache root. One is a Windows race; hundreds across a sweep is a release
+    # regression worth tens of GB, so the count travels with the summary rather
+    # than only reaching a log line the operator has already scrolled past.
+    from earthlens.ecmwf import cli
+
+    unremoved = list(cli.UNREMOVED_SCRATCH)
+    if unremoved:
+        typer.echo(
+            f"{len(unremoved)} probe scratch director"
+            f"{'y' if len(unremoved) == 1 else 'ies'} could not be removed; "
+            f"first: {unremoved[0]}"
+        )
     return {
         "candidates": total,
         "hydrated": hydrated,
@@ -1952,4 +1965,5 @@ def bulk_hydrate_empty(
         "unmatched": unmatched,
         "partial": partial,
         "filled": filled,
+        "unremoved_scratch": unremoved,
     }
