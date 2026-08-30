@@ -540,11 +540,15 @@ class Variable(FluxableLeaf):
             (e.g. `"t2m"`); used by post-processing scripts to
             index `fh.variables[...]`. See
             `examples/post_process_ecmwf_netcdf.py`.
-        units: Raw ERA5 unit string emitted by CDS for this variable
+        units: Raw unit string the producer emits for this variable
             (used in the output filename). The package returns values
-            in their native ERA5 units; downstream code is responsible
+            in their native units; downstream code is responsible
             for any unit conversion. See `docs/examples/catalog.md`
             for the conversion factors typical ERA5 workflows apply.
+            Transcribed verbatim and never normalised, so one unit
+            appears under several spellings across the catalog and
+            sibling rows of a stanza may disagree where the granule
+            does. Compare by parsing, not by string equality.
         cds_pressure_level: Optional list of pressure levels (as
             strings, e.g. `["1000"]`) for pressure-level datasets.
         product_type: CDS `product_type` request parameter. Picks

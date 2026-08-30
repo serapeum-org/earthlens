@@ -324,6 +324,15 @@ output filename for traceability and as documentation; downstream
 code is responsible for any conversion the user wants (e.g. K → °C,
 m → mm).
 
+The value is transcribed from the producer's own `units` attribute and is
+**not normalised**, so the catalog spans many spellings of one unit —
+`W m**-2`, `W m-2`, `W/m^2`; `K` and `kelvin`; `1`, `%`, and an empty
+string for a ratio. Rows of a single stanza can disagree, because the file
+they describe does: `satellite-surface-radiation-budget` labels `SRS`
+`W/m^2` and `SOL` `W m-2`. Rewriting either would make this row misdescribe
+the granule it documents and change the output filename, so the spelling is
+left as found. **Compare units by parsing them, never by string equality.**
+
 ##### `cds_variable`
 
 *Optional.* String. The exact `variable` request name CDS expects,
