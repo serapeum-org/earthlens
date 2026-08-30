@@ -369,7 +369,7 @@ def band_valid_times(url: str, steps: int) -> list[str]:
             `step_<n>` fallback when the coordinate cannot be read.
     """
     try:
-        from osgeo import gdal
+        gdal = gdal_module()
 
         dataset = gdal.OpenEx(url, gdal.OF_MULTIDIM_RASTER)
         try:
@@ -397,10 +397,17 @@ def band_valid_times(url: str, steps: int) -> list[str]:
     return [f"step_{index + 1}" for index in range(steps)]
 
 
+def gdal_module():
+    """Return the vendored `osgeo.gdal` module (an injectable seam for tests)."""
+    from osgeo import gdal
+
+    return gdal
+
+
 def _read_grid_coordinates(url: str):
     """Return the cube's `(longitude, latitude)` arrays, or `None` if unreadable."""
     try:
-        from osgeo import gdal
+        gdal = gdal_module()
 
         dataset = gdal.OpenEx(url, gdal.OF_MULTIDIM_RASTER)
         try:

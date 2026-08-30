@@ -43,6 +43,11 @@ def _offline_band_names(monkeypatch):
 _COASTAL_CSV = "GID_0,NAME_0,summary_TWL_1_10\nABW,Aruba,2\nNLD,Netherlands,9\n"
 
 
+def _raise_runtime(*args, **kwargs):
+    """Stand-in that fails the way an unreachable cube would."""
+    raise RuntimeError("cannot open")
+
+
 class _FakeHttp:
     """Fake jeodpp autoindex + CSV fetcher for one product's newest cycle."""
 
@@ -855,7 +860,8 @@ class TestHelperEdges:
     def test_band_valid_times_falls_back_when_time_is_unreadable(self, monkeypatch):
         """An unreadable time axis degrades to positional band names, never raises."""
         monkeypatch.undo()  # exercise the real helper, not the offline stand-in
-        assert _helpers.band_valid_times("/vsicurl/not-a-real-cube.nc", 3) == [
+        monkeypatch.setattr(_helpers, "gdal_module", _raise_runtime)
+        assert _helpers.band_valid_times("irrelevant", 3) == [
             "step_1",
             "step_2",
             "step_3",
