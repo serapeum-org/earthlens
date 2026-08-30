@@ -19,10 +19,16 @@ import re
 from collections.abc import Callable, Sequence
 from datetime import datetime, timedelta
 from functools import lru_cache
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import requests
 from loguru import logger
+
+if TYPE_CHECKING:  # pragma: no cover - import-time only for the annotations
+    from types import ModuleType
+
+    from earthlens.base.http import HttpClient
 
 #: Root of the JRC CEMS-EFAS flood-hazard directory (anonymous HTTPS, no auth).
 BASE_URL: str = (
@@ -40,7 +46,7 @@ _HREF = re.compile(r'href="([^"]+)"')
 
 
 @lru_cache(maxsize=1)
-def _client():
+def _client() -> HttpClient:
     """Return the process-wide `HttpClient` used for every jeodpp request.
 
     Cached so one `latest` resolve reuses a single session (and its connection
@@ -486,7 +492,7 @@ def band_valid_times(url: str, steps: int) -> list[str]:
     return [f"step_{index + 1}" for index in range(steps)]
 
 
-def gdal_module():
+def gdal_module() -> ModuleType:
     """Return the vendored `osgeo.gdal` module.
 
     Imported through this one accessor so the multidim reads below have a single
@@ -494,11 +500,13 @@ def gdal_module():
     once `pyramids` has put its vendored copy on the path).
 
     Returns:
-        module: The `osgeo.gdal` module.
+        ModuleType: The `osgeo.gdal` module.
     """
     from osgeo import gdal
 
-    return gdal
+    # osgeo ships no stubs, so the import is Any; the cast restores the
+    # declared return type without weakening it.
+    return cast("ModuleType", gdal)
 
 
 def require_geographic_affine(

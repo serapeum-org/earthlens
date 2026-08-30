@@ -131,7 +131,7 @@ class JRC(AbstractDataSource):
         reference_time: str | None = "latest",
         field: str | None = None,
         catalog: Catalog | None = None,
-    ):
+    ) -> None:
         """Initialise a JRC backend instance for the resolved dataset.
 
         Args:
@@ -404,7 +404,7 @@ class JRC(AbstractDataSource):
                 "'100', or 'RP100')."
             ) from None
 
-    def _initialize(self):
+    def _initialize(self) -> None:
         """No-op initialiser — every JRC dataset is public + anonymous.
 
         Returns:
