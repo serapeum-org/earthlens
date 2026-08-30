@@ -15,9 +15,11 @@ from __future__ import annotations
 import fnmatch
 import math
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
+import numpy as np
 import requests
+from loguru import logger
 
 #: Root of the JRC CEMS-EFAS flood-hazard directory (anonymous HTTPS, no auth).
 BASE_URL: str = (
@@ -60,10 +62,23 @@ def efhm_url(
 
 
 def _http_text(url: str) -> str:
-    """Return the body of a GET as text (jeodpp autoindex / coastal CSV)."""
-    response = requests.get(url, timeout=_HTTP_TIMEOUT)
-    response.raise_for_status()
-    return response.text
+    """Return the body of a GET as text (jeodpp autoindex / coastal CSV).
+
+    Reads through the shared `HttpClient` so the crawl inherits the repo's
+    session reuse, user agent and `Retry-After`-aware retry/back-off.
+
+    Args:
+        url: The directory or file URL to fetch.
+
+    Returns:
+        str: The response body as text.
+
+    Raises:
+        requests.HTTPError: If the server returns a non-2xx status.
+    """
+    from earthlens.base.http import HttpClient
+
+    return HttpClient(timeout=_HTTP_TIMEOUT).get(url).text
 
 
 def list_directory(url: str, *, http_text=_http_text) -> list[str]:
@@ -95,8 +110,23 @@ def _numeric_dirs(names: list[str]) -> list[str]:
 
 
 def _cycle_id(url: str) -> str:
-    """Compact `YYYYMMDDTHH` id from a `.../YYYY/MM/DD/HH/` cycle URL."""
+    """Compact `YYYYMMDDTHH` id from a `.../YYYY/MM/DD/HH/` cycle URL.
+
+    Args:
+        url: The resolved cycle directory URL.
+
+    Returns:
+        str: The `YYYYMMDDTHH` identifier used in output filenames.
+
+    Raises:
+        ValueError: If the URL does not carry the four numeric path segments.
+    """
     parts = [p for p in url.strip("/").split("/") if p.isdigit()]
+    if len(parts) < 4:
+        raise ValueError(
+            f"cannot derive a cycle id from {url!r}: expected a "
+            ".../YYYY/MM/DD/HH/ path."
+        )
     year, month, day, hour = parts[-4:]
     return f"{year}{month}{day}T{hour}"
 
@@ -134,17 +164,39 @@ def _parse_reference_time(value) -> datetime:
     )
 
 
+#: Cap on the cycle folders inspected while resolving `"latest"`. Without it a
+#: renamed sentinel or a publishing pause turns the walk into a crawl of the whole
+#: multi-year archive, one un-cached request per directory.
+MAX_CYCLE_PROBES: int = 40
+
+
 def _descend_newest(
-    url: str, level: int, endfls_marker: str, http_text
+    url: str, level: int, endfls_marker: str, http_text, budget: list[int]
 ) -> tuple[str, str] | None:
-    """Depth-first descend `level` numeric dirs, returning the newest complete cycle."""
+    """Depth-first descend `level` numeric dirs, returning the newest complete cycle.
+
+    Args:
+        url: The directory to descend from (trailing `/`).
+        level: How many numeric levels remain below `url`.
+        endfls_marker: The cycle-complete sentinel to look for at the leaf.
+        http_text: Injectable text fetcher.
+        budget: One-element list holding the remaining leaf probes; decremented in
+            place so the whole recursion shares one allowance.
+
+    Returns:
+        tuple[str, str] | None: `(cycle_url, cycle_id)` for the newest complete
+            cycle, or `None` when none was found within the budget.
+    """
     for name in _numeric_dirs(list_directory(url, http_text=http_text)):
         child = f"{url}{name}/"
         if level == 1:
+            if budget[0] <= 0:
+                return None
+            budget[0] -= 1
             if endfls_marker in list_directory(child, http_text=http_text):
                 return child, _cycle_id(child)
         else:
-            found = _descend_newest(child, level - 1, endfls_marker, http_text)
+            found = _descend_newest(child, level - 1, endfls_marker, http_text, budget)
             if found is not None:
                 return found
     return None
@@ -181,15 +233,29 @@ def resolve_cycle(
     """
     root = f"{base_url.rstrip('/')}/{product}"
     if _is_latest(reference_time):
-        found = _descend_newest(f"{root}/", 4, endfls_marker, http_text=http_text)
+        budget = [MAX_CYCLE_PROBES]
+        found = _descend_newest(f"{root}/", 4, endfls_marker, http_text, budget)
         if found is None:
             raise ValueError(
-                f"no complete cycle (with {endfls_marker!r}) found under {root}."
+                f"no complete cycle (with {endfls_marker!r}) found under {root} "
+                f"within the newest {MAX_CYCLE_PROBES} cycle folders; the archive "
+                "may be mid-publish or the sentinel may have been renamed."
             )
         return found
     dt = _parse_reference_time(reference_time)
     cycle_url = f"{root}/{dt.strftime(cycle_path_template)}/"
-    if endfls_marker not in list_directory(cycle_url, http_text=http_text):
+    try:
+        entries = list_directory(cycle_url, http_text=http_text)
+    except requests.HTTPError as exc:
+        # The archive keeps a rolling window, so a pinned cycle that has aged out
+        # (or a mistyped hour) 404s. Surface the ValueError the API documents
+        # rather than leaking the transport error.
+        raise ValueError(
+            f"cycle {dt.strftime(cycle_path_template)} is not published at "
+            f"{cycle_url} — it may have aged out of the archive's retention "
+            "window, or the cycle hour may be wrong."
+        ) from exc
+    if endfls_marker not in entries:
         raise ValueError(
             f"cycle {dt.strftime(cycle_path_template)} is not complete "
             f"(no {endfls_marker!r} at {cycle_url})."
@@ -216,6 +282,46 @@ def find_cycle_file(cycle_url: str, glob: str, *, http_text=_http_text) -> str:
         if not name.endswith("/") and fnmatch.fnmatchcase(name, glob):
             return name
     raise ValueError(f"no file matching {glob!r} in {cycle_url}.")
+
+
+#: CF epoch of the cubes' `time` coordinate (`days since 1950-01-01`).
+_TIME_EPOCH = datetime(1950, 1, 1)
+
+
+def band_valid_times(url: str, steps: int) -> list[str]:
+    """Name each output band by the forecast valid time it holds.
+
+    The cubes carry a CF `time` coordinate (`days since 1950-01-01`) that becomes
+    the written GeoTIFF's band axis; without these names a band is unidentifiable
+    without going back to the source. `time` is a *coordinate*, so it is reachable
+    through GDAL's multidimensional API rather than the container's data variables.
+
+    Args:
+        url: The `/vsicurl/`-prefixed cube URL to read the coordinate from.
+        steps: How many bands the written raster has.
+
+    Returns:
+        list[str]: One `YYYY-MM-DDTHH:MM` label per band, or a positional
+            `step_<n>` fallback when the coordinate cannot be read.
+    """
+    try:
+        from osgeo import gdal
+
+        dataset = gdal.OpenEx(url, gdal.OF_MULTIDIM_RASTER)
+        values = [
+            float(v)
+            for v in np.asarray(
+                dataset.GetRootGroup().OpenMDArray("time").ReadAsArray()
+            ).ravel()[:steps]
+        ]
+        if len(values) == steps:
+            return [
+                (_TIME_EPOCH + timedelta(days=v)).strftime("%Y-%m-%dT%H:%M")
+                for v in values
+            ]
+    except Exception:  # noqa: BLE001 - naming is best-effort; never fail the fetch
+        logger.debug("JRC: could not read the cube's time axis for band names")
+    return [f"step_{index + 1}" for index in range(steps)]
 
 
 def grid_geotransform(

@@ -15,7 +15,7 @@ cache (used by tests that monkey-patch `CATALOG_PATH`).
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -88,7 +88,9 @@ class Dataset(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     id: str
-    kind: str = "flood_hazard_raster"
+    kind: Literal["flood_hazard_raster", "sea_level_gridded", "sea_level_coastal"] = (
+        "flood_hazard_raster"
+    )
     title: str = ""
     band: str = "water_depth"
     long_name: str = ""

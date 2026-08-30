@@ -50,23 +50,35 @@ class _FakeVariable:
         self.rows = rows
         self._bands = bands
 
-    def read_array(self, window):
+    def read_array(self, window, masked=False):
         col_off, row_off, width, height = window
         array = np.full(
             (self._bands, height, width),
             float(col_off * 1000 + row_off),
             dtype="float32",
         )
-        return array
+        return np.ma.masked_array(array, mask=False) if masked else array
+
+
+class _FakeTimeVariable:
+    """The cube's CF `time` coordinate, in days since 1950-01-01."""
+
+    def __init__(self, steps=16):
+        self._steps = steps
+
+    def read_array(self, *args, **kwargs):
+        return np.arange(27996.0, 27996.0 + self._steps)
 
 
 class _FakeContainer:
-    """A NetCDF container yielding a single fake variable."""
+    """A NetCDF container yielding a fake data variable plus a `time` axis."""
 
     def __init__(self, variable):
         self._variable = variable
 
     def get_variable(self, name):
+        if name == "time":
+            return _FakeTimeVariable()
         return self._variable
 
 
@@ -78,7 +90,7 @@ def _fake_read_file(_url, variable=None):
 class _FakeMaskedVariable(_FakeVariable):
     """A variable whose window read masks one cell with a numeric fill value."""
 
-    def read_array(self, window):
+    def read_array(self, window, masked=False):
         _, _, width, height = window
         data = np.full((self._bands, height, width), 1.5, dtype="float32")
         mask = np.zeros_like(data, dtype=bool)
@@ -410,19 +422,25 @@ class TestGuards:
 class TestHelperEdges:
     """Edge cases in the sea-level helpers (raises + fallbacks)."""
 
-    def test_http_text_uses_requests(self, monkeypatch):
-        """`_http_text` GETs the URL and raises on a bad status."""
+    def test_http_text_reads_through_the_shared_client(self, monkeypatch):
+        """`_http_text` fetches through the shared `HttpClient`, not bare requests."""
         seen = {}
 
         class _Resp:
             text = '<a href="12/">12/</a>'
 
-            def raise_for_status(self):
-                seen["ok"] = True
+        class _Client:
+            def __init__(self, **kwargs):
+                seen["timeout"] = kwargs.get("timeout")
 
-        monkeypatch.setattr(_helpers.requests, "get", lambda url, timeout: _Resp())
+            def get(self, url, **kwargs):
+                seen["url"] = url
+                return _Resp()
+
+        monkeypatch.setattr("earthlens.base.http.HttpClient", _Client)
         assert "12/" in _helpers._http_text("https://x/")
-        assert seen["ok"]
+        assert seen["url"] == "https://x/", f"unexpected URL fetched: {seen}"
+        assert seen["timeout"] is not None, "the client should be given a timeout"
 
     def test_list_directory_normalizes_and_filters(self):
         """A missing trailing slash is added and parent / sort links are dropped."""

@@ -156,31 +156,30 @@ class JRC(AbstractDataSource):
         self._dataset: Dataset = self._catalog.get(
             self._resolve_dataset_id(dataset, product, representation)
         )
-        self.OUTPUT_KIND = self._KIND_TO_OUTPUT.get(self._dataset.kind, "raster")
         kind = self._dataset.kind
+        if kind not in self._KIND_TO_OUTPUT:
+            raise ValueError(
+                f"catalog dataset {self._dataset.id!r} declares an unhandled kind "
+                f"{kind!r}; expected one of {sorted(self._KIND_TO_OUTPUT)}."
+            )
+        self.OUTPUT_KIND = self._KIND_TO_OUTPUT[kind]
+        # Only the two raster kinds honour an AOI; declaring this per instance lets
+        # the base class warn when a polygon is handed to the global coastal table.
+        self.SUPPORTS_POLYGON_AOI = kind != "sea_level_coastal"
 
         self._return_periods: list[int] = []
         self._reference_time = reference_time
         self._field = ""
-        variables: list[str]
 
         if kind == "flood_hazard_raster":
-            if lat_lim is None or lon_lim is None:
-                raise ValueError(
-                    "JRC EFHM requires a bounding box (lat_lim=[s, n], "
-                    "lon_lim=[w, e]) — a hazard-map subset has no default extent."
-                )
+            self._require_bbox(lat_lim, lon_lim, "EFHM")
             self._return_periods = self._resolve_return_periods(return_periods)
             variables = [self._dataset.band]
         elif kind == "sea_level_gridded":
-            if lat_lim is None or lon_lim is None:
-                raise ValueError(
-                    "JRC sea-level gridded forecasts require a bounding box "
-                    "(lat_lim=[s, n], lon_lim=[w, e])."
-                )
+            self._require_bbox(lat_lim, lon_lim, "sea-level gridded forecasts")
             self._field = field or self._dataset.default_field or "TWL75"
             variables = [self._field]
-        else:  # sea_level_coastal — global, no AOI
+        else:  # sea_level_coastal — a global table; the AOI does not apply
             lat_lim = lat_lim if lat_lim is not None else [-90.0, 90.0]
             lon_lim = lon_lim if lon_lim is not None else [-180.0, 180.0]
             variables = [self._dataset.id]
@@ -195,6 +194,26 @@ class JRC(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
+
+    @staticmethod
+    def _require_bbox(
+        lat_lim: list[float] | None, lon_lim: list[float] | None, what: str
+    ) -> None:
+        """Reject a request whose kind needs an AOI but was given none.
+
+        Args:
+            lat_lim: The requested latitudes, or `None`.
+            lon_lim: The requested longitudes, or `None`.
+            what: The product name to quote in the message.
+
+        Raises:
+            ValueError: If either bound is missing.
+        """
+        if lat_lim is None or lon_lim is None:
+            raise ValueError(
+                f"JRC {what} require a bounding box (lat_lim=[s, n], "
+                "lon_lim=[w, e]) — a subset has no default extent."
+            )
 
     def _resolve_dataset_id(
         self, dataset: str | None, product: str | None, representation: str | None
@@ -452,7 +471,9 @@ class JRC(AbstractDataSource):
             return [self._fetch_efhm_one(product) for product in products]
         if kind == "sea_level_gridded":
             return [self._fetch_gridded_one(product) for product in products]
-        return [self._fetch_coastal(product) for product in products]
+        if kind == "sea_level_coastal":
+            return [self._fetch_coastal(product) for product in products]
+        raise ValueError(f"unhandled JRC dataset kind {kind!r}.")
 
     def _fetch_efhm_one(self, product: RemoteProduct) -> Path:
         """Windowed-read + crop one return-period GeoTIFF to the AOI.
@@ -557,8 +578,21 @@ class JRC(AbstractDataSource):
 
         with vsicurl_config():
             container = NetCDF.read_file(url)
+            variable = None
             try:
                 variable = container.get_variable(self._field)
+                # Not every variable in the cube is on the lat/lon grid (the
+                # `*coast*` fields are indexed by coastal point, and the coordinate
+                # variables are 1-D), and those come back as a bare MDArray. Fail
+                # with a message naming the gridded alternatives rather than an
+                # opaque AttributeError deep in the read.
+                if not hasattr(variable, "columns") or not hasattr(variable, "rows"):
+                    raise ValueError(
+                        f"field {self._field!r} is not a gridded field of "
+                        f"{self._dataset.id!r} (it is not on the lat/lon grid). "
+                        f"Pass a gridded field such as "
+                        f"{self._dataset.default_field or 'TWL75'!r}."
+                    )
                 cols, rows = variable.columns, variable.rows
                 geo = _helpers.grid_geotransform(cols, rows)
                 # Widen a point / cell-edge AOI to one pixel so an on-grid point
@@ -576,13 +610,22 @@ class JRC(AbstractDataSource):
                     f"JRC {self._dataset.id}: windowed /vsicurl read of "
                     f"{self._field!r} {win_cols}x{win_rows} at ({col_off}, {row_off})"
                 )
-                raw = variable.read_array(window=[col_off, row_off, win_cols, win_rows])
-                # Carry a masked / fill value through as NaN so masked land cells
-                # never leak as the source fill number (the cubes declare no
-                # nodata; missing arrives as NaN).
+                # `masked=True` so a field that declares a numeric `_FillValue` comes
+                # back masked; `filled` then turns both that and the cubes' own NaN
+                # gaps into the NaN this writes as no-data.
+                raw = variable.read_array(
+                    window=[col_off, row_off, win_cols, win_rows], masked=True
+                )
                 array = np.ma.filled(raw, np.nan).astype("float32")
                 window_geo = _helpers.window_origin(geo, col_off, row_off)
+                # The cube's time axis becomes the output's band axis, so carry the
+                # valid times across or the bands are unidentifiable.
+                steps = array.shape[0] if array.ndim == 3 else 1
+                band_names = _helpers.band_valid_times(url, steps)
             finally:
+                # The variable is a separate pyramids object with its own GDAL
+                # handle; closing only the container leaks it (variable first).
+                close_quietly(variable)
                 close_quietly(container)
 
         window_ds = PyramidsDataset.create_from_array(
@@ -602,6 +645,8 @@ class JRC(AbstractDataSource):
             )
             staged = target.with_name(f"{target.stem}.part{target.suffix}")
             try:
+                if len(band_names) == getattr(cropped, "band_count", 0):
+                    cropped.band_names = band_names
                 cropped.to_file(str(staged))
                 close_quietly(cropped)
                 staged.replace(target)
