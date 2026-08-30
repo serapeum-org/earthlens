@@ -257,3 +257,59 @@ def test_live_srtm_projected_crs_reads_the_same_ground(tmp_path):
         assert abs(got - want) < 8.0, (
             f"UTM q{quantile} {got:.2f} m differs from EPSG:4326 {want:.2f} m"
         )
+
+
+def _download_chirps(tmp_path, engine: str):
+    """Fetch a tiny CHIRPS precipitation composite through one engine."""
+    el = EarthLens(
+        data_source="gee",
+        start="2020-06-01",
+        end="2020-06-05",
+        variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+        temporal_resolution="raw",
+        lat_lim=[29.95, 30.0],
+        lon_lim=[31.25, 31.3],
+        path=str(tmp_path / engine),
+        scale=5566,
+        engine=engine,
+    ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
+    paths = el.download(progress_bar=False)
+    assert len(paths) == 1, f"{engine}: expected one GeoTIFF, got {paths}"
+    return paths[0]
+
+
+@_skip_without_creds
+@pytest.mark.skipif(
+    not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
+)
+def test_live_chirps_collection_eedai_matches_ee(tmp_path):
+    """A collection composited through the reader matches Earth Engine's reduce.
+
+    CHIRPS DAILY is an ImageCollection; the default `mean` reducer collapses the
+    five-day window to one image. Earth Engine reduces server-side, the reader
+    downloads the scenes and reduces client-side — so the check is a physical
+    agreement of the precipitation distribution, proving C1 routes the composite
+    correctly rather than reading a single scene.
+    """
+    import numpy as np
+
+    ee_path = _download_chirps(tmp_path, "ee")
+    eedai_path = _download_chirps(tmp_path, "eedai")
+    assert eedai_path.is_file() and eedai_path.stat().st_size > 0, (
+        "EEDAI output missing"
+    )
+
+    ee_values, ee_epsg, _ee_bbox = _open_raster(ee_path)
+    eedai_values, eedai_epsg, _eedai_bbox = _open_raster(eedai_path)
+    assert eedai_epsg == ee_epsg, f"CRS differs: {eedai_epsg} vs {ee_epsg}"
+
+    ee_finite = ee_values[np.isfinite(ee_values)]
+    eedai_finite = eedai_values[np.isfinite(eedai_values)]
+    assert ee_finite.size and eedai_finite.size, "a composite has no valid pixels"
+    for quantile in (0.05, 0.5, 0.95):
+        got = float(np.quantile(eedai_finite, quantile))
+        want = float(np.quantile(ee_finite, quantile))
+        assert abs(got - want) < 2.0, (
+            f"EEDAI composite q{quantile} {got:.3f} mm differs from Earth Engine "
+            f"{want:.3f} mm"
+        )

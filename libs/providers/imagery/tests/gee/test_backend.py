@@ -1307,7 +1307,7 @@ class TestComposite:
             gee._composite(col, ds, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1))
         )
         assert len(buckets) == 1
-        when, image = buckets[0]
+        when, image, _bs, _be = buckets[0]
         assert when == dt.datetime(2020, 6, 1)
         assert image.reducer == "mean"
 
@@ -1327,11 +1327,11 @@ class TestComposite:
         buckets = list(
             gee._composite(col, ds, dt.datetime(2020, 6, 1), dt.datetime(2020, 8, 1))
         )
-        assert [w for w, _ in buckets] == [
+        assert [b[0] for b in buckets] == [
             dt.datetime(2020, 6, 1),
             dt.datetime(2020, 7, 1),
         ]
-        assert all(img.reducer == "mean" for _, img in buckets)
+        assert all(b[1].reducer == "mean" for b in buckets)
 
     def test_monthly_maps_cloud_mask_once_not_per_bucket(self, make_gee):
         """The `cloud_mask` is `.map`-applied once at build, not re-applied per bucket."""
@@ -1352,7 +1352,7 @@ class TestComposite:
             gee._composite(col, ds, dt.datetime(2020, 6, 1), dt.datetime(2020, 8, 1))
         )
         assert len(buckets) == 2
-        assert all(img.reducer == "mean" for _, img in buckets)
+        assert all(b[1].reducer == "mean" for b in buckets)
 
     def test_static_image_one_bucket_regardless_of_resolution(self, make_gee):
         """A static `image` dataset always yields a single bucket."""
@@ -1379,7 +1379,7 @@ class TestComposite:
         col = gee._build_collection(
             ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 3)
         )
-        ((_, image),) = gee._composite(
+        ((_, image, _bs, _be),) = gee._composite(
             col, ds, dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 3)
         )
         assert image.reducer == "median"
@@ -1417,7 +1417,14 @@ class TestApi:
             spatial_resolution=None,
         )
         with pytest.raises(ValueError, match="no output scale"):
-            gee._api(_FakeImage(), bare, ["b"], dt.datetime(2000, 1, 1))
+            gee._api(
+                _FakeImage(),
+                bare,
+                ["b"],
+                dt.datetime(2000, 1, 1),
+                dt.datetime(2000, 1, 1),
+                dt.datetime(2000, 1, 2),
+            )
 
     def test_successful_download_writes_geotiff(self, make_gee, tmp_path):
         """A within-limits request writes a `.tif` and returns its path."""
@@ -1476,10 +1483,17 @@ class TestApi:
         col = gee._build_collection(
             ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)
         )
-        ((_, image),) = gee._composite(
+        ((_, image, _bs, _be),) = gee._composite(
             col, ds, dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)
         )
-        gee._api(image, ds, ["elevation"], dt.datetime(2000, 2, 11))
+        gee._api(
+            image,
+            ds,
+            ["elevation"],
+            dt.datetime(2000, 2, 11),
+            dt.datetime(2000, 1, 1),
+            dt.datetime(2000, 1, 2),
+        )
         assert image.download_params["format"] == "GEO_TIFF"
         assert image.download_params["scale"] == 120.0
         assert image.download_params["crs"] == "EPSG:3857"
@@ -1568,13 +1582,20 @@ class TestAutoSplit:
             dt.datetime(2000, 2, 11),
             dt.datetime(2000, 2, 13),
         )
-        ((_, image),) = gee._composite(
+        ((_, image, _bs, _be),) = gee._composite(
             col,
             ds,
             dt.datetime(2000, 2, 11),
             dt.datetime(2000, 2, 13),
         )
-        gee._api(image, ds, ["elevation"], dt.datetime(2000, 2, 11))
+        gee._api(
+            image,
+            ds,
+            ["elevation"],
+            dt.datetime(2000, 2, 11),
+            dt.datetime(2000, 1, 1),
+            dt.datetime(2000, 1, 2),
+        )
 
         assert len(image.download_params_list) > 1
         for call in image.download_params_list:
@@ -1782,7 +1803,17 @@ class _FakeReaderModule:
 
     def __init__(self):
         self.calls: list[tuple[str, dict]] = []
+        self.cost_calls: list[tuple[str, dict]] = []
         self.dataset = _FakeEedaiDataset()
+        # A small, servable collection by default; tests override per case.
+        self.cost = SimpleNamespace(scene_count=3, min_pixel_size=5566.0)
+        self.cost_error: Exception | None = None
+
+    def estimate_earthengine_cost(self, asset_id, **kwargs):
+        self.cost_calls.append((asset_id, kwargs))
+        if self.cost_error is not None:
+            raise self.cost_error
+        return self.cost
 
     def from_earthengine(self, asset_id, **kwargs):
         self.calls.append((asset_id, kwargs))
@@ -1835,6 +1866,94 @@ class TestEngineOption:
         """An unknown engine raises `ValueError` at construction."""
         with pytest.raises(ValueError, match="engine must be one of"):
             make_gee(engine="gdal")
+
+
+class TestEedaiCollections:
+    """C1: an eligible ImageCollection is composited through the reader per bucket."""
+
+    START = dt.datetime(2020, 6, 1)
+    END = dt.datetime(2020, 7, 1)
+
+    def _collection_gee(self, make_gee, **overrides):
+        """A GEE over a small CHIRPS collection window."""
+        params = dict(
+            start="2020-06-01",
+            end="2020-06-30",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_composite_kwargs_are_forwarded_to_the_reader(self, make_gee, fake_reader):
+        """The reader is asked to composite the bucket's window with the reducer."""
+        gee = self._collection_gee(make_gee)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert plan.can_serve, plan.reason
+        gee._export_via_eedai(
+            var_info, ["precipitation"], 5566.0, "chirps", plan, self.START, self.END
+        )
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["start"] == "2020-06-01"
+        assert kwargs["end"] == "2020-07-01"
+        assert kwargs["reducer"] == var_info.default_reducer
+
+    def test_single_image_read_sends_no_composite_kwargs(self, make_gee, fake_reader):
+        """A static image is read directly, with no start/end/reducer."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm", _plan_for(gee, var_info)
+        )
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert "start" not in kwargs and "reducer" not in kwargs
+
+    def test_over_the_scene_cap_declines(self, make_gee, fake_reader):
+        """More scenes than the cap fall back to Earth Engine's server-side reduce."""
+        gee = self._collection_gee(make_gee)
+        fake_reader.cost = SimpleNamespace(scene_count=5000, min_pixel_size=5566.0)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert not plan.can_serve
+        assert "scene cap" in plan.reason
+
+    def test_over_the_pixel_budget_declines(self, make_gee, fake_reader, monkeypatch):
+        """Scenes that together exceed the single-pass budget are declined."""
+        gee = self._collection_gee(make_gee)
+        fake_reader.cost = SimpleNamespace(scene_count=50, min_pixel_size=5566.0)
+        # Shrink the budget so the modest AOI footprint x 50 scenes overruns it.
+        monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 10)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert not plan.can_serve
+        assert "single-pass budget" in plan.reason
+
+    def test_scene_discovery_failure_declines(self, make_gee, fake_reader):
+        """A discovery error (or no scenes) declines rather than crashing."""
+        gee = self._collection_gee(make_gee)
+        fake_reader.cost_error = RuntimeError("no scenes")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert not plan.can_serve
+        assert "found none or failed" in plan.reason
+
+    def test_missing_bucket_window_declines(self, make_gee, fake_reader):
+        """A collection verdict without a date window cannot size the read."""
+        gee = self._collection_gee(make_gee)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, None, None)
+        assert not plan.can_serve
+        assert "bucket date window" in plan.reason
+
+    def test_estimate_is_queried_with_the_bucket_window(self, make_gee, fake_reader):
+        """Scene discovery uses the bucket's dates and a lat/lon AOI envelope."""
+        gee = self._collection_gee(make_gee)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        _asset_id, kwargs = fake_reader.cost_calls[0]
+        assert kwargs["start"] == "2020-06-01" and kwargs["end"] == "2020-07-01"
+        assert len(kwargs["bbox"]) == 4
 
 
 class TestEedaiProjectedCrs:
@@ -1897,10 +2016,19 @@ class TestEedaiEligibility:
         gee = make_gee()
         assert gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
 
-    def test_image_collection_is_not_eligible(self, make_gee):
-        """A reduced collection needs server-side compute, so it is not."""
+    def test_image_collection_is_eligible(self, make_gee):
+        """A collection with no server-side shaping is composited by the reader (C1)."""
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]}, scale=5566.0
+        )
+        assert gee._eedai_eligible(gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY"))
+
+    def test_collection_with_cloud_mask_stays_ineligible(self, make_gee):
+        """A collection that still needs a server-side mask is not eligible."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            cloud_mask=_identity_mask,
         )
         assert not gee._eedai_eligible(gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY"))
 
@@ -2097,7 +2225,14 @@ class TestExportViaEedai:
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         image = _FakeImage()
-        out = gee._api(image, var_info, ["elevation"], dt.datetime(2000, 2, 11))
+        out = gee._api(
+            image,
+            var_info,
+            ["elevation"],
+            dt.datetime(2000, 2, 11),
+            dt.datetime(2000, 1, 1),
+            dt.datetime(2000, 1, 2),
+        )
         assert out.suffix == ".tif"
         assert fake_reader.calls, "the EEDAI reader was not used"
         assert image.download_params is None, "getDownloadURL should not be called"
@@ -2437,7 +2572,14 @@ class TestExportViaEedai:
         monkeypatch.setattr(backend_module.GEE, "_eedai_plan", _recording_plan)
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        gee._api(_FakeImage(), var_info, ["elevation"], dt.datetime(2000, 2, 11))
+        gee._api(
+            _FakeImage(),
+            var_info,
+            ["elevation"],
+            dt.datetime(2000, 2, 11),
+            dt.datetime(2000, 1, 1),
+            dt.datetime(2000, 1, 2),
+        )
         assert len(_PLANS_SEEN) == 1, f"the plan was computed {len(_PLANS_SEEN)} times"
 
     def test_an_empty_band_request_budgets_for_every_band(self, make_gee, fake_reader):
@@ -2632,6 +2774,8 @@ class TestExportViaEedai:
                 image=_FakeImage(),
                 bands=["elevation"],
                 when=dt.datetime(2000, 2, 11),
+                bucket_start=dt.datetime(2000, 1, 1),
+                bucket_end=dt.datetime(2000, 1, 2),
             )
         assert len([w for w in warnings if "cog=True has no effect" in w]) == 1
 
@@ -2686,6 +2830,13 @@ class TestExportViaEedai:
         gee = make_gee(engine="ee")
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         image = _FakeImage()
-        gee._api(image, var_info, ["elevation"], dt.datetime(2000, 2, 11))
+        gee._api(
+            image,
+            var_info,
+            ["elevation"],
+            dt.datetime(2000, 2, 11),
+            dt.datetime(2000, 1, 1),
+            dt.datetime(2000, 1, 2),
+        )
         assert not fake_reader.calls
         assert image.download_params is not None

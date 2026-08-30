@@ -149,6 +149,11 @@ _EEDAI_MAX_NATIVE_PIXELS: int = 4_000_000_000
 #: native resolution into memory before downsampling.
 _EEDAI_MAX_PIXELS: int = 200_000_000
 
+#: Most scenes a collection composite may fetch through the reader in one bucket.
+#: Each scene is a separate download the reader holds in memory to reduce, so a
+#: long time series is routed to Earth Engine's server-side reduce instead.
+_EEDAI_MAX_SCENES: int = 500
+
 #: The only resampler a tiled read may use. Upstream refuses anything else,
 #: because an interpolating kernel would disagree with the un-tiled result at
 #: the tile seams.
@@ -999,7 +1004,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         iterator: Iterable = buckets
         if progress_bar:
             iterator = tqdm(buckets, desc=f"{asset_id} [{','.join(bands)}]", unit="img")
-        return [self._api(image, var_info, bands, when) for when, image in iterator]
+        return [
+            self._api(image, var_info, bands, when, bucket_start, bucket_end)
+            for when, image, bucket_start, bucket_end in iterator
+        ]
 
     def _build_collection(
         self, var_info: Dataset, bands: list[str], start: dt.datetime, end: dt.datetime
@@ -1081,12 +1089,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
             end: Exclusive window end (clamped, already +1 day).
 
         Yields:
-            `(timestamp, ee.Image)` pairs — `timestamp` is the bucket
-            start (a :class:`datetime.datetime`), used in the filename.
+            `(timestamp, ee.Image, bucket_start, bucket_end)` tuples —
+            `timestamp` is the bucket start (used in the filename), and
+            `(bucket_start, bucket_end)` is the bucket's half-open date window
+            (both :class:`datetime.datetime`), which the EEDAI collection path
+            re-composites client-side.
         """
         reducer = self.reducer or var_info.default_reducer
         if self.temporal_resolution == "raw" or not var_info.is_image_collection:
-            yield start, reduce_collection(collection, reducer)
+            yield start, reduce_collection(collection, reducer), start, end
             return
         freq = _RESOLUTION_FREQ[self.temporal_resolution]
         bucket_starts = date_windows(start, end, freq, inclusive="left")
@@ -1099,10 +1110,21 @@ class GEE(LazyClientMixin, AbstractDataSource):
             window = collection.filterDate(
                 bucket_start.strftime("%Y-%m-%d"), bucket_end.strftime("%Y-%m-%d")
             )
-            yield bucket_start.to_pydatetime(), reduce_collection(window, reducer)
+            yield (
+                bucket_start.to_pydatetime(),
+                reduce_collection(window, reducer),
+                bucket_start.to_pydatetime(),
+                bucket_end.to_pydatetime(),
+            )
 
     def _api(
-        self, image, var_info: Dataset, bands: list[str], when: dt.datetime
+        self,
+        image,
+        var_info: Dataset,
+        bands: list[str],
+        when: dt.datetime,
+        bucket_start: dt.datetime,
+        bucket_end: dt.datetime,
     ) -> Path | str | TaskInfo:
         """Export one composited `ee.Image` via the configured `export_via`.
 
@@ -1133,6 +1155,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 fallback `spatial_resolution`).
             bands: The band ids in `image` (used in the filename / prefix).
             when: The bucket timestamp (used in the filename / prefix).
+            bucket_start: Inclusive start of this bucket's date window; the
+                EEDAI collection path re-composites it client-side.
+            bucket_end: Exclusive end of this bucket's date window.
 
         Returns:
             For `"url"`: the :class:`pathlib.Path` of the written GeoTIFF.
@@ -1163,12 +1188,21 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # An empty request is not one band: upstream opens every band the
             # asset has, so budget for that rather than under-counting.
             use_reader, plan = self._use_eedai(
-                var_info, max(len(bands) or len(var_info.bands), 1)
+                var_info,
+                max(len(bands) or len(var_info.bands), 1),
+                bucket_start,
+                bucket_end,
             )
             if use_reader:
                 assert plan is not None  # a yes always carries its plan
                 return self._export_via_eedai(
-                    var_info, bands, float(scale), prefix, plan
+                    var_info,
+                    bands,
+                    float(scale),
+                    prefix,
+                    plan,
+                    bucket_start,
+                    bucket_end,
                 )
         self._warn_cog_ignored(var_info)
         # Only the Earth Engine paths need the `ee.Geometry`; the reader clips
@@ -1221,6 +1255,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
         `cloud_mask`, and no collection `filters`. The asynchronous sinks
         are Earth Engine-only.
 
+        A single `ee_type="image"` asset is read directly; an
+        `ee_type="image_collection"` is composited client-side by the reader
+        (a reducer over a date window), which is why a `cloud_mask` or
+        `filters` — server-side shaping — still disqualifies either.
+
         The output CRS may be `"EPSG:4326"` or a metre-based projected CRS.
         The reader reads `bbox` in the *target* CRS, so this backend reprojects
         its lat/lon AOI into that CRS first (see :meth:`_eedai_window`); a
@@ -1238,7 +1277,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             self.export_via == "url"
             and self.cloud_mask is None
             and not self.filters
-            and var_info.ee_type == "image"
+            and var_info.ee_type in ("image", "image_collection")
             and self._eedai_crs_supported()
         )
 
@@ -1310,6 +1349,139 @@ class GEE(LazyClientMixin, AbstractDataSource):
         rows = max(math.ceil((max_y - min_y) / scale), 1)
         cols = max(math.ceil((max_x - min_x) / scale), 1)
         return rows, cols
+
+    def _eedai_latlon_aoi(self) -> tuple[float, float, float, float]:
+        """Return the AOI envelope in EPSG:4326 for EEDA scene discovery.
+
+        Scene discovery queries the Earth Engine catalog in lat/lon, so the
+        AOI is given in EPSG:4326 whatever the output CRS. The request's
+        `space` already holds that lat/lon extent.
+
+        Returns:
+            `(min_lon, min_lat, max_lon, max_lat)`.
+        """
+        return (
+            self.space.longitude_min,
+            self.space.latitude_min,
+            self.space.longitude_max,
+            self.space.latitude_max,
+        )
+
+    def _eedai_collection_fits(
+        self,
+        var_info: Dataset,
+        band_count: int,
+        bucket_start: dt.datetime | None,
+        bucket_end: dt.datetime | None,
+    ) -> EedaiPlan:
+        """Decide whether the reader can composite this collection bucket.
+
+        The reader downloads every scene the bucket's date window and AOI
+        select and holds them in memory to reduce, so the cost is the scene
+        count times the AOI's native footprint. Both come from EEDA's own
+        per-scene fields via `estimate_earthengine_cost` — a fact about the
+        scenes, not a guess from asset metadata. A bucket with more scenes
+        than :data:`_EEDAI_MAX_SCENES`, or whose scenes together exceed the
+        single-pass pixel budget, is declined so Earth Engine's server-side
+        reduce serves it instead.
+
+        Args:
+            var_info: The collection's catalog entry.
+            band_count: Bands requested; the reader holds every band per scene.
+            bucket_start: Inclusive start of the bucket's date window.
+            bucket_end: Exclusive end of the bucket's date window.
+
+        Returns:
+            An :class:`EedaiPlan`; a collection is served in one pass
+            (`tile_size` is `None`) or declined with a reason.
+        """
+        if bucket_start is None or bucket_end is None:
+            return EedaiPlan(
+                False, None, 0, "a collection read needs a bucket date window"
+            )
+        reader = import_earthengine_reader()
+        try:
+            cost = reader.estimate_earthengine_cost(
+                var_info.id,
+                start=bucket_start.strftime("%Y-%m-%d"),
+                end=bucket_end.strftime("%Y-%m-%d"),
+                bbox=self._eedai_latlon_aoi(),
+                crs=self.crs,
+                credentials=self._eedai_credentials(),
+            )
+        except Exception as exc:  # noqa: BLE001 - any discovery failure declines
+            return EedaiPlan(
+                False,
+                None,
+                0,
+                f"scene discovery for {var_info.id} found none or failed ({exc})",
+            )
+        if cost.scene_count > _EEDAI_MAX_SCENES:
+            return EedaiPlan(
+                False,
+                None,
+                0,
+                (
+                    f"{cost.scene_count:,} scenes in this bucket, over the "
+                    f"{_EEDAI_MAX_SCENES:,}-scene cap — Earth Engine reduces this "
+                    "server-side instead of the reader fetching every scene"
+                ),
+            )
+        # `estimate_earthengine_cost` is authoritative for the *scene count*;
+        # the per-scene native footprint is sized from the catalog's metre
+        # `spatial_resolution`, since EEDA reports `min_pixel_size` in the
+        # asset's own CRS units (degrees for a geographic asset), which the
+        # metre-based grid would misread by ~1e5x.
+        native_scale = var_info.spatial_resolution
+        if not native_scale:
+            return EedaiPlan(
+                False,
+                None,
+                0,
+                f"{var_info.id} has no native resolution to size the read",
+            )
+        bbox, _cutline = self._eedai_window()
+        rows, cols = self._eedai_output_grid(bbox, float(native_scale))
+        total = cost.scene_count * rows * cols * max(band_count, 1)
+        if total > _EEDAI_MAX_PIXELS:
+            return EedaiPlan(
+                False,
+                None,
+                0,
+                (
+                    f"about {total:,} native px across {cost.scene_count:,} scenes, "
+                    f"over the {_EEDAI_MAX_PIXELS:,}-px single-pass budget"
+                ),
+            )
+        return EedaiPlan(True, None, 1, "")
+
+    def _eedai_verdict(
+        self,
+        var_info: Dataset,
+        band_count: int,
+        bucket_start: dt.datetime | None,
+        bucket_end: dt.datetime | None,
+    ) -> EedaiPlan:
+        """Build the serve/decline verdict, dispatching on the asset kind.
+
+        A single image is sized by :meth:`_eedai_plan`; an image collection is
+        sized by :meth:`_eedai_collection_fits`, which counts the scenes the
+        reader would fetch and reduce.
+
+        Args:
+            var_info: The catalog entry.
+            band_count: Bands requested.
+            bucket_start: Inclusive start of the bucket window (collections).
+            bucket_end: Exclusive end of the bucket window (collections).
+
+        Returns:
+            The :class:`EedaiPlan` verdict.
+        """
+        if var_info.is_image_collection:
+            return self._eedai_collection_fits(
+                var_info, band_count, bucket_start, bucket_end
+            )
+        return self._eedai_plan(var_info, band_count)
 
     def _eedai_plan(self, var_info: Dataset, band_count: int) -> EedaiPlan:
         """Decide how — or whether — the reader can serve this request.
@@ -1448,7 +1620,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
         return EedaiPlan(True, tile_size, tiles, "")
 
     def _use_eedai(
-        self, var_info: Dataset, band_count: int
+        self,
+        var_info: Dataset,
+        band_count: int,
+        bucket_start: dt.datetime | None = None,
+        bucket_end: dt.datetime | None = None,
     ) -> tuple[bool, EedaiPlan | None]:
         """Resolve the configured `engine` against this request's eligibility.
 
@@ -1491,7 +1667,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     f"projected CRS (got crs={self.crs!r}). Use engine='auto' "
                     "or engine='ee'."
                 )
-            plan = self._eedai_plan(var_info, band_count)
+            plan = self._eedai_verdict(var_info, band_count, bucket_start, bucket_end)
             if not plan.can_serve:
                 raise ValueError(
                     f"engine='eedai' cannot serve {var_info.id}: {plan.reason}. Use a "
@@ -1501,7 +1677,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return True, plan
         if not (eligible and eedai_available()):
             return False, None
-        plan = self._eedai_plan(var_info, band_count)
+        plan = self._eedai_verdict(var_info, band_count, bucket_start, bucket_end)
         if not plan.can_serve:
             logger.info(
                 f"Serving {var_info.id} through Earth Engine rather than the EEDAI "
@@ -1789,6 +1965,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         scale: float,
         prefix: str,
         plan: EedaiPlan,
+        bucket_start: dt.datetime | None = None,
+        bucket_end: dt.datetime | None = None,
     ) -> Path:
         """Materialise one raw asset through the pyramids-eo EEDAI reader.
 
@@ -1843,6 +2021,19 @@ class GEE(LazyClientMixin, AbstractDataSource):
             raise ValueError(
                 f"the EEDAI reader cannot serve {var_info.id}: {plan.reason}"
             )
+        composite_kwargs: dict[str, Any] = {}
+        if var_info.is_image_collection:
+            if bucket_start is None or bucket_end is None:
+                raise ValueError(
+                    f"a collection read of {var_info.id} needs a bucket window"
+                )
+            # The reader composites the scenes in this window with the same
+            # reducer the Earth Engine path would use.
+            composite_kwargs = {
+                "start": bucket_start.strftime("%Y-%m-%d"),
+                "end": bucket_end.strftime("%Y-%m-%d"),
+                "reducer": self.reducer or var_info.default_reducer,
+            }
         read_options: dict[str, Any] = {}
         tile_size = plan.tile_size
         if tile_size is not None:
@@ -1868,6 +2059,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 ),
                 geometry=cutline,
                 credentials=credentials,
+                **composite_kwargs,
                 **read_options,
             )
             try:
