@@ -23,6 +23,7 @@ import os
 from pathlib import Path
 
 import pytest
+from pandas.api.types import is_float_dtype
 
 from earthlens.earthlens import EarthLens
 from earthlens.firms.events import ATTRIBUTE_COLUMNS
@@ -44,11 +45,6 @@ _END = _TODAY.strftime("%Y-%m-%d")
 #: unit error, which is what this check exists to catch, shows up as wild values,
 #: not as one small negative.
 _FRP_NOISE_FLOOR = -1.0
-
-#: Largest share of negative FRP tolerated before the frame is suspect. The
-#: single measured negative is 9e-6 of the frame; a misparse would be orders of
-#: magnitude above this.
-_FRP_MAX_NEGATIVE_SHARE = 0.01
 
 
 @pytest.mark.e2e
@@ -73,17 +69,31 @@ class TestFirmsLiveQuery:
             assert column in fc.columns, f"missing column {column!r}"
         assert fc.crs.to_epsg() == 4326
         if len(fc):
+            # dtype first: a non-numeric column in the frp slot would make the
+            # numeric checks below raise instead of assert.
+            assert is_float_dtype(fc["frp"]), (
+                f"frp is {fc['frp'].dtype}, not floating — a non-numeric column "
+                "has taken its place"
+            )
             frp = fc["frp"].dropna()
             worst = float(frp.min()) if len(frp) else 0.0
             assert worst >= _FRP_NOISE_FLOOR, (
                 f"FRP {worst} is below the retrieval noise floor "
-                f"({_FRP_NOISE_FLOOR}) — suspect a column shift or unit error"
+                f"({_FRP_NOISE_FLOOR}) — suspect a unit error"
             )
-            share = float((frp < 0).mean()) if len(frp) else 0.0
-            assert share < _FRP_MAX_NEGATIVE_SHARE, (
-                f"{share:.2%} of FRP values are negative — retrieval noise is "
-                "rare, so this many suggests the frame is misparsed"
-            )
+            # A column shift is structural, so catch it structurally. The
+            # likeliest shift moves brightness or confidence into the frp slot,
+            # and both are wholly positive — a noise floor and a
+            # share-of-negatives test wave them straight through. Comparing the
+            # columns does not: if frp carries a neighbour's values, they are
+            # equal. This is also scale-free, where a share threshold is not:
+            # one NASA-emitted negative is 9e-6 of a 115k-row frame but 5% of a
+            # twenty-row one, which would fail on window size alone.
+            for other in ("brightness_k", "confidence_pct"):
+                if other in fc.columns and len(fc) > 1:
+                    assert not fc["frp"].equals(fc[other]), (
+                        f"frp is identical to {other} — the columns are shifted"
+                    )
             assert fc["latitude"].between(-10.0, 10.0).all(), "lat within bbox"
             assert fc["longitude"].between(10.0, 35.0).all(), "lon within bbox"
             assert list(tmp_path.glob("firms_*.gpkg")), "GeoPackage written"
