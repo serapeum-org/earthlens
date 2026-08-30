@@ -2016,6 +2016,34 @@ class TestEedaiCollections:
         assert kwargs["start"] == "2020-06-01" and kwargs["end"] == "2020-06-30"
         assert len(kwargs["bbox"]) == 4
 
+    def test_discovery_bbox_is_labelled_latlon(self, make_gee, fake_reader):
+        """Scene discovery must declare EPSG:4326, since the AOI it sends is lat/lon."""
+        gee = self._collection_gee(make_gee)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        kwargs = fake_reader.cost_calls[0][1]
+        assert kwargs["crs"] == "EPSG:4326", (
+            f"discovery CRS {kwargs['crs']!r} does not match the lat/lon bbox sent"
+        )
+
+    def test_projected_crs_collection_still_discovers_in_latlon(
+        self, make_gee, fake_reader
+    ):
+        """A projected output CRS must not relabel the lat/lon discovery AOI.
+
+        The two features are easy to test apart and wrong together: labelling
+        degrees as UTM metres discovers scenes over the wrong ground.
+        """
+        gee = self._collection_gee(make_gee, crs="EPSG:32636")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        kwargs = fake_reader.cost_calls[0][1]
+        assert kwargs["crs"] == "EPSG:4326"
+        assert max(abs(v) for v in kwargs["bbox"]) < 200, (
+            f"discovery bbox {kwargs['bbox']} is not lat/lon"
+        )
+        assert plan.can_serve, plan.reason
+
     def test_consecutive_buckets_do_not_overlap(self, make_gee, fake_reader):
         """Adjacent buckets must not both claim the boundary day.
 

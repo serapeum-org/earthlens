@@ -1444,7 +1444,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 start=bucket_start.strftime("%Y-%m-%d"),
                 end=self._reader_end(bucket_end),
                 bbox=self._eedai_latlon_aoi(),
-                crs=self.crs,
+                # The AOI handed over is lat/lon, so it must be labelled as
+                # such: upstream reads `bbox` *in* `crs`, and passing the
+                # output CRS here would have degrees read as projected metres
+                # and discover scenes over the wrong ground.
+                crs=_EEDAI_NATIVE_CRS,
                 credentials=self._eedai_credentials(),
                 property_filter=self.property_filter,
             )
