@@ -199,12 +199,8 @@ datasets:
     variables:
       incoming-shortwave-radiation:
         cds_variable: incoming_shortwave_radiation
-        nc_variable: solar_mon
-        units: W m-2
-        extras:
-          climate_data_record_type: [thematic_climate_data_record]
-          origin: [nasa]
-          product_family: [ceres_ebaf]
+        nc_variable: incoming_shortwave_radiation
+        units: unknown
       outgoing-longwave-radiation:
         cds_variable: outgoing_longwave_radiation
         nc_variable: olr
@@ -427,10 +423,8 @@ datasets:
     variables:
       land-surface-temperature:
         cds_variable: land_surface_temperature
-        nc_variable: lst
-        units: kelvin
-        extras:
-          observation_time: [day, night]
+        nc_variable: land_surface_temperature
+        units: unknown
   satellite-methane:
     endpoint: cds
     request_kind: satellite_cdr
@@ -501,10 +495,8 @@ datasets:
         units: mol m-2
       atmosphere-mole-content-of-ozone:
         cds_variable: atmosphere_mole_content_of_ozone
-        nc_variable: total_ozone_column
-        units: mol m-2
-        extras:
-          vertical_aggregation: [total_columns_uv]
+        nc_variable: atmosphere_mole_content_of_ozone
+        units: unknown
   satellite-precipitation-microwave:
     endpoint: cds
     request_kind: satellite_cdr

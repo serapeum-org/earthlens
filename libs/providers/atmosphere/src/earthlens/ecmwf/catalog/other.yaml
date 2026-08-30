@@ -1877,10 +1877,8 @@ datasets:
           version: [v4_03]
       temperature-anomaly:
         cds_variable: temperature_anomaly
-        nc_variable: tasmax
-        units: degrees Celsius
-        extras:
-          region: [global]
+        nc_variable: temperature_anomaly
+        units: unknown
       precipitation:
         cds_variable: precipitation
         nc_variable: pr
@@ -3293,10 +3291,8 @@ datasets:
           time: ['06_00', 09_00, '12_00', '15_00', '18_00']
       2m-relative-humidity-derived:
         cds_variable: 2m_relative_humidity_derived
-        nc_variable: Derived_Relative_Humidity_2m_Max_24h
-        units: '%'
-        extras:
-          version: ['2_0']
+        nc_variable: 2m_relative_humidity_derived
+        units: unknown
       2m-temperature:
         cds_variable: 2m_temperature
         nc_variable: Temperature_Air_2m_Max_24h
@@ -3311,20 +3307,16 @@ datasets:
         units: '1.0'
       precipitation-duration-fraction:
         cds_variable: precipitation_duration_fraction
-        nc_variable: Precipitation_Duration_Fraction
-        units: '1.0'
-        extras:
-          version: ['2_0']
+        nc_variable: precipitation_duration_fraction
+        units: unknown
       precipitation-flux:
         cds_variable: precipitation_flux
         nc_variable: Precipitation_Flux
         units: mm d-1
       reference-evapotranspiration:
         cds_variable: reference_evapotranspiration
-        nc_variable: ReferenceET_PenmanMonteith_FAO56
-        units: mm d-1
-        extras:
-          version: ['2_0']
+        nc_variable: reference_evapotranspiration
+        units: unknown
       snow-thickness:
         cds_variable: snow_thickness
         nc_variable: Snow_Thickness_Mean
@@ -3347,10 +3339,8 @@ datasets:
         units: hPa
       vapour-pressure-deficit-at-maximum-temperature:
         cds_variable: vapour_pressure_deficit_at_maximum_temperature
-        nc_variable: Vapour_Pressure_Deficit_at_Maximum_Temperature
-        units: hPa
-        extras:
-          version: ['2_0']
+        nc_variable: vapour_pressure_deficit_at_maximum_temperature
+        units: unknown
   sis-agrometeorological-indicators-timeseries:
     endpoint: cds
     request_kind: cams_date
@@ -4405,39 +4395,23 @@ datasets:
       snowfall-amount:
         cds_variable: snowfall_amount
         nc_variable: snowfall_amount
-        units: mm
-        extras:
-          temporal_aggregation: [yearly]
+        units: unknown
       relative-sea-level-rise:
         cds_variable: relative_sea_level_rise
-        nc_variable: MSL
-        units: m
-        extras:
-          origin: [projections]
-          temporal_aggregation: [yearly]
-          version: [v1_0, v2_0]
+        nc_variable: relative_sea_level_rise
+        units: unknown
       extreme-sea-level:
         cds_variable: extreme_sea_level
-        nc_variable: return_mean_water_level
-        units: m
-        extras:
-          origin: [projections]
-          temporal_aggregation: [yearly]
-          version: [v1_0, v2_0]
+        nc_variable: extreme_sea_level
+        units: unknown
       tiger-mosquito-season-length:
         cds_variable: tiger_mosquito_season_length
         nc_variable: tiger_mosquito_season_length
-        units: day
-        extras:
-          temporal_aggregation: [yearly]
-          version: [v2_0]
+        units: unknown
       tiger-mosquito-suitability-index:
         cds_variable: tiger_mosquito_suitability_index
         nc_variable: tiger_mosquito_suitability_index
-        units: '1'
-        extras:
-          temporal_aggregation: [yearly]
-          version: [v2_0]
+        units: unknown
   sis-ecv-cmip5-bias-corrected:
     endpoint: cds
     request_kind: form
@@ -5210,22 +5184,12 @@ datasets:
     variables:
       2m-temperature:
         cds_variable: 2m_temperature
-        nc_variable: tas
-        units: K
-        extras:
-          day: ['01']
-          product_type: [forecast]
-          spatial_extent: [gridded_5_km]
-          temporal_aggregation: [daily]
+        nc_variable: 2m_temperature
+        units: unknown
       precipitation:
         cds_variable: precipitation
-        nc_variable: pr
-        units: kg m-2
-        extras:
-          day: ['01']
-          product_type: [forecast]
-          spatial_extent: [gridded_5_km]
-          temporal_aggregation: [daily]
+        nc_variable: precipitation
+        units: unknown
       river-discharge:
         cds_variable: river_discharge
         nc_variable: rdis
@@ -5461,44 +5425,28 @@ datasets:
         units: m3/s
       reference-river-discharge-lower-tercile:
         cds_variable: reference_river_discharge_lower_tercile
-        nc_variable: rdis-p33
-        units: m3/s
-        extras:
-          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07, e_hypecatch_m08, e_hypecatch_m09, e_hypegrid, lisflood_efas, vic_wur]
+        nc_variable: reference_river_discharge_lower_tercile
+        units: unknown
       reference-river-discharge-upper-tercile:
         cds_variable: reference_river_discharge_upper_tercile
-        nc_variable: rdis-p66
-        units: m3/s
-        extras:
-          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07, e_hypecatch_m08, e_hypecatch_m09, e_hypegrid, lisflood_efas, vic_wur]
+        nc_variable: reference_river_discharge_upper_tercile
+        units: unknown
       brier-skill-score-above-normal-conditions:
         cds_variable: brier_skill_score_above_normal_conditions
-        nc_variable: fairBSSan
-        units: '1'
-        extras:
-          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07, e_hypecatch_m08, e_hypecatch_m09, e_hypegrid, lisflood_efas, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+        nc_variable: brier_skill_score_above_normal_conditions
+        units: unknown
       brier-skill-score-below-normal-conditions:
         cds_variable: brier_skill_score_below_normal_conditions
-        nc_variable: fairBSSbn
-        units: '1'
-        extras:
-          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07, e_hypecatch_m08, e_hypecatch_m09, e_hypegrid, lisflood_efas, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+        nc_variable: brier_skill_score_below_normal_conditions
+        units: unknown
       continuous-ranked-probability-skill-score:
         cds_variable: continuous_ranked_probability_skill_score
-        nc_variable: fairCRPSS
-        units: '1'
-        extras:
-          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07, e_hypecatch_m08, e_hypecatch_m09, e_hypegrid, lisflood_efas, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+        nc_variable: continuous_ranked_probability_skill_score
+        units: unknown
       fair-ranked-probability-skill-score:
         cds_variable: fair_ranked_probability_skill_score
-        nc_variable: fairRPSS
-        units: '1'
-        extras:
-          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07, e_hypecatch_m08, e_hypecatch_m09, e_hypegrid, lisflood_efas, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+        nc_variable: fair_ranked_probability_skill_score
+        units: unknown
   sis-hydrology-variables-derived-seasonal-reforecast:
     endpoint: cds
     request_kind: form
@@ -5518,44 +5466,28 @@ datasets:
         units: m3/s
       reference-river-discharge-lower-tercile:
         cds_variable: reference_river_discharge_lower_tercile
-        nc_variable: rdis-p33
-        units: m3/s
-        extras:
-          hydrological_model: [e_hypecatch_m00, vic_wur]
+        nc_variable: reference_river_discharge_lower_tercile
+        units: unknown
       reference-river-discharge-upper-tercile:
         cds_variable: reference_river_discharge_upper_tercile
-        nc_variable: rdis-p66
-        units: m3/s
-        extras:
-          hydrological_model: [e_hypecatch_m00, vic_wur]
+        nc_variable: reference_river_discharge_upper_tercile
+        units: unknown
       brier-skill-score-above-normal-conditions:
         cds_variable: brier_skill_score_above_normal_conditions
-        nc_variable: fairBSSan
-        units: '1'
-        extras:
-          hydrological_model: [e_hypecatch_m00, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+        nc_variable: brier_skill_score_above_normal_conditions
+        units: unknown
       brier-skill-score-below-normal-conditions:
         cds_variable: brier_skill_score_below_normal_conditions
-        nc_variable: fairBSSbn
-        units: '1'
-        extras:
-          hydrological_model: [e_hypecatch_m00, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+        nc_variable: brier_skill_score_below_normal_conditions
+        units: unknown
       continuous-ranked-probability-skill-score:
         cds_variable: continuous_ranked_probability_skill_score
-        nc_variable: fairCRPSS
-        units: '1'
-        extras:
-          hydrological_model: [e_hypecatch_m00, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+        nc_variable: continuous_ranked_probability_skill_score
+        units: unknown
       fair-ranked-probability-skill-score:
         cds_variable: fair_ranked_probability_skill_score
-        nc_variable: fairRPSS
-        units: '1'
-        extras:
-          hydrological_model: [e_hypecatch_m00, vic_wur]
-          month: ['01', '02', '03', '04', '05', '06', '07', 08, 09, '10', '11', '12']
+        nc_variable: fair_ranked_probability_skill_score
+        units: unknown
   sis-marine-properties:
     endpoint: cds
     request_kind: form
