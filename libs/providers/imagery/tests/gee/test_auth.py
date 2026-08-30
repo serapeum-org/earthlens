@@ -16,7 +16,13 @@ import ee
 import pytest
 
 from earthlens.gee import auth as auth_module
-from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _load_key_dict
+from earthlens.gee.auth import (
+    AuthenticationError,
+    EarthEngineAuth,
+    _is_inline_json,
+    _load_key_dict,
+    _redact,
+)
 
 
 def _key_text(**extra) -> str:
@@ -66,6 +72,97 @@ class TestLoadKeyDict:
     def test_non_object_json_returns_none(self):
         """Valid JSON that doesn't start with `{` is treated as a (missing) path → None."""
         assert _load_key_dict("[1, 2]") is None
+
+
+class TestIsInlineJson:
+    """Tests for the module-private `_is_inline_json` helper."""
+
+    @pytest.mark.parametrize(
+        "value",
+        ['{"type": "service_account"}', '   {"a": 1}'],
+        ids=["plain", "leading-spaces"],
+    )
+    def test_json_content_is_inline(self, value):
+        """A value whose first non-space character is a brace is inline JSON."""
+        assert _is_inline_json(value) is True, f"should be inline JSON: {value!r}"
+
+    @pytest.mark.parametrize(
+        "value",
+        [r"C:\\keys\\k.json", "/etc/keys/k.json", "./k.json", "k.json", "", "[1, 2]"],
+        ids=["windows", "posix", "relative", "bare", "empty", "json-array"],
+    )
+    def test_everything_else_is_a_path(self, value):
+        """Anything not starting with a brace is treated as a path, arrays included."""
+        assert _is_inline_json(value) is False, f"should not be inline JSON: {value!r}"
+
+    @pytest.mark.parametrize(
+        "value", [None, 123, b"{}", {"a": 1}], ids=["none", "int", "bytes", "dict"]
+    )
+    def test_non_string_is_not_inline(self, value):
+        """A non-string never counts as inline JSON, and does not raise."""
+        assert _is_inline_json(value) is False, f"non-str should be False: {value!r}"
+
+    def test_agrees_with_load_key_dict(self):
+        """The shape rule matches what `_load_key_dict` parses, so the two cannot disagree."""
+        content = _key_text(project_id="p")
+        assert _is_inline_json(content) is True
+        assert _load_key_dict(content) is not None, "inline JSON should parse"
+
+
+class TestRedact:
+    """Tests for the module-private `_redact` helper.
+
+    Pins the containment half of the fix that stopped a service-account key
+    reaching a traceback.
+    """
+
+    def test_key_value_is_replaced(self):
+        """The key's own text is swapped for the sentinel."""
+        key = _key_text(project_id="p")
+        result = _redact(f"failed opening {key} oops", key)
+        assert key not in result, "the key value survived redaction"
+        assert "<service key redacted>" in result, f"no sentinel in: {result}"
+
+    def test_every_occurrence_is_replaced(self):
+        """A key repeated in one message is redacted throughout."""
+        key = _key_text(project_id="p")
+        result = _redact(f"{key} and again {key}", key)
+        assert key not in result, "a repeated occurrence survived"
+
+    def test_pem_block_collapses_the_whole_message(self):
+        """Any residual PEM material discards the message rather than trusting it."""
+        marker = "-----BEGIN " + "PRIVATE KEY-----"
+        result = _redact(f"boom {marker} tail", "unrelated-but-long-enough")
+        assert result == "<service key redacted>", (
+            f"expected full collapse, got: {result}"
+        )
+
+    def test_clean_message_is_untouched(self):
+        """A message with neither the key nor PEM material passes through verbatim."""
+        message = "could not reach the Earth Engine endpoint"
+        assert _redact(message, _key_text()) == message, "a clean message was altered"
+
+    @pytest.mark.parametrize(
+        "short", ["", "a", "12345678"], ids=["empty", "one-char", "eight-chars"]
+    )
+    def test_short_keys_are_not_substituted(self, short):
+        """A short value is not substituted, so a common substring is not mangled."""
+        message = "12345678 is part of the identifier"
+        assert _redact(message, short) == message, "a short key triggered substitution"
+
+    @pytest.mark.parametrize("value", [None, 123, b"key"], ids=["none", "int", "bytes"])
+    def test_non_string_key_does_not_raise(self, value):
+        """A non-string key leaves the message alone instead of raising."""
+        message = "nothing sensitive here"
+        assert _redact(message, value) == message, f"non-str key mishandled: {value!r}"
+
+    def test_redacted_output_carries_no_key_material(self):
+        """The end-to-end property: neither the key nor a PEM header survives."""
+        marker = "-----BEGIN " + "PRIVATE KEY-----"
+        key = _key_text(project_id="p", private_key=f"{marker}\nSECRET\n")
+        result = _redact(f"open() failed on {key}", key)
+        assert "SECRET" not in result, f"key material survived: {result}"
+        assert marker not in result, f"PEM header survived: {result}"
 
 
 class TestAuthenticationError:
