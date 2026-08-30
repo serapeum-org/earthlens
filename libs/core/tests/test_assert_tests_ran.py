@@ -71,6 +71,33 @@ def _case_report(path: Path, *cases: tuple[str, str | None]) -> Path:
     return path
 
 
+def _backend_report(path: Path, *cases: tuple[str, str, str | None]) -> Path:
+    """Write a junit report of `(backend, name, skip_type)` cases.
+
+    Args:
+        path: File to write.
+        cases: `(backend, test name, skip_type)`; `skip_type` is `None` when the
+            test ran. An empty backend puts the test directly under `tests/`.
+    """
+    body = ""
+    for backend, name, kind in cases:
+        classname = (
+            f"tests.{backend}.test_mod.TestX" if backend else "tests.test_mod.TestX"
+        )
+        body += (
+            f'<testcase classname="{classname}" name="{name}">'
+            + (f'<skipped type="{kind}" message="m"/>' if kind else "")
+            + "</testcase>"
+        )
+    skipped = sum(1 for _, _, kind in cases if kind)
+    path.write_text(
+        f'<testsuites><testsuite name="s" tests="{len(cases)}" '
+        f'skipped="{skipped}">{body}</testsuite></testsuites>',
+        encoding="utf-8",
+    )
+    return path
+
+
 class TestTotals:
     """Tests for the module-private `_totals` helper."""
 
@@ -182,3 +209,77 @@ class TestMain:
         """Anything but `<report> <lane>` exits 2 and prints usage to stderr."""
         assert guard.main(argv) == 2, f"expected usage exit 2 for {argv!r}"
         assert "usage:" in capsys.readouterr().err, "usage was not printed to stderr"
+
+
+class TestBackendGrouping:
+    """Tests for the per-backend view that makes the guard match the problem."""
+
+    @pytest.mark.parametrize(
+        "classname, expected",
+        [
+            ("tests.cmems.test_cmems_e2e.TestLive", "cmems"),
+            ("tests.erddap.test_catalog.TestBundled", "erddap"),
+            ("tests.test_aggregate.TestReal", ""),
+            ("", ""),
+            ("weird", ""),
+        ],
+    )
+    def test_backend_is_the_segment_after_tests(self, guard, classname, expected):
+        """The backend is the directory under `tests/`, not the module."""
+        assert guard._backend(classname) == expected, f"misparsed {classname!r}"
+
+    def test_counts_are_grouped_per_backend(self, guard, tmp_path):
+        """Each backend gets its own executed/skipped pair."""
+        report = _backend_report(
+            tmp_path / "r.xml",
+            ("cmems", "a", "pytest.skip"),
+            ("erddap", "b", None),
+            ("erddap", "c", None),
+        )
+        assert guard._per_backend(report) == {"cmems": (0, 1), "erddap": (2, 0)}
+
+    def test_an_xfail_counts_as_executed_per_backend(self, guard, tmp_path):
+        """The xfail rule applies inside a group too."""
+        report = _backend_report(tmp_path / "r.xml", ("gee", "a", "pytest.xfail"))
+        assert guard._per_backend(report) == {"gee": (1, 0)}
+
+
+class TestDeadBackendDetection:
+    """Tests for failing a lane on one silent backend among healthy ones."""
+
+    def test_a_silent_backend_fails_the_lane(self, guard, tmp_path, capsys):
+        """The case a lane-level count cannot see: cmems skipped, erddap green."""
+        report = _backend_report(
+            tmp_path / "r.xml",
+            ("cmems", "a", "pytest.skip"),
+            ("cmems", "b", "pytest.skip"),
+            ("erddap", "c", None),
+            ("erddap", "d", None),
+        )
+        code = guard.main([str(report), "e2e (rest-of-ocean)"])
+        out = capsys.readouterr().out
+        assert code == 1, f"a silent backend must fail the lane, got {code}"
+        assert "cmems" in out, f"the silent backend is not named: {out}"
+        assert "erddap" not in out, f"a healthy backend was blamed: {out}"
+
+    def test_a_healthy_lane_still_passes(self, guard, tmp_path):
+        """Every backend executing something leaves the lane green."""
+        report = _backend_report(
+            tmp_path / "r.xml", ("cmems", "a", None), ("erddap", "b", None)
+        )
+        assert guard.main([str(report), "lane"]) == 0, "a healthy lane was failed"
+
+    def test_a_declared_empty_backend_is_exempt(self, guard, tmp_path):
+        """A backend listed in `_EXPECTED_EMPTY` does not fail its lane."""
+        assert "wdpa" in guard._EXPECTED_EMPTY, "wdpa should be a declared exemption"
+        report = _backend_report(
+            tmp_path / "r.xml", ("wdpa", "a", "pytest.skip"), ("iucn", "b", None)
+        )
+        assert guard.main([str(report), "lane"]) == 0, "a declared exemption failed"
+
+    def test_tests_without_a_backend_do_not_form_a_group(self, guard, tmp_path):
+        """A module directly under `tests/` is judged at lane level only."""
+        report = _backend_report(
+            tmp_path / "r.xml", ("", "a", "pytest.skip"), ("erddap", "b", None)
+        )
+        assert guard.main([str(report), "lane"]) == 0, "a lane-level skip was blamed"
