@@ -595,6 +595,55 @@ class Variable(FluxableLeaf):
             fall back to the ERA5 default (`ERA5_GRID_DEGREES`).
             Propagated from the parent dataset; used by
             `ECMWF._create_grid` to snap the bbox to the right grid.
+
+    Examples:
+        - A curated row carries the NetCDF name and unit a retrieve will return:
+
+            ```python
+            >>> from earthlens.ecmwf.catalog import Variable
+            >>> row = Variable(
+            ...     cds_dataset="reanalysis-era5-single-levels",
+            ...     cds_variable="2m_temperature",
+            ...     nc_variable="t2m",
+            ...     units="K",
+            ... )
+            >>> row.nc_variable
+            't2m'
+            >>> f"{row.cds_variable} arrives as {row.nc_variable} in {row.units}"
+            '2m_temperature arrives as t2m in K'
+
+            ```
+        - A placeholder keeps the `unknown` sentinel and mirrors its
+          `cds_variable`, which is what marks it as not yet curated:
+
+            ```python
+            >>> from earthlens.ecmwf.catalog import Variable
+            >>> row = Variable(
+            ...     cds_dataset="satellite-ozone-v1",
+            ...     cds_variable="atmosphere_mole_content_of_ozone",
+            ...     nc_variable="atmosphere_mole_content_of_ozone",
+            ...     units="unknown",
+            ... )
+            >>> row.units == "unknown" and row.unhydratable is None
+            True
+
+            ```
+        - A row no retrieve can ever fill carries the reason, so a sweep skips
+          it instead of paying for the same answer again:
+
+            ```python
+            >>> from earthlens.ecmwf.catalog import Variable
+            >>> row = Variable(
+            ...     cds_dataset="satellite-precipitation-microwave",
+            ...     cds_variable="all",
+            ...     nc_variable="all",
+            ...     units="unknown",
+            ...     unhydratable="pseudo-slug",
+            ... )
+            >>> row.unhydratable
+            'pseudo-slug'
+
+            ```
     """
 
     # `model_config` (frozen=True, extra="forbid") and the `types` field

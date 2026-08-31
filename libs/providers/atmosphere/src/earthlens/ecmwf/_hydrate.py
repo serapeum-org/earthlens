@@ -2053,6 +2053,41 @@ class _ServingBlocks:
             The union of keys across the dataset's blocks. A key in here that a
             serving block omits belongs to another product, so a row sending it
             cannot be served; a key absent from this set constrains nothing.
+
+        Examples:
+            - Every key the dataset partitions on, gathered across all blocks,
+              not only the ones serving a given variable:
+
+                ```python
+                >>> from earthlens.ecmwf._hydrate import _ServingBlocks
+                >>> lookup = _ServingBlocks("a-dataset")
+                >>> lookup._rows = [
+                ...     {"variable": ["t2m"], "product_type": ["analysis"]},
+                ...     {"variable": ["sst"], "leadtime_hour": ["3"]},
+                ... ]
+                >>> sorted(lookup.enumerated)
+                ['leadtime_hour', 'product_type', 'variable']
+
+                ```
+            - Which decides how a key the serving blocks omit is read: `t2m` is
+              served by a block with no `leadtime_hour`, and because the dataset
+              partitions on it elsewhere, sending it is a conflict:
+
+                ```python
+                >>> from earthlens.ecmwf._hydrate import (
+                ...     _ServingBlocks,
+                ...     _selectors_are_serveable,
+                ... )
+                >>> lookup = _ServingBlocks("a-dataset")
+                >>> lookup._rows = [
+                ...     {"variable": ["t2m"], "product_type": ["analysis"]},
+                ...     {"variable": ["sst"], "leadtime_hour": ["3"]},
+                ... ]
+                >>> request = {"product_type": ["analysis"], "leadtime_hour": ["3"]}
+                >>> _selectors_are_serveable(request, lookup("t2m"), lookup.enumerated)
+                False
+
+                ```
         """
         return {key for block in self._load() for key in block}
 
