@@ -115,7 +115,8 @@ class TestVariablesFor:
             dataset_id="cwwcNDBCMet",
         )
         served = erddap_cli.variables_for(record)
-        assert "WTMP" in served and "wtmp" not in served, "server casing preserved"
+        assert "WTMP" in served, "served column present"
+        assert "wtmp" not in served, "server casing preserved"
         assert calls == ["https://x/erddap/tabledap/cwwcNDBCMet.dds"]
 
     def test_griddap_dds_yields_grid_variable_and_dimensions(self, monkeypatch):

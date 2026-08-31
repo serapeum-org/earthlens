@@ -387,7 +387,8 @@ class TestAuditOne:
         )
         monkeypatch.setattr(erddap_cli, "get_text", lambda url: _WTMP_DDS)
         outcome = audit_one(_info("erddap"))
-        assert outcome.status == "ok" and outcome.broken == [], "id-level clean"
+        assert outcome.status == "ok", "id audit ran"
+        assert outcome.broken == [], "no id-level drift"
         assert outcome.variable_status == "ok"
         assert outcome.variable_drift == ["cwwcNDBCMet:wtmp"], (
             "re-cased variable flagged"
@@ -428,7 +429,8 @@ class TestAuditVariables:
         status, drift, detail = refresh_mod._audit_variables(
             self._catalog(a=["x"]), "gdacs"
         )
-        assert status == "unsupported" and drift == []
+        assert status == "unsupported"
+        assert drift == []
 
     def test_reports_drift_for_unserved_variable(self, monkeypatch):
         """A curated variable the provider no longer serves is drift."""
@@ -449,7 +451,8 @@ class TestAuditVariables:
         status, drift, detail = refresh_mod._audit_variables(
             self._catalog(cwwcNDBCMet=["WTMP"]), "erddap"
         )
-        assert status == "ok" and drift == []
+        assert status == "ok"
+        assert drift == []
 
     def test_fetch_error_is_captured(self, monkeypatch):
         """A lister that raises reports 'error' and names the dataset, never propagates."""
@@ -457,7 +460,8 @@ class TestAuditVariables:
         status, drift, detail = refresh_mod._audit_variables(
             self._catalog(x=["v"]), "erddap"
         )
-        assert status == "error" and drift == []
+        assert status == "error"
+        assert drift == []
         assert "x" in detail, "the failed dataset is named in the detail"
 
     def test_partial_failure_keeps_other_datasets_drift(self, monkeypatch):
@@ -484,7 +488,8 @@ class TestAuditVariables:
         status, drift, detail = refresh_mod._audit_variables(
             self._catalog(empty=[], kept=["keep"]), "erddap"
         )
-        assert status == "ok" and drift == [], "the variable-less row adds no drift"
+        assert status == "ok", "the variable-less row keeps the audit ok"
+        assert drift == [], "the variable-less row adds no drift"
         assert seen == ["kept"], "the variable-less row was not fetched"
 
     def test_retired_dataset_is_not_variable_audited(self, monkeypatch):
@@ -499,7 +504,8 @@ class TestAuditVariables:
         status, drift, detail = refresh_mod._audit_variables(
             self._catalog(retired=["wtmp"], alive=["WTMP"]), "erddap", live={"alive"}
         )
-        assert status == "ok" and detail == "", "the retired id makes no variable error"
+        assert status == "ok", "the retired id keeps the audit ok"
+        assert detail == "", "the retired id makes no variable error"
         assert seen == ["alive"], "the retired dataset's .dds was not fetched"
 
 
