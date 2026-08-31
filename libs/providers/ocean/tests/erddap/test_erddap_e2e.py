@@ -41,10 +41,11 @@ _offline_skip = pytest.mark.skipif(not _network_ok(), reason=f"{_HOST} unreachab
 #: Every shipped griddap row paired with a window inside its real coverage and
 #: a variable, so each catalog row is fetch-verified (not just metadata-probed).
 #: erdMH1chla8day is a historical MODIS product (2003-2022), hence the 2020
-#: window; the others are current, hence 2023.
+#: window; erdPH53sstd8day ends 2023-06, hence the early-June date. Only
+#: NOAA_DHW is still updating.
 _GRIDDAP_CASES = [
     ("NOAA_DHW", "CRW_SSTANOMALY", "2023-06-01", "2023-06-01"),
-    ("nceiPH53sstd1day", "sea_surface_temperature", "2023-06-01", "2023-06-01"),
+    ("erdPH53sstd8day", "sea_surface_temperature", "2023-06-01", "2023-06-01"),
     ("erdMH1chla8day", "chlorophyll", "2020-06-01", "2020-06-10"),
 ]
 
@@ -95,7 +96,7 @@ def test_tabledap_ndbc_buoys(tmp_path: Path):
     df = EarthLens(
         data_source="erddap",
         dataset="cwwcNDBCMet",
-        variables=["station", "time", "wtmp"],
+        variables=["station", "time", "WTMP"],
         start="2023-01-01",
         end="2023-01-01",
         lat_lim=[36.0, 37.0],

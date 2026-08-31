@@ -6,18 +6,28 @@ four-cell decision matrix in `_resolve_pressure_level`,
 `window_groups`, `reduce_time_axis` (op dispatch + skipna + min_count),
 `_resolve_op` (auto-routing from `Variable.is_flux`), and round-trip
 runs of `aggregate_netcdf` against synthetic NetCDFs (H7).
+
+`TestAggregateAgainstARealNetCDF` drives the same path against a NetCDF
+written to disk by pyramids rather than a mock, so the suite can observe
+what a mock has none of: how much the aggregator reads, and whether it
+releases the file it opens.
 """
 
 from __future__ import annotations
 
+import gc
+import os
+import tracemalloc
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import numpy as np
 import pandas as pd
+import psutil
 import pytest
 from pydantic import ValidationError
+from pyramids.dataset import Dataset, DatasetCollection
 
 from earthlens.aggregate import (
     _LEVEL_DIM_CANDIDATES,
@@ -1769,3 +1779,262 @@ class TestAggregationMemoryCeiling:
             f"peak allocation {peak} is more than 6x one window ({window}); "
             "windows appear to be accumulating rather than being released"
         )
+
+
+def _write_real_nc(path, *, periods=6, rows=2, cols=3, nan_at=None):
+    """Write a real NetCDF time cube and return the values it holds.
+
+    Built entirely through pyramids, which owns NetCDF in this project: a dated
+    GeoTIFF per timestep, collected into a `DatasetCollection` that derives its
+    time axis from those dates, then written out by `to_netcdf`. The
+    aggregator's own time reader decodes the result, which is the point - the
+    fixture exercises the same path a downloaded cube takes.
+
+    The ramp starts at 1 rather than 0 so a cell cannot be confused with a fill
+    value. `nan_at` puts a NaN in one timestep, which is what `skipna` needs and
+    what a mock cannot supply.
+    """
+    frames = Path(path).parent / f"{Path(path).stem}_frames"
+    frames.mkdir(parents=True, exist_ok=True)
+    values = (
+        np.arange(1, periods * rows * cols + 1, dtype="f4")
+        .reshape(periods, rows, cols)
+        .copy()
+    )
+    if nan_at is not None:
+        values[nan_at] = np.nan
+    days = pd.date_range("2020-01-01", periods=periods, freq="D")
+    for index, day in enumerate(days):
+        raster = Dataset.create_from_array(
+            arr=values[index],
+            top_left_corner=(0.0, 2.0),
+            cell_size=1.0,
+            epsg=4326,
+        )
+        raster.to_file(str(frames / f"t2m_{day:%Y.%m.%d}.tif"))
+        del raster
+    gc.collect()
+    collection = DatasetCollection.from_files(
+        str(frames), glob="*.tif", date_format="%Y.%m.%d"
+    )
+    collection.to_netcdf(str(path))
+    del collection
+    gc.collect()
+    return values
+
+
+def _handles_on(path):
+    """Entries this process holds open on `path`.
+
+    Compared with `os.path.samefile` rather than by string: Windows reports a
+    mapped drive under its UNC name, so equal paths can spell differently and a
+    string comparison silently never matches.
+
+    Deliberately absolute rather than a difference against an earlier snapshot.
+    psutil reports one entry per path, not per handle, so a second handle on a
+    path already open would not show up in a difference — which is precisely
+    the leak a release check exists to catch.
+
+    Skips when the enumeration itself is unavailable. On Windows psutil raises
+    `RuntimeError: SystemExtendedHandleInformation buffer too big` once the
+    machine holds enough handles system-wide, which says nothing about whether
+    the aggregator released its own. Failing there would report a defect in
+    code the check never got far enough to observe.
+    """
+    try:
+        open_files = psutil.Process().open_files()
+    except (RuntimeError, psutil.Error) as err:
+        # Narrow to the one documented failure. A blanket catch would turn any
+        # psutil problem into a silent pass, which is the shape of bug this
+        # check exists to catch - an AccessDenied, say, should surface rather
+        # than quietly disarm the release assertion.
+        if "SystemExtendedHandleInformation" not in str(err):
+            raise
+        pytest.skip(f"psutil cannot enumerate this process's open files: {err}")
+    found = []
+    for handle in open_files:
+        try:
+            if os.path.samefile(handle.path, path):
+                found.append(handle.path)
+        except ValueError:
+            continue
+    return found
+
+
+def _single_level_var():
+    """The catalog row the real-NetCDF tests aggregate.
+
+    Built on `_RealVariable`, which already carries the reason core must not
+    import a provider's `Variable` and the full list of attributes the
+    aggregator reads — `_output_stem` consults `cds_dataset` / `dataset_id`
+    through `getattr` as well, so the stem here is the bare `cds_variable`.
+    """
+    return _RealVariable(
+        cds_variable="2m_temperature",
+        nc_variable="Band_1",
+        units="K",
+        is_flux=False,
+        is_pre_aggregated=False,
+    )
+
+
+@pytest.mark.slow
+class TestAggregateAgainstARealNetCDF:
+    """Exercises the aggregator against a NetCDF on disk rather than a mock.
+
+    A mock has no memory footprint and no file handle, so a suite built on one
+    cannot observe how much the aggregator reads or whether it releases what it
+    opens - the two things this path most needs to get right.
+    """
+
+    def test_each_window_reduces_the_real_values(self, tmp_path):
+        """The numbers must come from the file, which a mock cannot demonstrate."""
+        path = tmp_path / "cube.nc"
+        data = _write_real_nc(path)
+        result = aggregate_netcdf(
+            path, _single_level_var(), AggregationConfig(freq="3D", op="mean")
+        )
+        assert len(result) == 2
+        np.testing.assert_allclose(result[0][1], data[0:3].mean(axis=0))
+        np.testing.assert_allclose(result[1][1], data[3:6].mean(axis=0))
+
+    def test_a_sum_differs_from_a_mean_on_the_same_cube(self, tmp_path):
+        """Guards against a reduction that silently ignores its op."""
+        path = tmp_path / "cube.nc"
+        data = _write_real_nc(path)
+        var_info = _single_level_var()
+        summed = aggregate_netcdf(
+            path, var_info, AggregationConfig(freq="3D", op="sum")
+        )
+        meaned = aggregate_netcdf(
+            path, var_info, AggregationConfig(freq="3D", op="mean")
+        )
+        for index, window in enumerate((slice(0, 3), slice(3, 6))):
+            np.testing.assert_allclose(summed[index][1], data[window].sum(axis=0))
+            np.testing.assert_allclose(meaned[index][1], data[window].mean(axis=0))
+            assert not np.allclose(summed[index][1], meaned[index][1]), (
+                f"window {index} reduced identically under sum and mean, so the "
+                "op is not being honoured"
+            )
+
+    def test_the_source_file_is_released_when_the_run_ends(self, tmp_path):
+        """The descriptor is checked; POSIX would happily unlink an open file."""
+        path = tmp_path / "cube.nc"
+        _write_real_nc(path)
+        assert not _handles_on(path), (
+            "the fixture left the cube open, so this test cannot attribute a "
+            "handle to the aggregator"
+        )
+        aggregate_netcdf(
+            path, _single_level_var(), AggregationConfig(freq="3D", op="mean")
+        )
+        assert not _handles_on(path), "the aggregator kept a handle on its input"
+
+    def test_the_handle_check_can_actually_fail(self, tmp_path):
+        """Guards the test above: a check that cannot fail proves nothing."""
+        path = tmp_path / "cube.nc"
+        path.write_bytes(b"not a cube")
+        with path.open("rb"):
+            assert _handles_on(path), (
+                "an open handle went unseen, so the release test is vacuous"
+            )
+        assert not _handles_on(path), "the handle survived its context"
+
+    def test_skipna_ignores_a_nan_a_mock_could_not_supply(self, tmp_path):
+        """`skipna` is what a real cube exercises and a mock cannot."""
+        path = tmp_path / "cube.nc"
+        data = _write_real_nc(path, nan_at=(1, 0, 0))
+        result = aggregate_netcdf(
+            path,
+            _single_level_var(),
+            AggregationConfig(freq="3D", op="mean", skipna=True),
+        )
+        expected = np.nanmean(data[0:3], axis=0)
+        np.testing.assert_allclose(result[0][1], expected)
+        assert not np.isnan(result[0][1][0, 0]), (
+            "skipna=True still produced NaN for the cell holding one"
+        )
+
+    def test_without_skipna_a_nan_carries_into_the_window(self, tmp_path):
+        """The complement: the flag has to change the answer to mean anything."""
+        path = tmp_path / "cube.nc"
+        _write_real_nc(path, nan_at=(1, 0, 0))
+        result = aggregate_netcdf(
+            path,
+            _single_level_var(),
+            AggregationConfig(freq="3D", op="mean", skipna=False),
+        )
+        assert np.isnan(result[0][1][0, 0]), (
+            "skipna=False dropped a NaN it should have propagated"
+        )
+
+    def test_streaming_does_not_materialise_the_whole_cube(self, tmp_path):
+        """The other half of the claim: read volume, measured on a real file.
+
+        Peak allocation tracks the window, not the cube, so the cube is made
+        several times a window to leave the assertion real margin. An earlier
+        version sized them equal and passed only when a sibling test had warmed
+        the allocator first.
+
+        The streaming call is the one that can be held to this: the eager call
+        keeps every window it returns.
+        """
+        path = tmp_path / "cube.nc"
+        data = _write_real_nc(path, periods=96, rows=80, cols=80)
+        tracemalloc.start()
+        try:
+            for _window in iter_aggregate_netcdf(
+                path, _single_level_var(), AggregationConfig(freq="4D", op="mean")
+            ):
+                pass
+            _, peak = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+        assert peak < data.nbytes / 2, (
+            f"peak allocation {peak} is not comfortably below the "
+            f"{data.nbytes}-byte cube: the time axis is being materialised "
+            "rather than streamed a window at a time"
+        )
+
+    def test_a_date_range_drops_samples_outside_it(self, tmp_path):
+        """A CDS cross-product over-covers the request; the trim must be real."""
+        path = tmp_path / "cube.nc"
+        data = _write_real_nc(path)
+        result = aggregate_netcdf(
+            path,
+            _single_level_var(),
+            AggregationConfig(freq="3D", op="mean"),
+            date_range=("2020-01-01", "2020-01-03"),
+        )
+        assert len(result) == 1
+        np.testing.assert_allclose(result[0][1], data[0:3].mean(axis=0))
+
+    def test_streaming_yields_the_same_windows_as_the_eager_call(self, tmp_path):
+        """The streaming path exists to bound memory; it must not change answers."""
+        path = tmp_path / "cube.nc"
+        _write_real_nc(path)
+        var_info, config = _single_level_var(), AggregationConfig(freq="3D", op="mean")
+        eager = aggregate_netcdf(path, var_info, config)
+        streamed = list(iter_aggregate_netcdf(path, var_info, config))
+        assert len(streamed) == len(eager)
+        for window, (label, array, _) in zip(streamed, eager, strict=True):
+            assert window.label == label
+            np.testing.assert_allclose(window.array, array)
+
+    def test_writing_produces_one_readable_geotiff_per_window(self, tmp_path):
+        """The written raster is the deliverable, so it must open and match."""
+        from pyramids.dataset import Dataset
+
+        path = tmp_path / "cube.nc"
+        data = _write_real_nc(path)
+        out_dir = tmp_path / "out"
+        out_dir.mkdir()
+        result = aggregate_netcdf(
+            path,
+            _single_level_var(),
+            AggregationConfig(freq="3D", op="mean", out_dir=out_dir),
+        )
+        written = [p for _, _, p in result if p is not None]
+        assert len(written) == 2
+        first = np.asarray(Dataset.read_file(str(written[0])).read_array())
+        np.testing.assert_allclose(np.squeeze(first), data[0:3].mean(axis=0), rtol=1e-5)
