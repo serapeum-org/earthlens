@@ -2174,9 +2174,9 @@ class _ServingBlocks:
                 ['leadtime_hour', 'product_type', 'variable']
 
                 ```
-            - Which decides how a key the serving blocks omit is read: `t2m` is
-              served by a block with no `leadtime_hour`, and because the dataset
-              partitions on it elsewhere, sending it is a conflict:
+            - And which decides whether a key a block *requires* is missing:
+              the `sst` block partitions on `leadtime_hour`, so a request that
+              names none cannot be answered by it:
 
                 ```python
                 >>> from earthlens.ecmwf._hydrate import (
@@ -2188,9 +2188,12 @@ class _ServingBlocks:
                 ...     {"variable": ["t2m"], "product_type": ["analysis"]},
                 ...     {"variable": ["sst"], "leadtime_hour": ["3"]},
                 ... ]
-                >>> request = {"product_type": ["analysis"], "leadtime_hour": ["3"]}
-                >>> _selectors_are_serveable(request, lookup("t2m"), lookup.enumerated)
+                >>> _selectors_are_serveable({}, lookup("sst"), lookup.enumerated)
                 False
+                >>> _selectors_are_serveable(
+                ...     {"leadtime_hour": ["3"]}, lookup("sst"), lookup.enumerated
+                ... )
+                True
 
                 ```
         """
@@ -2317,7 +2320,9 @@ def audit_serveability(
             >>> {len(finding) for finding in findings}
             {3}
             >>> dataset_id, slug, selectors = findings[0]
-            >>> selectors["product_type"] != ["nothing"]
+            >>> bool(dataset_id) and bool(slug)
+            True
+            >>> selectors.get("product_type") != ["nothing"]
             True
 
             ```
