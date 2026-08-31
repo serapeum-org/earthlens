@@ -130,6 +130,24 @@ class TestDiscovery:
             logger.remove(sink)
         assert any("published by both" in message for message in messages)
 
+    def test_bare_reserved_key_is_warned_about(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A provider registering a bare reserved topic word warns at discovery."""
+        from loguru import logger
+
+        monkeypatch.setattr(
+            "earthlens._backends.entry_points",
+            lambda group: [_FakeEntryPoint("plugin", {"precipitation": _SPEC_A})],
+        )
+        messages: list[str] = []
+        sink = logger.add(lambda record: messages.append(record), level="WARNING")
+        try:
+            discover_backends()
+        finally:
+            logger.remove(sink)
+        assert any("reserved generic topic word" in message for message in messages)
+
     def test_distinct_keys_are_not_warned_about(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:

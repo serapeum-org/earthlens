@@ -88,6 +88,10 @@ class AmbiguousDataSourceError(ValueError):
 def topic_claimants(keys: Iterable[str], topic: str) -> list[str]:
     """Return the sorted `source:topic` keys that serve a bare `topic`.
 
+    A key's topic is the segment after its first `:` — the same definition the
+    registration guard uses — so `foo:sea-surface-temperature` is a claimant of
+    `sea-surface-temperature`, never of `temperature`.
+
     Args:
         keys: The registered facade keys to search.
         topic: A bare generic topic word (no `:` separator).
@@ -96,8 +100,7 @@ def topic_claimants(keys: Iterable[str], topic: str) -> list[str]:
         list[str]: Every registered key of the form `<source>:<topic>`, sorted;
         empty when no source exposes the topic.
     """
-    suffix = f":{topic}"
-    return sorted(key for key in keys if key.endswith(suffix))
+    return sorted(key for key in keys if ":" in key and key.split(":", 1)[1] == topic)
 
 
 def discover_backends() -> dict[str, BackendSpec]:
@@ -108,6 +111,10 @@ def discover_backends() -> dict[str, BackendSpec]:
     same install could dispatch a key to different backends on different
     machines. A collision is a packaging mistake, so it is logged as a warning
     naming both entry points and the winner, rather than resolved silently.
+
+    A bare `RESERVED_TOPICS` word is also warned about: the in-repo tables never
+    register one (a test enforces it), but an out-of-tree provider could, so the
+    invariant is checked at discovery too rather than only in this repo's tests.
 
     Returns:
         A `key -> BackendSpec` mapping union of every entry point in the
@@ -128,4 +135,11 @@ def discover_backends() -> dict[str, BackendSpec]:
                 )
             merged[key] = spec
             source[key] = ep.value
+    for key in merged:
+        if ":" not in key and key in RESERVED_TOPICS:
+            logger.warning(
+                f"backend key {key!r} (from {source[key]!r}) is a reserved "
+                f"generic topic word; register it as '<source>:{key}', not bare. "
+                f"A bare reserved key is a packaging mistake — qualify it."
+            )
     return merged
