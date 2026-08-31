@@ -13,10 +13,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from earthlens._backends import AmbiguousDataSourceError
+from earthlens._backends import AmbiguousDataSourceError, discover_backends
 from earthlens.aggregate import AggregationConfig
 from earthlens.chc import CHIRPS
-from earthlens.earthlens import EarthLens, _LazyRegistry
+from earthlens.earthlens import EarthLens, _LazyRegistry, _source_dirname
 from earthlens.ecmwf import ECMWF
 from earthlens.s3 import S3
 
@@ -1446,3 +1446,41 @@ class TestFacadeAoi:
                 aoi="USA",
                 buffer=0.5,
             )
+
+
+class TestQualifiedKeyDefaultDir:
+    """The default output directory derived from a `source:topic` facade key."""
+
+    def test_qualified_key_flattens_its_separator(self):
+        """A source:topic key becomes one directory name, colon flattened."""
+        assert _source_dirname("jrc:sea-level-forecast") == "jrc_sea-level-forecast"
+
+    def test_bare_key_is_unchanged(self):
+        """A bare source key already names a directory, so it passes through."""
+        assert _source_dirname("chc") == "chc"
+
+    def test_no_registered_key_keeps_a_colon(self):
+        """No registered key may leave a colon in its directory name.
+
+        A colon is legal in a POSIX filename, so Linux CI would accept the
+        unflattened name; asserting on the derived string keeps this a real
+        gate on every platform rather than a Windows-only one.
+        """
+        qualified = sorted(k for k in discover_backends() if ":" in k)
+        assert qualified, "expected the registry to carry source:topic keys"
+        offenders = [k for k in qualified if ":" in _source_dirname(k)]
+        assert not offenders, f"colon survives into the directory name: {offenders}"
+
+    @pytest.mark.jrc
+    def test_facade_default_path_is_creatable(self, tmp_path):
+        """The facade's derived default directory can actually be created."""
+        from earthlens.config import set_output_dir
+
+        set_output_dir(tmp_path)
+        try:
+            target = pathlib.Path(EarthLens(data_source="jrc:coastal-forecast").path)
+            assert ":" not in target.name, f"unusable directory name: {target.name}"
+            target.mkdir(parents=True, exist_ok=True)
+            assert target.is_dir(), f"{target} was not created"
+        finally:
+            set_output_dir(None)

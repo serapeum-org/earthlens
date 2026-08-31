@@ -58,6 +58,37 @@ _RASTER_SUFFIXES = frozenset(
 )
 
 
+#: Separator the `source:topic` facade-key grammar puts in a qualified key.
+#: Windows reads `:` as the drive / alternate-data-stream separator and refuses
+#: it in a path component, so a key is flattened before it names a directory.
+_KEY_TOPIC_SEPARATOR = ":"
+
+
+def _source_dirname(data_source: str) -> str:
+    """Return the directory name holding a data source's default output.
+
+    A qualified `source:topic` key cannot name a directory on Windows, where
+    `:` is reserved, so the separator is flattened to `_`. The result stays one
+    directory per key, which is what the empty-default cleanup in `load()`
+    assumes. A bare source key is returned unchanged.
+
+    Args:
+        data_source: The facade key, bare (`"chc"`) or qualified
+            (`"jrc:sea-level-forecast"`).
+
+    Returns:
+        str: A directory name valid on every supported platform.
+
+    Examples:
+        >>> from earthlens.earthlens import _source_dirname
+        >>> _source_dirname("chc")
+        'chc'
+        >>> _source_dirname("jrc:sea-level-forecast")
+        'jrc_sea-level-forecast'
+    """
+    return data_source.replace(_KEY_TOPIC_SEPARATOR, "_")
+
+
 def _load_path(path: Path) -> Any:
     """Read a written raster `path` into a native pyramids object.
 
@@ -732,7 +763,8 @@ class EarthLens:
                 `ValueError`. Defaults to `None`.
             path: Output directory. Created by the backend if it does
                 not exist. When omitted (`None`), defaults to
-                `<output_dir()>/<data_source>/` — the directory configured by
+                `<output_dir()>/<data_source>/` (a qualified `source:topic`
+                key flattens its `:` to `_`) — the directory configured by
                 `set_output_dir()` / `EARTHLENS_DATA_DIR`, else
                 `~/.earthlens/data` — rather than the current working
                 directory; pass `path=""` to opt into the CWD.
@@ -988,7 +1020,7 @@ class EarthLens:
         # still means the CWD (a deliberate choice).
         self._explicit_path = path is not None
         if path is None:
-            path = output_dir() / data_source
+            path = output_dir() / _source_dirname(data_source)
             logger.info(
                 f"No `path` given; download() writes {data_source!r} output under "
                 f"{path}/ (load() uses a temp dir)."
@@ -1856,7 +1888,8 @@ def download(
             single date) — the ergonomic alternative to `start` / `end`;
             mutually exclusive with them.
         path: Output directory; defaults to
-            `<output_dir()>/<data_source>/` when omitted — the directory
+            `<output_dir()>/<data_source>/` when omitted (a qualified
+            `source:topic` key flattens its `:` to `_`) — the directory
             configured by `set_output_dir()` / `EARTHLENS_DATA_DIR`.
         lat_lim: Legacy `[lat_min, lat_max]` pair — prefer `aoi=` (mutually
             exclusive with it).
