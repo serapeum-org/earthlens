@@ -123,6 +123,23 @@ datasets:
         cds_variable: particulate_matter_2.5um
         nc_variable: particulate_matter_2.5um
         units: unknown
+  # Why most rows here stay placeholders, verified by probing all 61 in one
+  # sweep (2026-08-31): under the stanza's `source: anthropogenic`, a
+  # single-species request returns one data variable PER EMISSION SECTOR -
+  # ene, fef, ind, mma, res, shp, slv, swd, tnr, tro - plus `sum` for all
+  # sectors, each long_name reading "Emissions of <species> for <sector>
+  # sector". Nothing in a species row says which sector it means, so the
+  # matcher declines rather than guess, and no probe can settle it. Filling
+  # these is a curation decision per row (a named sector, or `sum`).
+  #
+  # The rows that ARE filled are the ones overriding `source` to a value
+  # that returns a single variable: biogenic -> emiss_bio, oceanic ->
+  # emi_oceans, shipping -> sum.
+  #
+  # A second, smaller obstacle: the stanza pins `version: v5.3`, which the
+  # store no longer offers for these variables (v1.1 / v1.2 / v3.0 / v3.1),
+  # so 18 of the placeholders could not be written even if a sector were
+  # chosen. Retargeting that version is also a curation decision.
   cams-global-emission-inventories:
     endpoint: ads
     request_kind: form
@@ -161,8 +178,11 @@ datasets:
         units: unknown
       alpha-pinene:
         cds_variable: alpha_pinene
-        nc_variable: alpha_pinene
-        units: unknown
+        nc_variable: emiss_bio
+        units: kg m-2 s-1
+        extras:
+          source: [biogenic]
+          version: [v3.0, v3.1]
       ammonia:
         cds_variable: ammonia
         nc_variable: ammonia
@@ -182,8 +202,11 @@ datasets:
         units: unknown
       beta-pinene:
         cds_variable: beta_pinene
-        nc_variable: beta_pinene
-        units: unknown
+        nc_variable: emiss_bio
+        units: kg m-2 s-1
+        extras:
+          source: [biogenic]
+          version: [v3.0, v3.1]
       black-carbon:
         cds_variable: black_carbon
         nc_variable: black_carbon
@@ -304,16 +327,25 @@ datasets:
         units: unknown
       methyl-bromide:
         cds_variable: methyl_bromide
-        nc_variable: methyl_bromide
-        units: unknown
+        nc_variable: emiss_bio
+        units: kg m-2 s-1
+        extras:
+          source: [biogenic]
+          version: [v3.0, v3.1]
       methyl-chloride:
         cds_variable: methyl_chloride
-        nc_variable: methyl_chloride
-        units: unknown
+        nc_variable: emiss_bio
+        units: kg m-2 s-1
+        extras:
+          source: [biogenic]
+          version: [v3.0, v3.1]
       methyl-iodide:
         cds_variable: methyl_iodide
-        nc_variable: methyl_iodide
-        units: unknown
+        nc_variable: emiss_bio
+        units: kg m-2 s-1
+        extras:
+          source: [biogenic]
+          version: [v3.0, v3.1]
       monoterpenes:
         cds_variable: monoterpenes
         nc_variable: monoterpenes
