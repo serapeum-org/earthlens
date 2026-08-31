@@ -18,14 +18,6 @@ on:
     workflows: ['github-release']
     types: [completed]
 
-# Serialise deploys to the shared `gh-pages` branch: every PR/main/release
-# deploy pushes the built docs to the same branch, so overlapping runs race
-# and the loser fails with `! [rejected] ... fetch first`. One global group
-# (not keyed by ref) makes them queue instead of racing.
-concurrency:
-  group: mkdocs-gh-pages-deploy
-  cancel-in-progress: false
-
 jobs:
   # Gate every deploy on a warnings-as-errors build. The deploy action builds
   # non-strict, so a broken nav entry, a dangling anchor or a malformed
@@ -67,6 +59,14 @@ jobs:
       if: github.event_name == 'pull_request'
       needs: build-strict
       runs-on: ubuntu-latest
+      # Serialise only the frequent PR deploys on the shared `gh-pages` branch; a
+      # newer PR deploy evicts the pending one (GitHub keeps one running + one
+      # pending per group). build-strict and the main/release deploys stay
+      # unthrottled so the gate always runs and every main/release deploy
+      # completes.
+      concurrency:
+        group: mkdocs-gh-pages-deploy
+        cancel-in-progress: false
       steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
