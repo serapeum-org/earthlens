@@ -472,6 +472,21 @@ class TestAuditVariables:
         assert drift == ["good:wtmp"], "the good dataset's drift is still reported"
         assert "bad" in detail, "the failed dataset is named"
 
+    def test_dataset_without_variables_is_skipped(self, monkeypatch):
+        """A curated row with no `variables` is skipped, not fetched or flagged."""
+        seen: list[str] = []
+
+        def _lister(record):
+            seen.append(record.dataset_id)
+            return {"keep"}
+
+        monkeypatch.setitem(refresh_mod._VARIABLE_LISTERS, "erddap", _lister)
+        status, drift, detail = refresh_mod._audit_variables(
+            self._catalog(empty=[], kept=["keep"]), "erddap"
+        )
+        assert status == "ok" and drift == [], "the variable-less row adds no drift"
+        assert seen == ["kept"], "the variable-less row was not fetched"
+
 
 class TestAuditOutcome:
     """Tests for AuditOutcome."""
