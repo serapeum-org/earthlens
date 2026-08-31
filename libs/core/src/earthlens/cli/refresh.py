@@ -414,6 +414,8 @@ class AuditOutcome:
             (a variable fetch failed). Never a false `"ok"`.
         variable_drift: Curated `"<dataset>:<variable>"` pairs the provider no
             longer serves (a removed or re-cased variable) — actionable drift.
+        variable_detail: Failure reason when `variable_status == "error"` (names
+            the datasets whose variable fetch failed), else empty.
     """
 
     provider: str
@@ -425,6 +427,7 @@ class AuditOutcome:
     untracked: list[str] = field(default_factory=list)
     variable_status: str = "unsupported"
     variable_drift: list[str] = field(default_factory=list)
+    variable_detail: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         """Project the audit outcome to a JSON-friendly dict.
@@ -452,6 +455,7 @@ class AuditOutcome:
             "untracked": self.untracked,
             "variable_status": self.variable_status,
             "variable_drift": self.variable_drift,
+            "variable_detail": self.variable_detail,
         }
 
 
@@ -577,31 +581,44 @@ def _bundled_ids(catalog: Any, provider: str) -> list[str]:
     return resolver(catalog) if resolver else [str(key) for key in catalog.datasets]
 
 
-def _audit_variables(catalog: Any, provider: str) -> tuple[str, list[str]]:
+def _audit_variables(catalog: Any, provider: str) -> tuple[str, list[str], str]:
     """Diff each curated row's `variables` against what the provider serves live.
+
+    The per-dataset fetch is guarded individually: one dataset's `.dds` failure
+    (a transient blip, or a removed dataset whose `.dds` now 404s) is recorded
+    but does not discard the drift already found for the other datasets, so a
+    real re-casing is never lost because a sibling fetch failed.
 
     Args:
         catalog: The loaded provider `Catalog`.
         provider: Canonical provider id.
 
     Returns:
-        A `(variable_status, variable_drift)` pair. `variable_status` is
-        `"unsupported"` when the provider has no variable-lister, `"error"` on a
-        fetch failure, else `"ok"`; `variable_drift` holds the sorted
-        `"<dataset>:<variable>"` pairs the provider no longer serves.
+        A `(variable_status, variable_drift, variable_detail)` triple.
+        `variable_status` is `"unsupported"` when the provider has no
+        variable-lister, `"error"` when any dataset's fetch failed (even so, the
+        drift found for the datasets that did resolve is still returned), else
+        `"ok"`; `variable_drift` holds the sorted `"<dataset>:<variable>"` pairs
+        the provider no longer serves; `variable_detail` names the failed
+        datasets (empty unless `variable_status == "error"`).
     """
     lister = _VARIABLE_LISTERS.get(provider)
     if lister is None:
-        return "unsupported", []
+        return "unsupported", [], ""
     drift: list[str] = []
-    try:
-        for key, record in catalog.datasets.items():
-            curated = getattr(record, "variables", None) or []
-            served = lister(record) if curated else set()
-            drift.extend(f"{key}:{name}" for name in curated if name not in served)
-    except Exception:  # noqa: BLE001 — network / parse failures are reported, not raised
-        return "error", []
-    return "ok", sorted(drift)
+    errors: list[str] = []
+    for key, record in catalog.datasets.items():
+        curated = getattr(record, "variables", None) or []
+        if not curated:
+            continue
+        try:
+            served = lister(record)
+        except Exception as exc:  # noqa: BLE001 — reported per dataset, never raised
+            errors.append(f"{key}: {exc}")
+            continue
+        drift.extend(f"{key}:{name}" for name in curated if name not in served)
+    status = "error" if errors else "ok"
+    return status, sorted(drift), "; ".join(errors)
 
 
 def audit_one(info: BackendInfo) -> AuditOutcome:
@@ -637,7 +654,9 @@ def audit_one(info: BackendInfo) -> AuditOutcome:
     curated = set(curated_fn(catalog)) if curated_fn else set(catalog.datasets)
     index_attr = _INDEX_ATTR.get(info.provider, "available_datasets")
     available = {str(ident) for ident in getattr(catalog, index_attr, [])}
-    variable_status, variable_drift = _audit_variables(catalog, info.provider)
+    variable_status, variable_drift, variable_detail = _audit_variables(
+        catalog, info.provider
+    )
     return AuditOutcome(
         provider=info.provider,
         status="ok",
@@ -650,6 +669,7 @@ def audit_one(info: BackendInfo) -> AuditOutcome:
         untracked=sorted(live - available - curated),
         variable_status=variable_status,
         variable_drift=variable_drift,
+        variable_detail=variable_detail,
     )
 
 

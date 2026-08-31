@@ -398,6 +398,13 @@ def _raise_dds_error(record):
     raise RuntimeError("dds fetch failed")
 
 
+def _lister_fails_on_bad(record):
+    """A lister that fails for the 'bad' dataset and serves WTMP for the rest."""
+    if record.dataset_id == "bad":
+        raise RuntimeError("dds fetch failed")
+    return {"WTMP"}
+
+
 class TestAuditVariables:
     """Tests for the variable-drift dimension (_audit_variables)."""
 
@@ -405,14 +412,16 @@ class TestAuditVariables:
     def _catalog(**variables_by_key):
         """A fake catalog whose records carry the given variable lists."""
         datasets = {
-            key: SimpleNamespace(variables=list(names))
+            key: SimpleNamespace(variables=list(names), dataset_id=key)
             for key, names in variables_by_key.items()
         }
         return SimpleNamespace(datasets=datasets)
 
     def test_unsupported_when_no_lister(self):
         """A provider with no variable-lister reports 'unsupported'."""
-        status, drift = refresh_mod._audit_variables(self._catalog(a=["x"]), "gdacs")
+        status, drift, detail = refresh_mod._audit_variables(
+            self._catalog(a=["x"]), "gdacs"
+        )
         assert status == "unsupported" and drift == []
 
     def test_reports_drift_for_unserved_variable(self, monkeypatch):
@@ -420,7 +429,7 @@ class TestAuditVariables:
         monkeypatch.setitem(
             refresh_mod._VARIABLE_LISTERS, "erddap", lambda rec: {"WTMP"}
         )
-        status, drift = refresh_mod._audit_variables(
+        status, drift, detail = refresh_mod._audit_variables(
             self._catalog(cwwcNDBCMet=["wtmp"]), "erddap"
         )
         assert status == "ok"
@@ -431,16 +440,31 @@ class TestAuditVariables:
         monkeypatch.setitem(
             refresh_mod._VARIABLE_LISTERS, "erddap", lambda rec: {"WTMP", "ATMP"}
         )
-        status, drift = refresh_mod._audit_variables(
+        status, drift, detail = refresh_mod._audit_variables(
             self._catalog(cwwcNDBCMet=["WTMP"]), "erddap"
         )
         assert status == "ok" and drift == []
 
     def test_fetch_error_is_captured(self, monkeypatch):
-        """A lister that raises reports 'error', never propagates."""
+        """A lister that raises reports 'error' and names the dataset, never propagates."""
         monkeypatch.setitem(refresh_mod._VARIABLE_LISTERS, "erddap", _raise_dds_error)
-        status, drift = refresh_mod._audit_variables(self._catalog(x=["v"]), "erddap")
+        status, drift, detail = refresh_mod._audit_variables(
+            self._catalog(x=["v"]), "erddap"
+        )
         assert status == "error" and drift == []
+        assert "x" in detail, "the failed dataset is named in the detail"
+
+    def test_partial_failure_keeps_other_datasets_drift(self, monkeypatch):
+        """One dataset's fetch failure never discards drift found for the others."""
+        monkeypatch.setitem(
+            refresh_mod._VARIABLE_LISTERS, "erddap", _lister_fails_on_bad
+        )
+        status, drift, detail = refresh_mod._audit_variables(
+            self._catalog(good=["wtmp"], bad=["v"]), "erddap"
+        )
+        assert status == "error", "the failed dataset marks the dimension errored"
+        assert drift == ["good:wtmp"], "the good dataset's drift is still reported"
+        assert "bad" in detail, "the failed dataset is named"
 
 
 class TestAuditOutcome:
@@ -453,12 +477,17 @@ class TestAuditOutcome:
         ]
 
     def test_to_dict_carries_variable_dimension(self):
-        """to_dict exposes the variable_status and variable_drift fields."""
+        """to_dict exposes variable_status, variable_drift, and variable_detail."""
         data = AuditOutcome(
-            "erddap", "ok", variable_status="ok", variable_drift=["cwwcNDBCMet:wtmp"]
+            "erddap",
+            "ok",
+            variable_status="error",
+            variable_drift=["cwwcNDBCMet:wtmp"],
+            variable_detail="bad: 404",
         ).to_dict()
-        assert data["variable_status"] == "ok"
+        assert data["variable_status"] == "error"
         assert data["variable_drift"] == ["cwwcNDBCMet:wtmp"]
+        assert data["variable_detail"] == "bad: 404"
 
 
 class TestRefreshOutcome:
