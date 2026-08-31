@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 import tomllib
 from pathlib import Path
 from typing import Any
@@ -280,3 +281,71 @@ class TestReservedTopics:
             "solar-pv",
         }
         assert migrated <= RESERVED_TOPICS
+
+
+def _provider_tables() -> list[tuple[str, dict]]:
+    """Return `(theme, BACKENDS)` for every provider distribution."""
+    return [
+        (theme, importlib.import_module(f"earthlens._{theme}").BACKENDS)
+        for theme in THEMES
+    ]
+
+
+def _duplicate_keys(tables: list[tuple[str, dict]]) -> list[str]:
+    """Return the sorted keys registered by more than one provider table."""
+    seen: dict[str, str] = {}
+    dups: list[str] = []
+    for theme, table in tables:
+        for key in table:
+            if key in seen:
+                dups.append(key)
+            seen[key] = theme
+    return sorted(dups)
+
+
+def _bare_reserved(keys) -> list[str]:
+    """Return the sorted bare keys that are reserved topic words."""
+    return sorted(key for key in keys if ":" not in key and key in RESERVED_TOPICS)
+
+
+def _dangling_topics(keys) -> list[str]:
+    """Return the sorted `source:topic` keys whose topic is not reserved."""
+    return sorted(
+        key
+        for key in keys
+        if ":" in key and key.split(":", 1)[1] not in RESERVED_TOPICS
+    )
+
+
+@pytest.mark.unit
+class TestRegistrationGuards:
+    """The merged registry obeys the source/topic key invariants (C3)."""
+
+    def test_no_key_is_registered_twice(self) -> None:
+        """No facade key is registered by more than one provider table."""
+        tables = _provider_tables()
+        assert _duplicate_keys(tables) == []
+        assert len(discover_backends()) == sum(len(table) for _theme, table in tables)
+
+    def test_no_bare_reserved_word_is_registered(self) -> None:
+        """A reserved topic word is never registered as a bare facade key."""
+        assert _bare_reserved(discover_backends()) == []
+
+    def test_no_qualified_key_names_an_unreserved_topic(self) -> None:
+        """Every `source:topic` key's topic is a reserved word."""
+        assert _dangling_topics(discover_backends()) == []
+
+    def test_duplicate_detection_catches_a_clash(self) -> None:
+        """`_duplicate_keys` flags a key that two tables share."""
+        tables = [("a", {"x": 1, "y": 1}), ("b", {"x": 2})]
+        assert _duplicate_keys(tables) == ["x"]
+
+    def test_bare_reserved_detection_catches_a_violation(self) -> None:
+        """`_bare_reserved` flags a reserved word registered bare."""
+        assert _bare_reserved(["dem", "elevation", "dem:elevation"]) == ["elevation"]
+
+    def test_dangling_topic_detection_catches_a_violation(self) -> None:
+        """`_dangling_topics` flags a qualified key naming an unreserved topic."""
+        assert _dangling_topics(["dem:elevation", "foo:not-a-topic"]) == [
+            "foo:not-a-topic"
+        ]
