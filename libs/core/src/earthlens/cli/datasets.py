@@ -924,8 +924,13 @@ def audit(
                     f"[red]broken in {outcome.provider}:[/red] "
                     f"{', '.join(outcome.broken)}"
                 )
+            if outcome.variable_drift:
+                out_console().print(
+                    f"[red]variable drift in {outcome.provider}:[/red] "
+                    f"{', '.join(outcome.variable_drift)}"
+                )
 
-    if strict and any(o.broken for o in outcomes):
+    if strict and any(o.broken or o.variable_drift for o in outcomes):
         raise typer.Exit(code=1)
 
 

@@ -409,6 +409,11 @@ class AuditOutcome:
         curated_count: Number of curated upstream ids checked.
         broken: Curated upstream ids no longer served live (actionable drift).
         untracked: Live ids absent from the bundled index (informational).
+        variable_status: `"ok"` (variables were checked live), `"unsupported"`
+            (the provider cannot enumerate a dataset's variables), or `"error"`
+            (a variable fetch failed). Never a false `"ok"`.
+        variable_drift: Curated `"<dataset>:<variable>"` pairs the provider no
+            longer serves (a removed or re-cased variable) — actionable drift.
     """
 
     provider: str
@@ -418,6 +423,8 @@ class AuditOutcome:
     curated_count: int = 0
     broken: list[str] = field(default_factory=list)
     untracked: list[str] = field(default_factory=list)
+    variable_status: str = "unsupported"
+    variable_drift: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         """Project the audit outcome to a JSON-friendly dict.
@@ -443,6 +450,8 @@ class AuditOutcome:
             "curated_count": self.curated_count,
             "broken": self.broken,
             "untracked": self.untracked,
+            "variable_status": self.variable_status,
+            "variable_drift": self.variable_drift,
         }
 
 
@@ -509,6 +518,15 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     **dispatch_table("curated_ids"),
 }
 
+#: Provider id -> a callable that, given one curated catalog record, returns the
+#: set of variable names the provider serves for it live. A provider publishes
+#: `variable_lister` only when its listing endpoint enumerates a dataset's
+#: variables (e.g. erddap's `.dds`); providers without one report
+#: `variable_status="unsupported"`, so the audit never claims false coverage.
+_VARIABLE_LISTERS: dict[str, Callable[[Any], set[str]]] = {
+    **dispatch_table("variable_lister"),
+}
+
 #: Provider id -> the catalog attribute holding its persisted informational
 #: index. Defaults to `available_datasets`; Overture's refreshable axis is
 #: its date-stamped `available_releases`, NWM's is its `available_configurations`.
@@ -559,6 +577,33 @@ def _bundled_ids(catalog: Any, provider: str) -> list[str]:
     return resolver(catalog) if resolver else [str(key) for key in catalog.datasets]
 
 
+def _audit_variables(catalog: Any, provider: str) -> tuple[str, list[str]]:
+    """Diff each curated row's `variables` against what the provider serves live.
+
+    Args:
+        catalog: The loaded provider `Catalog`.
+        provider: Canonical provider id.
+
+    Returns:
+        A `(variable_status, variable_drift)` pair. `variable_status` is
+        `"unsupported"` when the provider has no variable-lister, `"error"` on a
+        fetch failure, else `"ok"`; `variable_drift` holds the sorted
+        `"<dataset>:<variable>"` pairs the provider no longer serves.
+    """
+    lister = _VARIABLE_LISTERS.get(provider)
+    if lister is None:
+        return "unsupported", []
+    drift: list[str] = []
+    try:
+        for key, record in catalog.datasets.items():
+            curated = getattr(record, "variables", None) or []
+            served = lister(record) if curated else set()
+            drift.extend(f"{key}:{name}" for name in curated if name not in served)
+    except Exception:  # noqa: BLE001 — network / parse failures are reported, not raised
+        return "error", []
+    return "ok", sorted(drift)
+
+
 def audit_one(info: BackendInfo) -> AuditOutcome:
     """Audit a provider's curated catalog against its live index.
 
@@ -592,6 +637,7 @@ def audit_one(info: BackendInfo) -> AuditOutcome:
     curated = set(curated_fn(catalog)) if curated_fn else set(catalog.datasets)
     index_attr = _INDEX_ATTR.get(info.provider, "available_datasets")
     available = {str(ident) for ident in getattr(catalog, index_attr, [])}
+    variable_status, variable_drift = _audit_variables(catalog, info.provider)
     return AuditOutcome(
         provider=info.provider,
         status="ok",
@@ -602,6 +648,8 @@ def audit_one(info: BackendInfo) -> AuditOutcome:
         # in the available index (so a provider whose index lives elsewhere,
         # like openaq's `parameters`, doesn't report its curated rows as drift).
         untracked=sorted(live - available - curated),
+        variable_status=variable_status,
+        variable_drift=variable_drift,
     )
 
 

@@ -349,6 +349,56 @@ class TestAuditOne:
         assert audit_one(_info("stac")).status == "error", "failure captured"
 
 
+def _raise_dds_error(record):
+    """A variable-lister stand-in that fails the way a bad `.dds` fetch would."""
+    raise RuntimeError("dds fetch failed")
+
+
+class TestAuditVariables:
+    """Tests for the variable-drift dimension (_audit_variables)."""
+
+    @staticmethod
+    def _catalog(**variables_by_key):
+        """A fake catalog whose records carry the given variable lists."""
+        datasets = {
+            key: SimpleNamespace(variables=list(names))
+            for key, names in variables_by_key.items()
+        }
+        return SimpleNamespace(datasets=datasets)
+
+    def test_unsupported_when_no_lister(self):
+        """A provider with no variable-lister reports 'unsupported'."""
+        status, drift = refresh_mod._audit_variables(self._catalog(a=["x"]), "gdacs")
+        assert status == "unsupported" and drift == []
+
+    def test_reports_drift_for_unserved_variable(self, monkeypatch):
+        """A curated variable the provider no longer serves is drift."""
+        monkeypatch.setitem(
+            refresh_mod._VARIABLE_LISTERS, "erddap", lambda rec: {"WTMP"}
+        )
+        status, drift = refresh_mod._audit_variables(
+            self._catalog(cwwcNDBCMet=["wtmp"]), "erddap"
+        )
+        assert status == "ok"
+        assert drift == ["cwwcNDBCMet:wtmp"], "re-cased variable reported as drift"
+
+    def test_no_drift_when_all_served(self, monkeypatch):
+        """A curated variable still served is not drift."""
+        monkeypatch.setitem(
+            refresh_mod._VARIABLE_LISTERS, "erddap", lambda rec: {"WTMP", "ATMP"}
+        )
+        status, drift = refresh_mod._audit_variables(
+            self._catalog(cwwcNDBCMet=["WTMP"]), "erddap"
+        )
+        assert status == "ok" and drift == []
+
+    def test_fetch_error_is_captured(self, monkeypatch):
+        """A lister that raises reports 'error', never propagates."""
+        monkeypatch.setitem(refresh_mod._VARIABLE_LISTERS, "erddap", _raise_dds_error)
+        status, drift = refresh_mod._audit_variables(self._catalog(x=["v"]), "erddap")
+        assert status == "error" and drift == []
+
+
 class TestAuditOutcome:
     """Tests for AuditOutcome."""
 
@@ -357,6 +407,14 @@ class TestAuditOutcome:
         assert AuditOutcome("stac", "ok", broken=["gone"]).to_dict()["broken"] == [
             "gone"
         ]
+
+    def test_to_dict_carries_variable_dimension(self):
+        """to_dict exposes the variable_status and variable_drift fields."""
+        data = AuditOutcome(
+            "erddap", "ok", variable_status="ok", variable_drift=["cwwcNDBCMet:wtmp"]
+        ).to_dict()
+        assert data["variable_status"] == "ok"
+        assert data["variable_drift"] == ["cwwcNDBCMet:wtmp"]
 
 
 class TestRefreshOutcome:
