@@ -625,7 +625,9 @@ def _audit_variables(
             continue
         try:
             served = lister(record)
-        except Exception as exc:  # noqa: BLE001 — reported per dataset, never raised
+        except Exception as exc:  # noqa: BLE001
+            # A per-record fetch failure is reported, never raised, so one
+            # dataset's `.dds` blip cannot discard the drift found for the rest.
             errors.append(f"{key}: {exc}")
             continue
         drift.extend(f"{key}:{name}" for name in curated if name not in served)
