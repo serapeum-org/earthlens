@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23823,11 +23823,41 @@ engines sample differently (see below), so it is opt-in.</p>
 </tr>
 </tbody>
 </table>
-<p>A request qualifies only when nothing server-side shapes the image:
-a single <code>ee_type="image"</code> asset (not a reduced collection), no
-<code>cloud_mask</code>, no <code>filters</code>, <code>export_via="url"</code>, and <code>crs="EPSG:4326"</code>.
-Everything else stays on Earth Engine, which is the only engine that can
-run a computation graph or export to Drive / GCS / an asset.</p>
+<p>A request qualifies when nothing server-side has to shape the image: no
+<code>cloud_mask</code>, no <code>filters</code>, and <code>export_via="url"</code>. That covers both a
+single <code>ee_type="image"</code> asset and an <code>ee_type="image_collection"</code>, which
+the reader composites client-side per time bucket with the same reducer
+Earth Engine would have used. The output CRS may be <code>"EPSG:4326"</code> or any
+metre-based projected CRS. Everything else stays on Earth Engine, which is
+the only engine that can run a computation graph or export to Drive / GCS /
+an asset.</p>
+<p>A collection is sized before it is served, because the reader downloads
+every scene in the bucket and holds them to reduce. It goes back to Earth
+Engine's server-side reduce when the bucket has too many scenes, when the
+scene stack would not fit one pass, or when the reducer is <code>mosaic</code> — Earth
+Engine's is last-wins, while the reader returns the first scene of the
+stack, so they are not the same composite.</p>
+<p>With a collection you can also narrow which scenes are read:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gee&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;COPERNICUS/S2_SR_HARMONIZED&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;B4&quot;</span><span class="p">]},</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">property_filter</span><span class="o">=</span><span class="s2">&quot;CLOUDY_PIXEL_PERCENTAGE &lt; 20&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="o">...</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">)</span>
+</code></pre></div>
+<p><code>property_filter</code> is an OGR attribute-filter string on the collection's own
+scene properties. It is separate from <code>filters</code> because those are Earth
+Engine closures with no string form. It applies only on this path — a single
+image, or a request Earth Engine ends up serving, ignores it and says so in
+a warning. <strong>Build it in code, never from untrusted input</strong>: it reaches the
+catalog query without escaping.</p>
+<p>One caveat worth knowing: the reader takes each band's nodata from the
+scene's own dataset and the EEDAI driver declares none, so its statistical
+reducers fold a scene's fill pixels into the result where Earth Engine would
+mask them. The two agree wherever the scenes carry no fill over the AOI. There
+is no way to supply the fill from here — the composite read takes no <code>nodata</code>
+argument — so pass <code>engine="ee"</code> when you need Earth Engine's masking exactly.</p>
 <p>What you gain: no 32768-px synchronous cap and no HTTP/zip round-trip,
 so <code>auto_split</code> is unnecessary. What to know before switching:</p>
 <ul>
