@@ -365,6 +365,50 @@ _CLAIMED_BLOCK = """      total-precipitation:
 """
 
 
+class TestCallerDerivedSelectorsAreNotOverridden:
+    """`extras` is merged last, so an override on a date key overrules the request."""
+
+    @pytest.mark.parametrize("key", ["year", "month", "day"])
+    def test_a_multi_value_date_override_is_refused(self, key):
+        """Recording a selector's whole domain says nothing and discards the dates."""
+        offered = {key: ["01", "02", "03"]}
+
+        assert hydrate_mod._selector_override(offered, {key: ["01"]}) == {}
+
+    @pytest.mark.parametrize("key", ["year", "month", "day"])
+    def test_a_single_value_date_override_is_kept(self, key):
+        """A monthly product genuinely requiring `day: 01` is a real pin."""
+        assert hydrate_mod._selector_override({key: ["01"]}, {key: ["15"]}) == {
+            key: ["01"]
+        }
+
+    def test_a_non_date_key_is_unaffected(self):
+        """The rule is about keys the backend builds from the caller, not all keys."""
+        assert hydrate_mod._selector_override(
+            {"product_type": ["forecast", "analysis"]}, {"product_type": ["reanalysis"]}
+        ) == {"product_type": ["forecast", "analysis"]}
+
+
+class TestNoShippedRowOverrulesTheCallersDates:
+    """The catalog on disk must not carry the shape the writer now refuses."""
+
+    def test_no_row_pins_more_than_one_date_value(self):
+        """Such a row silently replaces whatever range was asked for."""
+        from earthlens.ecmwf import Catalog
+
+        offenders = []
+        for name, dataset in Catalog().datasets.items():
+            for slug, row in dataset.variables.items():
+                for key in ("year", "month", "day"):
+                    value = (row.extras or {}).get(key)
+                    if isinstance(value, list) and len(value) > 1:
+                        offenders.append(f"{name}/{slug}: {key}={len(value)} values")
+
+        assert not offenders, "rows overriding the caller's dates: " + "; ".join(
+            offenders
+        )
+
+
 class TestSelectorsAreServeable:
     """A row must not ship selectors the store does not offer for its variable."""
 

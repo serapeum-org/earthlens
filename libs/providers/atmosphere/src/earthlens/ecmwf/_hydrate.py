@@ -1240,6 +1240,12 @@ def _selectors_are_serveable(
     return any(_block_satisfies(effective, block, enumerated) for block in serving)
 
 
+#: Selectors the backend derives from the caller's start/end dates. An
+#: override on one of these does not add information, it overrules the
+#: request, because `_apply_extras_and_strips` merges extras last.
+_CALLER_DERIVED_KEYS = frozenset({"year", "month", "day"})
+
+
 def _selector_override(
     selectors: dict[str, Any], dataset_extras: dict[str, str]
 ) -> dict[str, Any]:
@@ -1283,6 +1289,25 @@ def _selector_override(
             {}
 
             ```
+        - A caller-derived key is never overridden with more than one value,
+          since the backend builds it from the requested dates:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _selector_override
+            >>> _selector_override(
+            ...     {"month": ["01", "02", "03"]}, {"month": ["01"]}
+            ... )
+            {}
+
+            ```
+        - A single value is a real requirement and is still recorded:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _selector_override
+            >>> _selector_override({"day": ["01"]}, {"day": ["15"]})
+            {'day': ['01']}
+
+            ```
         - And one the stanza never declares is not this row's business:
 
             ```python
@@ -1295,6 +1320,15 @@ def _selector_override(
     override: dict[str, Any] = {}
     for key, value in selectors.items():
         if key not in dataset_extras:
+            continue
+        if key in _CALLER_DERIVED_KEYS and isinstance(value, list) and len(value) > 1:
+            # The backend builds year/month/day from the caller's date range and
+            # then merges extras over them, so a multi-valued override here
+            # silently replaces the dates that were asked for. With one serving
+            # block every value the store offers looks required, and recording
+            # all twelve months says nothing except "this selector exists". A
+            # single value is different: that is a real pin, like the `day: 01`
+            # a monthly product genuinely requires.
             continue
         if dataset_extras[key] != value:
             override[key] = value
