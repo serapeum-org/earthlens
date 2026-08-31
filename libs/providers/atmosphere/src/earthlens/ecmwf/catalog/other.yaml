@@ -5622,10 +5622,13 @@ datasets:
   # soil wetness) come from the stanza's historical / catchment / monthly
   # combination. The two meteorological forcings (2m temperature,
   # precipitation) are not produced by a hydrological model at all and are
-  # served only as forecast / gridded_5_km / daily, so they override those
-  # keys and strip `hydrological_model`. Both are correct against the
-  # constraints; they are simply different grids and cadences, and a caller
-  # asking for the dataset as a whole gets whichever the row implies.
+  # served only as forecast / gridded_5_km / daily, so they override those keys
+  # and strip `hydrological_model`. Those blocks also partition on
+  # `leadtime_hour` and `meteorological_source`, which the two rows therefore
+  # pin as well — without them the request names no combination the store
+  # offers. So the dataset returns two different products on different grids
+  # and cadences, and a caller asking for it as a whole gets whichever the row
+  # implies.
   sis-hydrology-europe-seasonal:
     endpoint: cds
     request_kind: form

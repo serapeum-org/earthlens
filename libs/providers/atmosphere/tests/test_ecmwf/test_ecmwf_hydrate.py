@@ -631,10 +631,19 @@ class TestUnserveableSelectors:
 
         assert effective == {"product_type": ["reanalysis"], "day": ["01"]}
 
-    def test_a_variable_no_block_serves_is_not_judged(self):
-        """There is nothing to check the request against."""
+    def test_a_variable_the_store_does_not_offer_is_reported(self):
+        """Where the dataset partitions on `variable`, absence means not offered."""
         row = SimpleNamespace(cds_variable="unknown_variable", extras={})
         lookup = _FixtureBlocks([{"variable": ["2m_temperature"]}])
+
+        assert hydrate_mod._unserveable_selectors(
+            {"product_type": ["x"]}, row, lookup
+        ) == {"variable": ["unknown_variable"]}
+
+    def test_a_dataset_not_partitioning_on_variable_is_not_judged(self):
+        """There is genuinely nothing to check the request against."""
+        row = SimpleNamespace(cds_variable="anything", extras={})
+        lookup = _FixtureBlocks([{"product_type": ["analysis"]}])
 
         assert (
             hydrate_mod._unserveable_selectors({"product_type": ["x"]}, row, lookup)
@@ -658,6 +667,89 @@ class TestQuoteIfNumberShaped:
     def test_an_already_quoted_scalar_is_not_quoted_twice(self):
         """The emitter having quoted it means the type is already pinned."""
         assert hydrate_mod._quote_if_number_shaped("'1'", "1") == "'1'"
+
+
+class TestRowExtras:
+    """What a row already carries, read from the stanza the guard is holding."""
+
+    def test_a_rows_own_extras_are_returned(self):
+        """The guard must judge these, or it and the audit disagree."""
+        block = (
+            "      t2m:\n"
+            "        cds_variable: 2m_temperature\n"
+            "        units: unknown\n"
+            "        extras:\n"
+            "          product_type: [forecast]\n"
+        )
+
+        assert hydrate_mod._row_extras(block, "t2m") == {"product_type": ["forecast"]}
+
+    @pytest.mark.parametrize("slug", ["sst", "absent"])
+    def test_a_row_with_none_or_no_row_at_all_reads_empty(self, slug):
+        """Both mean the same to the caller: nothing of its own to merge."""
+        block = "      sst:\n        cds_variable: sea_surface_temperature\n"
+
+        assert hydrate_mod._row_extras(block, slug) == {}
+
+    def test_unparseable_text_reads_empty_rather_than_raising(self):
+        """A splice in progress must not take the sweep down."""
+        assert hydrate_mod._row_extras("      t2m:\n    : : :\n", "t2m") == {}
+
+
+class TestAuditReportsAMissingVariable:
+    """The store not having the variable is worse than a mis-set selector."""
+
+    def test_a_variable_no_block_offers_is_reported(self, monkeypatch):
+        """Where the dataset partitions on `variable`, absence means not offered."""
+        _audit_catalog(
+            monkeypatch,
+            {
+                "a-dataset": SimpleNamespace(
+                    extras={},
+                    variables={
+                        "gone": SimpleNamespace(
+                            units="K",
+                            unhydratable=None,
+                            cds_variable="not_offered",
+                            extras={},
+                        )
+                    },
+                )
+            },
+        )
+        blocks = [{"variable": ["2m_temperature"], "product_type": ["analysis"]}]
+
+        findings = hydrate_mod.audit_serveability(lambda name: _FixtureBlocks(blocks))
+
+        assert findings == [("a-dataset", "gone", {"variable": ["not_offered"]})]
+
+    def test_a_dataset_not_partitioning_on_variable_is_still_unjudged(
+        self, monkeypatch
+    ):
+        """There is genuinely nothing to check the request against."""
+        _audit_catalog(
+            monkeypatch,
+            {
+                "a-dataset": SimpleNamespace(
+                    extras={},
+                    variables={
+                        "x": SimpleNamespace(
+                            units="K",
+                            unhydratable=None,
+                            cds_variable="anything",
+                            extras={},
+                        )
+                    },
+                )
+            },
+        )
+
+        assert (
+            hydrate_mod.audit_serveability(
+                lambda name: _FixtureBlocks([{"product_type": ["analysis"]}])
+            )
+            == []
+        )
 
 
 class TestAuditServeability:
@@ -789,6 +881,13 @@ class TestAuditServeability:
             "sis-tourism-fire-danger-indicators",
             "multi-origin-c3s-atlas",
             "cams-global-emission-inventories",
+            # A different defect, also pre-existing: these name a variable the
+            # store does not offer at all, which the repo's own RequestValidator
+            # already reports. Fixing them means finding the current name, not
+            # adjusting a selector.
+            "reanalysis-pan-carra-means",
+            "reanalysis-era5-single-levels",
+            "reanalysis-era5-single-levels-monthly-means",
         }
         unexpected = [
             f"{dataset}/{slug}" for dataset, slug, _ in findings if dataset not in known

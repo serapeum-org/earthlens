@@ -886,6 +886,38 @@ def _extras_span(lines: list[str]) -> tuple[int, int] | None:
     return found, stop
 
 
+def _row_extras(block: str, slug: str) -> dict[str, Any]:
+    """Return the `extras:` one row already carries in the stanza text.
+
+    The write-time guard has the stanza as text rather than as the parsed lines
+    `_existing_override` wants, and it needs the same mapping the audit reads:
+    a row with hand-set extras that conflict with the block would otherwise pass
+    the guard and then be reported by the audit.
+
+    Args:
+        block: The stanza's `variables:` text.
+        slug: The row to read.
+
+    Returns:
+        The row's own extras, empty when it has none or cannot be parsed.
+    """
+    for match in _VARIABLE_BLOCK.finditer(block):
+        if match.group("slug") != slug:
+            continue
+        body = match.group("body")
+        dedented = "".join(
+            line[8:] if line.startswith(" " * 8) else line
+            for line in body.splitlines(keepends=True)
+        )
+        try:
+            parsed = yaml.safe_load(dedented) or {}
+        except yaml.YAMLError:
+            return {}
+        extras = parsed.get("extras") if isinstance(parsed, dict) else None
+        return extras if isinstance(extras, dict) else {}
+    return {}
+
+
 def _existing_override(
     lines: list[str], span: tuple[int, int]
 ) -> dict[str, Any] | None:
@@ -1023,10 +1055,13 @@ def _hydrate_stanza_per_variable(
         name, units = chosen
         override = _selector_override(selectors, dataset_extras)
         blocks = serving(cds_variable) if serving is not None else []
+        # The same merge the audit performs: stanza, then whatever `extras:` the
+        # row already carries on disk, then this pass's override. Judging only
+        # `{stanza, override}` let a row with hand-set extras pass here and be
+        # reported by the audit afterwards — two definitions of serveable.
+        written = {**dataset_extras, **_row_extras(new_block, slug), **override}
         if blocks and not _selectors_are_serveable(
-            {**dataset_extras, **override},
-            blocks,
-            getattr(serving, "enumerated", None),
+            written, blocks, getattr(serving, "enumerated", None)
         ):
             # The name was read under a product this row will not ask for, so
             # writing it would ship a request the store cannot answer. A
@@ -2238,11 +2273,20 @@ def _unserveable_selectors(
         lookup: The dataset's serving-block lookup.
 
     Returns:
-        The merged selectors when the row is unserveable, else `None` — which
-        also covers a variable no block serves, since there is nothing to judge.
+        The merged selectors when the row is unserveable, else `None`. A
+        variable the dataset partitions on but no block offers is reported as
+        `{"variable": [name]}`, since the store not having it is a different
+        and worse problem than a selector pointing at the wrong combination.
     """
     serving = lookup(row.cds_variable)
     if not serving:
+        # No block names this variable. Where the dataset partitions on
+        # `variable` at all, that means the store does not offer it — a
+        # stronger defect than a mis-set selector, and one the row's own
+        # request cannot describe. Where it does not partition on `variable`,
+        # there is genuinely nothing to judge.
+        if "variable" in lookup.enumerated:
+            return {"variable": [row.cds_variable]}
         return None
     effective = effective_selectors(stanza, row)
     if _selectors_are_serveable(effective, serving, lookup.enumerated):

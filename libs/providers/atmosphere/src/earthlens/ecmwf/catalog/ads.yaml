@@ -136,10 +136,16 @@ datasets:
   # that returns a single variable: biogenic -> emiss_bio, oceanic ->
   # emi_oceans, shipping -> sum.
   #
-  # A second, smaller obstacle: the stanza pins `version: v5.3`, which the
-  # store no longer offers for these variables (v1.1 / v1.2 / v3.0 / v3.1),
-  # so 18 of the placeholders could not be written even if a sector were
-  # chosen. Retargeting that version is also a curation decision.
+  # A second obstacle for 18 of them, and not the one an earlier version of
+  # this comment claimed. `v5.3` is offered under `anthropogenic` — acetylene,
+  # acids, alcohols and ammonia are all served at v2.1/v4.2/v5.3/v6.1/v6.2 —
+  # so no version retarget helps. 17 species (acetaldehyde, acetic-acid,
+  # acetone, the higher alkanes and alkenes, dibromomethane, dimethyl-sulphide,
+  # ethanol, formic-acid, hydrogen-cyanide, iodomethane, methanol,
+  # other-ketones, other-monoterpenes, pinene, sesquiterpenes, sulphate) have
+  # no `anthropogenic` block at all, and would need the stanza's `source`
+  # changed to one that serves them. `carbon-dioxide` is served under
+  # anthropogenic but only at v2.1/v4.2.
   cams-global-emission-inventories:
     endpoint: ads
     request_kind: form
