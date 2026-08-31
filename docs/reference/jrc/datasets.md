@@ -8,8 +8,8 @@ The EFHM is selected by its facade key; the sea-level datasets are selected with
 | Dataset id | Facade key(s) | `kind` | Request axis | Native resolution | CRS | Output | Licence |
 |---|---|---|---|---|---|---|---|
 | `efhm` | `efhm`, `jrc-flood`, … | `flood_hazard_raster` | `return_periods` | ~90 m (3 arc-second) | EPSG:4326 | GeoTIFF | CC-BY-4.0 |
-| `sea_level_medium_term` | `sea-level-forecast` (`product="medium_term"`) | `sea_level_gridded` | `reference_time` + bbox + `field` | 0.25° global | EPSG:4326 | multi-band GeoTIFF | CC-BY-4.0 |
-| `sea_level_subseasonal` | `sea-level-forecast` (`product="subseasonal"`) | `sea_level_gridded` | `reference_time` + bbox + `field` | 0.25° global | EPSG:4326 | multi-band GeoTIFF | CC-BY-4.0 |
+| `sea_level_medium_term` | `jrc:sea-level-forecast` (`product="medium_term"`) | `sea_level_gridded` | `reference_time` + bbox + `field` | 0.25° global | EPSG:4326 | multi-band GeoTIFF | CC-BY-4.0 |
+| `sea_level_subseasonal` | `jrc:sea-level-forecast` (`product="subseasonal"`) | `sea_level_gridded` | `reference_time` + bbox + `field` | 0.25° global | EPSG:4326 | multi-band GeoTIFF | CC-BY-4.0 |
 | `sea_level_subseasonal_coastal` | `jrc:coastal-forecast` | `sea_level_coastal` | `reference_time` (global) | per-country | — | `pandas.DataFrame` | CC-BY-4.0 |
 
 - **EFHM return periods:** 10, 20, 30, 40, 50, 75, 100, 200, 500 years — given as

@@ -8,9 +8,9 @@ the [`ecmwf`](../ecmwf/introduction.md) backend's per-store `endpoint`:
 
 | Facade key(s) | Product | `kind` | Output |
 |---|---|---|---|
-| `efhm` / `jrc-flood` / `jrc-flood-hazard` / `european-flood-hazard` | European Flood Hazard Map (river-flood depth per return period) | `flood_hazard_raster` | `list[Path]` GeoTIFF |
-| `sea-level-forecast` / `jrc-sea-level` / `twl-forecast` | Probabilistic Total Water Level (TWL) forecasts (gridded) | `sea_level_gridded` | `list[Path]` GeoTIFF |
-| `coastal-forecast` | Subseasonal coastal per-country summary | `sea_level_coastal` | `pandas.DataFrame` |
+| `efhm` / `jrc-flood` / `jrc-flood-hazard` / `jrc:european-flood-hazard` | European Flood Hazard Map (river-flood depth per return period) | `flood_hazard_raster` | `list[Path]` GeoTIFF |
+| `jrc:sea-level-forecast` / `jrc-sea-level` / `jrc:twl-forecast` | Probabilistic Total Water Level (TWL) forecasts (gridded) | `sea_level_gridded` | `list[Path]` GeoTIFF |
+| `jrc:coastal-forecast` | Subseasonal coastal per-country summary | `sea_level_coastal` | `pandas.DataFrame` |
 
 For the walkthrough see [Usage](usage.md), the datasets on the
 [Available datasets](datasets.md) page, and the rendered API on the
