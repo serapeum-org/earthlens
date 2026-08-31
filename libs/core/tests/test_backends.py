@@ -8,7 +8,12 @@ from typing import Any
 
 import pytest
 
-from earthlens._backends import ENTRY_POINT_GROUP, discover_backends
+from earthlens._backends import (
+    ENTRY_POINT_GROUP,
+    RESERVED_TOPICS,
+    discover_backends,
+    topic_claimants,
+)
 from earthlens.earthlens import EarthLens
 
 #: Every thematic provider distribution installed in the dev workspace.
@@ -244,3 +249,34 @@ class TestPreBoundKwargs:
     def test_alias_survives_discovery(self, key: str, expected: dict) -> None:
         """An entry point carries the table, so pre-bound kwargs survive."""
         assert EarthLens.DataSources.default_kwargs(key) == expected
+
+
+@pytest.mark.unit
+class TestReservedTopics:
+    """`RESERVED_TOPICS` and the `topic_claimants` helper (C1)."""
+
+    def test_topic_claimants_returns_sorted_qualified_keys(self) -> None:
+        """`topic_claimants` returns the sorted `source:topic` keys for a topic."""
+        keys = ["b:elevation", "a:elevation", "dem", "x:solar-pv"]
+        assert topic_claimants(keys, "elevation") == ["a:elevation", "b:elevation"]
+
+    def test_topic_claimants_empty_when_unclaimed(self) -> None:
+        """A topic no key qualifies yields an empty list."""
+        assert topic_claimants(["chc", "cmems"], "precipitation") == []
+
+    def test_reserved_topics_covers_the_migrated_words(self) -> None:
+        """Every generic word migrated to `source:topic` is a reserved topic."""
+        migrated = {
+            "elevation",
+            "insar",
+            "bare-earth-dem",
+            "human-settlement",
+            "climate-projections",
+            "teleconnections",
+            "european-flood-hazard",
+            "sea-level-forecast",
+            "coastal-forecast",
+            "twl-forecast",
+            "solar-pv",
+        }
+        assert migrated <= RESERVED_TOPICS

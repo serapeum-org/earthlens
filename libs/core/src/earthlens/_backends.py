@@ -8,6 +8,7 @@ small module import, never a backend's optional dependency.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from importlib.metadata import entry_points
 
 from loguru import logger
@@ -30,6 +31,67 @@ ENTRY_POINT_GROUP = "earthlens.backends"
 #: publishes its own slice (`earthlens._<theme>:BACKENDS`), so core names no
 #: backend and depends on no provider distribution.
 BackendSpec = tuple[str, str, str, dict[str, object]]
+
+#: Generic domain words that must never be a *bare* facade key. A reserved word
+#: names a subject several providers could serve (`elevation`, `precipitation`,
+#: `sea-level-forecast`), so it is reachable only in qualified `source:topic`
+#: form — `dem:elevation`, not a bare `elevation` that one arbitrary backend
+#: owns. Requesting a bare reserved word raises `AmbiguousDataSourceError`; a
+#: provider table registering one bare fails the registration guard. The set is
+#: seeded with the words in the registry today plus common subjects not yet
+#: claimed, so a future provider cannot squat one.
+RESERVED_TOPICS: frozenset[str] = frozenset(
+    {
+        "elevation",
+        "insar",
+        "bare-earth-dem",
+        "human-settlement",
+        "climate-projections",
+        "teleconnections",
+        "european-flood-hazard",
+        "sea-level-forecast",
+        "coastal-forecast",
+        "twl-forecast",
+        "solar-pv",
+        "precipitation",
+        "temperature",
+        "discharge",
+        "streamflow",
+        "wind",
+        "sea-surface-temperature",
+        "soil-moisture",
+        "evapotranspiration",
+        "snow",
+        "humidity",
+        "air-quality",
+        "land-cover",
+    }
+)
+
+
+class AmbiguousDataSourceError(ValueError):
+    """Raised when a bare generic topic word is requested as a `data_source`.
+
+    A generic domain word (a `RESERVED_TOPICS` member) is never a bare key — it
+    is reachable only in qualified `source:topic` form, so several sources can
+    serve the same subject without colliding. Subclasses `ValueError` so callers
+    that already catch the facade's unknown-source `ValueError` keep working.
+    """
+
+
+def topic_claimants(keys: Iterable[str], topic: str) -> list[str]:
+    """Return the sorted `source:topic` keys that serve a bare `topic`.
+
+    Args:
+        keys: The registered facade keys to search.
+        topic: A bare generic topic word (no `:` separator).
+
+    Returns:
+        list[str]: Every registered key of the form `<source>:<topic>`, sorted;
+        empty when no source exposes the topic.
+    """
+    suffix = f":{topic}"
+    return sorted(key for key in keys if key.endswith(suffix))
 
 
 def discover_backends() -> dict[str, BackendSpec]:

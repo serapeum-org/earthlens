@@ -28,7 +28,12 @@ from typing import TYPE_CHECKING, Any, cast
 
 from loguru import logger
 
-from earthlens._backends import discover_backends
+from earthlens._backends import (
+    RESERVED_TOPICS,
+    AmbiguousDataSourceError,
+    discover_backends,
+    topic_claimants,
+)
 from earthlens.base import split_time
 from earthlens.base.spatial import resolve_aoi
 from earthlens.config import output_dir
@@ -1039,17 +1044,31 @@ class EarthLens:
             data_source: The backend key to validate.
 
         Raises:
+            AmbiguousDataSourceError: If `data_source` is a bare generic topic
+                word (a `RESERVED_TOPICS` member). Such a word is reachable only
+                in qualified `source:topic` form; the message lists the
+                registered `source:topic` keys that serve it.
             ValueError: If `data_source` is not a registered key. The
                 message names the closest registered key (via `difflib`)
                 and lists the known keys.
         """
-        if data_source not in cls.DataSources:
-            close = difflib.get_close_matches(data_source, list(cls.DataSources), n=1)
-            hint = f" Did you mean {close[0]!r}?" if close else ""
-            raise ValueError(
-                f"{data_source!r} is not a supported data source. "
-                f"Known: {sorted(cls.DataSources)}.{hint}"
+        if data_source in cls.DataSources:
+            return
+        if ":" not in data_source and data_source in RESERVED_TOPICS:
+            claimants = topic_claimants(cls.DataSources, data_source)
+            if claimants:
+                raise AmbiguousDataSourceError(
+                    f"{data_source!r} is a reserved topic; use one of: {claimants}."
+                )
+            raise AmbiguousDataSourceError(
+                f"{data_source!r} is a reserved topic; no source currently provides it."
             )
+        close = difflib.get_close_matches(data_source, list(cls.DataSources), n=1)
+        hint = f" Did you mean {close[0]!r}?" if close else ""
+        raise ValueError(
+            f"{data_source!r} is not a supported data source. "
+            f"Known: {sorted(cls.DataSources)}.{hint}"
+        )
 
     #: Constructor parameter names the facade owns and supplies itself.
     #: Everything else a backend declares is a backend-specific option,
