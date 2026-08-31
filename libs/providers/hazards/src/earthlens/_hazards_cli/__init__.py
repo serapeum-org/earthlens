@@ -49,7 +49,7 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "emitter": "earthlens.hdx.cli:emitter",
     },
     "hanze": {"validator": "earthlens.hanze.cli:validator"},
-    "jrc_flood": {"validator": "earthlens.jrc_flood.cli:validator"},
+    "jrc": {"validator": "earthlens.jrc.cli:validator"},
     "nsi": {"validator": "earthlens.nsi.cli:validator"},
     "osm": {"validator": "earthlens.osm.cli:validator"},
 }

@@ -1,0 +1,107 @@
+# JRC hazards catalog — the European Flood Hazard Map (EFHM) plus the
+# probabilistic sea-level (Total Water Level) forecasts. Each row carries the
+# `kind` the backend dispatches on: `flood_hazard_raster` (a whole-Europe GeoTIFF
+# per return period), `sea_level_gridded` (a global 0.25 deg NetCDF forecast
+# cube) or `sea_level_coastal` (a global per-country summary CSV).
+#
+# "River flood hazard maps for Europe and the Mediterranean Basin" (JRC /
+# Copernicus Emergency Management Service). Each cell value is river-flood water
+# depth (m) for a given return period, on a single-band EPSG:4326 ~90 m (3
+# arc-second; documented 100 m) grid covering Europe and the Mediterranean.
+#
+# Licence: CC-BY-4.0 (permissive attribution) — no LicenseWarning.
+license: CC-BY-4.0
+attribution: >-
+  Dottori, F., Alfieri, L., Bianchi, A., Skoulikaris, C., Salamon, P. (2020).
+  River flood hazard maps for Europe and the Mediterranean Basin region. JRC /
+  Copernicus Emergency Management Service (CEMS).
+
+datasets:
+  efhm:
+    kind: flood_hazard_raster
+    title: "JRC River flood hazard maps for Europe and the Mediterranean Basin (EFHM)"
+    band: water_depth
+    long_name: River-flood water depth
+    units: m
+    dtype: float32
+    crs: EPSG:4326
+    nodata: -9999.0
+    spatial_resolution: 90
+    base_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-EFAS/flood_hazard"
+    filename_template: "Europe_RP{rp}_filled_depth.tif"
+    return_periods: [10, 20, 30, 40, 50, 75, 100, 200, 500]
+    source_url: "https://data.jrc.ec.europa.eu/dataset/1d128b6c-a4ee-4858-9e34-6210707f3c81"
+
+  # --- Sea-level (Total Water Level) probabilistic forecasts (Copernicus EMS / EC JRC) ---
+  # Global 0.25° NetCDF-4 cubes read via pyramids.netcdf.NetCDF; a global coastal-summary
+  # CSV rides with the subseasonal product. Licence CC-BY-4.0 (shared, top-level). DOI +
+  # the 2024 methodology-paper citation are pending the data producer's reply (left empty
+  # until confirmed). The gridded field's geotransform comes from the cube's own CF
+  # latitude/longitude, which pyramids derives as of 0.58.1.
+  sea_level_medium_term:
+    kind: sea_level_gridded
+    title: "JRC medium-term probabilistic sea-level (TWL) forecast — 15-day, twice daily"
+    long_name: Total water level (tide + surge + wave) probabilistic forecast
+    # units/dtype describe `default_field` (a water level in m). The same cube
+    # also carries exceedance-probability fields (%) and 1-10 severity flags,
+    # which a `field=` request may select instead.
+    units: m
+    dtype: float32
+    crs: EPSG:4326
+    nodata: null
+    spatial_resolution: 27750
+    base_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven"
+    product: medium_term_forecasts
+    cycle_path_template: "%Y/%m/%d/%H"
+    gridded_glob: "*TWLforecastGridded_*.nc"
+    cadence: twice-daily
+    horizon_days: 15
+    endfls_marker: endFls
+    default_field: TWL75
+    # The server keeps a rolling window (roughly the last few weeks of
+    # cycles), so older dates in this range are no longer retrievable.
+    data_period: "2022-present (rolling retention)"
+    attribution: "Copernicus Emergency Management Service (CEMS) / EC JRC — probabilistic data-driven sea-level forecasts (2024 methodology; full citation pending)."
+    source_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven/medium_term_forecasts/"
+
+  sea_level_subseasonal:
+    kind: sea_level_gridded
+    title: "JRC subseasonal probabilistic sea-level (TWL) forecast — ~46-day, weekly"
+    long_name: Total water level (tide + surge + wave) probabilistic forecast
+    # units/dtype describe `default_field` (a water level in m). The same cube
+    # also carries exceedance-probability fields (%) and 1-10 severity flags,
+    # which a `field=` request may select instead.
+    units: m
+    dtype: float32
+    crs: EPSG:4326
+    nodata: null
+    spatial_resolution: 27750
+    base_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven"
+    product: subseasonal_forecasts
+    cycle_path_template: "%Y/%m/%d/%H"
+    gridded_glob: "*TWLforecastGridded_*.nc"
+    cadence: weekly
+    horizon_days: 46
+    endfls_marker: endFls
+    default_field: TWL75
+    data_period: "2026-present (rolling retention)"
+    attribution: "Copernicus Emergency Management Service (CEMS) / EC JRC — probabilistic data-driven sea-level forecasts (2024 methodology; full citation pending)."
+    source_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven/subseasonal_forecasts/"
+
+  sea_level_subseasonal_coastal:
+    kind: sea_level_coastal
+    title: "JRC subseasonal coastal sea-level summary — global, per-country exceedance probabilities"
+    long_name: Per-country coastal total-water-level exceedance-probability summary
+    units: ""
+    crs: EPSG:4326
+    nodata: null
+    base_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven"
+    product: subseasonal_forecasts
+    cycle_path_template: "%Y/%m/%d/%H"
+    coastal_glob: "*CoastalForecast_*.csv"
+    cadence: weekly
+    horizon_days: 46
+    endfls_marker: endFls
+    data_period: "2026-present (rolling retention)"
+    attribution: "Copernicus Emergency Management Service (CEMS) / EC JRC — probabilistic data-driven sea-level forecasts (2024 methodology; full citation pending)."
+    source_url: "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/FLOODS/sea_level_forecasts/probabilistic_data_driven/subseasonal_forecasts/"

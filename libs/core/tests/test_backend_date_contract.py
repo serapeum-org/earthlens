@@ -126,7 +126,7 @@ _NO_WINDOW_REQUIRED = {
     "FLOPROS",
     "Glaciers",
     "HANZE",
-    "JRCFlood",
+    "JRC",
     "NSI",
     "OSM",
     "Overture",

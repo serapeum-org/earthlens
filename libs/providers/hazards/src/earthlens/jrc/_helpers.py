@@ -1,0 +1,636 @@
+"""URL + cycle-resolution helpers for the JRC backend (EFHM + sea-level).
+
+The EFHM half serves one whole-Europe GeoTIFF per return period at a
+deterministic `{BASE_URL}/Europe_RP{rp}_filled_depth.tif`. The sea-level half
+walks the jeodpp autoindex (`YYYY/MM/DD/HH` cycle tree) to resolve a forecast
+cycle — gated on the 0-byte `endFls` sentinel — and reconstructs the global
+pixel window for a requested bbox. The cubes' affine comes from pyramids, which
+derives it from the CF `latitude` / `longitude` coordinates (>= 0.58.1,
+serapeum-org/pyramids#1071); `require_geographic_affine` sanity-checks it.
+All network access
+goes through the injectable `http_text` seam so tests can fake the autoindex.
+"""
+
+from __future__ import annotations
+
+import fnmatch
+import math
+import re
+from collections.abc import Callable, Sequence
+from datetime import datetime, timedelta
+from functools import lru_cache
+from typing import TYPE_CHECKING, cast
+
+import numpy as np
+import requests
+from loguru import logger
+
+if TYPE_CHECKING:  # pragma: no cover - import-time only for the annotations
+    from types import ModuleType
+
+    from earthlens.base.http import HttpClient
+
+#: Root of the JRC CEMS-EFAS flood-hazard directory (anonymous HTTPS, no auth).
+BASE_URL: str = (
+    "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-EFAS/flood_hazard"
+)
+
+#: `strftime`-free file-name template; `{rp}` is the integer return period.
+FILENAME_TEMPLATE: str = "Europe_RP{rp}_filled_depth.tif"
+
+#: Seconds to wait on a jeodpp autoindex / coastal-CSV request.
+_HTTP_TIMEOUT: float = 60.0
+
+#: Captures the `href` targets in the jeodpp Apache autoindex.
+_HREF = re.compile(r'href="([^"]+)"')
+
+
+@lru_cache(maxsize=1)
+def _client() -> HttpClient:
+    """Return the process-wide `HttpClient` used for every jeodpp request.
+
+    Cached so one `latest` resolve reuses a single session (and its connection
+    pool) across the whole directory walk instead of building one per request.
+
+    Returns:
+        earthlens.base.http.HttpClient: The shared client. Process-wide by design
+            (one pooled session for the whole directory walk); call
+            `_client.cache_clear()` to drop it, which the tests do between cases.
+    """
+    from earthlens.base.http import HttpClient
+
+    return HttpClient(timeout=_HTTP_TIMEOUT)
+
+
+def _safe_name(value: str) -> str:
+    """Reduce a request value to characters that are safe in a filename.
+
+    A `field=` comes from the caller and lands in the written filename, so strip
+    anything that could traverse a path or upset a filesystem.
+
+    Args:
+        value: The raw request value.
+
+    Returns:
+        str: The value with unsafe characters replaced by `_`.
+    """
+    return re.sub(r"[^A-Za-z0-9._-]", "_", value) or "field"
+
+
+def efhm_url(
+    rp: int, *, base_url: str = BASE_URL, template: str = FILENAME_TEMPLATE
+) -> str:
+    """Build the EFHM GeoTIFF URL for one return period.
+
+    Args:
+        rp: The integer return period in years (e.g. `100`).
+        base_url: The directory root; defaults to `BASE_URL`.
+        template: The file-name template; defaults to `FILENAME_TEMPLATE`.
+
+    Returns:
+        str: The fully-qualified `.tif` URL.
+
+    Examples:
+        - The verified RP100 URL:
+            ```python
+            >>> from earthlens.jrc._helpers import efhm_url
+            >>> efhm_url(100)
+            'https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-EFAS/flood_hazard/Europe_RP100_filled_depth.tif'
+
+            ```
+    """
+    return f"{base_url}/{template.format(rp=rp)}"
+
+
+def _http_text(url: str) -> str:
+    """Return the body of a GET as text (jeodpp autoindex / coastal CSV).
+
+    Reads through the shared `HttpClient` so the crawl inherits the repo's
+    session reuse, user agent and `Retry-After`-aware retry/back-off.
+
+    Args:
+        url: The directory or file URL to fetch.
+
+    Returns:
+        str: The response body as text.
+
+    Raises:
+        requests.HTTPError: If the server returns a non-2xx status.
+    """
+    return str(_client().get(url).text)
+
+
+def http_bytes(url: str, *, fetch: Callable[[str], bytes] | None = None) -> bytes:
+    """Return the raw body of a GET, undecoded.
+
+    The coastal CSV is served as `text/csv` with **no charset**, so `requests`
+    falls back to ISO-8859-1 and silently mangles the UTF-8 country names
+    (`Côte d'Ivoire`, `São Tomé and Príncipe`, `Åland`). Handing the bytes to the
+    parser lets it decode UTF-8 properly.
+
+    Args:
+        url: The file URL to fetch.
+        fetch: Injectable byte fetcher; the shared `HttpClient` is used when
+            omitted.
+
+    Returns:
+        bytes: The undecoded response body.
+
+    Raises:
+        requests.HTTPError: If the server returns a non-2xx status.
+    """
+    if fetch is not None:
+        return bytes(fetch(url))
+    return bytes(_client().get(url).content)
+
+
+def list_directory(
+    url: str, *, http_text: Callable[[str], str] | None = None
+) -> list[str]:
+    """List the entries of a jeodpp autoindex directory.
+
+    Args:
+        url: The directory URL (a trailing slash is added when missing).
+        http_text: Injectable text fetcher; resolved at call time (never as a
+            default) so replacing the module-level `_http_text` takes effect.
+
+    Returns:
+        list[str]: Entry names — subdirectories keep their trailing `/`; the
+            parent link and the column-sort query links are dropped.
+    """
+    fetch = http_text if http_text is not None else _http_text
+    if not url.endswith("/"):
+        url += "/"
+    names: list[str] = []
+    for href in _HREF.findall(fetch(url)):
+        href = href.strip()
+        if not href or href.startswith(("?", "/", "..")):
+            continue
+        names.append(href)
+    return names
+
+
+def _numeric_dirs(names: list[str]) -> list[str]:
+    """Return the numeric subdirectory names, newest (largest) first."""
+    dirs = [n[:-1] for n in names if n.endswith("/") and n[:-1].isdigit()]
+    return sorted(dirs, key=int, reverse=True)
+
+
+def _cycle_id(url: str) -> str:
+    """Compact `YYYYMMDDTHH` id from a `.../YYYY/MM/DD/HH/` cycle URL.
+
+    Args:
+        url: The resolved cycle directory URL.
+
+    Returns:
+        str: The `YYYYMMDDTHH` identifier used in output filenames.
+
+    Raises:
+        ValueError: If the URL does not carry the four numeric path segments.
+    """
+    parts = [p for p in url.strip("/").split("/") if p.isdigit()]
+    if len(parts) < 4:
+        raise ValueError(
+            f"cannot derive a cycle id from {url!r}: expected a "
+            ".../YYYY/MM/DD/HH/ path."
+        )
+    year, month, day, hour = parts[-4:]
+    return f"{year}{month}{day}T{hour}"
+
+
+def _is_latest(value: datetime | str | None) -> bool:
+    """Whether a `reference_time` means 'the newest complete cycle'."""
+    return value is None or (
+        isinstance(value, str) and value.strip().lower() in ("", "latest")
+    )
+
+
+def _parse_reference_time(value: datetime | str | None) -> datetime:
+    """Parse an explicit `reference_time` to a `datetime`.
+
+    Args:
+        value: A `datetime`, or a string such as `"2026-08-26T12"`,
+            `"2026-08-26 12"`, `"2026-08-26"`, or `"20260826T12"`. `None` is
+            accepted by the signature (the caller screens it with `_is_latest`)
+            but does not parse.
+
+    Returns:
+        datetime: The parsed cycle timestamp.
+
+    Raises:
+        ValueError: If the value cannot be parsed (`None` included).
+    """
+    if isinstance(value, datetime):
+        return value
+    text = str(value).strip().replace(" ", "T")
+    for fmt in ("%Y-%m-%dT%H", "%Y-%m-%dT%H:%M", "%Y-%m-%d", "%Y%m%dT%H", "%Y%m%d%H"):
+        try:
+            return datetime.strptime(text, fmt)
+        except ValueError:
+            continue
+    raise ValueError(
+        f"could not parse reference_time {value!r} (expected e.g. '2026-08-26T12')."
+    )
+
+
+#: Cap on the directory listings issued while resolving `"latest"`. Without it a
+#: renamed sentinel or a publishing pause turns the walk into a crawl of the whole
+#: multi-year archive. This bounds EVERY listing (year/month/day levels included),
+#: not just the leaf probes — budgeting leaves alone still allows thousands of
+#: requests across the intermediate levels.
+MAX_CYCLE_PROBES: int = 60
+
+
+def _probe_leaf(
+    url: str,
+    endfls_marker: str,
+    http_text: Callable[[str], str],
+    budget: list[int],
+) -> tuple[str, str] | None:
+    """Spend one budget unit checking whether a cycle folder is complete.
+
+    Args:
+        url: The candidate cycle directory (trailing `/`).
+        endfls_marker: The cycle-complete sentinel to look for.
+        http_text: Injectable text fetcher.
+        budget: The shared remaining-listing allowance, decremented in place.
+
+    Returns:
+        tuple[str, str] | None: `(cycle_url, cycle_id)` when the cycle carries the
+            sentinel, otherwise `None`.
+    """
+    if budget[0] <= 0:
+        return None
+    budget[0] -= 1
+    if endfls_marker in list_directory(url, http_text=http_text):
+        return url, _cycle_id(url)
+    return None
+
+
+def _descend_newest(
+    url: str,
+    level: int,
+    endfls_marker: str,
+    http_text: Callable[[str], str],
+    budget: list[int],
+) -> tuple[str, str] | None:
+    """Depth-first descend `level` numeric dirs, returning the newest complete cycle.
+
+    Args:
+        url: The directory to descend from (trailing `/`).
+        level: How many numeric levels remain below `url`.
+        endfls_marker: The cycle-complete sentinel to look for at the leaf.
+        http_text: Injectable text fetcher.
+        budget: One-element list holding the remaining leaf probes; decremented in
+            place so the whole recursion shares one allowance.
+
+    Returns:
+        tuple[str, str] | None: `(cycle_url, cycle_id)` for the newest complete
+            cycle, or `None` when none was found within the budget.
+    """
+    if budget[0] <= 0:
+        return None
+    budget[0] -= 1
+    try:
+        entries = list_directory(url, http_text=http_text)
+    except requests.HTTPError as exc:
+        # The archive prunes daily, so a directory listed a moment ago can be
+        # gone by the time the walk reaches it. Skip that branch rather than
+        # failing the whole resolve.
+        if getattr(getattr(exc, "response", None), "status_code", None) == 404:
+            logger.debug(f"JRC: {url} disappeared mid-walk; skipping")
+            return None
+        raise
+    for name in _numeric_dirs(entries):
+        child = f"{url}{name}/"
+        found = (
+            _probe_leaf(child, endfls_marker, http_text, budget)
+            if level == 1
+            else _descend_newest(child, level - 1, endfls_marker, http_text, budget)
+        )
+        if found is not None:
+            return found
+        if budget[0] <= 0:
+            return None
+    return None
+
+
+def resolve_cycle(
+    base_url: str,
+    product: str,
+    cycle_path_template: str,
+    reference_time: datetime | str | None,
+    endfls_marker: str,
+    *,
+    http_text: Callable[[str], str] | None = None,
+) -> tuple[str, str]:
+    """Resolve a forecast cycle to its directory URL, gated on `endFls`.
+
+    Args:
+        base_url: The sea-level `probabilistic_data_driven` root.
+        product: The product subdir (`"medium_term_forecasts"` /
+            `"subseasonal_forecasts"`).
+        cycle_path_template: `strftime` layout of the cycle folders under
+            `product` (`"%Y/%m/%d/%H"`).
+        reference_time: `"latest"` (default) or an explicit cycle.
+        endfls_marker: The 0-byte cycle-complete sentinel name (`"endFls"`).
+        http_text: Injectable text fetcher.
+
+    Returns:
+        tuple[str, str]: `(cycle_url, cycle_id)` — the directory URL (trailing
+            `/`) and a compact `YYYYMMDDTHH` id.
+
+    Raises:
+        ValueError: If no complete cycle is found, or a requested one is
+            missing / not yet complete (a 404 on a pinned cycle).
+        requests.HTTPError: If the server fails for any other reason (403, 429,
+            5xx) — those are not reported as a missing cycle.
+    """
+    http_text = http_text if http_text is not None else _http_text
+    root = f"{base_url.rstrip('/')}/{product}"
+    if _is_latest(reference_time):
+        budget = [MAX_CYCLE_PROBES]
+        found = _descend_newest(f"{root}/", 4, endfls_marker, http_text, budget)
+        if found is None:
+            raise ValueError(
+                f"no complete cycle (with {endfls_marker!r}) found under {root} "
+                f"within a budget of {MAX_CYCLE_PROBES} directory listings; the archive "
+                "may be mid-publish or the sentinel may have been renamed."
+            )
+        return found
+    dt = _parse_reference_time(reference_time)
+    cycle_url = f"{root}/{dt.strftime(cycle_path_template)}/"
+    try:
+        entries = list_directory(cycle_url, http_text=http_text)
+    except requests.HTTPError as exc:
+        # Only a 404 means "no such cycle" (the archive keeps a rolling window, so
+        # an aged-out or mistyped cycle is the common case). A 403/429/5xx is a
+        # live server problem and must not be reported as a missing cycle.
+        status = getattr(getattr(exc, "response", None), "status_code", None)
+        if status is not None and status != 404:
+            raise
+        raise ValueError(
+            f"cycle {dt.strftime(cycle_path_template)} is not published at "
+            f"{cycle_url} — it may have aged out of the archive's retention "
+            "window, or the cycle hour may be wrong."
+        ) from exc
+    if endfls_marker not in entries:
+        raise ValueError(
+            f"cycle {dt.strftime(cycle_path_template)} is not complete "
+            f"(no {endfls_marker!r} at {cycle_url})."
+        )
+    return cycle_url, dt.strftime("%Y%m%dT%H")
+
+
+def find_cycle_file(
+    cycle_url: str, glob: str, *, http_text: Callable[[str], str] | None = None
+) -> str:
+    """Return the name of the file in `cycle_url` matching `glob`.
+
+    Args:
+        cycle_url: The resolved cycle directory URL.
+        glob: A `fnmatch` pattern (`"*TWLforecastGridded_*.nc"`).
+        http_text: Injectable text fetcher.
+
+    Returns:
+        str: The matching file name.
+
+    Raises:
+        ValueError: If no file matches (the filename embeds a start-end range,
+            so it is read from the listing rather than reconstructed).
+    """
+    http_text = http_text if http_text is not None else _http_text
+    matches = [
+        name
+        for name in list_directory(cycle_url, http_text=http_text)
+        if not name.endswith("/") and fnmatch.fnmatchcase(name, glob)
+    ]
+    if not matches:
+        raise ValueError(f"no file matching {glob!r} in {cycle_url}.")
+    if len(matches) > 1:
+        # A cycle should publish exactly one file per glob; more than one means
+        # the layout changed and picking the first would be a silent guess.
+        raise ValueError(
+            f"{len(matches)} files match {glob!r} in {cycle_url} ({matches}); "
+            "expected exactly one."
+        )
+    return matches[0]
+
+
+#: Fallback CF epoch when the cube's `time` units cannot be parsed.
+_TIME_EPOCH = datetime(1950, 1, 1)
+
+
+def _parse_cf_epoch(units: str | None) -> datetime:
+    """Parse a CF `days since <date>` unit string into its epoch.
+
+    Args:
+        units: The coordinate's unit string, e.g. `"days since 1950-01-01"`.
+
+    Returns:
+        datetime: The parsed epoch, or the documented 1950-01-01 default when the
+            units are missing or in an unexpected form (band naming is
+            best-effort and must never fail the fetch).
+    """
+    if not units or " since " not in units:
+        return _TIME_EPOCH
+    amount, _, rest = units.partition(" since ")
+    if amount.strip().lower() != "days":
+        logger.warning(f"JRC: unexpected time units {units!r}; band labels may be off")
+        return _TIME_EPOCH
+    stamp = rest.strip().replace("T", " ").split(".")[0]
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(stamp, fmt)
+        except ValueError:
+            continue
+    return _TIME_EPOCH
+
+
+def band_valid_times(url: str, steps: int) -> list[str]:
+    """Name each output band by the forecast valid time it holds.
+
+    The cubes carry a CF `time` coordinate (`days since 1950-01-01`) that becomes
+    the written GeoTIFF's band axis; without these names a band is unidentifiable
+    without going back to the source. `time` is a *coordinate*, so it is reachable
+    through GDAL's multidimensional API rather than the container's data variables.
+
+    Args:
+        url: The `/vsicurl/`-prefixed cube URL to read the coordinate from.
+        steps: How many bands the written raster has.
+
+    Returns:
+        list[str]: One `YYYY-MM-DDTHH:MM` label per band, or a positional
+            `step_<n>` fallback when the coordinate cannot be read.
+    """
+    try:
+        gdal = gdal_module()
+
+        dataset = gdal.OpenEx(url, gdal.OF_MULTIDIM_RASTER)
+        try:
+            array = dataset.GetRootGroup().OpenMDArray("time")
+            axis = np.asarray(array.ReadAsArray()).ravel()
+            epoch = _parse_cf_epoch(array.GetUnit())
+        finally:
+            # Release the second remote handle this opens; leaving it to the GC
+            # holds a /vsicurl connection open per fetch.
+            dataset = None
+        # Compare the FULL axis, unsliced: a 2-D aggregate field (e.g. a 15-day
+        # exceedance probability) has one band while the cube's time axis has
+        # many, and slicing first would confidently mislabel it with step 0's
+        # timestamp. Only a field whose bands ARE the time axis gets valid times.
+        if axis.size == steps:
+            return [
+                (epoch + timedelta(days=float(v))).strftime("%Y-%m-%dT%H:%M")
+                for v in axis
+            ]
+    except Exception as exc:  # noqa: BLE001 - naming is best-effort; never fail
+        logger.warning(
+            f"JRC: could not read the cube's time axis ({type(exc).__name__}: "
+            f"{exc}); bands fall back to positional step_N names."
+        )
+    return [f"step_{index + 1}" for index in range(steps)]
+
+
+def gdal_module() -> ModuleType:
+    """Return the vendored `osgeo.gdal` module.
+
+    Imported through this one accessor so the multidim reads below have a single
+    seam a test can replace, and so `osgeo` is imported lazily (it only resolves
+    once `pyramids` has put its vendored copy on the path).
+
+    Returns:
+        ModuleType: The `osgeo.gdal` module.
+    """
+    from osgeo import gdal
+
+    # osgeo ships no stubs, so the import is Any; the cast restores the
+    # declared return type without weakening it.
+    return cast("ModuleType", gdal)
+
+
+def require_geographic_affine(
+    geo: tuple[float, float, float, float, float, float],
+    cols: int,
+    rows: int,
+    dataset_id: str,
+) -> None:
+    """Reject an affine that is not a plausible north-up geographic grid.
+
+    pyramids >= 0.58.1 derives the affine from the cube's CF coordinates. If that
+    ever regresses — or a future row is not a lon/lat grid — the crop would place
+    the window at the wrong coordinates with no other symptom, so check the shape
+    of the transform rather than only its pixel sizes: degrees per pixel, a
+    north-up row order, and an extent that stays inside the lon/lat domain.
+
+    Args:
+        geo: The variable's 6-element geotransform.
+        cols: The variable's column count.
+        rows: The variable's row count.
+        dataset_id: The catalog id, for the message.
+
+    Raises:
+        ValueError: If the affine is index-space, south-up, or spans an extent
+            that cannot be longitude / latitude.
+    """
+    x0, dx, _, y0, _, dy = geo
+    # GDAL's ungeoreferenced affine for an (rows x cols) raster is exactly
+    # (0, 1, 0, rows, 0, -1). A small non-gridded variable (the cube's coastal
+    # -point fields are e.g. 50x16) produces one that also sits inside the
+    # lon/lat domain, so the extent check alone cannot catch it — match the
+    # signature directly.
+    if (x0, dx, dy) == (0.0, 1.0, -1.0) and y0 == float(rows):
+        raise ValueError(
+            f"{dataset_id!r} returned the index-space geotransform {geo} for a "
+            f"{cols}x{rows} variable — this field is not on the lon/lat grid "
+            "(the coastal-point fields report one). Request a gridded field."
+        )
+    rot_x, rot_y = geo[2], geo[4]
+    if rot_x or rot_y:
+        raise ValueError(
+            f"{dataset_id!r} returned a rotated geotransform {geo}; only an "
+            "axis-aligned north-up grid can be windowed by bbox."
+        )
+    if x0 >= 0.0 and x0 + cols * dx > 180.5:
+        raise ValueError(
+            f"{dataset_id!r} spans {x0}..{x0 + cols * dx}, which looks like a "
+            "0..360 longitude convention; earthlens expects -180..180."
+        )
+    if dx <= 0 or dy >= 0:
+        raise ValueError(
+            f"{dataset_id!r} returned a geotransform {geo} that is not north-up "
+            f"(pixel width {dx}, height {dy}); pyramids >= 0.58.1 is required to "
+            "georeference the sea-level cubes."
+        )
+    # Slack of one cell, not a fixed half-degree, so a coarse grid is not
+    # rejected for legitimately overhanging its first cell.
+    slack = max(abs(dx), abs(dy))
+    east, south = x0 + cols * dx, y0 + rows * dy
+    if not (-180 - slack <= x0 <= 180 + slack and -90 - slack <= y0 <= 90 + slack):
+        raise ValueError(
+            f"{dataset_id!r} returned a geotransform {geo} whose origin is not a "
+            "lon/lat coordinate (an index-space affine looks like this); pyramids "
+            ">= 0.58.1 is required to georeference the sea-level cubes."
+        )
+    if not (-180 - slack <= east <= 180 + slack and -90 - slack <= south <= 90 + slack):
+        raise ValueError(
+            f"{dataset_id!r} spans {x0}..{east} / {south}..{y0}, which is outside "
+            "the lon/lat domain; the grid is not the geographic one expected."
+        )
+
+
+def pixel_window(
+    geo: tuple[float, float, float, float, float, float],
+    bbox: Sequence[float],
+    cols: int,
+    rows: int,
+) -> tuple[int, int, int, int] | None:
+    """Map an AOI bbox to a clamped pixel window on a north-up grid.
+
+    Args:
+        geo: The source grid's geotransform (from pyramids).
+        bbox: `(west, south, east, north)` in degrees.
+        cols: Grid column count.
+        rows: Grid row count.
+
+    Returns:
+        tuple[int, int, int, int] | None: `(col_off, row_off, width, height)`,
+            or `None` when the bbox does not overlap the grid.
+    """
+    x0, dx, _, y0, _, dy = geo
+    west, south, east, north = bbox
+    pixel_h = -dy
+    col_off = max(0, math.floor((west - x0) / dx))
+    col_end = min(cols, math.ceil((east - x0) / dx))
+    row_off = max(0, math.floor((y0 - north) / pixel_h))
+    row_end = min(rows, math.ceil((y0 - south) / pixel_h))
+    if col_end <= col_off or row_end <= row_off:
+        return None
+    return col_off, row_off, col_end - col_off, row_end - row_off
+
+
+def window_origin(
+    geo: tuple[float, float, float, float, float, float], col_off: int, row_off: int
+) -> tuple[float, float, float, float, float, float]:
+    """Shift a geotransform's origin to a pixel window's top-left corner.
+
+    Args:
+        geo: The source grid's 6-element north-up geotransform.
+        col_off: The window's first column, in source pixels.
+        row_off: The window's first row, in source pixels.
+
+    Returns:
+        tuple: The same transform with its origin moved to the window corner, so
+            the cropped array carries real-world coordinates.
+
+    Examples:
+        - The North Sea window of the global 0.25 deg grid starts at 3E / 53N:
+            ```python
+            >>> from earthlens.jrc._helpers import window_origin
+            >>> window_origin((-180.0, 0.25, 0.0, 90.0, 0.0, -0.25), 732, 148)
+            (3.0, 0.25, 0.0, 53.0, 0.0, -0.25)
+
+            ```
+    """
+    x0, dx, _, y0, _, dy = geo
+    return (x0 + col_off * dx, dx, 0.0, y0 + row_off * dy, 0.0, dy)

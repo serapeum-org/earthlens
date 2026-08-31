@@ -1,4 +1,4 @@
-"""Unit tests for the JRC-flood catalog loader."""
+"""Unit tests for the JRC catalog loader."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from earthlens.jrc_flood.catalog import (
+from earthlens.jrc.catalog import (
     CATALOG_PATH,
     Catalog,
     Dataset,
@@ -14,17 +14,22 @@ from earthlens.jrc_flood.catalog import (
     clear_catalog_cache,
 )
 
-pytestmark = pytest.mark.jrc_flood
+pytestmark = pytest.mark.jrc
 
 
 class TestCatalog:
-    """Tests for the bundled JRC-flood catalog."""
+    """Tests for the bundled JRC catalog."""
 
-    def test_loads_single_product(self):
-        """The bundled catalog exposes the efhm product."""
+    def test_loads_datasets(self):
+        """The bundled catalog exposes the EFHM + three sea-level datasets."""
         cat = Catalog()
-        assert list(cat.datasets) == ["efhm"]
-        assert cat.available_datasets == ["efhm"]
+        assert sorted(cat.datasets) == [
+            "efhm",
+            "sea_level_medium_term",
+            "sea_level_subseasonal",
+            "sea_level_subseasonal_coastal",
+        ]
+        assert cat.available_datasets == sorted(cat.datasets)
 
     def test_permissive_license(self):
         """The EFHM is CC-BY-4.0 (permissive)."""
@@ -46,7 +51,12 @@ class TestCatalog:
 
     def test_load_classmethod(self):
         """Catalog.load() reads the bundled catalog."""
-        assert list(Catalog.load().datasets) == ["efhm"]
+        assert sorted(Catalog.load().datasets) == [
+            "efhm",
+            "sea_level_medium_term",
+            "sea_level_subseasonal",
+            "sea_level_subseasonal_coastal",
+        ]
 
 
 class TestParseCatalog:
@@ -75,9 +85,9 @@ class TestParseCatalog:
         """clear_catalog_cache empties the parse cache without error."""
         Catalog()
         clear_catalog_cache()
-        assert list(Catalog().datasets) == ["efhm"]
+        assert "efhm" in Catalog().datasets
 
     def test_catalog_path_points_at_yaml(self):
         """CATALOG_PATH is the bundled EFHM YAML."""
-        assert CATALOG_PATH.name == "jrc_flood_data_catalog.yaml"
+        assert CATALOG_PATH.name == "jrc_data_catalog.yaml"
         assert CATALOG_PATH.exists()
