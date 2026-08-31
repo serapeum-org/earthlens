@@ -24267,7 +24267,10 @@ refused rather than blanking a populated index — the skip is reported in the o
 </code></pre></div>
 <h3 id="audit-providers-curated-vs-live-drift-and-coverage"><a class="toclink" href="#audit-providers-curated-vs-live-drift-and-coverage"><code>audit &lt;providers&gt;</code> — curated-vs-live drift (and coverage)</a><a class="headerlink" href="#audit-providers-curated-vs-live-drift-and-coverage" title="Permanent link">#</a></h3>
 <p>Like <code>refresh</code>, but focused on the <strong>curated</strong> rows: flags <code>broken</code> curated ids the provider no longer
-serves (the drift a CI gate fails on) and, informationally, live ids missing from the index.</p>
+serves (the drift a CI gate fails on) and, informationally, live ids missing from the index. For providers
+whose listing endpoint enumerates a dataset's variables (currently <code>erddap</code>, via each dataset's <code>.dds</code>), it
+also flags a curated <strong>variable</strong> the provider stopped serving or re-cased (e.g. <code>wtmp</code> → <code>WTMP</code>); providers
+that cannot enumerate variables report <code>unsupported</code> for that dimension, never a false <code>ok</code>.</p>
 <table>
 <thead>
 <tr>
@@ -24278,7 +24281,7 @@ serves (the drift a CI gate fails on) and, informationally, live ids missing fro
 <tbody>
 <tr>
 <td><code>--strict</code></td>
-<td>exit non-zero if any curated dataset is no longer served live</td>
+<td>exit non-zero if any curated dataset id — or a curated variable a provider stopped serving — is no longer served live</td>
 </tr>
 <tr>
 <td><code>--coverage</code></td>
