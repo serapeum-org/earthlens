@@ -2012,8 +2012,13 @@ class _ServingBlocks:
     other blocks enumerate it is a conflict rather than a free choice, and only
     the full block set can tell those apart.
 
+    The constraints are fetched on first use rather than at construction: the
+    caller builds one of these per dataset before knowing whether the stanza has
+    any placeholder to check, and a stanza with nothing to hydrate should not
+    cost a round trip.
+
     Args:
-        rows: The dataset's constraints blocks, empty when unavailable.
+        dataset_id: The Copernicus dataset id whose constraints to consult.
 
     Attributes:
         enumerated: Every key any block of the dataset constrains.
@@ -2041,7 +2046,15 @@ class _ServingBlocks:
         return {key for block in self._load() for key in block}
 
     def __call__(self, cds_variable: str) -> list[dict[str, Any]]:
-        """Return the blocks that list `cds_variable`."""
+        """Return the constraints blocks that serve one variable.
+
+        Args:
+            cds_variable: The CDS variable name a catalog row requests.
+
+        Returns:
+            The blocks listing that variable, empty when none does or when the
+            dataset publishes no constraints.
+        """
         return [
             row for row in self._load() if cds_variable in (row.get("variable") or [])
         ]
