@@ -414,6 +414,40 @@ class TestAudit:
         assert result.exit_code == 1, f"variable drift -> exit 1: {result.output}"
         assert "variable drift" in result.output.lower(), "drift surfaced to the user"
 
+    def test_variable_audit_error_is_surfaced_in_default_output(self, monkeypatch):
+        """A variable-fetch error prints a human-visible line, not only via --json."""
+        import earthlens.erddap.cli as erddap_cli
+        from earthlens.erddap.catalog import Dataset
+
+        record = Dataset(
+            server_url="https://x/erddap",
+            dataset_id="cwwcNDBCMet",
+            protocol="tabledap",
+            variables=["wtmp"],
+        )
+        catalog = SimpleNamespace(
+            datasets={"cwwcNDBCMet": record}, available_datasets=["cwwcNDBCMet"]
+        )
+        monkeypatch.setattr(refresh_mod, "load_catalog", lambda info: catalog)
+        monkeypatch.setitem(
+            refresh_mod._REFRESHERS,
+            "erddap",
+            lambda cat: {"https://x/erddap": ["cwwcNDBCMet"]},
+        )
+
+        def _boom(url):
+            raise RuntimeError("404 Not Found")
+
+        monkeypatch.setattr(erddap_cli, "get_text", _boom)
+        result = runner.invoke(app, ["datasets", "audit", "erddap"])
+        assert result.exit_code == 0, (
+            f"a variable error alone is not drift: {result.output}"
+        )
+        assert "variable audit errored in erddap" in result.output, (
+            f"the variable-audit error is not surfaced: {result.output}"
+        )
+        assert "404 Not Found" in result.output, "the reason is not surfaced"
+
     def test_coverage_reports_buckets(self, monkeypatch):
         """--coverage prints the curation buckets + the addressable todo list."""
         monkeypatch.setattr(
