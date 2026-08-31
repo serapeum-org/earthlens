@@ -320,6 +320,23 @@ class TestCuratedCollectionIds:
         assert ids == sorted(set(ids)), "sorted + de-duplicated"
 
 
+_WTMP_DDS = (
+    "Dataset {\n  Sequence {\n    Float32 ATMP;\n    Float32 WTMP;\n  } s;\n} s;\n"
+)
+
+
+def _raise_dds_error(record):
+    """A variable-lister stand-in that fails the way a bad `.dds` fetch would."""
+    raise RuntimeError("dds fetch failed")
+
+
+def _lister_fails_on_bad(record):
+    """A lister that fails for the 'bad' dataset and serves WTMP for the rest."""
+    if record.dataset_id == "bad":
+        raise RuntimeError("dds fetch failed")
+    return {"WTMP"}
+
+
 class TestAuditOne:
     """Tests for audit_one."""
 
@@ -378,6 +395,9 @@ class TestAuditOne:
 
     def test_provider_without_variable_lister_reports_unsupported(self, monkeypatch):
         """A provider with no variable-lister never reports a false variable ok."""
+        assert "stac" not in refresh_mod._VARIABLE_LISTERS, (
+            "stac gained a variable-lister; pick a provider that still lacks one"
+        )
         monkeypatch.setattr(
             stac_cli,
             "get_json",
@@ -386,23 +406,6 @@ class TestAuditOne:
         outcome = audit_one(_info("stac"))
         assert outcome.status == "ok"
         assert outcome.variable_status == "unsupported"
-
-
-_WTMP_DDS = (
-    "Dataset {\n  Sequence {\n    Float32 ATMP;\n    Float32 WTMP;\n  } s;\n} s;\n"
-)
-
-
-def _raise_dds_error(record):
-    """A variable-lister stand-in that fails the way a bad `.dds` fetch would."""
-    raise RuntimeError("dds fetch failed")
-
-
-def _lister_fails_on_bad(record):
-    """A lister that fails for the 'bad' dataset and serves WTMP for the rest."""
-    if record.dataset_id == "bad":
-        raise RuntimeError("dds fetch failed")
-    return {"WTMP"}
 
 
 class TestAuditVariables:
@@ -419,6 +422,9 @@ class TestAuditVariables:
 
     def test_unsupported_when_no_lister(self):
         """A provider with no variable-lister reports 'unsupported'."""
+        assert "gdacs" not in refresh_mod._VARIABLE_LISTERS, (
+            "gdacs gained a variable-lister; pick a provider that still lacks one"
+        )
         status, drift, detail = refresh_mod._audit_variables(
             self._catalog(a=["x"]), "gdacs"
         )
