@@ -206,6 +206,14 @@ datasets:
         cds_variable: outgoing_longwave_radiation
         nc_variable: olr
         units: W m-2
+        extras:
+          origin:
+          - noaa_ncei
+          product_family:
+          - hirs
+          sensor_on_satellite: null
+          time_aggregation:
+          - daily_mean
       outgoing-shortwave-radiation:
         cds_variable: outgoing_shortwave_radiation
         nc_variable: outgoing_shortwave_radiation
@@ -605,6 +613,8 @@ datasets:
         cds_variable: sea_ice_thickness
         nc_variable: sea_ice_thickness
         units: m
+        extras:
+          day: null
   satellite-sea-level-global:
     endpoint: cds
     request_kind: satellite_cdr
@@ -684,13 +694,19 @@ datasets:
         nc_variable: SRS
         units: W/m^2
         extras:
-          product_family: [clara_a2]
+          day: null
+          product_family:
+          - clara_a2
+          sensor_on_satellite: null
       surface-upwelling-longwave-flux:
         cds_variable: surface_upwelling_longwave_flux
         nc_variable: SOL
         units: W m-2
         extras:
-          product_family: [clara_a2]
+          day: null
+          product_family:
+          - clara_a2
+          sensor_on_satellite: null
       surface-downwelling-shortwave-flux:
         cds_variable: surface_downwelling_shortwave_flux
         nc_variable: surface_downwelling_shortwave_flux

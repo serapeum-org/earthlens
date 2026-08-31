@@ -172,7 +172,10 @@ datasets:
         nc_variable: sum
         units: kg m-2 s-1
         extras:
-          source: [shipping]
+          source:
+          - shipping
+          version:
+          - v2.1
       benzene:
         cds_variable: benzene
         nc_variable: benzene
@@ -190,7 +193,10 @@ datasets:
         nc_variable: emi_oceans
         units: kg m-2 s-1
         extras:
-          source: [oceanic]
+          source:
+          - oceanic
+          version:
+          - v2.1
       butanes:
         cds_variable: butanes
         nc_variable: butanes
@@ -236,7 +242,10 @@ datasets:
         nc_variable: sum
         units: kg m-2 s-1
         extras:
-          source: [shipping]
+          source:
+          - shipping
+          version:
+          - v2.1
       esters:
         cds_variable: esters
         nc_variable: esters

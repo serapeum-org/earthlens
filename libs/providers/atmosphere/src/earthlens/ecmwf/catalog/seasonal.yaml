@@ -60,6 +60,9 @@ datasets:
         nc_variable: lsm
         types: state
         units: (0 - 1)
+        extras:
+          leadtime_hour:
+          - '0'
       maximum-2m-temperature-in-the-last-24-hours-seasonal-orig:
         cds_variable: maximum_2m_temperature_in_the_last_24_hours
         nc_variable: mx2t24
@@ -85,6 +88,9 @@ datasets:
         nc_variable: orog
         types: state
         units: m
+        extras:
+          leadtime_hour:
+          - '0'
       runoff-seasonal-orig:
         cds_variable: runoff
         nc_variable: ro
@@ -465,26 +471,41 @@ datasets:
         nc_variable: z
         types: state
         units: m**2 s**-2
+        extras:
+          leadtime_hour:
+          - '1020'
       specific-humidity-seasonal-orig-p:
         cds_variable: specific_humidity
         nc_variable: q
         types: state
         units: kg kg**-1
+        extras:
+          leadtime_hour:
+          - '1020'
       temperature-seasonal-orig-p:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
+        extras:
+          leadtime_hour:
+          - '1020'
       u-component-of-wind-seasonal-orig-p:
         cds_variable: u_component_of_wind
         nc_variable: u
         types: state
         units: m s**-1
+        extras:
+          leadtime_hour:
+          - '1020'
       v-component-of-wind-seasonal-orig-p:
         cds_variable: v_component_of_wind
         nc_variable: v
         types: state
         units: m s**-1
+        extras:
+          leadtime_hour:
+          - '1020'
   seasonal-postprocessed-pressure-levels:
     product_type:
     - reanalysis

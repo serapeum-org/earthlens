@@ -2338,78 +2338,135 @@ datasets:
         cds_variable: monthly_temperature
         nc_variable: t
         units: degC
+        extras:
+          period:
+          - 1950-2024
       monthly-daily-minimum-temperature:
         cds_variable: monthly_daily_minimum_temperature
         nc_variable: tn
         units: degC
+        extras:
+          period:
+          - 1950-2024
       monthly-daily-maximum-temperature:
         cds_variable: monthly_daily_maximum_temperature
         nc_variable: tx
         units: degC
+        extras:
+          period:
+          - 1950-2024
       monthly-daily-temperature-range:
         cds_variable: monthly_daily_temperature_range
         nc_variable: dtr
         units: degC
+        extras:
+          period:
+          - 1950-2024
       monthly-maximum-of-daily-maximum-temperature:
         cds_variable: monthly_maximum_of_daily_maximum_temperature
         nc_variable: txx
         units: degC
+        extras:
+          period:
+          - 1950-2024
       monthly-extreme-hot-days:
         cds_variable: monthly_extreme_hot_days
         nc_variable: tx35
         units: '1'
+        extras:
+          period:
+          - 1950-2024
       monthly-very-extreme-hot-days:
         cds_variable: monthly_very_extreme_hot_days
         nc_variable: tx40
         units: '1'
+        extras:
+          period:
+          - 1950-2024
       monthly-tropical-nights:
         cds_variable: monthly_tropical_nights
         nc_variable: tr
         units: '1'
+        extras:
+          period:
+          - 1950-2024
       annual-cooling-degree-days:
         cds_variable: annual_cooling_degree_days
         nc_variable: cd
         units: degC day
+        extras:
+          period:
+          - 1950-2024
       monthly-minimum-of-daily-minimum-temperature:
         cds_variable: monthly_minimum_of_daily_minimum_temperature
         nc_variable: tnn
         units: degC
+        extras:
+          period:
+          - 1950-2024
       monthly-frost-days:
         cds_variable: monthly_frost_days
         nc_variable: fd
         units: '1'
+        extras:
+          period:
+          - 1950-2024
       annual-heating-degree-days:
         cds_variable: annual_heating_degree_days
         nc_variable: hd
         units: degC day
+        extras:
+          period:
+          - 1950-2024
       monthly-precipitation:
         cds_variable: monthly_precipitation
         nc_variable: r
         units: mm
+        extras:
+          period:
+          - 1950-2024
       monthly-wet-days:
         cds_variable: monthly_wet_days
         nc_variable: r01
         units: '1'
+        extras:
+          period:
+          - 1950-2024
       monthly-precipitation-intensity:
         cds_variable: monthly_precipitation_intensity
         nc_variable: sdii
         units: mm
+        extras:
+          period:
+          - 1950-2024
       monthly-maximum-1-day-precipitation:
         cds_variable: monthly_maximum_1_day_precipitation
         nc_variable: rx1day
         units: mm
+        extras:
+          period:
+          - 1950-2024
       monthly-maximum-5-day-precipitation:
         cds_variable: monthly_maximum_5_day_precipitation
         nc_variable: rx5day
         units: mm
+        extras:
+          period:
+          - 1950-2024
       monthly-heavy-precipitation-days:
         cds_variable: monthly_heavy_precipitation_days
         nc_variable: r10
         units: '1'
+        extras:
+          period:
+          - 1950-2024
       monthly-very-heavy-precipitation-days:
         cds_variable: monthly_very_heavy_precipitation_days
         nc_variable: r20
         units: '1'
+        extras:
+          period:
+          - 1950-2024
       monthly-near-surface-specific-humidity:
         cds_variable: monthly_near_surface_specific_humidity
         nc_variable: monthly_near_surface_specific_humidity
@@ -2498,8 +2555,12 @@ datasets:
         nc_variable: prsn
         units: mm
         extras:
-          domain: [global]
-          origin: [cmip6]
+          domain:
+          - global
+          origin:
+          - cmip6
+          period:
+          - 1850-2014
       annual-cooling-degree-days:
         cds_variable: annual_cooling_degree_days
         nc_variable: cd
@@ -2521,8 +2582,12 @@ datasets:
         nc_variable: ph
         units: '1'
         extras:
-          domain: [global]
-          origin: [cmip6]
+          domain:
+          - global
+          origin:
+          - cmip6
+          period:
+          - 1850-2014
       monthly-maximum-of-1-day-accumulated-precipitation:
         cds_variable: monthly_maximum_of_1_day_accumulated_precipitation
         nc_variable: rx1day
@@ -2607,15 +2672,23 @@ datasets:
         nc_variable: mrsofc
         units: kg m-2
         extras:
-          temporal_resolution: [fixed]
+          level: null
+          model:
+          - awi_cm_1_1_mr
+          temporal_resolution:
+          - fixed
       daily-maximum-near-surface-air-temperature:
         cds_variable: daily_maximum_near_surface_air_temperature
         nc_variable: tasmax
         units: K
+        extras:
+          level: null
       daily-minimum-near-surface-air-temperature:
         cds_variable: daily_minimum_near_surface_air_temperature
         nc_variable: tasmin
         units: K
+        extras:
+          level: null
       eastward-near-surface-wind:
         cds_variable: eastward_near_surface_wind
         nc_variable: eastward_near_surface_wind
@@ -3082,6 +3155,9 @@ datasets:
         cds_variable: volumetric_soil_moisture
         nc_variable: voltso
         units: m**3 m**-3
+        extras:
+          origin:
+          - uerra_harmonie
       volumetric-transpiration-stress-onset:
         cds_variable: volumetric_transpiration_stress_onset
         nc_variable: volumetric_transpiration_stress_onset
@@ -3976,10 +4052,16 @@ datasets:
         cds_variable: sea_ice_concentration
         nc_variable: sea-ice-concentration
         units: '1'
+        extras:
+          temporal_aggregation:
+          - climatology
       sea-surface-temperature:
         cds_variable: sea_surface_temperature
         nc_variable: sea-surface-temperature
         units: K
+        extras:
+          temporal_aggregation:
+          - climatology
       2m-temperature:
         cds_variable: 2m_temperature
         nc_variable: temperature_annual-maximum
@@ -4004,14 +4086,23 @@ datasets:
         cds_variable: wind_speed
         nc_variable: wind-speed
         units: m s**-1
+        extras:
+          temporal_aggregation:
+          - climatology
       zonal-wind-speed:
         cds_variable: zonal_wind_speed
         nc_variable: zonal-wind-speed
         units: m s**-1
+        extras:
+          temporal_aggregation:
+          - climatology
       meridional-wind-speed:
         cds_variable: meridional_wind_speed
         nc_variable: meridional-wind-speed
         units: m s**-1
+        extras:
+          temporal_aggregation:
+          - climatology
   sis-biodiversity-era5-regional:
     endpoint: cds
     request_kind: form
@@ -5123,36 +5214,81 @@ datasets:
         nc_variable: HI
         units: degrees_C
         extras:
-          temporal_aggregation: [daily]
-          version: ['1_0', '2_0']
+          ensemble_member:
+          - r1i1p1f1
+          period:
+          - '19510101_20101231'
+          product_type:
+          - bias_adjusted
+          temporal_aggregation:
+          - daily
+          version:
+          - '1_0'
+          - '2_0'
       humidex:
         cds_variable: humidex
         nc_variable: Humidex
         units: degrees_C
         extras:
-          temporal_aggregation: [daily]
-          version: ['1_0', '2_0']
+          ensemble_member:
+          - r1i1p1f1
+          period:
+          - '19510101_20101231'
+          product_type:
+          - bias_adjusted
+          temporal_aggregation:
+          - daily
+          version:
+          - '1_0'
+          - '2_0'
       universal-thermal-climate-index:
         cds_variable: universal_thermal_climate_index
         nc_variable: UTCI
         units: degrees_C
         extras:
-          temporal_aggregation: [daily]
-          version: ['1_0', '2_0']
+          ensemble_member:
+          - r1i1p1f1
+          period:
+          - '19510101_20101231'
+          product_type:
+          - bias_adjusted
+          temporal_aggregation:
+          - daily
+          version:
+          - '1_0'
+          - '2_0'
       wet-bulb-temperature-index:
         cds_variable: wet_bulb_temperature_index
         nc_variable: WBT
         units: degrees_C
         extras:
-          temporal_aggregation: [daily]
-          version: ['1_0', '2_0']
+          ensemble_member:
+          - r1i1p1f1
+          period:
+          - '19510101_20101231'
+          product_type:
+          - bias_adjusted
+          temporal_aggregation:
+          - daily
+          version:
+          - '1_0'
+          - '2_0'
       wet-bulb-globe-temperature-index:
         cds_variable: wet_bulb_globe_temperature_index
         nc_variable: WBGT
         units: degrees_C
         extras:
-          temporal_aggregation: [daily]
-          version: ['1_0', '2_0']
+          ensemble_member:
+          - r1i1p1f1
+          period:
+          - '19510101_20101231'
+          product_type:
+          - bias_adjusted
+          temporal_aggregation:
+          - daily
+          version:
+          - '1_0'
+          - '2_0'
   sis-health-vector:
     endpoint: cds
     request_kind: form
@@ -5213,19 +5349,29 @@ datasets:
         nc_variable: tas
         units: K
         extras:
-          day: ['01']
-          product_type: [forecast]
-          spatial_extent: [gridded_5_km]
-          temporal_aggregation: [daily]
+          day:
+          - '01'
+          hydrological_model: null
+          product_type:
+          - forecast
+          spatial_extent:
+          - gridded_5_km
+          temporal_aggregation:
+          - daily
       precipitation:
         cds_variable: precipitation
         nc_variable: pr
         units: kg m-2
         extras:
-          day: ['01']
-          product_type: [forecast]
-          spatial_extent: [gridded_5_km]
-          temporal_aggregation: [daily]
+          day:
+          - '01'
+          hydrological_model: null
+          product_type:
+          - forecast
+          spatial_extent:
+          - gridded_5_km
+          temporal_aggregation:
+          - daily
       river-discharge:
         cds_variable: river_discharge
         nc_variable: rdis
@@ -5302,6 +5448,9 @@ datasets:
         cds_variable: 2m_air_temperature
         nc_variable: tas_tmean
         units: Degree Celsius
+        extras:
+          variable_type:
+          - absolute_values
       precipitation:
         cds_variable: precipitation
         nc_variable: pr_tmean
@@ -5793,9 +5942,15 @@ datasets:
         nc_variable: fwi-daily-proj
         units: '1'
         extras:
-          product_type: [single_model]
-          time_aggregation: [daily_indicators]
-          version: [v1_0, v2_0]
+          period:
+          - '1970'
+          product_type:
+          - single_model
+          time_aggregation:
+          - daily_indicators
+          version:
+          - v1_0
+          - v2_0
       seasonal-fire-weather-index:
         cds_variable: seasonal_fire_weather_index
         nc_variable: fwi-mean-jjas
@@ -6019,18 +6174,34 @@ datasets:
         cds_variable: mean_sea_level
         nc_variable: MSL_absolute
         units: m
+        extras:
+          multi_model_ensemble_statistic: null
+          product_type: null
+          statistic: null
       tidal-range:
         cds_variable: tidal_range
         nc_variable: TR_absolute
         units: m
+        extras:
+          multi_model_ensemble_statistic: null
+          product_type: null
+          statistic: null
       highest-astronomical-tide:
         cds_variable: highest_astronomical_tide
         nc_variable: HAT_absolute
         units: m
+        extras:
+          multi_model_ensemble_statistic: null
+          product_type: null
+          statistic: null
       lowest-astronomical-tide:
         cds_variable: lowest_astronomical_tide
         nc_variable: LAT_absolute
         units: m
+        extras:
+          multi_model_ensemble_statistic: null
+          product_type: null
+          statistic: null
       annual-mean-of-highest-high-water:
         cds_variable: annual_mean_of_highest_high_water
         nc_variable: annual_mean_of_highest_high_water
