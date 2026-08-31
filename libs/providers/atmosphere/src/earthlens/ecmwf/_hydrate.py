@@ -1877,7 +1877,16 @@ _CREDENTIAL_PATTERNS = (
         r"(?:(?:bearer|basic|token)\s+)?\S+"
     ),
     re.compile(r"(?i)([?&](?:api_?key|key|token|access_token)=)[^&\s]+"),
+    re.compile(r"(?i)((?:set-)?cookie\s*[:=]\s*)[^\s;]+"),
+    # Basic auth inside a URL, which requests and urllib3 do echo in some
+    # error text: keep the scheme and the host, drop what is between them.
+    re.compile(r"(?i)(https?://)[^/\s:@]+:[^/\s@]+@"),
 )
+
+#: Shortest configured key worth striking by exact match. A key set to
+#: something like `test` would otherwise blank every occurrence of that
+#: substring in an unrelated message, costing the diagnosis to protect nothing.
+_MIN_STRIKEABLE_KEY = 8
 
 
 def _redact_credentials(message: str) -> str:
@@ -1886,6 +1895,10 @@ def _redact_credentials(message: str) -> str:
     The configured key is matched exactly rather than by pattern: it is the
     one secret whose value is knowable here, so an exact strike is a
     guarantee where a pattern is only a guess. The patterns cover the rest.
+
+    The exact strike applies only to a key of at least `_MIN_STRIKEABLE_KEY`
+    characters, because a short one would blank unrelated text that happens to
+    contain it.
 
     Args:
         message: The upstream error text about to be echoed.
@@ -1896,7 +1909,8 @@ def _redact_credentials(message: str) -> str:
     for pattern in _CREDENTIAL_PATTERNS:
         message = pattern.sub(r"\1" + _REDACTED, message)
     for key in _configured_keys():
-        message = message.replace(key, _REDACTED)
+        if len(key) >= _MIN_STRIKEABLE_KEY:
+            message = message.replace(key, _REDACTED)
     return message
 
 
@@ -2005,29 +2019,41 @@ class _ServingBlocks:
         enumerated: Every key any block of the dataset constrains.
     """
 
-    def __init__(self, rows: list[dict[str, Any]]) -> None:
-        self._rows = rows
-        self.enumerated = {key for block in rows for key in block}
+    def __init__(self, dataset_id: str) -> None:
+        self._dataset_id = dataset_id
+        self._rows: list[dict[str, Any]] | None = None
+
+    def _load(self) -> list[dict[str, Any]]:
+        """Fetch the dataset's constraints once, tolerating an unreachable store."""
+        if self._rows is None:
+            from earthlens.ecmwf.cli import _ecmwf_constraints
+
+            try:
+                self._rows = _ecmwf_constraints(self._dataset_id) or []
+            except Exception as exc:  # noqa: BLE001 - uncheckable is not fatal
+                logger.debug(f"no constraints for {self._dataset_id}: {exc}")
+                self._rows = []
+        return self._rows
+
+    @property
+    def enumerated(self) -> set[str]:
+        """Every key any block of the dataset constrains."""
+        return {key for block in self._load() for key in block}
 
     def __call__(self, cds_variable: str) -> list[dict[str, Any]]:
         """Return the blocks that list `cds_variable`."""
         return [
-            row for row in self._rows if cds_variable in (row.get("variable") or [])
+            row for row in self._load() if cds_variable in (row.get("variable") or [])
         ]
 
 
-def _serving_blocks_for(
-    dataset_id: str,
-) -> Callable[[str], list[dict[str, Any]]]:
-    """Return a lookup from `cds_variable` to the constraints blocks serving it.
+def _serving_blocks_for(dataset_id: str) -> _ServingBlocks:
+    """Return a lazy lookup from `cds_variable` to the blocks serving it.
 
-    The blocks say which selector values the store actually offers for a
-    variable, which is what makes a written row checkable: a name read under
-    one product must not be shipped with selectors belonging to another.
-
-    Fetching them is best-effort. A dataset that publishes no `constraints.json`
-    yields an empty list, and the caller then writes as before rather than
-    refusing every row of a dataset it cannot check.
+    Lazy because the caller builds one per dataset, before knowing whether the
+    stanza has any placeholder to check. A stanza with nothing to hydrate would
+    otherwise cost a constraints round trip it never uses, on a path that is
+    otherwise careful about spending network.
 
     Args:
         dataset_id: The Copernicus dataset id being hydrated.
@@ -2035,13 +2061,7 @@ def _serving_blocks_for(
     Returns:
         A callable taking a `cds_variable` and returning its serving blocks.
     """
-    from earthlens.ecmwf.cli import _ecmwf_constraints
-
-    try:
-        rows = _ecmwf_constraints(dataset_id) or []
-    except Exception:  # noqa: BLE001 - an uncheckable dataset is not a failure
-        rows = []
-    return _ServingBlocks(rows)
+    return _ServingBlocks(dataset_id)
 
 
 def _hydrate_one(

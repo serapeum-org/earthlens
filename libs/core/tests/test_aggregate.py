@@ -1826,6 +1826,12 @@ def _write_real_nc(path, *, periods=6, rows=2, cols=3, nan_at=None):
 
 #: The one enumeration failure that says nothing about the code under test: the
 #: whole-system handle walk cannot fit the machine's current handle count.
+#:
+#: Matched on the message because psutil raises a bare `RuntimeError` for it,
+#: with nothing else to key on. Read verbatim from `_psutil_windows` in psutil
+#: 7.2.2; if a later release rewords it, this stops skipping and starts failing
+#: every handle-release test in the file, which is the safe direction but worth
+#: knowing. Both spellings are kept so either half of the phrase still matches.
 _ENUMERATION_CAPACITY_MARKERS = ("buffer too big", "systemextendedhandleinformation")
 
 
@@ -1833,35 +1839,6 @@ def _is_enumeration_capacity_failure(error):
     """Whether `error` is the machine being too busy to enumerate handles."""
     text = str(error).lower()
     return any(marker in text for marker in _ENUMERATION_CAPACITY_MARKERS)
-
-
-class TestHandleEnumerationGuard:
-    """What the shared release-check helper tolerates, and what it must not."""
-
-    def test_a_capacity_failure_skips_the_caller(self, monkeypatch, tmp_path):
-        """The machine being too busy says nothing about the code under test."""
-        monkeypatch.setattr(
-            psutil.Process,
-            "open_files",
-            lambda self: (_ for _ in ()).throw(
-                RuntimeError("SystemExtendedHandleInformation buffer too big")
-            ),
-        )
-
-        with pytest.warns(RuntimeWarning, match="handle-release checks skipped"):
-            with pytest.raises(pytest.skip.Exception, match="cannot be enumerated"):
-                _handles_on(tmp_path)
-
-    def test_any_other_enumeration_error_is_raised(self, monkeypatch, tmp_path):
-        """Swallowing it would skip every release check in this file, green."""
-        monkeypatch.setattr(
-            psutil.Process,
-            "open_files",
-            lambda self: (_ for _ in ()).throw(psutil.AccessDenied()),
-        )
-
-        with pytest.raises(psutil.AccessDenied):
-            _handles_on(tmp_path)
 
 
 def _handles_on(path):
@@ -1905,6 +1882,35 @@ def _handles_on(path):
         except ValueError:
             continue
     return found
+
+
+class TestHandleEnumerationGuard:
+    """What the shared release-check helper tolerates, and what it must not."""
+
+    def test_a_capacity_failure_skips_the_caller(self, monkeypatch, tmp_path):
+        """The machine being too busy says nothing about the code under test."""
+        monkeypatch.setattr(
+            psutil.Process,
+            "open_files",
+            lambda self: (_ for _ in ()).throw(
+                RuntimeError("SystemExtendedHandleInformation buffer too big")
+            ),
+        )
+
+        with pytest.warns(RuntimeWarning, match="handle-release checks skipped"):
+            with pytest.raises(pytest.skip.Exception, match="cannot be enumerated"):
+                _handles_on(tmp_path)
+
+    def test_any_other_enumeration_error_is_raised(self, monkeypatch, tmp_path):
+        """Swallowing it would skip every release check in this file, green."""
+        monkeypatch.setattr(
+            psutil.Process,
+            "open_files",
+            lambda self: (_ for _ in ()).throw(psutil.AccessDenied()),
+        )
+
+        with pytest.raises(psutil.AccessDenied):
+            _handles_on(tmp_path)
 
 
 def _single_level_var():

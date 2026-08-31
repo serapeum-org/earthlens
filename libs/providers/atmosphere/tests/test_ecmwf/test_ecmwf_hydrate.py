@@ -365,6 +365,82 @@ _CLAIMED_BLOCK = """      total-precipitation:
 """
 
 
+class TestRedactionCoversTheCommonShapes:
+    """Sweep output is pasted into issues; a credential must not ride along."""
+
+    @pytest.mark.parametrize(
+        ("raw", "secret"),
+        [
+            ("GET https://alice:s3cret@cds.example/api failed", "s3cret"),
+            ("Cookie: session=abcdef123456 rejected", "abcdef123456"),
+            ("Set-Cookie: sid=zzzsecret; Path=/", "zzzsecret"),
+        ],
+    )
+    def test_a_url_credential_or_cookie_is_struck(self, raw, secret):
+        """Both shapes appear in requests and urllib3 error text."""
+        summary = hydrate_mod._error_summary(RuntimeError(raw))
+
+        assert secret not in summary
+        assert hydrate_mod._REDACTED in summary
+
+    def test_a_short_configured_key_is_not_struck_blindly(self, monkeypatch):
+        """Blanking every occurrence of `test` would cost the diagnosis."""
+        monkeypatch.setattr(hydrate_mod, "_configured_keys", lambda: ["test"])
+
+        summary = hydrate_mod._error_summary(RuntimeError("the latest request failed"))
+
+        assert "latest request failed" in summary
+        assert hydrate_mod._REDACTED not in summary
+
+    def test_a_full_length_configured_key_is_still_struck(self, monkeypatch):
+        """The floor guards against short values, not against real keys."""
+        monkeypatch.setattr(
+            hydrate_mod, "_configured_keys", lambda: ["a-real-looking-key-value"]
+        )
+
+        summary = hydrate_mod._error_summary(
+            RuntimeError("refused (a-real-looking-key-value)")
+        )
+
+        assert "a-real-looking-key-value" not in summary
+        assert hydrate_mod._REDACTED in summary
+
+
+class TestServingBlocksAreFetchedLazily:
+    """A stanza with nothing to hydrate must not pay for a constraints fetch."""
+
+    def test_building_the_lookup_fetches_nothing(self, monkeypatch):
+        """The caller builds one per dataset before knowing if any row needs it."""
+        import earthlens.ecmwf.cli as ecmwf_cli
+
+        calls = []
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_constraints", lambda ds: calls.append(ds) or []
+        )
+
+        lookup = hydrate_mod._serving_blocks_for("a-dataset")
+
+        assert calls == [], "constraints were fetched before any row was checked"
+        lookup("t2m")
+        assert calls == ["a-dataset"]
+
+    def test_the_fetch_happens_once(self, monkeypatch):
+        """Per dataset per process, not per row."""
+        import earthlens.ecmwf.cli as ecmwf_cli
+
+        calls = []
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_constraints", lambda ds: calls.append(ds) or []
+        )
+
+        lookup = hydrate_mod._serving_blocks_for("a-dataset")
+        lookup("t2m")
+        lookup("sst")
+        _ = lookup.enumerated
+
+        assert calls == ["a-dataset"]
+
+
 class TestDeclinedDetailTellsTheTruth:
     """The echo must not describe a response the sweep never received."""
 
@@ -727,7 +803,7 @@ class TestSelectorsAreServeablePerBlock:
         """A dataset publishing no constraints is written as before, not refused."""
         assert hydrate_mod._selectors_are_serveable({"product_type": ["x"]}, [])
 
-    def test_the_lookup_carries_the_datasets_enumerated_keys(self):
+    def test_the_lookup_carries_the_datasets_enumerated_keys(self, monkeypatch):
         """The per-block check needs the whole block set, not just the serving ones."""
         import earthlens.ecmwf.cli as ecmwf_cli
 
@@ -735,11 +811,11 @@ class TestSelectorsAreServeablePerBlock:
             {"variable": ["t2m"], "product_type": ["forecast"]},
             {"variable": ["sst"], "sensor_on_satellite": ["slstr"]},
         ]
-        lookup = hydrate_mod._ServingBlocks(blocks)
+        monkeypatch.setattr(ecmwf_cli, "_ecmwf_constraints", lambda ds: blocks)
+        lookup = hydrate_mod._ServingBlocks("a-dataset")
 
         assert [b["product_type"] for b in lookup("t2m")] == [["forecast"]]
         assert lookup.enumerated == {"variable", "product_type", "sensor_on_satellite"}
-        assert ecmwf_cli is not None
 
 
 class TestServingBlocksFor:
