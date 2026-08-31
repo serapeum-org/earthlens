@@ -2029,7 +2029,12 @@ class _ServingBlocks:
         self._rows: list[dict[str, Any]] | None = None
 
     def _load(self) -> list[dict[str, Any]]:
-        """Fetch the dataset's constraints once, tolerating an unreachable store."""
+        """Fetch the dataset's constraints once, tolerating an unreachable store.
+
+        Returns:
+            The dataset's constraints blocks, empty when the store publishes
+            none or could not be reached. Fetched on first call and reused.
+        """
         if self._rows is None:
             from earthlens.ecmwf.cli import _ecmwf_constraints
 
@@ -2042,7 +2047,13 @@ class _ServingBlocks:
 
     @property
     def enumerated(self) -> set[str]:
-        """Every key any block of the dataset constrains."""
+        """Every key any block of the dataset constrains.
+
+        Returns:
+            The union of keys across the dataset's blocks. A key in here that a
+            serving block omits belongs to another product, so a row sending it
+            cannot be served; a key absent from this set constrains nothing.
+        """
         return {key for block in self._load() for key in block}
 
     def __call__(self, cds_variable: str) -> list[dict[str, Any]]:
@@ -2119,6 +2130,55 @@ def audit_serveability(
     Returns:
         One `(dataset_id, slug, effective_selectors)` per unserveable row, in
         catalog order. Empty is the invariant holding.
+
+    Examples:
+        - A store that constrains nothing serves every row, so nothing is
+          reported. The lookup is injected, so this reaches no network:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import audit_serveability
+            >>> class ServesAnything:
+            ...     enumerated = set()
+            ...     def __call__(self, cds_variable):
+            ...         return [{"variable": [cds_variable]}]
+            >>> audit_serveability(lambda dataset_id: ServesAnything())
+            []
+
+            ```
+        - A store offering one `product_type` nothing is curated under reports
+          each row it cannot serve, as a triple naming where the row lives:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import audit_serveability
+            >>> class ServesOnlyOneProduct:
+            ...     enumerated = {"variable", "product_type"}
+            ...     def __call__(self, cds_variable):
+            ...         return [
+            ...             {"variable": [cds_variable], "product_type": ["nothing"]}
+            ...         ]
+            >>> findings = audit_serveability(lambda dataset_id: ServesOnlyOneProduct())
+            >>> len(findings) > 0
+            True
+            >>> {len(finding) for finding in findings}
+            {3}
+            >>> dataset_id, slug, selectors = findings[0]
+            >>> selectors["product_type"] != ["nothing"]
+            True
+
+            ```
+        - A dataset the store knows nothing about is not judged, since there
+          is nothing to check the request against:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import audit_serveability
+            >>> class KnowsNothing:
+            ...     enumerated = set()
+            ...     def __call__(self, cds_variable):
+            ...         return []
+            >>> audit_serveability(lambda dataset_id: KnowsNothing())
+            []
+
+            ```
     """
     from earthlens.ecmwf import Catalog
 
