@@ -1191,10 +1191,82 @@ def _dataset_extras(block: str) -> dict[str, str]:
     return {}
 
 
+#: Block keys a catalog row is not expected to carry, so omitting one does
+#: not make a request under-specified. `variable` is what selects the block
+#: in the first place, and the rest the backend fills in at request time:
+#: the date keys and `time` come from the caller's range, `area` from the
+#: bounding box, `data_format` is fixed at netcdf. Verified against the
+#: request assembly in `backend.py`.
+_BLOCK_KEYS_NOT_REQUESTED = frozenset(
+    {"variable", "year", "month", "day", "time", "date", "area", "data_format"}
+)
+
+#: Selector values a row carries as typed fields rather than in `extras`,
+#: mapped to the request key the backend sends them under. A check reading
+#: only `extras` would think every ERA5 row omits `product_type`.
+_ROW_FIELD_SELECTORS = {
+    "product_type": "product_type",
+    "cds_pressure_level": "pressure_level",
+}
+
+
+def effective_selectors(stanza: dict[str, Any], row: Any) -> dict[str, Any]:
+    """Return every selector a retrieve built from `row` will actually send.
+
+    Stanza `extras` first, the row's own `extras` over them (the row wins,
+    since `request.update(extras)` is the last write before the retrieve),
+    and the row's typed fields folded in under the key the backend sends
+    them as.
+
+    Args:
+        stanza: The dataset-level `extras:` mapping.
+        row: The catalog row whose request is being assembled.
+
+    Returns:
+        The merged selectors, as the store will see them.
+    """
+    effective = dict(stanza)
+    effective.update(getattr(row, "extras", None) or {})
+    for field, key in _ROW_FIELD_SELECTORS.items():
+        value = getattr(row, field, None)
+        if value:
+            effective.setdefault(key, value)
+    return effective
+
+
+def _asked_values(want: Any) -> set[str] | None:
+    """Return the values a selector asks for, or None when it asks for nothing.
+
+    A selector reaches here as a list (`["forecast"]`), as a bare scalar
+    (`level_type: single_levels`, which the catalog also spells), or as `None`
+    for a key the stanza strips. Only the last carries no request, and treating
+    a scalar as unjudgeable would leave most of a row unchecked — scalars are
+    roughly half the selector values in the shipped catalog.
+
+    Args:
+        want: One selector value from a row's effective request.
+
+    Returns:
+        The requested values as strings, or `None` when nothing is asked.
+    """
+    if want is None:
+        return None
+    if isinstance(want, list):
+        return {str(value) for value in want} or None
+    return {str(want)}
+
+
 def _block_satisfies(
     effective: dict[str, Any], block: dict[str, Any], enumerated: set[str]
 ) -> bool:
-    """Whether one constraints block offers every selector the row will send.
+    """Whether one constraints block can answer the whole request a row sends.
+
+    Two ways a block fails. It may **offer** a key the row asks for but share no
+    value with it. Or it may **require** a key the row never sends: a CARRA
+    `forecast` block enumerates `leadtime_hour` on every combination, so a row
+    naming only `product_type` cannot be answered by it however well the rest
+    matches. Checking only the keys the row sends misses the second kind
+    entirely, which is how a row can pass this and still retrieve nothing.
 
     Args:
         effective: The row's selectors, stanza extras merged with its own.
@@ -1207,14 +1279,23 @@ def _block_satisfies(
         True when this single block can serve the request.
     """
     for key, want in effective.items():
-        if want is None or not isinstance(want, list) or not want:
+        asked = _asked_values(want)
+        if asked is None:
             continue
         offered = {str(value) for value in (block.get(key) or [])}
         if not offered:
             if key in enumerated:
                 return False
             continue
-        if not ({str(value) for value in want} & offered):
+        if not (asked & offered):
+            return False
+    for key in block:
+        if key in _BLOCK_KEYS_NOT_REQUESTED:
+            continue
+        if _asked_values(effective.get(key)) is None:
+            # The block partitions on this key, so a request omitting it is
+            # under-specified for this combination even though nothing it does
+            # send conflicts.
             return False
     return True
 
@@ -2136,8 +2217,7 @@ def _unserveable_selectors(
     serving = lookup(row.cds_variable)
     if not serving:
         return None
-    effective = dict(stanza)
-    effective.update(getattr(row, "extras", {}) or {})
+    effective = effective_selectors(stanza, row)
     if _selectors_are_serveable(effective, serving, lookup.enumerated):
         return None
     return effective

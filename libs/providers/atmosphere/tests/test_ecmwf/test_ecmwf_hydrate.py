@@ -459,7 +459,9 @@ class TestBlockSatisfies:
     def test_a_key_absent_everywhere_is_a_free_choice(self):
         """Nothing partitions on it, so sending it constrains nothing."""
         assert hydrate_mod._block_satisfies(
-            {"day": ["01"]}, {"product_type": ["forecast"]}, {"product_type"}
+            {"product_type": ["forecast"], "spatial_extent": ["catchment"]},
+            {"product_type": ["forecast"]},
+            {"product_type"},
         )
 
     def test_a_key_absent_here_but_enumerated_elsewhere_is_a_conflict(self):
@@ -469,6 +471,111 @@ class TestBlockSatisfies:
             {"product_type": ["analysis"]},
             {"product_type", "leadtime_hour"},
         )
+
+
+class TestAskedValues:
+    """What a selector is asking for, whatever shape the catalog spells it in."""
+
+    @pytest.mark.parametrize(
+        ("want", "expected"),
+        [
+            (["forecast"], {"forecast"}),
+            (["a", "b"], {"a", "b"}),
+            ("single_levels", {"single_levels"}),
+            (3, {"3"}),
+            (None, None),
+            ([], None),
+        ],
+    )
+    def test_every_spelling_is_read(self, want, expected):
+        """A scalar asks for exactly one value; only None and [] ask for nothing."""
+        assert hydrate_mod._asked_values(want) == expected
+
+
+class TestBlockSatisfiesReadsScalars:
+    """Half the catalog's selector values are scalars, not lists."""
+
+    def test_a_conflicting_scalar_is_refused(self):
+        """Skipping scalars left most of a row unjudged."""
+        block = {"level_type": ["surface"]}
+
+        assert not hydrate_mod._block_satisfies(
+            {"level_type": "single_levels"}, block, set(block)
+        ), "a scalar selector conflicting with the block was not judged"
+
+    def test_an_agreeing_scalar_is_accepted(self):
+        """The ordinary case must still pass."""
+        block = {"level_type": ["single_levels"]}
+
+        assert hydrate_mod._block_satisfies(
+            {"level_type": "single_levels"}, block, set(block)
+        )
+
+
+class TestBlockSatisfiesChecksWhatTheBlockRequires:
+    """A block can fail a request by requiring a key the row never sends."""
+
+    def test_a_block_requiring_an_omitted_key_cannot_serve(self):
+        """CARRA forecast blocks all enumerate leadtime_hour; a row sending none
+        cannot be answered by them however well the rest matches."""
+        block = {"product_type": ["forecast"], "leadtime_hour": ["3"]}
+
+        assert not hydrate_mod._block_satisfies(
+            {"product_type": ["forecast"]}, block, set(block)
+        ), "the row omits a key every serving block requires"
+
+    def test_the_same_row_is_served_by_a_block_that_requires_nothing_more(self):
+        """Which is why the analysis blocks, enumerating no leadtime_hour, serve it."""
+        block = {"product_type": ["analysis"]}
+
+        assert hydrate_mod._block_satisfies(
+            {"product_type": ["analysis"]}, block, set(block)
+        )
+
+    @pytest.mark.parametrize(
+        "key",
+        ["variable", "year", "month", "day", "time", "date", "area", "data_format"],
+    )
+    def test_a_key_the_backend_supplies_is_not_the_rows_to_send(self, key):
+        """These come from the caller's range and bbox, not from the catalog row."""
+        block = {"product_type": ["forecast"], key: ["whatever"]}
+
+        assert hydrate_mod._block_satisfies(
+            {"product_type": ["forecast"]}, block, set(block)
+        ), f"{key} was treated as the row's responsibility"
+
+
+class TestEffectiveSelectors:
+    """Everything a retrieve built from a row will actually send."""
+
+    def test_the_rows_extras_win_over_the_stanza(self):
+        """`request.update(extras)` is the last write before the retrieve."""
+        row = SimpleNamespace(extras={"product_type": ["forecast"]})
+
+        merged = hydrate_mod.effective_selectors({"product_type": ["analysis"]}, row)
+
+        assert merged["product_type"] == ["forecast"]
+
+    def test_typed_fields_are_folded_in(self):
+        """`product_type` lives as a field, not in extras, on most ERA5 rows."""
+        row = SimpleNamespace(
+            extras={}, product_type=["reanalysis"], cds_pressure_level=["1000"]
+        )
+
+        merged = hydrate_mod.effective_selectors({}, row)
+
+        assert merged["product_type"] == ["reanalysis"]
+        assert merged["pressure_level"] == ["1000"], (
+            "cds_pressure_level is sent as `pressure_level`"
+        )
+
+    def test_an_extras_entry_wins_over_the_typed_field(self):
+        """The override mechanism has to be able to retarget a typed field."""
+        row = SimpleNamespace(
+            extras={"product_type": ["forecast"]}, product_type=["reanalysis"]
+        )
+
+        assert hydrate_mod.effective_selectors({}, row)["product_type"] == ["forecast"]
 
 
 class TestPromisesData:
@@ -835,7 +942,9 @@ class TestSelectorsAreServeable:
     def test_a_key_the_blocks_do_not_enumerate_is_not_judged(self):
         """Absence means the dataset does not partition on it, not that it is wrong."""
         blocks = [{"sensor": ["gome"]}]
-        assert hydrate_mod._selectors_are_serveable({"area": ["global"]}, blocks)
+        assert hydrate_mod._selectors_are_serveable(
+            {"sensor": ["gome"], "spatial_extent": ["global"]}, blocks
+        )
 
     @pytest.mark.parametrize("value", [None, []])
     def test_an_empty_or_stripped_selector_is_not_judged(self, value):
@@ -2228,6 +2337,20 @@ class TestFoldedMatching:
         assert hydrate_mod._match_variables(["tp"], meta)["tp"] == ("tp", "m")
 
 
+class _ServesAnything:
+    """A serving-block lookup that constrains nothing.
+
+    The sweep tests judge bookkeeping, not serveability, so they pin this rather
+    than let the guard reach for a dataset's real constraints.
+    """
+
+    enumerated: set[str] = set()
+
+    def __call__(self, cds_variable):
+        """Return one block naming the variable and constraining nothing else."""
+        return [{"variable": [cds_variable]}]
+
+
 def _probe_that_leaks_scratch(dataset, cds_variable):
     """Stand in for a probe whose scratch directory could not be removed."""
     from earthlens.ecmwf import cli as ecmwf_cli
@@ -2287,6 +2410,9 @@ class TestBulkHydrateEmpty:
             ecmwf_cli, "UNREMOVED_SCRATCH", ["D:/earthlens-cache/from-an-earlier-run"]
         )
         monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
+        monkeypatch.setattr(
+            hydrate_mod, "_serving_blocks_for", lambda dataset_id: _ServesAnything()
+        )
 
         summary = bulk_hydrate_empty()
 
@@ -2313,6 +2439,9 @@ class TestBulkHydrateEmpty:
             },
         )
         monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
+        monkeypatch.setattr(
+            hydrate_mod, "_serving_blocks_for", lambda dataset_id: _ServesAnything()
+        )
 
         summary = bulk_hydrate_empty()
         assert summary == {
@@ -2393,6 +2522,9 @@ class TestBulkHydrateEmpty:
         )
         monkeypatch.setattr(hydrate_mod, "_find_file_for_dataset", lambda *a: None)
         monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
+        monkeypatch.setattr(
+            hydrate_mod, "_serving_blocks_for", lambda dataset_id: _ServesAnything()
+        )
         summary = bulk_hydrate_empty()
         assert summary["unmatched"] == 0
         assert summary["skipped"] == 1
@@ -2406,6 +2538,9 @@ class TestBulkHydrateEmpty:
             {"other-dataset": _placeholder_dataset("total-precipitation")},
         )
         monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
+        monkeypatch.setattr(
+            hydrate_mod, "_serving_blocks_for", lambda dataset_id: _ServesAnything()
+        )
         summary = bulk_hydrate_empty()
         assert summary["unmatched"] == 0
         assert summary["skipped"] == 1
@@ -2525,6 +2660,9 @@ class TestBulkHydrateEmpty:
         )
         monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
         monkeypatch.setattr(
+            hydrate_mod, "_serving_blocks_for", lambda dataset_id: _ServesAnything()
+        )
+        monkeypatch.setattr(
             hydrate_mod,
             "_hydrate_stanza_per_variable",
             lambda text, ds, probe, serving=None: (
@@ -2638,6 +2776,9 @@ class TestBulkHydrateEmpty:
             raise TimeoutError("stuck in the CDS queue")
 
         monkeypatch.setattr(hydrate_mod, "_probe_with_timeout", _one_then_stall)
+        monkeypatch.setattr(
+            hydrate_mod, "_serving_blocks_for", lambda dataset_id: _ServesAnything()
+        )
         summary = bulk_hydrate_empty()
         assert summary["hydrated"] == 1, "the row it did fill still counts"
         assert summary["partial"] == 1, "and the dataset is flagged for a re-run"
@@ -2666,6 +2807,9 @@ class TestBulkHydrateEmpty:
             raise RuntimeError("licence not accepted")
 
         monkeypatch.setattr(hydrate_mod, "_probe_with_timeout", _one_then_refuse)
+        monkeypatch.setattr(
+            hydrate_mod, "_serving_blocks_for", lambda dataset_id: _ServesAnything()
+        )
         summary = bulk_hydrate_empty()
         assert summary["partial"] == 1
         assert "RuntimeError" in capsys.readouterr().out
@@ -2729,6 +2873,9 @@ class TestBulkHydrateEmpty:
             raise TimeoutError("stuck in the CDS queue")
 
         monkeypatch.setattr(hydrate_mod, "_probe_with_timeout", _stall)
+        monkeypatch.setattr(
+            hydrate_mod, "_serving_blocks_for", lambda dataset_id: _ServesAnything()
+        )
         summary = bulk_hydrate_empty()
         assert summary["timed_out"] == 1, "the timed-out dataset is counted"
         assert summary["skipped"] == 1, "a timeout also counts as skipped"
