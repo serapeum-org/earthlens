@@ -264,6 +264,148 @@ def _stub_client(monkeypatch, captured=None, seen_endpoints=None):
     monkeypatch.setattr(endpoints, "open_client", _open_client)
 
 
+class TestRetrieveProbeUnpacksAZip:
+    """CADS answers some requests with a zip; every CAMS probe takes this path."""
+
+    def test_the_netcdf_inside_a_zip_is_the_one_read(self, monkeypatch, tmp_path):
+        """A zipped answer must be unpacked, not handed to the reader as-is."""
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+        monkeypatch.setattr(ecmwf_endpoints, "open_client", lambda endpoint: object())
+        monkeypatch.setenv("EARTHLENS_CACHE_DIR", str(tmp_path))
+        monkeypatch.setattr(
+            ecmwf_helpers, "_retrieve_with_retry", _write_zip_holding_one_netcdf
+        )
+        seen = {}
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_read_netcdf_var_meta",
+            lambda path: (
+                seen.setdefault("path", path) and {} or {"t2m": {"units": "K"}}
+            ),
+        )
+
+        result = ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
+
+        assert result == {"t2m": {"units": "K"}}
+        assert seen["path"].endswith("inner.nc"), (
+            f"the reader was handed {seen['path']}, not the unpacked granule"
+        )
+
+    def test_a_zip_holding_no_netcdf_is_read_as_downloaded(self, monkeypatch, tmp_path):
+        """With nothing to unpack the original file is still what gets read."""
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+        monkeypatch.setattr(ecmwf_endpoints, "open_client", lambda endpoint: object())
+        monkeypatch.setenv("EARTHLENS_CACHE_DIR", str(tmp_path))
+        monkeypatch.setattr(
+            ecmwf_helpers, "_retrieve_with_retry", _write_zip_holding_no_netcdf
+        )
+        seen = {}
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_read_netcdf_var_meta",
+            lambda path: seen.setdefault("path", path) and {} or {},
+        )
+
+        ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
+
+        assert seen["path"].endswith("probe.nc")
+
+
+class TestEndpointFor:
+    """Which CADS instance a dataset id is served from."""
+
+    @pytest.mark.parametrize(
+        ("dataset_id", "endpoint"),
+        [
+            ("cams-global-emission-inventories", "ads"),
+            ("cams-europe-air-quality-forecasts", "ads"),
+            ("cems-glofas-historical", "ewds"),
+            ("efas-historical", "ewds"),
+            ("reanalysis-era5-single-levels", "cds"),
+            ("satellite-ozone-v1", "cds"),
+        ],
+    )
+    def test_the_prefix_picks_the_store_when_the_catalog_says_nothing(
+        self, dataset_id, endpoint
+    ):
+        """A misrouted probe authenticates against the wrong store and fails."""
+        catalog = SimpleNamespace()
+
+        assert ecmwf_cli._ecmwf_endpoint_for(catalog, dataset_id) == endpoint, (
+            f"{dataset_id} routed to the wrong endpoint"
+        )
+
+    def test_the_catalogs_own_index_wins_over_the_prefix(self):
+        """A curated store assignment must not be second-guessed by a prefix rule."""
+        catalog = SimpleNamespace(store_for=lambda dataset_id: "xds")
+
+        assert ecmwf_cli._ecmwf_endpoint_for(catalog, "cams-anything") == "xds"
+
+    def test_an_empty_store_falls_through_to_the_prefix(self):
+        """An index that knows nothing about the id must not return an empty store."""
+        catalog = SimpleNamespace(store_for=lambda dataset_id: None)
+
+        assert ecmwf_cli._ecmwf_endpoint_for(catalog, "efas-historical") == "ewds"
+
+
+class TestDeepSampleVariable:
+    """The per-variable probe entry point."""
+
+    def test_a_dataset_no_block_serves_returns_two_empties(self, monkeypatch):
+        """Nothing to request means nothing to describe, and no retrieve is sent."""
+        monkeypatch.setattr(ecmwf_cli, "_ecmwf_constraints", lambda dataset: [])
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_retrieve_probe",
+            lambda *args, **kwargs: pytest.fail("no retrieve should be issued"),
+        )
+
+        assert ecmwf_cli._ecmwf_deep_sample_variable("a-dataset", "t2m") == ({}, {})
+
+
+class TestReadNetcdfVarMetaSubdatasets:
+    """A container whose variables live in subdatasets rather than at the root."""
+
+    def test_every_named_subdataset_is_read_and_merged(self, monkeypatch, tmp_path):
+        """Some CDS NetCDFs describe their variables one subdataset down."""
+        from osgeo import gdal
+
+        target = tmp_path / "granule.nc"
+        target.write_bytes(b"not really netcdf")
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_read_via_pyramids",
+            lambda path: (_ for _ in ()).throw(OSError("unreadable")),
+        )
+        monkeypatch.setattr(gdal, "Info", _info_with_two_subdatasets)
+        monkeypatch.setattr(ecmwf_cli, "_from_info", _info_to_meta)
+
+        meta = ecmwf_cli._read_netcdf_var_meta(str(target))
+
+        assert sorted(meta) == ["sst", "t2m"], f"subdatasets not merged: {sorted(meta)}"
+        assert meta["t2m"]["units"] == "K"
+
+    def test_a_root_exposing_variables_is_read_without_subdatasets(
+        self, monkeypatch, tmp_path
+    ):
+        """The ordinary container needs no second pass."""
+        from osgeo import gdal
+
+        target = tmp_path / "granule.nc"
+        target.write_bytes(b"not really netcdf")
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_read_via_pyramids",
+            lambda path: (_ for _ in ()).throw(OSError("unreadable")),
+        )
+        monkeypatch.setattr(gdal, "Info", lambda path, format=None: {"path": "t2m"})
+        monkeypatch.setattr(ecmwf_cli, "_from_info", _info_to_meta)
+
+        assert ecmwf_cli._read_netcdf_var_meta(str(target)) == {
+            "t2m": {"long_name": "2 metre temperature", "units": "K"}
+        }
+
+
 class TestDiscardScratch:
     """Removing one probe's scratch directory, and what it records if it cannot."""
 
@@ -299,6 +441,48 @@ class TestDiscardScratch:
         ecmwf_cli._discard_scratch(str(scratch))
 
         assert ecmwf_cli.UNREMOVED_SCRATCH == [str(scratch)]
+
+
+def _write_zip_holding_one_netcdf(client, dataset, request, target, endpoint):
+    """Stand in for a store answering with a zipped granule."""
+    import zipfile
+
+    with zipfile.ZipFile(target, "w") as archive:
+        archive.writestr("inner.nc", b"granule bytes")
+
+
+def _write_zip_holding_no_netcdf(client, dataset, request, target, endpoint):
+    """Stand in for a zip carrying no NetCDF member at all."""
+    import zipfile
+
+    with zipfile.ZipFile(target, "w") as archive:
+        archive.writestr("readme.txt", b"no granule here")
+
+
+def _info_with_two_subdatasets(path, format=None):
+    """Stand in for gdal.Info over a container holding two subdatasets."""
+    if path.endswith(".nc"):
+        return {
+            "metadata": {
+                "SUBDATASETS": {
+                    "SUBDATASET_1_NAME": "NETCDF:granule.nc:t2m",
+                    "SUBDATASET_1_DESC": "the temperature field",
+                    "SUBDATASET_2_NAME": "NETCDF:granule.nc:sst",
+                    "SUBDATASET_2_DESC": "the sea surface field",
+                }
+            }
+        }
+    return {"path": path}
+
+
+def _info_to_meta(info):
+    """Turn a stubbed gdal.Info payload into the meta mapping the reader returns."""
+    path = str(info.get("path", ""))
+    if path.endswith("t2m"):
+        return {"t2m": {"long_name": "2 metre temperature", "units": "K"}}
+    if path.endswith("sst"):
+        return {"sst": {"long_name": "sea surface temperature", "units": "K"}}
+    return {}
 
 
 def _refuse_to_remove(path, **kwargs):
