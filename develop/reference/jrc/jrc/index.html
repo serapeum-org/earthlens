@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -31994,11 +31994,8 @@ so it is read from the listing rather than reconstructed).</p>
 
         <p>Return the vendored <code>osgeo.gdal</code> module.</p>
 <p>Imported through this one accessor so the multidim reads below have a single
-seam a test can replace, and so <code>osgeo</code> is imported lazily.</p>
-<p><code>osgeo</code> is not importable on its own: pyramids vendors GDAL under
-<code>pyramids/_vendor/osgeo</code> and only puts it on the path as a side effect of
-importing <code>pyramids</code>. Importing pyramids first is therefore load-bearing,
-not decorative -- without it this raises <code>ModuleNotFoundError: osgeo</code>.</p>
+seam a test can replace, and so <code>osgeo</code> is imported lazily (it only resolves
+once <code>pyramids</code> has put its vendored copy on the path).</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -32040,31 +32037,21 @@ not decorative -- without it this raises <code>ModuleNotFoundError: osgeo</code>
 <span class="normal"><a href="#__codelineno-0-506">506</a></span>
 <span class="normal"><a href="#__codelineno-0-507">507</a></span>
 <span class="normal"><a href="#__codelineno-0-508">508</a></span>
-<span class="normal"><a href="#__codelineno-0-509">509</a></span>
-<span class="normal"><a href="#__codelineno-0-510">510</a></span>
-<span class="normal"><a href="#__codelineno-0-511">511</a></span>
-<span class="normal"><a href="#__codelineno-0-512">512</a></span>
-<span class="normal"><a href="#__codelineno-0-513">513</a></span>
-<span class="normal"><a href="#__codelineno-0-514">514</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="k">def</span><span class="w"> </span><span class="nf">gdal_module</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ModuleType</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-509">509</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="k">def</span><span class="w"> </span><span class="nf">gdal_module</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ModuleType</span><span class="p">:</span>
 <a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the vendored `osgeo.gdal` module.</span>
 <a id="__codelineno-0-497" name="__codelineno-0-497"></a>
 <a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">    Imported through this one accessor so the multidim reads below have a single</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">    seam a test can replace, and so `osgeo` is imported lazily.</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">    `osgeo` is not importable on its own: pyramids vendors GDAL under</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">    `pyramids/_vendor/osgeo` and only puts it on the path as a side effect of</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">    importing `pyramids`. Importing pyramids first is therefore load-bearing,</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">    not decorative -- without it this raises `ModuleNotFoundError: osgeo`.</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        ModuleType: The `osgeo.gdal` module.</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">pyramids</span>  <span class="c1"># noqa: F401 - side effect: puts the vendored osgeo on the path</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">osgeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdal</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>    <span class="c1"># osgeo ships no stubs, so the import is Any; the cast restores the</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="c1"># declared return type without weakening it.</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;ModuleType&quot;</span><span class="p">,</span> <span class="n">gdal</span><span class="p">)</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">    seam a test can replace, and so `osgeo` is imported lazily (it only resolves</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">    once `pyramids` has put its vendored copy on the path).</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">        ModuleType: The `osgeo.gdal` module.</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">osgeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdal</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>    <span class="c1"># osgeo ships no stubs, so the import is Any; the cast restores the</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>    <span class="c1"># declared return type without weakening it.</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;ModuleType&quot;</span><span class="p">,</span> <span class="n">gdal</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -32494,7 +32481,12 @@ or <code>None</code> when the bbox does not overlap the grid.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/jrc/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-587">587</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-582">582</a></span>
+<span class="normal"><a href="#__codelineno-0-583">583</a></span>
+<span class="normal"><a href="#__codelineno-0-584">584</a></span>
+<span class="normal"><a href="#__codelineno-0-585">585</a></span>
+<span class="normal"><a href="#__codelineno-0-586">586</a></span>
+<span class="normal"><a href="#__codelineno-0-587">587</a></span>
 <span class="normal"><a href="#__codelineno-0-588">588</a></span>
 <span class="normal"><a href="#__codelineno-0-589">589</a></span>
 <span class="normal"><a href="#__codelineno-0-590">590</a></span>
@@ -32516,39 +32508,34 @@ or <code>None</code> when the bbox does not overlap the grid.</p>
 <span class="normal"><a href="#__codelineno-0-606">606</a></span>
 <span class="normal"><a href="#__codelineno-0-607">607</a></span>
 <span class="normal"><a href="#__codelineno-0-608">608</a></span>
-<span class="normal"><a href="#__codelineno-0-609">609</a></span>
-<span class="normal"><a href="#__codelineno-0-610">610</a></span>
-<span class="normal"><a href="#__codelineno-0-611">611</a></span>
-<span class="normal"><a href="#__codelineno-0-612">612</a></span>
-<span class="normal"><a href="#__codelineno-0-613">613</a></span>
-<span class="normal"><a href="#__codelineno-0-614">614</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="k">def</span><span class="w"> </span><span class="nf">pixel_window</span><span class="p">(</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>    <span class="n">geo</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a>    <span class="n">cols</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a>    <span class="n">rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Map an AOI bbox to a clamped pixel window on a north-up grid.</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">        geo: The source grid&#39;s geotransform (from pyramids).</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="sd">        bbox: `(west, south, east, north)` in degrees.</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="sd">        cols: Grid column count.</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">        rows: Grid row count.</span>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">        tuple[int, int, int, int] | None: `(col_off, row_off, width, height)`,</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">            or `None` when the bbox does not overlap the grid.</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>    <span class="n">x0</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">geo</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a>    <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a>    <span class="n">pixel_h</span> <span class="o">=</span> <span class="o">-</span><span class="n">dy</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a>    <span class="n">col_off</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">west</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>    <span class="n">col_end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">east</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>    <span class="n">row_off</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">y0</span> <span class="o">-</span> <span class="n">north</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_h</span><span class="p">))</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a>    <span class="n">row_end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">y0</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_h</span><span class="p">))</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a>    <span class="k">if</span> <span class="n">col_end</span> <span class="o">&lt;=</span> <span class="n">col_off</span> <span class="ow">or</span> <span class="n">row_end</span> <span class="o">&lt;=</span> <span class="n">row_off</span><span class="p">:</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>        <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>    <span class="k">return</span> <span class="n">col_off</span><span class="p">,</span> <span class="n">row_off</span><span class="p">,</span> <span class="n">col_end</span> <span class="o">-</span> <span class="n">col_off</span><span class="p">,</span> <span class="n">row_end</span> <span class="o">-</span> <span class="n">row_off</span>
+<span class="normal"><a href="#__codelineno-0-609">609</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="k">def</span><span class="w"> </span><span class="nf">pixel_window</span><span class="p">(</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a>    <span class="n">geo</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a>    <span class="n">cols</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a>    <span class="n">rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Map an AOI bbox to a clamped pixel window on a north-up grid.</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">        geo: The source grid&#39;s geotransform (from pyramids).</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">        bbox: `(west, south, east, north)` in degrees.</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">        cols: Grid column count.</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="sd">        rows: Grid row count.</span>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="sd">        tuple[int, int, int, int] | None: `(col_off, row_off, width, height)`,</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="sd">            or `None` when the bbox does not overlap the grid.</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>    <span class="n">x0</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">geo</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>    <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>    <span class="n">pixel_h</span> <span class="o">=</span> <span class="o">-</span><span class="n">dy</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>    <span class="n">col_off</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">west</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>    <span class="n">col_end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">east</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>    <span class="n">row_off</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">y0</span> <span class="o">-</span> <span class="n">north</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_h</span><span class="p">))</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>    <span class="n">row_end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">y0</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixel_h</span><span class="p">))</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>    <span class="k">if</span> <span class="n">col_end</span> <span class="o">&lt;=</span> <span class="n">col_off</span> <span class="ow">or</span> <span class="n">row_end</span> <span class="o">&lt;=</span> <span class="n">row_off</span><span class="p">:</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a>    <span class="k">return</span> <span class="n">col_off</span><span class="p">,</span> <span class="n">row_off</span><span class="p">,</span> <span class="n">col_end</span> <span class="o">-</span> <span class="n">col_off</span><span class="p">,</span> <span class="n">row_end</span> <span class="o">-</span> <span class="n">row_off</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -32679,7 +32666,12 @@ that cannot be longitude / latitude.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/jrc/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-517">517</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-512">512</a></span>
+<span class="normal"><a href="#__codelineno-0-513">513</a></span>
+<span class="normal"><a href="#__codelineno-0-514">514</a></span>
+<span class="normal"><a href="#__codelineno-0-515">515</a></span>
+<span class="normal"><a href="#__codelineno-0-516">516</a></span>
+<span class="normal"><a href="#__codelineno-0-517">517</a></span>
 <span class="normal"><a href="#__codelineno-0-518">518</a></span>
 <span class="normal"><a href="#__codelineno-0-519">519</a></span>
 <span class="normal"><a href="#__codelineno-0-520">520</a></span>
@@ -32741,79 +32733,74 @@ that cannot be longitude / latitude.</p>
 <span class="normal"><a href="#__codelineno-0-576">576</a></span>
 <span class="normal"><a href="#__codelineno-0-577">577</a></span>
 <span class="normal"><a href="#__codelineno-0-578">578</a></span>
-<span class="normal"><a href="#__codelineno-0-579">579</a></span>
-<span class="normal"><a href="#__codelineno-0-580">580</a></span>
-<span class="normal"><a href="#__codelineno-0-581">581</a></span>
-<span class="normal"><a href="#__codelineno-0-582">582</a></span>
-<span class="normal"><a href="#__codelineno-0-583">583</a></span>
-<span class="normal"><a href="#__codelineno-0-584">584</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="k">def</span><span class="w"> </span><span class="nf">require_geographic_affine</span><span class="p">(</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>    <span class="n">geo</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>    <span class="n">cols</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>    <span class="n">rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>    <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Reject an affine that is not a plausible north-up geographic grid.</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">    pyramids &gt;= 0.58.1 derives the affine from the cube&#39;s CF coordinates. If that</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">    ever regresses — or a future row is not a lon/lat grid — the crop would place</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">    the window at the wrong coordinates with no other symptom, so check the shape</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">    of the transform rather than only its pixel sizes: degrees per pixel, a</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">    north-up row order, and an extent that stays inside the lon/lat domain.</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">        geo: The variable&#39;s 6-element geotransform.</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        cols: The variable&#39;s column count.</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">        rows: The variable&#39;s row count.</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">        dataset_id: The catalog id, for the message.</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        ValueError: If the affine is index-space, south-up, or spans an extent</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            that cannot be longitude / latitude.</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>    <span class="n">x0</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">geo</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a>    <span class="c1"># GDAL&#39;s ungeoreferenced affine for an (rows x cols) raster is exactly</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>    <span class="c1"># (0, 1, 0, rows, 0, -1). A small non-gridded variable (the cube&#39;s coastal</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>    <span class="c1"># -point fields are e.g. 50x16) produces one that also sits inside the</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a>    <span class="c1"># lon/lat domain, so the extent check alone cannot catch it — match the</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>    <span class="c1"># signature directly.</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">y0</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> returned the index-space geotransform </span><span class="si">{</span><span class="n">geo</span><span class="si">}</span><span class="s2"> for a &quot;</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cols</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">rows</span><span class="si">}</span><span class="s2"> variable — this field is not on the lon/lat grid &quot;</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a>            <span class="s2">&quot;(the coastal-point fields report one). Request a gridded field.&quot;</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>        <span class="p">)</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>    <span class="n">rot_x</span><span class="p">,</span> <span class="n">rot_y</span> <span class="o">=</span> <span class="n">geo</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">geo</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>    <span class="k">if</span> <span class="n">rot_x</span> <span class="ow">or</span> <span class="n">rot_y</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-579">579</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="k">def</span><span class="w"> </span><span class="nf">require_geographic_affine</span><span class="p">(</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="n">geo</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>    <span class="n">cols</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="n">rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>    <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Reject an affine that is not a plausible north-up geographic grid.</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">    pyramids &gt;= 0.58.1 derives the affine from the cube&#39;s CF coordinates. If that</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">    ever regresses — or a future row is not a lon/lat grid — the crop would place</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">    the window at the wrong coordinates with no other symptom, so check the shape</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">    of the transform rather than only its pixel sizes: degrees per pixel, a</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">    north-up row order, and an extent that stays inside the lon/lat domain.</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">        geo: The variable&#39;s 6-element geotransform.</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">        cols: The variable&#39;s column count.</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">        rows: The variable&#39;s row count.</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">        dataset_id: The catalog id, for the message.</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        ValueError: If the affine is index-space, south-up, or spans an extent</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            that cannot be longitude / latitude.</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>    <span class="n">x0</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">geo</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a>    <span class="c1"># GDAL&#39;s ungeoreferenced affine for an (rows x cols) raster is exactly</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>    <span class="c1"># (0, 1, 0, rows, 0, -1). A small non-gridded variable (the cube&#39;s coastal</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>    <span class="c1"># -point fields are e.g. 50x16) produces one that also sits inside the</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>    <span class="c1"># lon/lat domain, so the extent check alone cannot catch it — match the</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>    <span class="c1"># signature directly.</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">y0</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> returned the index-space geotransform </span><span class="si">{</span><span class="n">geo</span><span class="si">}</span><span class="s2"> for a &quot;</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cols</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">rows</span><span class="si">}</span><span class="s2"> variable — this field is not on the lon/lat grid &quot;</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a>            <span class="s2">&quot;(the coastal-point fields report one). Request a gridded field.&quot;</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>        <span class="p">)</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>    <span class="n">rot_x</span><span class="p">,</span> <span class="n">rot_y</span> <span class="o">=</span> <span class="n">geo</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">geo</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>    <span class="k">if</span> <span class="n">rot_x</span> <span class="ow">or</span> <span class="n">rot_y</span><span class="p">:</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> returned a rotated geotransform </span><span class="si">{</span><span class="n">geo</span><span class="si">}</span><span class="s2">; only an &quot;</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>            <span class="s2">&quot;axis-aligned north-up grid can be windowed by bbox.&quot;</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="p">)</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>    <span class="k">if</span> <span class="n">x0</span> <span class="o">&gt;=</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">cols</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">&gt;</span> <span class="mf">180.5</span><span class="p">:</span>
 <a id="__codelineno-0-555" name="__codelineno-0-555"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> returned a rotated geotransform </span><span class="si">{</span><span class="n">geo</span><span class="si">}</span><span class="s2">; only an &quot;</span>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a>            <span class="s2">&quot;axis-aligned north-up grid can be windowed by bbox.&quot;</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> spans </span><span class="si">{</span><span class="n">x0</span><span class="si">}</span><span class="s2">..</span><span class="si">{</span><span class="n">x0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cols</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dx</span><span class="si">}</span><span class="s2">, which looks like a &quot;</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a>            <span class="s2">&quot;0..360 longitude convention; earthlens expects -180..180.&quot;</span>
 <a id="__codelineno-0-558" name="__codelineno-0-558"></a>        <span class="p">)</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a>    <span class="k">if</span> <span class="n">x0</span> <span class="o">&gt;=</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">cols</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">&gt;</span> <span class="mf">180.5</span><span class="p">:</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>    <span class="k">if</span> <span class="n">dx</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">dy</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
 <a id="__codelineno-0-560" name="__codelineno-0-560"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> spans </span><span class="si">{</span><span class="n">x0</span><span class="si">}</span><span class="s2">..</span><span class="si">{</span><span class="n">x0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cols</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dx</span><span class="si">}</span><span class="s2">, which looks like a &quot;</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a>            <span class="s2">&quot;0..360 longitude convention; earthlens expects -180..180.&quot;</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a>        <span class="p">)</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>    <span class="k">if</span> <span class="n">dx</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">dy</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> returned a geotransform </span><span class="si">{</span><span class="n">geo</span><span class="si">}</span><span class="s2"> that is not north-up &quot;</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>            <span class="sa">f</span><span class="s2">&quot;(pixel width </span><span class="si">{</span><span class="n">dx</span><span class="si">}</span><span class="s2">, height </span><span class="si">{</span><span class="n">dy</span><span class="si">}</span><span class="s2">); pyramids &gt;= 0.58.1 is required to &quot;</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>            <span class="s2">&quot;georeference the sea-level cubes.&quot;</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>        <span class="p">)</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>    <span class="c1"># Slack of one cell, not a fixed half-degree, so a coarse grid is not</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a>    <span class="c1"># rejected for legitimately overhanging its first cell.</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>    <span class="n">slack</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">))</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a>    <span class="n">east</span><span class="p">,</span> <span class="n">south</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">cols</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">y0</span> <span class="o">+</span> <span class="n">rows</span> <span class="o">*</span> <span class="n">dy</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="o">-</span><span class="mi">180</span> <span class="o">-</span> <span class="n">slack</span> <span class="o">&lt;=</span> <span class="n">x0</span> <span class="o">&lt;=</span> <span class="mi">180</span> <span class="o">+</span> <span class="n">slack</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">90</span> <span class="o">-</span> <span class="n">slack</span> <span class="o">&lt;=</span> <span class="n">y0</span> <span class="o">&lt;=</span> <span class="mi">90</span> <span class="o">+</span> <span class="n">slack</span><span class="p">):</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> returned a geotransform </span><span class="si">{</span><span class="n">geo</span><span class="si">}</span><span class="s2"> whose origin is not a &quot;</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a>            <span class="s2">&quot;lon/lat coordinate (an index-space affine looks like this); pyramids &quot;</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a>            <span class="s2">&quot;&gt;= 0.58.1 is required to georeference the sea-level cubes.&quot;</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> returned a geotransform </span><span class="si">{</span><span class="n">geo</span><span class="si">}</span><span class="s2"> that is not north-up &quot;</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a>            <span class="sa">f</span><span class="s2">&quot;(pixel width </span><span class="si">{</span><span class="n">dx</span><span class="si">}</span><span class="s2">, height </span><span class="si">{</span><span class="n">dy</span><span class="si">}</span><span class="s2">); pyramids &gt;= 0.58.1 is required to &quot;</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a>            <span class="s2">&quot;georeference the sea-level cubes.&quot;</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>        <span class="p">)</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>    <span class="c1"># Slack of one cell, not a fixed half-degree, so a coarse grid is not</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>    <span class="c1"># rejected for legitimately overhanging its first cell.</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="n">slack</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">))</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a>    <span class="n">east</span><span class="p">,</span> <span class="n">south</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">cols</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">y0</span> <span class="o">+</span> <span class="n">rows</span> <span class="o">*</span> <span class="n">dy</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="o">-</span><span class="mi">180</span> <span class="o">-</span> <span class="n">slack</span> <span class="o">&lt;=</span> <span class="n">x0</span> <span class="o">&lt;=</span> <span class="mi">180</span> <span class="o">+</span> <span class="n">slack</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">90</span> <span class="o">-</span> <span class="n">slack</span> <span class="o">&lt;=</span> <span class="n">y0</span> <span class="o">&lt;=</span> <span class="mi">90</span> <span class="o">+</span> <span class="n">slack</span><span class="p">):</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> returned a geotransform </span><span class="si">{</span><span class="n">geo</span><span class="si">}</span><span class="s2"> whose origin is not a &quot;</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a>            <span class="s2">&quot;lon/lat coordinate (an index-space affine looks like this); pyramids &quot;</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a>            <span class="s2">&quot;&gt;= 0.58.1 is required to georeference the sea-level cubes.&quot;</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>        <span class="p">)</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="o">-</span><span class="mi">180</span> <span class="o">-</span> <span class="n">slack</span> <span class="o">&lt;=</span> <span class="n">east</span> <span class="o">&lt;=</span> <span class="mi">180</span> <span class="o">+</span> <span class="n">slack</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">90</span> <span class="o">-</span> <span class="n">slack</span> <span class="o">&lt;=</span> <span class="n">south</span> <span class="o">&lt;=</span> <span class="mi">90</span> <span class="o">+</span> <span class="n">slack</span><span class="p">):</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> spans </span><span class="si">{</span><span class="n">x0</span><span class="si">}</span><span class="s2">..</span><span class="si">{</span><span class="n">east</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">south</span><span class="si">}</span><span class="s2">..</span><span class="si">{</span><span class="n">y0</span><span class="si">}</span><span class="s2">, which is outside &quot;</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a>            <span class="s2">&quot;the lon/lat domain; the grid is not the geographic one expected.&quot;</span>
 <a id="__codelineno-0-579" name="__codelineno-0-579"></a>        <span class="p">)</span>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="o">-</span><span class="mi">180</span> <span class="o">-</span> <span class="n">slack</span> <span class="o">&lt;=</span> <span class="n">east</span> <span class="o">&lt;=</span> <span class="mi">180</span> <span class="o">+</span> <span class="n">slack</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">90</span> <span class="o">-</span> <span class="n">slack</span> <span class="o">&lt;=</span> <span class="n">south</span> <span class="o">&lt;=</span> <span class="mi">90</span> <span class="o">+</span> <span class="n">slack</span><span class="p">):</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> spans </span><span class="si">{</span><span class="n">x0</span><span class="si">}</span><span class="s2">..</span><span class="si">{</span><span class="n">east</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">south</span><span class="si">}</span><span class="s2">..</span><span class="si">{</span><span class="n">y0</span><span class="si">}</span><span class="s2">, which is outside &quot;</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a>            <span class="s2">&quot;the lon/lat domain; the grid is not the geographic one expected.&quot;</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -33256,7 +33243,12 @@ the cropped array carries real-world coordinates.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/jrc/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-617">617</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-612">612</a></span>
+<span class="normal"><a href="#__codelineno-0-613">613</a></span>
+<span class="normal"><a href="#__codelineno-0-614">614</a></span>
+<span class="normal"><a href="#__codelineno-0-615">615</a></span>
+<span class="normal"><a href="#__codelineno-0-616">616</a></span>
+<span class="normal"><a href="#__codelineno-0-617">617</a></span>
 <span class="normal"><a href="#__codelineno-0-618">618</a></span>
 <span class="normal"><a href="#__codelineno-0-619">619</a></span>
 <span class="normal"><a href="#__codelineno-0-620">620</a></span>
@@ -33275,36 +33267,31 @@ the cropped array carries real-world coordinates.</p>
 <span class="normal"><a href="#__codelineno-0-633">633</a></span>
 <span class="normal"><a href="#__codelineno-0-634">634</a></span>
 <span class="normal"><a href="#__codelineno-0-635">635</a></span>
-<span class="normal"><a href="#__codelineno-0-636">636</a></span>
-<span class="normal"><a href="#__codelineno-0-637">637</a></span>
-<span class="normal"><a href="#__codelineno-0-638">638</a></span>
-<span class="normal"><a href="#__codelineno-0-639">639</a></span>
-<span class="normal"><a href="#__codelineno-0-640">640</a></span>
-<span class="normal"><a href="#__codelineno-0-641">641</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="k">def</span><span class="w"> </span><span class="nf">window_origin</span><span class="p">(</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>    <span class="n">geo</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">col_off</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">row_off</span><span class="p">:</span> <span class="nb">int</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Shift a geotransform&#39;s origin to a pixel window&#39;s top-left corner.</span>
+<span class="normal"><a href="#__codelineno-0-636">636</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="k">def</span><span class="w"> </span><span class="nf">window_origin</span><span class="p">(</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>    <span class="n">geo</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">col_off</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">row_off</span><span class="p">:</span> <span class="nb">int</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Shift a geotransform&#39;s origin to a pixel window&#39;s top-left corner.</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">        geo: The source grid&#39;s 6-element north-up geotransform.</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">        col_off: The window&#39;s first column, in source pixels.</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">        row_off: The window&#39;s first row, in source pixels.</span>
 <a id="__codelineno-0-621" name="__codelineno-0-621"></a>
-<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">        geo: The source grid&#39;s 6-element north-up geotransform.</span>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">        col_off: The window&#39;s first column, in source pixels.</span>
-<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">        row_off: The window&#39;s first row, in source pixels.</span>
-<a id="__codelineno-0-626" name="__codelineno-0-626"></a>
-<a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">        tuple: The same transform with its origin moved to the window corner, so</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a><span class="sd">            the cropped array carries real-world coordinates.</span>
-<a id="__codelineno-0-630" name="__codelineno-0-630"></a>
-<a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="sd">        - The North Sea window of the global 0.25 deg grid starts at 3E / 53N:</span>
-<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            &gt;&gt;&gt; from earthlens.jrc._helpers import window_origin</span>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">            &gt;&gt;&gt; window_origin((-180.0, 0.25, 0.0, 90.0, 0.0, -0.25), 732, 148)</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">            (3.0, 0.25, 0.0, 53.0, 0.0, -0.25)</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-640" name="__codelineno-0-640"></a>    <span class="n">x0</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">geo</span>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a>    <span class="k">return</span> <span class="p">(</span><span class="n">x0</span> <span class="o">+</span> <span class="n">col_off</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">y0</span> <span class="o">+</span> <span class="n">row_off</span> <span class="o">*</span> <span class="n">dy</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">        tuple: The same transform with its origin moved to the window corner, so</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">            the cropped array carries real-world coordinates.</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">        - The North Sea window of the global 0.25 deg grid starts at 3E / 53N:</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a><span class="sd">            &gt;&gt;&gt; from earthlens.jrc._helpers import window_origin</span>
+<a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">            &gt;&gt;&gt; window_origin((-180.0, 0.25, 0.0, 90.0, 0.0, -0.25), 732, 148)</span>
+<a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="sd">            (3.0, 0.25, 0.0, 53.0, 0.0, -0.25)</span>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a>
+<a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a>    <span class="n">x0</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">geo</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a>    <span class="k">return</span> <span class="p">(</span><span class="n">x0</span> <span class="o">+</span> <span class="n">col_off</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">y0</span> <span class="o">+</span> <span class="n">row_off</span> <span class="o">*</span> <span class="n">dy</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
