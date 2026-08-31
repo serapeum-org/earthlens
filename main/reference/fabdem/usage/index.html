@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23599,7 +23599,7 @@ only what it needs).</p>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">dem</span><span class="o">.</span><span class="n">epsg</span>                 <span class="c1"># 4326 (WGS84)</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">array</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span> <span class="c1"># bare-earth elevation in metres</span>
 </code></pre></div>
-<p>The <code>fab-dem</code> and <code>bare-earth-dem</code> aliases route to the same backend.</p>
+<p>The <code>fab-dem</code> and <code>fabdem:bare-earth-dem</code> aliases route to the same backend.</p>
 <h2 id="the-non-commercial-licence-warning"><a class="toclink" href="#the-non-commercial-licence-warning">The non-commercial licence warning</a><a class="headerlink" href="#the-non-commercial-licence-warning" title="Permanent link">#</a></h2>
 <p>FABDEM is CC-BY-NC-SA 4.0, so every <code>download()</code> emits a <code>LicenseWarning</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>

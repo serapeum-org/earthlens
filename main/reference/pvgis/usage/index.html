@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23614,7 +23614,7 @@
 
 <h1 id="pvgis-usage"><a class="toclink" href="#pvgis-usage">PVGIS — usage</a><a class="headerlink" href="#pvgis-usage" title="Permanent link">#</a></h1>
 <p>All examples go through the <a href="../../earthlens/"><code>EarthLens</code></a> facade with
-<code>data_source="pvgis"</code> (alias <code>"solar-pv"</code>). The backend needs no credentials.
+<code>data_source="pvgis"</code> (topic key <code>"pvgis:solar-pv"</code>). The backend needs no credentials.
 <code>download()</code> returns a long-format <code>pandas.DataFrame</code> and also writes it to
 <code>path</code> as CSV (or Parquet — see below).</p>
 <h2 id="pick-a-tool-with-variables"><a class="toclink" href="#pick-a-tool-with-variables">Pick a tool with <code>variables=</code></a><a class="headerlink" href="#pick-a-tool-with-variables" title="Permanent link">#</a></h2>

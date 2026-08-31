@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24422,7 +24422,7 @@ print(f'reference granule: {REFERENCE}')</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s1">'insar'</span><span class="p">,</span>  <span class="c1"># alias for 'asf'</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'asf:insar'</span><span class="p">,</span>  <span class="c1"># topic key for 'asf'</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'sentinel-1-slc'</span><span class="p">],</span>
     <span class="n">reference</span><span class="o">=</span><span class="n">REFERENCE</span><span class="p">,</span>  <span class="c1"># &lt;-- switches to stack mode</span>
     <span class="n">perpendicular_baseline</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">),</span>  <span class="c1"># metres, (min, max)</span>
@@ -24434,7 +24434,7 @@ print(f'reference granule: {REFERENCE}')</div>
 <span class="n">el</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_mode</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">el = EarthLens(
-    data_source='insar',  # alias for 'asf'
+    data_source='asf:insar',  # topic key for 'asf'
     variables=['sentinel-1-slc'],
     reference=REFERENCE,  # &lt;-- switches to stack mode
     perpendicular_baseline=(-100.0, 100.0),  # metres, (min, max)
@@ -24555,7 +24555,7 @@ for product in products:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">tight</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s1">'insar'</span><span class="p">,</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'asf:insar'</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'sentinel-1-slc'</span><span class="p">],</span>
     <span class="n">reference</span><span class="o">=</span><span class="n">REFERENCE</span><span class="p">,</span>
     <span class="n">perpendicular_baseline</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">),</span>  <span class="c1"># tighter than before</span>
@@ -24568,7 +24568,7 @@ for product in products:
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'tight stack: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tight_products</span><span class="p">)</span><span class="si">}</span><span class="s1"> acquisition(s)'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">tight = EarthLens(
-    data_source='insar',
+    data_source='asf:insar',
     variables=['sentinel-1-slc'],
     reference=REFERENCE,
     perpendicular_baseline=(-50.0, 50.0),  # tighter than before
