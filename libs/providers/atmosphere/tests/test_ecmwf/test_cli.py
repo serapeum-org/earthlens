@@ -264,6 +264,43 @@ def _stub_client(monkeypatch, captured=None, seen_endpoints=None):
     monkeypatch.setattr(endpoints, "open_client", _open_client)
 
 
+class TestDiscardScratch:
+    """Removing one probe's scratch directory, and what it records if it cannot."""
+
+    def test_an_ordinary_directory_is_removed_and_not_recorded(
+        self, monkeypatch, tmp_path
+    ):
+        """The common path leaves nothing on disk and nothing to report."""
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+        scratch = tmp_path / "probe"
+        scratch.mkdir()
+        (scratch / "granule.nc").write_bytes(b"x")
+
+        ecmwf_cli._discard_scratch(str(scratch))
+
+        assert not scratch.exists(), "the scratch directory survived"
+        assert ecmwf_cli.UNREMOVED_SCRATCH == []
+
+    def test_an_already_gone_directory_is_not_recorded(self, monkeypatch, tmp_path):
+        """Nothing is left behind, so there is nothing to attribute."""
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+
+        ecmwf_cli._discard_scratch(str(tmp_path / "never-created"))
+
+        assert ecmwf_cli.UNREMOVED_SCRATCH == []
+
+    def test_a_survivor_is_recorded_once_per_call(self, monkeypatch, tmp_path):
+        """The sweep summary counts these, so a double entry would overstate it."""
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+        monkeypatch.setattr(shutil, "rmtree", _refuse_to_remove)
+        scratch = tmp_path / "probe"
+        scratch.mkdir()
+
+        ecmwf_cli._discard_scratch(str(scratch))
+
+        assert ecmwf_cli.UNREMOVED_SCRATCH == [str(scratch)]
+
+
 def _refuse_to_remove(path, **kwargs):
     """Stand in for a Windows reader that still holds the granule."""
 

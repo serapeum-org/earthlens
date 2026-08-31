@@ -386,6 +386,173 @@ def _audit_catalog(monkeypatch, datasets):
     )
 
 
+class TestRedactCredentials:
+    """The redaction itself, before `_error_summary` truncates what it returns."""
+
+    def test_a_secret_past_the_summary_cap_is_still_struck(self):
+        """`_error_summary` truncates at 160, which could hide a leak beyond it."""
+        raw = "x" * 400 + " Authorization: Bearer leaked-token-value"
+
+        redacted = hydrate_mod._redact_credentials(raw)
+
+        assert "leaked-token-value" not in redacted, "a secret survived past the cap"
+        assert hydrate_mod._REDACTED in redacted
+
+    def test_text_carrying_no_credential_is_returned_unchanged(self):
+        """Over-redacting costs the diagnosis the summary exists to give."""
+        raw = "400 Bad Request: month must be one of 01..12"
+
+        assert hydrate_mod._redact_credentials(raw) == raw
+
+    def test_every_occurrence_of_the_configured_key_is_struck(self, monkeypatch):
+        """One survivor is a leak, so a repeated key must not be partly missed."""
+        monkeypatch.setattr(
+            hydrate_mod, "_configured_keys", lambda: ["a-real-looking-key"]
+        )
+
+        redacted = hydrate_mod._redact_credentials(
+            "a-real-looking-key failed, retry with a-real-looking-key"
+        )
+
+        assert "a-real-looking-key" not in redacted
+        assert redacted.count(hydrate_mod._REDACTED) == 2
+
+    def test_the_longest_key_is_struck_first(self, monkeypatch):
+        """A key containing another must not be left half-redacted."""
+        monkeypatch.setattr(
+            hydrate_mod, "_configured_keys", lambda: ["long-key-prefix-and-suffix"]
+        )
+
+        redacted = hydrate_mod._redact_credentials("got long-key-prefix-and-suffix")
+
+        assert redacted == f"got {hydrate_mod._REDACTED}"
+
+
+class TestBlockSatisfies:
+    """One constraints block against the whole request a row will send."""
+
+    def test_a_block_offering_every_asked_key_satisfies(self):
+        """The ordinary case."""
+        block = {"product_type": ["forecast"], "year": ["2020"]}
+
+        assert hydrate_mod._block_satisfies(
+            {"product_type": ["forecast"], "year": ["2020"]}, block, set(block)
+        )
+
+    def test_one_disagreeing_key_is_enough_to_refuse(self):
+        """A request is answered whole or not at all."""
+        block = {"product_type": ["forecast"], "year": ["2020"]}
+
+        assert not hydrate_mod._block_satisfies(
+            {"product_type": ["forecast"], "year": ["2021"]}, block, set(block)
+        )
+
+    @pytest.mark.parametrize("value", [None, [], "surface_level", 3])
+    def test_a_value_that_is_not_a_populated_list_is_not_judged(self, value):
+        """A stripped or scalar selector carries no set to intersect."""
+        block = {"product_type": ["forecast"]}
+
+        assert hydrate_mod._block_satisfies(
+            {"product_type": ["forecast"], "level": value}, block, set(block)
+        )
+
+    def test_a_key_absent_everywhere_is_a_free_choice(self):
+        """Nothing partitions on it, so sending it constrains nothing."""
+        assert hydrate_mod._block_satisfies(
+            {"day": ["01"]}, {"product_type": ["forecast"]}, {"product_type"}
+        )
+
+    def test_a_key_absent_here_but_enumerated_elsewhere_is_a_conflict(self):
+        """It belongs to another product, so this block cannot answer it."""
+        assert not hydrate_mod._block_satisfies(
+            {"leadtime_hour": ["3"]},
+            {"product_type": ["analysis"]},
+            {"product_type", "leadtime_hour"},
+        )
+
+
+class TestPromisesData:
+    """Which rows the audit is entitled to judge."""
+
+    @pytest.mark.parametrize(
+        ("units", "unhydratable", "expected"),
+        [
+            ("K", None, True),
+            ("unknown", None, False),
+            ("unknown", "pseudo-slug", False),
+            ("K", "pseudo-slug", False),
+        ],
+    )
+    def test_only_a_filled_unmarked_row_promises_data(
+        self, units, unhydratable, expected
+    ):
+        """A placeholder promises nothing, so it cannot be failing to deliver."""
+        row = SimpleNamespace(units=units, unhydratable=unhydratable)
+
+        assert hydrate_mod._promises_data(row) is expected
+
+
+class TestUnserveableSelectors:
+    """One row's merged selectors, returned only when nothing can serve them."""
+
+    def test_a_serveable_row_returns_none(self):
+        """None means there is nothing to report."""
+        row = SimpleNamespace(cds_variable="2m_temperature", extras={})
+        lookup = _FixtureBlocks(
+            [{"variable": ["2m_temperature"], "product_type": ["forecast"]}]
+        )
+
+        assert (
+            hydrate_mod._unserveable_selectors(
+                {"product_type": ["forecast"]}, row, lookup
+            )
+            is None
+        )
+
+    def test_an_unserveable_row_returns_its_merged_selectors(self):
+        """The caller reports them, so the row's own extras must win."""
+        row = SimpleNamespace(
+            cds_variable="2m_temperature", extras={"product_type": ["reanalysis"]}
+        )
+        lookup = _FixtureBlocks(
+            [{"variable": ["2m_temperature"], "product_type": ["forecast"]}]
+        )
+
+        effective = hydrate_mod._unserveable_selectors(
+            {"product_type": ["analysis"], "day": ["01"]}, row, lookup
+        )
+
+        assert effective == {"product_type": ["reanalysis"], "day": ["01"]}
+
+    def test_a_variable_no_block_serves_is_not_judged(self):
+        """There is nothing to check the request against."""
+        row = SimpleNamespace(cds_variable="unknown_variable", extras={})
+        lookup = _FixtureBlocks([{"variable": ["2m_temperature"]}])
+
+        assert (
+            hydrate_mod._unserveable_selectors({"product_type": ["x"]}, row, lookup)
+            is None
+        )
+
+
+class TestQuoteIfNumberShaped:
+    """The guard that keeps a scalar's type the file's rather than the parser's."""
+
+    @pytest.mark.parametrize("value", ["1e-3", "08", "1.0", "0755"])
+    def test_a_bare_number_shaped_scalar_is_quoted(self, value):
+        """The emitter left it bare; another reader would give it a type."""
+        assert hydrate_mod._quote_if_number_shaped(value, value) == f"'{value}'"
+
+    @pytest.mark.parametrize("value", ["K", "W m-2", "2e", "day"])
+    def test_a_plain_scalar_is_left_alone(self, value):
+        """Quoting everything would churn the catalog for nothing."""
+        assert hydrate_mod._quote_if_number_shaped(value, value) == value
+
+    def test_an_already_quoted_scalar_is_not_quoted_twice(self):
+        """The emitter having quoted it means the type is already pinned."""
+        assert hydrate_mod._quote_if_number_shaped("'1'", "1") == "'1'"
+
+
 class TestAuditServeability:
     """The #1147 invariant as code, so its clean result can be re-derived."""
 
