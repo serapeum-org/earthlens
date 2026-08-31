@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24393,7 +24393,7 @@ time step becomes a band of the written GeoTIFF.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc:sea-level-forecast"</span><span class="p">,</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"sea-level-forecast"</span><span class="p">,</span>
     <span class="n">product</span><span class="o">=</span><span class="s2">"medium_term"</span><span class="p">,</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">50.0</span><span class="p">,</span> <span class="mf">58.0</span><span class="p">],</span>  <span class="c1"># North Sea</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
@@ -24402,7 +24402,7 @@ time step becomes a band of the written GeoTIFF.</p>
 <span class="n">paths</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">paths = EarthLens(
-    data_source="jrc:sea-level-forecast",
+    data_source="sea-level-forecast",
     product="medium_term",
     lat_lim=[50.0, 58.0],  # North Sea
     lon_lim=[-2.0, 10.0],
@@ -24500,7 +24500,7 @@ plt.show()</div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="3-global-coastal-summary">3. Global coastal summary<a class="anchor-link" href="#3-global-coastal-summary">¶</a></h2><p>The subseasonal product also publishes a global, per-country coastal summary as
-a table. The <code>jrc:coastal-forecast</code> key returns it directly as a <code>pandas.DataFrame</code>
+a table. The <code>coastal-forecast</code> key returns it directly as a <code>pandas.DataFrame</code>
 (exceedance probabilities against return-period thresholds, plus a 1–10 severity
 summary per country).</p>
 </div>
@@ -24525,11 +24525,11 @@ summary per country).</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">summary</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc:coastal-forecast"</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">summary</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"coastal-forecast"</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"countries:"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">summary</span><span class="p">))</span>
 <span class="n">summary</span><span class="p">[[</span><span class="s2">"GID_0"</span><span class="p">,</span> <span class="s2">"NAME_0"</span><span class="p">,</span> <span class="s2">"summary_TWL_1_10"</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">summary = EarthLens(data_source="jrc:coastal-forecast").download()
+<div class="clipboard-copy-txt" id="cell-4">summary = EarthLens(data_source="coastal-forecast").download()
 print("countries:", len(summary))
 summary[["GID_0", "NAME_0", "summary_TWL_1_10"]].head(10)</div>
 </div>
