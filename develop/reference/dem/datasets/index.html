@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23601,12 +23601,12 @@ buckets in <code>eu-central-1</code>, both cover the whole global land surface a
 </tbody>
 </table>
 <h2 id="discoverability-aliases"><a class="toclink" href="#discoverability-aliases">Discoverability aliases</a><a class="headerlink" href="#discoverability-aliases" title="Permanent link">#</a></h2>
-<p>The four keys <code>dem</code>, <code>copernicus-dem</code>, <code>cop-dem</code>, and <code>elevation</code> all
+<p>The four keys <code>dem</code>, <code>copernicus-dem</code>, <code>cop-dem</code>, and <code>dem:elevation</code> all
 route to the same backend — pick whichever reads best in your code:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;dem&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;copernicus-dem&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;cop-dem&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;elevation&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;dem:elevation&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="coverage"><a class="toclink" href="#coverage">Coverage</a><a class="headerlink" href="#coverage" title="Permanent link">#</a></h2>
 <p>Both grids are <strong>global land</strong>, tiled on the integer-degree grid. Ocean

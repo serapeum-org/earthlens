@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23563,19 +23563,19 @@ the <a href="../../ecmwf/introduction/"><code>ecmwf</code></a> backend's per-sto
 </thead>
 <tbody>
 <tr>
-<td><code>efhm</code> / <code>jrc-flood</code> / <code>jrc-flood-hazard</code> / <code>european-flood-hazard</code></td>
+<td><code>efhm</code> / <code>jrc-flood</code> / <code>jrc-flood-hazard</code> / <code>jrc:european-flood-hazard</code></td>
 <td>European Flood Hazard Map (river-flood depth per return period)</td>
 <td><code>flood_hazard_raster</code></td>
 <td><code>list[Path]</code> GeoTIFF</td>
 </tr>
 <tr>
-<td><code>sea-level-forecast</code> / <code>jrc-sea-level</code> / <code>twl-forecast</code></td>
+<td><code>jrc:sea-level-forecast</code> / <code>jrc-sea-level</code> / <code>jrc:twl-forecast</code></td>
 <td>Probabilistic Total Water Level (TWL) forecasts (gridded)</td>
 <td><code>sea_level_gridded</code></td>
 <td><code>list[Path]</code> GeoTIFF</td>
 </tr>
 <tr>
-<td><code>coastal-forecast</code></td>
+<td><code>jrc:coastal-forecast</code></td>
 <td>Subseasonal coastal per-country summary</td>
 <td><code>sea_level_coastal</code></td>
 <td><code>pandas.DataFrame</code></td>
@@ -23632,7 +23632,7 @@ forecast time step).</p>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># gridded medium-term TWL forecast, latest cycle, cropped to the North Sea</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;sea-level-forecast&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jrc:sea-level-forecast&quot;</span><span class="p">,</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">product</span><span class="o">=</span><span class="s2">&quot;medium_term&quot;</span><span class="p">,</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">],</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
@@ -23640,7 +23640,7 @@ forecast time step).</p>
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
 <a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="c1"># subseasonal global coastal summary -&gt; a pandas.DataFrame</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;coastal-forecast&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jrc:coastal-forecast&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 <p>The forecasts are read only over the AOI window (<code>/vsicurl</code>), so a small area
 transfers little of the 13–38 GB cube. Because a forecast cycle is chosen by
