@@ -40,6 +40,11 @@ _TRANSIENT_MARKERS = (
     "502",
     "503",
     "504",
+    # A 200 whose body is not a DDS is a maintenance / interstitial page from a
+    # variable-lister (see erddap `variables_for`): the server is briefly not
+    # serving real data, the same transient class as a 503. Without this it
+    # would fail the gate hard while the equivalent 503 only warned.
+    "did not return a dds",
 )
 
 

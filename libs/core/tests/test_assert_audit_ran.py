@@ -342,3 +342,30 @@ class TestMain:
             {"provider": "erddap", "status": "ok", "variable_status": "ok"},
         )
         assert checker.main([str(report)]) == 0, "a clean variable audit must pass"
+
+    def test_a_non_dds_variable_body_warns_like_a_503(self, checker, tmp_path, capsys):
+        """A 200 maintenance/interstitial body ("did not return a DDS") is transient.
+
+        The same server answering 503 only warns, so a 200 holding page must not
+        fail the gate harder than a 503 would.
+        """
+        report = _report(
+            tmp_path / "a.json",
+            {
+                "provider": "erddap",
+                "status": "ok",
+                "variable_status": "error",
+                "variable_detail": (
+                    "cwwcNDBCMet: https://x/erddap/tabledap/cwwcNDBCMet.dds "
+                    "did not return a DDS"
+                ),
+            },
+        )
+        assert checker.main([str(report)]) == 0, (
+            "a maintenance page must warn, not fail"
+        )
+        out = capsys.readouterr().out
+        assert "::warning::erddap: variable audit could not reach" in out, (
+            f"the non-DDS body was not treated as transient: {out}"
+        )
+        assert "::error::" not in out, f"a non-DDS body was escalated: {out}"
