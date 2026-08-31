@@ -31,7 +31,7 @@ def _facade(tmp_path: Path, **overrides: Any) -> EarthLens:
     return EarthLens(**params)
 
 
-@pytest.mark.parametrize("key", ["pvgis", "solar-pv"])
+@pytest.mark.parametrize("key", ["pvgis", "pvgis:solar-pv"])
 def test_keys_resolve_to_pvgis(key):
     """Both the canonical key and the alias resolve to the PVGIS class."""
     assert EarthLens.DataSources[key] is earthlens.pvgis.PVGIS

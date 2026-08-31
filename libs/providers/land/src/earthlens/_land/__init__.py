@@ -20,7 +20,7 @@ _FABDEM = "earthlens.fabdem"
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'ghsl': ('earthlens.ghsl', 'GHSL', '', {}),
     'ghs': ('earthlens.ghsl', 'GHSL', '', {}),
-    'human-settlement': ('earthlens.ghsl', 'GHSL', '', {}),
+    'ghsl:human-settlement': ('earthlens.ghsl', 'GHSL', '', {}),
     'worldpop': ('earthlens.worldpop', 'WorldPop', 'worldpop', {}),
     'world-pop': ('earthlens.worldpop', 'WorldPop', 'worldpop', {}),
     'gbif': ('earthlens.gbif', 'GBIF', 'gbif', {}),
@@ -40,8 +40,8 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'dem': ('earthlens.dem', 'DEM', 's3', {}),
     'copernicus-dem': ('earthlens.dem', 'DEM', 's3', {}),
     'cop-dem': ('earthlens.dem', 'DEM', 's3', {}),
-    'elevation': ('earthlens.dem', 'DEM', 's3', {}),
+    'dem:elevation': ('earthlens.dem', 'DEM', 's3', {}),
     'fabdem': (_FABDEM, 'FABDEM', '', {}),
     'fab-dem': (_FABDEM, 'FABDEM', '', {}),
-    'bare-earth-dem': (_FABDEM, 'FABDEM', '', {}),
+    'fabdem:bare-earth-dem': (_FABDEM, 'FABDEM', '', {}),
 }

@@ -13,7 +13,7 @@ from earthlens.earthlens import EarthLens
 
 pytestmark = pytest.mark.climate_indices
 
-KEYS = ["climate-indices", "climate_indices", "teleconnections"]
+KEYS = ["climate-indices", "climate_indices", "climate-indices:teleconnections"]
 
 DATA = Path(__file__).parent / "data"
 
@@ -80,7 +80,7 @@ class TestFacadeConstruction:
         """A faked download routed through the facade returns a long DataFrame."""
         monkeypatch.setattr(backend.requests, "get", _fake_get)
         df = EarthLens(
-            data_source="teleconnections",
+            data_source="climate-indices:teleconnections",
             variables=["oni"],
             start="2000-01-01",
             end="2001-12-31",

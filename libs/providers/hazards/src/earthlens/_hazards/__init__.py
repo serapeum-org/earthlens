@@ -52,13 +52,18 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'jrc-flood': (_JRC, 'JRC', '', {}),
     'efhm': (_JRC, 'JRC', '', {}),
     'jrc-flood-hazard': (_JRC, 'JRC', '', {}),
-    'european-flood-hazard': (_JRC, 'JRC', '', {}),
+    'jrc:european-flood-hazard': (_JRC, 'JRC', '', {}),
     # Sea-level (Total Water Level) probabilistic forecasts — same JRC backend;
     # dataset='sea_level' selects the family (product picks the row).
-    'sea-level-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
+    'jrc:sea-level-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
     'jrc-sea-level': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
-    'coastal-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level_subseasonal_coastal'}),
-    'twl-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
+    'jrc:coastal-forecast': (
+        _JRC,
+        'JRC',
+        '',
+        {'dataset': 'sea_level_subseasonal_coastal'},
+    ),
+    'jrc:twl-forecast': (_JRC, 'JRC', '', {'dataset': 'sea_level'}),
     'risk-indicators': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'thinkhazard': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'inform': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),

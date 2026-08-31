@@ -12,7 +12,7 @@ from earthlens.earthlens import EarthLens
 class TestFacadeRouting:
     """`EarthLens(data_source=...)` routing for the GHSL keys."""
 
-    @pytest.mark.parametrize("key", ["ghsl", "ghs", "human-settlement"])
+    @pytest.mark.parametrize("key", ["ghsl", "ghs", "ghsl:human-settlement"])
     def test_keys_registered(self, key):
         """Each GHSL key resolves to `earthlens.ghsl.GHSL`."""
         assert key in EarthLens.DataSources
