@@ -271,9 +271,6 @@ class _ProbeSession:
             `FAPAR_ERR` and `FAPAR_QFLAG` would otherwise report the same
             "nothing offered" as a store that answered with an empty file, and
             those call for opposite actions — widen the row, or chase the store.
-        answered: How many probes came back describing something. Zero while
-            `issued` is above zero means the store was asked and answered with
-            nothing, which is a different problem from never having asked.
         issued: How many probes were actually sent. Zero means the stanza named
             no `cds_variable` to probe, so nothing can be said about what the
             store would have returned.
@@ -286,7 +283,6 @@ class _ProbeSession:
         self.timed_out = False
         self.offered: set[str] = set()
         self.filtered: set[str] = set()
-        self.answered = 0
         self.issued = 0
 
     def __call__(
@@ -319,7 +315,6 @@ class _ProbeSession:
             data = _data_variables(meta)
             self.offered.update(data)
             self.filtered.update(set(meta) - set(data))
-            self.answered += bool(meta)
             return meta, selectors
         except TimeoutError as exc:
             self.timed_out = True
@@ -1362,7 +1357,10 @@ def _block_satisfies(
             # thereby broken. Treating absence as a conflict reported exactly
             # those rows, and other known-good ones with them.
             continue
-        if not (asked & offered):
+        if not asked <= offered:
+            # Subset, not intersection: the store builds the cross product of
+            # everything requested, so a selector naming one value it serves and
+            # one it does not is rejected whole. Intersection would pass it.
             return False
     for key in block:
         if key in _BLOCK_KEYS_NOT_REQUESTED:

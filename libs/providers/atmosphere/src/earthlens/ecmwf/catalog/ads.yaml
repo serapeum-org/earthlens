@@ -188,6 +188,7 @@ datasets:
         units: kg m-2 s-1
         extras:
           source: [biogenic]
+          version: [v3.1]
       ammonia:
         cds_variable: ammonia
         nc_variable: ammonia
@@ -211,6 +212,7 @@ datasets:
         units: kg m-2 s-1
         extras:
           source: [biogenic]
+          version: [v3.1]
       black-carbon:
         cds_variable: black_carbon
         nc_variable: black_carbon
@@ -335,18 +337,21 @@ datasets:
         units: kg m-2 s-1
         extras:
           source: [biogenic]
+          version: [v3.1]
       methyl-chloride:
         cds_variable: methyl_chloride
         nc_variable: emiss_bio
         units: kg m-2 s-1
         extras:
           source: [biogenic]
+          version: [v3.1]
       methyl-iodide:
         cds_variable: methyl_iodide
         nc_variable: emiss_bio
         units: kg m-2 s-1
         extras:
           source: [biogenic]
+          version: [v3.1]
       monoterpenes:
         cds_variable: monoterpenes
         nc_variable: monoterpenes

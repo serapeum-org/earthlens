@@ -871,6 +871,76 @@ def _curate_fill_empty(
     )
 
 
+def _report_serveability(providers: str, json_output: bool, strict: bool) -> None:
+    """Print the rows whose request the store cannot answer, and exit non-zero.
+
+    Dispatches on the `serveability_auditor` role rather than naming a provider,
+    so core stays backend-agnostic: a provider that can check its own requests
+    publishes the role, and one that cannot simply does not appear here.
+
+    Args:
+        providers: The provider selection from the command line.
+        json_output: Emit the findings as JSON rather than as a table.
+        strict: Exit non-zero when anything is reported.
+
+    Raises:
+        typer.Exit: Code 2 when no selected provider publishes the role or the
+            check could not run, code 1 under `--strict` when rows are found.
+    """
+    import json as _json
+
+    from earthlens._cli_tooling import dispatch_table
+
+    auditors = dispatch_table("serveability_auditor")
+    wanted = (
+        sorted(auditors)
+        if providers.strip().lower() == "all"
+        else [name.strip() for name in providers.split(",") if name.strip()]
+    )
+    usable = [name for name in wanted if name in auditors]
+    if not usable:
+        typer.echo(
+            "--serveable needs a provider that can check its own requests; "
+            f"available: {sorted(auditors) or 'none'}"
+        )
+        raise typer.Exit(code=2)
+
+    findings: list[tuple[str, str, str, dict[str, object]]] = []
+    for name in usable:
+        try:
+            rows = auditors[name]()
+        except Exception as exc:  # noqa: BLE001 - reported, not raised, per provider
+            typer.echo(f"{name}: could not check: {exc}")
+            raise typer.Exit(code=2) from exc
+        findings.extend((name, dataset, slug, sel) for dataset, slug, sel in rows)
+
+    if json_output:
+        typer.echo(
+            _json.dumps(
+                [
+                    {
+                        "provider": provider,
+                        "dataset": dataset,
+                        "slug": slug,
+                        "selectors": selectors,
+                    }
+                    for provider, dataset, slug, selectors in findings
+                ],
+                indent=1,
+                sort_keys=True,
+            )
+        )
+    elif not findings:
+        typer.echo("every curated row names a combination the store serves")
+    else:
+        typer.echo(f"{len(findings)} row(s) the store cannot answer:")
+        for provider, dataset, slug, selectors in findings:
+            asked = {key: value for key, value in selectors.items() if value}
+            typer.echo(f"  [{provider}] {dataset}/{slug}: {asked}")
+    if strict and findings:
+        raise typer.Exit(code=1)
+
+
 @datasets_app.command()
 def audit(
     providers: str = typer.Argument(
@@ -888,11 +958,24 @@ def audit(
         help="Classify the available universe by curation status "
         "(DONE/addressable/thin/table/missing) instead of drift. gee only.",
     ),
+    serveable: bool = typer.Option(
+        False,
+        "--serveable",
+        help="Report curated rows whose selectors no combination of the "
+        "store can answer, so a download returns nothing.",
+    ),
     json_output: bool = typer.Option(
         False, "--json", "-j", help="Emit the outcomes as JSON (for piping)."
     ),
 ) -> None:
     """Audit curated datasets against what each provider serves LIVE.
+
+    With `--serveable` it answers a narrower question than drift: not whether
+    the dataset still exists, but whether each curated row's own selectors name
+    a combination the store actually offers. A row can name a real variable with
+    the right unit and still fetch nothing, because the request it sends matches
+    no constraints block. Available for providers that publish the
+    `serveability_auditor` role.
 
     Goes to the **network** (like `refresh`): flags `broken` curated datasets
     the provider no longer serves — the drift a `--strict` CI gate fails on —
@@ -912,6 +995,10 @@ def audit(
         err_console().print(
             f"[dim]Auditing {len(selected)} provider(s) against live...[/dim]"
         )
+    if serveable:
+        _report_serveability(providers, json_output, strict)
+        return
+
     outcomes = [audit_one(info) for info in selected]
 
     if json_output:

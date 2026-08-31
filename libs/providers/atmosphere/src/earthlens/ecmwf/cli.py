@@ -98,6 +98,27 @@ def refresher(_catalog: Any) -> dict[str, list[str]]:
     return grouped
 
 
+def serveability_auditor() -> list[tuple[str, str, dict[str, Any]]]:
+    """Report curated rows whose request no constraints block can answer.
+
+    The `serveability_auditor` role behind `earthlens datasets audit ecmwf
+    --serveable`. Reads the store's public constraints only — no retrieve, no
+    credentials.
+
+    Returns:
+        One `(dataset_id, slug, effective_selectors)` per row the store cannot
+        answer, empty when every curated row names a combination it serves.
+
+    Raises:
+        ConstraintsUnavailable: When a dataset's constraints could not be read,
+            since a silent clean result from a run that checked nothing is
+            worse than an error.
+    """
+    from earthlens.ecmwf._hydrate import audit_serveability
+
+    return audit_serveability()
+
+
 def coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
     """Classify every `available_datasets:` id across all five stores.
 

@@ -360,6 +360,79 @@ class TestDeepSampleRowPicksTheRowsProduct:
         )
 
 
+class TestAuditServeableCommand:
+    """`datasets audit ecmwf --serveable`, so re-deriving needs no script."""
+
+    def test_a_clean_catalog_says_so(self, monkeypatch):
+        """Silence would leave a reader unsure the check ran."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(ecmwf_cli, "serveability_auditor", lambda: [])
+
+        result = CliRunner().invoke(app, ["datasets", "audit", "ecmwf", "--serveable"])
+
+        assert result.exit_code == 0, result.output
+        assert "names a combination the store serves" in result.output
+
+    def test_findings_are_listed_with_what_the_row_asks_for(self, monkeypatch):
+        """A bare count would not say which selector to look at."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(
+            hydrate,
+            "audit_serveability",
+            lambda: [("a-dataset", "a-slug", {"product_type": ["reanalysis"]})],
+        )
+
+        result = CliRunner().invoke(app, ["datasets", "audit", "ecmwf", "--serveable"])
+
+        assert "a-dataset/a-slug" in result.output
+        assert "reanalysis" in result.output
+
+    def test_strict_exits_non_zero_when_rows_are_reported(self, monkeypatch):
+        """So a CI gate can fail on it."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(
+            hydrate, "audit_serveability", lambda: [("d", "s", {"x": ["y"]})]
+        )
+
+        result = CliRunner().invoke(
+            app, ["datasets", "audit", "ecmwf", "--serveable", "--strict"]
+        )
+
+        assert result.exit_code == 1, result.output
+
+    def test_an_unreadable_store_exits_two_rather_than_reporting_clean(
+        self, monkeypatch
+    ):
+        """A run that checked nothing must not look like a run that found nothing."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        def _unavailable():
+            raise hydrate.ConstraintsUnavailable("the store could not be read")
+
+        monkeypatch.setattr(hydrate, "audit_serveability", _unavailable)
+
+        result = CliRunner().invoke(app, ["datasets", "audit", "ecmwf", "--serveable"])
+
+        assert result.exit_code == 2, result.output
+        assert "could not check" in result.output
+
+    def test_a_provider_without_the_role_is_refused(self):
+        """Only a provider publishing `serveability_auditor` can answer this."""
+        result = CliRunner().invoke(app, ["datasets", "audit", "gee", "--serveable"])
+
+        assert result.exit_code == 2, result.output
+        assert "check its own requests" in result.output
+
+    def test_the_role_is_published_by_the_provider_not_named_in_core(self):
+        """Core must stay backend-agnostic; the handler lives with ecmwf."""
+        from earthlens._cli_tooling import dispatch_table
+
+        assert "ecmwf" in dispatch_table("serveability_auditor")
+
+
 class TestEndpointFor:
     """Which CADS instance a dataset id is served from."""
 
