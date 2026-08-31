@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -5179,7 +5179,7 @@
   <span class="md-ellipsis">
     
   
-    JRC European flood hazard (EFHM)
+    JRC hazards (EFHM + sea-level)
   
 
     
@@ -5195,7 +5195,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    JRC European flood hazard (EFHM)
+    JRC hazards (EFHM + sea-level)
   
 
           </label>
@@ -5208,7 +5208,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../jrc-flood/introduction/" class="md-nav__link">
+      <a href="../jrc/introduction/" class="md-nav__link">
         
   
   
@@ -5236,7 +5236,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../jrc-flood/usage/" class="md-nav__link">
+      <a href="../jrc/usage/" class="md-nav__link">
         
   
   
@@ -5264,7 +5264,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../jrc-flood/datasets/" class="md-nav__link">
+      <a href="../jrc/datasets/" class="md-nav__link">
         
   
   
@@ -5292,7 +5292,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../jrc-flood/jrc-flood/" class="md-nav__link">
+      <a href="../jrc/jrc/" class="md-nav__link">
         
   
   
@@ -12705,34 +12705,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/showcases/nepal_glacier_flood_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    A glacier collapse hits the Nepal–China border, 26 August 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../examples/showcase/earthlens-satellites/" class="md-nav__link">
         
   
@@ -17604,7 +17576,7 @@
   <span class="md-ellipsis">
     
   
-    JRC European flood hazard (EFHM)
+    JRC hazards (EFHM + sea-level)
   
 
     
@@ -17620,7 +17592,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    JRC European flood hazard (EFHM)
+    JRC hazards (EFHM + sea-level)
   
 
           </label>
@@ -17633,14 +17605,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/jrc-flood/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../examples/jrc/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    JRC European flood hazard (EFHM) — catalog explorer (no network)
+    JRC hazards — catalog explorer (no network)
   
 
     
@@ -17661,7 +17633,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/jrc-flood/02_efhm_quickstart/" class="md-nav__link">
+      <a href="../../examples/jrc/02_efhm_quickstart/" class="md-nav__link">
         
   
   
@@ -17689,7 +17661,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/jrc-flood/03_return_periods/" class="md-nav__link">
+      <a href="../../examples/jrc/03_return_periods/" class="md-nav__link">
         
   
   
@@ -17697,6 +17669,34 @@
     
   
     EFHM return periods — how flood depth grows with rarity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/jrc/04_sea_level_forecast/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JRC sea-level (Total Water Level) forecasts
   
 
     
@@ -23923,7 +23923,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a> <span class="s1">&#39;aqueduct-flood-risk&#39;</span><span class="p">,</span> <span class="s1">&#39;aqueduct-floods&#39;</span><span class="p">,</span> <span class="s1">&#39;argo&#39;</span><span class="p">,</span> <span class="s1">&#39;argo-floats&#39;</span><span class="p">,</span> <span class="s1">&#39;argopy&#39;</span><span class="p">,</span> <span class="s1">&#39;asf&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a> <span class="s1">&#39;bare-earth-dem&#39;</span><span class="p">,</span> <span class="s1">&#39;bathymetry&#39;</span><span class="p">,</span> <span class="s1">&#39;bdc&#39;</span><span class="p">,</span> <span class="s1">&#39;brazil-data-cube&#39;</span><span class="p">,</span> <span class="s1">&#39;caravan&#39;</span><span class="p">,</span> <span class="s1">&#39;caravan-grdc&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a> <span class="s1">&#39;catrare&#39;</span><span class="p">,</span> <span class="s1">&#39;cdse&#39;</span><span class="p">,</span> <span class="s1">&#39;chc&#39;</span><span class="p">,</span> <span class="s1">&#39;chirps&#39;</span><span class="p">,</span> <span class="s1">&#39;climate-indices&#39;</span><span class="p">,</span> <span class="s1">&#39;climate-projections&#39;</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a> <span class="s1">&#39;climate_indices&#39;</span><span class="p">,</span> <span class="s1">&#39;cmems&#39;</span><span class="p">,</span> <span class="s1">&#39;cmip6&#39;</span><span class="p">,</span> <span class="s1">&#39;cop-dem&#39;</span><span class="p">,</span> <span class="s1">&#39;copernicus-dem&#39;</span><span class="p">,</span> <span class="s1">&#39;dea&#39;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a> <span class="s1">&#39;climate_indices&#39;</span><span class="p">,</span> <span class="s1">&#39;cmems&#39;</span><span class="p">,</span> <span class="s1">&#39;cmip6&#39;</span><span class="p">,</span> <span class="s1">&#39;coastal-forecast&#39;</span><span class="p">,</span> <span class="s1">&#39;cop-dem&#39;</span><span class="p">,</span> <span class="s1">&#39;copernicus-dem&#39;</span><span class="p">,</span> <span class="s1">&#39;dea&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a> <span class="s1">&#39;deafrica&#39;</span><span class="p">,</span> <span class="s1">&#39;dem&#39;</span><span class="p">,</span> <span class="s1">&#39;digital-earth-africa&#39;</span><span class="p">,</span> <span class="s1">&#39;digital-earth-australia&#39;</span><span class="p">,</span> <span class="s1">&#39;drought&#39;</span><span class="p">,</span> <span class="s1">&#39;earth-search&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a> <span class="s1">&#39;earthdata&#39;</span><span class="p">,</span> <span class="s1">&#39;ecmwf&#39;</span><span class="p">,</span> <span class="s1">&#39;edo&#39;</span><span class="p">,</span> <span class="s1">&#39;eea-aq&#39;</span><span class="p">,</span> <span class="s1">&#39;efhm&#39;</span><span class="p">,</span> <span class="s1">&#39;elevation&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a> <span class="s1">&#39;emdat&#39;</span><span class="p">,</span> <span class="s1">&#39;eodc&#39;</span><span class="p">,</span> <span class="s1">&#39;erddap&#39;</span><span class="p">,</span> <span class="s1">&#39;etopo&#39;</span><span class="p">,</span> <span class="s1">&#39;eumetsat&#39;</span><span class="p">,</span> <span class="s1">&#39;european-flood-hazard&#39;</span><span class="p">,</span> <span class="s1">&#39;fab-dem&#39;</span><span class="p">,</span>
@@ -23933,15 +23933,15 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a> <span class="s1">&#39;global-forest-watch&#39;</span><span class="p">,</span> <span class="s1">&#39;global-solar-atlas&#39;</span><span class="p">,</span> <span class="s1">&#39;global-wind-atlas&#39;</span><span class="p">,</span> <span class="s1">&#39;gloh2o&#39;</span><span class="p">,</span> <span class="s1">&#39;goes&#39;</span><span class="p">,</span> <span class="s1">&#39;google-earth-engine&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a> <span class="s1">&#39;grdc-caravan&#39;</span><span class="p">,</span> <span class="s1">&#39;gsa&#39;</span><span class="p">,</span> <span class="s1">&#39;gwa&#39;</span><span class="p">,</span> <span class="s1">&#39;hanze&#39;</span><span class="p">,</span> <span class="s1">&#39;hdx&#39;</span><span class="p">,</span> <span class="s1">&#39;himawari&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a> <span class="s1">&#39;human-settlement&#39;</span><span class="p">,</span> <span class="s1">&#39;inform&#39;</span><span class="p">,</span> <span class="s1">&#39;insar&#39;</span><span class="p">,</span> <span class="s1">&#39;ioos&#39;</span><span class="p">,</span> <span class="s1">&#39;isimip&#39;</span><span class="p">,</span> <span class="s1">&#39;isric&#39;</span><span class="p">,</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a> <span class="s1">&#39;iucn&#39;</span><span class="p">,</span> <span class="s1">&#39;jaxa&#39;</span><span class="p">,</span> <span class="s1">&#39;jaxa-earth&#39;</span><span class="p">,</span> <span class="s1">&#39;jrc-flood&#39;</span><span class="p">,</span> <span class="s1">&#39;jrc-flood-hazard&#39;</span><span class="p">,</span> <span class="s1">&#39;landsat&#39;</span><span class="p">,</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a> <span class="s1">&#39;iucn&#39;</span><span class="p">,</span> <span class="s1">&#39;jaxa&#39;</span><span class="p">,</span> <span class="s1">&#39;jaxa-earth&#39;</span><span class="p">,</span> <span class="s1">&#39;jrc-flood&#39;</span><span class="p">,</span> <span class="s1">&#39;jrc-flood-hazard&#39;</span><span class="p">,</span> <span class="s1">&#39;jrc-sea-level&#39;</span><span class="p">,</span> <span class="s1">&#39;landsat&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a> <span class="s1">&#39;mswep&#39;</span><span class="p">,</span> <span class="s1">&#39;mswx&#39;</span><span class="p">,</span> <span class="s1">&#39;national-water-model&#39;</span><span class="p">,</span> <span class="s1">&#39;natural-earth&#39;</span><span class="p">,</span> <span class="s1">&#39;nexrad&#39;</span><span class="p">,</span> <span class="s1">&#39;nfhl&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a> <span class="s1">&#39;nfip&#39;</span><span class="p">,</span> <span class="s1">&#39;nrel&#39;</span><span class="p">,</span> <span class="s1">&#39;nsi&#39;</span><span class="p">,</span> <span class="s1">&#39;nsrdb&#39;</span><span class="p">,</span> <span class="s1">&#39;nwis&#39;</span><span class="p">,</span> <span class="s1">&#39;nwm&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a> <span class="s1">&#39;nwp&#39;</span><span class="p">,</span> <span class="s1">&#39;obis&#39;</span><span class="p">,</span> <span class="s1">&#39;ohsome&#39;</span><span class="p">,</span> <span class="s1">&#39;openaq&#39;</span><span class="p">,</span> <span class="s1">&#39;openeo&#39;</span><span class="p">,</span> <span class="s1">&#39;openstreetmap&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a> <span class="s1">&#39;osm&#39;</span><span class="p">,</span> <span class="s1">&#39;overpass&#39;</span><span class="p">,</span> <span class="s1">&#39;overture&#39;</span><span class="p">,</span> <span class="s1">&#39;pangeo-cmip6&#39;</span><span class="p">,</span> <span class="s1">&#39;planetary-computer&#39;</span><span class="p">,</span> <span class="s1">&#39;protected-planet&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a> <span class="s1">&#39;ptree&#39;</span><span class="p">,</span> <span class="s1">&#39;pvgis&#39;</span><span class="p">,</span> <span class="s1">&#39;radar&#39;</span><span class="p">,</span> <span class="s1">&#39;radklim&#39;</span><span class="p">,</span> <span class="s1">&#39;radolan&#39;</span><span class="p">,</span> <span class="s1">&#39;redlist&#39;</span><span class="p">,</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a> <span class="s1">&#39;rgi&#39;</span><span class="p">,</span> <span class="s1">&#39;risk-indicators&#39;</span><span class="p">,</span> <span class="s1">&#39;sensor-community&#39;</span><span class="p">,</span> <span class="s1">&#39;sentinel-hub&#39;</span><span class="p">,</span> <span class="s1">&#39;sentinelhub&#39;</span><span class="p">,</span> <span class="s1">&#39;soilgrids&#39;</span><span class="p">,</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a> <span class="s1">&#39;rgi&#39;</span><span class="p">,</span> <span class="s1">&#39;risk-indicators&#39;</span><span class="p">,</span> <span class="s1">&#39;sea-level-forecast&#39;</span><span class="p">,</span> <span class="s1">&#39;sensor-community&#39;</span><span class="p">,</span> <span class="s1">&#39;sentinel-hub&#39;</span><span class="p">,</span> <span class="s1">&#39;sentinelhub&#39;</span><span class="p">,</span> <span class="s1">&#39;soilgrids&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a> <span class="s1">&#39;solar-pv&#39;</span><span class="p">,</span> <span class="s1">&#39;solar-wind-atlas&#39;</span><span class="p">,</span> <span class="s1">&#39;stac&#39;</span><span class="p">,</span> <span class="s1">&#39;teleconnections&#39;</span><span class="p">,</span> <span class="s1">&#39;thinkhazard&#39;</span><span class="p">,</span> <span class="s1">&#39;tiger&#39;</span><span class="p">,</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a> <span class="s1">&#39;tropycal&#39;</span><span class="p">,</span> <span class="s1">&#39;usdm&#39;</span><span class="p">,</span> <span class="s1">&#39;usgs-landsat&#39;</span><span class="p">,</span> <span class="s1">&#39;usgs-nwis&#39;</span><span class="p">,</span> <span class="s1">&#39;usgs-water&#39;</span><span class="p">,</span> <span class="s1">&#39;veda&#39;</span><span class="p">,</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a> <span class="s1">&#39;tropycal&#39;</span><span class="p">,</span> <span class="s1">&#39;twl-forecast&#39;</span><span class="p">,</span> <span class="s1">&#39;usdm&#39;</span><span class="p">,</span> <span class="s1">&#39;usgs-landsat&#39;</span><span class="p">,</span> <span class="s1">&#39;usgs-nwis&#39;</span><span class="p">,</span> <span class="s1">&#39;usgs-water&#39;</span><span class="p">,</span> <span class="s1">&#39;veda&#39;</span><span class="p">,</span>
 <a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a> <span class="s1">&#39;wdpa&#39;</span><span class="p">,</span> <span class="s1">&#39;wgms&#39;</span><span class="p">,</span> <span class="s1">&#39;wind-toolkit&#39;</span><span class="p">,</span> <span class="s1">&#39;world-pop&#39;</span><span class="p">,</span> <span class="s1">&#39;worldpop&#39;</span><span class="p">]</span>
 </code></pre></div>
 - Asking for an unknown backend raises <code>ValueError</code>:</p>
@@ -25518,7 +25518,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">             &#39;aqueduct-flood-risk&#39;, &#39;aqueduct-floods&#39;, &#39;argo&#39;, &#39;argo-floats&#39;, &#39;argopy&#39;, &#39;asf&#39;,</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">             &#39;bare-earth-dem&#39;, &#39;bathymetry&#39;, &#39;bdc&#39;, &#39;brazil-data-cube&#39;, &#39;caravan&#39;, &#39;caravan-grdc&#39;,</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">             &#39;catrare&#39;, &#39;cdse&#39;, &#39;chc&#39;, &#39;chirps&#39;, &#39;climate-indices&#39;, &#39;climate-projections&#39;,</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">             &#39;climate_indices&#39;, &#39;cmems&#39;, &#39;cmip6&#39;, &#39;cop-dem&#39;, &#39;copernicus-dem&#39;, &#39;dea&#39;,</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">             &#39;climate_indices&#39;, &#39;cmems&#39;, &#39;cmip6&#39;, &#39;coastal-forecast&#39;, &#39;cop-dem&#39;, &#39;copernicus-dem&#39;, &#39;dea&#39;,</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">             &#39;deafrica&#39;, &#39;dem&#39;, &#39;digital-earth-africa&#39;, &#39;digital-earth-australia&#39;, &#39;drought&#39;, &#39;earth-search&#39;,</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">             &#39;earthdata&#39;, &#39;ecmwf&#39;, &#39;edo&#39;, &#39;eea-aq&#39;, &#39;efhm&#39;, &#39;elevation&#39;,</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">             &#39;emdat&#39;, &#39;eodc&#39;, &#39;erddap&#39;, &#39;etopo&#39;, &#39;eumetsat&#39;, &#39;european-flood-hazard&#39;, &#39;fab-dem&#39;,</span>
@@ -25528,15 +25528,15 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">             &#39;global-forest-watch&#39;, &#39;global-solar-atlas&#39;, &#39;global-wind-atlas&#39;, &#39;gloh2o&#39;, &#39;goes&#39;, &#39;google-earth-engine&#39;,</span>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">             &#39;grdc-caravan&#39;, &#39;gsa&#39;, &#39;gwa&#39;, &#39;hanze&#39;, &#39;hdx&#39;, &#39;himawari&#39;,</span>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">             &#39;human-settlement&#39;, &#39;inform&#39;, &#39;insar&#39;, &#39;ioos&#39;, &#39;isimip&#39;, &#39;isric&#39;,</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">             &#39;iucn&#39;, &#39;jaxa&#39;, &#39;jaxa-earth&#39;, &#39;jrc-flood&#39;, &#39;jrc-flood-hazard&#39;, &#39;landsat&#39;,</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">             &#39;iucn&#39;, &#39;jaxa&#39;, &#39;jaxa-earth&#39;, &#39;jrc-flood&#39;, &#39;jrc-flood-hazard&#39;, &#39;jrc-sea-level&#39;, &#39;landsat&#39;,</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">             &#39;mswep&#39;, &#39;mswx&#39;, &#39;national-water-model&#39;, &#39;natural-earth&#39;, &#39;nexrad&#39;, &#39;nfhl&#39;,</span>
 <a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">             &#39;nfip&#39;, &#39;nrel&#39;, &#39;nsi&#39;, &#39;nsrdb&#39;, &#39;nwis&#39;, &#39;nwm&#39;,</span>
 <a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">             &#39;nwp&#39;, &#39;obis&#39;, &#39;ohsome&#39;, &#39;openaq&#39;, &#39;openeo&#39;, &#39;openstreetmap&#39;,</span>
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">             &#39;osm&#39;, &#39;overpass&#39;, &#39;overture&#39;, &#39;pangeo-cmip6&#39;, &#39;planetary-computer&#39;, &#39;protected-planet&#39;,</span>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">             &#39;ptree&#39;, &#39;pvgis&#39;, &#39;radar&#39;, &#39;radklim&#39;, &#39;radolan&#39;, &#39;redlist&#39;,</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">             &#39;rgi&#39;, &#39;risk-indicators&#39;, &#39;sensor-community&#39;, &#39;sentinel-hub&#39;, &#39;sentinelhub&#39;, &#39;soilgrids&#39;,</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">             &#39;rgi&#39;, &#39;risk-indicators&#39;, &#39;sea-level-forecast&#39;, &#39;sensor-community&#39;, &#39;sentinel-hub&#39;, &#39;sentinelhub&#39;, &#39;soilgrids&#39;,</span>
 <a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">             &#39;solar-pv&#39;, &#39;solar-wind-atlas&#39;, &#39;stac&#39;, &#39;teleconnections&#39;, &#39;thinkhazard&#39;, &#39;tiger&#39;,</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">             &#39;tropycal&#39;, &#39;usdm&#39;, &#39;usgs-landsat&#39;, &#39;usgs-nwis&#39;, &#39;usgs-water&#39;, &#39;veda&#39;,</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">             &#39;tropycal&#39;, &#39;twl-forecast&#39;, &#39;usdm&#39;, &#39;usgs-landsat&#39;, &#39;usgs-nwis&#39;, &#39;usgs-water&#39;, &#39;veda&#39;,</span>
 <a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">             &#39;wdpa&#39;, &#39;wgms&#39;, &#39;wind-toolkit&#39;, &#39;world-pop&#39;, &#39;worldpop&#39;]</span>
 <a id="__codelineno-0-474" name="__codelineno-0-474"></a>
 <a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">            ```</span>

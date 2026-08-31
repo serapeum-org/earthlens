@@ -589,15 +589,19 @@
          <lastmod>2026-08-31</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/jrc-flood/01_catalog_explorer/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/jrc/01_catalog_explorer/</loc>
          <lastmod>2026-08-31</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/jrc-flood/02_efhm_quickstart/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/jrc/02_efhm_quickstart/</loc>
          <lastmod>2026-08-31</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/jrc-flood/03_return_periods/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/jrc/03_return_periods/</loc>
+         <lastmod>2026-08-31</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/jrc/04_sea_level_forecast/</loc>
          <lastmod>2026-08-31</lastmod>
     </url>
     <url>
@@ -942,10 +946,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/mswep_precipitation_2020/</loc>
-         <lastmod>2026-08-31</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/nepal_glacier_flood_2026/</loc>
          <lastmod>2026-08-31</lastmod>
     </url>
     <url>
@@ -1773,19 +1773,19 @@
          <lastmod>2026-08-31</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/jrc-flood/datasets/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/jrc/datasets/</loc>
          <lastmod>2026-08-31</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/jrc-flood/introduction/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/jrc/introduction/</loc>
          <lastmod>2026-08-31</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/jrc-flood/jrc-flood/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/jrc/jrc/</loc>
          <lastmod>2026-08-31</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/jrc-flood/usage/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/jrc/usage/</loc>
          <lastmod>2026-08-31</lastmod>
     </url>
     <url>

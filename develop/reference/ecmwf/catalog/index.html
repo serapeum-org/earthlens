@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -5543,7 +5543,7 @@
   <span class="md-ellipsis">
     
   
-    JRC European flood hazard (EFHM)
+    JRC hazards (EFHM + sea-level)
   
 
     
@@ -5559,7 +5559,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    JRC European flood hazard (EFHM)
+    JRC hazards (EFHM + sea-level)
   
 
           </label>
@@ -5572,7 +5572,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../jrc-flood/introduction/" class="md-nav__link">
+      <a href="../../jrc/introduction/" class="md-nav__link">
         
   
   
@@ -5600,7 +5600,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../jrc-flood/usage/" class="md-nav__link">
+      <a href="../../jrc/usage/" class="md-nav__link">
         
   
   
@@ -5628,7 +5628,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../jrc-flood/datasets/" class="md-nav__link">
+      <a href="../../jrc/datasets/" class="md-nav__link">
         
   
   
@@ -5656,7 +5656,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../jrc-flood/jrc-flood/" class="md-nav__link">
+      <a href="../../jrc/jrc/" class="md-nav__link">
         
   
   
@@ -13069,34 +13069,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcases/nepal_glacier_flood_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    A glacier collapse hits the Nepal–China border, 26 August 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../examples/showcase/earthlens-satellites/" class="md-nav__link">
         
   
@@ -17968,7 +17940,7 @@
   <span class="md-ellipsis">
     
   
-    JRC European flood hazard (EFHM)
+    JRC hazards (EFHM + sea-level)
   
 
     
@@ -17984,7 +17956,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    JRC European flood hazard (EFHM)
+    JRC hazards (EFHM + sea-level)
   
 
           </label>
@@ -17997,14 +17969,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/jrc-flood/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../../examples/jrc/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    JRC European flood hazard (EFHM) — catalog explorer (no network)
+    JRC hazards — catalog explorer (no network)
   
 
     
@@ -18025,7 +17997,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/jrc-flood/02_efhm_quickstart/" class="md-nav__link">
+      <a href="../../../examples/jrc/02_efhm_quickstart/" class="md-nav__link">
         
   
   
@@ -18053,7 +18025,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/jrc-flood/03_return_periods/" class="md-nav__link">
+      <a href="../../../examples/jrc/03_return_periods/" class="md-nav__link">
         
   
   
@@ -18061,6 +18033,34 @@
     
   
     EFHM return periods — how flood depth grows with rarity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/jrc/04_sea_level_forecast/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JRC sea-level (Total Water Level) forecasts
   
 
     
@@ -24500,6 +24500,14 @@ conversion happens during download. The string here is used in the
 output filename for traceability and as documentation; downstream
 code is responsible for any conversion the user wants (e.g. K → °C,
 m → mm).</p>
+<p>The value is transcribed from the producer's own <code>units</code> attribute and is
+<strong>not normalised</strong>, so the catalog spans many spellings of one unit —
+<code>W m**-2</code>, <code>W m-2</code>, <code>W/m^2</code>; <code>K</code> and <code>kelvin</code>; <code>1</code>, <code>%</code>, and an empty
+string for a ratio. Rows of a single stanza can disagree, because the file
+they describe does: <code>satellite-surface-radiation-budget</code> labels <code>SRS</code>
+<code>W/m^2</code> and <code>SOL</code> <code>W m-2</code>. Rewriting either would make this row misdescribe
+the granule it documents and change the output filename, so the spelling is
+left as found. <strong>Compare units by parsing them, never by string equality.</strong></p>
 <h5 id="cds_variable"><a class="toclink" href="#cds_variable"><code>cds_variable</code></a><a class="headerlink" href="#cds_variable" title="Permanent link">#</a></h5>
 <p><em>Optional.</em> String. The exact <code>variable</code> request name CDS expects,
 e.g. <code>"2m_temperature"</code>, <code>"total_precipitation"</code>. Defaults to the
@@ -24614,6 +24622,24 @@ is a flat list, not a dict).</p>
 <code>pressure_level</code>. Most pressure-level variables inherit the parent
 default; use this only when one specific variable should pull a
 different level set than the rest of its dataset family. Rare.</p>
+<h5 id="unhydratable"><a class="toclink" href="#unhydratable"><code>unhydratable</code></a><a class="headerlink" href="#unhydratable" title="Permanent link">#</a></h5>
+<p><em>Optional.</em> String. Why a live probe can never fill this row's <code>units</code> /
+<code>nc_variable</code>. Absent means the row is simply not filled yet, and
+<code>earthlens datasets curate ecmwf --fill-empty</code> will try it; present means no
+retrieve can answer it, and the sweep skips the row rather than spending a
+request and a queue slot to rediscover that.</p>
+<p>Write the key only when the row is terminal. <code>unhydratable: null</code> (and <code>~</code>,
+and an empty value) load as absent, so they mean <em>pending</em> — the sweep will
+still probe such a row. There is no spelling of the key that means "skip me"
+other than a reason string.</p>
+<p>The only value in use is <code>pseudo-slug</code>: the row is keyed <code>all</code> or
+<code>all-variables</code>, naming every variable its dataset serves rather than one of
+them. That is resolvable only where the dataset serves exactly one variable —
+<code>satellite-precipitation</code> and <code>satellite-sea-surface-temperature</code> are hydrated
+that way and carry no mark. The mark records that this row has more than one
+candidate and so can never be pinned to a single variable.</p>
+<p>Without this, a placeholder waiting for a sweep and one no sweep can ever
+answer look identical, so every re-run pays for the second kind again.</p>
 <h5 id="request_kind-per-row"><a class="toclink" href="#request_kind-per-row"><code>request_kind</code> (per-row)</a><a class="headerlink" href="#request_kind-per-row" title="Permanent link">#</a></h5>
 <p><em>Optional.</em> Per-row override of the parent's <code>request_kind</code>. Very
 rare — usually the whole dataset shares one request-shape category,
