@@ -496,12 +496,17 @@ def gdal_module() -> ModuleType:
     """Return the vendored `osgeo.gdal` module.
 
     Imported through this one accessor so the multidim reads below have a single
-    seam a test can replace, and so `osgeo` is imported lazily (it only resolves
-    once `pyramids` has put its vendored copy on the path).
+    seam a test can replace, and so `osgeo` is imported lazily.
+
+    `osgeo` is not importable on its own: pyramids vendors GDAL under
+    `pyramids/_vendor/osgeo` and only puts it on the path as a side effect of
+    importing `pyramids`. Importing pyramids first is therefore load-bearing,
+    not decorative -- without it this raises `ModuleNotFoundError: osgeo`.
 
     Returns:
         ModuleType: The `osgeo.gdal` module.
     """
+    import pyramids  # noqa: F401 - side effect: puts the vendored osgeo on the path
     from osgeo import gdal
 
     # osgeo ships no stubs, so the import is Any; the cast restores the

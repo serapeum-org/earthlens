@@ -295,6 +295,11 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     if schema:
         return schema
 
+    # pyramids vendors GDAL under `pyramids/_vendor/osgeo` and only puts it on
+    # the path as a side effect of being imported, so `osgeo` is not importable
+    # before it. The pyramids read above already did that, but this fallback
+    # must not depend on that ordering holding.
+    import pyramids  # noqa: F401 - side effect: puts the vendored osgeo on the path
     from osgeo import gdal
 
     gdal.UseExceptions()
