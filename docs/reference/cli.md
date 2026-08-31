@@ -215,11 +215,14 @@ earthlens datasets refresh ghsl --tiles          # regenerate the tile grid
 ### `audit <providers>` — curated-vs-live drift (and coverage)
 
 Like `refresh`, but focused on the **curated** rows: flags `broken` curated ids the provider no longer
-serves (the drift a CI gate fails on) and, informationally, live ids missing from the index.
+serves (the drift a CI gate fails on) and, informationally, live ids missing from the index. For providers
+whose listing endpoint enumerates a dataset's variables (currently `erddap`, via each dataset's `.dds`), it
+also flags a curated **variable** the provider stopped serving or re-cased (e.g. `wtmp` → `WTMP`); providers
+that cannot enumerate variables report `unsupported` for that dimension, never a false `ok`.
 
 | Option | Meaning |
 |--------|---------|
-| `--strict` | exit non-zero if any curated dataset is no longer served live |
+| `--strict` | exit non-zero if any curated dataset id — or a curated variable a provider stopped serving — is no longer served live |
 | `--coverage` | switch to a **curation-coverage** report — classify the available universe into DONE / addressable / thin / table / missing, and list the highest-value ids to curate next (`gee`, `erddap`) |
 | `-j, --json` | JSON output |
 

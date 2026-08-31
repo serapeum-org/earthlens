@@ -320,6 +320,23 @@ class TestCuratedCollectionIds:
         assert ids == sorted(set(ids)), "sorted + de-duplicated"
 
 
+_WTMP_DDS = (
+    "Dataset {\n  Sequence {\n    Float32 ATMP;\n    Float32 WTMP;\n  } s;\n} s;\n"
+)
+
+
+def _raise_dds_error(record):
+    """A variable-lister stand-in that fails the way a bad `.dds` fetch would."""
+    raise RuntimeError("dds fetch failed")
+
+
+def _lister_fails_on_bad(record):
+    """A lister that fails for the 'bad' dataset and serves WTMP for the rest."""
+    if record.dataset_id == "bad":
+        raise RuntimeError("dds fetch failed")
+    return {"WTMP"}
+
+
 class TestAuditOne:
     """Tests for audit_one."""
 
@@ -348,6 +365,149 @@ class TestAuditOne:
         monkeypatch.setattr(stac_cli, "get_json", boom)
         assert audit_one(_info("stac")).status == "error", "failure captured"
 
+    def test_variable_drift_flags_a_recased_variable(self, monkeypatch):
+        """A curated variable the server re-cased (wtmp -> WTMP) is drift (#1129)."""
+        import earthlens.erddap.cli as erddap_cli
+        from earthlens.erddap.catalog import Dataset
+
+        record = Dataset(
+            server_url="https://x/erddap",
+            dataset_id="cwwcNDBCMet",
+            protocol="tabledap",
+            variables=["wtmp"],
+        )
+        catalog = SimpleNamespace(
+            datasets={"cwwcNDBCMet": record}, available_datasets=["cwwcNDBCMet"]
+        )
+        monkeypatch.setattr(refresh_mod, "load_catalog", lambda info: catalog)
+        monkeypatch.setitem(
+            refresh_mod._REFRESHERS,
+            "erddap",
+            lambda cat: {"https://x/erddap": ["cwwcNDBCMet"]},
+        )
+        monkeypatch.setattr(erddap_cli, "get_text", lambda url: _WTMP_DDS)
+        outcome = audit_one(_info("erddap"))
+        assert outcome.status == "ok", "id audit ran"
+        assert outcome.broken == [], "no id-level drift"
+        assert outcome.variable_status == "ok"
+        assert outcome.variable_drift == ["cwwcNDBCMet:wtmp"], (
+            "re-cased variable flagged"
+        )
+
+    def test_provider_without_variable_lister_reports_unsupported(self, monkeypatch):
+        """A provider with no variable-lister never reports a false variable ok."""
+        assert "stac" not in refresh_mod._VARIABLE_LISTERS, (
+            "stac gained a variable-lister; pick a provider that still lacks one"
+        )
+        monkeypatch.setattr(
+            stac_cli,
+            "get_json",
+            lambda url: {"collections": [{"id": "x"}], "links": []},
+        )
+        outcome = audit_one(_info("stac"))
+        assert outcome.status == "ok"
+        assert outcome.variable_status == "unsupported"
+
+
+class TestAuditVariables:
+    """Tests for the variable-drift dimension (_audit_variables)."""
+
+    @staticmethod
+    def _catalog(**variables_by_key):
+        """A fake catalog whose records carry the given variable lists."""
+        datasets = {
+            key: SimpleNamespace(variables=list(names), dataset_id=key)
+            for key, names in variables_by_key.items()
+        }
+        return SimpleNamespace(datasets=datasets)
+
+    def test_unsupported_when_no_lister(self):
+        """A provider with no variable-lister reports 'unsupported'."""
+        assert "gdacs" not in refresh_mod._VARIABLE_LISTERS, (
+            "gdacs gained a variable-lister; pick a provider that still lacks one"
+        )
+        status, drift, detail = refresh_mod._audit_variables(
+            self._catalog(a=["x"]), "gdacs"
+        )
+        assert status == "unsupported"
+        assert drift == []
+
+    def test_reports_drift_for_unserved_variable(self, monkeypatch):
+        """A curated variable the provider no longer serves is drift."""
+        monkeypatch.setitem(
+            refresh_mod._VARIABLE_LISTERS, "erddap", lambda rec: {"WTMP"}
+        )
+        status, drift, detail = refresh_mod._audit_variables(
+            self._catalog(cwwcNDBCMet=["wtmp"]), "erddap"
+        )
+        assert status == "ok"
+        assert drift == ["cwwcNDBCMet:wtmp"], "re-cased variable reported as drift"
+
+    def test_no_drift_when_all_served(self, monkeypatch):
+        """A curated variable still served is not drift."""
+        monkeypatch.setitem(
+            refresh_mod._VARIABLE_LISTERS, "erddap", lambda rec: {"WTMP", "ATMP"}
+        )
+        status, drift, detail = refresh_mod._audit_variables(
+            self._catalog(cwwcNDBCMet=["WTMP"]), "erddap"
+        )
+        assert status == "ok"
+        assert drift == []
+
+    def test_fetch_error_is_captured(self, monkeypatch):
+        """A lister that raises reports 'error' and names the dataset, never propagates."""
+        monkeypatch.setitem(refresh_mod._VARIABLE_LISTERS, "erddap", _raise_dds_error)
+        status, drift, detail = refresh_mod._audit_variables(
+            self._catalog(x=["v"]), "erddap"
+        )
+        assert status == "error"
+        assert drift == []
+        assert "x" in detail, "the failed dataset is named in the detail"
+
+    def test_partial_failure_keeps_other_datasets_drift(self, monkeypatch):
+        """One dataset's fetch failure never discards drift found for the others."""
+        monkeypatch.setitem(
+            refresh_mod._VARIABLE_LISTERS, "erddap", _lister_fails_on_bad
+        )
+        status, drift, detail = refresh_mod._audit_variables(
+            self._catalog(good=["wtmp"], bad=["v"]), "erddap"
+        )
+        assert status == "error", "the failed dataset marks the dimension errored"
+        assert drift == ["good:wtmp"], "the good dataset's drift is still reported"
+        assert "bad" in detail, "the failed dataset is named"
+
+    def test_dataset_without_variables_is_skipped(self, monkeypatch):
+        """A curated row with no `variables` is skipped, not fetched or flagged."""
+        seen: list[str] = []
+
+        def _lister(record):
+            seen.append(record.dataset_id)
+            return {"keep"}
+
+        monkeypatch.setitem(refresh_mod._VARIABLE_LISTERS, "erddap", _lister)
+        status, drift, detail = refresh_mod._audit_variables(
+            self._catalog(empty=[], kept=["keep"]), "erddap"
+        )
+        assert status == "ok", "the variable-less row keeps the audit ok"
+        assert drift == [], "the variable-less row adds no drift"
+        assert seen == ["kept"], "the variable-less row was not fetched"
+
+    def test_retired_dataset_is_not_variable_audited(self, monkeypatch):
+        """A curated id absent from `live` (id drift) is skipped, not re-fetched."""
+        seen: list[str] = []
+
+        def _lister(record):
+            seen.append(record.dataset_id)
+            return {"WTMP"}
+
+        monkeypatch.setitem(refresh_mod._VARIABLE_LISTERS, "erddap", _lister)
+        status, drift, detail = refresh_mod._audit_variables(
+            self._catalog(retired=["wtmp"], alive=["WTMP"]), "erddap", live={"alive"}
+        )
+        assert status == "ok", "the retired id keeps the audit ok"
+        assert detail == "", "the retired id makes no variable error"
+        assert seen == ["alive"], "the retired dataset's .dds was not fetched"
+
 
 class TestAuditOutcome:
     """Tests for AuditOutcome."""
@@ -357,6 +517,19 @@ class TestAuditOutcome:
         assert AuditOutcome("stac", "ok", broken=["gone"]).to_dict()["broken"] == [
             "gone"
         ]
+
+    def test_to_dict_carries_variable_dimension(self):
+        """to_dict exposes variable_status, variable_drift, and variable_detail."""
+        data = AuditOutcome(
+            "erddap",
+            "ok",
+            variable_status="error",
+            variable_drift=["cwwcNDBCMet:wtmp"],
+            variable_detail="bad: 404",
+        ).to_dict()
+        assert data["variable_status"] == "error"
+        assert data["variable_drift"] == ["cwwcNDBCMet:wtmp"]
+        assert data["variable_detail"] == "bad: 404"
 
 
 class TestRefreshOutcome:

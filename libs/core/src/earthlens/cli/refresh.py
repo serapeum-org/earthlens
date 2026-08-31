@@ -409,6 +409,13 @@ class AuditOutcome:
         curated_count: Number of curated upstream ids checked.
         broken: Curated upstream ids no longer served live (actionable drift).
         untracked: Live ids absent from the bundled index (informational).
+        variable_status: `"ok"` (variables were checked live), `"unsupported"`
+            (the provider cannot enumerate a dataset's variables), or `"error"`
+            (a variable fetch failed). Never a false `"ok"`.
+        variable_drift: Curated `"<dataset>:<variable>"` pairs the provider no
+            longer serves (a removed or re-cased variable) — actionable drift.
+        variable_detail: Failure reason when `variable_status == "error"` (names
+            the datasets whose variable fetch failed), else empty.
     """
 
     provider: str
@@ -418,6 +425,9 @@ class AuditOutcome:
     curated_count: int = 0
     broken: list[str] = field(default_factory=list)
     untracked: list[str] = field(default_factory=list)
+    variable_status: str = "unsupported"
+    variable_drift: list[str] = field(default_factory=list)
+    variable_detail: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         """Project the audit outcome to a JSON-friendly dict.
@@ -443,6 +453,9 @@ class AuditOutcome:
             "curated_count": self.curated_count,
             "broken": self.broken,
             "untracked": self.untracked,
+            "variable_status": self.variable_status,
+            "variable_drift": self.variable_drift,
+            "variable_detail": self.variable_detail,
         }
 
 
@@ -509,6 +522,15 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     **dispatch_table("curated_ids"),
 }
 
+#: Provider id -> a callable that, given one curated catalog record, returns the
+#: set of variable names the provider serves for it live. A provider publishes
+#: `variable_lister` only when its listing endpoint enumerates a dataset's
+#: variables (e.g. erddap's `.dds`); providers without one report
+#: `variable_status="unsupported"`, so the audit never claims false coverage.
+_VARIABLE_LISTERS: dict[str, Callable[[Any], set[str]]] = {
+    **dispatch_table("variable_lister"),
+}
+
 #: Provider id -> the catalog attribute holding its persisted informational
 #: index. Defaults to `available_datasets`; Overture's refreshable axis is
 #: its date-stamped `available_releases`, NWM's is its `available_configurations`.
@@ -559,6 +581,60 @@ def _bundled_ids(catalog: Any, provider: str) -> list[str]:
     return resolver(catalog) if resolver else [str(key) for key in catalog.datasets]
 
 
+def _audit_variables(
+    catalog: Any, provider: str, live: set[str] | None = None
+) -> tuple[str, list[str], str]:
+    """Diff each curated row's `variables` against what the provider serves live.
+
+    The per-dataset fetch is guarded individually: one dataset's `.dds` failure
+    (a transient blip, or a removed dataset whose `.dds` now 404s) is recorded
+    but does not discard the drift already found for the other datasets, so a
+    real re-casing is never lost because a sibling fetch failed.
+
+    Args:
+        catalog: The loaded provider `Catalog`.
+        provider: Canonical provider id.
+        live: The set of dataset ids the provider serves live, when known. A
+            curated id absent from it is already reported as id-level `broken`
+            drift, so it is skipped here — re-fetching a retired dataset's `.dds`
+            only wastes a request and manufactures a phantom variable-audit error
+            for what is really id drift. When `None`, every curated row is
+            audited (the identity of a live id matches the catalog key only for
+            providers whose keys are their served ids, currently the sole
+            `variable_lister` provider, erddap).
+
+    Returns:
+        A `(variable_status, variable_drift, variable_detail)` triple.
+        `variable_status` is `"unsupported"` when the provider has no
+        variable-lister, `"error"` when any dataset's fetch failed (even so, the
+        drift found for the datasets that did resolve is still returned), else
+        `"ok"`; `variable_drift` holds the sorted `"<dataset>:<variable>"` pairs
+        the provider no longer serves; `variable_detail` names the failed
+        datasets (empty unless `variable_status == "error"`).
+    """
+    lister = _VARIABLE_LISTERS.get(provider)
+    if lister is None:
+        return "unsupported", [], ""
+    drift: list[str] = []
+    errors: list[str] = []
+    for key, record in catalog.datasets.items():
+        if live is not None and key not in live:
+            continue
+        curated = getattr(record, "variables", None) or []
+        if not curated:
+            continue
+        try:
+            served = lister(record)
+        except Exception as exc:  # noqa: BLE001
+            # A per-record fetch failure is reported, never raised, so one
+            # dataset's `.dds` blip cannot discard the drift found for the rest.
+            errors.append(f"{key}: {exc}")
+            continue
+        drift.extend(f"{key}:{name}" for name in curated if name not in served)
+    status = "error" if errors else "ok"
+    return status, sorted(drift), "; ".join(errors)
+
+
 def audit_one(info: BackendInfo) -> AuditOutcome:
     """Audit a provider's curated catalog against its live index.
 
@@ -592,6 +668,9 @@ def audit_one(info: BackendInfo) -> AuditOutcome:
     curated = set(curated_fn(catalog)) if curated_fn else set(catalog.datasets)
     index_attr = _INDEX_ATTR.get(info.provider, "available_datasets")
     available = {str(ident) for ident in getattr(catalog, index_attr, [])}
+    variable_status, variable_drift, variable_detail = _audit_variables(
+        catalog, info.provider, live
+    )
     return AuditOutcome(
         provider=info.provider,
         status="ok",
@@ -602,6 +681,9 @@ def audit_one(info: BackendInfo) -> AuditOutcome:
         # in the available index (so a provider whose index lives elsewhere,
         # like openaq's `parameters`, doesn't report its curated rows as drift).
         untracked=sorted(live - available - curated),
+        variable_status=variable_status,
+        variable_drift=variable_drift,
+        variable_detail=variable_detail,
     )
 
 
