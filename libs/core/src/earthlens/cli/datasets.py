@@ -27,6 +27,7 @@ from earthlens.cli.query import (
 )
 from earthlens.cli.refresh import (
     _TILE_REGENS,
+    AuditOutcome,
     audit_one,
     coverage_one,
     refresh_one,
@@ -918,33 +919,42 @@ def audit(
         typer.echo(json.dumps([o.to_dict() for o in outcomes], indent=2))
     else:
         out_console().print(audit_table(outcomes))
-        for outcome in outcomes:
-            # `broken` and `variable_drift` are only ever populated on a
-            # successful audit of their dimension, so both lines carry the same
-            # `status == "ok"` guard for symmetry (`variable_drift` is empty
-            # unless `variable_status == "ok"`, which implies id-level "ok").
-            if outcome.status == "ok" and outcome.broken:
-                out_console().print(
-                    f"[red]broken in {outcome.provider}:[/red] "
-                    f"{', '.join(outcome.broken)}"
-                )
-            if outcome.status == "ok" and outcome.variable_drift:
-                out_console().print(
-                    f"[red]variable drift in {outcome.provider}:[/red] "
-                    f"{', '.join(outcome.variable_drift)}"
-                )
-            # A variable fetch that errored leaves `variable_status="error"`
-            # while the id audit stays "ok"; without this line it is visible
-            # only via `--json`, so a maintainer would see a clean table and no
-            # sign the variable dimension did not run.
-            if outcome.variable_status == "error":
-                out_console().print(
-                    f"[yellow]variable audit errored in {outcome.provider}:"
-                    f"[/yellow] {outcome.variable_detail or 'no detail given'}"
-                )
+        _print_audit_drift(outcomes)
 
     if strict and any(o.broken or o.variable_drift for o in outcomes):
         raise typer.Exit(code=1)
+
+
+def _print_audit_drift(outcomes: list[AuditOutcome]) -> None:
+    """Print the per-provider drift / variable-audit lines under the audit table.
+
+    Args:
+        outcomes: The audit outcomes to report — one line each for a provider
+            with broken ids, variable drift, or a variable-audit error.
+    """
+    for outcome in outcomes:
+        # `broken` and `variable_drift` are only ever populated on a successful
+        # audit of their dimension, so both lines carry the same `status == "ok"`
+        # guard for symmetry (`variable_drift` is empty unless
+        # `variable_status == "ok"`, which implies id-level "ok").
+        if outcome.status == "ok" and outcome.broken:
+            out_console().print(
+                f"[red]broken in {outcome.provider}:[/red] {', '.join(outcome.broken)}"
+            )
+        if outcome.status == "ok" and outcome.variable_drift:
+            out_console().print(
+                f"[red]variable drift in {outcome.provider}:[/red] "
+                f"{', '.join(outcome.variable_drift)}"
+            )
+        # A variable fetch that errored leaves `variable_status="error"` while
+        # the id audit stays "ok"; without this line it is visible only via
+        # `--json`, so a maintainer would see a clean table and no sign the
+        # variable dimension did not run.
+        if outcome.variable_status == "error":
+            out_console().print(
+                f"[yellow]variable audit errored in {outcome.provider}:"
+                f"[/yellow] {outcome.variable_detail or 'no detail given'}"
+            )
 
 
 def _audit_coverage(selected, *, json_output: bool) -> None:
