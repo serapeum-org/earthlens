@@ -208,9 +208,9 @@ datasets:
         units: W m-2
         extras:
           origin:
-          - noaa_ncei
+          - eumetsat
           product_family:
-          - hirs
+          - clara_a3
           sensor_on_satellite: null
           time_aggregation:
           - daily_mean
@@ -435,8 +435,6 @@ datasets:
         cds_variable: land_surface_temperature
         nc_variable: lst
         units: kelvin
-        extras:
-          observation_time: [day, night]
   satellite-methane:
     endpoint: cds
     request_kind: satellite_cdr

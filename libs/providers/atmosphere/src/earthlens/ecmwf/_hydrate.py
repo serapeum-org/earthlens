@@ -1198,7 +1198,21 @@ def _dataset_extras(block: str) -> dict[str, str]:
 #: bounding box, `data_format` is fixed at netcdf. Verified against the
 #: request assembly in `backend.py`.
 _BLOCK_KEYS_NOT_REQUESTED = frozenset(
-    {"variable", "year", "month", "day", "time", "date", "area", "data_format"}
+    {
+        "variable",
+        "year",
+        "month",
+        "day",
+        "time",
+        "date",
+        "area",
+        "data_format",
+        # The hindcast forms key on `hmonth` / `hday`, which the backend copies
+        # from the caller's dates. A row pinning them would fix itself to one
+        # date. `hyear` is not here: that one really does come from `extras`.
+        "hmonth",
+        "hday",
+    }
 )
 
 #: Selector values a row carries as typed fields rather than in `extras`,

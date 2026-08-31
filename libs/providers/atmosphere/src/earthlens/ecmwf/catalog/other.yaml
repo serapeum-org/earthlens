@@ -1520,6 +1520,11 @@ datasets:
         nc_variable: Rainf
         types: flux
         units: kg m**-2 s**-1
+        extras:
+          product:
+          - wfde5
+          reference_dataset:
+          - cru
       near-surface-wind-speed-nsmv:
         cds_variable: near_surface_wind_speed
         nc_variable: Wind
@@ -3357,10 +3362,16 @@ datasets:
         cds_variable: 10m_wind_speed
         nc_variable: Wind_Speed_10m_Mean
         units: m s-1
+        extras:
+          statistic:
+          - 24_hour_mean
       2m-dewpoint-temperature:
         cds_variable: 2m_dewpoint_temperature
         nc_variable: Dew_Point_Temperature_2m_Mean
         units: K
+        extras:
+          statistic:
+          - 24_hour_mean
       2m-relative-humidity:
         cds_variable: 2m_relative_humidity
         nc_variable: Relative_Humidity_2m_06h
@@ -3377,10 +3388,16 @@ datasets:
         cds_variable: 2m_temperature
         nc_variable: Temperature_Air_2m_Max_24h
         units: K
+        extras:
+          statistic:
+          - 24_hour_maximum
       cloud-cover:
         cds_variable: cloud_cover
         nc_variable: Cloud_Cover_Mean
         units: (0-1)
+        extras:
+          statistic:
+          - 24_hour_mean
       liquid-precipitation-duration-fraction:
         cds_variable: liquid_precipitation_duration_fraction
         nc_variable: Precipitation_Rain_Duration_Fraction
@@ -3405,10 +3422,16 @@ datasets:
         cds_variable: snow_thickness
         nc_variable: Snow_Thickness_Mean
         units: cm
+        extras:
+          statistic:
+          - 24_hour_mean
       snow-thickness-lwe:
         cds_variable: snow_thickness_lwe
         nc_variable: Snow_Thickness_LWE_Mean
         units: cm
+        extras:
+          statistic:
+          - 24_hour_mean
       solar-radiation-flux:
         cds_variable: solar_radiation_flux
         nc_variable: Solar_Radiation_Flux
@@ -3421,6 +3444,9 @@ datasets:
         cds_variable: vapour_pressure
         nc_variable: Vapour_Pressure_Mean
         units: hPa
+        extras:
+          statistic:
+          - 24_hour_mean
       vapour-pressure-deficit-at-maximum-temperature:
         cds_variable: vapour_pressure_deficit_at_maximum_temperature
         nc_variable: Vapour_Pressure_Deficit_at_Maximum_Temperature
@@ -3636,49 +3662,83 @@ datasets:
         nc_variable: aridity_annual-mean
         units: '1'
         extras:
-          experiment: [rcp4_5, rcp8_5]
+          derived_variable:
+          - annual_mean
+          experiment:
+          - rcp4_5
+          - rcp8_5
       dry-spells:
         cds_variable: dry_spells
         nc_variable: dry-spells_maximum-length
         units: days
+        extras:
+          derived_variable:
+          - maximum_length
       dry-days:
         cds_variable: dry_days
         nc_variable: dry-days_annual-sum
         units: days year**-1
+        extras:
+          derived_variable:
+          - annual_sum
       summer-days:
         cds_variable: summer_days
         nc_variable: summer-days_annual-sum
         units: days year**-1
+        extras:
+          derived_variable:
+          - annual_sum
       surface-latent-heat-flux:
         cds_variable: surface_latent_heat_flux
         nc_variable: surface-latent-heat-flux_annual-mean
         units: W m-2
         extras:
-          experiment: [rcp4_5, rcp8_5]
+          derived_variable:
+          - annual_mean
+          experiment:
+          - rcp4_5
+          - rcp8_5
       surface-sensible-heat-flux:
         cds_variable: surface_sensible_heat_flux
         nc_variable: surface-sensible-heat-flux_annual-mean
         units: W m-2
         extras:
-          experiment: [rcp4_5, rcp8_5]
+          derived_variable:
+          - annual_mean
+          experiment:
+          - rcp4_5
+          - rcp8_5
       evaporative-fraction:
         cds_variable: evaporative_fraction
         nc_variable: evaporative-fraction_annual-mean
         units: '1'
         extras:
-          experiment: [rcp4_5, rcp8_5]
+          derived_variable:
+          - annual_mean
+          experiment:
+          - rcp4_5
+          - rcp8_5
       frost-days:
         cds_variable: frost_days
         nc_variable: frost-days_annual-sum
         units: days year**-1
+        extras:
+          derived_variable:
+          - annual_sum
       growing-season:
         cds_variable: growing_season
         nc_variable: growing-season_end
         units: day since 1 January
+        extras:
+          derived_variable:
+          - end_of_season
       growing-degree-days:
         cds_variable: growing_degree_days
         nc_variable: growing-degree-days_annual-sum
         units: K days year**-1
+        extras:
+          derived_variable:
+          - annual_sum
       growing-degree-days-during-growing-season-length:
         cds_variable: growing_degree_days_during_growing_season_length
         nc_variable: growing-degree-days-during-growing-season-length
@@ -3688,14 +3748,23 @@ datasets:
         nc_variable: koeppen-geiger-class
         units: ''
         extras:
-          experiment: [rcp4_5, rcp8_5]
-          temporal_aggregation: [climatology]
+          experiment:
+          - rcp4_5
+          - rcp8_5
+          statistic:
+          - mean
+          temporal_aggregation:
+          - climatology
       potential-evaporation:
         cds_variable: potential_evaporation
         nc_variable: potential-evaporation_annual-mean
         units: m s**-1
         extras:
-          experiment: [rcp4_5, rcp8_5]
+          derived_variable:
+          - annual_mean
+          experiment:
+          - rcp4_5
+          - rcp8_5
       sea-ice-concentration:
         cds_variable: sea_ice_concentration
         nc_variable: sea_ice_concentration
@@ -3998,42 +4067,72 @@ datasets:
         cds_variable: aridity
         nc_variable: aridity_annual-mean
         units: '1'
+        extras:
+          derived_variable:
+          - annual_mean
       dry-spells:
         cds_variable: dry_spells
         nc_variable: dry-spells_maximum-length
         units: days
+        extras:
+          derived_variable:
+          - maximum_length
       dry-days:
         cds_variable: dry_days
         nc_variable: dry-days_annual-sum
         units: days year**-1
+        extras:
+          derived_variable:
+          - annual_sum
       summer-days:
         cds_variable: summer_days
         nc_variable: summer-days_annual-sum
         units: days year**-1
+        extras:
+          derived_variable:
+          - annual_sum
       surface-latent-heat-flux:
         cds_variable: surface_latent_heat_flux
         nc_variable: surface-latent-heat-flux_annual-mean
         units: W m**-2
+        extras:
+          derived_variable:
+          - annual_mean
       surface-sensible-heat-flux:
         cds_variable: surface_sensible_heat_flux
         nc_variable: surface-sensible-heat-flux_annual-mean
         units: W m**-2
+        extras:
+          derived_variable:
+          - annual_mean
       evaporative-fraction:
         cds_variable: evaporative_fraction
         nc_variable: evaporative-fraction_annual-mean
         units: '1'
+        extras:
+          derived_variable:
+          - annual_mean
       frost-days:
         cds_variable: frost_days
         nc_variable: frost-days_annual-sum
         units: days year**-1
+        extras:
+          derived_variable:
+          - annual_sum
       growing-season:
         cds_variable: growing_season
         nc_variable: growing-season_end
         units: day since 1 January
+        extras:
+          derived_variable:
+          - end_of_season
       growing-degree-days:
         cds_variable: growing_degree_days
         nc_variable: growing-degree-days_annual-sum
         units: K days year**-1
+        extras:
+          derived_variable:
+          - annual_sum
       growing-degree-days-during-growing-season-length:
         cds_variable: growing_degree_days_during_growing_season_length
         nc_variable: growing-degree-days-during-growing-season-length
@@ -4043,66 +4142,97 @@ datasets:
         nc_variable: koeppen-geiger-class
         units: ''
         extras:
-          temporal_aggregation: [climatology]
+          statistic:
+          - mean
+          temporal_aggregation:
+          - climatology
       potential-evaporation:
         cds_variable: potential_evaporation
         nc_variable: potential-evaporation_annual-mean
         units: m s**-1
+        extras:
+          derived_variable:
+          - annual_mean
       sea-ice-concentration:
         cds_variable: sea_ice_concentration
         nc_variable: sea-ice-concentration
         units: '1'
         extras:
+          derived_variable:
+          - monthly_mean
           temporal_aggregation:
-          - climatology
+          - monthly
       sea-surface-temperature:
         cds_variable: sea_surface_temperature
         nc_variable: sea-surface-temperature
         units: K
         extras:
+          derived_variable:
+          - monthly_mean
           temporal_aggregation:
-          - climatology
+          - monthly
       2m-temperature:
         cds_variable: 2m_temperature
         nc_variable: temperature_annual-maximum
         units: K
+        extras:
+          derived_variable:
+          - annual_maximum
       precipitation:
         cds_variable: precipitation
         nc_variable: precipitation_daily-mean-annual-maximum
         units: m s**-1
+        extras:
+          derived_variable:
+          - annual_maximum_of_daily_mean
       water-vapour-pressure:
         cds_variable: water_vapour_pressure
         nc_variable: water-vapor-pressure_annual-mean
         units: Pa
+        extras:
+          derived_variable:
+          - annual_mean
       cloud-cover:
         cds_variable: cloud_cover
         nc_variable: cloud-cover_annual-mean
         units: '1'
+        extras:
+          derived_variable:
+          - annual_mean
       volumetric-soil-water:
         cds_variable: volumetric_soil_water
         nc_variable: volumetric-soil-water-layer-1_annual-mean
         units: m**3 m**-3
+        extras:
+          derived_variable:
+          - annual_mean
       wind-speed:
         cds_variable: wind_speed
         nc_variable: wind-speed
         units: m s**-1
         extras:
+          derived_variable:
+          - monthly_mean
           temporal_aggregation:
-          - climatology
+          - monthly
       zonal-wind-speed:
         cds_variable: zonal_wind_speed
         nc_variable: zonal-wind-speed
         units: m s**-1
         extras:
+          derived_variable:
+          - monthly_mean
           temporal_aggregation:
-          - climatology
+          - monthly
       meridional-wind-speed:
         cds_variable: meridional_wind_speed
         nc_variable: meridional-wind-speed
         units: m s**-1
         extras:
+          derived_variable:
+          - monthly_mean
           temporal_aggregation:
-          - climatology
+          - monthly
   sis-biodiversity-era5-regional:
     endpoint: cds
     request_kind: form
@@ -4199,69 +4329,145 @@ datasets:
         nc_variable: aridity_annual-mean
         units: '1'
         extras:
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_mean
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       dry-spells:
         cds_variable: dry_spells
         nc_variable: dry-spells_maximum-length
         units: days
         extras:
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - maximum_length
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       dry-days:
         cds_variable: dry_days
         nc_variable: dry-days_annual-sum
         units: days year**-1
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_sum
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       summer-days:
         cds_variable: summer_days
         nc_variable: summer-days_annual-sum
         units: days year**-1
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_sum
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       surface-latent-heat-flux:
         cds_variable: surface_latent_heat_flux
         nc_variable: surface-latent-heat-flux_annual-mean
         units: W m**-2
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_mean
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       surface-sensible-heat-flux:
         cds_variable: surface_sensible_heat_flux
         nc_variable: surface-sensible-heat-flux_annual-mean
         units: W m**-2
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_mean
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       evaporative-fraction:
         cds_variable: evaporative_fraction
         nc_variable: evaporative-fraction_annual-mean
         units: '1'
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_mean
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       frost-days:
         cds_variable: frost_days
         nc_variable: frost-days_annual-sum
         units: days year**-1
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_sum
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       growing-season:
         cds_variable: growing_season
         nc_variable: growing-season_end
         units: day since 1 January
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - end_of_season
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       growing-degree-days:
         cds_variable: growing_degree_days
         nc_variable: growing-degree-days_annual-sum
         units: K days year**-1
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_sum
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       growing-degree-days-during-growing-season-length:
         cds_variable: growing_degree_days_during_growing_season_length
         nc_variable: growing-degree-days-during-growing-season-length
@@ -4279,57 +4485,121 @@ datasets:
         nc_variable: potential-evaporation_annual-mean
         units: m s**-1
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_mean
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       2m-temperature:
         cds_variable: 2m_temperature
         nc_variable: temperature_annual-maximum
         units: K
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_maximum
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       precipitation:
         cds_variable: precipitation
         nc_variable: precipitation_daily-mean-annual-maximum
         units: m s**-1
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_maximum_of_daily_mean
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       water-vapor-pressure:
         cds_variable: water_vapor_pressure
         nc_variable: water-vapor-pressure_annual-mean
         units: Pa
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_mean
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       cloud-cover:
         cds_variable: cloud_cover
         nc_variable: cloud-cover_annual-mean
         units: '1'
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_mean
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       volumetric-soil-water:
         cds_variable: volumetric_soil_water
         nc_variable: volumetric-soil-water-layer-1_annual-mean
         units: m**3 m**-3
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - annual_mean
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       wind-speed:
         cds_variable: wind_speed
         nc_variable: wind-speed
         units: m s**-1
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - monthly_mean
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       zonal-wind-speed:
         cds_variable: zonal_wind_speed
         nc_variable: zonal-wind-speed
         units: m s**-1
         extras:
-          region: [central_africa, europe]
-          statistic: [25th_quartile, 75th_quartile, mean, median]
+          derived_variable:
+          - monthly_mean
+          region:
+          - central_africa
+          - europe
+          statistic:
+          - 25th_quartile
+          - 75th_quartile
+          - mean
+          - median
       meridional-wind-speed:
         cds_variable: meridional_wind_speed
         nc_variable: meridional_wind_speed
@@ -4498,23 +4768,32 @@ datasets:
         nc_variable: snowfall_amount
         units: mm
         extras:
-          temporal_aggregation: [yearly]
+          temporal_aggregation:
+          - yearly
       relative-sea-level-rise:
         cds_variable: relative_sea_level_rise
         nc_variable: MSL
         units: m
         extras:
-          origin: [projections]
-          temporal_aggregation: [yearly]
-          version: [v1_0, v2_0]
+          experiment:
+          - ssp5_8_5
+          origin:
+          - projections
+          temporal_aggregation:
+          - yearly
       extreme-sea-level:
         cds_variable: extreme_sea_level
         nc_variable: return_mean_water_level
         units: m
         extras:
-          origin: [projections]
-          temporal_aggregation: [yearly]
-          version: [v1_0, v2_0]
+          experiment:
+          - ssp5_8_5
+          gcm:
+          - cm2_vhr4
+          origin:
+          - projections
+          temporal_aggregation:
+          - yearly
       tiger-mosquito-season-length:
         cds_variable: tiger_mosquito_season_length
         nc_variable: tiger_mosquito_season_length
@@ -4943,7 +5222,11 @@ datasets:
         nc_variable: r90pday
         units: day
         extras:
-          temporal_aggregation: [monthly, yearly]
+          percentile:
+          - 99th
+          temporal_aggregation:
+          - monthly
+          - yearly
       number-of-wet-days:
         cds_variable: number_of_wet_days
         nc_variable: rr1
@@ -4976,7 +5259,10 @@ datasets:
         nc_variable: nrr95p
         units: '-'
         extras:
-          temporal_aggregation: [daily]
+          percentile:
+          - 99th
+          temporal_aggregation:
+          - daily
   sis-european-wind-storm-indicators:
     endpoint: cds
     request_kind: form
@@ -5358,9 +5644,11 @@ datasets:
         nc_variable: tas
         units: K
         extras:
-          day:
-          - '01'
           hydrological_model: null
+          leadtime_hour:
+          - '4320'
+          meteorological_source:
+          - cmcc_s35
           product_type:
           - forecast
           spatial_extent:
@@ -5372,9 +5660,11 @@ datasets:
         nc_variable: pr
         units: kg m-2
         extras:
-          day:
-          - '01'
           hydrological_model: null
+          leadtime_hour:
+          - '4320'
+          meteorological_source:
+          - cmcc_s35
           product_type:
           - forecast
           spatial_extent:
@@ -5420,18 +5710,46 @@ datasets:
         cds_variable: river_discharge
         nc_variable: rdis
         units: m3 s-1
+        extras:
+          hydrological_model:
+          - e_hypegrid_v30
+          spatial_extent:
+          - gridded_5_km
+          temporal_aggregation:
+          - daily
       runoff-water-equivalent:
         cds_variable: runoff_water_equivalent
         nc_variable: run
         units: kg m-2
+        extras:
+          hydrological_model:
+          - e_hypegrid_v30
+          spatial_extent:
+          - gridded_5_km
+          temporal_aggregation:
+          - daily
       snow-depth-water-equivalent:
         cds_variable: snow_depth_water_equivalent
         nc_variable: swe
         units: kg m-2
+        extras:
+          hydrological_model:
+          - e_hypegrid_v30
+          spatial_extent:
+          - gridded_5_km
+          temporal_aggregation:
+          - daily
       soil-wetness-index-in-root-zone:
         cds_variable: soil_wetness_index_in_root_zone
         nc_variable: smoist
         units: ''
+        extras:
+          hydrological_model:
+          - e_hypegrid_v30
+          spatial_extent:
+          - gridded_5_km
+          temporal_aggregation:
+          - daily
   sis-hydrology-meteorology-derived-projections:
     endpoint: cds
     request_kind: form

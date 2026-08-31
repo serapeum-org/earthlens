@@ -25,11 +25,21 @@ datasets:
         nc_variable: u100
         types: state
         units: m s**-1
+        extras:
+          originating_centre:
+          - meteo_france
+          system:
+          - '9'
       100m-v-component-of-wind-seasonal-orig:
         cds_variable: 100m_v_component_of_wind
         nc_variable: v100
         types: state
         units: m s**-1
+        extras:
+          originating_centre:
+          - meteo_france
+          system:
+          - '9'
       10m-u-component-of-wind-seasonal-orig:
         cds_variable: 10m_u_component_of_wind
         nc_variable: u10
@@ -111,6 +121,11 @@ datasets:
         nc_variable: snowc
         types: state
         units: '%'
+        extras:
+          originating_centre:
+          - meteo_france
+          system:
+          - '9'
       snow-density-seasonal-orig:
         cds_variable: snow_density
         nc_variable: rsn
@@ -136,6 +151,9 @@ datasets:
         nc_variable: ssro
         types: flux
         units: m
+        extras:
+          originating_centre:
+          - eccc
       surface-latent-heat-flux-seasonal-orig:
         cds_variable: surface_latent_heat_flux
         nc_variable: mslhfl
@@ -156,6 +174,9 @@ datasets:
         nc_variable: sro
         types: flux
         units: kg m**-2
+        extras:
+          originating_centre:
+          - eccc
       surface-sensible-heat-flux-seasonal-orig:
         cds_variable: surface_sensible_heat_flux
         nc_variable: msshfl
@@ -176,6 +197,9 @@ datasets:
         nc_variable: tisr
         types: state
         units: J m**-2
+        extras:
+          originating_centre:
+          - eccc
       top-net-solar-radiation-seasonal-orig:
         cds_variable: top_net_solar_radiation
         nc_variable: tsr
@@ -196,16 +220,25 @@ datasets:
         nc_variable: tciw
         types: state
         units: kg m**-2
+        extras:
+          originating_centre:
+          - eccc
       total-column-cloud-liquid-water-seasonal-orig:
         cds_variable: total_column_cloud_liquid_water
         nc_variable: tclw
         types: state
         units: kg m**-2
+        extras:
+          originating_centre:
+          - eccc
       total-column-water-vapour-seasonal-orig:
         cds_variable: total_column_water_vapour
         nc_variable: tcwv
         types: state
         units: kg m**-2
+        extras:
+          originating_centre:
+          - eccc
       total-precipitation-seasonal-orig:
         cds_variable: total_precipitation
         nc_variable: tprate
@@ -216,6 +249,9 @@ datasets:
         nc_variable: vsw
         types: state
         units: m**3 m**-3
+        extras:
+          originating_centre:
+          - eccc
   seasonal-postprocessed-single-levels:
     product_type:
     - reanalysis
@@ -242,16 +278,31 @@ datasets:
         nc_variable: ua100
         types: state
         units: m s**-1
+        extras:
+          originating_centre:
+          - meteo_france
+          system:
+          - '9'
       100-metre-v-wind-component-anomaly-seasonal-pp:
         cds_variable: 100_metre_v_wind_component_anomaly
         nc_variable: va100
         types: state
         units: m s**-1
+        extras:
+          originating_centre:
+          - meteo_france
+          system:
+          - '9'
       100-metre-wind-speed-anomaly-seasonal-pp:
         cds_variable: 100_metre_wind_speed_anomaly
         nc_variable: sia100
         types: state
         units: m s**-1
+        extras:
+          originating_centre:
+          - meteo_france
+          system:
+          - '9'
       10m-u-component-of-wind-anomaly-seasonal-pp:
         cds_variable: 10m_u_component_of_wind_anomaly
         nc_variable: u10a
@@ -317,6 +368,11 @@ datasets:
         nc_variable: roa
         types: flux
         units: kg m**-2 s**-1
+        extras:
+          originating_centre:
+          - ecmwf
+          system:
+          - '51'
       sea-ice-cover-anomaly-seasonal-pp:
         cds_variable: sea_ice_cover_anomaly
         nc_variable: sica
@@ -332,11 +388,21 @@ datasets:
         nc_variable: rsna
         types: state
         units: kg m**-3
+        extras:
+          originating_centre:
+          - meteo_france
+          system:
+          - '8'
       snow-depth-anomaly-seasonal-pp:
         cds_variable: snow_depth_anomaly
         nc_variable: sda
         types: state
         units: m of water equivalent
+        extras:
+          originating_centre:
+          - eccc
+          system:
+          - '4'
       snowfall-anomalous-rate-of-accumulation-seasonal-pp:
         cds_variable: snowfall_anomalous_rate_of_accumulation
         nc_variable: sfa
@@ -347,6 +413,9 @@ datasets:
         nc_variable: stl1a
         types: state
         units: K
+        extras:
+          system:
+          - '14'
       solar-insolation-anomalous-rate-of-accumulation-seasonal-pp:
         cds_variable: solar_insolation_anomalous_rate_of_accumulation
         nc_variable: siraa
@@ -402,16 +471,31 @@ datasets:
         nc_variable: tciwa
         types: state
         units: kg m**-2
+        extras:
+          originating_centre:
+          - eccc
+          system:
+          - '4'
       total-column-liquid-water-anomaly-seasonal-pp:
         cds_variable: total_column_liquid_water_anomaly
         nc_variable: tclwa
         types: state
         units: kg m**-2
+        extras:
+          originating_centre:
+          - eccc
+          system:
+          - '4'
       total-column-water-vapour-anomaly-seasonal-pp:
         cds_variable: total_column_water_vapour_anomaly
         nc_variable: tcwva
         types: state
         units: kg m**-2
+        extras:
+          originating_centre:
+          - eccc
+          system:
+          - '4'
       total-precipitation-anomalous-rate-of-accumulation-seasonal-pp:
         cds_variable: total_precipitation_anomalous_rate_of_accumulation
         nc_variable: tpa
@@ -473,7 +557,7 @@ datasets:
         units: m**2 s**-2
         extras:
           leadtime_hour:
-          - '1020'
+          - '5160'
       specific-humidity-seasonal-orig-p:
         cds_variable: specific_humidity
         nc_variable: q
@@ -481,7 +565,7 @@ datasets:
         units: kg kg**-1
         extras:
           leadtime_hour:
-          - '1020'
+          - '5160'
       temperature-seasonal-orig-p:
         cds_variable: temperature
         nc_variable: t
@@ -489,7 +573,7 @@ datasets:
         units: K
         extras:
           leadtime_hour:
-          - '1020'
+          - '5160'
       u-component-of-wind-seasonal-orig-p:
         cds_variable: u_component_of_wind
         nc_variable: u
@@ -497,7 +581,7 @@ datasets:
         units: m s**-1
         extras:
           leadtime_hour:
-          - '1020'
+          - '5160'
       v-component-of-wind-seasonal-orig-p:
         cds_variable: v_component_of_wind
         nc_variable: v
@@ -505,7 +589,7 @@ datasets:
         units: m s**-1
         extras:
           leadtime_hour:
-          - '1020'
+          - '5160'
   seasonal-postprocessed-pressure-levels:
     product_type:
     - reanalysis
@@ -558,66 +642,139 @@ datasets:
         nc_variable: thetaot300
         types: state
         units: K
+        extras:
+          forecast_type:
+          - forecast
+          system:
+          - '602'
       depth-average-potential-temperature-of-upper-300m-seasonal-ocean:
         cds_variable: depth_average_potential_temperature_of_upper_300m
         nc_variable: thetaot300
         types: state
         units: K
+        extras:
+          forecast_type:
+          - forecast
+          system:
+          - '602'
       depth-average-salinity-of-upper-300m-seasonal-ocean:
         cds_variable: depth_average_salinity_of_upper_300m
         nc_variable: sot300
         types: state
         units: '1e-3'
+        extras:
+          forecast_type:
+          - forecast
+          system:
+          - '602'
       depth-of-14-c-isotherm-seasonal-ocean:
         cds_variable: depth_of_14_c_isotherm
         nc_variable: t14d
         types: state
         units: m
+        extras:
+          forecast_type:
+          - forecast
+          originating_centre:
+          - cmcc
+          system:
+          - '35'
       depth-of-17-c-isotherm-seasonal-ocean:
         cds_variable: depth_of_17_c_isotherm
         nc_variable: t17d
         types: state
         units: m
+        extras:
+          forecast_type:
+          - forecast
+          originating_centre:
+          - cmcc
+          system:
+          - '35'
       depth-of-20-c-isotherm-seasonal-ocean:
         cds_variable: depth_of_20_c_isotherm
         nc_variable: t20d
         types: state
         units: m
+        extras:
+          forecast_type:
+          - forecast
+          system:
+          - '602'
       depth-of-26-c-isotherm-seasonal-ocean:
         cds_variable: depth_of_26_c_isotherm
         nc_variable: t26d
         types: state
         units: m
+        extras:
+          forecast_type:
+          - forecast
+          originating_centre:
+          - cmcc
+          system:
+          - '35'
       depth-of-28-c-isotherm-seasonal-ocean:
         cds_variable: depth_of_28_c_isotherm
         nc_variable: t28d
         types: state
         units: m
+        extras:
+          forecast_type:
+          - forecast
+          system:
+          - '602'
       mixed-layer-depth-0-01-seasonal-ocean:
         cds_variable: mixed_layer_depth_0_01
         nc_variable: mlotst001
         types: state
         units: m
+        extras:
+          forecast_type:
+          - forecast
+          system:
+          - '602'
       mixed-layer-depth-0-03-seasonal-ocean:
         cds_variable: mixed_layer_depth_0_03
         nc_variable: mlotst003
         types: state
         units: m
+        extras:
+          forecast_type:
+          - forecast
+          originating_centre:
+          - cmcc
+          system:
+          - '35'
       sea-ice-thickness-seasonal-ocean:
         cds_variable: sea_ice_thickness
         nc_variable: siti
         types: state
         units: m
+        extras:
+          forecast_type:
+          - forecast
+          system:
+          - '602'
       sea-surface-height-above-geoid-seasonal-ocean:
         cds_variable: sea_surface_height_above_geoid
         nc_variable: zos
         types: state
         units: m
+        extras:
+          forecast_type:
+          - forecast
+          system:
+          - '602'
       sea-surface-salinity-seasonal-ocean:
         cds_variable: sea_surface_salinity
         nc_variable: sos
         types: state
         units: '1e-3'
+        extras:
+          forecast_type:
+          - forecast
+          system:
+          - '602'
   seasonal-monthly-single-levels:
     product_type:
     - reanalysis
@@ -724,16 +881,31 @@ datasets:
         nc_variable: u100
         types: state
         units: m s**-1
+        extras:
+          originating_centre:
+          - cmcc
+          system:
+          - '4'
       100m-v-component-of-wind-seasonal:
         cds_variable: 100m_v_component_of_wind
         nc_variable: v100
         types: state
         units: m s**-1
+        extras:
+          originating_centre:
+          - cmcc
+          system:
+          - '4'
       100m-wind-speed-seasonal:
         cds_variable: 100m_wind_speed
         nc_variable: si100
         types: state
         units: m s**-1
+        extras:
+          originating_centre:
+          - cmcc
+          system:
+          - '4'
       10m-wind-gust-since-previous-post-processing-seasonal:
         cds_variable: 10m_wind_gust_since_previous_post_processing
         nc_variable: 10fg
@@ -754,11 +926,17 @@ datasets:
         nc_variable: mssror
         types: flux
         units: kg m**-2 s**-1
+        extras:
+          originating_centre:
+          - eccc
       mean-surface-runoff-rate-seasonal:
         cds_variable: mean_surface_runoff_rate
         nc_variable: msror
         types: flux
         units: kg m**-2 s**-1
+        extras:
+          originating_centre:
+          - eccc
       minimum-2m-temperature-in-the-last-24-hours-seasonal:
         cds_variable: minimum_2m_temperature_in_the_last_24_hours
         nc_variable: mn2t24
@@ -789,6 +967,9 @@ datasets:
         nc_variable: sira
         types: flux
         units: J m**-2
+        extras:
+          originating_centre:
+          - eccc
       surface-thermal-radiation-seasonal:
         cds_variable: surface_thermal_radiation
         nc_variable: str
@@ -809,13 +990,22 @@ datasets:
         nc_variable: tciw
         types: state
         units: kg m**-2
+        extras:
+          originating_centre:
+          - eccc
       total-column-cloud-liquid-water-seasonal:
         cds_variable: total_column_cloud_liquid_water
         nc_variable: tclw
         types: state
         units: kg m**-2
+        extras:
+          originating_centre:
+          - eccc
       total-column-water-vapour-seasonal:
         cds_variable: total_column_water_vapour
         nc_variable: tcwv
         types: state
         units: kg m**-2
+        extras:
+          originating_centre:
+          - eccc

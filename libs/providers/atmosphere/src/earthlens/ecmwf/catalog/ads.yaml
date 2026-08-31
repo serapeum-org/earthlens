@@ -859,6 +859,9 @@ datasets:
         cds_variable: carbon_dioxide
         nc_variable: co2
         units: kg kg**-1
+        extras:
+          pressure_level:
+          - '1000'
       methane:
         cds_variable: methane
         nc_variable: methane
@@ -1187,7 +1190,17 @@ datasets:
         nc_variable: re_ari_anth_srf_sw_cs
         units: Wm-2
         extras:
-          aerosol_type: [anthropogenic, marine, mineral_dust, natural_land]
+          aerosol_type:
+          - anthropogenic
+          - marine
+          - mineral_dust
+          - natural_land
+          band:
+          - short_wave
+          level:
+          - surface
+          sky_type:
+          - clear_sky
       aerosol-optical-depth-550nm:
         cds_variable: aerosol_optical_depth_550nm
         nc_variable: od550anth
@@ -1452,126 +1465,219 @@ datasets:
         cds_variable: carbon_monoxide
         nc_variable: co
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       dust-aerosol-0.03-0.55um-mixing-ratio:
         cds_variable: dust_aerosol_0.03-0.55um_mixing_ratio
         nc_variable: aermr04
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       dust-aerosol-0.55-0.9um-mixing-ratio:
         cds_variable: dust_aerosol_0.55-0.9um_mixing_ratio
         nc_variable: aermr05
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       dust-aerosol-0.9-20um-mixing-ratio:
         cds_variable: dust_aerosol_0.9-20um_mixing_ratio
         nc_variable: aermr06
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       ethane:
         cds_variable: ethane
         nc_variable: c2h6
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       formaldehyde:
         cds_variable: formaldehyde
         nc_variable: hcho
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       geopotential:
         cds_variable: geopotential
         nc_variable: z
         units: m**2 s**-2
+        extras:
+          pressure_level:
+          - '1000'
       hydrophilic-black-carbon-aerosol-mixing-ratio:
         cds_variable: hydrophilic_black_carbon_aerosol_mixing_ratio
         nc_variable: aermr09
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       hydrophilic-organic-matter-aerosol-mixing-ratio:
         cds_variable: hydrophilic_organic_matter_aerosol_mixing_ratio
         nc_variable: aermr07
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       hydrophobic-black-carbon-aerosol-mixing-ratio:
         cds_variable: hydrophobic_black_carbon_aerosol_mixing_ratio
         nc_variable: aermr10
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       hydrophobic-organic-matter-aerosol-mixing-ratio:
         cds_variable: hydrophobic_organic_matter_aerosol_mixing_ratio
         nc_variable: aermr08
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       hydroxyl-radical:
         cds_variable: hydroxyl_radical
         nc_variable: oh
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       isoprene:
         cds_variable: isoprene
         nc_variable: c5h8
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       methane-chemistry:
         cds_variable: methane_chemistry
         nc_variable: ch4_c
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       nitric-acid:
         cds_variable: nitric_acid
         nc_variable: hno3
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       nitrogen-dioxide:
         cds_variable: nitrogen_dioxide
         nc_variable: no2
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       nitrogen-monoxide:
         cds_variable: nitrogen_monoxide
         nc_variable: 'no'
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       ozone:
         cds_variable: ozone
         nc_variable: go3
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       peroxyacetyl-nitrate:
         cds_variable: peroxyacetyl_nitrate
         nc_variable: pan
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       potential-vorticity:
         cds_variable: potential_vorticity
         nc_variable: pv
         units: K m**2 kg**-1 s**-1
+        extras:
+          pressure_level:
+          - '1000'
       propane:
         cds_variable: propane
         nc_variable: c3h8
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       relative-humidity:
         cds_variable: relative_humidity
         nc_variable: r
         units: '%'
+        extras:
+          pressure_level:
+          - '1000'
       sea-salt-aerosol-0.03-0.5um-mixing-ratio:
         cds_variable: sea_salt_aerosol_0.03-0.5um_mixing_ratio
         nc_variable: aermr01
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       sea-salt-aerosol-0.5-5um-mixing-ratio:
         cds_variable: sea_salt_aerosol_0.5-5um_mixing_ratio
         nc_variable: aermr02
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       sea-salt-aerosol-5-20um-mixing-ratio:
         cds_variable: sea_salt_aerosol_5-20um_mixing_ratio
         nc_variable: aermr03
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       so2-precursor-mixing-ratio:
         cds_variable: so2_precursor_mixing_ratio
         nc_variable: aermr12
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       specific-humidity:
         cds_variable: specific_humidity
         nc_variable: q
         units: kg kg**-1
+        extras:
+          pressure_level:
+          - '1000'
       sulphate-aerosol-mixing-ratio:
         cds_variable: sulphate_aerosol_mixing_ratio
         nc_variable: aermr11
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       sulphur-dioxide:
         cds_variable: sulphur_dioxide
         nc_variable: so2
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       temperature:
         cds_variable: temperature
         nc_variable: t
         units: K
+        extras:
+          pressure_level:
+          - '1000'
       vertical-velocity:
         cds_variable: vertical_velocity
         nc_variable: w
         units: Pa s**-1
+        extras:
+          pressure_level:
+          - '1000'
   cams-gridded-solar-radiation:
     endpoint: ads
     request_kind: form

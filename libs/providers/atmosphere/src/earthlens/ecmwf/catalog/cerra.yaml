@@ -17,13 +17,15 @@ datasets:
         units: '%'
         extras:
           product_type:
-          - forecast
+          - analysis
       evaporation-cerra:
         cds_variable: evaporation
         nc_variable: eva
         types: flux
         units: kg m**-2
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       2m-relative-humidity-cerra:
@@ -33,7 +35,7 @@ datasets:
         units: '%'
         extras:
           product_type:
-          - forecast
+          - analysis
       10m-wind-speed-cerra:
         cds_variable: 10m_wind_speed
         nc_variable: si10
@@ -41,7 +43,7 @@ datasets:
         units: m s**-1
         extras:
           product_type:
-          - forecast
+          - analysis
       2m-temperature-cerra:
         cds_variable: 2m_temperature
         nc_variable: t2m
@@ -49,7 +51,7 @@ datasets:
         units: K
         extras:
           product_type:
-          - forecast
+          - analysis
       10m-wind-direction-cerra:
         cds_variable: 10m_wind_direction
         nc_variable: wdir10
@@ -57,7 +59,7 @@ datasets:
         units: Degree true
         extras:
           product_type:
-          - forecast
+          - analysis
       snow-depth-cerra:
         cds_variable: snow_depth
         nc_variable: sde
@@ -65,13 +67,15 @@ datasets:
         units: m
         extras:
           product_type:
-          - forecast
+          - analysis
       total-precipitation-cerra:
         cds_variable: total_precipitation
         nc_variable: tp
         types: flux
         units: kg m**-2
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
       surface-pressure-cerra:
@@ -81,7 +85,7 @@ datasets:
         units: Pa
         extras:
           product_type:
-          - forecast
+          - analysis
       high-cloud-cover-cerra:
         cds_variable: high_cloud_cover
         nc_variable: hcc
@@ -89,7 +93,7 @@ datasets:
         units: '%'
         extras:
           product_type:
-          - forecast
+          - analysis
       snow-density-cerra:
         cds_variable: snow_density
         nc_variable: rsn
@@ -97,7 +101,7 @@ datasets:
         units: kg m**-3
         extras:
           product_type:
-          - forecast
+          - analysis
       orography-cerra:
         cds_variable: orography
         nc_variable: orog
@@ -113,7 +117,7 @@ datasets:
         units: '%'
         extras:
           product_type:
-          - forecast
+          - analysis
       medium-cloud-cover-cerra:
         cds_variable: medium_cloud_cover
         nc_variable: mcc
@@ -121,7 +125,7 @@ datasets:
         units: '%'
         extras:
           product_type:
-          - forecast
+          - analysis
       total-cloud-cover-cerra:
         cds_variable: total_cloud_cover
         nc_variable: tcc
@@ -129,7 +133,7 @@ datasets:
         units: '%'
         extras:
           product_type:
-          - forecast
+          - analysis
       mean-sea-level-pressure-cerra:
         cds_variable: mean_sea_level_pressure
         nc_variable: msl
@@ -137,7 +141,7 @@ datasets:
         units: Pa
         extras:
           product_type:
-          - forecast
+          - analysis
       skin-temperature-cerra:
         cds_variable: skin_temperature
         nc_variable: skt
@@ -145,7 +149,7 @@ datasets:
         units: K
         extras:
           product_type:
-          - forecast
+          - analysis
       surface-roughness-cerra:
         cds_variable: surface_roughness
         nc_variable: sr
@@ -153,7 +157,7 @@ datasets:
         units: m
         extras:
           product_type:
-          - forecast
+          - analysis
       land-sea-mask-cerra:
         cds_variable: land_sea_mask
         nc_variable: lsm
@@ -168,24 +172,36 @@ datasets:
         types: state
         units: m**3 m**-3
         extras:
+          level_type:
+          - soil
           product_type:
-          - forecast
+          - analysis
+          soil_layer:
+          - top_layer
       volumetric-soil-moisture-cerra:
         cds_variable: volumetric_soil_moisture
         nc_variable: vsw
         types: state
         units: m**3 m**-3
         extras:
+          level_type:
+          - soil
           product_type:
-          - forecast
+          - analysis
+          soil_layer:
+          - top_layer
       soil-temperature-cerra:
         cds_variable: soil_temperature
         nc_variable: sot
         types: state
         units: K
         extras:
+          level_type:
+          - soil
           product_type:
-          - forecast
+          - analysis
+          soil_layer:
+          - top_layer
       snow-depth-water-equivalent-cerra:
         cds_variable: snow_depth_water_equivalent
         nc_variable: sd
@@ -193,13 +209,15 @@ datasets:
         units: kg m**-2
         extras:
           product_type:
-          - forecast
+          - analysis
       momentum-flux-at-the-surface-u-component-cerra:
         cds_variable: momentum_flux_at_the_surface_u_component
         nc_variable: tisemf
         types: flux
         units: N m**-2 s
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
       momentum-flux-at-the-surface-v-component-cerra:
@@ -208,6 +226,8 @@ datasets:
         types: flux
         units: N m**-2 s
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
       time-integrated-surface-direct-short-wave-radiation-flux-cerra:
@@ -216,6 +236,8 @@ datasets:
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       surface-solar-radiation-downwards-cerra:
@@ -224,6 +246,8 @@ datasets:
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       surface-net-solar-radiation-cerra:
@@ -232,6 +256,8 @@ datasets:
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       surface-net-thermal-radiation-cerra:
@@ -240,6 +266,8 @@ datasets:
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       10m-wind-gust-since-previous-post-processing-cerra:
@@ -248,6 +276,8 @@ datasets:
         types: state
         units: m s**-1
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       maximum-2m-temperature-since-previous-post-processing-cerra:
@@ -256,6 +286,8 @@ datasets:
         types: state
         units: K
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       minimum-2m-temperature-since-previous-post-processing-cerra:
@@ -264,6 +296,8 @@ datasets:
         types: state
         units: K
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       snow-fall-water-equivalent-cerra:
@@ -272,6 +306,8 @@ datasets:
         types: flux
         units: kg m**-2
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       surface-latent-heat-flux-cerra:
@@ -280,6 +316,8 @@ datasets:
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       surface-net-solar-radiation-clear-sky-cerra:
@@ -288,6 +326,8 @@ datasets:
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       surface-net-thermal-radiation-clear-sky-cerra:
@@ -296,6 +336,8 @@ datasets:
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       surface-sensible-heat-flux-cerra:
@@ -304,6 +346,8 @@ datasets:
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       surface-thermal-radiation-downwards-cerra:
@@ -312,6 +356,8 @@ datasets:
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           product_type:
           - forecast
       total-column-integrated-water-vapour-cerra:
@@ -321,7 +367,7 @@ datasets:
         units: kg m**-2
         extras:
           product_type:
-          - forecast
+          - analysis
   reanalysis-cerra-height-levels:
     product_type:
     - reanalysis
@@ -339,7 +385,7 @@ datasets:
         units: Pa
         extras:
           product_type:
-          - forecast
+          - analysis
       relative-humidity-cerra-h:
         cds_variable: relative_humidity
         nc_variable: r
@@ -347,7 +393,7 @@ datasets:
         units: '%'
         extras:
           product_type:
-          - forecast
+          - analysis
       wind-speed-cerra-h:
         cds_variable: wind_speed
         nc_variable: si100
@@ -355,7 +401,7 @@ datasets:
         units: m s**-1
         extras:
           product_type:
-          - forecast
+          - analysis
       temperature-cerra-h:
         cds_variable: temperature
         nc_variable: t
@@ -363,7 +409,7 @@ datasets:
         units: K
         extras:
           product_type:
-          - forecast
+          - analysis
       wind-direction-cerra-h:
         cds_variable: wind_direction
         nc_variable: wdir
@@ -371,13 +417,15 @@ datasets:
         units: Degree true
         extras:
           product_type:
-          - forecast
+          - analysis
       turbulent-kinetic-energy-cerra-h:
         cds_variable: turbulent_kinetic_energy
         nc_variable: tke
         types: state
         units: J kg**-1
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
       specific-cloud-ice-water-content-cerra-h:
@@ -386,6 +434,8 @@ datasets:
         types: state
         units: kg kg**-1
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
       specific-cloud-liquid-water-content-cerra-h:
@@ -394,6 +444,8 @@ datasets:
         types: state
         units: kg kg**-1
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
       specific-rain-water-content-cerra-h:
@@ -402,6 +454,8 @@ datasets:
         types: state
         units: kg kg**-1
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
       specific-snow-water-content-cerra-h:
@@ -410,6 +464,8 @@ datasets:
         types: state
         units: kg kg**-1
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
   reanalysis-cerra-pressure-levels:
@@ -429,7 +485,7 @@ datasets:
         units: '%'
         extras:
           product_type:
-          - forecast
+          - analysis
       temperature-cerra-p:
         cds_variable: temperature
         nc_variable: t
@@ -437,7 +493,7 @@ datasets:
         units: K
         extras:
           product_type:
-          - forecast
+          - analysis
       u-component-of-wind-cerra-p:
         cds_variable: u_component_of_wind
         nc_variable: u
@@ -445,7 +501,7 @@ datasets:
         units: m s**-1
         extras:
           product_type:
-          - forecast
+          - analysis
       v-component-of-wind-cerra-p:
         cds_variable: v_component_of_wind
         nc_variable: v
@@ -453,7 +509,7 @@ datasets:
         units: m s**-1
         extras:
           product_type:
-          - forecast
+          - analysis
       geopotential-cerra-p:
         cds_variable: geopotential
         nc_variable: z
@@ -461,13 +517,15 @@ datasets:
         units: m**2 s**-2
         extras:
           product_type:
-          - forecast
+          - analysis
       cloud-cover-cerra-p:
         cds_variable: cloud_cover
         nc_variable: ccl
         types: state
         units: '%'
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
       specific-cloud-ice-water-content-cerra-p:
@@ -476,6 +534,8 @@ datasets:
         types: state
         units: kg kg**-1
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
       specific-cloud-liquid-water-content-cerra-p:
@@ -484,6 +544,8 @@ datasets:
         types: state
         units: kg kg**-1
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
       specific-rain-water-content-cerra-p:
@@ -492,6 +554,8 @@ datasets:
         types: state
         units: kg kg**-1
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
       specific-snow-water-content-cerra-p:
@@ -500,6 +564,8 @@ datasets:
         types: state
         units: kg kg**-1
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
       turbulent-kinetic-energy-cerra-p:
@@ -508,6 +574,8 @@ datasets:
         types: state
         units: J kg**-1
         extras:
+          leadtime_hour:
+          - '6'
           product_type:
           - forecast
   reanalysis-cerra-model-levels:
@@ -590,6 +658,11 @@ datasets:
         nc_variable: sot
         types: state
         units: K
+        extras:
+          level_type:
+          - soil
+          soil_layer:
+          - '14'
       snow-depth-cerra-land:
         cds_variable: snow_depth
         nc_variable: sde
@@ -693,6 +766,11 @@ datasets:
         nc_variable: liqvsm
         types: state
         units: m**3 m**-3
+        extras:
+          level_type:
+          - soil
+          soil_layer:
+          - '14'
       lake-mix-layer-depth-cerra-land:
         cds_variable: lake_mix_layer_depth
         nc_variable: lmld
@@ -736,6 +814,11 @@ datasets:
         nc_variable: vsw
         types: state
         units: m**3 m**-3
+        extras:
+          level_type:
+          - soil
+          soil_layer:
+          - '14'
       volumetric-transpiration-stress-onset-cerra-land:
         cds_variable: volumetric_transpiration_stress_onset
         nc_variable: vtso
@@ -743,8 +826,12 @@ datasets:
         units: m**3 m**-3
         extras:
           leadtime_hour: null
+          level_type:
+          - soil
           product_type:
           - analysis
+          soil_layer:
+          - '14'
       volumetric-wilting-point-cerra-land:
         cds_variable: volumetric_wilting_point
         nc_variable: vwp
@@ -752,5 +839,9 @@ datasets:
         units: m**3 m**-3
         extras:
           leadtime_hour: null
+          level_type:
+          - soil
           product_type:
           - analysis
+          soil_layer:
+          - '14'
