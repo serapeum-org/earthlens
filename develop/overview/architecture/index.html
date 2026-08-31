@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -708,6 +708,17 @@
     <span class="md-ellipsis">
       
         Distribution &amp; namespace layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#facade-key-naming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Facade key naming
       
     </span>
   </a>
@@ -23612,6 +23623,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#facade-key-naming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Facade key naming
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-data-source-contract" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23861,6 +23883,23 @@ Hold "Ctrl" to enable pan &amp; zoom
 <p><code>from earthlens import EarthLens</code> does <strong>not</strong> work — it required the <code>__init__.py</code> that the namespace layout
 removes. Backend modules keep their dotted paths (<code>earthlens.chc</code>, <code>earthlens.gee</code>, …), which is how you reach a
 provider's <code>Catalog</code>.</p>
+<h2 id="facade-key-naming"><a class="toclink" href="#facade-key-naming">Facade key naming</a><a class="headerlink" href="#facade-key-naming" title="Permanent link">#</a></h2>
+<p>A <code>data_source</code> key is one of two shapes, and the difference is a hard rule enforced by a test:</p>
+<ul>
+<li><strong>A bare source/brand key</strong> — a proper noun that names one origin and cannot be independently offered by another
+  source: <code>chc</code>, <code>cmems</code>, <code>gebco</code>, <code>nsrdb</code>, <code>planetary-computer</code>, <code>jrc-flood</code>, <code>amazon-s3</code>. Every backend has at
+  least one. These do not collide, so they stay bare.</li>
+<li><strong>A qualified <code>source:topic</code> key</strong> — a <strong>generic domain word</strong> (a subject several sources could serve) namespaced
+  under the source that provides it: <code>dem:elevation</code>, <code>jrc:sea-level-forecast</code>, <code>pvgis:solar-pv</code>.</li>
+</ul>
+<p><strong>A generic topic word is never a bare key.</strong> The reserved generic words live in
+<code>earthlens._backends.RESERVED_TOPICS</code>; a bare one is forbidden — requesting it raises
+<code>AmbiguousDataSourceError</code> listing the <code>source:topic</code> keys that serve it (so <code>elevation</code> alone points at no single
+backend, while <code>dem:elevation</code> and a future <code>bathymetry:elevation</code> coexist), and a provider table that registers one
+bare fails CI. This makes a collision on the only axis that actually collides — generic subjects — impossible by
+construction as the catalog grows, rather than something a maintainer re-adjudicates per new provider. It follows the
+same qualified-namespace model as STAC collection ids, Docker's reserved <code>library/</code>, and Kubernetes API groups.
+Datasets within a backend are still chosen by <code>variables=</code> and the catalog, not by the key.</p>
 <h2 id="the-data-source-contract"><a class="toclink" href="#the-data-source-contract">The data-source contract</a><a class="headerlink" href="#the-data-source-contract" title="Permanent link">#</a></h2>
 <p><code>AbstractDataSource</code> is the core abstraction. Only <strong>two</strong> members are abstract — <code>download()</code> and
 <code>_check_input_dates()</code>; everything else is a hook with a working default, which is why a new backend is usually a

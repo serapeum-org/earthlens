@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23641,7 +23641,7 @@ sea-level products further down. See
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">depth</span><span class="o">.</span><span class="n">epsg</span>                  <span class="c1"># 4326 (WGS84)</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">array</span> <span class="o">=</span> <span class="n">depth</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>  <span class="c1"># river-flood water depth in metres (-9999 = no data)</span>
 </code></pre></div>
-<p>The <code>efhm</code>, <code>jrc-flood-hazard</code>, and <code>european-flood-hazard</code> aliases route to the
+<p>The <code>efhm</code>, <code>jrc-flood-hazard</code>, and <code>jrc:european-flood-hazard</code> aliases route to the
 same backend.</p>
 <h2 id="several-return-periods-at-once"><a class="toclink" href="#several-return-periods-at-once">Several return periods at once</a><a class="headerlink" href="#several-return-periods-at-once" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">EarthLens</span><span class="p">(</span>
@@ -23676,12 +23676,12 @@ The <code>jrc-flood</code> backend here serves the separate, Europe-focused EFHM
 passing <code>aggregate=</code> is rejected.</p>
 <h2 id="sea-level-total-water-level-forecasts"><a class="toclink" href="#sea-level-total-water-level-forecasts">Sea-level (Total Water Level) forecasts</a><a class="headerlink" href="#sea-level-total-water-level-forecasts" title="Permanent link">#</a></h2>
 <p>The same backend serves the JRC probabilistic sea-level forecasts. Select the
-gridded product with <code>product=</code>; the <code>coastal-forecast</code> key returns the global
+gridded product with <code>product=</code>; the <code>jrc:coastal-forecast</code> key returns the global
 per-country summary instead. By default the newest complete forecast cycle is
 used (<code>reference_time="latest"</code>); pass an explicit cycle to pin one.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># gridded medium-term TWL forecast, latest cycle, cropped to the North Sea</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;sea-level-forecast&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jrc:sea-level-forecast&quot;</span><span class="p">,</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">product</span><span class="o">=</span><span class="s2">&quot;medium_term&quot;</span><span class="p">,</span>           <span class="c1"># or &quot;subseasonal&quot;</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">],</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
@@ -23691,7 +23691,7 @@ used (<code>reference_time="latest"</code>); pass an explicit cycle to pin one.<
 <a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
 <a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1"># a specific cycle + a different field</span>
 <a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;sea-level-forecast&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jrc:sea-level-forecast&quot;</span><span class="p">,</span>
 <a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    <span class="n">product</span><span class="o">=</span><span class="s2">&quot;subseasonal&quot;</span><span class="p">,</span>
 <a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>    <span class="n">reference_time</span><span class="o">=</span><span class="s2">&quot;2026-08-24T00&quot;</span><span class="p">,</span>  <span class="c1"># a recent cycle; older ones age out</span>
 <a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>    <span class="n">field</span><span class="o">=</span><span class="s2">&quot;probabilityTWL_01_15-100&quot;</span><span class="p">,</span>
@@ -23701,7 +23701,7 @@ used (<code>reference_time="latest"</code>); pass an explicit cycle to pin one.<
 <a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>
 <a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="c1"># subseasonal global per-country coastal summary -&gt; a pandas.DataFrame</span>
-<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;coastal-forecast&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jrc:coastal-forecast&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="n">summary</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </code></pre></div>
 <p>As with the EFHM, only the AOI window is read over <code>/vsicurl</code>, and <code>aggregate=</code>
