@@ -487,6 +487,21 @@ class TestAuditVariables:
         assert status == "ok" and drift == [], "the variable-less row adds no drift"
         assert seen == ["kept"], "the variable-less row was not fetched"
 
+    def test_retired_dataset_is_not_variable_audited(self, monkeypatch):
+        """A curated id absent from `live` (id drift) is skipped, not re-fetched."""
+        seen: list[str] = []
+
+        def _lister(record):
+            seen.append(record.dataset_id)
+            return {"WTMP"}
+
+        monkeypatch.setitem(refresh_mod._VARIABLE_LISTERS, "erddap", _lister)
+        status, drift, detail = refresh_mod._audit_variables(
+            self._catalog(retired=["wtmp"], alive=["WTMP"]), "erddap", live={"alive"}
+        )
+        assert status == "ok" and detail == "", "the retired id makes no variable error"
+        assert seen == ["alive"], "the retired dataset's .dds was not fetched"
+
 
 class TestAuditOutcome:
     """Tests for AuditOutcome."""

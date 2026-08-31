@@ -581,7 +581,9 @@ def _bundled_ids(catalog: Any, provider: str) -> list[str]:
     return resolver(catalog) if resolver else [str(key) for key in catalog.datasets]
 
 
-def _audit_variables(catalog: Any, provider: str) -> tuple[str, list[str], str]:
+def _audit_variables(
+    catalog: Any, provider: str, live: set[str] | None = None
+) -> tuple[str, list[str], str]:
     """Diff each curated row's `variables` against what the provider serves live.
 
     The per-dataset fetch is guarded individually: one dataset's `.dds` failure
@@ -592,6 +594,14 @@ def _audit_variables(catalog: Any, provider: str) -> tuple[str, list[str], str]:
     Args:
         catalog: The loaded provider `Catalog`.
         provider: Canonical provider id.
+        live: The set of dataset ids the provider serves live, when known. A
+            curated id absent from it is already reported as id-level `broken`
+            drift, so it is skipped here — re-fetching a retired dataset's `.dds`
+            only wastes a request and manufactures a phantom variable-audit error
+            for what is really id drift. When `None`, every curated row is
+            audited (the identity of a live id matches the catalog key only for
+            providers whose keys are their served ids, currently the sole
+            `variable_lister` provider, erddap).
 
     Returns:
         A `(variable_status, variable_drift, variable_detail)` triple.
@@ -608,6 +618,8 @@ def _audit_variables(catalog: Any, provider: str) -> tuple[str, list[str], str]:
     drift: list[str] = []
     errors: list[str] = []
     for key, record in catalog.datasets.items():
+        if live is not None and key not in live:
+            continue
         curated = getattr(record, "variables", None) or []
         if not curated:
             continue
@@ -655,7 +667,7 @@ def audit_one(info: BackendInfo) -> AuditOutcome:
     index_attr = _INDEX_ATTR.get(info.provider, "available_datasets")
     available = {str(ident) for ident in getattr(catalog, index_attr, [])}
     variable_status, variable_drift, variable_detail = _audit_variables(
-        catalog, info.provider
+        catalog, info.provider, live
     )
     return AuditOutcome(
         provider=info.provider,
