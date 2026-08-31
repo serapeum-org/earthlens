@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/main/reference/jrc-flood/introduction/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/main/reference/jrc/usage/">
       
       
-        <link rel="prev" href="../../fabdem/fabdem/">
+        <link rel="prev" href="../introduction/">
       
       
-        <link rel="next" href="../usage/">
+        <link rel="next" href="../datasets/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Introduction - earthlens</title>
+        <title>Usage - earthlens</title>
       
     
     
@@ -87,13 +87,13 @@
     
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="earthlens">
-    <meta property="og:title" content="Introduction">
+    <meta property="og:title" content="Usage">
     <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
-    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/main/reference/jrc-flood/introduction/">
+    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/main/reference/jrc/usage/">
     <meta property="og:image"
           content="https://serapeum-org.github.io/earthlens/main/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Introduction">
+    <meta name="twitter:title" content="Usage">
     <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
     <meta name="twitter:image"
           content="https://serapeum-org.github.io/earthlens/main/_images/branding/earthlens-brand-kit/social/announcement-card.png">
@@ -119,7 +119,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#jrc-european-flood-hazard-efhm-introduction" class="md-skip">
+        <a href="#jrc-hazards-usage" class="md-skip">
           Skip to content
         </a>
       
@@ -158,7 +158,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction
+              Usage
             
           </span>
         </div>
@@ -5186,7 +5186,7 @@
   <span class="md-ellipsis">
     
   
-    JRC European flood hazard (EFHM)
+    JRC hazards (EFHM + sea-level)
   
 
     
@@ -5202,11 +5202,39 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    JRC European flood hazard (EFHM)
+    JRC hazards (EFHM + sea-level)
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -5231,7 +5259,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    Usage
   
 
     
@@ -5249,7 +5277,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    Usage
   
 
     
@@ -5275,10 +5303,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#global-vs-european-coverage" class="md-nav__link">
+  <a href="#a-single-return-period" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Global vs European coverage
+        A single return period
       
     </span>
   </a>
@@ -5286,10 +5314,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
+  <a href="#several-return-periods-at-once" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it works
+        Several return periods at once
       
     </span>
   </a>
@@ -5297,10 +5325,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#two-things-that-shape-the-backend" class="md-nav__link">
+  <a href="#outside-the-coverage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Two things that shape the backend
+        Outside the coverage
       
     </span>
   </a>
@@ -5308,10 +5336,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#licence" class="md-nav__link">
+  <a href="#global-flood-hazard" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Licence
+        Global flood hazard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#no-temporal-aggregation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No temporal aggregation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sea-level-total-water-level-forecasts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sea-level (Total Water Level) forecasts
       
     </span>
   </a>
@@ -5322,34 +5372,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -5390,7 +5412,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../jrc-flood/" class="md-nav__link">
+      <a href="../jrc/" class="md-nav__link">
         
   
   
@@ -17674,7 +17696,7 @@
   <span class="md-ellipsis">
     
   
-    JRC European flood hazard (EFHM)
+    JRC hazards (EFHM + sea-level)
   
 
     
@@ -17690,7 +17712,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    JRC European flood hazard (EFHM)
+    JRC hazards (EFHM + sea-level)
   
 
           </label>
@@ -17703,14 +17725,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/jrc-flood/01_catalog_explorer/" class="md-nav__link">
+      <a href="../../../examples/jrc/01_catalog_explorer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    JRC European flood hazard (EFHM) — catalog explorer (no network)
+    JRC hazards — catalog explorer (no network)
   
 
     
@@ -17731,7 +17753,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/jrc-flood/02_efhm_quickstart/" class="md-nav__link">
+      <a href="../../../examples/jrc/02_efhm_quickstart/" class="md-nav__link">
         
   
   
@@ -17759,7 +17781,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/jrc-flood/03_return_periods/" class="md-nav__link">
+      <a href="../../../examples/jrc/03_return_periods/" class="md-nav__link">
         
   
   
@@ -17767,6 +17789,34 @@
     
   
     EFHM return periods — how flood depth grows with rarity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/jrc/04_sea_level_forecast/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JRC sea-level (Total Water Level) forecasts
   
 
     
@@ -23464,10 +23514,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#global-vs-european-coverage" class="md-nav__link">
+  <a href="#a-single-return-period" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Global vs European coverage
+        A single return period
       
     </span>
   </a>
@@ -23475,10 +23525,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
+  <a href="#several-return-periods-at-once" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it works
+        Several return periods at once
       
     </span>
   </a>
@@ -23486,10 +23536,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#two-things-that-shape-the-backend" class="md-nav__link">
+  <a href="#outside-the-coverage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Two things that shape the backend
+        Outside the coverage
       
     </span>
   </a>
@@ -23497,10 +23547,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#licence" class="md-nav__link">
+  <a href="#global-flood-hazard" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Licence
+        Global flood hazard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#no-temporal-aggregation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No temporal aggregation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sea-level-total-water-level-forecasts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sea-level (Total Water Level) forecasts
       
     </span>
   </a>
@@ -23524,7 +23596,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/jrc-flood/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/jrc/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -23533,73 +23605,108 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/jrc-flood/introduction.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/jrc/usage.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="jrc-european-flood-hazard-efhm-introduction"><a class="toclink" href="#jrc-european-flood-hazard-efhm-introduction">JRC European flood hazard (EFHM) — introduction</a><a class="headerlink" href="#jrc-european-flood-hazard-efhm-introduction" title="Permanent link">#</a></h1>
-<p>earthlens ships a <code>jrc-flood</code> backend that fetches the <strong>JRC European Flood
-Hazard Map (EFHM)</strong> — "River flood hazard maps for Europe and the Mediterranean
-Basin" — subset to a requested bounding box and written as GeoTIFF. Each cell
-value is <strong>river-flood water depth in metres</strong> for a chosen <strong>return period</strong>
-(how rare the flood is: a 1-in-100-year event, etc.). The map is produced by the
-JRC / Copernicus Emergency Management Service (CEMS).</p>
-<p>This page orients the backend; for the walkthrough see <a href="../usage/">Usage</a>, the
-return periods on the <a href="../datasets/">Available datasets</a> page, and the rendered
-API on the <a href="../jrc-flood/">Reference</a> page.</p>
-<h2 id="global-vs-european-coverage"><a class="toclink" href="#global-vs-european-coverage">Global vs European coverage</a><a class="headerlink" href="#global-vs-european-coverage" title="Permanent link">#</a></h2>
-<p>There are two JRC flood-hazard products, and earthlens covers both — through
-different backends:</p>
-<ul>
-<li><strong>Global</strong> (<code>JRC/CEMS_GLOFAS/FloodHazard</code>, ~90 m, RP10–RP500) — already
-  available through the <a href="../../gee/introduction/"><code>gee</code></a> backend as a curated catalog row
-  (<code>JRC/CEMS_GLOFAS/FloodHazard/v2_1</code>). It covers Europe too. Use <code>gee</code> for the
-  global product.</li>
-<li><strong>European EFHM</strong> (this backend, ~90 m / 3 arc-second, 9 return periods) — a
-  higher-fidelity river-flood map for Europe and the Mediterranean, published as
-  whole-Europe GeoTIFFs on the JRC open-data server, <strong>not</strong> on Earth Engine.</li>
-</ul>
-<h2 id="how-it-works"><a class="toclink" href="#how-it-works">How it works</a><a class="headerlink" href="#how-it-works" title="Permanent link">#</a></h2>
-<p>Each return period is one whole-Europe EPSG:4326 GeoTIFF of ~23 GB uncompressed,
-so the backend <strong>never reads it whole</strong>. It opens the file lazily over GDAL's
-<code>/vsicurl</code> (HTTP range requests), reads <strong>only</strong> the AOI's pixel window through
-the <a href="https://github.com/serapeum-org/pyramids">pyramids</a> GIS backend, rebuilds a
-small cropped grid, and writes one GeoTIFF per return period. So a small AOI
-transfers only kilobytes, not gigabytes. <code>download()</code> returns the written paths
-(<code>list[Path]</code>); earthlens never imports a competing array stack.</p>
+<h1 id="jrc-hazards-usage"><a class="toclink" href="#jrc-hazards-usage">JRC hazards — usage</a><a class="headerlink" href="#jrc-hazards-usage" title="Permanent link">#</a></h1>
+<p>The <code>earthlens.jrc</code> backend serves every JRC hazard product — the European Flood
+Hazard Map (EFHM) and the probabilistic sea-level (Total Water Level) forecasts —
+from one class, selected by dataset. It needs no credentials (CC-BY-4.0).</p>
+<p>This page starts with the EFHM (a bounding box plus one or more return periods,
+writing one GeoTIFF of water depth (m) per return period) and covers the
+sea-level products further down. See
+<a href="../introduction/">Introduction</a> for the transport and
+<a href="../datasets/">Available datasets</a> for the return periods.</p>
+<h2 id="a-single-return-period"><a class="toclink" href="#a-single-return-period">A single return period</a><a class="headerlink" href="#a-single-return-period" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jrc-flood&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.8</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.8</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">return_periods</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.8</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span>       <span class="c1"># [south, north]</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.8</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>         <span class="c1"># [west, east], -180..180</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">return_periods</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span>       <span class="c1"># 1-in-100-year flood</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;efhm_out&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># -&gt; [Path(&#39;efhm_out/efhm_RP100.tif&#39;)]</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">paths</span>           <span class="c1"># [Path(&#39;efhm_out/efhm_RP100.tif&#39;)]</span>
 </code></pre></div>
-<h2 id="two-things-that-shape-the-backend"><a class="toclink" href="#two-things-that-shape-the-backend">Two things that shape the backend</a><a class="headerlink" href="#two-things-that-shape-the-backend" title="Permanent link">#</a></h2>
-<ul>
-<li>
-<p><strong>The request axis is <code>return_periods</code>, not <code>variables</code>.</strong> The EFHM has a
-  single <code>water_depth</code> band, so the backend is <em>facet-only</em>: select the flood
-  rarity with <code>return_periods=</code> (ints, <code>"100"</code>, or <code>"RP100"</code>); there is no
-  <code>variables=</code> / <code>dataset=</code> axis. It is static, so <code>aggregate=</code> is rejected.</p>
-</li>
-<li>
-<p><strong>A windowed read, not a whole-file download.</strong> Only the AOI window is fetched
-  over <code>/vsicurl</code>. An AOI outside the Europe / Mediterranean coverage raises a
-  clear <code>ValueError</code> rather than writing an empty raster.</p>
-</li>
-</ul>
-<h2 id="licence"><a class="toclink" href="#licence">Licence</a><a class="headerlink" href="#licence" title="Permanent link">#</a></h2>
-<p>The EFHM is <strong>CC-BY-4.0</strong> (permissive attribution) — no licence warning. Cite:
-Dottori, F., Alfieri, L., Bianchi, A., Skoulikaris, C., Salamon, P. (2020),
-<em>River flood hazard maps for Europe and the Mediterranean Basin region</em>, JRC /
-Copernicus Emergency Management Service.</p>
+<p>Read the result back with pyramids:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">depth</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;efhm_out/efhm_RP100.tif&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">depth</span><span class="o">.</span><span class="n">epsg</span>                  <span class="c1"># 4326 (WGS84)</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">array</span> <span class="o">=</span> <span class="n">depth</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>  <span class="c1"># river-flood water depth in metres (-9999 = no data)</span>
+</code></pre></div>
+<p>The <code>efhm</code>, <code>jrc-flood-hazard</code>, and <code>european-flood-hazard</code> aliases route to the
+same backend.</p>
+<h2 id="several-return-periods-at-once"><a class="toclink" href="#several-return-periods-at-once">Several return periods at once</a><a class="headerlink" href="#several-return-periods-at-once" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jrc-flood&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.8</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.8</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">return_periods</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">500</span><span class="p">],</span>   <span class="c1"># ints, &quot;100&quot;, or &quot;RP100&quot; all work</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;efhm_out&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1"># -&gt; [efhm_RP10.tif, efhm_RP100.tif, efhm_RP500.tif]</span>
+</code></pre></div>
+<p>Each return period is written to its own <code>efhm_RP{n}.tif</code>. Requesting an
+unpublished return period raises a <code>ValueError</code> listing the available ones.</p>
+<h2 id="outside-the-coverage"><a class="toclink" href="#outside-the-coverage">Outside the coverage</a><a class="headerlink" href="#outside-the-coverage" title="Permanent link">#</a></h2>
+<p>The EFHM covers Europe and the Mediterranean Basin. An AOI outside that extent
+raises rather than writing an empty raster:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;jrc-flood&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.8</span><span class="p">],</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">30.2</span><span class="p">],</span>     <span class="c1"># equatorial Africa -&gt; outside EFHM coverage</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">return_periods</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;efhm_out&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1"># ValueError: ... the AOI ... is outside the EFHM&#39;s Europe / Mediterranean coverage ...</span>
+</code></pre></div>
+<h2 id="global-flood-hazard"><a class="toclink" href="#global-flood-hazard">Global flood hazard</a><a class="headerlink" href="#global-flood-hazard" title="Permanent link">#</a></h2>
+<p>For the <strong>global</strong> JRC flood hazard (covering Europe too, at ~90 m), use the
+<a href="../../gee/introduction/"><code>gee</code></a> backend with <code>asset="JRC/CEMS_GLOFAS/FloodHazard/v2_1"</code>.
+The <code>jrc-flood</code> backend here serves the separate, Europe-focused EFHM product.</p>
+<h2 id="no-temporal-aggregation"><a class="toclink" href="#no-temporal-aggregation">No temporal aggregation</a><a class="headerlink" href="#no-temporal-aggregation" title="Permanent link">#</a></h2>
+<p>The return-period grids are static (a return period is not a time step), so
+passing <code>aggregate=</code> is rejected.</p>
+<h2 id="sea-level-total-water-level-forecasts"><a class="toclink" href="#sea-level-total-water-level-forecasts">Sea-level (Total Water Level) forecasts</a><a class="headerlink" href="#sea-level-total-water-level-forecasts" title="Permanent link">#</a></h2>
+<p>The same backend serves the JRC probabilistic sea-level forecasts. Select the
+gridded product with <code>product=</code>; the <code>coastal-forecast</code> key returns the global
+per-country summary instead. By default the newest complete forecast cycle is
+used (<code>reference_time="latest"</code>); pass an explicit cycle to pin one.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># gridded medium-term TWL forecast, latest cycle, cropped to the North Sea</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;sea-level-forecast&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">product</span><span class="o">=</span><span class="s2">&quot;medium_term&quot;</span><span class="p">,</span>           <span class="c1"># or &quot;subseasonal&quot;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">],</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;twl_out&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1"># -&gt; [Path(&#39;twl_out/sea_level_medium_term_&lt;cycle&gt;_TWL75.tif&#39;)]  (one band per forecast step)</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1"># a specific cycle + a different field</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;sea-level-forecast&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    <span class="n">product</span><span class="o">=</span><span class="s2">&quot;subseasonal&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>    <span class="n">reference_time</span><span class="o">=</span><span class="s2">&quot;2026-08-24T00&quot;</span><span class="p">,</span>  <span class="c1"># a recent cycle; older ones age out</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>    <span class="n">field</span><span class="o">=</span><span class="s2">&quot;probabilityTWL_01_15-100&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">],</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;twl_out&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="c1"># subseasonal global per-country coastal summary -&gt; a pandas.DataFrame</span>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;coastal-forecast&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="n">summary</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>
+<p>As with the EFHM, only the AOI window is read over <code>/vsicurl</code>, and <code>aggregate=</code>
+is rejected — a forecast cycle is chosen by <code>reference_time</code>, not reduced over
+time.</p>
 
 
 
@@ -23635,7 +23742,7 @@ Copernicus Emergency Management Service.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../fabdem/fabdem/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Reference">
+          <a href="../introduction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -23645,20 +23752,20 @@ Copernicus Emergency Management Service.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Reference
+                Introduction
               </div>
             </div>
           </a>
         
         
           
-          <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage">
+          <a href="../datasets/" class="md-footer__link md-footer__link--next" aria-label="Next: Available datasets">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Usage
+                Available datasets
               </div>
             </div>
             <div class="md-footer__button md-icon">
