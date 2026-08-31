@@ -15,8 +15,9 @@ failure, which is printed as a warning instead, because a gate fanning out
 over this many live services would otherwise go red whenever one of them is
 briefly slow; and when no report was written at all - the caller's own exit
 code already carries that case. Exits 1 when a provider reported
-`status="error"` for any other reason, or when the report is not valid JSON or
-not the list of provider records the audit emits. Exits 2 on a bad command
+`status="error"` (or `variable_status="error"`, the variable-drift dimension's
+own "could not run") for any other reason, or when the report is not valid JSON
+or not the list of provider records the audit emits. Exits 2 on a bad command
 line.
 """
 
@@ -42,21 +43,23 @@ _TRANSIENT_MARKERS = (
 )
 
 
-def _detail(row: dict) -> str:
-    """Return a row's `detail` as text, whatever the provider put there.
+def _detail(row: dict, key: str = "detail") -> str:
+    """Return a row's detail field as text, whatever the provider put there.
 
-    The shape guard only establishes that each row is a mapping, so `detail`
-    can be any JSON scalar. Coercing here keeps a malformed report a *reported*
-    failure rather than an `AttributeError` traceback that reads as a bug in
-    this checker.
+    The shape guard only establishes that each row is a mapping, so a detail
+    field can be any JSON scalar. Coercing here keeps a malformed report a
+    *reported* failure rather than an `AttributeError` traceback that reads as a
+    bug in this checker.
 
     Args:
         row: One provider record from the audit report.
+        key: Which detail field to read — `"detail"` for the id-level audit or
+            `"variable_detail"` for the variable-drift dimension.
 
     Returns:
         str: The detail text, or `""` when the row carries none.
     """
-    detail = row.get("detail")
+    detail = row.get(key)
     return "" if detail is None else str(detail)
 
 
@@ -147,7 +150,29 @@ def main(argv: list[str]) -> int:
             f"({_detail(row) or 'no detail given'}) - drift is unverified "
             f"for this provider",
         )
-    if hard:
+
+    # The variable-drift dimension is a second "could not run" surface: a row
+    # can pass the id-level audit (status="ok") while its variable fetch failed
+    # (variable_status="error"). Hold it to the same rule so a variable-fetch
+    # failure cannot leave the gate green having verified no variable drift.
+    var_errored = [r for r in rows if r.get("variable_status") == "error"]
+    var_transient = [
+        r for r in var_errored if _looks_transient(_detail(r, "variable_detail"))
+    ]
+    var_hard = [r for r in var_errored if r not in var_transient]
+    for row in var_transient:
+        print(
+            f"::warning::{row.get('provider', '?')}: variable audit could not "
+            f"reach the provider ({_detail(row, 'variable_detail') or 'no detail given'})"
+            f" - variable drift is unverified this run",
+        )
+    for row in var_hard:
+        print(
+            f"::error::{row.get('provider', '?')}: variable audit could not run "
+            f"({_detail(row, 'variable_detail') or 'no detail given'}) - variable "
+            f"drift is unverified for this provider",
+        )
+    if hard or var_hard:
         return 1
     audited = sum(1 for r in rows if r.get("status") == "ok")
     unsupported = sum(1 for r in rows if r.get("status") == "unsupported")
