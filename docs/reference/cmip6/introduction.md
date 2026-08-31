@@ -7,7 +7,7 @@
 Intercomparison Project Phase 6 — as analysis-ready cloud Zarr on the open
 **Pangeo Google Cloud mirror** (`gs://cmip6`). It is registered on the
 `EarthLens` facade under the keys `"cmip6"`, `"pangeo-cmip6"`, and
-`"climate-projections"`.
+`"cmip6:climate-projections"`.
 
 The archive is **anonymous** (no credentials, no auth), indexed by a single
 plain consolidated-stores CSV. There is no per-backend SDK to install — the CSV

@@ -750,22 +750,28 @@ class TestFacadeKeys:
         ("key", "extra", "dataset_id", "output_kind", "polygon"),
         [
             (
-                "sea-level-forecast",
+                "jrc:sea-level-forecast",
                 {"product": "medium_term"},
                 "sea_level_medium_term",
                 "raster",
                 True,
             ),
             (
-                "sea-level-forecast",
+                "jrc:sea-level-forecast",
                 {"product": "subseasonal"},
                 "sea_level_subseasonal",
                 "raster",
                 True,
             ),
             ("jrc-sea-level", {}, "sea_level_medium_term", "raster", True),
-            ("twl-forecast", {}, "sea_level_medium_term", "raster", True),
-            ("coastal-forecast", {}, "sea_level_subseasonal_coastal", "tabular", False),
+            ("jrc:twl-forecast", {}, "sea_level_medium_term", "raster", True),
+            (
+                "jrc:coastal-forecast",
+                {},
+                "sea_level_subseasonal_coastal",
+                "tabular",
+                False,
+            ),
             ("efhm", {"return_periods": [100]}, "efhm", "raster", True),
         ],
     )

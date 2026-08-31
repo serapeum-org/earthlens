@@ -101,7 +101,7 @@ class TestSeaLevelLiveFetch:
     def test_medium_term_gridded_writes_geotiff(self, tmp_path: Path):
         """A latest-cycle North Sea pull lands one georeferenced multi-band GeoTIFF."""
         paths = EarthLens(
-            data_source="sea-level-forecast",
+            data_source="jrc:sea-level-forecast",
             product="medium_term",
             lat_lim=[51.0, 53.0],
             lon_lim=[3.0, 5.0],
@@ -148,7 +148,9 @@ class TestSeaLevelLiveFetch:
         """The coastal key returns the global per-country summary as a DataFrame."""
         import pandas as pd
 
-        result = EarthLens(data_source="coastal-forecast").download(progress_bar=False)
+        result = EarthLens(data_source="jrc:coastal-forecast").download(
+            progress_bar=False
+        )
         assert isinstance(result, pd.DataFrame)
         assert "GID_0" in result.columns, f"missing GID_0: {list(result.columns)[:5]}"
         assert len(result) > 0, "the coastal summary came back empty"

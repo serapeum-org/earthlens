@@ -50,12 +50,12 @@ Canonical ids: `airnow`, `argo`, `asf`, `bathymetry`, `caravan`, `catrare`, `chc
 `obis`, `openaq`, `openeo`, `overture`, `pvgis`, `radar`, `risk-indicators`, `s3`, `sensor-community`, `sentinel_hub`, `soilgrids`,
 `stac`, `tropycal`, `usgs_water`, `wdpa`, `worldpop`. Common aliases include `amazon-s3`, `chirps`,
 `google-earth-engine`, `argo-floats`/`argopy`, `ioos` (erddap), `gebco`/`etopo` (bathymetry),
-`climate_indices`/`teleconnections` (climate indices), `copernicus-dem`/`cop-dem`/`elevation` (dem),
-`fab-dem`/`bare-earth-dem` (fabdem),
-`efhm`/`jrc-flood`/`jrc-flood-hazard`/`european-flood-hazard` and
-`sea-level-forecast`/`jrc-sea-level`/`coastal-forecast`/`twl-forecast` (jrc),
+`climate_indices`/`climate-indices:teleconnections` (climate indices), `copernicus-dem`/`cop-dem`/`dem:elevation` (dem),
+`fab-dem`/`fabdem:bare-earth-dem` (fabdem),
+`efhm`/`jrc-flood`/`jrc-flood-hazard`/`jrc:european-flood-hazard` and
+`jrc:sea-level-forecast`/`jrc-sea-level`/`jrc:coastal-forecast`/`jrc:twl-forecast` (jrc),
 `sentinel-hub`/`sentinelhub`, `nexrad`,
-`nwis`/`usgs-water`, `world-pop`, `human-settlement`/`ghs`, `solar-pv` (pvgis),
+`nwis`/`usgs-water`, `world-pop`, `ghsl:human-settlement`/`ghs`, `pvgis:solar-pv` (pvgis),
 `thinkhazard`/`inform`/`gfw`/`global-forest-watch` (risk indicators),
 `rgi`/`glims`/`wgms` (glaciers), `isric` (soilgrids),
 `caravan-grdc`/`grdc-caravan` (caravan - the open GRDC discharge route),

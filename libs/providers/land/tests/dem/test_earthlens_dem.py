@@ -11,7 +11,7 @@ from earthlens.earthlens import EarthLens
 
 pytestmark = pytest.mark.dem
 
-KEYS = ["dem", "copernicus-dem", "cop-dem", "elevation"]
+KEYS = ["dem", "copernicus-dem", "cop-dem", "dem:elevation"]
 
 
 @pytest.mark.unit
@@ -67,9 +67,9 @@ class TestFacadeConstruction:
         assert el.datasource._dataset.bucket == "copernicus-dem-90m"
 
     def test_elevation_alias_routes_to_dem(self, tmp_path: Path) -> None:
-        """`data_source="elevation"` constructs the `DEM` backend."""
+        """`data_source="dem:elevation"` constructs the `DEM` backend."""
         el = EarthLens(
-            data_source="elevation",
+            data_source="dem:elevation",
             variables=[],
             lat_lim=[30.2, 30.8],
             lon_lim=[31.2, 31.8],

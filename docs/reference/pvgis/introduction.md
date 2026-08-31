@@ -37,7 +37,7 @@ long-format frame tagged with `lat` / `lon` / `product`, and concatenates them.
 from earthlens.core import EarthLens
 
 df = EarthLens(
-    data_source="pvgis",            # alias: "solar-pv"
+    data_source="pvgis",            # topic key: "pvgis:solar-pv"
     variables=["seriescalc"],
     start="2020-01-01",
     end="2020-12-31",

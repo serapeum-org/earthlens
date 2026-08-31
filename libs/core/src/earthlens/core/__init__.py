@@ -34,6 +34,7 @@ from __future__ import annotations
 
 from importlib.metadata import PackageNotFoundError, version
 
+from earthlens._backends import AmbiguousDataSourceError
 from earthlens.aggregate import (
     AggregatedWindow,
     AggregationConfig,
@@ -47,6 +48,7 @@ from earthlens.earthlens import EarthLens, download, find, search, sources
 __all__ = [
     "AggregatedWindow",
     "AggregationConfig",
+    "AmbiguousDataSourceError",
     "EarthLens",
     "PolygonAoiWarning",
     "aggregate_netcdf",

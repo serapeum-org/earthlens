@@ -1,7 +1,7 @@
 # PVGIS — usage
 
 All examples go through the [`EarthLens`](../earthlens.md) facade with
-`data_source="pvgis"` (alias `"solar-pv"`). The backend needs no credentials.
+`data_source="pvgis"` (topic key `"pvgis:solar-pv"`). The backend needs no credentials.
 `download()` returns a long-format `pandas.DataFrame` and also writes it to
 `path` as CSV (or Parquet — see below).
 

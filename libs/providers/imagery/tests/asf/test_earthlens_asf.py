@@ -13,12 +13,12 @@ from earthlens.earthlens import EarthLens
 class TestRegistry:
     """Tests for the ASF entries in `EarthLens.DataSources`."""
 
-    @pytest.mark.parametrize("key", ["asf", "alaska-satellite-facility", "insar"])
+    @pytest.mark.parametrize("key", ["asf", "alaska-satellite-facility", "asf:insar"])
     def test_keys_present(self, key: str) -> None:
         """Every ASF key is registered in `EarthLens.DataSources`."""
         assert key in EarthLens.DataSources
 
-    @pytest.mark.parametrize("key", ["asf", "alaska-satellite-facility", "insar"])
+    @pytest.mark.parametrize("key", ["asf", "alaska-satellite-facility", "asf:insar"])
     def test_keys_resolve_to_asf_class(self, key: str) -> None:
         """All three keys resolve to `earthlens.asf.ASF`."""
         assert EarthLens.DataSources[key] is earthlens.asf.ASF
@@ -44,9 +44,9 @@ class TestFacadeConstruction:
         assert el.datasource._product_key == "sentinel-1-slc"
 
     def test_insar_alias_routes_to_asf(self, fake_asf_search, tmp_path):
-        """`data_source="insar"` constructs the `ASF` backend too."""
+        """`data_source="asf:insar"` constructs the `ASF` backend too."""
         el = EarthLens(
-            data_source="insar",
+            data_source="asf:insar",
             variables=["sentinel-1-slc"],
             reference="S1A_REF_SLC",
             start="2024-01-01",

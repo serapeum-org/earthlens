@@ -8,9 +8,9 @@ the [`ecmwf`](../ecmwf/introduction.md) backend's per-store `endpoint`:
 
 | Facade key(s) | Product | `kind` | Output |
 |---|---|---|---|
-| `efhm` / `jrc-flood` / `jrc-flood-hazard` / `european-flood-hazard` | European Flood Hazard Map (river-flood depth per return period) | `flood_hazard_raster` | `list[Path]` GeoTIFF |
-| `sea-level-forecast` / `jrc-sea-level` / `twl-forecast` | Probabilistic Total Water Level (TWL) forecasts (gridded) | `sea_level_gridded` | `list[Path]` GeoTIFF |
-| `coastal-forecast` | Subseasonal coastal per-country summary | `sea_level_coastal` | `pandas.DataFrame` |
+| `efhm` / `jrc-flood` / `jrc-flood-hazard` / `jrc:european-flood-hazard` | European Flood Hazard Map (river-flood depth per return period) | `flood_hazard_raster` | `list[Path]` GeoTIFF |
+| `jrc:sea-level-forecast` / `jrc-sea-level` / `jrc:twl-forecast` | Probabilistic Total Water Level (TWL) forecasts (gridded) | `sea_level_gridded` | `list[Path]` GeoTIFF |
+| `jrc:coastal-forecast` | Subseasonal coastal per-country summary | `sea_level_coastal` | `pandas.DataFrame` |
 
 For the walkthrough see [Usage](usage.md), the datasets on the
 [Available datasets](datasets.md) page, and the rendered API on the
@@ -72,7 +72,7 @@ from earthlens.core import EarthLens
 
 # gridded medium-term TWL forecast, latest cycle, cropped to the North Sea
 paths = EarthLens(
-    data_source="sea-level-forecast",
+    data_source="jrc:sea-level-forecast",
     product="medium_term",
     lat_lim=[51.0, 53.0],
     lon_lim=[3.0, 5.0],
@@ -80,7 +80,7 @@ paths = EarthLens(
 ).download()
 
 # subseasonal global coastal summary -> a pandas.DataFrame
-summary = EarthLens(data_source="coastal-forecast").download()
+summary = EarthLens(data_source="jrc:coastal-forecast").download()
 ```
 
 The forecasts are read only over the AOI window (`/vsicurl`), so a small area

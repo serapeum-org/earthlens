@@ -151,7 +151,7 @@ class JRC(AbstractDataSource):
             product: Sea-level family — `"medium_term"` | `"subseasonal"`.
                 Selects the gridded cube; the coastal summary is its own dataset
                 (`dataset="sea_level_subseasonal_coastal"`, or the
-                `coastal-forecast` facade key).
+                `jrc:coastal-forecast` facade key).
             reference_time: Sea-level — `"latest"` (default) or an explicit cycle
                 (`"2026-08-26T12"`).
             field: Sea-level gridded — the variable to crop (defaults to the
@@ -224,7 +224,7 @@ class JRC(AbstractDataSource):
         """Resolve the sea-level family selector to one gridded dataset id.
 
         The coastal summary is a dataset in its own right rather than a mode of
-        the gridded ones, so it is selected by id (or by the `coastal-forecast`
+        the gridded ones, so it is selected by id (or by the `jrc:coastal-forecast`
         facade key) instead of a second selector.
 
         Args:

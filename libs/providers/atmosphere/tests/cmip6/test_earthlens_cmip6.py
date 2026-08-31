@@ -9,7 +9,7 @@ from earthlens.earthlens import EarthLens
 
 pytestmark = [pytest.mark.cmip6, pytest.mark.unit]
 
-KEYS = ["cmip6", "pangeo-cmip6", "climate-projections"]
+KEYS = ["cmip6", "pangeo-cmip6", "cmip6:climate-projections"]
 
 
 @pytest.mark.parametrize("key", KEYS)
@@ -52,7 +52,7 @@ def test_facade_facet_call_builds_backend():
     assert backend._member_id == "r1i1p1f1"
 
 
-@pytest.mark.parametrize("alias", ["pangeo-cmip6", "climate-projections"])
+@pytest.mark.parametrize("alias", ["pangeo-cmip6", "cmip6:climate-projections"])
 def test_facade_aliases_build_backend(alias):
     """The CMIP6 aliases build the same backend as the canonical key."""
     el = EarthLens(

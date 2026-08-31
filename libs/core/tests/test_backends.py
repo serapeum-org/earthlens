@@ -2,13 +2,20 @@
 
 from __future__ import annotations
 
+import importlib
 import tomllib
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
 import pytest
 
-from earthlens._backends import ENTRY_POINT_GROUP, discover_backends
+from earthlens._backends import (
+    ENTRY_POINT_GROUP,
+    RESERVED_TOPICS,
+    discover_backends,
+    topic_claimants,
+)
 from earthlens.earthlens import EarthLens
 
 #: Every thematic provider distribution installed in the dev workspace.
@@ -123,6 +130,24 @@ class TestDiscovery:
         finally:
             logger.remove(sink)
         assert any("published by both" in message for message in messages)
+
+    def test_bare_reserved_key_is_warned_about(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A provider registering a bare reserved topic word warns at discovery."""
+        from loguru import logger
+
+        monkeypatch.setattr(
+            "earthlens._backends.entry_points",
+            lambda group: [_FakeEntryPoint("plugin", {"precipitation": _SPEC_A})],
+        )
+        messages: list[str] = []
+        sink = logger.add(lambda record: messages.append(record), level="WARNING")
+        try:
+            discover_backends()
+        finally:
+            logger.remove(sink)
+        assert any("reserved generic topic word" in message for message in messages)
 
     def test_distinct_keys_are_not_warned_about(
         self, monkeypatch: pytest.MonkeyPatch
@@ -244,3 +269,102 @@ class TestPreBoundKwargs:
     def test_alias_survives_discovery(self, key: str, expected: dict) -> None:
         """An entry point carries the table, so pre-bound kwargs survive."""
         assert EarthLens.DataSources.default_kwargs(key) == expected
+
+
+@pytest.mark.unit
+class TestReservedTopics:
+    """`RESERVED_TOPICS` and the `topic_claimants` helper (C1)."""
+
+    def test_topic_claimants_returns_sorted_qualified_keys(self) -> None:
+        """`topic_claimants` returns the sorted `source:topic` keys for a topic."""
+        keys = ["b:elevation", "a:elevation", "dem", "x:solar-pv"]
+        assert topic_claimants(keys, "elevation") == ["a:elevation", "b:elevation"]
+
+    def test_topic_claimants_empty_when_unclaimed(self) -> None:
+        """A topic no key qualifies yields an empty list."""
+        assert topic_claimants(["chc", "cmems"], "precipitation") == []
+
+    def test_reserved_topics_covers_the_migrated_words(self) -> None:
+        """Every generic word migrated to `source:topic` is a reserved topic."""
+        migrated = {
+            "elevation",
+            "insar",
+            "bare-earth-dem",
+            "human-settlement",
+            "climate-projections",
+            "teleconnections",
+            "european-flood-hazard",
+            "sea-level-forecast",
+            "coastal-forecast",
+            "twl-forecast",
+            "solar-pv",
+        }
+        assert migrated <= RESERVED_TOPICS
+
+
+def _provider_tables() -> list[tuple[str, dict[str, object]]]:
+    """Return `(theme, BACKENDS)` for every provider distribution."""
+    return [
+        (theme, importlib.import_module(f"earthlens._{theme}").BACKENDS)
+        for theme in THEMES
+    ]
+
+
+def _duplicate_keys(tables: list[tuple[str, dict[str, object]]]) -> list[str]:
+    """Return the sorted keys registered by more than one provider table."""
+    seen: dict[str, str] = {}
+    dups: list[str] = []
+    for theme, table in tables:
+        for key in table:
+            if key in seen:
+                dups.append(key)
+            seen[key] = theme
+    return sorted(dups)
+
+
+def _bare_reserved(keys: Iterable[str]) -> list[str]:
+    """Return the sorted bare keys that are reserved topic words."""
+    return sorted(key for key in keys if ":" not in key and key in RESERVED_TOPICS)
+
+
+def _dangling_topics(keys: Iterable[str]) -> list[str]:
+    """Return the sorted `source:topic` keys whose topic is not reserved."""
+    return sorted(
+        key
+        for key in keys
+        if ":" in key and key.split(":", 1)[1] not in RESERVED_TOPICS
+    )
+
+
+@pytest.mark.unit
+class TestRegistrationGuards:
+    """The merged registry obeys the source/topic key invariants (C3)."""
+
+    def test_no_key_is_registered_twice(self) -> None:
+        """No facade key is registered by more than one provider table."""
+        tables = _provider_tables()
+        assert _duplicate_keys(tables) == []
+        assert len(discover_backends()) == sum(len(table) for _theme, table in tables)
+
+    def test_no_bare_reserved_word_is_registered(self) -> None:
+        """A reserved topic word is never registered as a bare facade key."""
+        assert _bare_reserved(discover_backends()) == []
+
+    def test_no_qualified_key_names_an_unreserved_topic(self) -> None:
+        """Every `source:topic` key's topic is a reserved word."""
+        assert _dangling_topics(discover_backends()) == []
+
+    def test_duplicate_detection_catches_a_clash(self) -> None:
+        """`_duplicate_keys` flags a key that two tables share."""
+        tables = [("a", {"x": 1, "y": 1}), ("b", {"x": 2})]
+        assert _duplicate_keys(tables) == ["x"]
+
+    def test_bare_reserved_detection_catches_a_violation(self) -> None:
+        """`_bare_reserved` flags a reserved word registered bare."""
+        assert _bare_reserved(["dem", "elevation", "dem:elevation"]) == ["elevation"]
+
+    def test_dangling_topic_detection_catches_a_violation(self) -> None:
+        """`_dangling_topics` flags a qualified key naming an unreserved topic."""
+        assert _dangling_topics(["dem:elevation", "foo:not-a-topic"]) == [
+            "foo:not-a-topic"
+        ]
