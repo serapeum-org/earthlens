@@ -87,7 +87,7 @@ The `dataset=` kwarg picks the bucket:
 - `dataset="cop-dem-glo-90"` → the 90 m bucket, tile-name token `30`.
 
 Or use one of the discoverability aliases (`copernicus-dem`,
-`cop-dem`, `elevation`) — they all route to the same backend.
+`cop-dem`) or the topic key `dem:elevation` — they all route to the same backend.
 
 ## Attribution
 
