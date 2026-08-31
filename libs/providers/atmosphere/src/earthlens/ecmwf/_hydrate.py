@@ -1285,9 +1285,9 @@ def _block_satisfies(
     Args:
         effective: The row's selectors, stanza extras merged with its own.
         block: One constraints block serving the row's variable.
-        enumerated: Every key any block of the dataset constrains. A key this
-            block omits while the dataset partitions on it elsewhere is a
-            conflict, not a free choice.
+        enumerated: Every key any block of the dataset constrains. Kept for
+            callers and for the required-key check below; a key this block
+            omits is read as unconstrained rather than as a conflict.
 
     Returns:
         True when this single block can serve the request.
@@ -1298,8 +1298,12 @@ def _block_satisfies(
             continue
         offered = {str(value) for value in (block.get(key) or [])}
         if not offered:
-            if key in enumerated:
-                return False
+            # A key this block does not list is unconstrained for it, which is
+            # how CDS constraints read: `reanalysis-era5-land-monthly-means`
+            # serves nine time-invariant fields from a block naming only
+            # `data_format`, and a row sending `product_type` alongside is not
+            # thereby broken. Treating absence as a conflict reported exactly
+            # those rows, and other known-good ones with them.
             continue
         if not (asked & offered):
             return False
@@ -1347,7 +1351,7 @@ def _selectors_are_serveable(
 #: Selectors the backend derives from the caller's start/end dates. An
 #: override on one of these does not add information, it overrules the
 #: request, because `_apply_extras_and_strips` merges extras last.
-_CALLER_DERIVED_KEYS = frozenset({"year", "month", "day"})
+_CALLER_DERIVED_KEYS = frozenset({"year", "month", "day", "time"})
 
 
 def _selector_override(
@@ -1829,6 +1833,7 @@ def _hydrate_stanza_whole(
         session.error = exc
         return text, [], []
     data = _data_variables(nc_meta)
+    session.issued += 1
     session.offered.update(data)
     session.filtered.update(set(nc_meta) - set(data))
     match = _stanza_match(text, dataset_id)
@@ -2117,11 +2122,15 @@ class _ServingBlocks:
 
     Attributes:
         enumerated: Every key any block of the dataset constrains.
+        unreachable: Whether the fetch failed, as opposed to the store
+            publishing no constraints. Both leave no blocks to judge against,
+            but only the first means the check did not happen.
     """
 
     def __init__(self, dataset_id: str) -> None:
         self._dataset_id = dataset_id
         self._rows: list[dict[str, Any]] | None = None
+        self.unreachable = False
 
     def _load(self) -> list[dict[str, Any]]:
         """Fetch the dataset's constraints once, tolerating an unreachable store.
@@ -2138,6 +2147,7 @@ class _ServingBlocks:
             except Exception as exc:  # noqa: BLE001 - uncheckable is not fatal
                 logger.debug(f"no constraints for {self._dataset_id}: {exc}")
                 self._rows = []
+                self.unreachable = True
         return self._rows
 
     @property
@@ -2237,8 +2247,17 @@ def _unserveable_selectors(
     return effective
 
 
+class ConstraintsUnavailable(RuntimeError):
+    """Raised when an audit could not read a dataset's constraints.
+
+    Distinct from finding nothing wrong: a run that could not fetch has checked
+    nothing, and reporting that as clean is how a hand edit slips through.
+    """
+
+
 def audit_serveability(
     blocks_for: Callable[[str], _ServingBlocks] | None = None,
+    strict: bool = True,
 ) -> list[tuple[str, str, dict[str, Any]]]:
     """Find every curated row whose request no single serving block can answer.
 
@@ -2255,10 +2274,17 @@ def audit_serveability(
         blocks_for: Factory returning the serving-block lookup for a dataset id,
             defaulting to the live one. Injected so the audit can run against a
             fixture without reaching the network.
+        strict: Raise `ConstraintsUnavailable` when any dataset's constraints
+            could not be read, rather than returning a clean result from a run
+            that checked nothing. Pass `False` to audit what is reachable.
 
     Returns:
         One `(dataset_id, slug, effective_selectors)` per unserveable row, in
         catalog order. Empty is the invariant holding.
+
+    Raises:
+        ConstraintsUnavailable: Under `strict`, when a dataset's constraints
+            could not be fetched, so the audit's silence would be uninformed.
 
     Examples:
         - A store that constrains nothing serves every row, so nothing is
@@ -2313,6 +2339,7 @@ def audit_serveability(
 
     lookup_for = blocks_for or _serving_blocks_for
     findings: list[tuple[str, str, dict[str, Any]]] = []
+    unreachable: list[str] = []
     for name, dataset in Catalog().datasets.items():
         rows = [
             (slug, row)
@@ -2327,6 +2354,13 @@ def audit_serveability(
             effective = _unserveable_selectors(stanza, row, lookup)
             if effective is not None:
                 findings.append((name, slug, effective))
+        if getattr(lookup, "unreachable", False):
+            unreachable.append(name)
+    if strict and unreachable:
+        raise ConstraintsUnavailable(
+            f"constraints unreadable for {len(unreachable)} dataset(s), so this "
+            f"audit checked nothing for them: {', '.join(sorted(unreachable)[:5])}"
+        )
     return findings
 
 
