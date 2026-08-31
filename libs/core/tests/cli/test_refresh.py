@@ -348,6 +348,50 @@ class TestAuditOne:
         monkeypatch.setattr(stac_cli, "get_json", boom)
         assert audit_one(_info("stac")).status == "error", "failure captured"
 
+    def test_variable_drift_flags_a_recased_variable(self, monkeypatch):
+        """A curated variable the server re-cased (wtmp -> WTMP) is drift (#1129)."""
+        import earthlens.erddap.cli as erddap_cli
+        from earthlens.erddap.catalog import Dataset
+
+        record = Dataset(
+            server_url="https://x/erddap",
+            dataset_id="cwwcNDBCMet",
+            protocol="tabledap",
+            variables=["wtmp"],
+        )
+        catalog = SimpleNamespace(
+            datasets={"cwwcNDBCMet": record}, available_datasets=["cwwcNDBCMet"]
+        )
+        monkeypatch.setattr(refresh_mod, "load_catalog", lambda info: catalog)
+        monkeypatch.setitem(
+            refresh_mod._REFRESHERS,
+            "erddap",
+            lambda cat: {"https://x/erddap": ["cwwcNDBCMet"]},
+        )
+        monkeypatch.setattr(erddap_cli, "get_text", lambda url: _WTMP_DDS)
+        outcome = audit_one(_info("erddap"))
+        assert outcome.status == "ok" and outcome.broken == [], "id-level clean"
+        assert outcome.variable_status == "ok"
+        assert outcome.variable_drift == ["cwwcNDBCMet:wtmp"], (
+            "re-cased variable flagged"
+        )
+
+    def test_provider_without_variable_lister_reports_unsupported(self, monkeypatch):
+        """A provider with no variable-lister never reports a false variable ok."""
+        monkeypatch.setattr(
+            stac_cli,
+            "get_json",
+            lambda url: {"collections": [{"id": "x"}], "links": []},
+        )
+        outcome = audit_one(_info("stac"))
+        assert outcome.status == "ok"
+        assert outcome.variable_status == "unsupported"
+
+
+_WTMP_DDS = (
+    "Dataset {\n  Sequence {\n    Float32 ATMP;\n    Float32 WTMP;\n  } s;\n} s;\n"
+)
+
 
 def _raise_dds_error(record):
     """A variable-lister stand-in that fails the way a bad `.dds` fetch would."""

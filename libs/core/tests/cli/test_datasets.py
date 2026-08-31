@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from types import SimpleNamespace
 
 import pytest
 from typer.testing import CliRunner
@@ -383,6 +384,35 @@ class TestAudit:
         )
         result = runner.invoke(app, ["datasets", "audit", "stac", "--strict"])
         assert result.exit_code == 1, "drift under --strict -> exit 1"
+
+    def test_strict_exits_nonzero_on_variable_drift(self, monkeypatch):
+        """--strict exits 1 when a curated variable is no longer served (#1129)."""
+        import earthlens.erddap.cli as erddap_cli
+        from earthlens.erddap.catalog import Dataset
+
+        record = Dataset(
+            server_url="https://x/erddap",
+            dataset_id="cwwcNDBCMet",
+            protocol="tabledap",
+            variables=["wtmp"],
+        )
+        catalog = SimpleNamespace(
+            datasets={"cwwcNDBCMet": record}, available_datasets=["cwwcNDBCMet"]
+        )
+        monkeypatch.setattr(refresh_mod, "load_catalog", lambda info: catalog)
+        monkeypatch.setitem(
+            refresh_mod._REFRESHERS,
+            "erddap",
+            lambda cat: {"https://x/erddap": ["cwwcNDBCMet"]},
+        )
+        monkeypatch.setattr(
+            erddap_cli,
+            "get_text",
+            lambda url: "Dataset {\n  Sequence {\n    Float32 WTMP;\n  } s;\n} s;\n",
+        )
+        result = runner.invoke(app, ["datasets", "audit", "erddap", "--strict"])
+        assert result.exit_code == 1, f"variable drift -> exit 1: {result.output}"
+        assert "variable drift" in result.output.lower(), "drift surfaced to the user"
 
     def test_coverage_reports_buckets(self, monkeypatch):
         """--coverage prints the curation buckets + the addressable todo list."""
