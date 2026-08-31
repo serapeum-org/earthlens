@@ -691,9 +691,8 @@ class TestSelectorsAreServeable:
             lambda name: ({"col": {"long_name": "ozone", "units": "mol m-2"}}, {}),
             lambda name: [{"variable": ["ozone"], "sensor": ["gome"]}],
         )
-        assert filled == [] and declined == ["layer"], (
-            f"expected the row declined; filled={filled} declined={declined}"
-        )
+        assert filled == [], f"nothing should have been filled; got {filled}"
+        assert declined == ["layer"], f"the row should be declined; got {declined}"
         assert "units: unknown" in out, "the placeholder should be left as it was"
 
     def test_a_row_the_store_can_serve_is_still_written(self):
@@ -993,7 +992,8 @@ class TestNumberShapedScalarsAreQuoted:
         """PyYAML leaves `1e-3` and `08` bare; a YAML 1.2 reader would type them."""
         rendered = hydrate_mod._yaml_value(value)
 
-        assert rendered.startswith("'") and rendered.endswith("'")
+        assert rendered.startswith("'"), f"{rendered} is not quoted"
+        assert rendered.endswith("'"), f"{rendered} is not quoted"
         assert yaml.safe_load(f"x: {rendered}")["x"] == value
 
     @pytest.mark.parametrize("value", ["K", "W m-2", "(0 - 1)", "2e", "day"])

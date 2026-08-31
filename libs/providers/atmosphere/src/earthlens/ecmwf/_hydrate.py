@@ -2060,6 +2060,43 @@ class _ServingBlocks:
         ]
 
 
+def _promises_data(row: Any) -> bool:
+    """Whether a catalog row claims to describe a retrievable variable.
+
+    Args:
+        row: A `Variable` from the curated catalog.
+
+    Returns:
+        True unless the row is a placeholder, which promises nothing and so
+        cannot be failing to deliver it.
+    """
+    return row.units != "unknown" and not row.unhydratable
+
+
+def _unserveable_selectors(
+    stanza: dict[str, Any], row: Any, lookup: _ServingBlocks
+) -> dict[str, Any] | None:
+    """Return a row's effective selectors when no serving block can answer them.
+
+    Args:
+        stanza: The dataset-level `extras:` mapping.
+        row: The catalog row to judge.
+        lookup: The dataset's serving-block lookup.
+
+    Returns:
+        The merged selectors when the row is unserveable, else `None` — which
+        also covers a variable no block serves, since there is nothing to judge.
+    """
+    serving = lookup(row.cds_variable)
+    if not serving:
+        return None
+    effective = dict(stanza)
+    effective.update(getattr(row, "extras", {}) or {})
+    if _selectors_are_serveable(effective, serving, lookup.enumerated):
+        return None
+    return effective
+
+
 def audit_serveability(
     blocks_for: Callable[[str], _ServingBlocks] | None = None,
 ) -> list[tuple[str, str, dict[str, Any]]]:
@@ -2088,19 +2125,18 @@ def audit_serveability(
     lookup_for = blocks_for or _serving_blocks_for
     findings: list[tuple[str, str, dict[str, Any]]] = []
     for name, dataset in Catalog().datasets.items():
+        rows = [
+            (slug, row)
+            for slug, row in dataset.variables.items()
+            if _promises_data(row)
+        ]
+        if not rows:
+            continue
         stanza = dict(getattr(dataset, "extras", {}) or {})
-        lookup: _ServingBlocks | None = None
-        for slug, row in dataset.variables.items():
-            if row.units == "unknown" or row.unhydratable:
-                continue
-            if lookup is None:
-                lookup = lookup_for(name)
-            serving = lookup(row.cds_variable)
-            if not serving:
-                continue
-            effective = dict(stanza)
-            effective.update(getattr(row, "extras", {}) or {})
-            if not _selectors_are_serveable(effective, serving, lookup.enumerated):
+        lookup = lookup_for(name)
+        for slug, row in rows:
+            effective = _unserveable_selectors(stanza, row, lookup)
+            if effective is not None:
                 findings.append((name, slug, effective))
     return findings
 

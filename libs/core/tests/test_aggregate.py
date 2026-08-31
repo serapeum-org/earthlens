@@ -1897,9 +1897,12 @@ class TestHandleEnumerationGuard:
             ),
         )
 
-        with pytest.warns(RuntimeWarning, match="handle-release checks skipped"):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
             with pytest.raises(pytest.skip.Exception, match="cannot be enumerated"):
                 _handles_on(tmp_path)
+
+        assert [w for w in caught if "handle-release checks skipped" in str(w.message)]
 
     def test_any_other_enumeration_error_is_raised(self, monkeypatch, tmp_path):
         """Swallowing it would skip every release check in this file, green."""
