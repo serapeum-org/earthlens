@@ -126,7 +126,7 @@ class TestS3Backend:
             print("the downloaded files could not be deleted")
 
 
-@pytest.mark.ecmwf
+@pytest.mark.unit
 class TestCheckSourceResolution:
     """`EarthLens._check_source` resolves keys and guards reserved topics (C1)."""
 
@@ -174,6 +174,7 @@ class TestCheckSourceResolution:
         assert issubclass(AmbiguousDataSourceError, ValueError)
 
 
+@pytest.mark.ecmwf
 class TestECMWFBackend:
     """Tests for the C1+L3 fix that registers ECMWF in the facade.
 

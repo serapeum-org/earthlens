@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib
 import tomllib
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -301,7 +302,7 @@ class TestReservedTopics:
         assert migrated <= RESERVED_TOPICS
 
 
-def _provider_tables() -> list[tuple[str, dict]]:
+def _provider_tables() -> list[tuple[str, dict[str, object]]]:
     """Return `(theme, BACKENDS)` for every provider distribution."""
     return [
         (theme, importlib.import_module(f"earthlens._{theme}").BACKENDS)
@@ -309,7 +310,7 @@ def _provider_tables() -> list[tuple[str, dict]]:
     ]
 
 
-def _duplicate_keys(tables: list[tuple[str, dict]]) -> list[str]:
+def _duplicate_keys(tables: list[tuple[str, dict[str, object]]]) -> list[str]:
     """Return the sorted keys registered by more than one provider table."""
     seen: dict[str, str] = {}
     dups: list[str] = []
@@ -321,12 +322,12 @@ def _duplicate_keys(tables: list[tuple[str, dict]]) -> list[str]:
     return sorted(dups)
 
 
-def _bare_reserved(keys) -> list[str]:
+def _bare_reserved(keys: Iterable[str]) -> list[str]:
     """Return the sorted bare keys that are reserved topic words."""
     return sorted(key for key in keys if ":" not in key and key in RESERVED_TOPICS)
 
 
-def _dangling_topics(keys) -> list[str]:
+def _dangling_topics(keys: Iterable[str]) -> list[str]:
     """Return the sorted `source:topic` keys whose topic is not reserved."""
     return sorted(
         key
