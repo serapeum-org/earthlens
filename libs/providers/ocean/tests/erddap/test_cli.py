@@ -128,6 +128,17 @@ class TestVariablesFor:
         assert "chlorophyll" in served
         assert {"time", "latitude", "longitude"} <= served
 
+    def test_non_dds_body_raises(self, monkeypatch):
+        """A 200 non-DDS body raises, not parses to an empty (mass-drift) set."""
+        monkeypatch.setattr(
+            erddap_cli, "get_text", lambda url: "<html>under maintenance</html>"
+        )
+        record = SimpleNamespace(
+            server_url="https://x/erddap", protocol="tabledap", dataset_id="cwwcNDBCMet"
+        )
+        with pytest.raises(ValueError, match="did not return a DDS"):
+            erddap_cli.variables_for(record)
+
 
 class TestCoverage:
     """Tests for the ERDDAP `audit --coverage` classifier."""

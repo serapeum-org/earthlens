@@ -78,12 +78,24 @@ def variables_for(record: Any) -> set[str]:
             `protocol`, and `dataset_id`.
 
     Returns:
-        The set of variable names the server declares for the dataset (a
-        superset of the data variables, so a curated name absent from it is real
-        drift while extra dimension names never cause a false positive).
+        The set of variable names the server declares for the dataset. This
+        rests on ERDDAP destination names being `[A-Za-z][A-Za-z0-9_]*` (the
+        `.dds` grammar the regex matches), so the set is a superset of the data
+        variables and a curated name absent from it is real drift, while extra
+        dimension names never cause a false positive. A variable the `.dds`
+        grammar cannot express (e.g. a DAP structure type) is a known limitation
+        — it would read as drift, not be silently mis-parsed.
+
+    Raises:
+        ValueError: If the response is not a DDS — a 200 carrying a maintenance
+            or interstitial page — so the audit reports an errored fetch instead
+            of parsing an empty set and flagging every curated variable as drift.
     """
     base = record.server_url.rstrip("/")
-    dds = get_text(f"{base}/{record.protocol}/{record.dataset_id}.dds")
+    url = f"{base}/{record.protocol}/{record.dataset_id}.dds"
+    dds = get_text(url)
+    if "Dataset {" not in dds:
+        raise ValueError(f"{url} did not return a DDS")
     return set(_DDS_VARIABLE.findall(dds))
 
 
