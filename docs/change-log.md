@@ -1,5 +1,86 @@
 # Change Log
 
+## 0.19.0 (2026-08-29)
+
+### Feat
+
+- **ecmwf**: hydrate every placeholder by probing each variable in turn (#1113)
+
+### Fix
+
+- **ecmwf**: keep aggregated outputs unique and faithful to the request (#1112)
+
+## 0.18.0 (2026-08-23)
+
+### BREAKING CHANGE
+
+- the four inform:* Risk datasets change what they
+return. They read the published release workbook instead of the Scores
+API, so scores come from the current release (Kenya 6.2, against 5.8
+from the workflow the API still serves), the frame gains a source
+column, validity_year carries a real year instead of 0, and workflow_id
+is empty on a workbook row. No signatures change - source="api"
+restores the API behaviour.
+
+### Feat
+
+- **risk_indicators**: serve INFORM's currently published release (#1102)
+- **gee**: read raw assets through the pyramids-eo EEDAI fast-path (#1092)
+- **fdsn**: add optional ShakeMap raster side-output for USGS events (#1094)
+
+### Fix
+
+- **eea_aq**: mask EEA no-data sentinels to NaN (#1107)
+- **ecmwf**: require evidence before the hydrator pairs a lone slug (#1105)
+- **ecmwf**: broaden pre-aggregated detection to flux monthly/daily families (#1101)
+- **aggregate**: stop op="auto" over-counting pre-aggregated CDS datasets (#1095)
+
+### Refactor
+
+- **base**: consolidate the typed availability errors and status extractors (#1106)
+
+## 0.17.0 (2026-08-22)
+
+### Feat
+
+- **ecmwf**: add the ECDS and XDS data stores (#1055)
+- **gee**: add cloud_mask and filters hooks to the GEE backend (#1090)
+
+### Fix
+
+- **admin**: re-enable geoBoundaries ADM1 e2e via pyramids-gis 0.54.0 (#1081)
+
+### Refactor
+
+- **auth**: resolve single-secret credentials via a shared base (#1084)
+
+## 0.16.0 (2026-08-20)
+
+### BREAKING CHANGE
+
+- an omitted path= now writes to the configured output
+directory instead of the working directory, and the facade uses
+<output_dir>/<source> rather than ./earthlens-data/<source>. path=""
+still means the working directory. Old caches are not migrated.
+
+### Feat
+
+- **core**: configurable cache dir, EUMETSAT end-bound fix, and the 2026 eclipse showcase (#1070)
+- **eea_aq**: add adjacent-era fallback and split empty-result signals (#1066)
+- **ecmwf**: curate the GloFAS historical intermediate stream (#1039)
+
+### Fix
+
+- **docs**: repair the brand guide and restore the head overrides
+- **osm**: surface opaque ohsome failures as typed, logged errors (#1072)
+- **gdacs**: retry SEARCH and skip live tests on a persistent upstream failure (#1071)
+- **overture**: resolve the release live instead of globbing the bundled pin (#1069)
+- **earthdata**: force IPv4 on the shared Earthdata Login path only on a dead IPv6 route (#1035)
+
+### Refactor
+
+- **base**: consolidate the AOI-sidecar cache and windowed /vsicurl read (#1067)
+
 ## 0.15.0 (2026-08-14)
 
 ### Feat

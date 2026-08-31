@@ -7,7 +7,7 @@ uses an erddapy `constraints` dict, griddap uses an OPeNDAP-style URL
 with `(value)` coordinate subsetting — so :func:`build_constraints` is
 protocol-aware and :func:`build_griddap_url` assembles the griddap URL
 directly. The exact spellings here were pinned against live erddapy
-`3.2.1` in the A1 gate (see `planning/erddap/captures/`).
+`3.2.1` in the A1 gate.
 """
 
 from __future__ import annotations

@@ -95,7 +95,7 @@ class DEM(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "static",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         *,
         dataset: str = "cop-dem-glo-30",

@@ -47,6 +47,7 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.overture.catalog import Catalog, Theme
+from earthlens.overture.releases import ReleaseLookupError, is_release_id
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
@@ -118,7 +119,7 @@ class Overture(AbstractDataSource):
         start: str | None = None,
         end: str | None = None,
         temporal_resolution: str = "all",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         release: str | None = None,
         max_features: int | None = None,
@@ -152,8 +153,12 @@ class Overture(AbstractDataSource):
                 Created by the parent class if absent.
             fmt: `strptime` format for `start` / `end` (only used when
                 they are supplied, for record-keeping).
-            release: Overture release id (`"2026-05-20.0"`). `None` (the
-                default) lets the SDK auto-target the newest release.
+            release: Overture release id (`"2026-07-22.0"`). `None` (the
+                default) targets the newest release Overture publishes —
+                the SDK auto-targets it on the default fetch path, and the
+                DuckDB path resolves it live (see `_resolve_release`). Pin
+                it only for reproducibility, and expect a pinned id to stop
+                resolving once Overture prunes that release from S3.
             max_features: Optional cap on the rows kept per fetched type;
                 excess rows are dropped with a warning. `None` keeps all.
             file_format: Output vector format — `"geoparquet"` (default,
@@ -181,7 +186,8 @@ class Overture(AbstractDataSource):
         Raises:
             TypeError: If `variables` is not a mapping of theme -> types.
             ValueError: If `file_format` is not one of the supported
-                formats, or `variables` is empty.
+                formats, `variables` is empty, or `release` is not shaped
+                like an Overture release id.
             ImportError: If the `overturemaps` SDK is not installed.
         """
         if not isinstance(variables, dict):
@@ -199,6 +205,14 @@ class Overture(AbstractDataSource):
         if file_format not in _FORMATS:
             raise ValueError(
                 f"file_format must be one of {sorted(_FORMATS)}, got {file_format!r}."
+            )
+        if release is not None and not is_release_id(release):
+            raise ValueError(
+                f"release must be an Overture release id, got {release!r}. "
+                "Ids are a release date plus an ordinal (yyyy-mm-dd.n); "
+                "list the ones Overture publishes with "
+                "earthlens.overture.releases.child_release_ids(). Leave it "
+                "None to target whatever is published now."
             )
         self._release = release
         self._max_features = max_features
@@ -300,22 +314,73 @@ class Overture(AbstractDataSource):
     def _resolve_release(self) -> str:
         """Resolve a concrete release id for the DuckDB S3 path.
 
-        Uses the explicit `release` if given, else the newest entry in the
-        catalog's bundled index, else asks the SDK for the latest release.
-        The DuckDB path needs a concrete id (the `geodataframe` path can
-        leave it `None` and let the SDK pick latest, but the S3 glob can't).
+        Uses the explicit `release` if given, else asks the SDK which
+        release Overture currently publishes, else falls back to the
+        newest entry in the catalog's bundled index. The DuckDB path
+        needs a concrete id (the `geodataframe` path can leave it `None`
+        and let the SDK pick latest, but the S3 glob cannot).
+
+        The live lookup comes first because Overture keeps only the
+        newest release (or two) on `s3://overturemaps-us-west-2` and
+        prunes the rest, so a bundled id goes stale within weeks. Globbing
+        a pruned release matches no files and DuckDB fails the read with
+        `No files found that match the pattern`. The bundled index stays
+        as an offline fallback. The SDK caches the lookup per process,
+        but only successful ones, so `_fetch` resolves once up front rather
+        than per requested type.
+
+        Only a lookup failure is absorbed, and only that:
+        `earthlens.overture.releases.latest_release` raises the single
+        typed `ReleaseLookupError` for an unreachable, undecodable, or
+        nonsensical catalog, so a genuine code fault (a missing SDK
+        constant, say) propagates instead of degrading to the stale
+        bundled id — which would be issue #931 restored at `WARNING`
+        level. That read is bounded by `STAC_TIMEOUT`; the SDK's own
+        lookup is not, and an unbounded one would hang here rather than
+        fall through to the index.
+
+        A catalog that reports something which is not release-shaped
+        counts as a failure too. Upstream's `latest` is one key in a
+        document whose sibling release list already arrives as unparsed
+        `https:` fragments, so an unchecked value would build a glob like
+        `release/None/…` and fail with the very error this resolution
+        order exists to prevent.
 
         Returns:
-            str: A concrete release id (e.g. `"2026-05-20.0"`).
+            str: A concrete release id (e.g. `"2026-07-22.0"`).
+
+        Raises:
+            RuntimeError: If the live lookup fails and the bundled index
+                is empty, leaving no release to glob.
+
+        See Also:
+            earthlens.overture.catalog.Catalog.latest_release: The offline
+                fallback this reads when the live lookup fails.
+            earthlens.overture.query.build_query: Builds the S3 glob from
+                the resolved release.
         """
         if self._release:
             return self._release
-        indexed = self._catalog.latest_release()
-        if indexed:
-            return indexed
-        from overturemaps.core import get_latest_release
+        from earthlens.overture.releases import latest_release
 
-        return cast("str", get_latest_release())
+        try:
+            return latest_release()
+        except ReleaseLookupError as exc:
+            cause, reason = exc, str(exc)
+        indexed = self._catalog.latest_release()
+        if not indexed:
+            raise RuntimeError(
+                "Could not resolve an Overture release for the DuckDB query "
+                f"path: {reason}, and the bundled available_releases: index "
+                "is empty. Pass an explicit release= — the ids Overture "
+                "publishes are listed at https://stac.overturemaps.org."
+            ) from cause
+        logger.warning(
+            f"Could not resolve the live Overture release ({reason}); falling "
+            f"back to the bundled index entry {indexed!r}. Overture prunes old "
+            "releases, so this id may no longer exist on S3."
+        )
+        return indexed
 
     def _guard_bbox(self, theme_names: list[str]) -> None:
         """Reject an oversized / whole-Earth bbox for the guarded themes.
@@ -416,23 +481,32 @@ class Overture(AbstractDataSource):
             self.space.north,
         )
         written: list[Path] = []
+        # Resolved once, before the loop: a mid-loop recovery from a failed
+        # lookup would otherwise read the first types from the bundled release
+        # and the rest from the live one, so a single download() could mix two
+        # snapshots. Offline callers also pay one connect attempt, not one per
+        # requested type. Its name says what it is: the release the DuckDB
+        # path will glob, present exactly when that path is taken, which is
+        # the only path needing a concrete id.
+        duckdb_release = (
+            self._resolve_release() if (self._where or self._columns) else None
+        )
         for product in products:
             theme_name = product.metadata["theme_name"]
             overture_type = product.metadata["type"]
             label = product.id
-            if self._where or self._columns:
+            if duckdb_release is not None:
                 from earthlens.overture.query import query_overture
 
-                release = self._resolve_release()
                 logger.info(
                     f"Querying Overture {overture_type!r} (theme {theme_name!r}) "
-                    f"via DuckDB for bbox {bbox} (release={release}, "
+                    f"via DuckDB for bbox {bbox} (release={duckdb_release}, "
                     f"where={self._where!r})"
                 )
                 gdf = query_overture(
                     theme_name,
                     overture_type,
-                    release,
+                    duckdb_release,
                     bbox,
                     where=self._where,
                     columns=self._columns,
@@ -461,7 +535,9 @@ class Overture(AbstractDataSource):
                     f"{label}: no features matched the bbox; nothing written."
                 )
                 continue
-            out_path = self._write(collection, theme_name, overture_type)
+            out_path = self._write(
+                collection, theme_name, overture_type, duckdb_release
+            )
             logger.info(f"{label}: wrote {len(collection)} feature(s) to {out_path}")
             written.append(out_path)
         return written
@@ -471,25 +547,38 @@ class Overture(AbstractDataSource):
         collection: FeatureCollection,
         theme_name: str,
         overture_type: str,
+        release: str | None = None,
     ) -> Path:
         """Write one type's FeatureCollection to a vector file under `root_dir`.
 
         The filename embeds the theme, type, and release
-        (`overture_<theme>_<type>_<release>.<ext>`) so successive
-        downloads land in distinct files. GeoParquet (the default) is
-        written with `to_parquet` to preserve Overture's nested schema;
-        GPKG / GeoJSON go through `to_file`.
+        (`overture_<theme>_<type>_<release>.<ext>`). Overture has no
+        temporal axis — the release *is* the version — so naming it is
+        what keeps successive downloads in distinct files across a
+        monthly rollover.
+
+        The DuckDB path knows the concrete release it globbed and passes
+        it in. The default path cannot: it hands `release=None` to the SDK
+        and never learns which snapshot answered, so an unpinned fetch
+        there still writes `..._latest`, and a rollover overwrites the
+        previous run. GeoParquet (the default) is written with
+        `to_parquet` to preserve Overture's nested schema; GPKG / GeoJSON
+        go through `to_file`.
 
         Args:
             collection: The features to write.
             theme_name: Friendly theme name (for the filename).
             overture_type: Overture feature type (for the filename).
+            release: The release the rows were read from, when the caller
+                resolved one. `None` falls back to the requested
+                `release`, then to `latest`.
 
         Returns:
             Path: Absolute path of the file written.
         """
         driver, ext = _FORMATS[self._file_format]
-        stem = f"overture_{theme_name}_{overture_type}_{self._release or 'latest'}"
+        stamp = release or self._release or "latest"
+        stem = f"overture_{theme_name}_{overture_type}_{stamp}"
         out_path = self.root_dir / f"{stem}.{ext}"
         if driver == "parquet":
             collection.to_parquet(str(out_path))

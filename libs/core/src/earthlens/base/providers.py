@@ -5,7 +5,7 @@ canonical publishers/organisations its datasets attribute to. This
 module holds the per-backend-agnostic pieces — the `Provider` pydantic
 value object and the cached YAML loader — so the three backends (GEE,
 ECMWF, CHC) all reach the same shape (L2 in
-`planning/catalog-cross-backend-comparison.md`).
+the cross-backend catalog comparison).
 """
 
 from __future__ import annotations

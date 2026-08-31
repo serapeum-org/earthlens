@@ -4,9 +4,14 @@ FDSN is a fixed query protocol, not a curated dataset catalogue, so
 this "catalog" is deliberately tiny: a six-row map from a user-facing
 network name (`"USGS"`, `"EMSC"`, `"INGV"`, `"EARTHSCOPE"`, `"ISC"`,
 `"GEONET"`) to the obspy `URL_MAPPINGS` key plus a little metadata.
-There is no `refresh` / `probe` / `audit` tooling and no
-`tools/fdsn/` directory — adding another network later (ORFEUS,
-GFZ, …) is a hand-edit of one YAML row.
+Adding another network later (ORFEUS, GFZ, …) is a hand-edit of one
+YAML row. There is no `probe` handler and no `tools/fdsn/` directory,
+but the backend does ship `refresh` and `validate` handlers in
+`earthlens.fdsn.cli`: `refresh` lists the data centres obspy can reach
+(its `URL_MAPPINGS` registry, no network call) and diffs them against
+the `fdsn_id` values curated here, so a centre obspy gains or drops
+surfaces instead of going unnoticed. `audit` works too, derived from
+the refresher's drift axis rather than from a handler of its own.
 
 :class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
 subclass. To stay consistent with the other backends (GEE / ECMWF /

@@ -41,9 +41,11 @@ from earthlens.base import (
 )
 from earthlens.base.http import HttpClient
 from earthlens.bathymetry._helpers import (
+    WcsServiceUnavailableError,
     bbox_from_extent,
     estimate_grid_pixels,
     griddap_subset_url,
+    is_wcs_service_failure,
 )
 from earthlens.bathymetry.catalog import Catalog, Dataset
 
@@ -110,7 +112,7 @@ class Bathymetry(AbstractDataSource):
         dataset: str = "",
         variables: list[str] | None = None,
         temporal_resolution: str = "static",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         timeout: float = 120.0,
         catalog: Catalog | None = None,
@@ -320,8 +322,13 @@ class Bathymetry(AbstractDataSource):
             tif_path: Destination GeoTIFF path.
 
         Raises:
-            ValueError: When the bbox is outside the coverage extent, or the
-                WCS request / read fails.
+            WcsServiceUnavailableError: When `from_wcs` fails for a transport /
+                service reason (a dropped connection, a 5xx / gateway error, or
+                a non-XML `GetCapabilities` answer) — a distinct type so a live
+                `e2e` test can skip on a flaky upstream instead of failing.
+            ValueError: When the request itself is at fault — the bbox is outside
+                the coverage extent, or the coverage / subset is otherwise
+                invalid.
         """
         from pyramids.dataset import Dataset as PyramidsDataset
 
@@ -341,11 +348,17 @@ class Bathymetry(AbstractDataSource):
                 timeout=self._timeout,
             )
         except Exception as exc:
+            if is_wcs_service_failure(exc):
+                raise WcsServiceUnavailableError(
+                    f"the WCS service at {row.endpoint} is unavailable for "
+                    f"{row.id!r} over {self._extent_label()}: {exc}. This is a "
+                    f"server-side / transport problem, not the request — retry "
+                    f"later."
+                ) from exc
             raise ValueError(
                 f"bathymetry WCS request for {row.id!r} failed over "
                 f"{self._extent_label()}: {exc}. The bbox may be outside the "
-                f"coverage or too large for the server (shrink it), or the WCS "
-                f"service may be unavailable."
+                f"coverage or too large for the server (shrink it)."
             ) from exc
         dataset = mask_to_geometry(dataset, self.space)
         dataset.to_file(str(tif_path))

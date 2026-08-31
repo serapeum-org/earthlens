@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import re
 import tarfile
 import zipfile
@@ -34,10 +33,10 @@ from io import BytesIO
 from pathlib import Path, PurePosixPath
 from typing import TYPE_CHECKING, Any
 
-import platformdirs
 from loguru import logger
 
 from earthlens.base.http import HttpClient, HttpRangeFile
+from earthlens.config import cache_dir as _shared_cache_dir
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     import pandas as pd
@@ -100,18 +99,15 @@ def cache_dir() -> Path:
     itself may be done twice. Point `EARTHLENS_CACHE` at per-process
     directories if that matters.
 
-    Honours `EARTHLENS_CACHE` first (the override the cmip6 resolver already
-    reads), then falls back to the per-platform user cache directory the nwp
-    backend uses. A hard-coded `~/.cache` would be wrong on Windows, which is
-    where this is developed.
+    Resolved from the shared earthlens cache directory (`set_cache_dir()` /
+    `EARTHLENS_CACHE`), which falls back to the per-platform user cache
+    directory. A hard-coded `~/.cache` would be wrong on Windows, which is where
+    this is developed.
 
     Returns:
-        Path: `<EARTHLENS_CACHE>/caravan`, else
-            `platformdirs.user_cache_dir("earthlens")/caravan`.
+        Path: `<shared cache dir>/caravan`.
     """
-    base = os.environ.get("EARTHLENS_CACHE")
-    root = Path(base) if base else Path(platformdirs.user_cache_dir("earthlens"))
-    return root / "caravan"
+    return _shared_cache_dir() / "caravan"
 
 
 @dataclass(frozen=True)

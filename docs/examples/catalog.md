@@ -94,9 +94,9 @@ across three core datasets:
 
 - `reanalysis-era5-single-levels` — 261 atmospheric / surface
   variables on the global 0.25° ERA5 grid.
-- `reanalysis-era5-pressure-levels` — 16 variables on the 1000 hPa
-  level (extend `pressure_level:` in the dataset block to fetch more
-  levels).
+- `reanalysis-era5-pressure-levels` — 16 variables, curated at 1000 hPa
+  (pass `pressure_level=` to retrieve other levels; see the ECMWF usage
+  reference).
 - `reanalysis-era5-land` — 60 land-surface variables on the
   higher-resolution 0.1° land-only grid; `monthly:` resolves to
   `reanalysis-era5-land-monthly-means`. Where a variable code

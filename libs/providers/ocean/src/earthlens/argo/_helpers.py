@@ -32,7 +32,7 @@ ARGO_ACKNOWLEDGEMENT: str = (
 #: Canonical long-format columns for the empty-fetch fallback (`G8`): the
 #: float / cycle / position / time identity plus the core measured
 #: variables, pinned from the live `argopy` phy region columns (see
-#: `planning/argo/captures/argo-sdk-facts.md`).
+#: the A1 gate captures).
 ARGO_COLUMNS: list[str] = [
     "PLATFORM_NUMBER",
     "CYCLE_NUMBER",
@@ -155,7 +155,7 @@ def region_box(
     """Build the 8-element `argopy` `.region([...])` box (`G7`).
 
     The element order is pinned from the live `argopy` 1.4.0 docstring
-    (see `planning/argo/captures/argo-sdk-facts.md`):
+    (see the A1 gate captures):
     `[lon_min, lon_max, lat_min, lat_max, depth_min, depth_max,
     date_min, date_max]`.
 

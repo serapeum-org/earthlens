@@ -28,7 +28,7 @@ Which transport a layer uses is set by how its atlas is hosted, not by a knob:
   Cloud-Optimized GeoTIFFs (COGs) on figshare, so the backend reads **only the
   bbox window** over a virtual `/vsicurl/` range read through the
   [pyramids](https://github.com/serapeum-org/pyramids) GIS backend
-  (`Dataset.read_part`). A small area transfers a few hundred KB, not the
+  (`Dataset.crop(bbox=)`). A small area transfers a few hundred KB, not the
   multi-GB global file.
 
 - **Global Solar Atlas layers are *downloaded once, then cropped locally*.**

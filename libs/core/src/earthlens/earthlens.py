@@ -31,6 +31,7 @@ from loguru import logger
 from earthlens._backends import discover_backends
 from earthlens.base import split_time
 from earthlens.base.spatial import resolve_aoi
+from earthlens.config import output_dir
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -724,8 +725,10 @@ class EarthLens:
                 `ValueError`. Defaults to `None`.
             path: Output directory. Created by the backend if it does
                 not exist. When omitted (`None`), defaults to
-                `./earthlens-data/<data_source>/` rather than the current
-                working directory; pass `path=""` to opt into the CWD.
+                `<output_dir()>/<data_source>/` — the directory configured by
+                `set_output_dir()` / `EARTHLENS_DATA_DIR`, else
+                `~/.earthlens/data` — rather than the current working
+                directory; pass `path=""` to opt into the CWD.
             dataset: Explicit dataset / collection key, the ergonomic
                 alternative to keying it into `variables`. When given
                 with a plain `variables` list, the facade composes the
@@ -791,7 +794,8 @@ class EarthLens:
                 backend-specific options the facade does not name
                 explicitly (e.g. ECMWF's `skip_constraints`, or GEE's
                 `scale` / `crs` / `reducer` / `export_via` /
-                `drive_folder` / `gcs_bucket` / `region`). Credentials are
+                `drive_folder` / `gcs_bucket` / `region` / `cloud_mask` /
+                `filters` / `engine` / `cog`). Credentials are
                 not constructor kwargs: backends that defer auth take them
                 on `authenticate()` instead (e.g. GEE's `service_account`
                 / `service_key` / `project`), so forwarding those through
@@ -970,14 +974,14 @@ class EarthLens:
             lon_lim = DEFAULT_LONGITUDE_LIMIT
 
         # An omitted `path` makes earthlens manage the location: `download()`
-        # persists to a named per-source subdirectory (`./earthlens-data/<source>/`)
-        # rather than scattering files into the cwd, while `load()` (which only
-        # needs the in-memory object) redirects to a throwaway temp dir and
-        # removes the empty default afterwards. An explicit `path=""` still means
-        # the CWD (a deliberate choice).
+        # persists to a named per-source subdirectory of the configured output
+        # directory rather than scattering files into the cwd, while `load()`
+        # (which only needs the in-memory object) redirects to a throwaway temp
+        # dir and removes the empty default afterwards. An explicit `path=""`
+        # still means the CWD (a deliberate choice).
         self._explicit_path = path is not None
         if path is None:
-            path = Path("earthlens-data") / data_source
+            path = output_dir() / data_source
             logger.info(
                 f"No `path` given; download() writes {data_source!r} output under "
                 f"{path}/ (load() uses a temp dir)."
@@ -1657,7 +1661,7 @@ class EarthLens:
 
         Called by :meth:`load` when `path` was omitted: `load` only needs the
         in-memory object, so the incidental files go to a fresh temp directory
-        instead of the persistent `./earthlens-data/<source>/` default, and a
+        instead of the persistent `<output_dir()>/<source>/` default, and a
         load-and-plot run never leaves files in the working tree. Creating the
         temp dir here (not at construction) means a construct-only or
         download-only run allocates no temp directory.
@@ -1744,7 +1748,7 @@ class EarthLens:
         to `path` — `load` adds the in-memory handle on top.
 
         When `path` was omitted, `load` writes to a throwaway temp directory
-        (not the persistent `./earthlens-data/<source>/` that `download` uses),
+        (not the persistent `<output_dir()>/<source>/` that `download` uses),
         so a load-and-plot run never leaves files in the working tree — there is
         no need to pass `path=tempfile.mkdtemp()` yourself. Each returned raster
         is detached into an in-memory copy and the temp directory is removed
@@ -1830,7 +1834,8 @@ def download(
             single date) — the ergonomic alternative to `start` / `end`;
             mutually exclusive with them.
         path: Output directory; defaults to
-            `./earthlens-data/<data_source>/` when omitted.
+            `<output_dir()>/<data_source>/` when omitted — the directory
+            configured by `set_output_dir()` / `EARTHLENS_DATA_DIR`.
         lat_lim: Legacy `[lat_min, lat_max]` pair — prefer `aoi=` (mutually
             exclusive with it).
         lon_lim: Legacy `[lon_min, lon_max]` pair — prefer `aoi=` (mutually

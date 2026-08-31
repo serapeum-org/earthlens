@@ -6,7 +6,7 @@
 # Antarctic / Greenland ice sheets) and the `etopo1_bedrock` Bedrock model
 # (base of the ice sheets). Both expose a single `z` band of metres
 # relative to sea level. Pinned live in the A1 gate — see
-# planning/bathymetry/captures/bathymetry-sdk-facts.md.
+# the A1 gate captures.
 datasets:
   etopo1_ice:
     title: "ETOPO1 global relief, Ice Surface (1 arc-minute)"

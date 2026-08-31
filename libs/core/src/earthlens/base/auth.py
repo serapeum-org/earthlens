@@ -34,6 +34,7 @@ teardown override `close`.
 
 from __future__ import annotations
 
+import os
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
@@ -241,3 +242,168 @@ class AbstractAuth(ABC, Generic[CredentialsT]):
         tb: object | None,
     ) -> None:
         self.close()
+
+
+class SingleSecretAuth(AbstractAuth[CredentialsT]):
+    """`AbstractAuth` for a backend authenticated by a single secret.
+
+    Many backends authenticate with one API key or token: resolve it from an
+    explicit argument, fall back to one or more environment variables, raise
+    `AuthenticationError` when none is found, then memoise so a second
+    `configure()` is a no-op. That ceremony is identical across those backends —
+    only *which* env var, *how* the explicit value is stored, and *what* to do
+    with the resolved secret differ. This class carries the ceremony so each
+    single-secret backend supplies only the parts that differ:
+
+    * set :attr:`ENV_VARS` and :attr:`PROVIDER` (and optionally
+      :attr:`CREDENTIAL_HINT` / :attr:`AUTH_ERROR`),
+    * override :meth:`_explicit_credential` to read the explicit secret off its
+      credentials value object,
+    * implement :meth:`_connect` to apply the resolved secret.
+
+    A multi-field / OAuth / username+password backend does not fit this shape and
+    should extend :class:`AbstractAuth` directly with its own `configure`.
+
+    Examples:
+        - A minimal single-secret auth resolving from the environment:
+            ```python
+            >>> import os
+            >>> from pydantic import BaseModel, SecretStr
+            >>> from earthlens.base import SingleSecretAuth
+            >>> class _Creds(BaseModel):
+            ...     token: SecretStr | None = None
+            >>> class _Auth(SingleSecretAuth[_Creds]):
+            ...     ENV_VARS = ("DEMO_TOKEN",)
+            ...     PROVIDER = "Demo"
+            ...     def _explicit_credential(self):
+            ...         tok = self._creds.token
+            ...         return tok.get_secret_value() if tok is not None else None
+            ...     def _connect(self, credential):
+            ...         self._token = credential
+            >>> os.environ["DEMO_TOKEN"] = "from-env"
+            >>> auth = _Auth(_Creds())
+            >>> auth.configure()
+            >>> auth._token
+            'from-env'
+            >>> del os.environ["DEMO_TOKEN"]
+
+            ```
+        - An explicit credential wins over the environment, and a missing one
+          raises a message naming the provider and the variable:
+            ```python
+            >>> from pydantic import BaseModel, SecretStr
+            >>> from earthlens.base import AuthenticationError, SingleSecretAuth
+            >>> class _Creds(BaseModel):
+            ...     token: SecretStr | None = None
+            >>> class _Auth(SingleSecretAuth[_Creds]):
+            ...     ENV_VARS = ("DEMO_TOKEN",)
+            ...     PROVIDER = "Demo"
+            ...     def _explicit_credential(self):
+            ...         tok = self._creds.token
+            ...         return tok.get_secret_value() if tok is not None else None
+            ...     def _connect(self, credential):
+            ...         self._token = credential
+            >>> _Auth(_Creds(token="explicit")).configure() or None
+            >>> try:
+            ...     _Auth(_Creds()).configure()
+            ... except AuthenticationError as exc:
+            ...     str(exc)
+            'no Demo credential available: pass it explicitly or set DEMO_TOKEN.'
+
+            ```
+    """
+
+    #: Environment variables consulted, in priority order, after the explicit
+    #: argument. The first one that is set (non-empty) supplies the secret.
+    ENV_VARS: tuple[str, ...] = ()
+
+    #: Human-readable provider name used in the missing-credential message.
+    PROVIDER: str = ""
+
+    #: Name of the constructor argument that carries the explicit secret (e.g.
+    #: `"api_key"` or `"token"`). Named in the missing-credential message so it
+    #: tells the caller exactly what to pass. Empty falls back to the generic
+    #: "pass it explicitly".
+    CREDENTIAL_ARG: str = ""
+
+    #: Optional extra sentence appended to that message (e.g. a sign-up URL).
+    CREDENTIAL_HINT: str = ""
+
+    #: Exception type raised when no credential resolves. A subclass may point
+    #: this at its own `AuthenticationError` subclass so callers can catch it
+    #: narrowly while the message stays consistent across providers.
+    AUTH_ERROR: type[AuthenticationError] = AuthenticationError
+
+    def configure(self) -> None:
+        """Resolve and apply the secret once; idempotent.
+
+        Short-circuits when :meth:`is_authenticated` is already `True`; otherwise
+        resolves the credential (:meth:`_resolve_credential`), applies it
+        (:meth:`_connect`), and records success (:meth:`mark_configured`).
+
+        Raises:
+            AuthenticationError: When no credential can be resolved.
+        """
+        if self.is_authenticated():
+            return
+        self._connect(self._resolve_credential())
+        self.mark_configured()
+
+    def _resolve_credential(self) -> str:
+        """Return the secret: explicit argument, else :attr:`ENV_VARS`, else raise.
+
+        The environment is consulted only when no explicit credential was
+        supplied — i.e. :meth:`_explicit_credential` returns `None`. An explicit
+        credential that is present but empty is treated as an error and does not
+        fall back to the environment, matching each backend's original behaviour.
+
+        Returns:
+            The resolved secret string.
+
+        Raises:
+            AuthenticationError: When no explicit credential was supplied and
+                none of :attr:`ENV_VARS` is set, or when an explicit credential
+                was supplied but is empty. The message names :attr:`PROVIDER` and
+                the variables, plus :attr:`CREDENTIAL_HINT`.
+        """
+        explicit = self._explicit_credential()
+        if explicit:
+            return explicit
+        # Only an *absent* explicit credential (None) falls back to the
+        # environment; a present-but-empty one is an error, so it skips the
+        # env lookup and drops straight to the raise below.
+        if explicit is None:
+            for variable in self.ENV_VARS:
+                value = os.environ.get(variable)
+                if value:
+                    return value
+        names = " or ".join(self.ENV_VARS) or "a credential"
+        how = (
+            f"pass {self.CREDENTIAL_ARG}="
+            if self.CREDENTIAL_ARG
+            else "pass it explicitly"
+        )
+        message = (
+            f"no {self.PROVIDER or type(self).__name__} credential available: "
+            f"{how} or set {names}."
+        )
+        if self.CREDENTIAL_HINT:
+            message = f"{message} {self.CREDENTIAL_HINT}"
+        raise self.AUTH_ERROR(message)
+
+    def _explicit_credential(self) -> str | None:
+        """Return the explicit secret off the bound credentials, or `None`.
+
+        Default: `None` (rely on :attr:`ENV_VARS`). A subclass whose credentials
+        carry an explicit secret overrides this to extract it — typically
+        unwrapping a `pydantic.SecretStr`.
+        """
+        return None
+
+    @abstractmethod
+    def _connect(self, credential: str) -> None:
+        """Apply the resolved secret (store it, build a client, …).
+
+        Args:
+            credential: The secret resolved by :meth:`_resolve_credential`.
+        """

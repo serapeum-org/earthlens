@@ -18,7 +18,9 @@ pytestmark = [pytest.mark.e2e]
 class TestSatelliteCdrE2E:
     """Live soil-moisture CDR retrieve — unpacked and read."""
 
-    def test_live_soil_moisture_unpacks_and_reads(self, tmp_path):
+    def test_live_soil_moisture_unpacks_and_reads(
+        self, tmp_path, download_within_budget
+    ):
         """A tiny soil-moisture CDR retrieves, unpacks, and reads with pyramids."""
         lens = EarthLens(
             data_source="ecmwf",
@@ -30,7 +32,7 @@ class TestSatelliteCdrE2E:
             lon_lim=[0.0, 10.0],
             path=str(tmp_path),
         )
-        out = lens.download()
+        out = download_within_budget(lens)
         assert out, "at least one NetCDF member written"
 
         from pyramids.netcdf import NetCDF

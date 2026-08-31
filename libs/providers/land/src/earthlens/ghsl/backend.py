@@ -84,7 +84,7 @@ class GHSL(AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "yearly",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         *,
         release: str | None = None,

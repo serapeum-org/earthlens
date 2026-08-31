@@ -32,7 +32,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
+import requests  # module-level import so tests can monkeypatch this module's `requests.get`
 from loguru import logger
 
 from earthlens.base import (
@@ -43,6 +43,14 @@ from earthlens.base import (
 )
 from earthlens.base.http import HttpClient
 from earthlens.gdacs import events
+from earthlens.gdacs._helpers import (
+    GDACS_MAX_RETRIES,
+    GDACS_RETRY_EXCEPTIONS,
+    GDACS_RETRY_STATUSES,
+    GdacsUnavailableError,
+    gdacs_http_status,
+    service_failure_reason,
+)
 from earthlens.gdacs.catalog import Catalog
 
 if TYPE_CHECKING:
@@ -110,7 +118,7 @@ class GDACS(AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "all",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         alert_level: list[str] | None = None,
         file_format: FileFormat = "gpkg",
@@ -243,9 +251,12 @@ class GDACS(AbstractDataSource):
         """Issue the one combined GET and map the GeoJSON to a FeatureCollection.
 
         Widens the inherited `-> list[Path]` contract: a vector backend
-        returns in-memory :class:`FeatureCollection`s, not file paths.
-        An HTTP error propagates (it is not silently swallowed); an
-        empty feed yields a schema-correct empty FeatureCollection.
+        returns in-memory :class:`FeatureCollection`s, not file paths. A
+        service-availability failure (a connection/timeout error or a
+        retry-worthy status) that outlives the retries is re-raised as
+        `GdacsUnavailableError`; a genuine request error (`403` / `404`)
+        propagates as `requests.HTTPError`. Nothing is silently swallowed.
+        An empty feed yields a schema-correct empty FeatureCollection.
         Because GDACS SEARCH has no documented bbox filter, the mapped
         alerts are clipped to `self.space` client-side.
 
@@ -264,8 +275,15 @@ class GDACS(AbstractDataSource):
                 clipped alert collection.
 
         Raises:
-            requests.HTTPError: If the SEARCH endpoint returns a
-                non-2xx status.
+            GdacsUnavailableError: If the SEARCH request fails for a
+                service reason — a connection/timeout error or a
+                retry-worthy status (`400` / `408` / `425` / `429` /
+                `5xx`) — that outlived the backend's retries. A `400` is
+                treated this way because GDACS returns spurious `400`s on
+                well-formed queries (issue #929).
+            requests.HTTPError: On a non-retryable error status (for
+                example a `403` / `404`), which is a genuine request or
+                endpoint problem, not an availability one.
         """
         product = products[0]
         params = {
@@ -279,13 +297,32 @@ class GDACS(AbstractDataSource):
             f"{params['fromDate']}..{params['toDate']} "
             f"(levels {params['alertlevel']})"
         )
-        http = HttpClient(
-            timeout=self._timeout,
-            max_retries=0,
-            status_forcelist=(),
-            raise_for_status=True,
-        )
-        payload = http.get_json(SEARCH_URL, params=params)
+        try:
+            payload = self._http_client().get_json(SEARCH_URL, params=params)
+        except requests.RequestException as exc:
+            reason = service_failure_reason(exc)
+            if reason is None:
+                raise
+            status = gdacs_http_status(exc)
+            # A 400 is treated as availability (GDACS's spurious-400 under load,
+            # issue #929), which trades away the lane's ability to catch a real
+            # SEARCH-contract change. Make that unmistakable in the skip reason so
+            # a persistent 400 in the skip logs prompts a contract check rather
+            # than being silently masked.
+            contract_note = (
+                " This was a 400: if it persists across runs, verify GDACS has "
+                "not changed its SEARCH parameter contract (see test_forwards_params)."
+                if status == 400
+                else ""
+            )
+            raise GdacsUnavailableError(
+                f"GDACS SEARCH was unavailable after {GDACS_MAX_RETRIES} "
+                f"retries ({reason}). The composed query is well-formed (the "
+                "gdacs unit tests assert its parameters offline), so this is a "
+                "transient upstream condition — retry later or narrow the "
+                f"date window.{contract_note}",
+                status_code=status,
+            ) from exc
         feature_count = len(payload.get("features") or [])
         if feature_count >= MAX_EVENTS_PER_RESPONSE:
             logger.warning(
@@ -302,6 +339,29 @@ class GDACS(AbstractDataSource):
             [self.space.west, self.space.east],
         )
         return [clipped]
+
+    def _http_client(self) -> HttpClient:
+        """Build the retry-configured client for the one SEARCH request.
+
+        GDACS SEARCH is a single unpaged GET whose two observed failure
+        modes are both transient (issue #929): a spurious `400 Bad
+        Request` on a well-formed query, and a read timeout. So the
+        client retries the service-status family (`GDACS_RETRY_STATUSES`
+        — the `429` / `5xx` gateway family plus GDACS's spurious `400`)
+        and the transport errors (`GDACS_RETRY_EXCEPTIONS`), up to
+        `GDACS_MAX_RETRIES` times, before the survivor is re-raised (and
+        wrapped by `_fetch` into a `GdacsUnavailableError`).
+
+        Returns:
+            HttpClient: The configured transport for `_fetch`.
+        """
+        return HttpClient(
+            timeout=self._timeout,
+            max_retries=GDACS_MAX_RETRIES,
+            status_forcelist=GDACS_RETRY_STATUSES,
+            retry_on_exceptions=GDACS_RETRY_EXCEPTIONS,
+            raise_for_status=True,
+        )
 
     def download(
         self,

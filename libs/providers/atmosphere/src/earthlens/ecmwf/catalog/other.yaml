@@ -1789,40 +1789,67 @@ datasets:
     variables:
       mean-temperature:
         cds_variable: mean_temperature
-        nc_variable: mean_temperature
-        units: unknown
+        nc_variable: tg
+        units: Celsius
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       minimum-temperature:
         cds_variable: minimum_temperature
-        nc_variable: minimum_temperature
-        units: unknown
+        nc_variable: tn
+        units: Celsius
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       maximum-temperature:
         cds_variable: maximum_temperature
-        nc_variable: maximum_temperature
-        units: unknown
+        nc_variable: tx
+        units: Celsius
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       precipitation-amount:
         cds_variable: precipitation_amount
-        nc_variable: precipitation_amount
-        units: unknown
+        nc_variable: rr
+        units: mm
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       sea-level-pressure:
         cds_variable: sea_level_pressure
-        nc_variable: sea_level_pressure
-        units: unknown
+        nc_variable: pp
+        units: hPa
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       surface-shortwave-downwelling-radiation:
         cds_variable: surface_shortwave_downwelling_radiation
-        nc_variable: surface_shortwave_downwelling_radiation
-        units: unknown
+        nc_variable: qq
+        units: W/m2
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       relative-humidity:
         cds_variable: relative_humidity
-        nc_variable: relative_humidity
-        units: unknown
+        nc_variable: hu
+        units: '%'
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       wind-speed:
         cds_variable: wind_speed
-        nc_variable: wind_speed
-        units: unknown
+        nc_variable: fg
+        units: m/s
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       land-surface-elevation:
         cds_variable: land_surface_elevation
-        nc_variable: land_surface_elevation
-        units: unknown
+        nc_variable: elevation
+        units: metres
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          version: [27_0e, 28_0e, 29_0e, 30_0e, 31_0e, 32_0e, 33_0e]
   insitu-gridded-observations-global-and-regional:
     endpoint: cds
     request_kind: form
@@ -1840,8 +1867,14 @@ datasets:
     variables:
       temperature:
         cds_variable: temperature
-        nc_variable: temperature
-        units: unknown
+        nc_variable: tasmax
+        units: degrees Celsius
+        extras:
+          horizontal_aggregation: [0_5_x_0_5, 1_x_1, 2_5_x_2_5]
+          origin: [cru]
+          region: [global]
+          time_aggregation: [monthly]
+          version: [v4_03]
       temperature-anomaly:
         cds_variable: temperature_anomaly
         nc_variable: temperature_anomaly
@@ -1862,20 +1895,26 @@ datasets:
     variables:
       precipitation:
         cds_variable: precipitation
-        nc_variable: precipitation
-        units: unknown
+        nc_variable: RR
+        units: kg/m^2
+        extras:
+          spatial_interpolation_method: [type_1, type_2]
       mean-temperature:
         cds_variable: mean_temperature
-        nc_variable: mean_temperature
-        units: unknown
+        nc_variable: TG
+        units: K
+        extras:
+          spatial_interpolation_method: [type_1, type_2]
       maximum-temperature:
         cds_variable: maximum_temperature
         nc_variable: TX
         units: K
       minimum-temperature:
         cds_variable: minimum_temperature
-        nc_variable: minimum_temperature
-        units: unknown
+        nc_variable: TN
+        units: K
+        extras:
+          spatial_interpolation_method: [type_1, type_2]
   insitu-observations-gnss:
     endpoint: cds
     request_kind: form
@@ -2295,80 +2334,80 @@ datasets:
     variables:
       monthly-temperature:
         cds_variable: monthly_temperature
-        nc_variable: monthly_temperature
-        units: unknown
+        nc_variable: t
+        units: degC
       monthly-daily-minimum-temperature:
         cds_variable: monthly_daily_minimum_temperature
-        nc_variable: monthly_daily_minimum_temperature
-        units: unknown
+        nc_variable: tn
+        units: degC
       monthly-daily-maximum-temperature:
         cds_variable: monthly_daily_maximum_temperature
-        nc_variable: monthly_daily_maximum_temperature
-        units: unknown
+        nc_variable: tx
+        units: degC
       monthly-daily-temperature-range:
         cds_variable: monthly_daily_temperature_range
-        nc_variable: monthly_daily_temperature_range
-        units: unknown
+        nc_variable: dtr
+        units: degC
       monthly-maximum-of-daily-maximum-temperature:
         cds_variable: monthly_maximum_of_daily_maximum_temperature
-        nc_variable: monthly_maximum_of_daily_maximum_temperature
-        units: unknown
+        nc_variable: txx
+        units: degC
       monthly-extreme-hot-days:
         cds_variable: monthly_extreme_hot_days
-        nc_variable: monthly_extreme_hot_days
-        units: unknown
+        nc_variable: tx35
+        units: '1'
       monthly-very-extreme-hot-days:
         cds_variable: monthly_very_extreme_hot_days
-        nc_variable: monthly_very_extreme_hot_days
-        units: unknown
+        nc_variable: tx40
+        units: '1'
       monthly-tropical-nights:
         cds_variable: monthly_tropical_nights
-        nc_variable: monthly_tropical_nights
-        units: unknown
+        nc_variable: tr
+        units: '1'
       annual-cooling-degree-days:
         cds_variable: annual_cooling_degree_days
-        nc_variable: annual_cooling_degree_days
-        units: unknown
+        nc_variable: cd
+        units: degC day
       monthly-minimum-of-daily-minimum-temperature:
         cds_variable: monthly_minimum_of_daily_minimum_temperature
-        nc_variable: monthly_minimum_of_daily_minimum_temperature
-        units: unknown
+        nc_variable: tnn
+        units: degC
       monthly-frost-days:
         cds_variable: monthly_frost_days
-        nc_variable: monthly_frost_days
-        units: unknown
+        nc_variable: fd
+        units: '1'
       annual-heating-degree-days:
         cds_variable: annual_heating_degree_days
-        nc_variable: annual_heating_degree_days
-        units: unknown
+        nc_variable: hd
+        units: degC day
       monthly-precipitation:
         cds_variable: monthly_precipitation
-        nc_variable: monthly_precipitation
-        units: unknown
+        nc_variable: r
+        units: mm
       monthly-wet-days:
         cds_variable: monthly_wet_days
-        nc_variable: monthly_wet_days
-        units: unknown
+        nc_variable: r01
+        units: '1'
       monthly-precipitation-intensity:
         cds_variable: monthly_precipitation_intensity
-        nc_variable: monthly_precipitation_intensity
-        units: unknown
+        nc_variable: sdii
+        units: mm
       monthly-maximum-1-day-precipitation:
         cds_variable: monthly_maximum_1_day_precipitation
-        nc_variable: monthly_maximum_1_day_precipitation
-        units: unknown
+        nc_variable: rx1day
+        units: mm
       monthly-maximum-5-day-precipitation:
         cds_variable: monthly_maximum_5_day_precipitation
-        nc_variable: monthly_maximum_5_day_precipitation
-        units: unknown
+        nc_variable: rx5day
+        units: mm
       monthly-heavy-precipitation-days:
         cds_variable: monthly_heavy_precipitation_days
-        nc_variable: monthly_heavy_precipitation_days
-        units: unknown
+        nc_variable: r10
+        units: '1'
       monthly-very-heavy-precipitation-days:
         cds_variable: monthly_very_heavy_precipitation_days
-        nc_variable: monthly_very_heavy_precipitation_days
-        units: unknown
+        nc_variable: r20
+        units: '1'
       monthly-near-surface-specific-humidity:
         cds_variable: monthly_near_surface_specific_humidity
         nc_variable: monthly_near_surface_specific_humidity
@@ -2431,8 +2470,8 @@ datasets:
         units: unknown
       monthly-sea-level-pressure:
         cds_variable: monthly_sea_level_pressure
-        nc_variable: monthly_sea_level_pressure
-        units: unknown
+        nc_variable: psl
+        units: hPa
   projections-climate-atlas:
     endpoint: cds
     request_kind: form
@@ -2450,36 +2489,42 @@ datasets:
     variables:
       monthly-mean-of-daily-accumulated-precipitation:
         cds_variable: monthly_mean_of_daily_accumulated_precipitation
-        nc_variable: monthly_mean_of_daily_accumulated_precipitation
-        units: unknown
+        nc_variable: pr
+        units: mm
       monthly-mean-of-daily-accumulated-snowfall-precipitation:
         cds_variable: monthly_mean_of_daily_accumulated_snowfall_precipitation
-        nc_variable: monthly_mean_of_daily_accumulated_snowfall_precipitation
-        units: unknown
+        nc_variable: prsn
+        units: mm
+        extras:
+          domain: [global]
+          origin: [cmip6]
       annual-cooling-degree-days:
         cds_variable: annual_cooling_degree_days
-        nc_variable: annual_cooling_degree_days
-        units: unknown
+        nc_variable: cd
+        units: degC day
       annual-consecutive-dry-days:
         cds_variable: annual_consecutive_dry_days
-        nc_variable: annual_consecutive_dry_days
-        units: unknown
+        nc_variable: cdd
+        units: days
       monthly-count-of-frost-days:
         cds_variable: monthly_count_of_frost_days
-        nc_variable: monthly_count_of_frost_days
-        units: unknown
+        nc_variable: fd
+        units: '1'
       annual-heating-degree-days:
         cds_variable: annual_heating_degree_days
-        nc_variable: annual_heating_degree_days
-        units: unknown
+        nc_variable: hd
+        units: degC day
       monthly-mean-of-acidity-of-seawater:
         cds_variable: monthly_mean_of_acidity_of_seawater
-        nc_variable: monthly_mean_of_acidity_of_seawater
-        units: unknown
+        nc_variable: ph
+        units: '1'
+        extras:
+          domain: [global]
+          origin: [cmip6]
       monthly-maximum-of-1-day-accumulated-precipitation:
         cds_variable: monthly_maximum_of_1_day_accumulated_precipitation
-        nc_variable: monthly_maximum_of_1_day_accumulated_precipitation
-        units: unknown
+        nc_variable: rx1day
+        units: mm
       monthly-maximum-of-5-day-accumulated-precipitation:
         cds_variable: monthly_maximum_of_5_day_accumulated_precipitation
         nc_variable: monthly_maximum_of_5_day_accumulated_precipitation
@@ -2551,20 +2596,24 @@ datasets:
     variables:
       air-temperature:
         cds_variable: air_temperature
-        nc_variable: air_temperature
-        units: unknown
+        nc_variable: ta
+        units: K
+        extras:
+          level: ['1', '10', '100', '1000', '150', '20', '200', '250', '30', '300', '400', '5', '50', '500', '600', '70', '700', '850', '925']
       capacity-of-soil-to-store-water:
         cds_variable: capacity_of_soil_to_store_water
-        nc_variable: capacity_of_soil_to_store_water
-        units: unknown
+        nc_variable: mrsofc
+        units: kg m-2
+        extras:
+          temporal_resolution: [fixed]
       daily-maximum-near-surface-air-temperature:
         cds_variable: daily_maximum_near_surface_air_temperature
-        nc_variable: daily_maximum_near_surface_air_temperature
-        units: unknown
+        nc_variable: tasmax
+        units: K
       daily-minimum-near-surface-air-temperature:
         cds_variable: daily_minimum_near_surface_air_temperature
-        nc_variable: daily_minimum_near_surface_air_temperature
-        units: unknown
+        nc_variable: tasmin
+        units: K
       eastward-near-surface-wind:
         cds_variable: eastward_near_surface_wind
         nc_variable: eastward_near_surface_wind
@@ -2679,8 +2728,8 @@ datasets:
         units: unknown
       specific-humidity:
         cds_variable: specific_humidity
-        nc_variable: specific_humidity
-        units: unknown
+        nc_variable: hus
+        units: '1'
       surface-air-pressure:
         cds_variable: surface_air_pressure
         nc_variable: surface_air_pressure
@@ -2767,8 +2816,8 @@ datasets:
     variables:
       near-surface-air-temperature:
         cds_variable: near_surface_air_temperature
-        nc_variable: near_surface_air_temperature
-        units: unknown
+        nc_variable: tas
+        units: K
       daily-maximum-near-surface-air-temperature:
         cds_variable: daily_maximum_near_surface_air_temperature
         nc_variable: daily_maximum_near_surface_air_temperature
@@ -2876,8 +2925,8 @@ datasets:
     variables:
       pressure:
         cds_variable: pressure
-        nc_variable: pressure
-        units: unknown
+        nc_variable: pres
+        units: Pa
       relative-humidity:
         cds_variable: relative_humidity
         nc_variable: relative_humidity
@@ -2905,8 +2954,8 @@ datasets:
     variables:
       geopotential:
         cds_variable: geopotential
-        nc_variable: geopotential
-        units: unknown
+        nc_variable: z
+        units: m**2 s**-2
       geopotential-height:
         cds_variable: geopotential_height
         nc_variable: geopotential_height
@@ -3028,8 +3077,8 @@ datasets:
         units: unknown
       volumetric-soil-moisture:
         cds_variable: volumetric_soil_moisture
-        nc_variable: volumetric_soil_moisture
-        units: unknown
+        nc_variable: voltso
+        units: m**3 m**-3
       volumetric-transpiration-stress-onset:
         cds_variable: volumetric_transpiration_stress_onset
         nc_variable: volumetric_transpiration_stress_onset
@@ -3056,108 +3105,166 @@ datasets:
     variables:
       biologically-effective-degree-days:
         cds_variable: biologically_effective_degree_days
-        nc_variable: biologically_effective_degree_days
-        units: unknown
+        nc_variable: BEDD
+        units: degrees_C
       growing-season-length:
         cds_variable: growing_season_length
-        nc_variable: growing_season_length
-        units: unknown
+        nc_variable: GSL
+        units: day
+        extras:
+          temporal_aggregation: [annual]
+          version: ['1_0', '1_1']
       maximum-number-of-consecutive-dry-days:
         cds_variable: maximum_number_of_consecutive_dry_days
-        nc_variable: maximum_number_of_consecutive_dry_days
-        units: unknown
+        nc_variable: CDD
+        units: day
+        extras:
+          temporal_aggregation: [season]
+          version: ['1_0', '1_1']
       maximum-number-of-consecutive-frost-days:
         cds_variable: maximum_number_of_consecutive_frost_days
-        nc_variable: maximum_number_of_consecutive_frost_days
-        units: unknown
+        nc_variable: CFD
+        units: day
+        extras:
+          temporal_aggregation: [season]
+          version: ['1_0', '1_1']
       cold-spell-duration-index:
         cds_variable: cold_spell_duration_index
-        nc_variable: cold_spell_duration_index
-        units: unknown
+        nc_variable: CSDI
+        units: day
+        extras:
+          temporal_aggregation: [season]
+          version: ['1_0', '1_1']
       maximum-number-of-consecutive-summer-days:
         cds_variable: maximum_number_of_consecutive_summer_days
-        nc_variable: maximum_number_of_consecutive_summer_days
-        units: unknown
+        nc_variable: CSU
+        units: day
+        extras:
+          temporal_aggregation: [season]
+          version: ['1_0', '1_1']
       maximum-number-of-consecutive-wet-days:
         cds_variable: maximum_number_of_consecutive_wet_days
-        nc_variable: maximum_number_of_consecutive_wet_days
-        units: unknown
+        nc_variable: CWD
+        units: day
+        extras:
+          temporal_aggregation: [season]
+          version: ['1_0', '1_1']
       mean-of-diurnal-temperature-range:
         cds_variable: mean_of_diurnal_temperature_range
-        nc_variable: mean_of_diurnal_temperature_range
-        units: unknown
+        nc_variable: DTR
+        units: ''
+        extras:
+          version: ['1_0', '1_1']
       frost-days:
         cds_variable: frost_days
-        nc_variable: frost_days
-        units: unknown
+        nc_variable: FD
+        units: day
+        extras:
+          version: ['1_0', '1_1']
       ice-days:
         cds_variable: ice_days
-        nc_variable: ice_days
-        units: unknown
+        nc_variable: ID
+        units: day
+        extras:
+          version: ['1_0', '1_1']
       heavy-precipitation-days:
         cds_variable: heavy_precipitation_days
-        nc_variable: heavy_precipitation_days
-        units: unknown
+        nc_variable: R10mm
+        units: day
+        extras:
+          version: ['1_0', '1_1']
       very-heavy-precipitation-days:
         cds_variable: very_heavy_precipitation_days
-        nc_variable: very_heavy_precipitation_days
-        units: unknown
+        nc_variable: R20mm
+        units: day
+        extras:
+          version: ['1_0', '1_1']
       precipitation-sum:
         cds_variable: precipitation_sum
-        nc_variable: precipitation_sum
-        units: unknown
+        nc_variable: RR
+        units: mm
+        extras:
+          version: ['1_0', '1_1']
       wet-days:
         cds_variable: wet_days
-        nc_variable: wet_days
-        units: unknown
+        nc_variable: RR1
+        units: day
+        extras:
+          version: ['1_0', '1_1']
       simple-daily-intensity-index:
         cds_variable: simple_daily_intensity_index
-        nc_variable: simple_daily_intensity_index
-        units: unknown
+        nc_variable: SDII
+        units: mm
+        extras:
+          version: ['1_0', '1_1']
       summer-days:
         cds_variable: summer_days
-        nc_variable: summer_days
-        units: unknown
+        nc_variable: SU
+        units: day
+        extras:
+          version: ['1_0', '1_1']
       mean-of-daily-mean-temperature:
         cds_variable: mean_of_daily_mean_temperature
-        nc_variable: mean_of_daily_mean_temperature
-        units: unknown
+        nc_variable: TG
+        units: K
+        extras:
+          version: ['1_0', '1_1']
       mean-of-daily-minimum-temperature:
         cds_variable: mean_of_daily_minimum_temperature
-        nc_variable: mean_of_daily_minimum_temperature
-        units: unknown
+        nc_variable: TN
+        units: K
+        extras:
+          version: ['1_0', '1_1']
       minimum-of-daily-minimum-temperature:
         cds_variable: minimum_of_daily_minimum_temperature
-        nc_variable: minimum_of_daily_minimum_temperature
-        units: unknown
+        nc_variable: TNn
+        units: K
+        extras:
+          version: ['1_0', '1_1']
       maximum-of-daily-minimum-temperature:
         cds_variable: maximum_of_daily_minimum_temperature
-        nc_variable: maximum_of_daily_minimum_temperature
-        units: unknown
+        nc_variable: TNx
+        units: K
+        extras:
+          version: ['1_0', '1_1']
       tropical-nights:
         cds_variable: tropical_nights
-        nc_variable: tropical_nights
-        units: unknown
+        nc_variable: TR
+        units: day
+        extras:
+          version: ['1_0', '1_1']
       mean-of-daily-maximum-temperature:
         cds_variable: mean_of_daily_maximum_temperature
-        nc_variable: mean_of_daily_maximum_temperature
-        units: unknown
+        nc_variable: TX
+        units: K
+        extras:
+          version: ['1_0', '1_1']
       minimum-of-daily-maximum-temperature:
         cds_variable: minimum_of_daily_maximum_temperature
-        nc_variable: minimum_of_daily_maximum_temperature
-        units: unknown
+        nc_variable: TXn
+        units: K
+        extras:
+          version: ['1_0', '1_1']
       maximum-of-daily-maximum-temperature:
         cds_variable: maximum_of_daily_maximum_temperature
-        nc_variable: maximum_of_daily_maximum_temperature
-        units: unknown
+        nc_variable: TXx
+        units: K
+        extras:
+          version: ['1_0', '1_1']
       warm-spell-duration-index:
         cds_variable: warm_spell_duration_index
-        nc_variable: warm_spell_duration_index
-        units: unknown
+        nc_variable: WSDI
+        units: day
+        extras:
+          temporal_aggregation: [season]
+          version: ['1_0', '1_1']
       warm-and-wet-days:
         cds_variable: warm_and_wet_days
-        nc_variable: warm_and_wet_days
-        units: unknown
+        nc_variable: WW
+        units: day
+        extras:
+          temporal_aggregation: [season]
+          version: ['1_0', '1_1']
   sis-agrometeorological-indicators:
     endpoint: cds
     request_kind: form
@@ -3169,16 +3276,18 @@ datasets:
     variables:
       10m-wind-speed:
         cds_variable: 10m_wind_speed
-        nc_variable: 10m_wind_speed
-        units: unknown
+        nc_variable: Wind_Speed_10m_Mean
+        units: m s-1
       2m-dewpoint-temperature:
         cds_variable: 2m_dewpoint_temperature
-        nc_variable: 2m_dewpoint_temperature
-        units: unknown
+        nc_variable: Dew_Point_Temperature_2m_Mean
+        units: K
       2m-relative-humidity:
         cds_variable: 2m_relative_humidity
-        nc_variable: 2m_relative_humidity
-        units: unknown
+        nc_variable: Relative_Humidity_2m_06h
+        units: '%'
+        extras:
+          time: ['06_00', 09_00, '12_00', '15_00', '18_00']
       2m-relative-humidity-derived:
         cds_variable: 2m_relative_humidity_derived
         nc_variable: 2m_relative_humidity_derived
@@ -3361,132 +3470,145 @@ datasets:
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
-        nc_variable: annual_mean_temperature
-        units: unknown
+        nc_variable: BIO01
+        units: K
       mean-diurnal-range:
         cds_variable: mean_diurnal_range
-        nc_variable: mean_diurnal_range
-        units: unknown
+        nc_variable: BIO02
+        units: K
       isothermality:
         cds_variable: isothermality
-        nc_variable: isothermality
-        units: unknown
+        nc_variable: BIO03
+        units: '%'
       temperature-seasonality:
         cds_variable: temperature_seasonality
-        nc_variable: temperature_seasonality
-        units: unknown
+        nc_variable: BIO04
+        units: K
       maximum-temperature-of-warmest-month:
         cds_variable: maximum_temperature_of_warmest_month
-        nc_variable: maximum_temperature_of_warmest_month
-        units: unknown
+        nc_variable: BIO05
+        units: K
       minimum-temperature-of-coldest-month:
         cds_variable: minimum_temperature_of_coldest_month
-        nc_variable: minimum_temperature_of_coldest_month
-        units: unknown
+        nc_variable: BIO06
+        units: K
       temperature-annual-range:
         cds_variable: temperature_annual_range
-        nc_variable: temperature_annual_range
-        units: unknown
+        nc_variable: BIO07
+        units: K
       mean-temperature-of-wettest-quarter:
         cds_variable: mean_temperature_of_wettest_quarter
-        nc_variable: mean_temperature_of_wettest_quarter
-        units: unknown
+        nc_variable: BIO08
+        units: K
       mean-temperature-of-driest-quarter:
         cds_variable: mean_temperature_of_driest_quarter
-        nc_variable: mean_temperature_of_driest_quarter
-        units: unknown
+        nc_variable: BIO09
+        units: K
       mean-temperature-of-warmest-quarter:
         cds_variable: mean_temperature_of_warmest_quarter
-        nc_variable: mean_temperature_of_warmest_quarter
-        units: unknown
+        nc_variable: BIO10
+        units: K
       mean-temperature-of-coldest-quarter:
         cds_variable: mean_temperature_of_coldest_quarter
-        nc_variable: mean_temperature_of_coldest_quarter
-        units: unknown
+        nc_variable: BIO11
+        units: K
       annual-precipitation:
         cds_variable: annual_precipitation
-        nc_variable: annual_precipitation
-        units: unknown
+        nc_variable: BIO12
+        units: m s**-1
       precipitation-of-wettest-month:
         cds_variable: precipitation_of_wettest_month
-        nc_variable: precipitation_of_wettest_month
-        units: unknown
+        nc_variable: BIO13
+        units: m s**-1
       precipitation-of-driest-month:
         cds_variable: precipitation_of_driest_month
-        nc_variable: precipitation_of_driest_month
-        units: unknown
+        nc_variable: BIO14
+        units: m s**-1
       precipitation-seasonality:
         cds_variable: precipitation_seasonality
-        nc_variable: precipitation_seasonality
-        units: unknown
+        nc_variable: BIO15
+        units: '1'
       precipitation-of-wettest-quarter:
         cds_variable: precipitation_of_wettest_quarter
-        nc_variable: precipitation_of_wettest_quarter
-        units: unknown
+        nc_variable: BIO16
+        units: m s**-1
       precipitation-of-driest-quarter:
         cds_variable: precipitation_of_driest_quarter
-        nc_variable: precipitation_of_driest_quarter
-        units: unknown
+        nc_variable: BIO17
+        units: m s**-1
       precipitation-of-warmest-quarter:
         cds_variable: precipitation_of_warmest_quarter
-        nc_variable: precipitation_of_warmest_quarter
-        units: unknown
+        nc_variable: BIO18
+        units: m s**-1
       precipitation-of-coldest-quarter:
         cds_variable: precipitation_of_coldest_quarter
-        nc_variable: precipitation_of_coldest_quarter
-        units: unknown
+        nc_variable: BIO19
+        units: m s**-1
       aridity:
         cds_variable: aridity
-        nc_variable: aridity
-        units: unknown
+        nc_variable: aridity_annual-mean
+        units: '1'
+        extras:
+          experiment: [rcp4_5, rcp8_5]
       dry-spells:
         cds_variable: dry_spells
-        nc_variable: dry_spells
-        units: unknown
+        nc_variable: dry-spells_maximum-length
+        units: days
       dry-days:
         cds_variable: dry_days
-        nc_variable: dry_days
-        units: unknown
+        nc_variable: dry-days_annual-sum
+        units: days year**-1
       summer-days:
         cds_variable: summer_days
-        nc_variable: summer_days
-        units: unknown
+        nc_variable: summer-days_annual-sum
+        units: days year**-1
       surface-latent-heat-flux:
         cds_variable: surface_latent_heat_flux
-        nc_variable: surface_latent_heat_flux
-        units: unknown
+        nc_variable: surface-latent-heat-flux_annual-mean
+        units: W m-2
+        extras:
+          experiment: [rcp4_5, rcp8_5]
       surface-sensible-heat-flux:
         cds_variable: surface_sensible_heat_flux
-        nc_variable: surface_sensible_heat_flux
-        units: unknown
+        nc_variable: surface-sensible-heat-flux_annual-mean
+        units: W m-2
+        extras:
+          experiment: [rcp4_5, rcp8_5]
       evaporative-fraction:
         cds_variable: evaporative_fraction
-        nc_variable: evaporative_fraction
-        units: unknown
+        nc_variable: evaporative-fraction_annual-mean
+        units: '1'
+        extras:
+          experiment: [rcp4_5, rcp8_5]
       frost-days:
         cds_variable: frost_days
-        nc_variable: frost_days
-        units: unknown
+        nc_variable: frost-days_annual-sum
+        units: days year**-1
       growing-season:
         cds_variable: growing_season
-        nc_variable: growing_season
-        units: unknown
+        nc_variable: growing-season_end
+        units: day since 1 January
       growing-degree-days:
         cds_variable: growing_degree_days
-        nc_variable: growing_degree_days
-        units: unknown
+        nc_variable: growing-degree-days_annual-sum
+        units: K days year**-1
       growing-degree-days-during-growing-season-length:
         cds_variable: growing_degree_days_during_growing_season_length
-        nc_variable: growing_degree_days_during_growing_season_length
-        units: unknown
+        nc_variable: growing-degree-days-during-growing-season-length
+        units: 'K days '
       koeppen-geiger-class:
         cds_variable: koeppen_geiger_class
-        nc_variable: koeppen_geiger_class
-        units: unknown
+        nc_variable: koeppen-geiger-class
+        units: ''
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          temporal_aggregation: [climatology]
       potential-evaporation:
         cds_variable: potential_evaporation
-        nc_variable: potential_evaporation
-        units: unknown
+        nc_variable: potential-evaporation_annual-mean
+        units: m s**-1
+        extras:
+          experiment: [rcp4_5, rcp8_5]
       sea-ice-concentration:
         cds_variable: sea_ice_concentration
         nc_variable: sea_ice_concentration
@@ -3546,80 +3668,80 @@ datasets:
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
-        nc_variable: annual_mean_temperature
-        units: unknown
+        nc_variable: BIO01
+        units: K
       mean-diurnal-range:
         cds_variable: mean_diurnal_range
-        nc_variable: mean_diurnal_range
-        units: unknown
+        nc_variable: BIO02
+        units: K
       isothermality:
         cds_variable: isothermality
-        nc_variable: isothermality
-        units: unknown
+        nc_variable: BIO03
+        units: '%'
       temperature-seasonality:
         cds_variable: temperature_seasonality
-        nc_variable: temperature_seasonality
-        units: unknown
+        nc_variable: BIO04
+        units: K
       maximum-temperature-of-warmest-month:
         cds_variable: maximum_temperature_of_warmest_month
-        nc_variable: maximum_temperature_of_warmest_month
-        units: unknown
+        nc_variable: BIO05
+        units: K
       minimum-temperature-of-coldest-month:
         cds_variable: minimum_temperature_of_coldest_month
-        nc_variable: minimum_temperature_of_coldest_month
-        units: unknown
+        nc_variable: BIO06
+        units: K
       temperature-annual-range:
         cds_variable: temperature_annual_range
-        nc_variable: temperature_annual_range
-        units: unknown
+        nc_variable: BIO07
+        units: K
       mean-temperature-of-wettest-quarter:
         cds_variable: mean_temperature_of_wettest_quarter
-        nc_variable: mean_temperature_of_wettest_quarter
-        units: unknown
+        nc_variable: BIO08
+        units: K
       mean-temperature-of-driest-quarter:
         cds_variable: mean_temperature_of_driest_quarter
-        nc_variable: mean_temperature_of_driest_quarter
-        units: unknown
+        nc_variable: BIO09
+        units: K
       mean-temperature-of-warmest-quarter:
         cds_variable: mean_temperature_of_warmest_quarter
-        nc_variable: mean_temperature_of_warmest_quarter
-        units: unknown
+        nc_variable: BIO10
+        units: K
       mean-temperature-of-coldest-quarter:
         cds_variable: mean_temperature_of_coldest_quarter
-        nc_variable: mean_temperature_of_coldest_quarter
-        units: unknown
+        nc_variable: BIO11
+        units: K
       annual-precipitation:
         cds_variable: annual_precipitation
-        nc_variable: annual_precipitation
-        units: unknown
+        nc_variable: BIO12
+        units: m s**-1
       precipitation-of-wettest-month:
         cds_variable: precipitation_of_wettest_month
-        nc_variable: precipitation_of_wettest_month
-        units: unknown
+        nc_variable: BIO13
+        units: m s**-1
       precipitation-of-driest-month:
         cds_variable: precipitation_of_driest_month
-        nc_variable: precipitation_of_driest_month
-        units: unknown
+        nc_variable: BIO14
+        units: m s**-1
       precipitation-seasonality:
         cds_variable: precipitation_seasonality
-        nc_variable: precipitation_seasonality
-        units: unknown
+        nc_variable: BIO15
+        units: '1'
       precipitation-of-wettest-quarter:
         cds_variable: precipitation_of_wettest_quarter
-        nc_variable: precipitation_of_wettest_quarter
-        units: unknown
+        nc_variable: BIO16
+        units: m s**-1
       precipitation-of-driest-quarter:
         cds_variable: precipitation_of_driest_quarter
-        nc_variable: precipitation_of_driest_quarter
-        units: unknown
+        nc_variable: BIO17
+        units: m s**-1
       precipitation-of-warmest-quarter:
         cds_variable: precipitation_of_warmest_quarter
-        nc_variable: precipitation_of_warmest_quarter
-        units: unknown
+        nc_variable: BIO18
+        units: m s**-1
       precipitation-of-coldest-quarter:
         cds_variable: precipitation_of_coldest_quarter
-        nc_variable: precipitation_of_coldest_quarter
-        units: unknown
+        nc_variable: BIO19
+        units: m s**-1
       aridity:
         cds_variable: aridity
         nc_variable: aridity
@@ -3711,172 +3833,174 @@ datasets:
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
-        nc_variable: annual_mean_temperature
-        units: unknown
+        nc_variable: BIO01
+        units: K
       mean-diurnal-range:
         cds_variable: mean_diurnal_range
-        nc_variable: mean_diurnal_range
-        units: unknown
+        nc_variable: BIO02
+        units: K
       isothermality:
         cds_variable: isothermality
-        nc_variable: isothermality
-        units: unknown
+        nc_variable: BIO03
+        units: '%'
       temperature-seasonality:
         cds_variable: temperature_seasonality
-        nc_variable: temperature_seasonality
-        units: unknown
+        nc_variable: BIO04
+        units: K
       maximum-temperature-of-warmest-month:
         cds_variable: maximum_temperature_of_warmest_month
-        nc_variable: maximum_temperature_of_warmest_month
-        units: unknown
+        nc_variable: BIO05
+        units: K
       minimum-temperature-of-coldest-month:
         cds_variable: minimum_temperature_of_coldest_month
-        nc_variable: minimum_temperature_of_coldest_month
-        units: unknown
+        nc_variable: BIO06
+        units: K
       temperature-annual-range:
         cds_variable: temperature_annual_range
-        nc_variable: temperature_annual_range
-        units: unknown
+        nc_variable: BIO07
+        units: K
       mean-temperature-of-wettest-quarter:
         cds_variable: mean_temperature_of_wettest_quarter
-        nc_variable: mean_temperature_of_wettest_quarter
-        units: unknown
+        nc_variable: BIO08
+        units: K
       mean-temperature-of-driest-quarter:
         cds_variable: mean_temperature_of_driest_quarter
-        nc_variable: mean_temperature_of_driest_quarter
-        units: unknown
+        nc_variable: BIO09
+        units: K
       mean-temperature-of-warmest-quarter:
         cds_variable: mean_temperature_of_warmest_quarter
-        nc_variable: mean_temperature_of_warmest_quarter
-        units: unknown
+        nc_variable: BIO10
+        units: K
       mean-temperature-of-coldest-quarter:
         cds_variable: mean_temperature_of_coldest_quarter
-        nc_variable: mean_temperature_of_coldest_quarter
-        units: unknown
+        nc_variable: BIO11
+        units: K
       annual-precipitation:
         cds_variable: annual_precipitation
-        nc_variable: annual_precipitation
-        units: unknown
+        nc_variable: BIO12
+        units: m s**-1
       precipitation-of-wettest-month:
         cds_variable: precipitation_of_wettest_month
-        nc_variable: precipitation_of_wettest_month
-        units: unknown
+        nc_variable: BIO13
+        units: m s**-1
       precipitation-of-driest-month:
         cds_variable: precipitation_of_driest_month
-        nc_variable: precipitation_of_driest_month
-        units: unknown
+        nc_variable: BIO14
+        units: m s**-1
       precipitation-seasonality:
         cds_variable: precipitation_seasonality
-        nc_variable: precipitation_seasonality
-        units: unknown
+        nc_variable: BIO15
+        units: '1'
       precipitation-of-wettest-quarter:
         cds_variable: precipitation_of_wettest_quarter
-        nc_variable: precipitation_of_wettest_quarter
-        units: unknown
+        nc_variable: BIO16
+        units: m s**-1
       precipitation-of-driest-quarter:
         cds_variable: precipitation_of_driest_quarter
-        nc_variable: precipitation_of_driest_quarter
-        units: unknown
+        nc_variable: BIO17
+        units: m s**-1
       precipitation-of-warmest-quarter:
         cds_variable: precipitation_of_warmest_quarter
-        nc_variable: precipitation_of_warmest_quarter
-        units: unknown
+        nc_variable: BIO18
+        units: m s**-1
       precipitation-of-coldest-quarter:
         cds_variable: precipitation_of_coldest_quarter
-        nc_variable: precipitation_of_coldest_quarter
-        units: unknown
+        nc_variable: BIO19
+        units: m s**-1
       aridity:
         cds_variable: aridity
-        nc_variable: aridity
-        units: unknown
+        nc_variable: aridity_annual-mean
+        units: '1'
       dry-spells:
         cds_variable: dry_spells
-        nc_variable: dry_spells
-        units: unknown
+        nc_variable: dry-spells_maximum-length
+        units: days
       dry-days:
         cds_variable: dry_days
-        nc_variable: dry_days
-        units: unknown
+        nc_variable: dry-days_annual-sum
+        units: days year**-1
       summer-days:
         cds_variable: summer_days
-        nc_variable: summer_days
-        units: unknown
+        nc_variable: summer-days_annual-sum
+        units: days year**-1
       surface-latent-heat-flux:
         cds_variable: surface_latent_heat_flux
-        nc_variable: surface_latent_heat_flux
-        units: unknown
+        nc_variable: surface-latent-heat-flux_annual-mean
+        units: W m**-2
       surface-sensible-heat-flux:
         cds_variable: surface_sensible_heat_flux
-        nc_variable: surface_sensible_heat_flux
-        units: unknown
+        nc_variable: surface-sensible-heat-flux_annual-mean
+        units: W m**-2
       evaporative-fraction:
         cds_variable: evaporative_fraction
-        nc_variable: evaporative_fraction
-        units: unknown
+        nc_variable: evaporative-fraction_annual-mean
+        units: '1'
       frost-days:
         cds_variable: frost_days
-        nc_variable: frost_days
-        units: unknown
+        nc_variable: frost-days_annual-sum
+        units: days year**-1
       growing-season:
         cds_variable: growing_season
-        nc_variable: growing_season
-        units: unknown
+        nc_variable: growing-season_end
+        units: day since 1 January
       growing-degree-days:
         cds_variable: growing_degree_days
-        nc_variable: growing_degree_days
-        units: unknown
+        nc_variable: growing-degree-days_annual-sum
+        units: K days year**-1
       growing-degree-days-during-growing-season-length:
         cds_variable: growing_degree_days_during_growing_season_length
-        nc_variable: growing_degree_days_during_growing_season_length
-        units: unknown
+        nc_variable: growing-degree-days-during-growing-season-length
+        units: 'K days '
       koeppen-geiger-class:
         cds_variable: koeppen_geiger_class
-        nc_variable: koeppen_geiger_class
-        units: unknown
+        nc_variable: koeppen-geiger-class
+        units: ''
+        extras:
+          temporal_aggregation: [climatology]
       potential-evaporation:
         cds_variable: potential_evaporation
-        nc_variable: potential_evaporation
-        units: unknown
+        nc_variable: potential-evaporation_annual-mean
+        units: m s**-1
       sea-ice-concentration:
         cds_variable: sea_ice_concentration
-        nc_variable: sea_ice_concentration
-        units: unknown
+        nc_variable: sea-ice-concentration
+        units: '1'
       sea-surface-temperature:
         cds_variable: sea_surface_temperature
-        nc_variable: sea_surface_temperature
-        units: unknown
+        nc_variable: sea-surface-temperature
+        units: K
       2m-temperature:
         cds_variable: 2m_temperature
-        nc_variable: 2m_temperature
-        units: unknown
+        nc_variable: temperature_annual-maximum
+        units: K
       precipitation:
         cds_variable: precipitation
-        nc_variable: precipitation
-        units: unknown
+        nc_variable: precipitation_daily-mean-annual-maximum
+        units: m s**-1
       water-vapour-pressure:
         cds_variable: water_vapour_pressure
-        nc_variable: water_vapour_pressure
-        units: unknown
+        nc_variable: water-vapor-pressure_annual-mean
+        units: Pa
       cloud-cover:
         cds_variable: cloud_cover
-        nc_variable: cloud_cover
-        units: unknown
+        nc_variable: cloud-cover_annual-mean
+        units: '1'
       volumetric-soil-water:
         cds_variable: volumetric_soil_water
-        nc_variable: volumetric_soil_water
-        units: unknown
+        nc_variable: volumetric-soil-water-layer-1_annual-mean
+        units: m**3 m**-3
       wind-speed:
         cds_variable: wind_speed
-        nc_variable: wind_speed
-        units: unknown
+        nc_variable: wind-speed
+        units: m s**-1
       zonal-wind-speed:
         cds_variable: zonal_wind_speed
-        nc_variable: zonal_wind_speed
-        units: unknown
+        nc_variable: zonal-wind-speed
+        units: m s**-1
       meridional-wind-speed:
         cds_variable: meridional_wind_speed
-        nc_variable: meridional_wind_speed
-        units: unknown
+        nc_variable: meridional-wind-speed
+        units: m s**-1
   sis-biodiversity-era5-regional:
     endpoint: cds
     request_kind: form
@@ -3894,160 +4018,216 @@ datasets:
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
-        nc_variable: annual_mean_temperature
-        units: unknown
+        nc_variable: BIO01
+        units: K
       mean-diurnal-range:
         cds_variable: mean_diurnal_range
-        nc_variable: mean_diurnal_range
-        units: unknown
+        nc_variable: BIO02
+        units: K
       isothermality:
         cds_variable: isothermality
-        nc_variable: isothermality
-        units: unknown
+        nc_variable: BIO03
+        units: '%'
       temperature-seasonality:
         cds_variable: temperature_seasonality
-        nc_variable: temperature_seasonality
-        units: unknown
+        nc_variable: BIO04
+        units: K
       maximum-temperature-of-warmest-month:
         cds_variable: maximum_temperature_of_warmest_month
-        nc_variable: maximum_temperature_of_warmest_month
-        units: unknown
+        nc_variable: BIO05
+        units: K
       minimum-temperature-of-coldest-month:
         cds_variable: minimum_temperature_of_coldest_month
-        nc_variable: minimum_temperature_of_coldest_month
-        units: unknown
+        nc_variable: BIO06
+        units: K
       temperature-annual-range:
         cds_variable: temperature_annual_range
-        nc_variable: temperature_annual_range
-        units: unknown
+        nc_variable: BIO07
+        units: K
       mean-temperature-of-wettest-quarter:
         cds_variable: mean_temperature_of_wettest_quarter
-        nc_variable: mean_temperature_of_wettest_quarter
-        units: unknown
+        nc_variable: BIO08
+        units: K
       mean-temperature-of-driest-quarter:
         cds_variable: mean_temperature_of_driest_quarter
-        nc_variable: mean_temperature_of_driest_quarter
-        units: unknown
+        nc_variable: BIO09
+        units: K
       mean-temperature-of-warmest-quarter:
         cds_variable: mean_temperature_of_warmest_quarter
-        nc_variable: mean_temperature_of_warmest_quarter
-        units: unknown
+        nc_variable: BIO10
+        units: K
       mean-temperature-of-coldest-quarter:
         cds_variable: mean_temperature_of_coldest_quarter
-        nc_variable: mean_temperature_of_coldest_quarter
-        units: unknown
+        nc_variable: BIO11
+        units: K
       annual-precipitation:
         cds_variable: annual_precipitation
-        nc_variable: annual_precipitation
-        units: unknown
+        nc_variable: BIO12
+        units: m s**-1
       precipitation-of-wettest-month:
         cds_variable: precipitation_of_wettest_month
-        nc_variable: precipitation_of_wettest_month
-        units: unknown
+        nc_variable: BIO13
+        units: m s**-1
       precipitation-of-driest-month:
         cds_variable: precipitation_of_driest_month
-        nc_variable: precipitation_of_driest_month
-        units: unknown
+        nc_variable: BIO14
+        units: m s**-1
       precipitation-seasonality:
         cds_variable: precipitation_seasonality
-        nc_variable: precipitation_seasonality
-        units: unknown
+        nc_variable: BIO15
+        units: '1'
       precipitation-of-wettest-quarter:
         cds_variable: precipitation_of_wettest_quarter
-        nc_variable: precipitation_of_wettest_quarter
-        units: unknown
+        nc_variable: BIO16
+        units: m s**-1
       precipitation-of-driest-quarter:
         cds_variable: precipitation_of_driest_quarter
-        nc_variable: precipitation_of_driest_quarter
-        units: unknown
+        nc_variable: BIO17
+        units: m s**-1
       precipitation-of-warmest-quarter:
         cds_variable: precipitation_of_warmest_quarter
-        nc_variable: precipitation_of_warmest_quarter
-        units: unknown
+        nc_variable: BIO18
+        units: m s**-1
       precipitation-of-coldest-quarter:
         cds_variable: precipitation_of_coldest_quarter
-        nc_variable: precipitation_of_coldest_quarter
-        units: unknown
+        nc_variable: BIO19
+        units: m s**-1
       aridity:
         cds_variable: aridity
-        nc_variable: aridity
-        units: unknown
+        nc_variable: aridity_annual-mean
+        units: '1'
+        extras:
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       dry-spells:
         cds_variable: dry_spells
-        nc_variable: dry_spells
-        units: unknown
+        nc_variable: dry-spells_maximum-length
+        units: days
+        extras:
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       dry-days:
         cds_variable: dry_days
-        nc_variable: dry_days
-        units: unknown
+        nc_variable: dry-days_annual-sum
+        units: days year**-1
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       summer-days:
         cds_variable: summer_days
-        nc_variable: summer_days
-        units: unknown
+        nc_variable: summer-days_annual-sum
+        units: days year**-1
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       surface-latent-heat-flux:
         cds_variable: surface_latent_heat_flux
-        nc_variable: surface_latent_heat_flux
-        units: unknown
+        nc_variable: surface-latent-heat-flux_annual-mean
+        units: W m**-2
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       surface-sensible-heat-flux:
         cds_variable: surface_sensible_heat_flux
-        nc_variable: surface_sensible_heat_flux
-        units: unknown
+        nc_variable: surface-sensible-heat-flux_annual-mean
+        units: W m**-2
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       evaporative-fraction:
         cds_variable: evaporative_fraction
-        nc_variable: evaporative_fraction
-        units: unknown
+        nc_variable: evaporative-fraction_annual-mean
+        units: '1'
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       frost-days:
         cds_variable: frost_days
-        nc_variable: frost_days
-        units: unknown
+        nc_variable: frost-days_annual-sum
+        units: days year**-1
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       growing-season:
         cds_variable: growing_season
-        nc_variable: growing_season
-        units: unknown
+        nc_variable: growing-season_end
+        units: day since 1 January
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       growing-degree-days:
         cds_variable: growing_degree_days
-        nc_variable: growing_degree_days
-        units: unknown
+        nc_variable: growing-degree-days_annual-sum
+        units: K days year**-1
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       growing-degree-days-during-growing-season-length:
         cds_variable: growing_degree_days_during_growing_season_length
-        nc_variable: growing_degree_days_during_growing_season_length
-        units: unknown
+        nc_variable: growing-degree-days-during-growing-season-length
+        units: 'K days '
+        extras:
+          region: [central_africa, europe]
       koeppen-geiger-class:
         cds_variable: koeppen_geiger_class
-        nc_variable: koeppen_geiger_class
-        units: unknown
+        nc_variable: koeppen-geiger-class
+        units: ''
+        extras:
+          region: [central_africa, europe]
       potential-evaporation:
         cds_variable: potential_evaporation
-        nc_variable: potential_evaporation
-        units: unknown
+        nc_variable: potential-evaporation_annual-mean
+        units: m s**-1
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       2m-temperature:
         cds_variable: 2m_temperature
-        nc_variable: 2m_temperature
-        units: unknown
+        nc_variable: temperature_annual-maximum
+        units: K
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       precipitation:
         cds_variable: precipitation
-        nc_variable: precipitation
-        units: unknown
+        nc_variable: precipitation_daily-mean-annual-maximum
+        units: m s**-1
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       water-vapor-pressure:
         cds_variable: water_vapor_pressure
-        nc_variable: water_vapor_pressure
-        units: unknown
+        nc_variable: water-vapor-pressure_annual-mean
+        units: Pa
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       cloud-cover:
         cds_variable: cloud_cover
-        nc_variable: cloud_cover
-        units: unknown
+        nc_variable: cloud-cover_annual-mean
+        units: '1'
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       volumetric-soil-water:
         cds_variable: volumetric_soil_water
-        nc_variable: volumetric_soil_water
-        units: unknown
+        nc_variable: volumetric-soil-water-layer-1_annual-mean
+        units: m**3 m**-3
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       wind-speed:
         cds_variable: wind_speed
-        nc_variable: wind_speed
-        units: unknown
+        nc_variable: wind-speed
+        units: m s**-1
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       zonal-wind-speed:
         cds_variable: zonal_wind_speed
-        nc_variable: zonal_wind_speed
-        units: unknown
+        nc_variable: zonal-wind-speed
+        units: m s**-1
+        extras:
+          region: [central_africa, europe]
+          statistic: [25th_quartile, 75th_quartile, mean, median]
       meridional-wind-speed:
         cds_variable: meridional_wind_speed
         nc_variable: meridional_wind_speed
@@ -4069,16 +4249,16 @@ datasets:
     variables:
       mean-temperature:
         cds_variable: mean_temperature
-        nc_variable: mean_temperature
-        units: unknown
+        nc_variable: t2m
+        units: K
       growing-degree-days:
         cds_variable: growing_degree_days
         nc_variable: growing_degree_days
         units: unknown
       heating-degree-days:
         cds_variable: heating_degree_days
-        nc_variable: heating_degree_days
-        units: unknown
+        nc_variable: data
+        units: K
       cooling-degree-days:
         cds_variable: cooling_degree_days
         nc_variable: cooling_degree_days
@@ -4102,7 +4282,7 @@ datasets:
       high-utci-days:
         cds_variable: high_utci_days
         nc_variable: high_utci_days
-        units: unknown
+        units: '1'
       frost-days:
         cds_variable: frost_days
         nc_variable: frost_days
@@ -4110,15 +4290,24 @@ datasets:
       growing-season-start:
         cds_variable: growing_season_start
         nc_variable: growing_season_start
-        units: unknown
+        units: '1'
+        extras:
+          temporal_aggregation: [yearly]
+          version: [v2_0]
       growing-season-end:
         cds_variable: growing_season_end
         nc_variable: growing_season_end
-        units: unknown
+        units: '1'
+        extras:
+          temporal_aggregation: [yearly]
+          version: [v2_0]
       growing-season-length:
         cds_variable: growing_season_length
         nc_variable: growing_season_length
-        units: unknown
+        units: day
+        extras:
+          temporal_aggregation: [yearly]
+          version: [v2_0]
       daily-maximum-temperature:
         cds_variable: daily_maximum_temperature
         nc_variable: daily_maximum_temperature
@@ -4129,16 +4318,16 @@ datasets:
         units: unknown
       total-precipitation:
         cds_variable: total_precipitation
-        nc_variable: total_precipitation
-        units: unknown
+        nc_variable: tp
+        units: mm
       maximum-consecutive-five-day-precipitation:
         cds_variable: maximum_consecutive_five_day_precipitation
         nc_variable: maximum_consecutive_five_day_precipitation
         units: unknown
       extreme-precipitation-total:
         cds_variable: extreme_precipitation_total
-        nc_variable: extreme_precipitation_total
-        units: unknown
+        nc_variable: data
+        units: mm
       frequency-of-extreme-precipitation:
         cds_variable: frequency_of_extreme_precipitation
         nc_variable: frequency_of_extreme_precipitation
@@ -4146,35 +4335,50 @@ datasets:
       flood-recurrence:
         cds_variable: flood_recurrence
         nc_variable: flood_recurrence
-        units: unknown
+        units: m3 s-1
+        extras:
+          origin: [projections]
+          temporal_aggregation: [yearly]
+          version: [v1_0, v2_0]
       mean-river-discharge:
         cds_variable: mean_river_discharge
         nc_variable: mean_river_discharge
-        units: unknown
+        units: m3 s-1
+        extras:
+          origin: [projections]
+          temporal_aggregation: [yearly]
       aridity-actual:
         cds_variable: aridity_actual
         nc_variable: aridity_actual
-        units: unknown
+        units: '1'
+        extras:
+          origin: [projections]
       consecutive-dry-days:
         cds_variable: consecutive_dry_days
-        nc_variable: consecutive_dry_days
-        units: unknown
+        nc_variable: cdd
+        units: '1'
       duration-of-meteorological-droughts:
         cds_variable: duration_of_meteorological_droughts
-        nc_variable: duration_of_meteorological_droughts
-        units: unknown
+        nc_variable: meteorological_droughts_duration
+        units: month
+        extras:
+          temporal_aggregation: [yearly]
       magnitude-of-meteorological-droughts:
         cds_variable: magnitude_of_meteorological_droughts
-        nc_variable: magnitude_of_meteorological_droughts
-        units: unknown
+        nc_variable: mdm
+        units: '1'
+        extras:
+          temporal_aggregation: [yearly]
       mean-soil-moisture:
         cds_variable: mean_soil_moisture
-        nc_variable: mean_soil_moisture
-        units: unknown
+        nc_variable: smoist_ymonmean
+        units: m3 m-3
+        extras:
+          origin: [projections]
       days-with-high-fire-danger:
         cds_variable: days_with_high_fire_danger
-        nc_variable: days_with_high_fire_danger
-        units: unknown
+        nc_variable: fwi
+        units: '1'
       mean-wind-speed:
         cds_variable: mean_wind_speed
         nc_variable: mean_wind_speed
@@ -4223,16 +4427,16 @@ datasets:
     variables:
       precipitation-flux:
         cds_variable: precipitation_flux
-        nc_variable: precipitation_flux
-        units: unknown
+        nc_variable: prAdjust
+        units: kg m-2 s-1
       mean-2m-temperature:
         cds_variable: mean_2m_temperature
-        nc_variable: mean_2m_temperature
-        units: unknown
+        nc_variable: tasAdjust
+        units: K
       maximum-2m-temperature:
         cds_variable: maximum_2m_temperature
-        nc_variable: maximum_2m_temperature
-        units: unknown
+        nc_variable: tasmaxAdjust
+        units: K
       minimum-2m-temperature:
         cds_variable: minimum_2m_temperature
         nc_variable: minimum_2m_temperature
@@ -4491,8 +4695,8 @@ datasets:
         units: unknown
       2m-temperature:
         cds_variable: 2m_temperature
-        nc_variable: 2m_temperature
-        units: unknown
+        nc_variable: t2m
+        units: K
       population-weighted-temperature:
         cds_variable: population_weighted_temperature
         nc_variable: population_weighted_temperature
@@ -4594,44 +4798,67 @@ datasets:
     variables:
       maximum-1-day-precipitation:
         cds_variable: maximum_1_day_precipitation
-        nc_variable: maximum_1_day_precipitation
-        units: unknown
+        nc_variable: rx1day
+        units: mm
+        extras:
+          temporal_aggregation: [monthly, yearly]
       maximum-5-day-precipitation:
         cds_variable: maximum_5_day_precipitation
-        nc_variable: maximum_5_day_precipitation
-        units: unknown
+        nc_variable: rx5day
+        units: mm
+        extras:
+          temporal_aggregation: [monthly, yearly]
       number-of-consecutive-wet-days:
         cds_variable: number_of_consecutive_wet_days
-        nc_variable: number_of_consecutive_wet_days
-        units: unknown
+        nc_variable: cwd
+        units: day
+        extras:
+          temporal_aggregation: [monthly, yearly]
       number-of-precipitation-days-exceeding-20mm:
         cds_variable: number_of_precipitation_days_exceeding_20mm
-        nc_variable: number_of_precipitation_days_exceeding_20mm
-        units: unknown
+        nc_variable: rr20mm
+        units: day
+        extras:
+          temporal_aggregation: [monthly, yearly]
       number-of-precipitation-days-exceeding-fixed-percentiles:
         cds_variable: number_of_precipitation_days_exceeding_fixed_percentiles
-        nc_variable: number_of_precipitation_days_exceeding_fixed_percentiles
-        units: unknown
+        nc_variable: r90pday
+        units: day
+        extras:
+          temporal_aggregation: [monthly, yearly]
       number-of-wet-days:
         cds_variable: number_of_wet_days
-        nc_variable: number_of_wet_days
-        units: unknown
+        nc_variable: rr1
+        units: day
+        extras:
+          temporal_aggregation: [monthly, yearly]
       total-precipitation:
         cds_variable: total_precipitation
-        nc_variable: total_precipitation
-        units: unknown
+        nc_variable: prcptot
+        units: mm
+        extras:
+          temporal_aggregation: [monthly, yearly]
       precipitation-at-fixed-percentiles:
         cds_variable: precipitation_at_fixed_percentiles
-        nc_variable: precipitation_at_fixed_percentiles
-        units: unknown
+        nc_variable: r90p
+        units: mm
+        extras:
+          period: ['1989_2018']
+          temporal_aggregation: [30_year]
       precipitation-at-fixed-return-periods:
         cds_variable: precipitation_at_fixed_return_periods
-        nc_variable: precipitation_at_fixed_return_periods
-        units: unknown
+        nc_variable: r10yrrp
+        units: kg m-2
+        extras:
+          period: ['1989_2018']
+          product_type: [e_obs, eca_d, era5]
+          temporal_aggregation: [30_year]
       standardised-precipitation-exceeding-fixed-percentiles:
         cds_variable: standardised_precipitation_exceeding_fixed_percentiles
-        nc_variable: standardised_precipitation_exceeding_fixed_percentiles
-        units: unknown
+        nc_variable: nrr95p
+        units: '-'
+        extras:
+          temporal_aggregation: [daily]
   sis-european-wind-storm-indicators:
     endpoint: cds
     request_kind: form
@@ -4678,8 +4905,10 @@ datasets:
     variables:
       wind-speed-of-gusts:
         cds_variable: wind_speed_of_gusts
-        nc_variable: wind_speed_of_gusts
-        units: unknown
+        nc_variable: wind_speed_of_gust
+        units: m s-1
+        extras:
+          version_id: [synthetic_set_1_2, synthetic_set_2_0, synthetic_set_3_0]
   sis-extreme-indices-cmip6:
     endpoint: cds
     request_kind: form
@@ -4700,132 +4929,201 @@ datasets:
     variables:
       cold-days:
         cds_variable: cold_days
-        nc_variable: cold_days
-        units: unknown
+        nc_variable: tx10pETCCDI
+        units: '%'
+        extras:
+          product_type: [base_period_1961_1990, base_period_1981_2010]
       cold-nights:
         cds_variable: cold_nights
-        nc_variable: cold_nights
-        units: unknown
+        nc_variable: tn10pETCCDI
+        units: '%'
+        extras:
+          product_type: [base_period_1961_1990, base_period_1981_2010]
       cold-spell-duration-index:
         cds_variable: cold_spell_duration_index
-        nc_variable: cold_spell_duration_index
-        units: unknown
+        nc_variable: csdiETCCDI
+        units: days
+        extras:
+          product_type: [base_period_1961_1990, base_period_1981_2010]
       consecutive-dry-days:
         cds_variable: consecutive_dry_days
-        nc_variable: consecutive_dry_days
-        units: unknown
+        nc_variable: cddETCCDI
+        units: days
+        extras:
+          product_type: [base_independent]
       consecutive-wet-days:
         cds_variable: consecutive_wet_days
-        nc_variable: consecutive_wet_days
-        units: unknown
+        nc_variable: cwdETCCDI
+        units: days
+        extras:
+          product_type: [base_independent]
       diurnal-temperature-range:
         cds_variable: diurnal_temperature_range
-        nc_variable: diurnal_temperature_range
-        units: unknown
+        nc_variable: dtrETCCDI
+        units: degrees_C
+        extras:
+          product_type: [base_independent]
       extremely-wet-day-precipitation:
         cds_variable: extremely_wet_day_precipitation
-        nc_variable: extremely_wet_day_precipitation
-        units: unknown
+        nc_variable: r99pETCCDI
+        units: mm
+        extras:
+          product_type: [base_period_1961_1990, base_period_1981_2010]
       frost-days:
         cds_variable: frost_days
-        nc_variable: frost_days
-        units: unknown
+        nc_variable: fdETCCDI
+        units: days
+        extras:
+          product_type: [base_independent]
       growing-season-length:
         cds_variable: growing_season_length
-        nc_variable: growing_season_length
-        units: unknown
+        nc_variable: gslETCCDI
+        units: days
+        extras:
+          product_type: [base_independent]
       heavy-precipitation-days:
         cds_variable: heavy_precipitation_days
-        nc_variable: heavy_precipitation_days
-        units: unknown
+        nc_variable: r10mmETCCDI
+        units: days
+        extras:
+          product_type: [base_independent]
       ice-days:
         cds_variable: ice_days
-        nc_variable: ice_days
-        units: unknown
+        nc_variable: idETCCDI
+        units: days
+        extras:
+          product_type: [base_independent]
       maximum-1-day-precipitation:
         cds_variable: maximum_1_day_precipitation
-        nc_variable: maximum_1_day_precipitation
-        units: unknown
+        nc_variable: rx1dayETCCDI
+        units: mm
+        extras:
+          product_type: [base_independent]
       maximum-5-day-precipitation:
         cds_variable: maximum_5_day_precipitation
-        nc_variable: maximum_5_day_precipitation
-        units: unknown
+        nc_variable: rx5dayETCCDI
+        units: mm
+        extras:
+          product_type: [base_independent]
       maximum-value-of-daily-maximum-temperature:
         cds_variable: maximum_value_of_daily_maximum_temperature
-        nc_variable: maximum_value_of_daily_maximum_temperature
-        units: unknown
+        nc_variable: txxETCCDI
+        units: degrees_C
+        extras:
+          product_type: [base_independent]
       minimum-value-of-daily-maximum-temperature:
         cds_variable: minimum_value_of_daily_maximum_temperature
-        nc_variable: minimum_value_of_daily_maximum_temperature
-        units: unknown
+        nc_variable: txnETCCDI
+        units: degrees_C
+        extras:
+          product_type: [base_independent]
       maximum-value-of-daily-minimum-temperature:
         cds_variable: maximum_value_of_daily_minimum_temperature
-        nc_variable: maximum_value_of_daily_minimum_temperature
-        units: unknown
+        nc_variable: tnxETCCDI
+        units: degrees_C
+        extras:
+          product_type: [base_independent]
       minimum-value-of-daily-minimum-temperature:
         cds_variable: minimum_value_of_daily_minimum_temperature
-        nc_variable: minimum_value_of_daily_minimum_temperature
-        units: unknown
+        nc_variable: tnnETCCDI
+        units: degrees_C
+        extras:
+          product_type: [base_independent]
       number-of-wet-days:
         cds_variable: number_of_wet_days
-        nc_variable: number_of_wet_days
-        units: unknown
+        nc_variable: r1mmETCCDI
+        units: days
+        extras:
+          product_type: [base_independent]
       simple-daily-intensity-index:
         cds_variable: simple_daily_intensity_index
-        nc_variable: simple_daily_intensity_index
-        units: unknown
+        nc_variable: sdiiETCCDI
+        units: mm d-1
+        extras:
+          product_type: [base_independent]
       summer-days:
         cds_variable: summer_days
-        nc_variable: summer_days
-        units: unknown
+        nc_variable: suETCCDI
+        units: days
+        extras:
+          product_type: [base_independent]
       total-wet-day-precipitation:
         cds_variable: total_wet_day_precipitation
-        nc_variable: total_wet_day_precipitation
-        units: unknown
+        nc_variable: prcptotETCCDI
+        units: mm
+        extras:
+          product_type: [base_independent]
       tropical-nights:
         cds_variable: tropical_nights
-        nc_variable: tropical_nights
-        units: unknown
+        nc_variable: trETCCDI
+        units: days
+        extras:
+          product_type: [base_independent]
       very-heavy-precipitation-days:
         cds_variable: very_heavy_precipitation_days
-        nc_variable: very_heavy_precipitation_days
-        units: unknown
+        nc_variable: r20mmETCCDI
+        units: days
+        extras:
+          product_type: [base_independent]
       very-wet-day-precipitation:
         cds_variable: very_wet_day_precipitation
-        nc_variable: very_wet_day_precipitation
-        units: unknown
+        nc_variable: r95pETCCDI
+        units: mm
+        extras:
+          product_type: [base_period_1961_1990, base_period_1981_2010]
       warm-days:
         cds_variable: warm_days
-        nc_variable: warm_days
-        units: unknown
+        nc_variable: tx90pETCCDI
+        units: '%'
+        extras:
+          product_type: [base_period_1961_1990, base_period_1981_2010]
       warm-nights:
         cds_variable: warm_nights
-        nc_variable: warm_nights
-        units: unknown
+        nc_variable: tn90pETCCDI
+        units: '%'
+        extras:
+          product_type: [base_period_1961_1990, base_period_1981_2010]
       warm-spell-duration-index:
         cds_variable: warm_spell_duration_index
-        nc_variable: warm_spell_duration_index
-        units: unknown
+        nc_variable: wsdiETCCDI
+        units: days
+        extras:
+          product_type: [base_period_1961_1990, base_period_1981_2010]
       heat-index:
         cds_variable: heat_index
-        nc_variable: heat_index
-        units: unknown
+        nc_variable: HI
+        units: degrees_C
+        extras:
+          temporal_aggregation: [daily]
+          version: ['1_0', '2_0']
       humidex:
         cds_variable: humidex
-        nc_variable: humidex
-        units: unknown
+        nc_variable: Humidex
+        units: degrees_C
+        extras:
+          temporal_aggregation: [daily]
+          version: ['1_0', '2_0']
       universal-thermal-climate-index:
         cds_variable: universal_thermal_climate_index
-        nc_variable: universal_thermal_climate_index
-        units: unknown
+        nc_variable: UTCI
+        units: degrees_C
+        extras:
+          temporal_aggregation: [daily]
+          version: ['1_0', '2_0']
       wet-bulb-temperature-index:
         cds_variable: wet_bulb_temperature_index
-        nc_variable: wet_bulb_temperature_index
-        units: unknown
+        nc_variable: WBT
+        units: degrees_C
+        extras:
+          temporal_aggregation: [daily]
+          version: ['1_0', '2_0']
       wet-bulb-globe-temperature-index:
         cds_variable: wet_bulb_globe_temperature_index
-        nc_variable: wet_bulb_globe_temperature_index
-        units: unknown
+        nc_variable: WBGT
+        units: degrees_C
+        extras:
+          temporal_aggregation: [daily]
+          version: ['1_0', '2_0']
   sis-health-vector:
     endpoint: cds
     request_kind: form
@@ -4854,12 +5152,20 @@ datasets:
     variables:
       heat-wave-days:
         cds_variable: heat_wave_days
-        nc_variable: heat_wave_days
-        units: unknown
+        nc_variable: HWD_EU_climate
+        units: day
+        extras:
+          definition: [climatological_related, country_related, health_related]
+          ensemble_statistic: [ensemble_members_average, ensemble_members_standard_deviation]
+          experiment: [rcp4_5, rcp8_5]
       cold-spell-days:
         cds_variable: cold_spell_days
-        nc_variable: cold_spell_days
-        units: unknown
+        nc_variable: CSD_merged
+        units: day
+        extras:
+          definition: [country_related]
+          ensemble_statistic: [ensemble_members_average, ensemble_members_standard_deviation]
+          experiment: [rcp4_5, rcp8_5]
   sis-hydrology-europe-seasonal:
     endpoint: cds
     request_kind: form
@@ -4955,24 +5261,24 @@ datasets:
     variables:
       2m-air-temperature:
         cds_variable: 2m_air_temperature
-        nc_variable: 2m_air_temperature
-        units: unknown
+        nc_variable: tas_tmean
+        units: Degree Celsius
       precipitation:
         cds_variable: precipitation
-        nc_variable: precipitation
-        units: unknown
+        nc_variable: pr_tmean
+        units: '%'
       longest-dry-spells:
         cds_variable: longest_dry_spells
-        nc_variable: longest_dry_spells
-        units: unknown
+        nc_variable: cdd_tmean
+        units: '%'
       number-of-dry-spells:
         cds_variable: number_of_dry_spells
-        nc_variable: number_of_dry_spells
-        units: unknown
+        nc_variable: ncdd_tmean
+        units: '%'
       highest-5-day-precipitation-amount:
         cds_variable: highest_5_day_precipitation_amount
-        nc_variable: highest_5_day_precipitation_amount
-        units: unknown
+        nc_variable: rx5_tmean
+        units: '%'
   sis-hydrology-variables-derived-projections:
     endpoint: cds
     request_kind: form
@@ -4995,88 +5301,108 @@ datasets:
     variables:
       river-discharge:
         cds_variable: river_discharge
-        nc_variable: river_discharge
-        units: unknown
+        nc_variable: rdis_tmean
+        units: m3/s
       mean-runoff:
         cds_variable: mean_runoff
-        nc_variable: mean_runoff
-        units: unknown
+        nc_variable: run_tmean
+        units: mm/month
       flood-recurrence-2-years-return-period:
         cds_variable: flood_recurrence_2_years_return_period
-        nc_variable: flood_recurrence_2_years_return_period
-        units: unknown
+        nc_variable: rdisreturnmax2_tmean
+        units: m3/s
       flood-recurrence-5-years-return-period:
         cds_variable: flood_recurrence_5_years_return_period
-        nc_variable: flood_recurrence_5_years_return_period
-        units: unknown
+        nc_variable: rdisreturnmax5_tmean
+        units: m3/s
       flood-recurrence-10-years-return-period:
         cds_variable: flood_recurrence_10_years_return_period
-        nc_variable: flood_recurrence_10_years_return_period
-        units: unknown
+        nc_variable: rdisreturnmax10_tmean
+        units: m3/s
       flood-recurrence-50-years-return-period:
         cds_variable: flood_recurrence_50_years_return_period
-        nc_variable: flood_recurrence_50_years_return_period
-        units: unknown
+        nc_variable: rdisreturnmax50_tmean
+        units: m3/s
       maximum-river-discharge:
         cds_variable: maximum_river_discharge
-        nc_variable: maximum_river_discharge
-        units: unknown
+        nc_variable: rdisyearmax_tmean
+        units: m3/s
       minimum-river-discharge:
         cds_variable: minimum_river_discharge
-        nc_variable: minimum_river_discharge
-        units: unknown
+        nc_variable: rdisyearmin_tmean
+        units: m3/s
       mean-soil-moisture:
         cds_variable: mean_soil_moisture
-        nc_variable: mean_soil_moisture
-        units: unknown
+        nc_variable: smoist_tmean
+        units: ''
       wetness-actual:
         cds_variable: wetness_actual
-        nc_variable: wetness_actual
-        units: unknown
+        nc_variable: wetnessact_ymonmean
+        units: mm/month
+        extras:
+          time_aggregation: [monthly_mean]
       wetness-potential:
         cds_variable: wetness_potential
-        nc_variable: wetness_potential
-        units: unknown
+        nc_variable: wetnesspot_ymonmean
+        units: mm/month
+        extras:
+          time_aggregation: [monthly_mean]
       water-temperature-in-catchments:
         cds_variable: water_temperature_in_catchments
-        nc_variable: water_temperature_in_catchments
-        units: unknown
+        nc_variable: wtemp_tmean
+        units: degC
+        extras:
+          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m03, e_hypecatch_m04, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07]
       water-temperature-in-local-streams:
         cds_variable: water_temperature_in_local_streams
-        nc_variable: water_temperature_in_local_streams
-        units: unknown
+        nc_variable: locwtemp_tmean
+        units: degC
+        extras:
+          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m03, e_hypecatch_m04, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07]
       aridity-potential:
         cds_variable: aridity_potential
-        nc_variable: aridity_potential
-        units: unknown
+        nc_variable: aridpot_tmean
+        units: ''
       aridity-actual:
         cds_variable: aridity_actual
-        nc_variable: aridity_actual
-        units: unknown
+        nc_variable: aridact_tmean
+        units: ''
       total-nitrogen-concentration-in-catchments:
         cds_variable: total_nitrogen_concentration_in_catchments
-        nc_variable: total_nitrogen_concentration_in_catchments
-        units: unknown
+        nc_variable: totn_tmean
+        units: mg/L
+        extras:
+          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m03, e_hypecatch_m04, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07]
       total-nitrogen-load-in-catchments:
         cds_variable: total_nitrogen_load_in_catchments
-        nc_variable: total_nitrogen_load_in_catchments
-        units: unknown
+        nc_variable: totnload_tmean
+        units: kg/year
+        extras:
+          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m03, e_hypecatch_m04, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07]
       total-nitrogen-concentration-in-local-streams:
         cds_variable: total_nitrogen_concentration_in_local_streams
-        nc_variable: total_nitrogen_concentration_in_local_streams
-        units: unknown
+        nc_variable: totlocn_tmean
+        units: mg/L
+        extras:
+          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m03, e_hypecatch_m04, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07]
       total-phosphorus-concentration-in-catchments:
         cds_variable: total_phosphorus_concentration_in_catchments
-        nc_variable: total_phosphorus_concentration_in_catchments
-        units: unknown
+        nc_variable: totp_tmean
+        units: mg/L
+        extras:
+          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m03, e_hypecatch_m04, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07]
       total-phosphorus-load-in-catchments:
         cds_variable: total_phosphorus_load_in_catchments
-        nc_variable: total_phosphorus_load_in_catchments
-        units: unknown
+        nc_variable: totpload_tmean
+        units: kg/year
+        extras:
+          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m03, e_hypecatch_m04, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07]
       total-phosphorus-concentration-in-local-streams:
         cds_variable: total_phosphorus_concentration_in_local_streams
-        nc_variable: total_phosphorus_concentration_in_local_streams
-        units: unknown
+        nc_variable: totlocp_tmean
+        units: mg/L
+        extras:
+          hydrological_model: [e_hypecatch_m00, e_hypecatch_m01, e_hypecatch_m02, e_hypecatch_m03, e_hypecatch_m04, e_hypecatch_m05, e_hypecatch_m06, e_hypecatch_m07]
   sis-hydrology-variables-derived-seasonal-forecast:
     endpoint: cds
     request_kind: form
@@ -5174,84 +5500,138 @@ datasets:
     variables:
       apparent-oxygen-utilisation:
         cds_variable: apparent_oxygen_utilisation
-        nc_variable: apparent_oxygen_utilisation
-        units: unknown
+        nc_variable: aou
+        units: mol m-3
+        extras:
+          experiment: [rcp4_5, rcp8_5]
       total-chlorophyll-a:
         cds_variable: total_chlorophyll_a
-        nc_variable: total_chlorophyll_a
-        units: unknown
+        nc_variable: chl
+        units: kg m-3
+        extras:
+          experiment: [rcp4_5, rcp8_5]
       euphotic-zone-chlorophyll-a:
         cds_variable: euphotic_zone_chlorophyll_a
-        nc_variable: euphotic_zone_chlorophyll_a
-        units: unknown
+        nc_variable: chloez
+        units: kg m-3
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          vertical_resolution: [surface]
       euphotic-zone-depth:
         cds_variable: euphotic_zone_depth
-        nc_variable: euphotic_zone_depth
-        units: unknown
+        nc_variable: ez
+        units: m
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          vertical_resolution: [surface]
       mole-concentration-of-nitrate-and-nitrite:
         cds_variable: mole_concentration_of_nitrate_and_nitrite
-        nc_variable: mole_concentration_of_nitrate_and_nitrite
-        units: unknown
+        nc_variable: no3
+        units: mol m-3
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          time_aggregation: [month]
       mole-concentration-of-dissolved-oxygen:
         cds_variable: mole_concentration_of_dissolved_oxygen
-        nc_variable: mole_concentration_of_dissolved_oxygen
-        units: unknown
+        nc_variable: o2
+        units: mol m-3
+        extras:
+          experiment: [rcp4_5, rcp8_5]
       potential-energy-anomaly:
         cds_variable: potential_energy_anomaly
-        nc_variable: potential_energy_anomaly
-        units: unknown
+        nc_variable: pea
+        units: J m-3
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          time_aggregation: [month]
+          vertical_resolution: [surface]
       sea-water-ph:
         cds_variable: sea_water_ph
-        nc_variable: sea_water_ph
-        units: unknown
+        nc_variable: ph
+        units: '1'
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          time_aggregation: [month]
       phytoplankton-carbon:
         cds_variable: phytoplankton_carbon
-        nc_variable: phytoplankton_carbon
-        units: unknown
+        nc_variable: phyc
+        units: mol m-3
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          time_aggregation: [month]
       mole-concentration-of-phosphate:
         cds_variable: mole_concentration_of_phosphate
-        nc_variable: mole_concentration_of_phosphate
-        units: unknown
+        nc_variable: po4
+        units: mol m-3
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          time_aggregation: [month]
       net-primary-production:
         cds_variable: net_primary_production
-        nc_variable: net_primary_production
-        units: unknown
+        nc_variable: pp
+        units: mol m-3 s-1
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          time_aggregation: [month]
       saturation-state-of-aragonite:
         cds_variable: saturation_state_of_aragonite
-        nc_variable: saturation_state_of_aragonite
-        units: unknown
+        nc_variable: satarag
+        units: '1'
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          time_aggregation: [month]
       mole-concentration-of-silicate:
         cds_variable: mole_concentration_of_silicate
-        nc_variable: mole_concentration_of_silicate
-        units: unknown
+        nc_variable: si
+        units: mol m-3
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          time_aggregation: [month]
       sea-water-salinity:
         cds_variable: sea_water_salinity
-        nc_variable: sea_water_salinity
-        units: unknown
+        nc_variable: so
+        units: psu
+        extras:
+          experiment: [rcp4_5, rcp8_5]
       sea-water-potential-temperature:
         cds_variable: sea_water_potential_temperature
-        nc_variable: sea_water_potential_temperature
-        units: unknown
+        nc_variable: thetao
+        units: degC
+        extras:
+          experiment: [rcp4_5, rcp8_5]
       organic-carbon-in-the-water-column:
         cds_variable: organic_carbon_in_the_water_column
-        nc_variable: organic_carbon_in_the_water_column
-        units: unknown
+        nc_variable: totoc
+        units: mol m-3
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          time_aggregation: [month]
       u-component-of-water-velocity:
         cds_variable: u_component_of_water_velocity
-        nc_variable: u_component_of_water_velocity
-        units: unknown
+        nc_variable: uo
+        units: m s-1
+        extras:
+          experiment: [rcp4_5, rcp8_5]
       v-component-of-water-velocity:
         cds_variable: v_component_of_water_velocity
-        nc_variable: v_component_of_water_velocity
-        units: unknown
+        nc_variable: vo
+        units: m s-1
+        extras:
+          experiment: [rcp4_5, rcp8_5]
       zooplankton-carbon:
         cds_variable: zooplankton_carbon
-        nc_variable: zooplankton_carbon
-        units: unknown
+        nc_variable: zooc
+        units: mol m-3
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          time_aggregation: [month]
       secondary-production:
         cds_variable: secondary_production
-        nc_variable: secondary_production
-        units: unknown
+        nc_variable: zp
+        units: mol m-3 s-1
+        extras:
+          experiment: [rcp4_5, rcp8_5]
+          time_aggregation: [month]
   sis-ocean-wave-indicators:
     endpoint: cds
     request_kind: form
@@ -5339,24 +5719,30 @@ datasets:
     variables:
       daily-fire-weather-index:
         cds_variable: daily_fire_weather_index
-        nc_variable: daily_fire_weather_index
-        units: unknown
+        nc_variable: fwi-daily-proj
+        units: '1'
+        extras:
+          product_type: [single_model]
+          time_aggregation: [daily_indicators]
+          version: [v1_0, v2_0]
       seasonal-fire-weather-index:
         cds_variable: seasonal_fire_weather_index
-        nc_variable: seasonal_fire_weather_index
-        units: unknown
+        nc_variable: fwi-mean-jjas
+        units: '1'
+        extras:
+          time_aggregation: [seasonal_indicators]
       number-of-days-with-moderate-fire-danger:
         cds_variable: number_of_days_with_moderate_fire_danger
-        nc_variable: number_of_days_with_moderate_fire_danger
-        units: unknown
+        nc_variable: fwi-nods-gt-15
+        units: Day
       number-of-days-with-high-fire-danger:
         cds_variable: number_of_days_with_high_fire_danger
-        nc_variable: number_of_days_with_high_fire_danger
-        units: unknown
+        nc_variable: fwi-nods-gt-30
+        units: Day
       number-of-days-with-very-high-fire-danger:
         cds_variable: number_of_days_with_very_high_fire_danger
-        nc_variable: number_of_days_with_very_high_fire_danger
-        units: unknown
+        nc_variable: fwi-nods-gt-45
+        units: Day
   sis-tourism-snow-indicators:
     endpoint: cds
     request_kind: form

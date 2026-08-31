@@ -88,6 +88,7 @@ you install the meta-package or a thematic distribution directly:
 | `ecmwf` | [Copernicus Climate Data Store (ECMWF)](https://serapeum-org.github.io/earthlens/reference/ecmwf/introduction/) | `cdsapi >=0.7.7` |
 | `ecmwf-modern` | ECMWF (alternate SDK) | `ecmwf-datastores-client >=0.5.1` |
 | `gee` | [Google Earth Engine](https://serapeum-org.github.io/earthlens/reference/gee/introduction/) | `earthengine-api >=1.7.26`, `google-api-python-client >=2.0`, `google-cloud-storage >=2.0`, `Rtree >=1.0.0`, `urllib3 >=1.26` |
+| `eedai` | [Google Earth Engine](https://serapeum-org.github.io/earthlens/reference/gee/usage/) — optional EEDAI fetch path | `pyramids-eo >=0.5.0,<0.6` |
 | `cmems` | [Copernicus Marine Service](https://serapeum-org.github.io/earthlens/reference/cmems/introduction/) | `copernicusmarine >=2.0.0,<3` |
 | `cmip6` | [WCRP CMIP6](https://serapeum-org.github.io/earthlens/reference/cmip6/introduction/) | *(none — no SDK needed)* |
 | `fdsn` | [FDSN](https://serapeum-org.github.io/earthlens/reference/fdsn/introduction/) | `obspy >=1.5.0` |
@@ -147,7 +148,7 @@ Engine and nothing else.
 directly and skip the others' backends entirely:
 
 ```bash
-pip install earthlens-imagery[gee]     # Earth Engine, without the other 40 backends
+pip install earthlens-imagery[gee]     # Earth Engine, without the other 53 backends
 pip install earthlens-ocean[argo,cmems]
 pip install earthlens-atmosphere[all]  # every atmosphere SDK
 ```
@@ -169,13 +170,15 @@ one domain's dependencies without inheriting every other domain's constraints.
 ### What `earthlens[all]` excludes, and why
 
 `earthlens[all]` is the union of **every backend extra that can honestly share
-one environment** — that is every extra in the table above **except two**:
-`argo` and `osm-pbf`. Each is left out for a concrete, upstream reason:
+one environment** — that is every extra in the table above **except three**:
+`argo`, `osm-pbf` and `eedai`. Each is left out for a concrete reason:
 
 | Excluded | SDK | Why it can't join `all` |
 |---|---|---|
 | `argo` | `argopy` | **Two** independent problems, either one disqualifying. **(1) `xarray` — a resolution conflict:** `argopy >=1.4` needs `xarray>=2025.7`, but `openeo` (in `all`) caps `xarray<2025.01.2` — disjoint ranges, which is what `[tool.uv] conflicts` declares. **(2) `erddapy` — a runtime break:** `argopy 1.4.0` still *resolves* (it does not cap `erddapy`) but fails at `import` — it imports `erddapy.erddapy._quote_string_constraints`, which `erddapy 3.3` removed — while the `erddap` extra (in `all`) requires `erddapy>=3.0`. |
 | `osm-pbf` | `pyrosm` | `pyrosm` (0.11) and `osmium` (4.3.1) both ship wheels, but `pyrosm` pulls the **sdist-only** `cykhash` (no wheels for any Python), so adding `osm-pbf` to `all` would make `pip install earthlens[all]` require a C compiler — it is kept out to keep `all` wheel-only. Tracked in [#783](https://github.com/serapeum-org/earthlens/issues/783). |
+
+| `eedai` | `pyramids-eo` | It resolves cleanly — this one is about *behaviour*, not packaging. Installing it activates the GEE backend's default `engine="auto"`, which serves raw single-asset reads through the EEDAI reader; that path samples and grids differently from Earth Engine (see the [GEE usage page](reference/gee/usage.md)). Holding it out of `all` means an upgrade never silently changes an existing user's pixels. |
 
 (`osm` itself **is** in `all` — see the resolution note below for why.)
 

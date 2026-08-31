@@ -1,6 +1,6 @@
 """Credentials and `MAP_KEY` resolution for the NASA FIRMS backend.
 
-Hosts :class:`FirmsAuth`, an :class:`earthlens.base.AbstractAuth`
+Hosts :class:`FirmsAuth`, an :class:`earthlens.base.SingleSecretAuth`
 subclass that resolves a single FIRMS **`MAP_KEY`** from, in priority
 order, an explicit `api_key=` argument or the `FIRMS_MAP_KEY`
 environment variable. FIRMS requires a (free) key on every request;
@@ -19,10 +19,11 @@ The shape:
 
 * :class:`FirmsCredentials` is a frozen pydantic value object carrying
   the optional key as a :class:`pydantic.SecretStr`.
-* :class:`FirmsAuth` binds those credentials and resolves the key in
-  :meth:`FirmsAuth.configure` — explicit key first, then the
-  `FIRMS_MAP_KEY` env var, then a clear :class:`AuthenticationError`
-  naming the free-registration URL (never an interactive prompt).
+* :class:`FirmsAuth` binds those credentials and lets the shared
+  :meth:`earthlens.base.SingleSecretAuth.configure` resolve the key —
+  explicit key first, then the `FIRMS_MAP_KEY` env var, then a clear
+  :class:`AuthenticationError` naming the free-registration URL (never
+  an interactive prompt).
 * `configure()` is idempotent — a second call after
   :meth:`FirmsAuth.is_authenticated` returns `True` short-circuits, so
   it is safe to call from long-lived workers.
@@ -30,12 +31,10 @@ The shape:
 
 from __future__ import annotations
 
-import os
-
 from pydantic import BaseModel, ConfigDict, SecretStr
 
-from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
+from earthlens.base.auth import SingleSecretAuth
 
 #: Where a user requests a free FIRMS MAP_KEY.
 _MAP_KEY_URL = "https://firms.modaps.eosdis.nasa.gov/api/map_key/"
@@ -92,11 +91,12 @@ class FirmsCredentials(BaseModel):
     api_key: SecretStr | None = None
 
 
-class FirmsAuth(AbstractAuth[FirmsCredentials]):
+class FirmsAuth(SingleSecretAuth[FirmsCredentials]):
     """Resolve and hold the FIRMS `MAP_KEY`.
 
-    Implements the :class:`earthlens.base.AbstractAuth` contract for a
-    single-secret backend. Construction does not touch the environment;
+    Implements the :class:`earthlens.base.SingleSecretAuth` contract for
+    a single-secret backend: it declares its env var and provider name
+    and supplies `_explicit_credential` / `_connect`, while the inherited
     :meth:`configure` performs the resolution and is idempotent. After a
     successful `configure()`, the key is available via the
     :attr:`api_key` property for the backend to drop into the request
@@ -126,46 +126,23 @@ class FirmsAuth(AbstractAuth[FirmsCredentials]):
             ```
     """
 
-    def __init__(self, credentials: FirmsCredentials) -> None:
-        """Store credentials; does not resolve the key yet.
+    ENV_VARS = ("FIRMS_MAP_KEY",)
+    PROVIDER = "FIRMS"
+    CREDENTIAL_ARG = "api_key"
+    CREDENTIAL_HINT = f"Request a free key at {_MAP_KEY_URL}."
+    AUTH_ERROR = AuthenticationError
 
-        Args:
-            credentials: The :class:`FirmsCredentials` value object
-                carrying the optional `MAP_KEY`.
-        """
-        super().__init__(credentials)
-        self._configured = False
-        self._key: str | None = None
+    #: The resolved MAP_KEY, set by `_connect`; `None` until `configure` runs.
+    _key: str | None = None
 
-    def configure(self) -> None:
-        """Resolve the `MAP_KEY` so subsequent requests can authenticate.
+    def _explicit_credential(self) -> str | None:
+        """Return the explicit `api_key` off the credentials, if any."""
+        api_key = self._creds.api_key
+        return api_key.get_secret_value() if api_key is not None else None
 
-        Idempotent — short-circuits when :meth:`is_authenticated`
-        already returns `True`. On the first call, resolves the key in
-        this order: the explicit `api_key` on the credentials, then the
-        `FIRMS_MAP_KEY` environment variable.
-
-        Raises:
-            AuthenticationError: When neither source supplies a key. The
-                message names the `api_key=` argument, the
-                `FIRMS_MAP_KEY` env var, and the free-registration URL —
-                it never blocks on an interactive prompt.
-        """
-        if self.is_authenticated():
-            return
-        key = (
-            self._creds.api_key.get_secret_value()
-            if self._creds.api_key is not None
-            else os.environ.get("FIRMS_MAP_KEY")
-        )
-        if not key:
-            raise AuthenticationError(
-                "no FIRMS MAP_KEY available: pass api_key= to "
-                "EarthLens(...).authenticate() or set the FIRMS_MAP_KEY "
-                f"environment variable. Request a free key at {_MAP_KEY_URL}."
-            )
-        self._key = key
-        self.mark_configured()
+    def _connect(self, credential: str) -> None:
+        """Store the resolved MAP_KEY for the `api_key` property to read back."""
+        self._key = credential
 
     @property
     def api_key(self) -> str:

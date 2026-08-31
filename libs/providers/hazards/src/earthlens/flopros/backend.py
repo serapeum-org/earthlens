@@ -39,6 +39,7 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
+from earthlens.config import cache_dir as _shared_cache_dir
 from earthlens.flopros import _helpers
 from earthlens.flopros.catalog import Catalog
 
@@ -88,7 +89,7 @@ class FLOPROS(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "all",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         layer: str | list[str] | None = None,
         country: str | None = None,
@@ -106,8 +107,10 @@ class FLOPROS(AbstractDataSource):
                 unit. A narrower box filters the returned units.
             lon_lim: `[lon_min, lon_max]` bbox longitudes; `None` keeps all.
             temporal_resolution: Recorded as the resolution label only.
-            path: Output directory for the written vector file and, by default,
-                the download cache.
+            path: Output directory for the written vector file. When omitted it
+                falls back to the configured earthlens output directory
+                (`set_output_dir()` / `EARTHLENS_DATA_DIR`); see
+                `earthlens.config`.
             fmt: `strptime` format for `start` / `end`.
             layer: The FLOPROS protection layer(s) to keep — a public layer name
                 (`"merged_riverine"`), a list of them, or `None` (the default)
@@ -117,7 +120,8 @@ class FLOPROS(AbstractDataSource):
             geometry: `True` (default) returns a `FeatureCollection`; `False`
                 returns a geometry-dropped `DataFrame` (`OUTPUT_KIND="tabular"`).
             cache_dir: Directory for the downloaded zip. Defaults to
-                `_flopros_cache` under `path`.
+                `flopros/` under the shared earthlens cache directory
+                (`set_cache_dir()` / `EARTHLENS_CACHE`), not under `path`.
             timeout: Per-request timeout in seconds for the download.
 
         Raises:
@@ -219,12 +223,13 @@ class FLOPROS(AbstractDataSource):
     def _cache_root(self) -> Path:
         """The directory holding the downloaded zip and its extracted shapefile.
 
-        Defaults to a `_flopros_cache` subfolder under the output path; overridden
+        Defaults to `flopros/` under the shared earthlens cache directory
+        (`set_cache_dir()` / `EARTHLENS_CACHE`); overridden
         by `cache_dir`. The download and extraction land here, not directly under
         the output `root_dir`, so a `geometry=False` request — which skips the
         GeoPackage write — leaves the output directory free of result files.
         """
-        return self._cache_dir or (self.root_dir / "_flopros_cache")
+        return self._cache_dir or (_shared_cache_dir() / "flopros")
 
     def _cached_zip(self, product: RemoteProduct) -> Path:
         """Return the local zip path, downloading it on a cache miss.

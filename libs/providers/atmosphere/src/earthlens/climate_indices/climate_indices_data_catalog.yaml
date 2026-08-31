@@ -7,7 +7,7 @@
 # row's `url` and attaches the source citation. Sentinels are detected
 # per file at parse time (PSL) or fixed (`-999.9`, climexp), so they are
 # not stored here. Verified live 2026-06-26 (see
-# planning/climate_indices/captures/climate-indices-sdk-facts.md).
+# the A1 gate captures).
 
 sources:
   noaa-psl:

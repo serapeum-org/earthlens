@@ -81,7 +81,7 @@ class TestPbfConstruction:
         """Engine defaults to pyrosm and cache_dir to the user cache."""
         osm = _osm()
         assert osm._engine == "pyrosm"
-        assert osm._cache_dir == backend.DEFAULT_PBF_CACHE_DIR
+        assert osm._cache_dir == backend.default_pbf_cache_dir()
 
 
 class TestPbfSearch:

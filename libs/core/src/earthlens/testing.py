@@ -18,11 +18,21 @@ Requires pytest, which is why it is behind the `test` extra
 
 from __future__ import annotations
 
+import hashlib
 import re
 import urllib.error
-from collections.abc import Generator, Iterator
+from collections.abc import Generator
+from typing import NoReturn
 
 import pytest
+
+from earthlens.base import (
+    UpstreamUnavailableError,
+    exception_chain,
+    response_status,
+    status_in_message,
+)
+from earthlens.config import set_cache_dir, set_output_dir
 
 
 @pytest.fixture(autouse=True)
@@ -111,55 +121,6 @@ except ImportError:  # pragma: no cover - requests is always present under test
     _NETWORK_EXC = (ConnectionError, TimeoutError, urllib.error.URLError)
 
 
-def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
-    """Yield `exc` then each linked `__cause__` / `__context__`, cycle-safe.
-
-    Args:
-        exc: The exception to walk.
-
-    Yields:
-        Each exception in the chain, most recent first.
-    """
-    seen: set[int] = set()
-    current: BaseException | None = exc
-    while current is not None and id(current) not in seen:
-        seen.add(id(current))
-        yield current
-        # Honour `raise … from None`: an explicit cause wins; otherwise follow
-        # the implicit context unless the author suppressed it (matching
-        # Python's own traceback display), so a deliberately surfaced failure is
-        # not reclassified via a context it asked to hide.
-        if current.__cause__ is not None:
-            current = current.__cause__
-        elif current.__suppress_context__:
-            current = None
-        else:
-            current = current.__context__
-
-
-def _http_status(exc: BaseException) -> int | None:
-    """Return the HTTP status `exc` carries, from its type, a `response`, or text.
-
-    Handles the two stdlib/SDK shapes: `urllib.error.HTTPError` carries the status
-    on `.code`, `requests.HTTPError` on `.response.status_code`. Falls back to
-    parsing a leading `NNN Server/Client Error` out of the message.
-
-    Args:
-        exc: The exception to inspect.
-
-    Returns:
-        The status code, or `None` if none is discernible.
-    """
-    if isinstance(exc, urllib.error.HTTPError):
-        return exc.code
-    response = getattr(exc, "response", None)
-    code = getattr(response, "status_code", None)
-    if isinstance(code, int):
-        return code
-    match = re.match(r"\s*(\d{3})\s+(?:server|client)\s+error", str(exc), re.IGNORECASE)
-    return int(match.group(1)) if match else None
-
-
 def is_upstream_unavailable(exc: BaseException) -> str | None:
     """Classify `exc` as an external-service availability failure, or not.
 
@@ -177,15 +138,41 @@ def is_upstream_unavailable(exc: BaseException) -> str | None:
     Returns:
         A human-readable skip reason, or `None` when `exc` is not an availability
         problem.
+
+    Examples:
+        - A dropped connection is an availability failure, named by its type:
+            ```python
+            >>> import requests
+            >>> from earthlens.testing import is_upstream_unavailable
+            >>> is_upstream_unavailable(requests.ConnectionError("boom"))
+            'upstream unreachable (ConnectionError)'
+
+            ```
+        - A request error is not, so it stays a real failure:
+            ```python
+            >>> from earthlens.testing import is_upstream_unavailable
+            >>> is_upstream_unavailable(ValueError("does not match any constraint")) is None
+            True
+
+            ```
     """
-    for link in _exception_chain(exc):
-        # Status first: a `urllib.error.HTTPError` is also a `URLError` (in
+    for link in exception_chain(exc):
+        # A backend that already judged its own failure an availability problem
+        # raised the shared typed error; honour that verdict directly rather than
+        # re-deriving it from a status or message.
+        if isinstance(link, UpstreamUnavailableError):
+            return f"upstream unavailable ({type(link).__name__})"
+        # Status next: a `urllib.error.HTTPError` is also a `URLError` (in
         # `_NETWORK_EXC`), so classifying it by type would skip a real 4xx as
         # "unreachable". A definite non-transient status (400 / 403 / 404 / ...)
         # is authoritative: the request reached the service and got a real
         # answer, so it stays a failure and a deeper transient link (e.g. an
-        # earlier retry's connection error) does not override it.
-        status = _http_status(link)
+        # earlier retry's connection error) does not override it. The message
+        # parse is anchored, so a response body echoed by a pytest-rewritten
+        # `AssertionError` cannot spoof a status mid-string.
+        status = response_status(link)
+        if status is None:
+            status = status_in_message(str(link), anchored=True)
         if status is not None:
             if status in _TRANSIENT_HTTP_STATUS:
                 return f"upstream returned HTTP {status}"
@@ -208,6 +195,25 @@ def is_upstream_unavailable(exc: BaseException) -> str | None:
 #: Prefix stamped on every availability-skip reason, so the session-finish guard
 #: can tell a hook-induced skip from an ordinary `pytest.skip` (missing creds, …).
 _LIVE_SKIP_PREFIX = "live e2e skipped — "
+
+
+def skip_live_unavailable(reason: str) -> NoReturn:
+    """Skip the current live `e2e` test as an upstream-availability failure.
+
+    Stamps the same `_LIVE_SKIP_PREFIX` the automatic :func:`pytest_runtest_call`
+    hook uses, so the masked-lane guard in :func:`pytest_sessionfinish` still
+    counts the skip. A backend that raises a typed availability error which its
+    own e2e test catches — rather than letting the shared hook classify the raw
+    exception — calls this instead of a bare `pytest.skip`, so the guard stays
+    authoritative and a wholly-masked lane is never reported green.
+
+    Args:
+        reason: Human-readable reason, appended after the shared prefix.
+
+    Raises:
+        Skipped: Always — this is pytest's skip signal (never returns).
+    """
+    pytest.skip(f"{_LIVE_SKIP_PREFIX}{reason}")
 
 
 @pytest.hookimpl(wrapper=True)
@@ -298,3 +304,53 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
             "masked run does not report green.",
             red=True,
         )
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _earthlens_dirs_scratch(tmp_path_factory):
+    """Point the output and cache directories at a scratch root for the session.
+
+    Session-scoped and autouse so the redirect is in place before *any* other
+    fixture runs. A function-scoped fixture would be too late: pytest builds
+    session-, package-, module- and class-scoped fixtures first, so a
+    module-scoped fixture that constructs a backend without `path=` would
+    resolve the developer's real `~/.earthlens/data` instead.
+    """
+    root = tmp_path_factory.mktemp("earthlens-dirs")
+    set_output_dir(root / "data")
+    set_cache_dir(root / "cache")
+    yield root
+    set_output_dir(None)
+    set_cache_dir(None)
+
+
+@pytest.fixture(autouse=True)
+def isolate_earthlens_dirs(_earthlens_dirs_scratch, request):
+    """Give each test its own slot beneath the session scratch root.
+
+    A backend built without `path=` resolves to the configured output directory,
+    and each backend hangs its intermediates cache off the configured cache
+    directory. Left alone those are the developer's own `~/.earthlens/data` and
+    per-platform user cache, so any test that downloads would write there.
+
+    Per test, so a cache one test populates is not visible to the next — several
+    tests assert on an empty or a pre-seeded cache. The slot is keyed on a hash
+    of the whole node id: truncating the id would drop the discriminating path
+    prefix, and long ids that end alike would share a directory. A readable
+    prefix is kept so a leftover directory can still be traced back to its test.
+    Resolving a directory never creates it, so an unused slot costs nothing.
+
+    Autouse, so a member's tests get the isolation by importing this module's
+    fixtures the same way they already import the HTTP transport seam.
+    """
+    nodeid = request.node.nodeid
+    label = re.sub(r"[^A-Za-z0-9_.-]", "_", nodeid)[-60:]
+    digest = hashlib.blake2b(nodeid.encode("utf-8"), digest_size=8).hexdigest()
+    root = _earthlens_dirs_scratch / f"{label}-{digest}"
+    set_output_dir(root / "data")
+    set_cache_dir(root / "cache")
+    yield
+    # Back to the session root rather than None, so anything still resolving
+    # after this test — a wider-scoped teardown — stays isolated too.
+    set_output_dir(_earthlens_dirs_scratch / "data")
+    set_cache_dir(_earthlens_dirs_scratch / "cache")

@@ -59,15 +59,23 @@ theme:
 # from their stored outputs, not from these files.
 exclude_docs: |
   examples/*/out/
+  examples/*/*/out/
   examples/*/data/
-  examples/*/earthlens-data/
+  examples/*/*/data/
   examples/*/_nb_out/
+  examples/*/*/_nb_out/
   examples/*/_overture_out/
+  examples/*/*/_overture_out/
   examples/*/*_out/
+  examples/*/*/*_out/
   examples/*/*_output/
+  examples/*/*/*_output/
   examples/*/ohsome_log/
+  examples/*/*/ohsome_log/
   examples/*/insar_stack*/
+  examples/*/*/insar_stack*/
   examples/*/soilgrids_*/
+  examples/*/*/soilgrids_*/
   # Branding: publish the curated kit only. Everything loose beside it — the
   # zip of the kit, the exploration variants, and the duplicates of files the
   # kit already ships — stays out. These globs are single-level on purpose, so
@@ -166,6 +174,7 @@ nav:
     - Architecture: overview/architecture.md
     - Temporal aggregation: aggregation.md
     - Command-line interface: reference/cli.md
+    - Configuration: reference/configuration.md
     - Troubleshooting: troubleshooting.md
     - Migration guide: migration.md
     - Contributing: contributing.md
@@ -218,8 +227,9 @@ nav:
     - ECMWF:
       - Introduction: reference/ecmwf/introduction.md
       - Usage: reference/ecmwf/usage.md
-      - Data stores (CDS + ADS + EWDS): reference/ecmwf/datastores.md
+      - Data stores (CDS + ADS + EWDS + ECDS + XDS): reference/ecmwf/datastores.md
       - EWDS (GloFAS / floods): reference/ecmwf/ewds.md
+      - ECDS + XDS (TIGGE / S2S / fire fuel): reference/ecmwf/ecds.md
       - Catalog & tooling: reference/ecmwf/catalog.md
       - Reference: reference/ecmwf/ecmwf.md
     - EUMETSAT (Data Store):
@@ -516,6 +526,16 @@ nav:
       - Europe temperature animation, June-July 2026 (ECMWF): examples/showcases/europe_temperature_2026.ipynb
       - Netherlands 2026 water shortage (multi-source): examples/showcases/netherlands_drought_2026.ipynb
       - MSWEP pre-monsoon precipitation, April 2020 (GloH2O): examples/showcases/mswep_precipitation_2020.ipynb
+      - Danube braided channels (true-colour): examples/showcases/danube_braided_truecolour.ipynb
+      - Danube exposed sediment (true-colour): examples/showcases/danube_exposed_sediment_truecolour.ipynb
+      - Danube corridor MODIS time-lapse: examples/showcases/danube_modis_corridor_timelapse.ipynb
+      - Danube true-colour time-lapse: examples/showcases/danube_truecolour_timelapse.ipynb
+      - Rhine-Danube low flow, 2026: examples/showcases/rhine_danube_lowflow_2026.ipynb
+      - Rhine Landsat, wet year vs 2026 drought: examples/showcases/rhine_landsat_wetyear_vs_2026.ipynb
+      - Every satellite earthlens can reach (3D): examples/showcase/earthlens-satellites.ipynb
+      - Total solar eclipse 2026, geometry (3D): examples/showcase/eclipse/eclipse_geometry_3d.ipynb
+      - Total solar eclipse 2026 from Meteosat-12 (MTG FCI): examples/showcase/eclipse/solar_eclipse_2026_eumetsat_fci.ipynb
+      - Total solar eclipse 2026 from GOES-19: examples/showcase/eclipse/solar_eclipse_2026_goes.ipynb
     - June 2026 European heat wave:
       - Full case study: examples/heatwave/european_heatwave_2026.ipynb
       - True-colour time-lapse: examples/heatwave/european_heatwave_timelapse_2026.ipynb
@@ -562,6 +582,8 @@ nav:
     - CDS / ECMWF:
       - Quickstart: examples/ecmwf/cds_quickstart.ipynb
       - Floods — GloFAS forecast (EWDS): examples/ecmwf/floods_glofas_forecast.ipynb
+      - TIGGE + fire fuel (ECDS / XDS): examples/ecmwf/ecds_xds_stores.ipynb
+      - Floods — GloFAS historical intermediate (EWDS): examples/ecmwf/glofas_historical_intermediate.ipynb
       - Hydrology — water balance: examples/ecmwf/hydrology_water_balance.ipynb
       - Oceanography — SST & sea ice: examples/ecmwf/oceanography_sst_sea_ice.ipynb
       - Atmosphere — pressure levels: examples/ecmwf/atmosphere_pressure_levels.ipynb
@@ -621,6 +643,8 @@ nav:
       - Quickstart — impacts and footprints: examples/flodis/quickstart.ipynb
     - Flood-protection standards (FLOPROS):
       - Quickstart — protection standards: examples/flopros/quickstart.ipynb
+    - Water risk (Aqueduct):
+      - Quickstart — riverine flood risk: examples/aqueduct/quickstart.ipynb
     - Heavy-rainfall events (CatRaRE):
       - Quickstart — radar rainfall events: examples/catrare/quickstart.ipynb
     - OpenStreetMap (Overpass / ohsome):

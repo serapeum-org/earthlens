@@ -18,7 +18,7 @@ The parallel helper retries on a fixed tuple of transient network
 exceptions. The retry budget is `tries=5, backoff=2.0` (i.e. up to 5
 attempts; on each failure wait then double the delay) — a deliberately
 small budget. The original `gee_utils` retry was `tries=100`, which
-masked real errors as transient. See N2 in `planning/gee-utils.md`.
+masked real errors as transient. See N2 in the GEE utils plan.
 """
 
 from __future__ import annotations

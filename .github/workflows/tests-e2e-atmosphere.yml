@@ -40,4 +40,11 @@ jobs:
     uses: ./.github/workflows/tests-e2e-reusable.yml
     with:
       theme: atmosphere
+      # Atmosphere's live CDS/ECMWF hosts sit in server-side queues that can
+      # wait far longer than the other themes' hosts: a single CDS request has
+      # been observed queueing ~43 min, and the whole-lane sweep overran the
+      # earlier 90-minute cap at ~77% (cancelled mid-test). Give the lane
+      # generous headroom over the 45-minute default so a queue backlog does
+      # not fail an otherwise-passing run.
+      timeout_minutes: 180
     secrets: inherit

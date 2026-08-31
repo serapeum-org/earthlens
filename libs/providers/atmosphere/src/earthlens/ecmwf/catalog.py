@@ -1,7 +1,7 @@
 """Variable-catalog loader for the CDS-backed ECMWF data source.
 
 Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
-Copernicus Data Store catalog spanning all three stores. The catalog
+CADS catalog spanning all five stores. The catalog
 ships as a directory of per-family YAML files under
 `src/earthlens/ecmwf/catalog/` — one `<family>.yaml` per product
 family (CDS: `era5.yaml`, `carra.yaml`, `cerra.yaml`, `cmip5.yaml`,
@@ -19,7 +19,7 @@ The two consumed top-level sections each map to a typed field on
 :class:`Catalog`:
 
 * `available_datasets` (informational per-store index of dataset
-  names across CDS / ADS / EWDS) → :attr:`Catalog.available_datasets`
+  names across all five stores) → :attr:`Catalog.available_datasets`
 * `datasets` (structural map of CDS datasets, each carrying a
   monthly variant and a per-variable map) → :attr:`Catalog.datasets`,
   with each value a :class:`Dataset`
@@ -74,7 +74,7 @@ from earthlens.ecmwf.constraints import fetch_constraints
 
 # `read_cdsapirc` / `download_job` / `list_recent_jobs` were split out of this
 # module into `earthlens.ecmwf.jobs` (N3 in
-# planning/catalog-cross-backend-comparison.md). `Catalog` still delegates to
+# the cross-backend catalog comparison). `Catalog` still delegates to
 # `download_job` / `list_recent_jobs` internally, so import them under private
 # names; `_read_cdsapirc` is re-exported only so any external caller using
 # `from earthlens.ecmwf.catalog import _read_cdsapirc` keeps working.
@@ -127,7 +127,7 @@ def _merge_available(
 
     Args:
         block: A file's `available_datasets` value — a flat list of ids, or a
-            per-store `{cds: [...], ads: [...], ewds: [...]}` mapping (in which
+            per-store `{cds: [...], ads: [...], ...}` mapping (in which
             case each id is also recorded against its store for endpoint
             auto-resolution).
         available: Accumulator for the flat id list (mutated in place).
@@ -288,7 +288,19 @@ def _build_dataset_map(
         ds_vars: dict[str, Variable] = {}
         for code, entry in (ds_body.get("variables") or {}).items():
             merged = dict(entry)
-            merged["cds_dataset"] = ds_name
+            # The catalog key is the CDS dataset short name by default, but a row
+            # may set `cds_dataset:` explicitly to curate two configs of ONE CDS
+            # dataset under distinct catalog ids — e.g. the GloFAS historical
+            # `consolidated` vs `intermediate` streams both retrieve from
+            # `cems-glofas-historical`. setdefault (not assignment) so the explicit
+            # override wins; no existing row sets it, so this is backward-compatible.
+            merged.setdefault("cds_dataset", ds_name)
+            # Remember the catalog key the variable is curated under. It equals
+            # cds_dataset for every ordinary row, and differs only when the row
+            # overrode cds_dataset (the GloFAS intermediate stream). Naming the
+            # output by dataset_id keeps the intermediate's file from colliding
+            # with the consolidated stream (same cds_variable + cds_dataset).
+            merged.setdefault("dataset_id", ds_name)
             # Default cds_variable to the slug-with-underscores form
             # of the YAML key (e.g. "2m-temperature" -> "2m_temperature").
             # A per-variable row may set `cds_variable` explicitly
@@ -369,8 +381,14 @@ def _synthesize_monthly_entries(
                 "`monthly_product_type: [monthly_averaged_reanalysis]`)."
             )
         rebranded = {
+            # dataset_id tracks cds_dataset here (the synthesised entry is keyed
+            # under ds.monthly), so the monthly output filename is unaffected.
             code: var.model_copy(
-                update={"cds_dataset": ds.monthly, "product_type": monthly_pt}
+                update={
+                    "cds_dataset": ds.monthly,
+                    "dataset_id": ds.monthly,
+                    "product_type": monthly_pt,
+                }
             )
             for code, var in ds.variables.items()
         }
@@ -425,6 +443,75 @@ def _validate_grid_resolution(value: float | None) -> float | None:
     return value
 
 
+# Tokens in a `time_aggregation` / `temporal_resolution` value that mark the
+# samples as a server-side temporal aggregate (a daily-or-coarser mean). Both the
+# `day` and `daily` spellings appear in the catalog, so both are listed.
+_TEMPORAL_AGGREGATE_TOKENS = (
+    "mean",
+    "average",
+    "avg",
+    "climatolog",
+    "daily",
+    "day",
+    "dekad",
+    "pentad",
+    "week",
+    "month",
+    "season",
+    "annual",
+    "year",
+)
+
+
+def _denotes_temporal_aggregate(value: Any) -> bool:
+    """Whether a `time_aggregation` / `temporal_resolution` value marks an aggregate.
+
+    Returns `True` for a daily-or-coarser mean (`"daily"`, `"1_month_mean"`,
+    `"monthly_mean"`, ...) and `False` for a raw / sub-daily / instantaneous value
+    (`"instantaneous"`, `"1_hour"`, `"sub-daily"`, ...) or an empty one. Accepts a
+    scalar or a list (CDS spells these both ways). Cadence-only values (`"daily"`,
+    `"monthly"`) are assumed to name a mean — sum tokens are deliberately excluded,
+    since the flag routes `op="auto"` to `"mean"` (see `is_pre_aggregated`).
+
+    Args:
+        value: The `time_aggregation` / `temporal_resolution` extra, or `None`.
+
+    Returns:
+        `True` when the value denotes a temporal aggregate.
+
+    Examples:
+        - Daily-or-coarser means are aggregates; raw / sub-daily values are not:
+
+            ```python
+            >>> from earthlens.ecmwf.catalog import _denotes_temporal_aggregate
+            >>> _denotes_temporal_aggregate("1_month_mean")
+            True
+            >>> _denotes_temporal_aggregate("daily")
+            True
+            >>> _denotes_temporal_aggregate("instantaneous")
+            False
+            >>> _denotes_temporal_aggregate("1_hour")
+            False
+            >>> _denotes_temporal_aggregate(None)
+            False
+
+            ```
+    """
+    if not value:
+        return False
+    items = value if isinstance(value, (list, tuple)) else [value]
+    text = " ".join(str(item).lower() for item in items)
+    # Sub-daily / instantaneous samples are raw, not aggregates. This veto must
+    # run before the token match — a `sub-daily` value contains the `daily`
+    # token. Match the sub-daily spellings specifically (compacting separators)
+    # so a coarser-than-daily `subseasonal` value is not swallowed; any new
+    # sub-daily spelling must be added here.
+    compact = text.replace("-", "").replace("_", "")
+    if "instant" in text or "hour" in text or "subdaily" in compact:
+        return False
+    return any(token in text for token in _TEMPORAL_AGGREGATE_TOKENS)
+
+
 class Variable(FluxableLeaf):
     """Per-variable catalog entry consumed by :class:`ECMWF`.
 
@@ -437,8 +524,16 @@ class Variable(FluxableLeaf):
     :class:`earthlens.base.FluxableLeaf`.
 
     Attributes:
-        cds_dataset: CDS dataset short name used for daily / sub-daily
-            requests, e.g. `"reanalysis-era5-single-levels"`.
+        cds_dataset: CDS dataset short name the retrieve is sent to (the
+            download target), e.g. `"reanalysis-era5-single-levels"`.
+        dataset_id: Catalog key the variable is curated under. Equals
+            `cds_dataset` for every ordinary row, but differs when a row
+            overrides `cds_dataset` to curate a second config of one CDS
+            dataset under a distinct id (the GloFAS historical
+            `intermediate` stream, which retrieves from
+            `cems-glofas-historical`). Used to name the output file so the
+            two configs do not collide; `None` on a directly-built spec
+            falls back to `cds_dataset`.
         cds_variable: CDS variable name passed in the retrieve()
             request, e.g. `"2m_temperature"`.
         nc_variable: Short variable name inside the CDS NetCDF
@@ -475,7 +570,7 @@ class Variable(FluxableLeaf):
             for CMIP6. Keys not enumerated in this model are not
             silently dropped: they live here and reach the server.
         endpoint: CADS instance this dataset lives on — `"cds"`
-            (default), `"ads"`, or `"ewds"`. Propagated from the parent
+            (default), `"ads"`, `"ewds"`, `"ecds"` or `"xds"`. Propagated from the parent
             dataset; selects the retrieve URL via
             `earthlens.ecmwf.endpoints.open_client`.
         grid_resolution: Native grid spacing in degrees for the
@@ -489,6 +584,7 @@ class Variable(FluxableLeaf):
     # + `is_flux` property are inherited from `FluxableLeaf`.
 
     cds_dataset: str
+    dataset_id: str | None = None
     cds_variable: str
     nc_variable: str
     units: str
@@ -533,7 +629,122 @@ class Variable(FluxableLeaf):
         return _validate_grid_resolution(value)
 
     # `is_flux` property is inherited from `FluxableLeaf` (N1 in
-    # planning/catalog-cross-backend-comparison.md).
+    # the cross-backend catalog comparison).
+
+    @property
+    def is_pre_aggregated(self) -> bool:
+        """Whether each NetCDF sample is already a server-side temporal aggregate.
+
+        `True` for the CDS families whose samples are aggregated on the server,
+        so re-accumulating them over a coarser window over-counts:
+
+        * the daily-statistics family (`derived-era5-*-daily-statistics`), whose
+          dataset-level `daily_statistic` request extra is merged into every
+          child variable's `extras`;
+        * the ERA5 monthly-means family (`reanalysis-era5-*-monthly-means`),
+          whose product type is `monthly_averaged_*`;
+        * families carrying a `time_aggregation` / `temporal_resolution` extra
+          that denotes a daily-or-coarser mean (`ecv-for-climate-change`,
+          `reanalysis-carra-means` / `-pan-carra-means`,
+          `projections-cordex-domains-single-levels`); and
+        * monthly datasets whose only marker is a `-monthly` dataset id — the
+          CMIP5 monthly projections (`projections-cmip5-monthly-*`) and the
+          seasonal monthly-mean forecasts (`seasonal-monthly-single-levels`,
+          whose `monthly_mean` lives in `extras["product_type"]`).
+
+        The `time_aggregation` / `temporal_resolution` markers live in `extras`
+        (or the dataset id), not the `product_type` field, which stays
+        `[reanalysis]` on these rows — hence the extra checks below.
+
+        Every flagged family is treated as a temporal **mean**, mirroring the
+        established `reanalysis-era5-*-monthly-means` convention: the flagged
+        flux families are all mean products — `ecv-for-climate-change`
+        (`1_month_mean`), `-cordex-` (`monthly_mean`), CMIP5 monthly
+        (`mean-*-flux` variables), CARRA / pan-CARRA (the `*-means` datasets) and
+        `seasonal-monthly-single-levels` (`extras["product_type"] ==
+        ["monthly_mean"]`).
+        A family whose samples were pre-aggregated as a *total* (accumulation)
+        would need `sum`, not `mean`, and so must not be flagged here; none
+        exists in the shipped catalog. The extra-based branch additionally flags
+        many non-flux (`state`) satellite / in-situ / CMIP6 rows, where the flag
+        is a functional no-op (`_resolve_op` maps `state` to `mean` regardless).
+
+        `earthlens.aggregate._resolve_op` reads this so `op="auto"` reduces such
+        variables with `"mean"` rather than `"sum"` — a plain `sum` over samples
+        that are themselves daily/monthly aggregates multiplies by the number of
+        samples per window (e.g. ~30× for monthly windows over daily statistics).
+
+        Returns:
+            `True` when each sample is a server-side temporal aggregate — so
+            `op="auto"` should average rather than sum — and `False` otherwise.
+
+        Examples:
+            - An ERA5 monthly-means flux variable is pre-aggregated (its product
+              type is `monthly_averaged_*`):
+
+                ```python
+                >>> from earthlens.ecmwf.catalog import Variable
+                >>> monthly = Variable(
+                ...     cds_dataset="reanalysis-era5-single-levels-monthly-means",
+                ...     cds_variable="total_precipitation",
+                ...     nc_variable="tp",
+                ...     units="m",
+                ...     product_type=["monthly_averaged_reanalysis"],
+                ...     types="flux",
+                ... )
+                >>> monthly.is_pre_aggregated
+                True
+
+                ```
+            - A CARRA-means variable is flagged via its `time_aggregation` extra,
+              even though its product type is not `monthly_averaged_*`:
+
+                ```python
+                >>> from earthlens.ecmwf.catalog import Variable
+                >>> carra = Variable(
+                ...     cds_dataset="reanalysis-carra-means",
+                ...     cds_variable="10m_wind_gust",
+                ...     nc_variable="fg10",
+                ...     units="m s**-1",
+                ...     types="flux",
+                ...     extras={"time_aggregation": "daily"},
+                ... )
+                >>> carra.is_pre_aggregated
+                True
+
+                ```
+            - A raw hourly ERA5 flux variable is not, so `op="auto"` still sums it:
+
+                ```python
+                >>> from earthlens.ecmwf.catalog import Variable
+                >>> raw = Variable(
+                ...     cds_dataset="reanalysis-era5-single-levels",
+                ...     cds_variable="total_precipitation",
+                ...     nc_variable="tp",
+                ...     units="m",
+                ...     product_type=["reanalysis"],
+                ...     types="flux",
+                ... )
+                >>> raw.is_pre_aggregated
+                False
+
+                ```
+        """
+        if self.extras.get("daily_statistic"):
+            return True
+        if any(pt.startswith("monthly_averaged") for pt in self.product_type):
+            return True
+        if _denotes_temporal_aggregate(self.extras.get("time_aggregation")):
+            return True
+        if _denotes_temporal_aggregate(self.extras.get("temporal_resolution")):
+            return True
+        # CMIP5 monthly projections and seasonal monthly-mean forecasts carry no
+        # in-row time_aggregation marker (the seasonal family's `monthly_mean`
+        # lives in extras["product_type"]), so fall back to the `-monthly`
+        # dataset-id suffix. Validated against the shipped catalog: every
+        # `-monthly` id is a genuine monthly aggregate (no raw / sub-monthly id
+        # contains `-monthly`); a future id that did would need an explicit marker.
+        return "-monthly" in self.cds_dataset
 
 
 class Dataset(BaseModel):
@@ -561,7 +772,7 @@ class Dataset(BaseModel):
             `experiment`, `model`) that the dataset's request shape
             requires beyond the ERA5 standard set.
         endpoint: CADS instance the dataset lives on — `"cds"`
-            (default), `"ads"`, or `"ewds"`. Inherited by every child
+            (default), `"ads"`, `"ewds"`, `"ecds"` or `"xds"`. Inherited by every child
             variable and used to route the retrieve URL.
         grid_resolution: Native grid spacing in degrees (e.g. `0.05`
             for GloFAS), or `None` to use the ERA5 default. Inherited
@@ -641,7 +852,7 @@ class Catalog(AbstractCatalog):
 
     Attributes:
         available_datasets: Informational list of every dataset id across
-            the three Copernicus stores (CDS + ADS + EWDS), unioned from the
+            all five stores (CDS + ADS + EWDS + ECDS + XDS), unioned from the
             per-store `available_datasets:` block in `_index.yaml`; runtime
             code does not consume it.
         datasets: Structural map keyed by CDS dataset short name. Each
@@ -686,12 +897,12 @@ class Catalog(AbstractCatalog):
             ['divergence', 'fraction-of-cloud-cover', 'geopotential']
 
             ```
-        - Inspect what CDS hosts overall:
+        - Inspect what the five stores host overall:
 
             ```python
             >>> from earthlens.ecmwf import Catalog
             >>> len(Catalog().available_datasets)
-            169
+            174
 
             ```
     """
@@ -704,7 +915,7 @@ class Catalog(AbstractCatalog):
     providers: dict[str, Provider] = Field(default_factory=dict)
 
     def store_for(self, dataset_id: str) -> str | None:
-        """Return the Copernicus store (`cds` / `ads` / `ewds`) hosting a dataset.
+        """Return the store slug (e.g. `cds` / `ewds` / `xds`) hosting a dataset.
 
         Reads the per-store availability index. Used to auto-resolve the
         `endpoint` for a raw-request passthrough when the caller omits it.
@@ -907,7 +1118,7 @@ class Catalog(AbstractCatalog):
     # `__getitem__` / `__contains__` / `__iter__` / `__len__` / `__repr__`
     # / `__str__` dunders are inherited from
     # :class:`earthlens.base.AbstractCatalog` (M1 in
-    # planning/catalog-cross-backend-comparison.md).
+    # the cross-backend catalog comparison).
 
     def health(self) -> dict[str, list[str]]:
         """Report structural hygiene issues across the loaded catalog (L1).

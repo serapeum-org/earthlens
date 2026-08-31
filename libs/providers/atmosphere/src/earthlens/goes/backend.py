@@ -48,6 +48,8 @@ from earthlens.base import (
     AbstractDataSource,
     RemoteProduct,
     TemporalExtent,
+    end_is_date_only,
+    expand_bare_date_end,
     to_datetime,
 )
 from earthlens.goes._helpers import (
@@ -68,11 +70,6 @@ WIDE_WINDOW_HOURS = 720
 #: field (e.g. `OR_ABI-L1b-RadC-M6C02_G19_…` → `02`). Anchored on the mode
 #: digit so `C02` is never confused with `C12` / `C20`.
 _CHANNEL_IN_NAME = re.compile(r"-M\dC(\d{2})_")
-
-#: Matches an ISO date/time `T` (or `t`) separator sitting **between two
-#: digits** (`2026-07-03T00`), so a bare date in a month-name format
-#: (`2026-Oct-03`) is not mistaken for a timed value.
-_ISO_T_SEP = re.compile(r"\d[Tt]\d")
 
 
 def enumerate_hours(start: dt.datetime, end: dt.datetime) -> list[dt.datetime]:
@@ -115,80 +112,6 @@ def enumerate_hours(start: dt.datetime, end: dt.datetime) -> list[dt.datetime]:
         out.append(cursor)
         cursor += dt.timedelta(hours=1)
     return out
-
-
-def end_is_date_only(end: str | dt.date | dt.datetime) -> bool:
-    """Return whether an end bound was given as a bare date (no time-of-day).
-
-    The decision keys off the **input**, not the parsed value, so an
-    end the user typed with an explicit midnight time (`"2026-07-04 00:00"`)
-    is *not* treated as a bare date. A `datetime.date` (but not a
-    `datetime.datetime`) is bare; a string is bare when it carries no time
-    separator — a `:` (any `HH:MM`) or an ISO `T`/`t` *between two digits*
-    (`2026-07-03T00`). The digit-anchored `T` check avoids false-positives
-    on month-name formats whose name contains a `t` (`Oct` / `September`).
-
-    Args:
-        end: The raw end bound as passed to the backend (string, `date`,
-            or `datetime`).
-
-    Returns:
-        bool: `True` when `end` denotes a whole calendar day.
-
-    Examples:
-        - A bare date string is date-only; a timed one is not:
-            ```python
-            >>> from earthlens.goes.backend import end_is_date_only
-            >>> end_is_date_only("2026-07-03")
-            True
-            >>> end_is_date_only("2026-07-04 00:00")
-            False
-
-            ```
-    """
-    if isinstance(end, dt.datetime):
-        return False
-    if isinstance(end, dt.date):
-        return True
-    if isinstance(end, str):
-        return ":" not in end and _ISO_T_SEP.search(end) is None
-    return False
-
-
-def expand_bare_date_end(end: dt.datetime, *, date_only: bool) -> dt.datetime:
-    """Push a bare-date end bound to the last microsecond of its UTC day.
-
-    A user who passes a bare date with the default `fmt="%Y-%m-%d"` (e.g.
-    `end="2026-07-03"`) means "include the whole of 3 July" — but that
-    parses to `00:00:00`, and ABI scans never land exactly at midnight, so
-    an unexpanded inclusive filter would drop the entire day. When
-    `date_only` is `True` the bound is expanded to `23:59:59.999999` of the
-    same day; otherwise (an explicit time, including an explicit midnight)
-    it is returned untouched. Use :func:`end_is_date_only` on the raw input
-    to decide `date_only`.
-
-    Args:
-        end: The parsed end bound.
-        date_only: Whether the raw input denoted a whole calendar day.
-
-    Returns:
-        datetime.datetime: `end` unchanged, or expanded to end-of-day.
-
-    Examples:
-        - A bare date expands; an explicit time is left as-is:
-            ```python
-            >>> import datetime as dt
-            >>> from earthlens.goes.backend import expand_bare_date_end
-            >>> expand_bare_date_end(dt.datetime(2026, 7, 3), date_only=True)
-            datetime.datetime(2026, 7, 3, 23, 59, 59, 999999)
-            >>> expand_bare_date_end(dt.datetime(2026, 7, 4), date_only=False)
-            datetime.datetime(2026, 7, 4, 0, 0)
-
-            ```
-    """
-    if date_only:
-        return end.replace(hour=23, minute=59, second=59, microsecond=999999)
-    return end
 
 
 def normalize_channel(token: str) -> str:
@@ -250,7 +173,7 @@ class GOES(AbstractDataSource):
         dataset: str = "abi-l2-mcmip",
         variables: list[str] | str | None = None,
         temporal_resolution: str = "raw",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         *,
         satellite: str = "east",

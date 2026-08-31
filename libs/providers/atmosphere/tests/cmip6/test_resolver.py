@@ -182,13 +182,19 @@ def test_frame_loads_from_local_cache(tmp_path, store_frame):
 
 def test_default_cache_path_honours_env(monkeypatch, tmp_path):
     """EARTHLENS_CACHE relocates the default CSV cache path."""
+    from earthlens.config import set_cache_dir
+
+    set_cache_dir(None)  # the test-isolation override outranks the env var
     monkeypatch.setenv("EARTHLENS_CACHE", str(tmp_path))
     path = default_cache_path()
-    assert path == tmp_path / "cmip6" / "pangeo-cmip6.csv"
+    assert path == tmp_path.resolve() / "cmip6" / "pangeo-cmip6.csv"
 
 
 def test_default_cache_path_without_env(monkeypatch):
-    """Without EARTHLENS_CACHE the cache falls under the home directory."""
+    """Without EARTHLENS_CACHE the cache falls under the shared cache directory."""
+    from earthlens.config import set_cache_dir
+
+    set_cache_dir(None)  # the test-isolation override outranks the env var
     monkeypatch.delenv("EARTHLENS_CACHE", raising=False)
     path = default_cache_path()
     assert path.parts[-2:] == ("cmip6", "pangeo-cmip6.csv")

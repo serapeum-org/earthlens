@@ -10,7 +10,13 @@ from pathlib import Path
 
 import pytest
 
-from earthlens.testing import is_upstream_unavailable, pytest_runtest_call
+from earthlens.base import UpstreamUnavailableError
+from earthlens.testing import (
+    _LIVE_SKIP_PREFIX,
+    is_upstream_unavailable,
+    pytest_runtest_call,
+    skip_live_unavailable,
+)
 
 
 class _WithResponse(Exception):
@@ -19,6 +25,10 @@ class _WithResponse(Exception):
     def __init__(self, message: str, status: int) -> None:
         super().__init__(message)
         self.response = type("_Resp", (), {"status_code": status})()
+
+
+class _ProviderUnavailable(UpstreamUnavailableError):
+    """A stand-in provider subclass, to prove recognition is by the base type."""
 
 
 class _Item:
@@ -80,6 +90,32 @@ def test_classifies_availability_versus_real(exc: Exception, expect_skip: bool) 
     """Availability failures return a reason; real failures return None."""
     reason = is_upstream_unavailable(exc)
     assert (reason is not None) is expect_skip, reason
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        UpstreamUnavailableError("service down after retries"),
+        UpstreamUnavailableError("throttled", status_code=429),
+        _ProviderUnavailable("provider down", 503),
+    ],
+)
+def test_shared_typed_error_is_recognised(exc: UpstreamUnavailableError) -> None:
+    """The base type (and any subclass) classifies as a skip, unenumerated."""
+    reason = is_upstream_unavailable(exc)
+    assert reason is not None
+    assert type(exc).__name__ in reason
+
+
+def test_shared_typed_error_recognised_when_wrapped() -> None:
+    """A typed availability error reached through a cause chain is still a skip."""
+    try:
+        try:
+            raise _ProviderUnavailable("provider down", 503)
+        except UpstreamUnavailableError as cause:
+            raise RuntimeError("wrapper") from cause
+    except RuntimeError as exc:
+        assert is_upstream_unavailable(exc) is not None
 
 
 def test_walks_the_cause_chain() -> None:
@@ -259,3 +295,13 @@ def test_guard_fails_a_lane_mixing_creds_skip_and_availability_skip(
     )
     assert result.returncode != 0, result.stdout
     assert "wholly masked" in result.stdout
+
+
+def test_skip_live_unavailable_stamps_the_guard_prefix() -> None:
+    """The helper skips with the shared prefix so the masked-lane guard counts it."""
+    with pytest.raises(pytest.skip.Exception) as excinfo:
+        skip_live_unavailable("GDACS SEARCH unavailable: boom")
+    assert str(excinfo.value).startswith(_LIVE_SKIP_PREFIX), (
+        f"skip reason must carry the guard prefix, got {excinfo.value!r}"
+    )
+    assert "GDACS SEARCH unavailable: boom" in str(excinfo.value)

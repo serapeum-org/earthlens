@@ -102,7 +102,7 @@ class SoilGrids(AbstractDataSource):
         lon_lim: list[float] | None = None,
         variables: list[str] | None = None,
         temporal_resolution: str = "static",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         *,
         depths: list[str] | None = None,

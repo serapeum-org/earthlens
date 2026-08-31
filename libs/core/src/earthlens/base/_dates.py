@@ -11,10 +11,15 @@ from __future__ import annotations
 
 import datetime as dt
 import difflib
+import re
 from collections.abc import Mapping
 from typing import Any
 
 import pandas as pd
+
+#: Matches an ISO date/time separator anchored between two digits, so a
+#: month name containing a "t" is not mistaken for one.
+_ISO_T_SEP = re.compile(r"\d[Tt]\d")
 
 
 def _strip_tz(value: dt.datetime) -> dt.datetime:
@@ -417,3 +422,77 @@ def split_time(value: Any) -> tuple[Any, Any]:
         "time= must be a 'start/end' string, a (start, end) pair, a slice, "
         f"or a single date; got {type(value).__name__}"
     )
+
+
+def end_is_date_only(end: str | dt.date | dt.datetime) -> bool:
+    """Return whether an end bound was given as a bare date (no time-of-day).
+
+    The decision keys off the **input**, not the parsed value, so an
+    end the user typed with an explicit midnight time (`"2026-07-04 00:00"`)
+    is *not* treated as a bare date. A `datetime.date` (but not a
+    `datetime.datetime`) is bare; a string is bare when it carries no time
+    separator — a `:` (any `HH:MM`) or an ISO `T`/`t` *between two digits*
+    (`2026-07-03T00`). The digit-anchored `T` check avoids false-positives
+    on month-name formats whose name contains a `t` (`Oct` / `September`).
+
+    Args:
+        end: The raw end bound as passed to the backend (string, `date`,
+            or `datetime`).
+
+    Returns:
+        bool: `True` when `end` denotes a whole calendar day.
+
+    Examples:
+        - A bare date string is date-only; a timed one is not:
+            ```python
+            >>> from earthlens.base import end_is_date_only
+            >>> end_is_date_only("2026-07-03")
+            True
+            >>> end_is_date_only("2026-07-04 00:00")
+            False
+
+            ```
+    """
+    if isinstance(end, dt.datetime):
+        return False
+    if isinstance(end, dt.date):
+        return True
+    if isinstance(end, str):
+        return ":" not in end and _ISO_T_SEP.search(end) is None
+    return False
+
+
+def expand_bare_date_end(end: dt.datetime, *, date_only: bool) -> dt.datetime:
+    """Push a bare-date end bound to the last microsecond of its UTC day.
+
+    A user who passes a bare date with the default `fmt="%Y-%m-%d"` (e.g.
+    `end="2026-07-03"`) means "include the whole of 3 July" — but that
+    parses to `00:00:00`, and ABI scans never land exactly at midnight, so
+    an unexpanded inclusive filter would drop the entire day. When
+    `date_only` is `True` the bound is expanded to `23:59:59.999999` of the
+    same day; otherwise (an explicit time, including an explicit midnight)
+    it is returned untouched. Use :func:`end_is_date_only` on the raw input
+    to decide `date_only`.
+
+    Args:
+        end: The parsed end bound.
+        date_only: Whether the raw input denoted a whole calendar day.
+
+    Returns:
+        datetime.datetime: `end` unchanged, or expanded to end-of-day.
+
+    Examples:
+        - A bare date expands; an explicit time is left as-is:
+            ```python
+            >>> import datetime as dt
+            >>> from earthlens.base import expand_bare_date_end
+            >>> expand_bare_date_end(dt.datetime(2026, 7, 3), date_only=True)
+            datetime.datetime(2026, 7, 3, 23, 59, 59, 999999)
+            >>> expand_bare_date_end(dt.datetime(2026, 7, 4), date_only=False)
+            datetime.datetime(2026, 7, 4, 0, 0)
+
+            ```
+    """
+    if date_only:
+        return end.replace(hour=23, minute=59, second=59, microsecond=999999)
+    return end

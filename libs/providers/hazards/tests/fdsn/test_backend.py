@@ -253,3 +253,31 @@ class TestFDSNDownload:
         results = backend._api()
         assert len(results) == 1
         assert isinstance(results[0], GeoDataFrame)
+
+    def test_download_limit_overrides_constructor(
+        self, tmp_path: Path, fake_fdsn: _FakeFdsn
+    ):
+        """A per-call limit replaces the constructor's for that query."""
+        backend = _make_backend(tmp_path, limit=5)
+        backend.download(limit=2)
+        _base_url, kwargs = fake_fdsn.calls[-1]
+        assert kwargs["limit"] == 2, f"expected the per-call cap, got {kwargs['limit']}"
+
+    def test_download_limit_none_keeps_constructor(
+        self, tmp_path: Path, fake_fdsn: _FakeFdsn
+    ):
+        """Omitting the per-call limit keeps whatever the constructor set."""
+        backend = _make_backend(tmp_path, limit=5)
+        backend.download()
+        _base_url, kwargs = fake_fdsn.calls[-1]
+        assert kwargs["limit"] == 5, (
+            f"expected the constructor cap, got {kwargs['limit']}"
+        )
+
+    def test_download_rejects_non_positive_limit(
+        self, tmp_path: Path, fake_fdsn: _FakeFdsn
+    ):
+        """A zero or negative per-call limit is refused."""
+        backend = _make_backend(tmp_path)
+        with pytest.raises(ValueError):
+            backend.download(limit=0)

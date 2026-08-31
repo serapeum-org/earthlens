@@ -4,7 +4,7 @@
 # `https://www.geoboundaries.org/api/current/gbOpen/<ISO3>/<ADM>/`, reads the
 # `gjDownloadURL` from the JSON metadata, and reads that GeoJSON through pyramids
 # `FeatureCollection.read_file` (via `/vsicurl/`). Pinned live in the A1 gate —
-# see planning/admin/captures/admin-sdk-facts.md. Native CRS EPSG:4326. The
+# see the A1 gate captures. Native CRS EPSG:4326. The
 # request supplies the country as `country=<ISO3>`; the ADM level comes from the
 # dataset id. License CC-BY-4.0.
 datasets:

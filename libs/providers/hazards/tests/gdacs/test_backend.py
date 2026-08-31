@@ -10,7 +10,8 @@ import requests
 from geopandas import GeoDataFrame
 
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
-from earthlens.gdacs import GDACS
+from earthlens.gdacs import GDACS, GdacsUnavailableError
+from earthlens.gdacs._helpers import GDACS_MAX_RETRIES
 from earthlens.gdacs.backend import SEARCH_URL
 
 from .conftest import _FakeGdacs
@@ -135,7 +136,14 @@ class TestGDACSFetch:
         assert fake_gdacs.calls[0]["url"] == SEARCH_URL
 
     def test_forwards_params(self, tmp_path: Path, fake_gdacs: _FakeGdacs):
-        """Date window, hazard list, and alert levels reach the query params."""
+        """Date window, hazard list, and alert levels reach the query params.
+
+        This is the sole offline regression net for the SEARCH parameter
+        contract: because the backend treats a live 400 as availability (issue
+        #929) and skips rather than fails, a real query-shaping regression would
+        not redden the e2e lane — so keep these assertions exhaustive as new
+        params are added.
+        """
         backend = _make_backend(
             tmp_path, variables=["EQ", "TC"], alert_level=["Green", "Red"]
         )
@@ -164,12 +172,112 @@ class TestGDACSFetch:
         results = backend._fetch(backend._search())
         assert len(results[0]) == 0, "empty feed should yield an empty FC"
 
-    def test_http_error_propagates(self, tmp_path: Path, fake_gdacs: _FakeGdacs):
-        """A non-2xx status propagates rather than being swallowed."""
+    def test_service_error_becomes_unavailable(
+        self, tmp_path: Path, fake_gdacs: _FakeGdacs
+    ):
+        """A 5xx is classified as an availability failure and wrapped, keeping its status.
+
+        Verifies the wrap classification only; the retry-count behaviour is
+        covered by test_status_failure_retries_then_wraps.
+        """
         fake_gdacs.set_status_error(requests.HTTPError("500 Server Error"))
         backend = _make_backend(tmp_path)
-        with pytest.raises(requests.HTTPError, match="500"):
-            backend._fetch(backend._search())
+        products = backend._search()
+        with pytest.raises(GdacsUnavailableError) as excinfo:
+            backend._fetch(products)
+        assert excinfo.value.status_code == 500
+
+    def test_400_classified_as_unavailable(
+        self, tmp_path: Path, fake_gdacs: _FakeGdacs
+    ):
+        """A 400 is classified as an availability failure, not a client error.
+
+        GDACS returns spurious 400s on well-formed queries (issue #929), so a 400
+        is wrapped like a 5xx rather than raised as a client error — the query
+        composition itself is guarded by test_forwards_params. Verifies the wrap
+        classification only; the retry-count behaviour is covered by
+        test_status_failure_retries_then_wraps.
+        """
+        fake_gdacs.set_status_error(requests.HTTPError("400 Client Error: Bad Request"))
+        backend = _make_backend(tmp_path)
+        products = backend._search()
+        with pytest.raises(GdacsUnavailableError) as excinfo:
+            backend._fetch(products)
+        assert excinfo.value.status_code == 400
+        assert "SEARCH parameter contract" in str(excinfo.value), (
+            "a persistent 400 must flag a possible contract change in its reason"
+        )
+
+    def test_non_service_error_propagates(self, tmp_path: Path, fake_gdacs: _FakeGdacs):
+        """A genuine client error (404) fails hard instead of being masked."""
+        fake_gdacs.set_status_error(requests.HTTPError("404 Client Error: Not Found"))
+        backend = _make_backend(tmp_path)
+        products = backend._search()
+        with pytest.raises(requests.HTTPError, match="404"):
+            backend._fetch(products)
+
+    def test_transport_error_retries_then_wraps(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """A read timeout is retried, then wrapped as a status-less unavailable error.
+
+        The second failure mode in issue #929. The transport raises on every
+        attempt, so the backend exhausts its retries (one initial call plus
+        GDACS_MAX_RETRIES) and re-raises a GdacsUnavailableError whose
+        status_code is None (a transport error carries no HTTP status).
+        """
+        import earthlens.base.http as http
+
+        monkeypatch.setattr(http.HttpClient, "_backoff_wait", lambda self, ra, at: 0.0)
+        calls = {"n": 0}
+
+        def boom(url: str, **kwargs: object) -> object:
+            calls["n"] += 1
+            raise requests.ReadTimeout("read timed out")
+
+        monkeypatch.setattr("earthlens.gdacs.backend.requests.get", boom)
+        backend = _make_backend(tmp_path)
+        products = backend._search()
+        with pytest.raises(GdacsUnavailableError) as excinfo:
+            backend._fetch(products)
+        assert excinfo.value.status_code is None, (
+            f"a transport error carries no status, got {excinfo.value.status_code}"
+        )
+        assert calls["n"] == 1 + GDACS_MAX_RETRIES, (
+            f"expected {1 + GDACS_MAX_RETRIES} attempts, got {calls['n']}"
+        )
+
+    def test_status_failure_retries_then_wraps(
+        self, tmp_path: Path, fake_gdacs: _FakeGdacs, monkeypatch: pytest.MonkeyPatch
+    ):
+        """A persistent forcelist status (500) is retried, then wrapped.
+
+        Unlike the classification tests, the fake returns a real 500 status, so
+        the client's status-forcelist retry path actually runs: the request is
+        attempted one initial time plus GDACS_MAX_RETRIES before the survivor is
+        wrapped as a GdacsUnavailableError.
+        """
+        import earthlens.base.http as http
+
+        monkeypatch.setattr(http.HttpClient, "_backoff_wait", lambda self, ra, at: 0.0)
+        fake_gdacs.set_retry_status(500)
+        backend = _make_backend(tmp_path)
+        products = backend._search()
+        with pytest.raises(GdacsUnavailableError) as excinfo:
+            backend._fetch(products)
+        assert excinfo.value.status_code == 500
+        assert len(fake_gdacs.calls) == 1 + GDACS_MAX_RETRIES, (
+            f"expected {1 + GDACS_MAX_RETRIES} attempts, got {len(fake_gdacs.calls)}"
+        )
+
+    def test_http_client_retries_configured(self, tmp_path: Path):
+        """The SEARCH client retries the service-status family and transport errors."""
+        client = _make_backend(tmp_path)._http_client()
+        assert client.max_retries >= 1, "retries must be enabled"
+        assert 400 in client.status_forcelist, "GDACS's spurious 400 must be retried"
+        assert 503 in client.status_forcelist, "the 5xx family must be retried"
+        assert requests.ConnectionError in client.retry_on_exceptions
+        assert requests.Timeout in client.retry_on_exceptions
 
     def test_cap_logs_truncation_warning(
         self,

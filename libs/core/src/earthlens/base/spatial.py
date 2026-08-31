@@ -14,7 +14,16 @@ from collections.abc import Mapping, Sequence
 from typing import Any, cast
 
 from loguru import logger
+from pyramids.base.remote import CloudConfig
 from pyramids.feature import bbox as _pyramids_bbox
+
+#: `/vsicurl` HTTP tuning for a remote-raster read: suppress per-open sidecar
+#: probes (`GDAL_DISABLE_READDIR_ON_OPEN`, via `vsicurl_tuning`) and bound each
+#: range request with a retry / timeout budget. These are the knobs the raster
+#: backends used to set by hand; a plain `Dataset.read_file` installs none.
+_VSICURL_HTTP_MAX_RETRY = 3
+_VSICURL_HTTP_RETRY_DELAY = 2.0
+_VSICURL_HTTP_TIMEOUT = 30
 
 #: Approximate metres per degree of latitude at the equator. Retained as
 #: part of the public surface for callers doing their own rough
@@ -465,6 +474,206 @@ def normalize_aoi(
     return lat_lim, lon_lim
 
 
+def vsicurl_config() -> CloudConfig:
+    """Return a pyramids `CloudConfig` that tunes a remote `/vsicurl` read.
+
+    A plain `pyramids.dataset.Dataset.read_file(url)` installs no GDAL config, so
+    the readdir-suppression and retry / timeout knobs a backend needs on the
+    remote-raster hot path are not applied by default. Wrap the `read_file` (and
+    the `crop` that reads the window) in this context so `/vsicurl` opens skip the
+    per-open `.aux.xml` / `.ovr` sidecar probes against the host and bound each
+    range request — restoring the tuning the backends used to set by hand, now
+    scoped to the read rather than mutating the process environment.
+
+    Returns:
+        A `CloudConfig` context manager enabling `vsicurl_tuning` plus the retry /
+        retry-delay / timeout budget.
+
+    Examples:
+        - Use it around a remote read so the window fetch is tuned:
+            ```python
+            >>> from earthlens.base.spatial import vsicurl_config
+            >>> cfg = vsicurl_config()
+            >>> hasattr(cfg, "__enter__")
+            True
+
+            ```
+    """
+    return CloudConfig(
+        vsicurl_tuning=True,
+        http_max_retry=_VSICURL_HTTP_MAX_RETRY,
+        http_retry_delay=_VSICURL_HTTP_RETRY_DELAY,
+        http_timeout=_VSICURL_HTTP_TIMEOUT,
+    )
+
+
+def bbox_overlaps(dataset: Any, bbox: Sequence[float]) -> bool:
+    """Whether a bbox intersects a dataset's geographic extent.
+
+    A cheap geographic bounds test from the dataset's affine transform and pixel
+    dimensions, used to reject an AOI outside the source's coverage *before* a
+    windowed read — so an out-of-extent AOI fails fast with a clear error rather
+    than falling into pyramids' full-source cutline warp. The bbox is assumed to
+    be in the dataset's own CRS (the case for the raster backends here).
+
+    Args:
+        dataset: An opened `pyramids.Dataset` exposing `geotransform`, `columns`,
+            and `rows`.
+        bbox: `(west, south, east, north)` in the dataset's CRS.
+
+    Returns:
+        `True` when the bbox intersects the raster's extent.
+    """
+    origin_x, pixel_w, _, origin_y, _, pixel_h = dataset.geotransform
+    west_bound, east_bound = origin_x, origin_x + dataset.columns * pixel_w
+    # `pixel_h` is negative for a north-up grid, so the south edge is lower.
+    north_bound, south_bound = origin_y, origin_y + dataset.rows * pixel_h
+    west, south, east, north = bbox
+    return not (
+        east <= west_bound
+        or west >= east_bound
+        or north <= south_bound
+        or south >= north_bound
+    )
+
+
+def windowed_bbox_crop(dataset: Any, bbox: Sequence[float], *, epsg: Any = 4326) -> Any:
+    """Windowed bbox crop that keeps an all-no-data AOI as an all-no-data crop.
+
+    `Dataset.crop(bbox=)` with the default `touch=True` takes pyramids' windowed
+    fast path — reading only the AOI's pixel window — but *raises* `crop produced
+    no valid pixels` when that window is entirely no-data. An in-coverage but
+    empty AOI (e.g. open sea, or an area with no modelled value) must still
+    produce a crop, matching the pre-refactor contract where the backend wrote an
+    all-no-data raster rather than aborting. So retry with `touch=False`, whose
+    cutline warp crops the same window but returns the all-no-data result instead
+    of raising, and materialise it (a read into an in-memory dataset) so the
+    fallback's reads happen here — inside any tuning context and before the source
+    handle is closed — rather than lazily through a VRT afterwards.
+
+    Contract: the caller must guarantee `bbox` overlaps the source (e.g. via
+    `bbox_overlaps`). pyramids raises the same "no valid pixels" message for both
+    an all-no-data window (kept here) and a non-overlapping bbox (a full-source
+    read then error); pre-checking overlap ensures the only meaning that reaches
+    the fallback is all-no-data.
+
+    Args:
+        dataset: An opened `pyramids.Dataset` (anything exposing `crop`).
+        bbox: `(west, south, east, north)` in `epsg` (already widened if a point),
+            guaranteed to overlap the source.
+        epsg: CRS of `bbox`. Defaults to `4326`.
+
+    Returns:
+        The cropped `Dataset` — the windowed read, or the all-no-data window when
+        the AOI holds no valid data.
+    """
+    try:
+        return dataset.crop(bbox=list(bbox), epsg=epsg)
+    except ValueError as exc:
+        # The only ValueError carrying this phrase is pyramids'
+        # `_correct_wrap_cutline_error`; it means the window overlaps no valid
+        # data. Coupled to pyramids' wording — the `test_all_nodata_*` tests fail
+        # if a pyramids bump rewords it, flagging this string for update.
+        if "no valid pixels" not in str(exc):
+            raise
+        logger.info(
+            "windowed crop AOI holds no valid data; keeping the all-no-data "
+            "window via the slower cutline-warp crop of the same window"
+        )
+        fallback = dataset.crop(bbox=list(bbox), epsg=epsg, touch=False)
+        # `touch=False` returns a lazy warp VRT that reads through to the source;
+        # materialise it now so those reads happen before the caller closes the
+        # source handle (and inside any active tuning context).
+        from pyramids.dataset import Dataset
+
+        no_data = fallback.no_data_value
+        return Dataset.create_from_array(
+            arr=fallback.read_array(),
+            geo=fallback.geotransform,
+            epsg=fallback.epsg,
+            no_data_value=no_data[0] if isinstance(no_data, (list, tuple)) else no_data,
+        )
+
+
+def widen_degenerate_bbox(
+    bbox: Sequence[float], pixel_width: float, pixel_height: float
+) -> list[float]:
+    """Widen a zero-width / zero-height AOI to one source pixel.
+
+    `pyramids.Dataset.crop(bbox=)` requires a strictly positive box
+    (`west < east and south < north`); a point or cell-edge-aligned AOI
+    (`min == max` on an axis, which the facade allows) would otherwise raise. A
+    collapsed edge is pushed out by exactly one source pixel so the crop's
+    windowed fast path resolves to the single cell containing the point — the
+    1x1 window the old floor/ceil pixel math clamped to (`max(1, ...)`). A box
+    already positive on both axes is returned unchanged.
+
+    One whole pixel (not a sub-pixel epsilon) is used deliberately: a sub-pixel
+    box would fall through the strict `west < east` fast-path check into the
+    cutline warp and yield no cells. This assumes the pixel size is not lost to
+    float rounding at the coordinate magnitude (`west + abs(pixel) > west`),
+    which holds for geographic (|lon| <= 180, pixel ~1e-3) and normal projected
+    grids.
+
+    Args:
+        bbox: `(west, south, east, north)` in the source CRS.
+        pixel_width: The source's pixel width (`geotransform[1]`); the absolute
+            value is used, so the sign does not matter.
+        pixel_height: The source's pixel height (`geotransform[5]`, negative for
+            a north-up grid); the absolute value is used.
+
+    Returns:
+        A `[west, south, east, north]` list, with any collapsed axis widened by
+        one pixel.
+
+    Examples:
+        - A point AOI is widened by one pixel on both axes:
+            ```python
+            >>> from earthlens.base.spatial import widen_degenerate_bbox
+            >>> widen_degenerate_bbox([5.0, -5.0, 5.0, -5.0], 1.0, -1.0)
+            [5.0, -5.0, 6.0, -4.0]
+
+            ```
+        - A positive box is left unchanged:
+            ```python
+            >>> from earthlens.base.spatial import widen_degenerate_bbox
+            >>> widen_degenerate_bbox([4.8, 51.8, 5.0, 52.0], 0.00083, -0.00083)
+            [4.8, 51.8, 5.0, 52.0]
+
+            ```
+    """
+    west, south, east, north = bbox
+    if east <= west:
+        east = west + abs(pixel_width)
+    if north <= south:
+        north = south + abs(pixel_height)
+    return [west, south, east, north]
+
+
+def ensure_no_data(dataset: Any, default: float) -> Any:
+    """Stamp a fallback no-data value when a dataset declares none.
+
+    A windowed `crop(bbox=)` carries the source's own no-data through, but a
+    source that declares none leaves the output untagged — losing the flag that
+    exact polygon masking (`crop_to_aoi`) needs to trim outside-polygon cells.
+    When the dataset's first band has no no-data, set `default` and return the
+    dataset; this is a pure metadata tag (pixels are unchanged), restoring the
+    pre-crop behaviour where the backend stamped a catalog / default no-data.
+
+    Args:
+        dataset: A `pyramids.Dataset` (anything exposing a settable
+            `no_data_value` per-band tuple).
+        default: The no-data value to stamp when the dataset declares none.
+
+    Returns:
+        The same `dataset`, with a no-data value guaranteed on its first band.
+    """
+    nodata = getattr(dataset, "no_data_value", None)
+    if not isinstance(nodata, (list, tuple)) or not nodata or nodata[0] is None:
+        dataset.no_data_value = default
+    return dataset
+
+
 def crop_to_aoi(
     dataset: Any,
     space: Any,
@@ -502,6 +711,18 @@ def crop_to_aoi(
     geometry = getattr(space, "geometry", None)
     if geometry is not None:
         return _crop_to_mask(dataset, geometry, touch=True)
+    # Widen a point / cell-edge bbox to one pixel so a zero-area box is not handed
+    # to `crop` (which would trim to nothing / error); a point AOI still yields a
+    # 1x1 crop. The pixel size (`geo[1]`/`geo[5]`) is in the dataset's CRS units,
+    # so only widen when the bbox is in that same CRS — `epsg is None` means "the
+    # dataset's own CRS" (pyramids' default), and an explicit `epsg` must match
+    # the dataset's. For a reprojecting crop (bbox `epsg` != the dataset's CRS)
+    # mixing the units would push the edge out by a wrong amount, so leave the
+    # bbox as-is. (A real `Dataset` exposes `geotransform` / `epsg`; the getattr
+    # guards let a bare test double without them reach crop.)
+    geo = getattr(dataset, "geotransform", None)
+    if geo is not None and (epsg is None or getattr(dataset, "epsg", None) == epsg):
+        bbox = widen_degenerate_bbox(bbox, geo[1], geo[5])
     return dataset.crop(bbox=list(bbox), epsg=epsg, touch=touch)
 
 

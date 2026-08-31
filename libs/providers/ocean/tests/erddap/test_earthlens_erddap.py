@@ -35,7 +35,7 @@ class TestRouting:
         el = EarthLens(
             data_source="erddap",
             dataset=TABLEDAP_ID,
-            variables=["station", "time", "wtmp"],
+            variables=["station", "time", "WTMP"],
             start="2023-01-01",
             end="2023-01-02",
             lat_lim=[36.0, 37.0],

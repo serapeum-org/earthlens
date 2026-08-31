@@ -19,6 +19,10 @@ Public surface (re-exported from this package):
   call :meth:`GEE.download`.
 * :class:`AuthenticationError` — raised when Earth Engine cannot be
   initialised (missing/invalid key, unregistered project, missing IAM role).
+* :data:`CloudMask` / :data:`CollectionFilter` — the callable type
+  aliases for the `GEE(cloud_mask=..., filters=...)` hooks
+  (`ee.Image -> ee.Image` and `ee.ImageCollection -> ee.ImageCollection`);
+  handy for annotating your own masks / filters.
 * :class:`Catalog` — pydantic-backed loader for the bundled per-category
   catalog under `src/earthlens/gee/catalog/`, exposing
   `available_datasets`, `datasets`, `providers`, and
@@ -43,10 +47,15 @@ Public surface (re-exported from this package):
   small-FC `getInfo()` paths).
 
 Two submodules ship more specialised helpers and are intentionally
-**not** re-exported at this top level — import them directly:
+**not** re-exported at this top level — import them directly. Both
+feed the `GEE` backend's `cloud_mask=` / `filters=` constructor hooks
+(`.map`-applied / composed before the reducer), so a cloud-masked
+median composite is a facade call rather than raw `ee`:
 
-* `earthlens.gee.cloud_masks` — `landsat_sr(image, sensor=...)` for
-  Landsat C2-L2 QA_PIXEL Clear-bit masking.
+* `earthlens.gee.cloud_masks` — per-image `ee.Image -> ee.Image`
+  masks: `landsat_sr(image, sensor=...)` (Landsat C2-L2 QA_PIXEL
+  Clear-bit) and `sentinel2_scl(image)` (Sentinel-2 L2A SCL —
+  drops cloud shadow / cloud / cirrus).
 * `earthlens.gee.filters` — `by_year` / `by_bounds` /
   `by_property_in` / `by_cloud_cover_lte` / `by_year_and_bounds`
   for `ee.ImageCollection.filter*` composition.
@@ -98,7 +107,7 @@ Examples:
 from __future__ import annotations
 
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth
-from earthlens.gee.backend import GEE
+from earthlens.gee.backend import GEE, CloudMask, CollectionFilter
 from earthlens.gee.catalog import (
     CATALOG_PATH,
     PROVIDERS_PATH,
@@ -128,6 +137,8 @@ from earthlens.gee.sampling import sample_points, sample_points_to_gdf
 __all__ = [
     "GEE",
     "AuthenticationError",
+    "CloudMask",
+    "CollectionFilter",
     "Catalog",
     "Dataset",
     "Band",

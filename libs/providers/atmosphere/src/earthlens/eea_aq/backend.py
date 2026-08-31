@@ -56,6 +56,7 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.eea_aq._helpers import (
+    adjacent_eras,
     countries_in_bbox,
     datasets_for_years,
     download_request,
@@ -111,7 +112,7 @@ class EEA_AQ(AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "hourly",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         country: str | list[str] | None = None,
         client: Any | None = None,
@@ -324,19 +325,53 @@ class EEA_AQ(AbstractDataSource):
         code_to_name = {
             self._catalog.get_pollutant(name).code: name for name in self.vars
         }
-        datasets = datasets_for_years(
-            self.time.start_date.year, self.time.end_date.year
-        )
+        start_year = self.time.start_date.year
+        end_year = self.time.end_date.year
+        datasets = datasets_for_years(start_year, end_year)
 
         # Lazy so a `limit=` stops the work where it costs: each dataset is a
         # separate bulk download of every matching Parquet, so a cap met by the
         # Verified era means the Unverified one is never requested at all.
-        frames = self._take_limited(
-            self._iter_dataset_frames(datasets, client, countries, polls, code_to_name),
-            limit=self._limit,
-        )
-        non_empty = [frame for frame in frames if not frame.empty]
+        non_empty = self._sweep(datasets, client, countries, polls, code_to_name)
+        swept = list(datasets)
         if not non_empty:
+            # The primary era(s) returned zero files. Retry the adjacent live
+            # era(s) not already swept (Verified <-> Unverified) whose year span
+            # can plausibly cover the request: a boundary year can be missing
+            # from its primary era yet present in the neighbour (a not-yet-
+            # promoted year still in the Unverified stream). `adjacent_eras`
+            # gates on year overlap so a genuinely out-of-range request (e.g.
+            # 2015 against Unverified 2023+) never bulk-downloads an era it
+            # cannot be satisfied by. This runs *only* on a fully-empty primary
+            # sweep, so the normal success path never double-downloads, and a
+            # recent-year request — already spanning both live eras — has no
+            # adjacent era left to try. Logged at INFO: the fallback often
+            # recovers the data, so it is not on its own an alarm.
+            fallback = adjacent_eras(datasets, start_year, end_year)
+            if fallback:
+                logger.info(
+                    f"EEA download: primary era(s) {datasets} returned no files "
+                    f"for countries {countries} / pollutants {polls}; retrying the "
+                    f"adjacent era(s) {fallback}."
+                )
+                swept += fallback
+                non_empty = self._sweep(
+                    fallback, client, countries, polls, code_to_name
+                )
+        if not non_empty:
+            # Nothing from any era, primary or fallback. Only here — with the
+            # whole sweep in — is the outage-framed WARNING warranted: zero files
+            # across every swept era for the requested countries/pollutants is
+            # the shape of an upstream EEA export outage, though it can also be a
+            # genuine absence. A per-era WARNING would instead fire even when a
+            # sibling era satisfied the request.
+            logger.warning(
+                f"EEA download: no era returned any usable observations for "
+                f"countries {countries} / pollutants {polls} across {swept}; the "
+                f"EEA export may be temporarily unavailable upstream, or these "
+                f"countries/pollutants are genuinely absent from these eras. "
+                f"Returning an empty frame."
+            )
             return empty_frame()
         combined = pd.concat(non_empty, ignore_index=True)
         # A recently-promoted year can appear in both Verified and Unverified,
@@ -350,11 +385,55 @@ class EEA_AQ(AbstractDataSource):
         )
         lower, upper = self._window()
         mask = (combined["datetime_utc"] >= lower) & (combined["datetime_utc"] < upper)
-        return combined[mask].reset_index(drop=True)
+        windowed = combined[mask].reset_index(drop=True)
+        if windowed.empty:
+            # Files were downloaded and carried rows, but every row fell outside
+            # [start, end). Logged at INFO to keep it deliberately distinct from
+            # the aggregate outage WARNING (which fires only when *no* files came
+            # back): a caller facing an empty frame can tell "the export returned
+            # no files" (possible upstream outage) from "files came back, just
+            # not for these dates". The wording stays factual — it reports what
+            # was downloaded vs the window, without asserting a cause.
+            logger.info(
+                f"EEA download: {len(combined)} observation(s) were downloaded "
+                f"for {countries} / {polls} but none fell within [{lower}, "
+                f"{upper}); the swept era(s) returned data outside the requested "
+                f"window."
+            )
+        return windowed
+
+    def _sweep(
+        self,
+        datasets: list[str],
+        client: Any,
+        countries: list[str],
+        polls: list[str],
+        code_to_name: dict[int, str],
+    ) -> list[pd.DataFrame]:
+        """Download `datasets` era by era and return the non-empty shaped frames.
+
+        Args:
+            datasets: The eras to sweep, in priority order.
+            client: The airbase client to request through.
+            countries: Reporting-country codes the service serves.
+            polls: Pollutant codes to request.
+            code_to_name: Pollutant code (numeric) to catalog name, restricted
+                to the requested pollutants.
+
+        Returns:
+            list[pd.DataFrame]: One shaped frame per Parquet that held rows;
+                empty frames are dropped. A cap (`self._limit`) is honoured
+                lazily, so an era past the cap is never bulk-downloaded.
+        """
+        frames = self._take_limited(
+            self._iter_dataset_frames(datasets, client, countries, polls, code_to_name),
+            limit=self._limit,
+        )
+        return [frame for frame in frames if not frame.empty]
 
     def _iter_dataset_frames(
         self,
-        datasets: list[Any],
+        datasets: list[str],
         client: Any,
         countries: list[str],
         polls: list[str],
@@ -385,9 +464,16 @@ class EEA_AQ(AbstractDataSource):
                 download_request(request, tmp)
                 parquets = sorted(Path(tmp).rglob("*.parquet"))
                 if not parquets:
+                    # Diagnostic only, at INFO: this era returned no files for the
+                    # whole requested country/pollutant set. Whether that is an
+                    # upstream outage or a genuine absence cannot be judged from a
+                    # single era — a sibling era (or the adjacent-era fallback) may
+                    # still hold the data — so `_api` owns the outage WARNING once
+                    # the whole sweep is in. Warning per era here would cry
+                    # "outage" on a download that actually succeeded.
                     logger.info(
-                        f"EEA download: dataset {dataset!r} returned no Parquet "
-                        f"files for {countries} / {polls}."
+                        f"EEA download: era {dataset!r} returned no Parquet files "
+                        f"for countries {countries} / pollutants {polls}."
                     )
                 for parquet in parquets:
                     yield shape_frame(pd.read_parquet(parquet), dataset, code_to_name)

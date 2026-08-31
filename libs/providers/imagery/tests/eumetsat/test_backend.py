@@ -98,6 +98,86 @@ def test_search_dtend_extends_to_end_of_day(fake_eumdac, tmp_path):
     assert call["dtstart"] < call["dtend"]  # window is non-empty
 
 
+def test_search_dtend_with_time_of_day_is_not_widened(fake_eumdac, tmp_path):
+    """An end carrying a time of day means that instant, not the end of its day."""
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("p1")]
+    backend = EUMETSAT(
+        start="2024-06-01 09:00",
+        end="2024-06-01 09:09",
+        fmt="%Y-%m-%d %H:%M",
+        variables={"msg-hrseviri": ["HRSEVIRI"]},
+        lat_lim=[50.0, 52.0],
+        lon_lim=[-1.0, 1.0],
+        path=str(tmp_path),
+        **_CREDS,
+    )
+    backend._search()
+    call = fake_eumdac.store.search_calls[0]
+    assert call["dtend"] == backend.time.end_date
+    assert call["dtend"].hour == 9, f"hour changed: {call['dtend']}"
+    assert call["dtend"].minute == 9, f"minute changed: {call['dtend']}"
+
+
+def test_search_dtend_explicit_midnight_is_not_widened(fake_eumdac, tmp_path):
+    """An end typed as an explicit midnight instant means that instant."""
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("p1")]
+    backend = EUMETSAT(
+        start="2024-06-01 00:00",
+        end="2024-06-02 00:00",
+        fmt="%Y-%m-%d %H:%M",
+        variables={"msg-hrseviri": ["HRSEVIRI"]},
+        lat_lim=[50.0, 52.0],
+        lon_lim=[-1.0, 1.0],
+        path=str(tmp_path),
+        **_CREDS,
+    )
+    backend._search()
+    call = fake_eumdac.store.search_calls[0]
+    assert call["dtend"] == backend.time.end_date, (
+        f"an explicit '00:00' end must not be widened to end of day, got {call['dtend']}"
+    )
+
+
+def test_search_dtend_just_past_midnight_is_not_widened(fake_eumdac, tmp_path):
+    """One second past midnight is a time of day, so it is left alone."""
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("p1")]
+    backend = EUMETSAT(
+        start="2024-06-01 00:00:00",
+        end="2024-06-01 00:00:01",
+        fmt="%Y-%m-%d %H:%M:%S",
+        variables={"msg-hrseviri": ["HRSEVIRI"]},
+        lat_lim=[50.0, 52.0],
+        lon_lim=[-1.0, 1.0],
+        path=str(tmp_path),
+        **_CREDS,
+    )
+    backend._search()
+    call = fake_eumdac.store.search_calls[0]
+    assert call["dtend"] == backend.time.end_date, (
+        f"a 00:00:01 end must not be widened, got {call['dtend']}"
+    )
+
+
+def test_search_dtend_late_in_the_day_is_passed_through(fake_eumdac, tmp_path):
+    """An end already near end of day is used as given, not re-rounded."""
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("p1")]
+    backend = EUMETSAT(
+        start="2024-06-01 00:00:00",
+        end="2024-06-01 23:59:59",
+        fmt="%Y-%m-%d %H:%M:%S",
+        variables={"msg-hrseviri": ["HRSEVIRI"]},
+        lat_lim=[50.0, 52.0],
+        lon_lim=[-1.0, 1.0],
+        path=str(tmp_path),
+        **_CREDS,
+    )
+    backend._search()
+    call = fake_eumdac.store.search_calls[0]
+    assert call["dtend"].microsecond == 0, (
+        f"an explicit 23:59:59 end must keep its microseconds, got {call['dtend']}"
+    )
+
+
 def test_fetch_streams_each_product_to_disk(fake_eumdac, tmp_path):
     """_fetch writes one file per product, named by the product id."""
     fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [

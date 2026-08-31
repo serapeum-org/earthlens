@@ -55,6 +55,8 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
+    end_is_date_only,
+    expand_bare_date_end,
 )
 from earthlens.eumetsat._helpers import eumdac_bbox, safe_product_filename
 from earthlens.eumetsat.auth import EumetsatAuth, EumetsatCredentials
@@ -123,7 +125,7 @@ class EUMETSAT(AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "daily",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         group: DataStoreGroup | str | None = None,
         consumer_key: str | None = None,
@@ -295,6 +297,7 @@ class EUMETSAT(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
+        self._end_is_date_only = end_is_date_only(end)
         return self._cadence_extent(
             start,
             end,
@@ -309,10 +312,17 @@ class EUMETSAT(AbstractDataSource):
         One `Collection.search(bbox=, dtstart=, dtend=)` per resolved
         collection row, scoped to the request bbox and time window. The
         bbox is the `eumdac` `W,S,E,N` comma-string the OpenSearch
-        endpoint expects. The `end` date is treated as **inclusive of its
-        whole calendar day**: `dtend` is widened to `23:59:59.999999` of
-        the end day so a same-day request (`start == end`) covers the
-        day's products instead of collapsing to the midnight instant.
+        endpoint expects.
+
+        How `end` is interpreted depends on whether it carries a time of
+        day. A **date-only** `end` parses to midnight, which would collapse
+        a same-day request (`start == end`) to a zero-width instant, so it
+        is read as *inclusive of its whole calendar day* and `dtend` is
+        widened to `23:59:59.999999`. An `end` that **names a time** means
+        that instant and is passed through unchanged — widening it would
+        pull every later product of the day, which for a 10-minute
+        full-disk cadence is tens of gigabytes the caller never asked for.
+
         Each returned `eumdac` product becomes one `RemoteProduct` whose
         `metadata` carries the raw product handle and its collection row,
         so `_fetch` can stream without re-querying.
@@ -335,13 +345,9 @@ class EUMETSAT(AbstractDataSource):
         bbox = eumdac_bbox(
             self.space.west, self.space.south, self.space.east, self.space.north
         )
-        # `end_date` parses to midnight, so a same-day request (start == end)
-        # would otherwise collapse to the zero-width instant 00:00:00 and match
-        # (almost) no products. Extend the end bound to the end of its calendar
-        # day so an inclusive `end` covers the whole day's products.
         dtstart = self.time.start_date
-        dtend = self.time.end_date.replace(
-            hour=23, minute=59, second=59, microsecond=999999
+        dtend = expand_bare_date_end(
+            self.time.end_date, date_only=self._end_is_date_only
         )
         products: list[RemoteProduct] = []
         for ds in self._datasets:
@@ -505,6 +511,10 @@ class EUMETSAT(AbstractDataSource):
         every output to `self.root_dir`, and deletes the customisation in
         a `finally` — even on failure — so quota is always freed.
 
+        A `tailor.crs` of `None` means "do not reproject": `Chain.projection`
+        is `None`, which `Chain.asdict()` drops before the request is built,
+        matching what the native output formats require.
+
         Args:
             product: One `RemoteProduct` from `_search` (its `metadata`
                 carries the raw `eumdac` product handle and catalog row).
@@ -534,6 +544,12 @@ class EUMETSAT(AbstractDataSource):
         nswe = tailor.nswe or TailorConfig.nswe_from_extent(
             self.space.north, self.space.south, self.space.west, self.space.east
         )
+        # `crs=None` means "do not reproject" (TailorConfig already forbids pairing
+        # it with a native format). `Chain` is a dataclass with `projection: str |
+        # None = None`, and its `asdict()` -- what actually gets serialised into the
+        # request -- drops every `None` field (`eumdac.tailor_models.AsDictMixin`).
+        # So passing `projection=None` here and omitting the argument entirely
+        # produce the identical request; no conditional kwarg-building is needed.
         chain = eumdac.tailor_models.Chain(
             product=dataset.tailor_product_type,
             format=tailor.format,

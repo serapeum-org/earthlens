@@ -144,11 +144,13 @@ class Drought(AbstractDataSource):
             temporal_resolution: Advisory label. Defaults to `"auto"` —
                 the backend snaps dates to the source's release cadence
                 (`weekly` / `10day` / `monthly`).
-            path: Output directory for the raster transports. **Required**
-                when the resolved dataset is raster — the SPEIbase NetCDFs
-                and per-period GeoTIFFs land here, and silently writing
-                hundreds of MB into the user's CWD is hostile. Defaults to
-                `None`; raster requests without an explicit `path=` raise.
+            path: Output directory for the raster transports — the SPEIbase
+                NetCDFs and per-period GeoTIFFs land here. When omitted it
+                falls back to the configured earthlens output directory
+                (`set_output_dir()` / `EARTHLENS_DATA_DIR`); see
+                `earthlens.config`. Asking for the working directory
+                explicitly (`path=""` or `path="."`) is refused for raster
+                datasets, because writing hundreds of MB there is hostile.
                 Optional for the USDM vector transport (which returns an
                 in-memory FeatureCollection without writing to disk).
             fmt: `strptime` format for `start` / `end`. Defaults to
@@ -184,20 +186,23 @@ class Drought(AbstractDataSource):
         self.OUTPUT_KIND = self._dataset.output_kind
         self._today = today if today is not None else dt.date.today()
 
-        # `bool(Path("")) is True` and `str(Path(""))` is `"."` — both would
-        # bypass a `not path` check and silently route the parent class to
-        # `Path(".").absolute()` (the user's CWD). Normalise to a string
-        # first so the empty-path detection covers `None`, `""`, `Path("")`,
-        # `Path(".")`, and `Path()` uniformly.
-        path_str = "" if path is None else str(path)
-        is_empty_path = path_str in ("", ".")
-        if self.OUTPUT_KIND == "raster" and is_empty_path:
-            raise ValueError(
-                f"Drought needs path= for raster dataset {dataset!r} — the "
-                "per-period rasters are written to disk; silently writing "
-                "to the current working directory is not safe. Pass an "
-                "explicit output directory (e.g. path='drought_out')."
-            )
+        # An omitted `path` is fine: it resolves to the configured output
+        # directory, which is a deliberate location rather than wherever the
+        # process happens to be running. Asking for the cwd *explicitly* is
+        # still refused for raster, because that is the case this guard was
+        # written for. `bool(Path("")) is True` and `str(Path(""))` is `"."`,
+        # so normalise to a string first to cover `""`, `Path("")`, `Path(".")`
+        # and `Path()` uniformly.
+        if path is not None and self.OUTPUT_KIND == "raster":
+            if str(path).strip() in ("", "."):
+                raise ValueError(
+                    f"Drought needs a real path= for raster dataset "
+                    f"{dataset!r} — the per-period rasters are written to "
+                    "disk, and writing hundreds of MB into the current "
+                    "working directory is not safe. Pass an explicit output "
+                    "directory (e.g. path='drought_out'), or omit path= to "
+                    "use the configured earthlens output directory."
+                )
 
         super().__init__(
             # Drought accepts str/date/datetime; the overridden
@@ -210,7 +215,7 @@ class Drought(AbstractDataSource):
             lat_lim=lat_lim,
             lon_lim=lon_lim,
             fmt=fmt,
-            path=path_str,
+            path=path,
         )
 
     def _check_input_dates(

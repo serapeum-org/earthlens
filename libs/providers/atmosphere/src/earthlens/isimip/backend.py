@@ -78,7 +78,7 @@ class ISIMIP(AbstractDataSource):
         lon_lim: list[float] | None = None,
         whole_globe: bool = False,
         poll: float = 4.0,
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         catalog: Catalog | None = None,
         client: IsimipClient | None = None,

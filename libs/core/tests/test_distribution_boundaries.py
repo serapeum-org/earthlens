@@ -1422,3 +1422,87 @@ class TestCliIsBackendAgnostic:
             f"missing={sorted(self.PENDING_IMPORTS - imported)}. Move the handler "
             "into the provider and update PENDING_IMPORTS (empty = #863 closed)."
         )
+
+
+class TestSingleSecretAuthAdoption:
+    """#833: the single-secret credential ceremony lives once, in the base.
+
+    Six backends authenticate with a single *mandatory* API key / token and each
+    used to carry the same ceremony by hand: resolve an explicit argument, fall
+    back to an environment variable, raise `AuthenticationError` when neither is
+    present, then memoise. That ceremony now lives in
+    `earthlens.base.SingleSecretAuth`; each backend supplies only its `ENV_VARS`
+    / `PROVIDER` and the `_explicit_credential` / `_connect` hooks. This guard
+    keeps them on the shared base and off a re-grown `os.environ` fallback.
+
+    The exclusions are deliberate, not omissions:
+
+    * `usgs_water` has the same single-secret *shape* but its token is optional —
+      a missing one falls back to anonymous access rather than raising, so it does
+      not fit the always-raise `SingleSecretAuth` contract and keeps its own
+      `configure`.
+    * the multi-field / OAuth backends (`nrel`, `cmems`, `earthdata`, `emdat`,
+      `eumetsat`, `jaxa`, `openeo`, `sentinel_hub`, `gee`) resolve more than one
+      field and extend `AbstractAuth` directly by design.
+    """
+
+    #: Backends whose single mandatory secret must resolve through the base.
+    SINGLE_SECRET = frozenset(
+        {"airnow", "firms", "iucn", "openaq", "risk_indicators", "wdpa"}
+    )
+
+    def _auth_path(self, backend: str) -> Path:
+        """Return the one `auth.py` for `backend`, asserting it is unique."""
+        matches = sorted(
+            _ROOT.glob(f"libs/providers/*/src/earthlens/{backend}/auth.py")
+        )
+        assert len(matches) == 1, f"expected one auth.py for {backend}, got {matches}"
+        return matches[0]
+
+    def test_single_secret_backends_were_found(self):
+        """Guard the guard: every named backend resolves to exactly one auth.py."""
+        for backend in sorted(self.SINGLE_SECRET):
+            assert self._auth_path(backend).exists()
+
+    def test_single_secret_backends_extend_the_shared_base(self):
+        """Each single-secret `Auth` subclasses `SingleSecretAuth`, not `AbstractAuth`."""
+        offenders = []
+        for backend in sorted(self.SINGLE_SECRET):
+            tree = ast.parse(self._auth_path(backend).read_text(encoding="utf-8"))
+            bases = {
+                ast.unparse(base)
+                for node in ast.walk(tree)
+                if isinstance(node, ast.ClassDef)
+                for base in node.bases
+            }
+            if not any(base.startswith("SingleSecretAuth[") for base in bases):
+                offenders.append(backend)
+        assert offenders == [], (
+            f"these single-secret backends do not extend SingleSecretAuth, so "
+            f"they carry their own credential ceremony: {offenders}"
+        )
+
+    def test_single_secret_backends_do_not_reimplement_the_env_fallback(self):
+        """None of them still reads `os.environ` — the fallback lives in the base.
+
+        The explicit-or-`os.environ.get` chain that raises when the secret is
+        absent now lives once in `SingleSecretAuth._resolve_credential`. A read of
+        `os.environ` in one of these modules means a hand-rolled copy has crept
+        back in.
+        """
+        offenders = []
+        for backend in sorted(self.SINGLE_SECRET):
+            source = self._auth_path(backend).read_text(encoding="utf-8")
+            for node in ast.walk(ast.parse(source)):
+                if (
+                    isinstance(node, ast.Attribute)
+                    and node.attr == "environ"
+                    and isinstance(node.value, ast.Name)
+                    and node.value.id == "os"
+                ):
+                    offenders.append(backend)
+                    break
+        assert offenders == [], (
+            f"these single-secret backends still read os.environ instead of "
+            f"delegating the fallback to SingleSecretAuth: {offenders}"
+        )

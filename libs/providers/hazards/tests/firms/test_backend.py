@@ -80,7 +80,7 @@ class TestAuthenticate:
         """No api_key= and no env var raises AuthenticationError."""
         monkeypatch.delenv("FIRMS_MAP_KEY", raising=False)
         backend = _unauthed_backend(tmp_path)
-        with pytest.raises(AuthenticationError, match="api_key="):
+        with pytest.raises(AuthenticationError, match="no FIRMS credential"):
             backend.authenticate()
 
     def test_download_lazily_authenticates_from_env(

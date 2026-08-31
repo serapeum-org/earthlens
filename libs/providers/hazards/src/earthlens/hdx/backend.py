@@ -122,7 +122,7 @@ class HDX(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "all",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         hdx_site: str = "prod",
         user_agent: str = "earthlens",

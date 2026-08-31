@@ -175,6 +175,11 @@ lens.download(errors="raise")    # abort on the first failure
 
 `"skip"` is accepted as an alias of `"ignore"`.
 
+A failure of the *service* rather than of one item is exempt from all three: it propagates even under
+`"ignore"`, because continuing would report an upstream outage as every item having no data. On the ECMWF
+backend that is `CadsUnavailableError` — see
+[when a store is throttling](reference/ecmwf/datastores.md#when-a-store-is-throttling).
+
 ### A vector or tabular request exhausts memory
 
 Cap it. `limit=` is an exact cap that stops the work rather than truncating at the end:
@@ -198,10 +203,23 @@ See [Base contracts](reference/base/contracts.md).
 If you omit `path=`, earthlens logs where it wrote:
 
 ```
-No `path` given; download() writes 'chc' output under earthlens-data\chc/ (load() uses a temp dir).
+No `path` given; download() writes 'chc' output under ~/.earthlens/data/chc/ (load() uses a temp dir).
 ```
 
-Pass `path=` to control it.
+An omitted `path=` resolves to the configured output directory — `set_output_dir()`, else `EARTHLENS_DATA_DIR`,
+else `~/.earthlens/data` — and the facade adds a per-source subdirectory. Pass `path=` to control it per call, or
+see [Configuration](reference/configuration.md) to set it once for the whole process.
+
+If you are upgrading and a script that globbed `./earthlens-data/**` now finds nothing, that is why: the default
+moved off the working directory. Pass `path=""` to write to the working directory as before. Nothing was moved for
+you, so files an earlier version wrote are still where it put them.
+
+### Where did my cached downloads go?
+
+Backends that download an archive or index on the way to their output cache it under the shared cache directory —
+`set_cache_dir()`, else `EARTHLENS_CACHE`, else the per-platform user cache — each in its own subdirectory. Nine
+backends used to cache elsewhere (inside your output `path=`, or under `~/.earthlens/cache/`); anything they left
+behind is regenerable and safe to delete. [Configuration](reference/configuration.md) lists the old locations.
 
 ### `download()` returned an object, not file paths
 

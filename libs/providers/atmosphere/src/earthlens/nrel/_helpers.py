@@ -1,7 +1,7 @@
 """Pure, network-light helpers for the NREL backend.
 
 Every function here is stateless and grounded in the live API facts pinned
-under `planning/nrel/captures/nrel-sdk-facts.md`: the point sampler that turns
+under the A1 gate captures: the point sampler that turns
 a bbox into `(lat, lon)` pairs (`point_grid`), the keyed REST CSV URL builder
 (`build_url`), the rate-limited GET honouring the 1 req/s limit
 (`throttled_get`), and the CSV parser that folds an NSRDB PSM v4 / TMY / WIND

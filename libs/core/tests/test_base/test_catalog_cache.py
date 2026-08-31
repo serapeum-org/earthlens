@@ -2,7 +2,7 @@
 
 firms, gdacs, openaq, and overture gained the `(path, mtime_ns)` parse
 cache + `clear_catalog_cache()` helper in M3 of
-`planning/align/catalog-consistency.md`, matching the fdsn / nwp / radar
+the catalog-consistency alignment, matching the fdsn / nwp / radar
 loaders. This checks the cache populates on load and clears on demand.
 """
 

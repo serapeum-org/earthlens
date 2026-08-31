@@ -18,7 +18,7 @@ caller four operations on top:
   reaches a terminal state.
 * :func:`resolve_destination` — return the `destination_uris` of a
   completed task as a list (does *not* auto-download Drive / GCS
-  payloads — that's `L2` in `planning/gee-jobs-tracking-plan.md`).
+  payloads — that's `L2` in the GEE jobs tracking plan).
 
 These mirror :mod:`earthlens.ecmwf.jobs` so a user juggling both
 backends sees the same surface.

@@ -13,12 +13,17 @@ network. The autouse `_block_real_cdsapi` safeguard in
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
+from loguru import logger
 from pydantic import ValidationError
 
-from earthlens.ecmwf import Variable
+from earthlens.core import EarthLens
+from earthlens.ecmwf import ECMWF, Variable
+from earthlens.ecmwf import backend as ecmwf_backend
 from earthlens.ecmwf import constraints as constraints_module
 
 from ._fakes import captured_request
@@ -61,8 +66,10 @@ class TestApi:
         assert isinstance(args[1], dict), (
             f"Second arg must be a request dict, got {type(args[1])}"
         )
-        assert args[2] == str(target), (
-            f"Third arg must equal str(target); got {args[2]!r} vs {str(target)!r}"
+        # The retrieve writes a sidecar that is moved onto `target` on success,
+        # so a failed attempt cannot truncate a good file already there.
+        assert args[2] == f"{target}.part", (
+            f"Third arg must be the sidecar for {target!r}; got {args[2]!r}"
         )
 
     def test_request_carries_required_default_keys(
@@ -178,6 +185,42 @@ class TestApi:
         """Target filename follows <cds_variable>_<cds_dataset>.nc."""
         target = ecmwf_stub._api(pressure_level_var_info)
         assert target.name == "temperature_reanalysis-era5-pressure-levels.nc"
+
+    def test_target_filename_uses_dataset_id_override(self, ecmwf_stub):
+        """A cds_dataset override names the output by dataset_id, not the target.
+
+        Mirrors the GloFAS intermediate stream: the file is named by the
+        requested catalog id so it cannot collide with a sibling config sharing
+        cds_variable + cds_dataset, while the retrieve still targets cds_dataset.
+        """
+        spec = Variable(
+            cds_dataset="reanalysis-era5-single-levels",
+            dataset_id="alias-dataset",
+            cds_variable="2m_temperature",
+            nc_variable="t2m",
+            units="K",
+            product_type=["reanalysis"],
+        )
+        target = ecmwf_stub._api(spec)
+        assert target.name == "2m_temperature_alias-dataset.nc"
+        assert ecmwf_stub.client.retrieve.call_args.args[0] == (
+            "reanalysis-era5-single-levels"
+        ), "retrieve still targets cds_dataset, not the alias id"
+
+    def test_target_filename_falls_back_to_cds_dataset_when_no_dataset_id(
+        self, ecmwf_stub
+    ):
+        """A directly-built spec (dataset_id=None) names the output by cds_dataset."""
+        spec = Variable(
+            cds_dataset="reanalysis-era5-single-levels",
+            cds_variable="2m_temperature",
+            nc_variable="t2m",
+            units="K",
+            product_type=["reanalysis"],
+        )
+        assert spec.dataset_id is None, "a directly-built spec has no dataset_id"
+        target = ecmwf_stub._api(spec)
+        assert target.name == "2m_temperature_reanalysis-era5-single-levels.nc"
 
     def test_variable_spec_requires_cds_dataset(self):
         """Variable cannot be built without cds_dataset."""
@@ -511,6 +554,105 @@ class TestApiMonthly:
 class TestBuildRequest:
     """Tests for :meth:`ECMWF._build_request` (M5 — extracted pure builder)."""
 
+    def test_pressure_level_overrides_the_catalog_level(
+        self, ecmwf_stub, pressure_level_var_info
+    ):
+        """The curated row carries one level; a retrieval may want another."""
+        ecmwf_stub.pressure_level = ["500", "850"]
+        request = ecmwf_stub._build_request(pressure_level_var_info)
+        assert request["pressure_level"] == ["500", "850"]
+
+    def test_the_catalog_level_stands_without_an_override(
+        self, ecmwf_stub, pressure_level_var_info
+    ):
+        """Absent the kwarg the row's own level is what gets requested."""
+        ecmwf_stub.pressure_level = None
+        request = ecmwf_stub._build_request(pressure_level_var_info)
+        assert request["pressure_level"] == ["1000"]
+
+    def test_a_single_level_variable_gains_no_pressure_level(
+        self, ecmwf_stub, single_level_var_info
+    ):
+        """Adding one to a single-level request makes it invalid, not broader."""
+        ecmwf_stub.pressure_level = ["500"]
+        assert "pressure_level" not in ecmwf_stub._build_request(single_level_var_info)
+
+    def test_the_request_does_not_alias_the_override(
+        self, ecmwf_stub, pressure_level_var_info
+    ):
+        """One download builds a request per variable; they must not share a list."""
+        ecmwf_stub.pressure_level = ["500"]
+        request = ecmwf_stub._build_request(pressure_level_var_info)
+        request["pressure_level"].append("MUTATED")
+        assert ecmwf_stub.pressure_level == ["500"], (
+            "editing a request rewrote the override for every later variable; "
+            f"got {ecmwf_stub.pressure_level!r}"
+        )
+
+    def test_the_request_does_not_alias_the_catalog_row(
+        self, ecmwf_stub, pressure_level_var_info
+    ):
+        """The row is cached process-wide, so an edit would outlive the download."""
+        ecmwf_stub.pressure_level = None
+        request = ecmwf_stub._build_request(pressure_level_var_info)
+        request["pressure_level"].append("MUTATED")
+        assert pressure_level_var_info.cds_pressure_level == ["1000"], (
+            "editing a request rewrote the cached catalog row; got "
+            f"{pressure_level_var_info.cds_pressure_level!r}"
+        )
+
+    def test_an_extras_none_opt_out_still_wins_over_the_override(self, ecmwf_stub):
+        """A row that opts out of the key must not have one handed back to it."""
+        var_info = Variable(
+            cds_dataset="reanalysis-era5-pressure-levels",
+            cds_variable="temperature",
+            cds_pressure_level=["1000"],
+            nc_variable="t",
+            units="K",
+            product_type=["reanalysis"],
+            extras={"pressure_level": None},
+        )
+        ecmwf_stub.pressure_level = ["500"]
+        assert "pressure_level" not in ecmwf_stub._build_request(var_info), (
+            "the None opt-out was overridden after the relocation"
+        )
+
+    def test_the_request_does_not_alias_an_extras_value(self, ecmwf_stub):
+        """extras are merged from the row, which is cached for the process."""
+        extras = {"pressure_level": ["1000"]}
+        var_info = Variable(
+            cds_dataset="reanalysis-carra-means",
+            cds_variable="cloud_cover",
+            nc_variable="ccl",
+            units="%",
+            product_type=["reanalysis"],
+            extras=extras,
+        )
+        ecmwf_stub.pressure_level = None
+        request = ecmwf_stub._build_request(var_info)
+        request["pressure_level"].append("MUTATED")
+        assert var_info.extras["pressure_level"] == ["1000"], (
+            "editing a request rewrote the cached row's extras; got "
+            f"{var_info.extras['pressure_level']!r}"
+        )
+
+    def test_it_overrides_a_level_carried_in_extras(self, ecmwf_stub):
+        """The CARRA means rows keep their level in extras, merged after the build."""
+        var_info = Variable(
+            cds_dataset="reanalysis-carra-means",
+            cds_variable="cloud_cover",
+            nc_variable="ccl",
+            units="%",
+            product_type=["reanalysis"],
+            extras={"pressure_level": ["1000"], "level_type": "pressure_levels"},
+        )
+        ecmwf_stub.pressure_level = ["500"]
+        request = ecmwf_stub._build_request(var_info)
+        assert request["pressure_level"] == ["500"], (
+            "extras are merged last, so an override applied before them would be "
+            f"put back to the catalog's level; got {request['pressure_level']!r}"
+        )
+
     def test_returns_dict_with_required_keys(self, ecmwf_stub, single_level_var_info):
         """`_build_request` returns a dict carrying every CDS-required key."""
         request = ecmwf_stub._build_request(single_level_var_info)
@@ -627,4 +769,287 @@ class TestBuildRequest:
         assert request["area"] == [60, -10, 50, 5], (
             f"explicit `extras[area]` should re-introduce the stripped key; "
             f"got {request.get('area')!r}"
+        )
+
+
+class TestNormalizePressureLevel:
+    """Normalization of the `pressure_level=` override."""
+
+    @pytest.mark.parametrize(
+        ("given", "expected"),
+        [
+            (None, None),
+            ("500", ["500"]),
+            (500, ["500"]),
+            (500.0, ["500"]),
+            (["500", "850"], ["500", "850"]),
+            ([500, 850], ["500", "850"]),
+            ([500.0, 850], ["500", "850"]),
+            ((500,), ["500"]),
+        ],
+        ids=[
+            "none",
+            "bare-string",
+            "bare-int",
+            "bare-float",
+            "strings",
+            "integers",
+            "floats",
+            "tuple",
+        ],
+    )
+    def test_it_renders_levels_as_a_list_of_strings(self, given, expected):
+        """hPa reads as a number, so `[500]` is the natural thing to write."""
+        result = ecmwf_backend._normalize_pressure_level(given)
+        assert result == expected, f"Expected {expected!r}, got {result!r}"
+
+    @pytest.mark.parametrize(
+        "given",
+        [True, [True], b"500", bytearray(b"500")],
+        ids=["bool", "bool-in-list", "bytes", "bytearray"],
+    )
+    def test_something_that_only_looks_like_a_number_is_refused(self, given):
+        """A bool is an int subclass and bytes iterate to their byte values."""
+        with pytest.raises(TypeError):
+            ecmwf_backend._normalize_pressure_level(given)
+
+    @pytest.mark.parametrize(
+        ("given", "expected"),
+        [
+            (np.array([500, 850]), ["500", "850"]),
+            (np.int64(500), ["500"]),
+            (np.float64(500.0), ["500"]),
+        ],
+        ids=["array", "int64", "float64"],
+    )
+    def test_numpy_levels_render_like_the_builtins_they_stand_for(
+        self, given, expected
+    ):
+        """An array of levels is a natural thing to hand this."""
+        assert ecmwf_backend._normalize_pressure_level(given) == expected
+
+    @pytest.mark.parametrize(
+        ("given", "expected"),
+        [(" 500 ", ["500"]), ("1e3", ["1000"]), ([" 850 "], ["850"])],
+        ids=["padded", "exponent", "padded-in-list"],
+    )
+    def test_a_level_is_rendered_from_the_number_it_parses_to(self, given, expected):
+        """Both spellings parse; neither matches a level as written."""
+        assert ecmwf_backend._normalize_pressure_level(given) == expected
+
+    def test_a_generator_of_levels_is_accepted(self):
+        """Any ordered iterable will do; a generator is a natural one."""
+        assert ecmwf_backend._normalize_pressure_level(
+            level for level in (500, 850)
+        ) == ["500", "850"]
+
+    def test_a_generator_yielding_nothing_is_refused(self):
+        """The empty case has to survive being spelled lazily."""
+        with pytest.raises(ValueError, match="no levels"):
+            ecmwf_backend._normalize_pressure_level(level for level in ())
+
+    @pytest.mark.parametrize(
+        "given", [float("nan"), float("inf"), [float("nan")], ["inf"]]
+    )
+    def test_a_non_finite_level_is_refused(self, given):
+        """`nan` renders as a string CDS would take and never match."""
+        with pytest.raises(ValueError, match="finite"):
+            ecmwf_backend._normalize_pressure_level(given)
+
+    def test_a_set_is_refused_because_its_order_is_unspecified(self):
+        """Levels reach the request in order; a set would vary between runs."""
+        with pytest.raises(TypeError, match="sequence of levels"):
+            ecmwf_backend._normalize_pressure_level({500, 850})
+
+    @pytest.mark.parametrize("given", [["banana"], [[500]], ["500a"]])
+    def test_a_level_that_is_not_a_number_is_refused(self, given):
+        """Levels are hPa; the store would reject these, but not when skipped."""
+        with pytest.raises(ValueError, match="not a pressure level"):
+            ecmwf_backend._normalize_pressure_level(given)
+
+    @pytest.mark.parametrize(
+        ("given", "expected"),
+        [(12.5, ["12.5"]), (-500, ["-500"]), (range(500, 502), ["500", "501"])],
+        ids=["fractional", "negative", "range"],
+    )
+    def test_any_number_shaped_level_is_kept(self, given, expected):
+        """Plausibility is the store's call; this only checks it is a number."""
+        assert ecmwf_backend._normalize_pressure_level(given) == expected
+
+    @pytest.mark.parametrize("given", [{"a": 1}, {500}, object()])
+    def test_something_that_is_not_a_level_is_refused(self, given):
+        """A mapping would otherwise be reduced to its keys without a word."""
+        with pytest.raises(TypeError, match="sequence of levels"):
+            ecmwf_backend._normalize_pressure_level(given)
+
+    def test_no_levels_at_all_is_refused(self):
+        """`pressure_level: []` is not a valid request, and None means decline."""
+        with pytest.raises(ValueError, match="no levels") as exc_info:
+            ecmwf_backend._normalize_pressure_level([])
+        assert "pass None" in str(exc_info.value), (
+            f"the error should name the way to decline; got: {exc_info.value}"
+        )
+
+
+class _RecordingRetrieve:
+    """Client stub that records each request and writes an empty target."""
+
+    def __init__(self, root):
+        self.root = root
+        self.requests: list[dict] = []
+
+    def retrieve(self, dataset, request, target=None):
+        """Record the request and touch the target the backend asked for."""
+        self.requests.append(request)
+        if target is not None:
+            Path(target).parent.mkdir(parents=True, exist_ok=True)
+            Path(target).write_bytes(b"")
+        return target
+
+
+class TestPressureLevelKwarg:
+    """The `pressure_level=` retrieval override (#42)."""
+
+    def test_a_bare_string_is_accepted(self):
+        """One level is the common case and should not need a list."""
+        backend = ECMWF(
+            start="2020-01-01",
+            end="2020-01-02",
+            variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path="out",
+            pressure_level="500",
+        )
+        assert backend.pressure_level == ["500"]
+
+    def test_it_defaults_to_leaving_the_catalog_alone(self):
+        """No kwarg means every row keeps the level it was curated at."""
+        backend = ECMWF(
+            start="2020-01-01",
+            end="2020-01-02",
+            variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path="out",
+        )
+        assert backend.pressure_level is None
+
+    def test_an_empty_list_is_refused_at_construction(self):
+        """Better to say so than to send `pressure_level: []` to the store."""
+        with pytest.raises(ValueError, match="no levels"):
+            ECMWF(
+                start="2020-01-01",
+                end="2020-01-02",
+                variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+                lat_lim=[0.0, 1.0],
+                lon_lim=[0.0, 1.0],
+                path="out",
+                pressure_level=[],
+            )
+
+    def test_a_row_the_override_cannot_reach_is_logged(
+        self, ecmwf_stub, single_level_var_info
+    ):
+        """Silence would cost a queue slot and return the wrong thing."""
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING")
+        try:
+            ecmwf_stub.pressure_level = ["500"]
+            ecmwf_stub._build_request(single_level_var_info)
+        finally:
+            logger.remove(sink_id)
+        assert any("was not used" in message for message in messages), (
+            f"the skipped override went unreported; logged {messages!r}"
+        )
+
+    def test_a_row_the_override_reaches_is_not_logged(
+        self, ecmwf_stub, pressure_level_var_info
+    ):
+        """The warning must not fire on the case the override is built for."""
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING")
+        try:
+            ecmwf_stub.pressure_level = ["500"]
+            ecmwf_stub._build_request(pressure_level_var_info)
+        finally:
+            logger.remove(sink_id)
+        assert not any("was not used" in message for message in messages), (
+            f"a used override was reported as skipped; logged {messages!r}"
+        )
+
+    def test_it_survives_a_real_download_of_several_variables(self, tmp_path):
+        """Everything else here builds a stub; this proves the real path carries it."""
+        backend = ECMWF(
+            start="2020-01-01",
+            end="2020-01-02",
+            variables={
+                "reanalysis-era5-pressure-levels": ["temperature", "geopotential"]
+            },
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path=tmp_path,
+            skip_constraints=True,
+            pressure_level=[500, 850],
+        )
+        client = _RecordingRetrieve(tmp_path)
+        backend._client_for = lambda endpoint: client
+        backend.download()
+        assert len(client.requests) == 2, (
+            f"expected one retrieve per variable; got {len(client.requests)}"
+        )
+        for request in client.requests:
+            assert request["pressure_level"] == ["500", "850"], (
+                f"the override did not reach the request: {request!r}"
+            )
+        first, second = client.requests
+        assert first["pressure_level"] is not second["pressure_level"], (
+            "two requests of one download share the override list"
+        )
+
+    def test_a_bare_instance_has_the_default(self):
+        """_build_request reads it for every request; __new__ skips __init__."""
+        assert ECMWF.__new__(ECMWF).pressure_level is None
+
+    def test_it_is_refused_on_a_raw_request_passthrough(self):
+        """The passthrough forwards the request verbatim, so it would do nothing."""
+        with pytest.raises(ValueError, match="does not apply when request="):
+            ECMWF(
+                variables={"reanalysis-era5-single-levels": []},
+                request={"variable": ["2m_temperature"]},
+                path="out",
+                pressure_level=["500"],
+            )
+
+    def test_it_reaches_the_backend_through_the_facade(self):
+        """The facade forwards an unknown keyword, so no core change was needed."""
+        lens = EarthLens(
+            data_source="ecmwf",
+            start="2020-01-01",
+            end="2020-01-02",
+            variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path="out",
+            pressure_level=["300"],
+        )
+        assert lens.pressure_level == ["300"], (
+            f"the facade should forward the override; got {lens.pressure_level!r}"
+        )
+
+    def test_a_misspelled_kwarg_still_earns_its_hint(self):
+        """The facade validates against the signature, so the typo hint must survive."""
+        with pytest.raises(TypeError, match="pressure_level") as exc_info:
+            EarthLens(
+                data_source="ecmwf",
+                start="2020-01-01",
+                end="2020-01-02",
+                variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+                lat_lim=[0.0, 1.0],
+                lon_lim=[0.0, 1.0],
+                path="out",
+                presure_level=["300"],
+            )
+        assert "Did you mean" in str(exc_info.value), (
+            f"the hint is what makes the typo recoverable; got: {exc_info.value}"
         )

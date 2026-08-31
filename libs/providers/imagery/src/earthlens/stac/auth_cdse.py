@@ -11,7 +11,7 @@ S3 access-key/secret credentials. Two ways to obtain them:
   password grant when only `CDSE_USERNAME` / `CDSE_PASSWORD` are available.
 
 `s3_credentials` resolves (a) first (kwarg → env). Path (b) is a planned
-fallback (see `planning/stac/stac-completion.md` `G4`); until its token /
+fallback (see the STAC completion plan `G4`); until its token /
 exchange endpoints are pinned, supplying only username/password raises a
 clear `AuthenticationError` naming the dashboard URL.
 """

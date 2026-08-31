@@ -36,8 +36,12 @@ features, not a gridded array. Two consequences follow:
   a feature table.
 - Overture is a **static per-release snapshot** with no temporal axis, so
   `start` / `end` are accepted but ignored. Time is expressed only by the
-  **release** (`yyyy-mm-dd.x`); the SDK auto-targets the newest release
-  when you do not pin one.
+  **release** (`yyyy-mm-dd.x`). When you do not pin one, the newest release
+  is targeted live: the SDK auto-targets it on the default fetch path, and
+  the DuckDB (`where=` / `columns=`) path looks it up from Overture's STAC
+  catalog at `https://stac.overturemaps.org` before building its S3 glob.
+  That is a second endpoint to allow through a proxy or firewall; pin a
+  `release` to skip the lookup entirely.
 
 The output is written as **GeoParquet** by default (which preserves
 Overture's deeply-nested schema — `names`, `categories`, `sources`, … —

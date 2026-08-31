@@ -57,7 +57,7 @@ EarthLens(
     lat_lim=[55.0, 55.5],
     lon_lim=[12.0, 12.5],
     path="atlas_out",
-    cache_dir="/data/gsa_cache",   # default: <path>/_cache/gsa
+    cache_dir="/data/gsa_cache",   # default: <cache_dir()>/solar_wind_atlas
 ).download()
 ```
 

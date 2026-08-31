@@ -3,7 +3,7 @@
 # The higher-resolution European companion to GloFAS (Rhine / Danube / Elbe),
 # on the EWDS store. Request shapes are derived from the live `form.json`
 # (field names + allowed values are authoritative; see
-# `planning/ecmwf/captures/a1_form_efas-*.json`, pinned 2026-08-01). Each family
+# the A1 gate captures, pinned 2026-08-01). Each family
 # keeps `time` (unlike GloFAS) so the hindcast rows carry `time` in `extras`,
 # which skips the request-kind `time` strip. `nc_variable` follows the GloFAS
 # convention (`dis24`/`dis06`) and the exact time/leadtime combos are confirmed
@@ -27,9 +27,17 @@ datasets:
       time: ["00:00"]
       download_format: unarchived
     variables:
+      # The 24-hour discharge product is a fixed 2018-2020 archive on EWDS (the
+      # live forecast discontinued it); the 6-hour product is the current one and
+      # is served through the present. Both verified live 2026-08-15 (nc names
+      # `dis24` / `dis06`, m3 s-1) under the row's leadtime_hour: 24.
       river-discharge-in-the-last-24-hours:
         cds_variable: river_discharge_in_the_last_24_hours
         nc_variable: dis24
+        units: m3 s-1
+      river-discharge-in-the-last-6-hours:
+        cds_variable: river_discharge_in_the_last_6_hours
+        nc_variable: dis06
         units: m3 s-1
 
   efas-historical:

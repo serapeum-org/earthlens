@@ -1,6 +1,6 @@
 [project]
 name = "earthlens"
-version = "0.15.0"
+version = "0.19.0"
 description = "remote sensing package"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -30,12 +30,12 @@ requires-python = ">=3.11,<4"
 # five is conflict-free — the irreconcilable pins only meet if a user asks for
 # two conflicting extras at once, exactly as before the split.
 dependencies = [
-    "earthlens-core ==0.15.0",
-    "earthlens-atmosphere ==0.15.0",
-    "earthlens-ocean ==0.15.0",
-    "earthlens-imagery ==0.15.0",
-    "earthlens-land ==0.15.0",
-    "earthlens-hazards ==0.15.0",
+    "earthlens-core ==0.19.0",
+    "earthlens-atmosphere ==0.19.0",
+    "earthlens-ocean ==0.19.0",
+    "earthlens-imagery ==0.19.0",
+    "earthlens-land ==0.19.0",
+    "earthlens-hazards ==0.19.0",
 ]
 
 
@@ -49,6 +49,7 @@ earthdata = ["earthlens-imagery[earthdata]"]
 ecmwf = ["earthlens-atmosphere[ecmwf]"]
 ecmwf-modern = ["earthlens-atmosphere[ecmwf-modern]"]
 eea_aq = ["earthlens-atmosphere[eea_aq]"]
+eedai = ["earthlens-imagery[eedai]"]
 emdat = ["earthlens-hazards[emdat]"]
 erddap = ["earthlens-ocean[erddap]"]
 eumetsat = ["earthlens-imagery[eumetsat]"]
@@ -80,7 +81,10 @@ worldpop = ["earthlens-land[worldpop]"]
 # own extra on earthlens itself. `argo` (xarray clash with openeo -- see #789)
 # and `osm-pbf` (pyrosm's transitive cykhash dep is sdist-only) stay out; `osm`
 # is included because openeo already pins pandas<3, so ohsome's pandas<3 no
-# longer collides.
+# longer collides. `eedai` stays out deliberately: installing it flips the GEE
+# backend's default `engine="auto"` onto the pyramids-eo reader, which samples
+# and grids differently from Earth Engine, so it is opt-in rather than
+# something `all` turns on under an existing user.
 all = [
     "earthlens[asf]",
     "earthlens[cmems]",
@@ -120,14 +124,17 @@ all = [
 [dependency-groups]
 dev = [
     "nbval >=0.11.0",
+    # psutil: the aggregator's handle-release test counts the process's open
+    # files before and after a run. Deleting the input proves nothing on POSIX,
+    # which permits unlinking an open file, so the descriptor is counted
+    # directly instead; not a runtime dep.
+    "psutil >=5.9",
     # matplotlib: example notebooks plot with it; not a runtime dep.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
-    # runtime dep of earthlens itself. 0.52.0 adopts cleopatra 0.31's RgbBands
-    # in the ArrayGlyph constructor (pyramids #972) and its [viz] extra pulls
-    # cleopatra[tiles] >=0.31.0.
-    "pyramids-gis[viz] >=0.53.0",
+    # runtime dep of earthlens itself.
+    "pyramids-gis[viz] >=0.58.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -142,13 +149,22 @@ dev = [
     # subpackages), and 0.31.0 groups ArrayGlyph's loose rgb /
     # surface_reflectance / cutoff / percentile constructor keywords into an
     # RgbBands object (pyramids 0.52.0's plot path builds on this).
-    "cleopatra >=0.31.0",
+    # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
+    # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
+    # It arrives transitively through pyramids-gis[viz], but an imported package
+    # is declared here rather than relied on to come in sideways.
+    "cleopatra[tiles] >=0.35.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     # mypy: the `mypy` pre-commit hook and the lint.yml `static` job type-check src.
     "mypy >=1.11",
     "pytest >=8.2.2",
     "pytest-cov >=5.0.0",
+    # hypothesis: property-based tests for the pure base helpers (resolve_aoi,
+    # date_windows / split_time) and the frozen extent models. A derandomized
+    # profile (libs/core/tests/base/conftest.py) keeps CI failures reproducible
+    # from the log alone.
+    "hypothesis >=6.100",
     "coverage",
     "build>=1.0.0",
     "twine>=5.0.0",
@@ -157,6 +173,38 @@ dev = [
     "notebook",
     "jupyter",
     "commitizen>=4.8.4",
+    # pyramids-eo: the GEE backend's optional EEDAI reader. It is deliberately
+    # out of the `all` extra (installing it activates engine="auto"), so it is
+    # pulled in here instead -- otherwise the tests that pin its
+    # `from_earthengine` signature would skip everywhere and a 0.x contract
+    # change would only surface on a live run.
+    "pyramids-eo >=0.7.0,<0.8",
+]
+# The eclipse showcase notebooks need the geostationary-imagery pieces of
+# pyramids-eo (read_fci_l1c, the composites, the viewing geometry) plus a few small
+# helpers pyramids-eo does not carry, so they get their own group rather than folding
+# fully into `dev` / `docs`. Run them with `uv sync --group dev --group notebooks`
+# (`dev` supplies the plotting and credential tooling these notebooks also need).
+notebooks = [
+    # pyramids-eo: reads raw MTG FCI granules (read_fci_l1c) and builds the day/night
+    # composites -- true colour, the sun-zenith pair, Rayleigh correction and the
+    # viewing geometry it needs. This replaces the satpy / pyresample / pyspectral
+    # stack the eclipse notebook used to carry. 0.7 is the floor for `rayleigh_correct`,
+    # `solar_zenith_azimuth`, `satellite_zenith_azimuth` and `relative_azimuth`, none of
+    # which exist before it (pyramids-eo#91-93); `sunz_correct` / `sunz_reduce`, also
+    # used here, shipped earlier in 0.6.0 (pyramids-eo#86) but the other four still set
+    # the floor. Also declared, at the same version, in `dev` -- see the comment there.
+    "pyramids-eo >=0.7.0,<0.8",
+    # scipy: feathers the disc edge and softens the limb (ndimage.binary_erosion /
+    # gaussian_filter).
+    "scipy >=1.11",
+    # imageio-ffmpeg: the geometry notebook calls get_ffmpeg_exe() to encode its
+    # clip; it was only ever present transitively.
+    "imageio-ffmpeg >=0.5",
+    # python-dotenv: the eclipse notebook loads its EUMETSAT credentials from the
+    # repo-root .env, so `uv sync --group dev --group notebooks` has to supply it --
+    # `dev` does not, and the `docs` / `notebook` groups are a different profile.
+    "python-dotenv >=1.0",
 ]
 docs = [
     "mkdocs >=1.5.3",
@@ -173,10 +221,22 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.53.0",
-    "cleopatra >=0.31.0",
+    "pyramids-gis[viz] >=0.58.0",
+    # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
+    # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
+    # It arrives transitively through pyramids-gis[viz], but an imported package
+    # is declared here rather than relied on to come in sideways.
+    "cleopatra[tiles] >=0.35.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
+    # scipy: the satellite showcase blurs the logo's drop shadow with
+    # ndimage.gaussian_filter. Also in `notebooks`, for the eclipse notebooks --
+    # but that group carries the heavier geostationary stack this notebook does not
+    # need, so it must not be the only place these are declared.
+    "scipy >=1.11",
+    # imageio-ffmpeg: get_ffmpeg_exe() supplies the encoder every clip is
+    # written with, so the docs build needs it to execute the notebook.
+    "imageio-ffmpeg >=0.5",
 ]
 
 notebook = [
@@ -206,6 +266,11 @@ packages = []
 [tool.ruff]
 line-length = 88
 target-version = "py311"  # requires-python floors at 3.11
+# ruff skips dot-prefixed directories by default, so the CI helper scripts were
+# invisible to a repo-wide `ruff check .` even though they gate the test suite.
+# mypy names them individually for the same reason.
+extend-include = [".github/scripts/*.py"]
+force-exclude = false
 
 [tool.ruff.format]
 # black had skip-string-normalization = true → preserve existing quotes.
@@ -269,6 +334,11 @@ files = [
     "libs/providers/imagery/src/earthlens",
     "libs/providers/land/src/earthlens",
     "libs/providers/hazards/src/earthlens",
+    # CI helpers: not shipped in any distribution, but they gate the test
+    # suite, so a type error there fails runs rather than a user's import.
+    # Named individually because mypy skips dot-prefixed directories.
+    ".github/scripts/assert_tests_ran.py",
+    ".github/scripts/assert_audit_ran.py",
 ]
 warn_return_any = true
 warn_unused_configs = false

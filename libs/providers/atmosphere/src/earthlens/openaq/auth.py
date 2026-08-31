@@ -1,6 +1,6 @@
 """Credentials and API-key resolution for the OpenAQ backend.
 
-Hosts :class:`OpenaqAuth`, an :class:`earthlens.base.AbstractAuth`
+Hosts :class:`OpenaqAuth`, an :class:`earthlens.base.SingleSecretAuth`
 subclass that resolves a single OpenAQ **`X-API-Key`** from, in
 priority order, an explicit `api_key=` argument or the
 `OPENAQ_API_KEY` environment variable. OpenAQ v3 requires a (free)
@@ -13,10 +13,11 @@ The shape:
 
 * :class:`OpenaqCredentials` is a frozen pydantic value object
   carrying the optional API key as a :class:`pydantic.SecretStr`.
-* :class:`OpenaqAuth` binds those credentials and resolves the key in
-  :meth:`OpenaqAuth.configure` — explicit key first, then the
-  `OPENAQ_API_KEY` env var, then a clear :class:`AuthenticationError`
-  naming the free-registration URL (never an interactive prompt).
+* :class:`OpenaqAuth` binds those credentials and lets the shared
+  :meth:`earthlens.base.SingleSecretAuth.configure` resolve the key —
+  explicit key first, then the `OPENAQ_API_KEY` env var, then a clear
+  :class:`AuthenticationError` naming the free-registration URL (never
+  an interactive prompt).
 * `configure()` is idempotent — a second call after
   :meth:`OpenaqAuth.is_authenticated` returns `True` short-circuits,
   so it is safe to call from long-lived workers.
@@ -28,12 +29,10 @@ property and attached as the `X-API-Key` header by
 
 from __future__ import annotations
 
-import os
-
 from pydantic import BaseModel, ConfigDict, SecretStr
 
-from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
+from earthlens.base.auth import SingleSecretAuth
 
 #: Where a user registers for a free OpenAQ API key.
 _REGISTER_URL = "https://explore.openaq.org/register"
@@ -90,12 +89,13 @@ class OpenaqCredentials(BaseModel):
     api_key: SecretStr | None = None
 
 
-class OpenaqAuth(AbstractAuth[OpenaqCredentials]):
+class OpenaqAuth(SingleSecretAuth[OpenaqCredentials]):
     """Resolve and hold the OpenAQ API key.
 
-    Implements the :class:`earthlens.base.AbstractAuth` contract for a
-    single-secret backend. Construction does not touch the
-    environment; :meth:`configure` performs the resolution and is
+    Implements the :class:`earthlens.base.SingleSecretAuth` contract
+    for a single-secret backend: it declares its env var and provider
+    name and supplies `_explicit_credential` / `_connect`, while the
+    inherited :meth:`configure` performs the resolution and is
     idempotent. After a successful `configure()`, the key is available
     via the :attr:`api_key` property for the HTTP client to attach as
     the `X-API-Key` header.
@@ -124,46 +124,23 @@ class OpenaqAuth(AbstractAuth[OpenaqCredentials]):
             ```
     """
 
-    def __init__(self, credentials: OpenaqCredentials) -> None:
-        """Store credentials; does not resolve the key yet.
+    ENV_VARS = ("OPENAQ_API_KEY",)
+    PROVIDER = "OpenAQ"
+    CREDENTIAL_ARG = "api_key"
+    CREDENTIAL_HINT = f"Register a free key at {_REGISTER_URL}."
+    AUTH_ERROR = AuthenticationError
 
-        Args:
-            credentials: The :class:`OpenaqCredentials` value object
-                carrying the optional API key.
-        """
-        super().__init__(credentials)
-        self._configured = False
-        self._key: str | None = None
+    #: The resolved key, set by `_connect`; `None` until `configure` runs.
+    _key: str | None = None
 
-    def configure(self) -> None:
-        """Resolve the API key so subsequent requests can authenticate.
+    def _explicit_credential(self) -> str | None:
+        """Return the explicit `api_key` off the credentials, if any."""
+        api_key = self._creds.api_key
+        return api_key.get_secret_value() if api_key is not None else None
 
-        Idempotent — short-circuits when :meth:`is_authenticated`
-        already returns `True`. On the first call, resolves the key
-        in this order: the explicit `api_key` on the credentials, then
-        the `OPENAQ_API_KEY` environment variable.
-
-        Raises:
-            AuthenticationError: When neither source supplies a key.
-                The message names the `api_key=` argument, the
-                `OPENAQ_API_KEY` env var, and the free-registration
-                URL — it never blocks on an interactive prompt.
-        """
-        if self.is_authenticated():
-            return
-        key = (
-            self._creds.api_key.get_secret_value()
-            if self._creds.api_key is not None
-            else os.environ.get("OPENAQ_API_KEY")
-        )
-        if not key:
-            raise AuthenticationError(
-                "no OpenAQ API key available: pass api_key= to OpenAQ(...) "
-                "or set the OPENAQ_API_KEY environment variable. Register a "
-                f"free key at {_REGISTER_URL}."
-            )
-        self._key = key
-        self.mark_configured()
+    def _connect(self, credential: str) -> None:
+        """Store the resolved key for the `api_key` property to read back."""
+        self._key = credential
 
     @property
     def api_key(self) -> str:

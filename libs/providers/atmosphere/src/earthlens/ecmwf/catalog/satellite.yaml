@@ -2,7 +2,7 @@
 #
 # High-value drought / hydrology satellite CDRs. Request shapes + valid combos
 # are pinned from the live constraints.json
-# (`planning/ecmwf/captures/a1_form_satellite-*.json`, 2026-08-01). The `type`
+# (the A1 gate captures, 2026-08-01). The `type`
 # axis is the ESA-CCI sensor/record/version selector, carried in `extras`. The
 # response is a zip-of-NetCDF (unpacked by the C3 output-format handler); there
 # is no `data_format` choice (dropped per-row). No time-of-day (`satellite_cdr`
@@ -145,7 +145,7 @@ datasets:
       xco2:
         cds_variable: xco2
         nc_variable: xco2
-        units: unknown
+        units: '1'
   satellite-cloud-properties:
     endpoint: cds
     request_kind: satellite_cdr
@@ -203,8 +203,8 @@ datasets:
         units: unknown
       outgoing-longwave-radiation:
         cds_variable: outgoing_longwave_radiation
-        nc_variable: outgoing_longwave_radiation
-        units: unknown
+        nc_variable: olr
+        units: W m-2
       outgoing-shortwave-radiation:
         cds_variable: outgoing_shortwave_radiation
         nc_variable: outgoing_shortwave_radiation
@@ -435,7 +435,7 @@ datasets:
       xch4:
         cds_variable: xch4
         nc_variable: xch4
-        units: unknown
+        units: '1'
   satellite-ocean-colour:
     endpoint: cds
     request_kind: satellite_cdr
@@ -499,6 +499,11 @@ datasets:
     variables:
       all:
         cds_variable: all
+        # NOT hydrated: the bulk fill paired this row's pseudo-slug `all` with
+        # `num_covered_hours`, an auxiliary coverage counter, because it was the
+        # only unmatched data variable in the probe. That is a precipitation CDR,
+        # so aggregate= would have reduced the hours-covered field and written it
+        # out as rainfall. Left as a placeholder pending a real per-variable probe.
         nc_variable: all
         units: unknown
   satellite-precipitation-microwave-infrared:
@@ -577,7 +582,7 @@ datasets:
       sea-ice-thickness:
         cds_variable: sea_ice_thickness
         nc_variable: sea_ice_thickness
-        units: unknown
+        units: m
   satellite-sea-level-global:
     endpoint: cds
     request_kind: satellite_cdr
@@ -652,12 +657,16 @@ datasets:
     variables:
       surface-upwelling-shortwave-flux:
         cds_variable: surface_upwelling_shortwave_flux
-        nc_variable: surface_upwelling_shortwave_flux
-        units: unknown
+        nc_variable: SRS
+        units: W/m^2
+        extras:
+          product_family: [clara_a2]
       surface-upwelling-longwave-flux:
         cds_variable: surface_upwelling_longwave_flux
-        nc_variable: surface_upwelling_longwave_flux
-        units: unknown
+        nc_variable: SOL
+        units: W m-2
+        extras:
+          product_family: [clara_a2]
       surface-downwelling-shortwave-flux:
         cds_variable: surface_downwelling_shortwave_flux
         nc_variable: surface_downwelling_shortwave_flux

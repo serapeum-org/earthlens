@@ -1,6 +1,6 @@
 # WRI Aqueduct Global Flood Analyzer (2015) — riverine flood-risk data by admin
 # unit, served publicly by WRI's own file host (CC-BY-4.0, no auth). Pinned live
-# 2026-08-09; see planning/flood-risk/captures/a1-hydroshare-findings-2026-08-09.md.
+# 2026-08-09; see the A1 gate captures.
 #
 # Each `admin_levels:` row is one shapefile (253 countries / 4647 states / 230
 # river basins, verified live). The per-unit attributes are a {indicator}{year}_{scenario}_{rp}

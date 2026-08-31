@@ -13,6 +13,8 @@ from earthlens.gee import (
     Band,
     Cadence,
     Catalog,
+    CloudMask,
+    CollectionFilter,
     Dataset,
     EarthEngineAuth,
     create_feature,
@@ -22,6 +24,8 @@ from earthlens.gee import (
 _EXPECTED_EXPORTS = {
     "GEE",
     "AuthenticationError",
+    "CloudMask",
+    "CollectionFilter",
     "Catalog",
     "Dataset",
     "Band",
@@ -63,6 +67,13 @@ class TestPublicSurface:
         assert EarthEngineAuth.__module__ == "earthlens.gee.auth"
         for cls in (Catalog, Dataset, Band, Cadence):
             assert cls.__module__ == "earthlens.gee.catalog", cls
+
+    def test_type_aliases_are_reexported_from_backend(self):
+        """`CloudMask` / `CollectionFilter` are the backend's callable aliases."""
+        from earthlens.gee import backend
+
+        assert CloudMask is backend.CloudMask
+        assert CollectionFilter is backend.CollectionFilter
 
     def test_catalog_path_points_at_the_bundled_catalog_dir(self):
         """`CATALOG_PATH` is the bundled `catalog/` directory and exists."""

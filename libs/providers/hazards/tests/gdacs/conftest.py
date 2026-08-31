@@ -12,6 +12,7 @@ from collections.abc import Iterator
 from typing import Any, Callable
 
 import pytest
+import requests
 
 
 def _make_feature(
@@ -83,15 +84,24 @@ def _make_payload(features: list[dict[str, Any]] | None = None) -> dict[str, Any
 class _FakeResponse:
     """Stand-in for a `requests.Response` returning a canned payload."""
 
-    def __init__(self, payload: dict[str, Any], status_error: Exception | None):
+    def __init__(
+        self,
+        payload: dict[str, Any],
+        status_error: Exception | None,
+        status_code: int = 200,
+    ):
         self._payload = payload
         self._status_error = status_error
-        self.status_code = 200
+        self.status_code = status_code
         self.headers: dict[str, str] = {}
 
     def raise_for_status(self) -> None:
         if self._status_error is not None:
             raise self._status_error
+        if self.status_code >= 400:
+            # Neutral label (the response carries the real status_code, which is
+            # what gdacs_http_status reads first) so it is never mis-labelled.
+            raise requests.HTTPError(f"{self.status_code} HTTP Error", response=self)
 
     def json(self) -> dict[str, Any]:
         return self._payload
@@ -108,12 +118,13 @@ class _FakeGdacs:
         self.calls: list[dict[str, Any]] = []
         self.payload: dict[str, Any] = _make_payload()
         self.status_error: Exception | None = None
+        self.status_code: int = 200
 
     def __call__(self, url: str, **kwargs: Any) -> _FakeResponse:
         entry: dict[str, Any] = {"url": url}
         entry.update(kwargs)
         self.calls.append(entry)
-        return _FakeResponse(self.payload, self.status_error)
+        return _FakeResponse(self.payload, self.status_error, self.status_code)
 
     def set_payload(self, payload: dict[str, Any]) -> None:
         """Pin the payload the next SEARCH call returns."""
@@ -122,6 +133,16 @@ class _FakeGdacs:
     def set_status_error(self, error: Exception) -> None:
         """Make `raise_for_status` raise the given error (HTTP failure)."""
         self.status_error = error
+
+    def set_retry_status(self, code: int) -> None:
+        """Return this HTTP status on every call, so the client retry loop engages.
+
+        Unlike `set_status_error` (which raises only from `raise_for_status`, so
+        the response looks like a `200` to the client and is never retried), this
+        sets the real `status_code`, so a code in the client's `status_forcelist`
+        drives the actual retry path.
+        """
+        self.status_code = code
 
 
 @pytest.fixture

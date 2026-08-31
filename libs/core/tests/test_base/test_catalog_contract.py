@@ -4,7 +4,7 @@ Every backend catalog must chain to `super().model_post_init()` so the
 base `catalog` field is populated from `get_catalog()`. This guards
 against a backend overriding `model_post_init` and silently leaving
 `catalog` empty (the H2 regression in
-`planning/align/catalog-consistency.md`).
+the catalog-consistency alignment).
 """
 
 from __future__ import annotations

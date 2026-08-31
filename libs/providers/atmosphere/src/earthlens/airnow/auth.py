@@ -1,6 +1,6 @@
 """Credentials and API-key resolution for the AirNow backend.
 
-Hosts `AirnowAuth`, an `earthlens.base.AbstractAuth` subclass that
+Hosts `AirnowAuth`, an `earthlens.base.SingleSecretAuth` subclass that
 resolves a single AirNow API key from, in priority order, an explicit
 `api_key=` argument or the `AIRNOW_API_KEY` environment variable. The
 AirNow `/aq/data/` service requires a free key (registered at
@@ -12,10 +12,11 @@ The shape:
 
 * `AirnowCredentials` is a frozen pydantic value object carrying the
   optional API key as a `pydantic.SecretStr`.
-* `AirnowAuth` binds those credentials and resolves the key in
-  `AirnowAuth.configure` — explicit key first, then the
-  `AIRNOW_API_KEY` env var, then a clear `AuthenticationError` naming
-  the free-registration URL (never an interactive prompt).
+* `AirnowAuth` binds those credentials and lets the shared
+  `earthlens.base.SingleSecretAuth.configure` resolve the key — explicit
+  key first, then the `AIRNOW_API_KEY` env var, then a clear
+  `AuthenticationError` naming the free-registration URL (never an
+  interactive prompt).
 * `configure()` is idempotent — a second call after
   `AirnowAuth.is_authenticated` returns `True` short-circuits.
 
@@ -26,12 +27,10 @@ and attached as the `API_KEY` query argument by
 
 from __future__ import annotations
 
-import os
-
 from pydantic import BaseModel, ConfigDict, SecretStr
 
-from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
+from earthlens.base.auth import SingleSecretAuth
 
 #: Where a user registers for a free AirNow API key.
 _REGISTER_URL = "https://docs.airnowapi.org/account/request/"
@@ -86,15 +85,16 @@ class AirnowCredentials(BaseModel):
     api_key: SecretStr | None = None
 
 
-class AirnowAuth(AbstractAuth[AirnowCredentials]):
+class AirnowAuth(SingleSecretAuth[AirnowCredentials]):
     """Resolve and hold the AirNow API key.
 
-    Implements the `earthlens.base.AbstractAuth` contract for a
-    single-secret backend. Construction does not touch the environment;
-    `configure` performs the resolution and is idempotent. After a
-    successful `configure()`, the key is available via the `api_key`
-    property for the HTTP client to attach as the `API_KEY` query
-    argument.
+    Implements the `earthlens.base.SingleSecretAuth` contract for a
+    single-secret backend: it declares its env var and provider name and
+    supplies `_explicit_credential` / `_connect`, while the inherited
+    `configure` performs the explicit → env → raise → memoise resolution.
+    Construction does not touch the environment; `configure` is idempotent.
+    After a successful `configure()`, the key is available via the `api_key`
+    property for the HTTP client to attach as the `API_KEY` query argument.
 
     The class is a context manager (inherited from `AbstractAuth`):
     `with AirnowAuth(creds) as auth: ...` calls `configure()` on enter
@@ -120,46 +120,23 @@ class AirnowAuth(AbstractAuth[AirnowCredentials]):
             ```
     """
 
-    def __init__(self, credentials: AirnowCredentials) -> None:
-        """Store credentials; does not resolve the key yet.
+    ENV_VARS = ("AIRNOW_API_KEY",)
+    PROVIDER = "AirNow"
+    CREDENTIAL_ARG = "api_key"
+    CREDENTIAL_HINT = f"Register a free key at {_REGISTER_URL}."
+    AUTH_ERROR = AuthenticationError
 
-        Args:
-            credentials: The `AirnowCredentials` value object carrying
-                the optional API key.
-        """
-        super().__init__(credentials)
-        self._configured = False
-        self._key: str | None = None
+    #: The resolved key, set by `_connect`; `None` until `configure` runs.
+    _key: str | None = None
 
-    def configure(self) -> None:
-        """Resolve the API key so subsequent requests can authenticate.
+    def _explicit_credential(self) -> str | None:
+        """Return the explicit `api_key` off the credentials, if any."""
+        api_key = self._creds.api_key
+        return api_key.get_secret_value() if api_key is not None else None
 
-        Idempotent — short-circuits when `is_authenticated` already
-        returns `True`. On the first call, resolves the key in this
-        order: the explicit `api_key` on the credentials, then the
-        `AIRNOW_API_KEY` environment variable.
-
-        Raises:
-            AuthenticationError: When neither source supplies a key. The
-                message names the `api_key=` argument, the
-                `AIRNOW_API_KEY` env var, and the free-registration URL —
-                it never blocks on an interactive prompt.
-        """
-        if self.is_authenticated():
-            return
-        key = (
-            self._creds.api_key.get_secret_value()
-            if self._creds.api_key is not None
-            else os.environ.get("AIRNOW_API_KEY")
-        )
-        if not key:
-            raise AuthenticationError(
-                "no AirNow API key available: pass api_key= to AirNow(...) "
-                "or set the AIRNOW_API_KEY environment variable. Register a "
-                f"free key at {_REGISTER_URL}."
-            )
-        self._key = key
-        self.mark_configured()
+    def _connect(self, credential: str) -> None:
+        """Store the resolved key for the `api_key` property to read back."""
+        self._key = credential
 
     @property
     def api_key(self) -> str:

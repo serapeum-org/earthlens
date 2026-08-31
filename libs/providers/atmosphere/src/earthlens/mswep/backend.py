@@ -181,7 +181,7 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "daily",
         fmt: str = "%Y-%m-%d",
-        path: Path | str = "",
+        path: Path | str | None = None,
         *,
         product: str = "mswep",
         variant: str | None = None,

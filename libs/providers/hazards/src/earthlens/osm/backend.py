@@ -60,13 +60,18 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.base.http import DEFAULT_TIMEOUT, HttpClient
+from earthlens.config import cache_dir
 from earthlens.osm._helpers import (
     LicenseWarning,
+    OhsomeResponseError,
     OhsomeUnavailableError,
     bbox_swne,
     bbox_wsen,
     empty_fc,
+    ohsome_body_preview,
+    ohsome_error_response,
     ohsome_http_status,
+    ohsome_response_is_non_json,
     overpy_to_gdf,
     to_fc,
 )
@@ -93,11 +98,19 @@ ODBL_NOTICE = (
     "ODbL when redistributing."
 )
 
-#: Default on-disk cache directory for fetched Geofabrik `.osm.pbf` extracts
-#: (`G13`). A cross-run user cache (mirroring the cmip6 resolver's location) so
-#: a re-run reuses a previously-downloaded extract regardless of the output
-#: `path`. Overridable via the backend's `cache_dir=` argument.
-DEFAULT_PBF_CACHE_DIR = Path.home() / ".earthlens" / "cache" / "osm_pbf"
+
+def default_pbf_cache_dir() -> Path:
+    """The directory `.osm.pbf` extracts are cached in when none is given.
+
+    Resolved per call from the shared earthlens cache directory
+    (`set_cache_dir()` / `EARTHLENS_CACHE`), so redirecting that moves the
+    extracts with it.
+
+    Returns:
+        Path: `<cache_dir()>/osm_pbf`.
+    """
+    return cache_dir() / "osm_pbf"
+
 
 FileFormat = Literal["geojson", "gpkg"]
 
@@ -205,7 +218,7 @@ class OSM(AbstractDataSource):
         start: str | None = None,
         end: str | None = None,
         temporal_resolution: str = "all",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         query: str | None = None,
         filter: str | None = None,
@@ -274,7 +287,8 @@ class OSM(AbstractDataSource):
                 or `"pyosmium"` (streaming, for planet-scale extracts). Ignored
                 by the `overpass` / `ohsome` protocols.
             cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.
-                `None` uses `DEFAULT_PBF_CACHE_DIR` (a cross-run user cache).
+                `None` uses `default_pbf_cache_dir()` (a cross-run user cache
+                under the shared earthlens cache directory).
 
         Raises:
             TypeError: If `variables` is a mapping rather than a list / string
@@ -312,7 +326,7 @@ class OSM(AbstractDataSource):
         self._max_bbox_deg2 = max_bbox_deg2
         self._region = region
         self._engine: Engine = engine
-        self._cache_dir = Path(cache_dir) if cache_dir else DEFAULT_PBF_CACHE_DIR
+        self._cache_dir_arg = cache_dir
         # Built on first use and reused, so `MIN_REQUEST_INTERVAL` actually
         # paces successive queries: the interval is enforced from a timestamp
         # the client carries, which a per-query client would always reset.
@@ -333,6 +347,20 @@ class OSM(AbstractDataSource):
         # forwards its default cadence, so the attribute never misrepresents a
         # temporal cadence the backend does not have.
         self.temporal_resolution = "all"
+
+    @property
+    def _cache_dir(self) -> Path:
+        """The directory `.osm.pbf` extracts are cached in.
+
+        Resolved per call, so a later `set_cache_dir()` moves the cache the same
+        way it does for the other backends that hang off the shared directory.
+
+        Returns:
+            Path: The `cache_dir=` argument, else `default_pbf_cache_dir()`.
+        """
+        if self._cache_dir_arg:
+            return Path(self._cache_dir_arg)
+        return default_pbf_cache_dir()
 
     def _check_input_dates(
         self,
@@ -601,12 +629,13 @@ class OSM(AbstractDataSource):
         gives the SDK's session a urllib3 `Retry` (`MAX_OHSOME_RETRIES` retries,
         exponential `OHSOME_BACKOFF_FACTOR` growth, `Retry-After` honoured) so a
         `429`/`5xx` throttle is retried with backoff — matching the repo-wide
-        `HttpClient`. A `403` (and any leftover `429` after the retries) is *not*
-        a transient error on this public, keyless endpoint, so it is turned into
-        a clear, typed `OhsomeUnavailableError` (via `_raise_ohsome_unavailable`)
-        instead of the SDK's opaque failure — which exposes the status
-        inconsistently, sometimes as an `OhsomeException` and sometimes as a bare
-        leaked `JSONDecodeError`.
+        `HttpClient`. Any remaining failure is turned into a clear, typed error
+        (via `_reraise_ohsome_error`, which logs the recovered status /
+        `Content-Type` / body preview) instead of the SDK's opaque failure: a
+        `403` / `429` throttle becomes an `OhsomeUnavailableError`, and any other
+        non-JSON body (a rate-limit / maintenance / error page or a redirect)
+        becomes an `OhsomeResponseError` — so a decoder error never stands in for
+        "the server said no" (`#930`).
 
         Args:
             query_id: The named-query id (for logging).
@@ -619,8 +648,11 @@ class OSM(AbstractDataSource):
         Raises:
             ImportError: If `ohsome` is not installed (`earthlens[osm]`).
             OhsomeUnavailableError: If `api.ohsome.org` blocks/throttles the
-                request with a `403` (or a `429` outlasting the retries) — a
-                public-endpoint denial, not a credential error.
+                request with a `403` / `429`, or is unavailable with a `5xx`
+                outlasting the retries — a public-endpoint denial/outage, not a
+                credential error.
+            OhsomeResponseError: If `api.ohsome.org` returns any other non-JSON
+                body (a rate-limit / maintenance / error page or a redirect).
             ValueError: If no `start` (and `time`) was supplied — ohsome
                 requires a time.
         """
@@ -663,10 +695,11 @@ class OSM(AbstractDataSource):
                 endpoint="elements/geometry",
             )
             gdf = response.as_dataframe()
-        # Broad by design: classify a throttle/block into a typed error, else
-        # re-raise the original failure unchanged.
+        # Broad by design: convert a throttle/block or a non-JSON response into a
+        # clear typed error (logging the recovered evidence), else re-raise the
+        # original failure unchanged.
         except Exception as exc:  # noqa: BLE001
-            self._raise_ohsome_unavailable(exc)
+            self._reraise_ohsome_error(exc)
             raise
         # `as_dataframe()` carries a (@osmId, @snapshotTimestamp) MultiIndex;
         # reset it so the history fields become ordinary columns on the FC.
@@ -674,26 +707,67 @@ class OSM(AbstractDataSource):
             gdf = gdf.reset_index()
         return to_fc(gdf)
 
-    def _raise_ohsome_unavailable(self, exc: Exception) -> None:
-        """Re-raise an ohsome throttle/block as a typed `OhsomeUnavailableError`.
+    def _reraise_ohsome_error(self, exc: Exception) -> None:
+        """Convert an ohsome SDK failure into a clear, typed, logged error.
 
-        Inspects the SDK failure for an HTTP status (`ohsome_http_status`
-        recovers it whether the SDK wrapped the failure into an `OhsomeException`
-        or leaked a bare `JSONDecodeError`). A `403`, or a `429`
-        that outlived the retries, becomes a clear, actionable
-        `OhsomeUnavailableError`; any other failure — including a `401`, which on
-        this keyless endpoint signals a real auth-contract change, not a
-        throttle — is left for the caller to re-raise unchanged so a genuine
-        regression still surfaces loudly.
+        The raw SDK failure discards what the server actually said — a decoder
+        error is the wrong abstraction for "the response was not JSON" (`#930`).
+        This recovers the HTTP status, `Content-Type`, and first bytes of the
+        body from the exception chain (whether the SDK wrapped the failure into
+        an `OhsomeException` or leaked a bare `JSONDecodeError`), logs them at the
+        point of failure, and then raises the right typed error:
+
+        * a `403`, or a `429` that outlived the retries, becomes an
+          `OhsomeUnavailableError` (a public-endpoint throttle/block);
+        * a `5xx` that outlived the retries becomes an `OhsomeUnavailableError`
+          too — a transient server-side outage; the SDK can otherwise die with a
+          raw `KeyError: 'message'` on a `5xx` body (`#790`);
+        * any other non-JSON body — a rate-limit / maintenance / error page, an
+          empty body, or a redirect to a landing page — becomes an
+          `OhsomeResponseError` carrying the recovered evidence.
+
+        Anything else (a transport error, or a non-`5xx` ohsome error served
+        *as* JSON — including a `401`, which on this keyless endpoint signals a
+        real auth-contract change, not a throttle) is left for the caller to
+        re-raise unchanged, so a genuine regression still surfaces loudly.
 
         Args:
             exc: The exception raised by the ohsome SDK call.
 
         Raises:
-            OhsomeUnavailableError: When the status is a public-endpoint
-                throttle/block (`403` / `429`).
+            OhsomeUnavailableError: On a public-endpoint throttle/block (`403` /
+                `429`) or a transient server-side outage (`5xx`).
+            OhsomeResponseError: On any other non-JSON response body.
         """
         status = ohsome_http_status(exc)
+        non_json = ohsome_response_is_non_json(exc)
+        is_throttle = status in (403, 429)
+        is_server_error = status is not None and 500 <= status < 600
+        if not is_throttle and not is_server_error and not non_json:
+            # A transport error (no status), or a genuine ohsome error already
+            # served as readable JSON (including a JSON `401`) — nothing to add;
+            # let the caller re-raise the original, as quietly as before.
+            return
+
+        response = ohsome_error_response(exc)
+        headers = getattr(response, "headers", None)
+        content_type = headers.get("Content-Type") if headers is not None else None
+        body_preview = ohsome_body_preview(response)
+        status_shown = status if status is not None else "unknown"
+        body_note = (
+            f"first {len(body_preview)} body chars: {body_preview!r}"
+            if body_preview is not None
+            else "no body captured"
+        )
+        # Log the evidence the raw decoder error discards, at the point of failure
+        # — visible even when the caller skips the throttle case (`#930`). Only the
+        # converted (throttle / non-JSON) branches reach here, so a JSON-served
+        # error propagates without a stray warning.
+        logger.warning(
+            "ohsome elements/geometry request failed: "
+            f"HTTP {status_shown}, Content-Type {content_type!r}, {body_note}"
+        )
+
         if status == 403:
             raise OhsomeUnavailableError(
                 "ohsome refused the elements/geometry request with HTTP 403. "
@@ -703,6 +777,8 @@ class OSM(AbstractDataSource):
                 "later, shrink the bbox or time window, or try from a different "
                 "network.",
                 status_code=status,
+                content_type=content_type,
+                body_preview=body_preview,
             ) from exc
         if status == 429:
             raise OhsomeUnavailableError(
@@ -711,7 +787,39 @@ class OSM(AbstractDataSource):
                 "rate-limiting this client; wait before retrying, or reduce the "
                 "request frequency and size.",
                 status_code=status,
+                content_type=content_type,
+                body_preview=body_preview,
             ) from exc
+        if is_server_error:
+            # A 5xx that outlived the retries — a server-side outage. The SDK can
+            # die with a raw `KeyError: 'message'` here (its error handler assumes
+            # a `"message"` field the 5xx body lacks, `#790`), so surface a clear
+            # service-unavailable error carrying the status instead.
+            raise OhsomeUnavailableError(
+                "ohsome could not serve the elements/geometry request: HTTP "
+                f"{status_shown} after automatic retries. api.ohsome.org is a "
+                "public endpoint that load-sheds its compute-heavy extraction "
+                "path under load, so a 5xx is usually a transient server-side "
+                "condition (load-shedding or a gateway error), not typically a "
+                "problem with the request. Retry later, or check the ohsome "
+                "service status.",
+                status_code=status,
+                content_type=content_type,
+                body_preview=body_preview,
+            ) from exc
+        # Not a throttle or a server error, so — given the guard above — the body
+        # was not JSON.
+        raise OhsomeResponseError(
+            "ohsome returned a non-JSON response for the elements/geometry "
+            f"request (HTTP {status_shown}, Content-Type {content_type!r}); "
+            f"{body_note}. api.ohsome.org served an unparseable body — typically "
+            "a rate-limit, maintenance, or error page, or a redirect to a landing "
+            "page — rather than the expected GeoJSON. Retry later, or check the "
+            "ohsome service status.",
+            status_code=status,
+            content_type=content_type,
+            body_preview=body_preview,
+        ) from exc
 
     def _fetch_pbf(self, query_id: str, dataset: Dataset) -> FeatureCollection:
         """Fetch one `pbf` layer: resolve region, fetch-cache, read, bbox-clip.
@@ -884,3 +992,31 @@ class OSM(AbstractDataSource):
         out_path = self.root_dir / f"osm_{slug}.{ext}"
         collection.to_file(str(out_path), driver=driver)
         return out_path
+
+
+def __getattr__(name: str) -> Path:
+    """Keep the removed `DEFAULT_PBF_CACHE_DIR` constant importable.
+
+    It became `default_pbf_cache_dir()` so the location follows a later
+    `set_cache_dir()` instead of freezing at import. Returning the resolved
+    directory keeps an existing `from earthlens.osm.backend import
+    DEFAULT_PBF_CACHE_DIR` working rather than failing with a bare ImportError.
+
+    Args:
+        name: The attribute being looked up.
+
+    Returns:
+        Path: The current default `.osm.pbf` cache directory.
+
+    Raises:
+        AttributeError: For any other name.
+    """
+    if name == "DEFAULT_PBF_CACHE_DIR":
+        warnings.warn(
+            "DEFAULT_PBF_CACHE_DIR is deprecated; call default_pbf_cache_dir() "
+            "instead, which follows set_cache_dir() / EARTHLENS_CACHE.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return default_pbf_cache_dir()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

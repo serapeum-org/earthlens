@@ -1,6 +1,6 @@
-"""ECMWF / Copernicus Data Store backend (CDS + ADS + EWDS).
+"""ECMWF / CADS backend (CDS + ADS + EWDS + ECDS + XDS).
 
-Reaches all three Copernicus Data Store instances through one
+Reaches all five CADS instances through one
 :mod:`cdsapi` client and one Personal Access Token, routing each
 dataset to its store via the catalog `endpoint`: the Climate Data
 Store (C3S — ERA5, CARRA / CERRA, seasonal, CMIP5 / CORDEX, satellite
@@ -52,6 +52,7 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.ecmwf._helpers import CadsUnavailableError
 from earthlens.ecmwf.backend import (
     ECMWF,
     ERA5_GRID_DEGREES,
@@ -65,6 +66,7 @@ __all__ = [
     "Dataset",
     "Variable",
     "AuthenticationError",
+    "CadsUnavailableError",
     "ERA5_GRID_DEGREES",
     "CATALOG_PATH",
 ]

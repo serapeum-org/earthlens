@@ -204,29 +204,40 @@ def test_drought_output_kind_is_per_instance(tmp_path):
     assert spei.OUTPUT_KIND == "raster"
 
 
-@pytest.mark.parametrize(
-    "empty_path",
-    [None, "", Path(""), Path("."), Path()],
-    ids=["None", "empty-str", "Path-empty-str", "Path-dot", "Path-default"],
+_RASTER_KWARGS = dict(
+    start="2026-06-01",
+    end="2026-06-01",
+    lat_lim=[30.0, 40.0],
+    lon_lim=[-95.0, -85.0],
+    dataset="speibase-12",
 )
-def test_drought_raster_rejects_every_empty_path_form(empty_path):
-    """Every empty-path form (None, '', Path(''), Path('.'), Path()) raises.
+
+
+@pytest.mark.parametrize(
+    "cwd_path",
+    ["", "   ", Path(""), Path("."), Path()],
+    ids=["empty-str", "whitespace", "Path-empty-str", "Path-dot", "Path-default"],
+)
+def test_drought_raster_rejects_an_explicit_cwd_path(cwd_path):
+    """Asking for the working directory explicitly is refused for raster.
 
     `bool(Path(''))` and `bool(Path())` are both True (pathlib defines no
-    __bool__/__len__), so a `not path` check would silently route the
-    parent class to `Path('.').absolute()` — the user's CWD.
+    __bool__/__len__), so a `not path` check would silently route the parent
+    class to `Path('.').absolute()` — the user's CWD.
     """
-    kwargs = dict(
-        start="2026-06-01",
-        end="2026-06-01",
-        lat_lim=[30.0, 40.0],
-        lon_lim=[-95.0, -85.0],
-        dataset="speibase-12",
+    with pytest.raises(ValueError, match="needs a real path="):
+        Drought(**_RASTER_KWARGS, path=cwd_path)
+
+
+def test_drought_raster_without_path_uses_the_configured_output_dir(tmp_path):
+    """An omitted path is no longer an error: it resolves to the configured dir."""
+    from earthlens.config import set_output_dir
+
+    set_output_dir(tmp_path / "configured")
+    backend = Drought(**_RASTER_KWARGS)
+    assert backend.root_dir == (tmp_path / "configured").resolve(), (
+        f"got {backend.root_dir}"
     )
-    if empty_path is not None:
-        kwargs["path"] = empty_path
-    with pytest.raises(ValueError, match="needs path="):
-        Drought(**kwargs)
 
 
 def test_drought_search_emits_one_product_per_snapped_period():

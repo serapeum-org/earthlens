@@ -457,14 +457,13 @@ class TestIdxCachePath:
 
         assert _idx_cache_path("https://a/x.idx") != _idx_cache_path("https://a/y.idx")
 
-    def test_cache_root_under_platformdirs(self):
-        """The default cache root lives under `platformdirs.user_cache_dir('earthlens')`."""
-        import platformdirs
-
+    def test_cache_root_under_the_shared_cache_dir(self):
+        """The default cache root hangs off the shared earthlens cache directory."""
+        from earthlens.config import cache_dir
         from earthlens.nwp._helpers import _idx_cache_root
 
         root = _idx_cache_root()
-        assert str(root).startswith(platformdirs.user_cache_dir("earthlens"))
+        assert root == cache_dir() / "nwp" / "idx", f"got {root}"
         assert root.name == "idx"
 
 

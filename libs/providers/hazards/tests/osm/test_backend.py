@@ -294,6 +294,350 @@ class TestOhsomeRoute:
         with pytest.raises(RuntimeError, match="some genuine bug"):
             backend.download()
 
+    def test_non_json_body_becomes_response_error(self, osm_kwargs, fake_ohsome):
+        """A non-JSON body (an HTML page) surfaces as a typed OhsomeResponseError."""
+        import json
+
+        from earthlens.osm import OhsomeResponseError, OhsomeUnavailableError
+
+        response = types.SimpleNamespace(
+            status_code=200,
+            headers={"Content-Type": "text/html"},
+            text="<html><body>Service under maintenance</body></html>",
+        )
+        decode_error = json.JSONDecodeError("Expecting value", "<html>", 0)
+        decode_error.response = response
+        fake_ohsome.error = decode_error
+
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeResponseError) as excinfo:
+            backend.download()
+        err = excinfo.value
+        assert err.status_code == 200
+        assert err.content_type == "text/html"
+        assert err.body_preview.startswith("<html>")
+        assert "non-JSON" in str(err)
+        assert "text/html" in str(err)
+        # a 200 body is not a throttle, so it is the base error, not the subtype
+        assert not isinstance(err, OhsomeUnavailableError)
+
+    def test_non_json_body_without_status_still_typed(self, osm_kwargs, fake_ohsome):
+        """A non-JSON failure with no recoverable status still yields the typed error."""
+        import json
+
+        from earthlens.osm import OhsomeResponseError
+
+        fake_ohsome.error = json.JSONDecodeError("Expecting value", "", 0)
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeResponseError) as excinfo:
+            backend.download()
+        err = excinfo.value
+        assert err.status_code is None
+        assert err.content_type is None
+        assert err.body_preview is None
+
+    def test_json_error_response_propagates_unchanged(self, osm_kwargs, fake_ohsome):
+        """A genuine ohsome error served AS JSON is not masked as a response error."""
+        from earthlens.osm import OhsomeResponseError
+
+        ohsome_error = RuntimeError("bad request")
+        ohsome_error.error_code = 400  # recovered status, but no JSONDecodeError
+        fake_ohsome.error = ohsome_error
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(RuntimeError, match="bad request") as excinfo:
+            backend.download()
+        assert not isinstance(excinfo.value, OhsomeResponseError)
+
+    def test_transport_error_propagates_unchanged(self, osm_kwargs, fake_ohsome):
+        """A transport error (no status, not non-JSON) propagates untouched."""
+        import requests
+
+        from earthlens.osm import OhsomeResponseError
+
+        fake_ohsome.error = requests.ConnectionError("connection reset")
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(
+            requests.ConnectionError, match="connection reset"
+        ) as excinfo:
+            backend.download()
+        assert not isinstance(excinfo.value, OhsomeResponseError)
+
+    def test_failure_logs_status_content_type_and_body_preview(
+        self, osm_kwargs, fake_ohsome
+    ):
+        """The recovered status, content-type and body preview are logged (#930)."""
+        import json
+
+        from loguru import logger
+
+        from earthlens.osm import OhsomeResponseError
+
+        response = types.SimpleNamespace(
+            status_code=503,
+            headers={"Content-Type": "text/html; charset=utf-8"},
+            text="<html>rate limited</html>",
+        )
+        decode_error = json.JSONDecodeError("Expecting value", "<html>", 0)
+        decode_error.response = response
+        fake_ohsome.error = decode_error
+
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+        try:
+            backend = OSM(
+                **{
+                    **osm_kwargs(),
+                    "variables": ["ohsome:buildings"],
+                    "start": "2020-01-01",
+                }
+            )
+            with pytest.raises(OhsomeResponseError):
+                backend.download()
+        finally:
+            logger.remove(sink_id)
+        logged = "".join(str(message) for message in messages)
+        assert "503" in logged
+        assert "text/html" in logged
+        assert "rate limited" in logged
+
+    def test_forbidden_carries_and_logs_evidence(self, osm_kwargs, fake_ohsome):
+        """A 403 throttle carries the recovered content-type/body and logs them."""
+        import json
+
+        from loguru import logger
+
+        from earthlens.osm import OhsomeUnavailableError
+
+        response = types.SimpleNamespace(
+            status_code=403,
+            headers={"Content-Type": "text/html"},
+            text="<html>Forbidden</html>",
+        )
+        decode_error = json.JSONDecodeError("Expecting value", "<html>", 0)
+        decode_error.response = response
+        fake_ohsome.error = decode_error
+
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+        try:
+            backend = OSM(
+                **{
+                    **osm_kwargs(),
+                    "variables": ["ohsome:buildings"],
+                    "start": "2020-01-01",
+                }
+            )
+            with pytest.raises(OhsomeUnavailableError) as excinfo:
+                backend.download()
+        finally:
+            logger.remove(sink_id)
+        err = excinfo.value
+        assert err.status_code == 403
+        assert err.content_type == "text/html"
+        assert err.body_preview.startswith("<html>")
+        logged = "".join(str(message) for message in messages)
+        assert "403" in logged
+        assert "text/html" in logged
+
+    def test_json_error_pass_through_does_not_log(self, osm_kwargs, fake_ohsome):
+        """A JSON-served ohsome error is re-raised quietly, with no stray warning."""
+        from loguru import logger
+
+        ohsome_error = RuntimeError("bad request")
+        ohsome_error.error_code = 400  # recovered status, but served AS JSON
+        fake_ohsome.error = ohsome_error
+
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+        try:
+            backend = OSM(
+                **{
+                    **osm_kwargs(),
+                    "variables": ["ohsome:buildings"],
+                    "start": "2020-01-01",
+                }
+            )
+            with pytest.raises(RuntimeError, match="bad request"):
+                backend.download()
+        finally:
+            logger.remove(sink_id)
+        assert messages == [], f"expected no warning on pass-through, got: {messages}"
+
+    def test_server_error_becomes_unavailable(self, osm_kwargs, fake_ohsome):
+        """A 503 (the SDK's KeyError on a 5xx body) surfaces as unavailable (#790)."""
+        import requests
+
+        from earthlens.osm import OhsomeUnavailableError
+
+        # The ohsome SDK does e.response.json()["message"] on the 503 body, which
+        # lacks a "message" key, dying with a raw KeyError whose originating
+        # HTTPError (status 503) is only in the __context__ chain.
+        http_error = requests.HTTPError("503 Service Unavailable")
+        http_error.response = types.SimpleNamespace(
+            status_code=503, headers={}, text=""
+        )
+        key_error = KeyError("message")
+        key_error.__context__ = http_error
+        fake_ohsome.error = key_error
+
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeUnavailableError) as excinfo:
+            backend.download()
+        assert excinfo.value.status_code == 503
+        assert "503" in str(excinfo.value)
+        assert excinfo.value.__cause__ is key_error
+
+    @pytest.mark.parametrize("status", [500, 502, 504, 599])
+    def test_server_error_variants_become_unavailable(
+        self, osm_kwargs, fake_ohsome, status
+    ):
+        """A 5xx wrapped as OhsomeException(error_code=5xx) becomes unavailable."""
+        from earthlens.osm import OhsomeUnavailableError
+
+        ohsome_error = RuntimeError("server error")
+        ohsome_error.error_code = status
+        ohsome_error.response = types.SimpleNamespace(
+            status_code=status,
+            headers={"Content-Type": "text/html"},
+            text="<html>server error</html>",
+        )
+        fake_ohsome.error = ohsome_error
+
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeUnavailableError) as excinfo:
+            backend.download()
+        err = excinfo.value
+        assert err.status_code == status, f"expected {status}, got {err.status_code}"
+        assert err.content_type == "text/html", f"got {err.content_type}"
+        assert err.body_preview.startswith("<html>"), f"got {err.body_preview!r}"
+
+    def test_server_error_with_html_body_prefers_unavailable(
+        self, osm_kwargs, fake_ohsome
+    ):
+        """A 5xx served as HTML is unavailable, not a response error (5xx wins)."""
+        import json
+
+        from earthlens.osm import OhsomeResponseError, OhsomeUnavailableError
+
+        response = types.SimpleNamespace(
+            status_code=503,
+            headers={"Content-Type": "text/html"},
+            text="<html>Service Unavailable</html>",
+        )
+        decode_error = json.JSONDecodeError("Expecting value", "<html>", 0)
+        decode_error.response = response
+        fake_ohsome.error = decode_error
+
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeUnavailableError) as excinfo:
+            backend.download()
+        err = excinfo.value
+        assert isinstance(err, OhsomeResponseError), "subtype should keep the base"
+        assert err.status_code == 503, f"expected 503, got {err.status_code}"
+        assert err.content_type == "text/html", f"got {err.content_type}"
+        assert err.body_preview.startswith("<html>"), f"got {err.body_preview!r}"
+
+
+class TestE2ESkipHelper:
+    """The e2e `_skip_on_network` decides skip-vs-fail from the typed error."""
+
+    def test_skips_on_server_error(self):
+        """A 5xx OhsomeUnavailableError skips the lane rather than failing (#790)."""
+        from _pytest.outcomes import Skipped
+
+        from earthlens.osm import OhsomeUnavailableError
+
+        from .test_osm_e2e import _skip_on_network
+
+        outage = OhsomeUnavailableError("outage", status_code=503)
+        with pytest.raises(Skipped):
+            _skip_on_network(outage)
+
+    def test_skips_on_throttle(self):
+        """A 403 OhsomeUnavailableError still skips (issue #1025 behaviour)."""
+        from _pytest.outcomes import Skipped
+
+        from earthlens.osm import OhsomeUnavailableError
+
+        from .test_osm_e2e import _skip_on_network
+
+        throttled = OhsomeUnavailableError("throttled", status_code=403)
+        with pytest.raises(Skipped):
+            _skip_on_network(throttled)
+
+    def test_reraises_a_genuine_error(self):
+        """A non-throttle, non-outage error re-raises and fails the lane."""
+        from .test_osm_e2e import _skip_on_network
+
+        genuine = ValueError("boom")
+        with pytest.raises(ValueError, match="boom"):
+            _skip_on_network(genuine)
+
+    def test_does_not_skip_on_non_transient_status(self):
+        """A non-transient-status OhsomeUnavailableError re-raises, not skipped."""
+        from earthlens.osm import OhsomeUnavailableError
+
+        from .test_osm_e2e import _skip_on_network
+
+        unexpected = OhsomeUnavailableError("odd", status_code=404)
+        with pytest.raises(OhsomeUnavailableError):
+            _skip_on_network(unexpected)
+
+    def test_skips_at_upper_5xx_boundary(self):
+        """The top of the 5xx range (599) still skips."""
+        from _pytest.outcomes import Skipped
+
+        from earthlens.osm import OhsomeUnavailableError
+
+        from .test_osm_e2e import _skip_on_network
+
+        top = OhsomeUnavailableError("outage", status_code=599)
+        with pytest.raises(Skipped):
+            _skip_on_network(top)
+
+    def test_does_not_skip_at_600(self):
+        """Just past the 5xx range (600) re-raises, not skipped."""
+        from earthlens.osm import OhsomeUnavailableError
+
+        from .test_osm_e2e import _skip_on_network
+
+        past = OhsomeUnavailableError("odd", status_code=600)
+        with pytest.raises(OhsomeUnavailableError):
+            _skip_on_network(past)
+
+    def test_shared_hook_does_not_mask_deliberate_failures(self):
+        """The shared classifier fails what `_skip_on_network` re-raises (#1088)."""
+        # A non-transient OhsomeUnavailableError (404/600) or a bare non-JSON
+        # OhsomeResponseError that _skip_on_network re-raises reaches the shared
+        # pytest_runtest_call hook, which classifies via is_upstream_unavailable;
+        # that must return None (fail), else a real ohsome request-shape
+        # regression is masked as a skip.
+        from earthlens.osm import OhsomeResponseError, OhsomeUnavailableError
+        from earthlens.testing import is_upstream_unavailable
+
+        non_transient = OhsomeUnavailableError("bad filter", status_code=404)
+        beyond_5xx = OhsomeUnavailableError("odd", status_code=600)
+        non_json = OhsomeResponseError("non-JSON maintenance page")
+        assert is_upstream_unavailable(non_transient) is None, "404 must stay a failure"
+        assert is_upstream_unavailable(beyond_5xx) is None, "600 must stay a failure"
+        assert is_upstream_unavailable(non_json) is None, (
+            "bare body must stay a failure"
+        )
+
 
 class TestDownloadContract:
     """Cross-cutting download() behaviour."""

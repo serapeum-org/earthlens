@@ -9,6 +9,8 @@ needs a configured Copernicus token and the GloFAS licence accepted.
 
 from __future__ import annotations
 
+from functools import partial
+
 import pytest
 
 from earthlens.ecmwf import Catalog
@@ -23,7 +25,7 @@ _GLOFAS_CODE = "river-discharge-in-the-last-24-hours"
 class TestGlofasE2E:
     """End-to-end GloFAS retrieve against the live EWDS endpoint."""
 
-    def test_live_glofas_forecast_retrieve(self, tmp_path):
+    def test_live_glofas_forecast_retrieve(self, tmp_path, download_within_budget):
         """A tiny GloFAS forecast retrieves a NetCDF on the native 0.05° grid."""
         ecmwf = ECMWF(
             start="2024-01-01",
@@ -36,7 +38,8 @@ class TestGlofasE2E:
         )
         assert ecmwf.space.resolution == 0.05, "GloFAS bbox must snap to 0.05°"
 
-        target = ecmwf._api(Catalog().get_variable(_GLOFAS, _GLOFAS_CODE))
+        variable = Catalog().get_variable(_GLOFAS, _GLOFAS_CODE)
+        target = download_within_budget(partial(ecmwf._api, variable))
 
         assert target.exists(), f"GloFAS NetCDF not created at {target}"
         assert target.stat().st_size > 0, f"GloFAS NetCDF is empty: {target}"

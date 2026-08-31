@@ -72,11 +72,26 @@ class TestGet:
         assert row.output_kind == "tabular"
         assert row.gfw_dataset and row.gfw_version and "{iso}" in row.sql_template
 
-    def test_inform_row(self):
-        """An INFORM row carries a workflow id and indicator id."""
-        row = Catalog().get("inform:risk")
-        assert row.workflow_id == 505
-        assert row.indicator_id == "INFORM"
+    @pytest.mark.parametrize(
+        ("dataset_id", "indicator_id"),
+        [
+            ("inform:risk", "INFORM"),
+            ("inform:hazard_exposure", "HA"),
+            ("inform:vulnerability", "VU"),
+            ("inform:coping_capacity", "CC"),
+        ],
+    )
+    def test_inform_rows_pin_the_served_workflow(self, dataset_id, indicator_id):
+        """Every INFORM Risk row pins workflow 503 and carries its indicator id."""
+        row = Catalog().get(dataset_id)
+        assert row.workflow_id == 503
+        assert row.indicator_id == indicator_id
+
+    def test_climate_risk_pins_the_served_scenario(self):
+        """The climate row reads the one Climate Change workflow that holds scores."""
+        row = Catalog().get("inform:climate_risk")
+        assert row.workflow_id == 451
+        assert "RCP4.5-SSP1" in row.long_name
 
     def test_unknown_id_raises_did_you_mean(self):
         """An unknown but close id raises with a did-you-mean hint."""
@@ -122,7 +137,7 @@ class TestDatasetValidator:
     def test_non_gfw_provider_must_be_tabular(self, provider):
         """A thinkhazard / inform row declared as vector is rejected."""
         kwargs = (
-            {"workflow_id": 505, "indicator_id": "INFORM"}
+            {"workflow_id": 503, "indicator_id": "INFORM"}
             if provider == "inform"
             else {}
         )
@@ -187,7 +202,7 @@ class TestCacheControl:
         path = _write_yaml(
             tmp_path,
             "datasets:\n  inform:risk:\n    provider: inform\n    "
-            "output_kind: tabular\n    workflow_id: 505\n    indicator_id: INFORM\n",
+            "output_kind: tabular\n    workflow_id: 503\n    indicator_id: INFORM\n",
         )
         first = Catalog.load(path)
         assert "inform:risk" in first.datasets

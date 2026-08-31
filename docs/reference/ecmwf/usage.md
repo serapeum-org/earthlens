@@ -60,6 +60,70 @@ lens = EarthLens(
 `skip_constraints` is one of the extra keyword arguments the `EarthLens` facade
 forwards verbatim to the backend constructor.
 
+## Choosing a pressure level
+
+Each curated pressure-level row ships the single level it was audited at —
+`reanalysis-era5-pressure-levels` is catalogued at 1000 hPa. Pass
+`pressure_level=` to retrieve others, without editing the shipped catalog:
+
+```python
+from earthlens.core import EarthLens
+
+EarthLens(
+    data_source="ecmwf",
+    variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+    pressure_level=["500", "850"],
+    start="2020-01-01",
+    end="2020-01-02",
+    lat_lim=[40.0, 50.0],
+    lon_lim=[0.0, 10.0],
+    path="out",
+).download()
+```
+
+A single level needs no brackets, and a level written as a number is accepted:
+`pressure_level=500` and `pressure_level="500"` are the same request.
+
+Only variables the catalog gives a level to are affected — a single-level
+variable in the same retrieve keeps its own request shape, since adding a
+`pressure_level` to it would make the request invalid rather than broader. The
+override is applied after the catalog's per-row `extras`, so it also wins for
+the families that carry their level there.
+
+It does not apply to a raw-request passthrough: a raw request already spells
+its own level, so combining the two raises rather than being ignored.
+
+An override that no request can use is logged rather than applied silently —
+a single-level dataset, or a row selected by `model_level` instead, would
+otherwise be retrieved at a queue slot's cost and return the wrong thing.
+
+### With `aggregate=`
+
+`pressure_level=` and `AggregationConfig(level=)` are different knobs:
+`pressure_level=` chooses what CDS sends, `level=` chooses which level the
+aggregator reduces from a cube that already has several. Retrieving two levels
+and reducing one means setting both:
+
+```python
+from earthlens.core import AggregationConfig, EarthLens
+
+EarthLens(
+    data_source="ecmwf",
+    variables={"reanalysis-era5-pressure-levels": ["temperature"]},
+    pressure_level=["500", "850"],
+    start="2020-01-01",
+    end="2020-01-31",
+    lat_lim=[40.0, 50.0],
+    lon_lim=[0.0, 10.0],
+    path="out",
+).download(
+    aggregate=AggregationConfig(freq="1ME", op="mean", level="500", out_dir="out")
+)
+```
+
+Retrieving several levels without a `level=` leaves the aggregator facing a
+cube it cannot reduce unambiguously, and it says so rather than picking one.
+
 ## Multiple datasets and variables
 
 A single request can mix datasets and ask for several variables each; the

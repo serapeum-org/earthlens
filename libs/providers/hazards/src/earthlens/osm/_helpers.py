@@ -11,16 +11,18 @@ Three concerns are factored here so `osm/backend.py` only routes:
   geometry is built here (`G4`). Under the `out geom;` QL the backend uses,
   way coordinates ride on `way.attributes["geometry"]` (a list of `{lat, lon}`
   dicts), *not* on `way.nodes` (which raises `DataIncomplete` under
-  `out geom`) — see `planning/osm/captures/osm-sdk-facts.md`.
+  `out geom`) — see the A1 gate captures.
 * `to_fc` / `empty_fc` — wrap a `GeoDataFrame` into a pyramids
   `FeatureCollection` (`G7`), normalising the CRS to EPSG:4326. The ohsome
   path's `.as_dataframe()` is already a `GeoDataFrame`, so it goes straight to
   `to_fc`.
-* `OhsomeUnavailableError` / `ohsome_http_status` — turn the `ohsome` SDK's
-  opaque failure on a throttled/blocked public endpoint into a clear, typed,
-  actionable error. The SDK exposes the HTTP status inconsistently (see
-  `ohsome_http_status` for the two shapes), so the status is recovered from the
-  exception chain here.
+* `OhsomeResponseError` / `OhsomeUnavailableError` + `ohsome_http_status` /
+  `ohsome_error_response` / `ohsome_response_is_non_json` / `ohsome_body_preview`
+  — turn the `ohsome` SDK's opaque failure into a clear, typed, actionable error
+  carrying the evidence a raw `JSONDecodeError` discards (`#930`): the HTTP
+  status, the response `Content-Type`, and the first bytes of the body. The SDK
+  exposes those inconsistently (see `ohsome_http_status`), so they are recovered
+  from the exception chain here.
 
 All GIS containerisation stays inside the pyramids `FeatureCollection` per the
 repository's pyramids policy; earthlens only assembles the plain attribute rows
@@ -30,12 +32,14 @@ the shared biodiversity home so the backend imports the one warning class.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import geopandas as gpd
 import pandas as pd
 from pyramids.feature.collection import FeatureCollection
 from shapely.geometry import LineString, Point, Polygon, box
+
+from earthlens.base import exception_chain, is_http_status, response_status
 
 # `LicenseWarning` is shared across the ODbL / restrictive-license backends; it
 # lives in the biodiversity cluster's helper module (overture re-exports the same
@@ -44,6 +48,8 @@ from shapely.geometry import LineString, Point, Polygon, box
 from earthlens.biodiversity import LicenseWarning  # noqa: F401
 
 if TYPE_CHECKING:
+    import requests
+
     from earthlens.base import SpatialExtent
 
 #: WGS84 — the CRS every OSM FeatureCollection is tagged with.
@@ -54,30 +60,93 @@ OSM_CRS = "EPSG:4326"
 _ID_COLUMNS = ["osm_id", "osm_type"]
 
 
-class OhsomeUnavailableError(RuntimeError):
-    """The public ohsome endpoint refused a request with a retry-worthy status.
+#: Characters of a non-JSON ohsome body to surface in the error / log line —
+#: enough to recognise an HTML rate-limit / maintenance / login page without
+#: dumping the whole thing.
+OHSOME_BODY_PREVIEW_CHARS = 200
 
-    Raised by the OSM backend when `api.ohsome.org` answers a `403` (its front
-    proxy blocking / throttling this client — the endpoint is public and
-    keyless, so it is never a credential problem) or a `429` that outlived the
-    SDK's automatic retries. Carries the HTTP `status_code` so a caller can tell
-    a transient public-endpoint throttle apart from a genuine request error and
-    back off rather than fail hard.
+
+class OhsomeResponseError(RuntimeError):
+    """The ohsome endpoint returned a response earthlens could not use.
+
+    Raised in place of a raw `JSONDecodeError` when `api.ohsome.org` answers with
+    a body that is not the expected GeoJSON — a rate-limit / maintenance / error
+    page, an empty body, or a redirect followed to a landing page. Carries the
+    HTTP `status_code`, the response `content_type`, and a short `body_preview`
+    so a caller (and the logs) can tell those cases apart, instead of guessing
+    behind a decoder error (`#930`).
+
+    Deliberately a plain `RuntimeError`, **not** an
+    `earthlens.base.UpstreamUnavailableError`: this is a broad "response we could
+    not use" catch-all, and its `OhsomeUnavailableError` subtype can carry a
+    non-transient status (a `404` / `600` from a bad filter is an earthlens
+    defect, not an outage). The transient-vs-real triage is the osm backend's own
+    job (`ohsome_http_status` + the e2e `_skip_on_network` helper); subclassing
+    the shared availability type would let `is_upstream_unavailable` mask those
+    deliberate failures as skips.
     """
 
-    def __init__(self, message: str, status_code: int | None = None) -> None:
-        """Store the actionable message and the originating HTTP status.
+    def __init__(
+        self,
+        message: str,
+        status_code: int | None = None,
+        content_type: str | None = None,
+        body_preview: str | None = None,
+    ) -> None:
+        """Store the readable message and the recovered response evidence.
 
         Args:
             message: Human-facing explanation — what happened and what to do.
-            status_code: The HTTP status that triggered it (`403` / `429`), or
-                `None` when it could not be recovered from the SDK error.
+            status_code: The HTTP status of the offending response, or `None`
+                when it could not be recovered from the SDK error.
+            content_type: The response `Content-Type` header, or `None`.
+            body_preview: The first characters of the response body (decoded), or
+                `None` when no response object was recoverable.
         """
         super().__init__(message)
         self.status_code = status_code
+        self.content_type = content_type
+        self.body_preview = body_preview
 
 
-def ohsome_http_status(exc: BaseException) -> int | None:
+class OhsomeUnavailableError(OhsomeResponseError):
+    """The public ohsome endpoint refused a request with a retry-worthy status.
+
+    A specialisation of `OhsomeResponseError` for the throttle / block / outage
+    case: raised when `api.ohsome.org` answers a `403` (its front proxy blocking
+    / throttling this client — the endpoint is public and keyless, so it is never
+    a credential problem), a `429`, or a `5xx` server-side outage that outlived
+    the SDK's automatic retries. Carries the HTTP `status_code` so a caller can
+    tell a transient public-endpoint unavailability apart from a genuine request
+    error and back off rather than fail hard.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        status_code: int | None = None,
+        content_type: str | None = None,
+        body_preview: str | None = None,
+    ) -> None:
+        """Store the actionable message and the recovered response evidence.
+
+        Args:
+            message: Human-facing explanation — what happened and what to do.
+            status_code: The HTTP status that triggered it (`403` / `429` /
+                `5xx`), or `None` when it could not be recovered from the SDK
+                error.
+            content_type: The response `Content-Type` header, or `None`.
+            body_preview: The first characters of the response body, or `None`.
+        """
+        super().__init__(
+            message,
+            status_code=status_code,
+            content_type=content_type,
+            body_preview=body_preview,
+        )
+
+
+def ohsome_http_status(exc: Exception) -> int | None:
     """Best-effort HTTP status behind an `ohsome` SDK failure.
 
     The SDK exposes the status inconsistently. Usually it wraps the failure into
@@ -108,36 +177,113 @@ def ohsome_http_status(exc: BaseException) -> int | None:
 
             ```
     """
-    seen: set[int] = set()
-    current: BaseException | None = exc
-    while current is not None and id(current) not in seen:
-        seen.add(id(current))
-        error_code = getattr(current, "error_code", None)
-        if _is_http_status(error_code):
+    for node in exception_chain(exc):
+        error_code = getattr(node, "error_code", None)
+        if is_http_status(error_code):
             return error_code
-        response = getattr(current, "response", None)
-        status = getattr(response, "status_code", None)
-        if _is_http_status(status):
+        status = response_status(node)
+        if status is not None:
             return status
-        current = current.__cause__ or current.__context__
     return None
 
 
-def _is_http_status(value: object) -> bool:
-    """Return whether `value` is a real integer HTTP status (not a `bool`).
+def ohsome_error_response(exc: Exception) -> requests.Response | None:
+    """Best-effort `requests.Response` behind an `ohsome` SDK failure.
 
-    `bool` is a subclass of `int`, so a plain `isinstance(value, int)` would
-    accept `True` / `False` and report a nonsensical status `1` / `0`; this
-    excludes them.
+    The companion to `ohsome_http_status`: walks the same exception chain and
+    returns the first `response` object carrying a real HTTP status — the
+    `OhsomeException`'s `.response`, or the `requests.HTTPError.response` buried
+    in `__context__`. Hands the caller the status, `Content-Type`, and body the
+    raw decoder error discards (`#930`).
 
     Args:
-        value: A candidate status pulled off an exception (`error_code` or a
-            response's `status_code`).
+        exc: The exception raised by an `ohsome` SDK call.
 
     Returns:
-        bool: `True` when `value` is an `int` and not a `bool`.
+        requests.Response | None: The offending response, or `None` when none is
+            recoverable from the chain.
+
+    Examples:
+        - The buried response is recovered, so its status is readable:
+            ```python
+            >>> import requests
+            >>> from earthlens.osm import ohsome_error_response
+            >>> resp = requests.Response()
+            >>> resp.status_code = 503
+            >>> err = requests.HTTPError("service unavailable")
+            >>> err.response = resp
+            >>> ohsome_error_response(err).status_code
+            503
+
+            ```
+        - A bare transport error carries no response:
+            ```python
+            >>> import requests
+            >>> from earthlens.osm import ohsome_error_response
+            >>> ohsome_error_response(requests.ConnectionError("boom")) is None
+            True
+
+            ```
     """
-    return isinstance(value, int) and not isinstance(value, bool)
+    for node in exception_chain(exc):
+        response = getattr(node, "response", None)
+        if response is not None and is_http_status(
+            getattr(response, "status_code", None)
+        ):
+            return cast("requests.Response", response)
+    return None
+
+
+def ohsome_response_is_non_json(exc: Exception) -> bool:
+    """Return whether the failure is a JSON-decode of the ohsome response body.
+
+    True when a `JSONDecodeError` (stdlib, `simplejson`, or the `requests`
+    variant) appears anywhere in the exception chain — the signature of "the body
+    was not JSON" (an HTML rate-limit / maintenance / error page, an empty body,
+    or a redirect to a landing page), as opposed to a genuine ohsome error served
+    *as* JSON.
+
+    Args:
+        exc: The exception raised by an `ohsome` SDK call.
+
+    Returns:
+        bool: `True` when a JSON-decode failure is in the chain.
+    """
+    # Match by class name to catch the stdlib, `simplejson`, and `requests`
+    # variants without importing them, guarded by `ValueError` (every real
+    # variant subclasses it) so an unrelated same-named class is not a false
+    # positive.
+    for node in exception_chain(exc):
+        if isinstance(node, ValueError) and type(node).__name__ == "JSONDecodeError":
+            return True
+    return False
+
+
+def ohsome_body_preview(
+    response: requests.Response | None,
+    limit: int = OHSOME_BODY_PREVIEW_CHARS,
+) -> str | None:
+    """Return the first `limit` characters of a response body, or `None`.
+
+    Reads `response.text` defensively (the SDK has already consumed the body, so
+    it is cached) and truncates it — the evidence `#930` asks to surface without
+    dumping a whole error page.
+
+    Args:
+        response: The offending response, or `None`.
+        limit: Maximum number of characters to return.
+
+    Returns:
+        str | None: The decoded body prefix, or `None` when there is no response
+            or its body could not be decoded.
+    """
+    if response is None:
+        return None
+    try:
+        text = response.text
+    except Exception:  # noqa: BLE001 - a body we cannot decode is simply no preview
+        return None
+    return text[:limit]
 
 
 def bbox_swne(space: SpatialExtent) -> tuple[float, float, float, float]:

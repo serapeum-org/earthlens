@@ -32,7 +32,7 @@ rather than silently using the default.
 | Field | Type | Default | Purpose |
 |---|---|---|---|
 | `freq` | `str` (required) | — | Pandas offset alias defining the window. |
-| `op` | `Literal["mean","sum","min","max","std","auto"]` | `"auto"` | Reduction within each window. `"auto"` reads `Variable.is_flux`. |
+| `op` | `Literal["mean","sum","min","max","std","auto"]` | `"auto"` | Reduction within each window. `"auto"` reads `Variable.is_pre_aggregated` then `Variable.is_flux`. |
 | `out_dir` | `Path \| None` | `None` | Where per-window GeoTIFFs are written. `None` skips the write step. |
 | `cell_size` | `float` | `0.125` | Pixel size in degrees (informational; the geotransform is read off the NetCDF). |
 | `level` | `int \| float \| None` | `None` | Pin a pressure level for 4-D inputs. |
@@ -54,7 +54,7 @@ Arguments:
 
 - `nc_path` — path to the NetCDF on disk.
 - `var_info` — :class:`earthlens.ecmwf.Variable` row (resolves
-  `op="auto"` via `is_flux`, drives the output filename via
+  `op="auto"` via `is_pre_aggregated` / `is_flux`, drives the output filename via
   `cds_variable`, picks the variable from the NetCDF via
   `nc_variable`).
 - `config` — :class:`AggregationConfig` describing the window,
@@ -112,7 +112,7 @@ a single bad variable does not abort the rest of the loop.
 | `"min"` | `np.nanmin` | `np.min` |
 | `"max"` | `np.nanmax` | `np.max` |
 | `"std"` | `np.nanstd` | `np.std` |
-| `"auto"` | resolves to `"mean"` (state) or `"sum"` (flux) | same |
+| `"auto"` | `"mean"` (pre-aggregated or state) or `"sum"` (flux) | same |
 
 ## Supported `freq` values
 
@@ -140,13 +140,20 @@ catalog. The resolver is `_resolve_op` in `earthlens.aggregate`:
 def _resolve_op(op, var_info):
     if op != "auto":
         return op
+    if getattr(var_info, "is_pre_aggregated", False):
+        return "mean"
     return "sum" if var_info.is_flux else "mean"
 ```
 
-Two-line decision:
+Decision order (first match wins):
 
 - An **explicit** `op` (`"mean"`, `"sum"`, `"min"`, `"max"`, `"std"`)
   is returned unchanged. User choice always wins.
+- `op="auto"` + `var_info.is_pre_aggregated` → `"mean"`. The
+  `derived-era5-*-daily-statistics` and `reanalysis-era5-*-monthly-means`
+  families are already server-side daily / monthly aggregates, so a
+  `"sum"` would re-accumulate them (~30× for a monthly window over daily
+  statistics). This wins over the flux rule below.
 - `op="auto"` reads `var_info.is_flux`:
   - `True` → `"sum"`
   - `False` → `"mean"`
@@ -227,7 +234,7 @@ different semantics:
 | Reproduce the legacy buggy daily-flux output | `"mean"` |
 | Daily *max* / *min* temperature | `"max"` / `"min"` |
 | Per-window standard deviation | `"std"` |
-| Pre-aggregated CDS datasets like `derived-era5-*-daily-statistics` (each NetCDF sample is *already* a daily aggregate; summing 4 of them would multiply by 4) | `"mean"` |
+| A monthly *sum* from a pre-aggregated dataset — `op="auto"` already resolves the `derived-era5-*-daily-statistics` / `reanalysis-era5-*-monthly-means` families to `"mean"` via `is_pre_aggregated`, so you only override to force a total | `"sum"` |
 
 ## Pressure-level support (`level=`)
 
@@ -272,8 +279,8 @@ earthlens.download(
 The retrieved NetCDF lands at
 `out/era5/2m_temperature_reanalysis-era5-single-levels.nc`; the
 aggregated GeoTIFF lands at
-`out/era5/aggregated/2m_temperature_1MS_20220101.tif` (default
-`out_dir = <root_dir>/aggregated/`).
+`out/era5/aggregated/2m_temperature_reanalysis-era5-single-levels_1MS_20220101.tif`
+(default `out_dir = <root_dir>/aggregated/`).
 
 ## Worked example — aggregate later, separately
 
@@ -336,14 +343,21 @@ the full list.
 Per-window GeoTIFFs are named:
 
 ```
-<cds_variable>_<freq>_<window-label-as-YYYYMMDD>.tif
+<cds_variable>_<dataset_id>_<freq>_<window-label-as-YYYYMMDD>.tif
 ```
+
+The `<dataset_id>` (the requested catalog id, e.g. `reanalysis-era5-single-levels`)
+is included so datasets sharing a `cds_variable` — or the two GloFAS streams that
+also share `cds_dataset` — never overwrite one another in a shared `out_dir`,
+matching the `.nc` naming. It is omitted only for a `var_info` that carries no
+dataset id — the s3 and erddap backends (whose variable adapters carry none), or
+a plain caller passing a bare stand-in to `aggregate_netcdf`.
 
 Examples:
 
-- `2m_temperature_1D_20220101.tif` — daily mean for 2022-01-01.
-- `total_precipitation_1MS_20220101.tif` — monthly sum for 2022-01.
-- `temperature_QS-DEC_20220301.tif` — MAM seasonal mean.
+- `2m_temperature_reanalysis-era5-single-levels_1D_20220101.tif` — daily mean for 2022-01-01.
+- `total_precipitation_reanalysis-era5-single-levels_1MS_20220101.tif` — monthly sum for 2022-01.
+- `temperature_reanalysis-era5-pressure-levels_QS-DEC_20220301.tif` — MAM seasonal mean.
 
 ## Related
 

@@ -175,13 +175,13 @@ class TestEmitter:
         monkeypatch.setattr(
             erddap_cli,
             "get_json",
-            lambda url, **kw: self._info_table(dims=[], variables=["station", "wtmp"]),
+            lambda url, **kw: self._info_table(dims=[], variables=["station", "WTMP"]),
         )
         result = emit_stanza(_info(), "myTable", server="https://x/erddap")
         assert result.status == "ok"
         assert result.row["protocol"] == "tabledap"
         assert "dim_names" not in result.row
-        assert result.row["variables"] == ["station", "wtmp"]
+        assert result.row["variables"] == ["station", "WTMP"]
 
     def test_defaults_to_curated_servers(self, monkeypatch):
         """With no --server, the id is looked up on the catalog's curated servers."""

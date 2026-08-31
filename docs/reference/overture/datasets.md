@@ -15,7 +15,7 @@ cat = Catalog()
 cat.themes()                       # ['buildings', 'divisions', 'places', 'transportation']
 cat.get_theme("buildings").types   # ['building', 'building_part']
 cat.available_types()              # all 15 Overture types (curated + deferred)
-cat.available_releases             # ['2026-05-20.0', '2026-04-15.0']
+cat.available_releases             # ['2026-06-17.0', '2026-07-22.0']
 ```
 
 ## Curated vs available
@@ -127,10 +127,19 @@ address datasets and OSM.
 ## Releases
 
 Overture publishes a new **release** roughly monthly, identified
-`yyyy-mm-dd.x`. The bundled `available_releases:` index is informational
-(rebuilt by the [refresh tool](usage.md#catalog-tooling)); the SDK
-auto-targets the newest release when `release=None`. Pin a `release` for
-reproducible downloads.
+`yyyy-mm-dd.x`, and keeps only the newest one (or two) on S3 — older
+releases are pruned from the bucket and their paths stop resolving.
+
+`release=None` (the default) therefore targets whatever Overture publishes
+*now*: the SDK auto-targets it on the default fetch path, and the DuckDB
+`where=` / `columns=` path resolves it live before building the S3 glob.
+The bundled `available_releases:` index is informational (rebuilt by the
+[refresh tool](usage.md#catalog-tooling)) and serves only as an offline
+fallback.
+
+Pin a `release` when you need a byte-reproducible download, and expect the
+pin to stop resolving once Overture prunes that release — a pinned id is
+reproducible only for as long as it exists upstream.
 
 ## Coverage
 

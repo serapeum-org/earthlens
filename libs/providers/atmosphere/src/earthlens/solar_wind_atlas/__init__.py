@@ -6,7 +6,7 @@ Weibull / capacity-factor / air-density) climatology layers as GeoTIFFs
 (`OUTPUT_KIND="raster"`). Both atlases are keyless / CC-BY-4.0.
 
 The backend uses **two transports**, one per atlas (pinned in the A1 gate,
-`planning/solar_wind_atlas/captures/solar-wind-sdk-facts.md`): the Global Wind
+the A1 gate captures): the Global Wind
 Atlas layers are range-accessible COGs on figshare, read **windowed** over
 `/vsicurl/` so only the AOI transfers; the Global Solar Atlas layers are
 DEFLATE-compressed ZIP archives with no random access, so they are downloaded

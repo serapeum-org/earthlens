@@ -6,7 +6,7 @@
 # maps.isric.org (the categorical `wrb` soil-class service is out of scope), so
 # this index equals the curated keys — there is no larger auto-discovered
 # universe to track. Verified live 2026-07-01; see
-# planning/soilgrids/captures/soilgrids-sdk-facts.md.
+# the A1 gate captures.
 
 available_datasets:
   - clay

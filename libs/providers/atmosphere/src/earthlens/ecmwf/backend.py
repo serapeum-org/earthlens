@@ -1,9 +1,47 @@
+"""ECMWF / Copernicus data-store backend — :class:`ECMWF`, an :class:`AbstractDataSource`.
+
+Downloads from the five CADS data stores through one `cdsapi` client:
+the Copernicus trio (CDS, ADS, EWDS) and the two ECMWF-hosted stores
+(ECDS, XDS). A request is `{dataset: [variable, ...], ...}` plus a date
+range, a bbox and a temporal resolution; the dataset ids, variable
+metadata and per-store routing all come from
+:class:`earthlens.ecmwf.Catalog` (loaded from the per-family
+`catalog/*.yaml` shards). Nothing about a dataset is hardcoded here.
+
+Each row's `endpoint` picks the store, resolved to an API root and a
+credential by :mod:`earthlens.ecmwf.endpoints`; one client is cached per
+endpoint, so a single :meth:`ECMWF.download` may span several stores.
+
+The pipeline (per `(dataset, variable)` pair) is:
+
+1. :meth:`ECMWF._build_request` — build the request from the catalog row,
+   then shape its date keys by `request_kind` (see
+   :data:`_REQUEST_KIND_STRIPS`): kinds strip the template fields their
+   dataset rejects, and the reforecast kinds rewrite the date axes —
+   `glofas_hindcast` *renames* `year`/`month`/`day` to the `h*` keys,
+   while `s2s_reforecast` *copies* them, keeping both dates.
+2. :class:`earthlens.ecmwf.constraints.RequestValidator` — pre-flight the
+   request against the store's `constraints.json` before anything is queued.
+3. :meth:`ECMWF._api` — submit through `cdsapi`, then normalise the
+   response: a zipped or archived NetCDF is unpacked
+   (:func:`_unpack_netcdf_archive`) so `download()` always returns the
+   written data files.
+
+Authentication failures are surfaced as :class:`AuthenticationError`,
+which distinguishes missing credentials from an unaccepted licence — the
+two most common ways a retrieve is refused.
+"""
+
 from __future__ import annotations
 
+import math
 import os
 import shutil
 import zipfile
+from collections.abc import Iterable, Mapping
+from collections.abc import Set as AbstractSet
 from functools import partial
+from numbers import Real
 from pathlib import Path
 from typing import Any
 
@@ -21,9 +59,15 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.base import AuthenticationError as _BaseAuthenticationError
+from earthlens.config import resolve_output_path
+from earthlens.ecmwf._helpers import (
+    CadsUnavailableError,
+    _retrieve_with_retry,
+    endpoint_for,
+)
 from earthlens.ecmwf.catalog import Catalog, Variable
 from earthlens.ecmwf.constraints import RequestValidator
-from earthlens.ecmwf.endpoints import constraints_base_url, endpoint_url
+from earthlens.ecmwf.endpoints import constraints_base_url
 from earthlens.ecmwf.endpoints import open_client as _open_endpoint_client
 
 __all__ = ["AuthenticationError", "ECMWF", "ERA5_GRID_DEGREES"]
@@ -55,6 +99,14 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
     # GloFAS/EFAS hindcast (reforecast): keys on `hyear`/`hmonth`/`hday`
     # (remapped in `_build_request`) + `leadtime_hour`; drop `time`.
     "glofas_hindcast": ("time",),
+    # S2S reforecast (ECDS): unlike `glofas_hindcast` this keeps BOTH date
+    # axes — `year`/`month`/`day` select the model cycle and
+    # `hyear`/`hmonth`/`hday` the reforecast — so the month/day are *copied*
+    # into the h-keys rather than renamed. `hyear` alone comes from `extras`.
+    # The strip tuple is deliberately empty: the form accepts every template
+    # key including `time`, so there is nothing to drop (the row's `extras`
+    # pin the single `time` slot the dataset serves).
+    "s2s_reforecast": (),
     # Seasonal (GloFAS/EFAS/CDS seasonal): keyed by `year`/`month` + a lead
     # (`leadtime_month`/`leadtime_hour`) + `originating_centre`/`system` from
     # `extras`; no `day`, no time-of-day.
@@ -134,33 +186,6 @@ def _looks_like_missing_credentials(exc: BaseException) -> bool:
     no_credentials = not cdsapirc_present and not env_present
     message_indicates_auth = any(keyword in message for keyword in auth_keywords)
     return no_credentials or message_indicates_auth
-
-
-def _looks_like_licence_not_accepted(exc: BaseException) -> bool:
-    """Heuristic: does this exception come from an unaccepted CDS licence?
-
-    CDS returns HTTP 403 with a body that mentions "Required licences
-    not accepted" (or "licence" depending on locale) when the user has
-    a valid Personal Access Token but has not ticked the licence on
-    the dataset's download page. cdsapi raises this through to the
-    caller as a generic exception; we detect it by message scan so we
-    can rewrite into a :class:`PermissionError` that names the
-    dataset URL.
-
-    Args:
-        exc: The exception raised by `client.retrieve(...)`.
-
-    Returns:
-        True if the message looks like a licence-acceptance failure;
-        False otherwise.
-    """
-    message = str(exc).lower()
-    return (
-        "licence" in message
-        or "license" in message
-        or "403" in message
-        and ("accept" in message or "term" in message)
-    )
 
 
 def _unwrap_zipped_netcdf(target: Path) -> None:
@@ -354,14 +379,68 @@ def _remap_date_keys(
             request[dst_key] = request.pop(src_key)
 
 
+def _reject_multi_day_reforecast(request: dict[str, Any], var_info: Variable) -> None:
+    """Refuse an S2S-reforecast window that spans more than one model-cycle day.
+
+    The model-cycle and reforecast dates are paired, but a CDS form request
+    treats every list as an independent cross-product axis, so a window of `n`
+    days would submit `n x n` `day`/`hday` combinations of which only the `n`
+    diagonal pairs exist. There is no request shape that expresses the pairing,
+    so ask for one day at a time.
+
+    Args:
+        request: The request assembled so far.
+        var_info: The catalog row being requested (named in the error).
+
+    Raises:
+        ValueError: If the window covers more than one day.
+    """
+    days = request.get("day") or []
+    months = request.get("month") or []
+    if not days:
+        raise ValueError(
+            f"{var_info.cds_dataset!r} selects a reforecast by the model run's "
+            "own calendar day, so it needs a `day`. Request it with "
+            "temporal_resolution='daily'."
+        )
+    if len(days) > 1 or len(months) > 1:
+        raise ValueError(
+            f"{var_info.cds_dataset!r} pairs the model-cycle date with the "
+            "reforecast date, and a CDS form request cannot express that "
+            f"pairing: a {len(days)}-day window would submit "
+            f"{len(days) * len(days)} day/hday combinations of which only "
+            f"{len(days)} exist. Request one model-cycle date at a time "
+            "(start == end)."
+        )
+    # A 29 February model cycle has no reforecast in a non-leap `hyear`. The
+    # row's `extras` are merged after this hook runs, so read `hyear` from the
+    # catalog row rather than from the half-built request.
+    hyears = var_info.extras.get("hyear") or []
+    if months == ["02"] and days == ["29"]:
+        non_leap = [
+            year
+            for year in hyears
+            if not (int(year) % 4 == 0 and (int(year) % 100 or int(year) % 400 == 0))
+        ]
+        if non_leap:
+            raise ValueError(
+                f"{var_info.cds_dataset!r}: a 29 February model cycle has no "
+                f"reforecast in the non-leap hyear(s) {non_leap}. Pick a leap "
+                "`hyear` in the row's extras, or another model-cycle date."
+            )
+
+
 def _apply_request_kind_dates(
     request: dict[str, Any], var_info: Variable, start_date: Any, end_date: Any
 ) -> None:
     """Rewrite the request's date keys for the date-representation kinds (G11).
 
     `cams_date` replaces year/month/day with a single `date` range string;
-    `glofas_hindcast` / `seasonal_hindcast` remap year/month(/day) to the
-    `hyear`/`hmonth`(/`hday`) hindcast-reference keys. Any other kind is a no-op.
+    `glofas_hindcast` / `seasonal_hindcast` *rename* year/month(/day) to the
+    `hyear`/`hmonth`(/`hday`) hindcast-reference keys; `s2s_reforecast`
+    *copies* month/day into them instead, because that dataset needs both the
+    model-cycle and the reforecast date (and rejects a window it cannot
+    express). Any other kind is a no-op.
 
     Args:
         request: The request dict assembled so far (mutated in place).
@@ -383,6 +462,22 @@ def _apply_request_kind_dates(
     elif var_info.request_kind == "seasonal_hindcast":
         # Seasonal reforecast: hindcast year/month, no day (stripped elsewhere).
         _remap_date_keys(request, (("year", "hyear"), ("month", "hmonth")))
+    elif var_info.request_kind == "s2s_reforecast":
+        # S2S reforecasts carry two coupled date axes: the model cycle
+        # (`year`/`month`/`day`) and the reforecast (`hyear`/`hmonth`/`hday`).
+        # The store only serves a reforecast on the model run's own calendar
+        # day, so the two must be *paired*, not crossed — and a CDS form
+        # request cannot express "zip these two lists": every list is a
+        # cross-product axis. A multi-day window would therefore submit
+        # `day x hday` combinations of which only the diagonal exists, so
+        # refuse it explicitly rather than send a request the store rejects
+        # (or, worse, one it partially serves).
+        _reject_multi_day_reforecast(request, var_info)
+        for src_key, dst_key in (("month", "hmonth"), ("day", "hday")):
+            if src_key in request:
+                # Copy by value: assigning the list itself would alias the two
+                # keys, so a later edit to `day` would silently move `hday`.
+                request[dst_key] = list(request[src_key])
 
 
 def _apply_extras_and_strips(request: dict[str, Any], var_info: Variable) -> None:
@@ -392,17 +487,127 @@ def _apply_extras_and_strips(request: dict[str, Any], var_info: Variable) -> Non
     key by setting it in `extras`; the `None` opt-out then drops any `extras`
     key explicitly set to `None`.
 
+    A list arriving from `extras` is copied rather than assigned. The catalog
+    row is cached for the life of the process, so sharing it would let an edit
+    to one request rewrite that variable for every later retrieve.
+
     Args:
         request: The request dict assembled so far (mutated in place).
         var_info: The catalog row supplying `extras` and `request_kind`.
     """
-    request.update(var_info.extras)
+    # Copy by value: the catalog row is cached for the life of the process, so
+    # assigning a list or dict straight out of `extras` would let an edit to one
+    # request rewrite it for every later retrieve of that variable. The levels
+    # this PR promotes to first-class arrive exactly this way.
+    request.update(
+        {
+            key: list(value) if isinstance(value, list) else value
+            for key, value in var_info.extras.items()
+        }
+    )
     for stripped in _REQUEST_KIND_STRIPS.get(var_info.request_kind, ()):
         if stripped not in var_info.extras:
             request.pop(stripped, None)
     for key, value in list(var_info.extras.items()):
         if value is None:
             request.pop(key, None)
+
+
+def _render_level(level: Any) -> str:
+    """Render one pressure level the way CDS spells it.
+
+    A whole number written as a float — `500.0`, which is what arithmetic on
+    levels produces — would otherwise reach the store as `"500.0"` and match no
+    level it offers. Any real number is accepted, so a numpy scalar out of an
+    array of levels renders like the builtin it stands for.
+
+    A level is a pressure in hPa, so anything that does not read as a finite
+    number is refused here rather than sent, and one written with surrounding
+    space or in exponent form is rendered from the number it parses to rather
+    than echoed back. The store's own constraint check
+    would catch most of them, but not under `skip_constraints=True` and not
+    offline, and a rejected request says far less than this does.
+
+    Args:
+        level: A single level.
+
+    Returns:
+        The level as a string.
+
+    Raises:
+        TypeError: If given a bool, which is a `numbers.Real` and would
+            otherwise render as `"True"`.
+        ValueError: If the level does not read as a number, or reads as one
+            that is not finite.
+    """
+    if isinstance(level, bool):
+        raise TypeError(f"pressure_level= takes a number, not {level!r}.")
+    if isinstance(level, Real) and not isinstance(level, str):
+        value = float(level)
+        if not math.isfinite(value):
+            raise ValueError(f"{level!r} is not a finite pressure level.")
+        return str(int(value)) if value.is_integer() else str(level)
+    text = str(level).strip()
+    try:
+        value = float(text)
+    except (TypeError, ValueError):
+        raise ValueError(
+            f"{level!r} is not a pressure level; levels are numbers in hPa."
+        ) from None
+    if not math.isfinite(value):
+        raise ValueError(f"{level!r} is not a finite pressure level.")
+    # Rendered from the parsed number rather than echoed, so a level spelled
+    # `" 500 "` or `"1e3"` reaches the store as `"500"` and `"1000"` — both
+    # parse, and neither matches a level as written.
+    return str(int(value)) if value.is_integer() else text
+
+
+def _normalize_pressure_level(
+    pressure_level: Any | None,
+) -> list[str] | None:
+    """Normalize the `pressure_level=` override to a list of strings.
+
+    CDS spells a level as a string, but hPa reads as a number, so `500` and
+    `[500]` are both natural things to write. Each level is rendered by
+    :func:`_render_level` from the number it parses to rather than echoed, and
+    a lone level is wrapped so the single-level case needs no brackets. Any
+    ordered iterable of levels is accepted, a numpy array included.
+
+    Args:
+        pressure_level: Levels to request, a single level, or None.
+
+    Returns:
+        The levels as a list of strings, or None to keep each row's own level.
+
+    Raises:
+        TypeError: If given something that is neither a level nor a sequence
+            of levels. A mapping, a set and a `bytes` are refused by name
+            rather than iterated — they yield keys, an unspecified order, and
+            byte values respectively — and a bool is refused by
+            :func:`_render_level` as a `numbers.Real`.
+        ValueError: If given an empty sequence, or a level that does not read
+            as a number. `pressure_level: []` is not a valid request and asking
+            for no levels is not what any caller means; `None` is how a caller
+            declines to override.
+    """
+    if pressure_level is None:
+        return None
+    if isinstance(pressure_level, (str, Real)):
+        return [_render_level(pressure_level)]
+    if isinstance(
+        pressure_level, (Mapping, AbstractSet, bytes, bytearray)
+    ) or not isinstance(pressure_level, Iterable):
+        raise TypeError(
+            "pressure_level= takes a level or a sequence of levels, not "
+            f"{type(pressure_level).__name__}."
+        )
+    levels = [_render_level(level) for level in pressure_level]
+    if not levels:
+        raise ValueError(
+            "pressure_level= was given no levels; pass None to keep each "
+            "catalog row's own level, or name at least one level to request."
+        )
+    return levels
 
 
 class ECMWF(LazyClientMixin, AbstractDataSource):
@@ -443,6 +648,13 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
 
+    #: Retrieval-level pressure override, `None` unless a caller sets
+    #: `pressure_level=`. Declared on the class because `_build_request` reads
+    #: it for every request, while a cheap instance built with
+    #: `ECMWF.__new__` - the idiom this module's own docstrings advertise -
+    #: never runs `__init__`.
+    pressure_level: list[str] | None = None
+
     def __init__(
         self,
         start: str | None = None,
@@ -451,11 +663,12 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "daily",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         skip_constraints: bool = False,
         request: dict[str, Any] | None = None,
         endpoint: str | None = None,
+        pressure_level: Any | None = None,
     ):
         """Initialize an ECMWF backend instance.
 
@@ -481,8 +694,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             temporal_resolution: Either `"daily"` or `"monthly"`.
                 Defaults to `"daily"`.
             path: Output directory. Created by the parent if it does
-                not exist. Defaults to `""` (the current working
-                directory).
+                not exist. When omitted it falls back to the
+                configured earthlens output directory (`set_output_dir()` /
+                `EARTHLENS_DATA_DIR`); see `earthlens.config`.
             fmt: `strptime` format for `start` / `end`.
                 Defaults to `"%Y-%m-%d"`.
             skip_constraints: When `True`, every CDS pre-flight
@@ -492,9 +706,29 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 unchecked. Useful when CDS's published
                 `constraints.json` is stale or wrong for the
                 dataset, or when running offline. Defaults to `False`.
+            pressure_level: Pressure levels in hPa to retrieve, replacing
+                the level each catalog row carries. A lone level needs no
+                brackets and may be written as a number, so `500`, `"500"`
+                and `[500]` are the same request.
+
+                Replaces the `pressure_level` of any request that already
+                has one, whether the catalog spelled it as
+                `cds_pressure_level` or in the row's `extras` — the CARRA
+                means family does the latter. A request without that key
+                keeps none: a single-level row would be made invalid rather
+                than broader by acquiring one, and a model-level row is
+                selected by `model_level`, not by this. Such a row is logged
+                rather than silently skipped.
+
+                Defaults to `None`, which keeps each row's own level.
+
+        Raises:
+            ValueError: If `pressure_level=` is combined with `request=`. The
+                raw request is forwarded verbatim, so the override would be
+                accepted and never consulted.
         """
         self.skip_constraints = skip_constraints
-        # Per-endpoint cdsapi client cache (cds / ads / ewds). Populated
+        # Per-endpoint cdsapi client cache (one per ENDPOINTS slug). Populated
         # lazily by `_client_for` so a multi-endpoint download reuses one
         # connection per CADS instance. `_injected_client` holds a client
         # bound via the `client` setter (used for every endpoint); it stays
@@ -502,6 +736,13 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # poison endpoint routing.
         self._clients: dict[str, Any] = {}
         self._injected_client: Any = None
+        # Retrieval-time override for the catalog's pressure level. The curated
+        # rows carry the single level each was audited at, so without this a
+        # different level means editing the shipped YAML or building a
+        # `Variable` by hand and bypassing the facade.
+        self.pressure_level: list[str] | None = _normalize_pressure_level(
+            pressure_level
+        )
         # Raw-request passthrough (the coverage lever): when `request=` is
         # given, skip the typed catalog / date / grid machinery and forward
         # the raw request to the resolved store's client (see `download`). The
@@ -509,6 +750,14 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # composes `dataset=<id>` into `variables={<id>: []}`, so a passthrough
         # is `EarthLens('ecmwf', dataset=<id>, request=<dict>)`.
         self._passthrough: dict[str, Any] | None = None
+        if request is not None and self.pressure_level is not None:
+            # Any `request=` takes the passthrough, an empty one included, and
+            # the passthrough forwards what it is given verbatim - so an
+            # override would be accepted and then never consulted.
+            raise ValueError(
+                "pressure_level= does not apply when request= is given: the "
+                "raw request is forwarded as-is, so put the level in it."
+            )
         if request is not None:
             dataset = (
                 next(iter(variables))
@@ -529,7 +778,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             # Construction stays read-only: the base `download` wrapper's
             # `_ensure_root_dir` creates (and unwinds on failure) the output
             # directory at download time, exactly as the typed path relies on.
-            self.root_dir = Path(path).absolute()
+            self.root_dir = resolve_output_path(path)
             self.path = self.root_dir
             return
 
@@ -891,27 +1140,41 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 `0.003 m` (the average 6-hour accumulation, **not**
                 a daily total).
 
+                * **Pre-aggregated** (`Variable.is_pre_aggregated` —
+                  the `derived-era5-*-daily-statistics` and
+                  `reanalysis-era5-*-monthly-means` families, where
+                  each NetCDF sample is already a server-side daily /
+                  monthly aggregate). `auto` → `"mean"`, overriding
+                  the flux rule: a `"sum"` would re-accumulate the
+                  aggregates and multiply by the number of samples in
+                  the window (~30× for a monthly window over daily
+                  statistics).
+
                 Pass an explicit `op="mean"` / `"sum"` / `"min"` /
-                `"max"` / `"std"` to bypass auto-routing — for
-                example, on pre-aggregated CDS datasets like
-                `derived-era5-single-levels-daily-statistics` where
-                each NetCDF sample is already a daily aggregate and
-                summing four of them would multiply by 4. See
-                `docs/reference/aggregation.md` for the full
-                walkthrough.
+                `"max"` / `"std"` to bypass auto-routing entirely. See
+                `docs/aggregation.md` for the full walkthrough.
         Returns:
             list[Path]: The written output paths — one per-variable
-            NetCDF at `<self.root_dir>/<cds_variable>_<cds_dataset>.nc`,
+            NetCDF at `<self.root_dir>/<cds_variable>_<dataset_id>.nc`
+            (`dataset_id` is the requested catalog id; it equals
+            `cds_dataset` except for a row that overrides it — the GloFAS
+            intermediate stream — which is named by its own id so it does
+            not collide with the consolidated stream),
             or, when `aggregate` is set, the per-window GeoTIFFs at
-            `<aggregate.out_dir or self.root_dir/aggregated>/<cds_variable>_<freq>_<window>.tif`.
+            `<aggregate.out_dir or self.root_dir/aggregated>/<cds_variable>_<dataset_id>_<freq>_<window>.tif`
+            (the `dataset_id` is carried for the same collision-avoidance reason
+            as the `.nc` name above — datasets sharing a `cds_variable` reduce
+            into one `aggregated/` dir and would otherwise overwrite one another).
             A zip-of-NetCDF response (satellite CDRs, CAMS `netcdf_zip`)
             that unpacks to more than one member is returned as every
-            member under a sibling `<cds_variable>_<cds_dataset>/`
+            member under a sibling `<cds_variable>_<dataset_id>/`
             directory (all masked to a polygon `aoi=` if one was given);
             such a multi-member response cannot be aggregated. Under the
             default `errors="warn"`, variables whose download (or
             aggregate) failed are logged and omitted from the returned
-            list rather than aborting the batch.
+            list rather than aborting the batch. A store-level refusal is
+            the exception to that — see :class:`CadsUnavailableError`
+            under `Raises:`.
 
         Raises:
             ValueError: If `errors` is not a recognised policy.
@@ -919,6 +1182,15 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 curated CDS dataset, or if a listed variable is not
                 declared under that dataset — under `errors="warn"` this
                 is logged per pair rather than raised.
+            CadsUnavailableError: The store refused to queue the job on
+                its per-dataset limit and kept refusing across all three
+                attempts (roughly six seconds of backoff). Raised **whatever
+                `errors` is set to**, including `"ignore"`: a refusal by
+                the service is not the per-variable data gap the policy
+                exists to absorb, and continuing would report an outage
+                as every variable having no data.
+            PermissionError: The dataset's licence has not been accepted
+                on the Copernicus account.
             Exception: Any error :meth:`_api` propagates from
                 :meth:`cdsapi.Client.retrieve`.
 
@@ -987,6 +1259,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             errors=self._errors,
             label="variable",
             describe=_describe_pair,
+            # A throttled store refused to serve anything; continuing would
+            # report that as every variable having no data.
+            fatal=(CadsUnavailableError,),
         )
         if not failures:
             logger.info(
@@ -1030,7 +1305,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # `<cds_variable>_<cds_dataset>/` directory; the returned member's parent
         # equals it exactly (a single-file retrieve returns the file at
         # `root_dir` itself).
-        member_dir = self.root_dir / f"{var_info.cds_variable}_{var_info.cds_dataset}"
+        member_dir = (
+            self.root_dir
+            / f"{var_info.cds_variable}_{var_info.dataset_id or var_info.cds_dataset}"
+        )
         is_multi_member = member_dir.is_dir() and nc_path.parent == member_dir
         if aggregate is None:
             # Return every member (already masked in `_api`) so `download()`'s
@@ -1048,14 +1326,26 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 f"reduce the member directory ({member_dir}) yourself, or "
                 "request a single window."
             )
-        agg = aggregate_netcdf(nc_path, var_info, aggregate)
+        # Bound the aggregation to the requested span: a daily CDS
+        # `year`/`month`/`day` request is a cross-product, so a window
+        # crossing month boundaries over-covers the range (a Jun 25-Jul 5
+        # request also returns Jun 1-5 and Jul 25-30). Trimming here keeps the
+        # written GeoTIFFs faithful to `start`/`end` and stops a stray day from
+        # skewing a window it shares (e.g. a monthly mean).
+        agg = aggregate_netcdf(
+            nc_path,
+            var_info,
+            aggregate,
+            date_range=(self.time.start_date, self.time.end_date),
+        )
         return [path for _, _, path in agg if path is not None]
 
     def _resolve_endpoint(self, dataset: str) -> str:
         """Resolve which store hosts `dataset` for a passthrough retrieve.
 
-        A curated row's `endpoint` wins; otherwise the per-store availability
-        index (`Catalog.store_for`) decides; falling back to `"cds"`.
+        Delegates to :func:`earthlens.ecmwf._helpers.endpoint_for`, the one
+        resolver the CLI tooling shares: a curated row's `endpoint` wins, then
+        the per-store availability index, then `"cds"` with a warning.
 
         Args:
             dataset: The Copernicus dataset id being retrieved.
@@ -1063,11 +1353,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         Returns:
             str: The store slug (`"cds"` / `"ads"` / `"ewds"`).
         """
-        catalog = Catalog()
-        row = catalog.datasets.get(dataset)
-        if row is not None:
-            return row.endpoint
-        return catalog.store_for(dataset) or "cds"
+        return endpoint_for(dataset)
 
     def _passthrough_target(self, dataset: str, request: dict[str, Any]) -> str:
         """Pick an output filename for a raw retrieve from the request format.
@@ -1130,19 +1416,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             f"Passthrough retrieve {dataset!r} via {endpoint.upper()}; "
             "this may take several minutes"
         )
-        try:
-            client.retrieve(dataset, request, str(target))
-        except Exception as exc:  # noqa: BLE001
-            # Broad catch on purpose: classify a licence rejection into a clear
-            # PermissionError and re-raise everything else unchanged.
-            if _looks_like_licence_not_accepted(exc):
-                base = endpoint_url(endpoint).rsplit("/api", 1)[0]
-                raise PermissionError(
-                    f"{endpoint.upper()} rejected {dataset!r}: licence not "
-                    f"accepted. Open {base}/datasets/{dataset} and tick the "
-                    "licence at the bottom of the 'Download' tab."
-                ) from exc
-            raise
+        _retrieve_with_retry(client, dataset, request, target, endpoint)
         return self._passthrough_postprocess(target)
 
     def _passthrough_postprocess(self, target: Path) -> list[Path]:
@@ -1238,8 +1512,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             var_info: Catalog row resolved by :class:`Catalog`.
                 See :meth:`_build_request` for the full list of
                 fields consumed during request assembly. `_api`
-                itself reads `cds_dataset` (the retrieve target)
-                and `cds_variable` (the output filename stem).
+                itself reads `cds_dataset` (the retrieve target) and
+                `cds_variable` / `dataset_id` (the output filename stem).
 
         Returns:
             pathlib.Path: Absolute path to the downloaded NetCDF
@@ -1272,7 +1546,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 ... )
                 >>> spec.cds_dataset
                 'reanalysis-era5-single-levels'
-                >>> f"{spec.cds_variable}_{spec.cds_dataset}.nc"
+                >>> spec.dataset_id == spec.cds_dataset  # equal for ordinary rows
+                True
+                >>> f"{spec.cds_variable}_{spec.dataset_id}.nc"
                 '2m_temperature_reanalysis-era5-single-levels.nc'
 
                 ```
@@ -1326,25 +1602,19 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             base_url=constraints_base_url(var_info.endpoint),
         ).check()
 
-        target = self.root_dir / f"{var_info.cds_variable}_{dataset}.nc"
+        # Name the output by the requested catalog id (dataset_id), not the
+        # retrieve target (cds_dataset). They match for every ordinary row; they
+        # differ only when a row overrode cds_dataset (the GloFAS intermediate
+        # stream), and naming by dataset_id stops its file from colliding with
+        # the consolidated stream, which shares cds_variable + cds_dataset.
+        stem = f"{var_info.cds_variable}_{var_info.dataset_id or dataset}"
+        target = self.root_dir / f"{stem}.nc"
         client = self._client_for(var_info.endpoint)
         logger.info(
             f"Requesting {dataset} from {var_info.endpoint.upper()}; "
             "this may take several minutes"
         )
-        try:
-            client.retrieve(dataset, request, str(target))
-        except Exception as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related
-            if _looks_like_licence_not_accepted(exc):
-                base = endpoint_url(var_info.endpoint).rsplit("/api", 1)[0]
-                raise PermissionError(
-                    f"{var_info.endpoint.upper()} rejected the request for "
-                    f"{dataset!r}: licence not accepted. Open the dataset page "
-                    f"at {base}/datasets/{dataset} and tick the licence at the "
-                    "bottom of the 'Download' tab. The acceptance is permanent "
-                    "and tied to your Copernicus account."
-                ) from exc
-            raise
+        _retrieve_with_retry(client, dataset, request, target, var_info.endpoint)
         # A zip-of-NetCDF response (satellite CDRs, CAMS netcdf_zip) is unpacked
         # by the C3 handler — single-member in place, multi-member into a
         # sibling dir — so a multi-timestep curated retrieve does not crash.
@@ -1421,9 +1691,12 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
            and omits `day` (CDS monthly-means datasets reject
            `day`).
         3. Pressure-level forward — `cds_pressure_level` becomes
-           `pressure_level` on the request.
+           `pressure_level` on the request, unless the retrieval set
+           `pressure_level=`, which replaces it. A row the catalog gives
+           no level keeps none either way.
         4. `var_info.extras` merge — per-row catalog overrides win
-           over the template defaults.
+           over the template defaults, but not over the retrieval's own
+           `pressure_level=`, which is applied after them.
         5. `request_kind` strip — drop template-default keys the
            dataset family rejects (e.g. ORAS5 rejects
            `day`/`time`/`area`). Done after the extras merge so a
@@ -1487,8 +1760,35 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         )
 
         if var_info.cds_pressure_level is not None:
-            request["pressure_level"] = var_info.cds_pressure_level
+            # Copy by value: the catalog row is cached process-wide, so
+            # assigning its list would let an edit to one request rewrite the
+            # level for every later retrieve of that variable.
+            request["pressure_level"] = list(var_info.cds_pressure_level)
 
         _apply_extras_and_strips(request, var_info)
+
+        # The retrieval's own level is applied last, after extras. A row may
+        # carry its level in either place — the CARRA means rows keep theirs in
+        # `extras` and leave `cds_pressure_level` unset — and extras are merged
+        # with `update`, so an override written before this point would be put
+        # back to the catalog's level for those rows and the caller would be
+        # served a different altitude than they asked for, with no error.
+        #
+        # Keying on the assembled request rather than on the catalog row makes
+        # both sources behave alike, and keeps the single-level case safe: such
+        # a request never has the key, so it never acquires one.
+        if self.pressure_level is not None:
+            if "pressure_level" in request:
+                request["pressure_level"] = list(self.pressure_level)
+            else:
+                # Silence here would cost a queue slot and return the wrong
+                # thing: a single-level dataset served at the surface, or a
+                # model-level row served at model level 1, with the override
+                # accepted and never used.
+                logger.warning(
+                    f"pressure_level={self.pressure_level} does not apply to "
+                    f"{var_info.cds_variable!r}: it is not requested on "
+                    "pressure levels, so the override was not used."
+                )
 
         return request

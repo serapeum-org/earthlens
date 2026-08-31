@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from loguru import logger
 
 from earthlens.eea_aq import EEA_AQ
 
@@ -48,6 +49,26 @@ def _era_frame(verification: int) -> pd.DataFrame:
     )
 
 
+def _row_frame(start: str, verification: int = 1) -> pd.DataFrame:
+    """One MT pm25 row at ISO `start`, tagged with `verification`."""
+    starts = pd.to_datetime([start])
+    return pd.DataFrame(
+        {
+            "Samplingpoint": ["MT/SPO-1"],
+            "Pollutant": [6001],
+            "Start": starts,
+            # `End` is unused by `shape_frame`; keep it equal to `Start` to avoid
+            # timedelta arithmetic (the value is irrelevant to the reshape).
+            "End": starts,
+            "Value": ["5.0"],
+            "Unit": ["ug.m-3"],
+            "AggType": ["hour"],
+            "Validity": [1],
+            "Verification": [verification],
+        }
+    )
+
+
 class _EraRequest:
     """Copies a per-era fixture Parquet into the download dir."""
 
@@ -71,6 +92,62 @@ class _EraClient:
 
     def request(self, source, *countries, poll=None, verbose=True):
         return _EraRequest(self._verified if source == "Verified" else self._unverified)
+
+
+class _NoFilesRequest:
+    """An airbase request whose download writes no Parquet (an empty era)."""
+
+    def download(
+        self, dir: str, skip_existing: bool = True, raise_for_status: bool = True
+    ) -> None:
+        return None
+
+
+class _NoFilesClient:
+    """A recording client whose every era returns zero Parquet files."""
+
+    countries = frozenset({"MT"})
+
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, tuple[str, ...], object]] = []
+
+    def request(self, source, *countries, poll=None, verbose=True):
+        self.calls.append((source, countries, poll))
+        return _NoFilesRequest()
+
+
+class _MaybeEraRequest:
+    """Copies a fixture Parquet, or writes nothing when the era has no files."""
+
+    def __init__(self, parquet: str | None) -> None:
+        self._parquet = parquet
+
+    def download(
+        self, dir: str, skip_existing: bool = True, raise_for_status: bool = True
+    ) -> None:
+        if self._parquet is not None:
+            shutil.copy(self._parquet, Path(dir) / "d.parquet")
+
+
+class _SelectiveEraClient:
+    """Serves a Parquet for some eras and zero files for others (by era name)."""
+
+    countries = frozenset({"MT"})
+
+    def __init__(self, **era_parquets: str | None) -> None:
+        self._map = era_parquets
+        self.calls: list[tuple[str, tuple[str, ...], object]] = []
+
+    def request(self, source, *countries, poll=None, verbose=True):
+        self.calls.append((source, countries, poll))
+        return _MaybeEraRequest(self._map.get(source))
+
+
+def _capture(level: str) -> tuple[list[str], int]:
+    """Add a loguru sink collecting messages at `level`; return (messages, id)."""
+    messages: list[str] = []
+    sink = logger.add(lambda m: messages.append(m.record["message"]), level=level)
+    return messages, sink
 
 
 def _backend(client, tmp_path: Path, **overrides) -> EEA_AQ:
@@ -214,6 +291,121 @@ class TestApi:
 
 
 @pytest.mark.eea
+class TestEmptyResultSignals:
+    """The two empty results are logged distinctly (see issue #1046).
+
+    A request where every era returns zero files (the shape of an upstream EEA
+    export outage) raises a single aggregate WARNING; a window that excludes
+    every downloaded row (the era holds data, the dates are simply empty) is an
+    INFO, so a caller facing an empty frame can tell the two apart.
+    """
+
+    def test_all_eras_empty_warns_once_about_upstream(self, tmp_path):
+        """When every era returns zero files, one aggregate upstream WARNING fires."""
+        client = _NoFilesClient()
+        infos, isink = _capture("INFO")
+        warnings, wsink = _capture("WARNING")
+        df = _backend(client, tmp_path).download(progress_bar=False)
+        logger.remove(wsink)
+        logger.remove(isink)
+
+        assert df.empty
+        assert "station_id" in df.columns
+        assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
+        # A single aggregate outage WARNING, naming both eras, not one per era.
+        outage = [m for m in warnings if "no era returned any usable observations" in m]
+        assert len(outage) == 1
+        assert "upstream" in outage[0]
+        assert "Verified" in outage[0]
+        assert "Unverified" in outage[0]
+        # The per-era emptiness is downgraded to a diagnostic INFO (not a WARNING),
+        # and is positively emitted per era with the new wording.
+        assert not any("returned no Parquet files" in m for m in warnings)
+        assert any("era 'Verified' returned no Parquet files" in m for m in infos)
+        assert any("era 'Unverified' returned no Parquet files" in m for m in infos)
+
+    def test_out_of_window_download_logs_info_not_outage(self, tmp_path):
+        """Files that all fall outside the window log an INFO, not the era WARNING."""
+        parquet = tmp_path / "june.parquet"
+        _era_frame(verification=1).to_parquet(parquet)  # a single 2023-06-15 row
+        client = _FakeAirbaseClient(parquet)
+        messages, sink = _capture("INFO")
+        df = _backend(client, tmp_path, start="2023-07-01", end="2023-07-31").download(
+            progress_bar=False
+        )
+        logger.remove(sink)
+
+        assert df.empty
+        assert "station_id" in df.columns
+        assert any("none fell within" in m for m in messages)
+        # Distinct from the empty-era path: this is not reported as missing files.
+        assert not any("no Parquet files" in m for m in messages)
+
+
+@pytest.mark.eea
+class TestAdjacentEraFallback:
+    """When the primary era is empty, the adjacent live era is retried (#1046)."""
+
+    def test_empty_primary_era_falls_back_to_adjacent(self, tmp_path):
+        """A June-2022 boundary-year request with an empty Verified era resolves via Unverified."""
+        unverified = tmp_path / "u.parquet"
+        _row_frame("2022-06-15T00:00").to_parquet(unverified)
+        client = _SelectiveEraClient(Verified=None, Unverified=str(unverified))
+        infos, isink = _capture("INFO")
+        warnings, wsink = _capture("WARNING")
+        df = _backend(client, tmp_path, start="2022-06-01", end="2022-06-30").download(
+            progress_bar=False
+        )
+        logger.remove(isink)
+        logger.remove(wsink)
+
+        assert len(df) == 1
+        assert df.loc[0, "dataset"] == "Unverified"
+        assert df.loc[0, "datetime_utc"].year == 2022
+        # Verified swept first (empty), then Unverified as the adjacent fallback.
+        assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
+        # The retry is an INFO, and a recovered download raises no outage WARNING.
+        assert any("retrying the adjacent era(s)" in m for m in infos)
+        assert not any("no era returned any usable observations" in m for m in warnings)
+
+    def test_no_fallback_when_both_live_eras_already_swept(self, tmp_path):
+        """A 2023+ window already spans both live eras, so no fallback fires."""
+        client = _NoFilesClient()  # both eras empty
+        messages, sink = _capture("WARNING")
+        df = _backend(client, tmp_path).download(progress_bar=False)  # default 2023
+        logger.remove(sink)
+
+        assert df.empty
+        # Exactly the two live eras, with no extra adjacent retry appended.
+        assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
+        assert not any("retrying the adjacent era(s)" in m for m in messages)
+
+    def test_fallback_era_also_empty_returns_schema_only(self, tmp_path):
+        """When both the primary and the adjacent era are empty, an empty frame."""
+        client = _SelectiveEraClient(Verified=None, Unverified=None)
+        df = _backend(client, tmp_path, start="2022-06-01", end="2022-06-30").download(
+            progress_bar=False
+        )
+
+        assert df.empty
+        assert "station_id" in df.columns
+        assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
+
+    def test_out_of_range_request_does_not_fall_back(self, tmp_path):
+        """A 2015 empty-Verified request never bulk-downloads the Unverified era."""
+        unverified = tmp_path / "u.parquet"
+        _row_frame("2023-06-15T00:00").to_parquet(unverified)
+        client = _SelectiveEraClient(Verified=None, Unverified=str(unverified))
+        df = _backend(client, tmp_path, start="2015-06-01", end="2015-06-30").download(
+            progress_bar=False
+        )
+
+        assert df.empty
+        # Unverified (2023+) can never satisfy 2015, so it is never requested.
+        assert [call[0] for call in client.calls] == ["Verified"]
+
+
+@pytest.mark.eea
 class TestGuards:
     """Constructor + download guards."""
 
@@ -262,6 +454,36 @@ def test_missing_airbase_raises(tmp_path, monkeypatch):
     monkeypatch.setattr(builtins, "__import__", _no_airbase)
     with pytest.raises(ImportError, match="eea_aq"):
         backend._airbase_client()
+
+
+@pytest.mark.eea
+def test_airbase_client_builds_and_caches_real_client(tmp_path, monkeypatch):
+    """With no client injected, `_airbase_client` builds one via airbase, once."""
+    import airbase
+
+    built: list[object] = []
+
+    def _factory():
+        obj = object()
+        built.append(obj)
+        return obj
+
+    monkeypatch.setattr(airbase, "AirbaseClient", _factory)
+    backend = EEA_AQ(
+        start="2023-06-01",
+        end="2023-06-30",
+        variables=["pm25"],
+        lat_lim=[35.7, 36.1],
+        lon_lim=[14.1, 14.6],
+        country="MT",
+        path=str(tmp_path),
+    )
+    first = backend._airbase_client()
+    second = backend._airbase_client()
+
+    assert first is built[0], "should return the airbase-built client"
+    assert second is first, "should cache the client, not rebuild it"
+    assert len(built) == 1, f"client built {len(built)} times, expected once"
 
 
 @pytest.mark.eea

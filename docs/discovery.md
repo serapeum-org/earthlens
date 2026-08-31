@@ -1,6 +1,6 @@
 # Discovering datasets
 
-With 50 providers and thousands of datasets between them, the hard part is often not downloading — it is working
+With 61 providers and thousands of datasets between them, the hard part is often not downloading — it is working
 out *which* provider serves what you want, and what it is called there. earthlens exposes three functions for
 that, all importable from `earthlens.core`:
 
@@ -42,7 +42,7 @@ against every registered provider's catalog and collects the hits, returning `{p
 from earthlens.core import find
 
 matches = find("precipitation")
-len(matches)          # 29 providers matched
+len(matches)          # 37 providers matched
 
 matches["chc"]        # ['prelim-global-pentad', 'chirp-daily', 'chirtsdaily-tmin', ...]
 matches["cmip6"]      # ['tasmin', 'sfcWind']
@@ -104,7 +104,7 @@ paths = lens.download()       # then fetch
 
 A typical path from "I need rainfall over Colombia" to a download:
 
-1. **`find("precipitation")`** — narrow 50 providers to a handful.
+1. **`find("precipitation")`** — narrow 61 providers to a handful.
 2. Read the candidates' [provider pages](reference/providers.md) — coverage, resolution, licence, auth.
 3. **`search(...)`** — confirm the request resolves to the granules you expect, on the backends that support it.
 4. **`download()`** — fetch. On a backend without `search()`, go straight here.

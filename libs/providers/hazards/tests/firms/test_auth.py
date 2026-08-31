@@ -10,6 +10,7 @@ from earthlens.firms import (
     FirmsAuth,
     FirmsCredentials,
 )
+from earthlens.firms.auth import _MAP_KEY_URL
 
 pytestmark = pytest.mark.firms
 
@@ -46,12 +47,16 @@ def test_explicit_key_beats_env(monkeypatch: pytest.MonkeyPatch):
     assert auth.api_key == "explicit"
 
 
-def test_missing_key_raises_naming_url(monkeypatch: pytest.MonkeyPatch):
-    """No key anywhere raises AuthenticationError naming the map_key URL."""
+def test_missing_key_raises_naming_arg_env_and_url(monkeypatch: pytest.MonkeyPatch):
+    """No key anywhere raises AuthenticationError naming the arg, env var, and URL."""
     monkeypatch.delenv("FIRMS_MAP_KEY", raising=False)
     auth = FirmsAuth(FirmsCredentials())
-    with pytest.raises(AuthenticationError, match="map_key"):
+    with pytest.raises(AuthenticationError) as exc:
         auth.configure()
+    message = str(exc.value)
+    assert "api_key=" in message, message
+    assert "FIRMS_MAP_KEY" in message, message
+    assert _MAP_KEY_URL in message, message
 
 
 def test_configure_is_idempotent():

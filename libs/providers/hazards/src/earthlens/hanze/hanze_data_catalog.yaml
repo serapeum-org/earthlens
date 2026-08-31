@@ -9,7 +9,7 @@
 # The record id, file names, licence and event schema were verified live against
 # Zenodo record 20478847 (2026-08-07); the region shapefile's join field / CRS
 # and the flood-type vocabulary were pinned by the A1 probe (2026-08-09) — see
-# `planning/flood-risk/captures/a1_hanze_probe.json`.
+# the A1 gate captures.
 
 # The pinned Zenodo *version* record (never the moving concept DOI), so a
 # request is reproducible. A refresh check reports drift; it never auto-bumps.

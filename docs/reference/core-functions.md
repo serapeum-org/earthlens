@@ -1,7 +1,7 @@
 # Core functions
 
 The module-level surface of `earthlens.core` — one-shot helpers that wrap the
-[`EarthLens`](earthlens.md) facade, plus the discovery functions for finding a dataset across all 48 providers.
+[`EarthLens`](earthlens.md) facade, plus the discovery functions for finding a dataset across all 61 providers.
 
 ```python
 from earthlens.core import download, find, search, sources

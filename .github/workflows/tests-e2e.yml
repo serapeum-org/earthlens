@@ -1,70 +1,28 @@
 name: Tests - E2E (live CDS + GEE + STAC)
 
-# Live end-to-end suites against external services (Copernicus Climate
-# Data Store; Google Earth Engine). These hit real servers / queue
-# server-side, so running on every push to any branch or every PR would burn
-# quota and slow CI. So the triggers are deliberately scoped:
-#
-#   * push to `main`: every non-docs/non-CI merge to the default branch runs
-#     the FULL live e2e suite, so what actually landed is validated end-to-end (the
-#     per-provider `tests-e2e-<theme>.yml` gates only run the affected lane on
-#     a PR; this is the complete post-merge check). Docs-/markdown-/CI-only
-#     merges are skipped via `paths-ignore` on the trigger below.
-#   * schedule: weekly on Sunday at 04:00 UTC
-#   * workflow_dispatch: manual trigger from the Actions tab
-#
-# Forks cannot read repo secrets, so a fork-PR run would fail at auth.
-# The jobs below only run on the main repo, and each suite skips its
-# tests when its credentials are absent.
+# Live e2e against external, rate/quota-limited services (CDS, GEE, EUMETSAT,
+# STAC, …). Triggers: every non-docs merge to `main` (docs-only merges skipped
+# below), the weekly cron, and manual dispatch. Jobs run only on the main repo
+# (forks have no secrets) and self-skip when a credential is absent.
 
 permissions:
   contents: read
 
-# There is no `pull_request` trigger, so the expression is always false and
-# `cancel-in-progress: false` protects a live run that is already IN PROGRESS —
-# an active suite is never cancelled mid-flight against rate/quota-limited
-# services, which is the point.
-#
-# The one shared `github.ref` group is deliberate: the non-PR events that run as
-# `refs/heads/main` — a merge to `main`, the weekly cron, and a dispatch from
-# `main` — serialise, so two full live runs never overlap. (A dispatch launched
-# from another branch runs as that ref, a separate group, and would not
-# serialise against a `main` run — an accepted edge for a manual action.) The cost is that it does NOT
-# guarantee a run per merge: GitHub cancels a *pending* run when a newer one
-# queues in the same group (see tests.yml for the full note), so during a burst
-# — merge A in progress, B pending, C queued — B is superseded before it starts,
-# and any non-PR event (a dispatch/cron, not just a later merge) can drop a
-# pending run this way. This is quota-first by choice: run the latest main state,
-# not every intermediate; the weekly cron backstops. Guaranteeing a run per merge
-# needs a run_id-keyed group (as tests.yml uses), which runs collisions in
-# PARALLEL and doubles the live-quota spend — exactly what this suite avoids.
-#
-# The expression is kept rather than hard-coded `false` so the PR-cancel half
-# switches on by itself if a `pull_request` trigger is ever added - at which
-# point re-read it, because cancelling a half-finished live run mid-flight is
-# not obviously right for this suite.
+# No pull_request trigger here, so key the group on the run id: every run (a
+# merge to `main`, the cron, a dispatch) gets its own group and runs to the end -
+# a later merge never cancels an earlier one. Overlapping live runs are the
+# accepted cost of never dropping a merge's run.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.run_id }}
+  cancel-in-progress: false
 
 on:
   push:
     branches: [main]
-    # A merge that changes only docs / markdown / mkdocs config / CI workflow
-    # files cannot affect an e2e result, so it skips the full live suite (which
-    # burns rate/quota-limited services). `paths-ignore` skips only when EVERY
-    # changed path matches, so a mixed merge (docs + code) still runs.
-    #
-    # Trade-off: a merge touching ONLY `.github/**` — including this workflow
-    # itself — is not re-run on the merge push; a CI-config change is validated
-    # only by the next weekly cron or a manual dispatch, never by its own merge.
-    # Acceptable: a workflow-YAML change cannot alter the shipped code's e2e
-    # result, and the e2e jobs use no local composite actions under `.github/`.
-    paths-ignore:
+    paths-ignore:  # docs-only merges skip; code and CI changes run
       - 'docs/**'
       - '**/*.md'
       - 'mkdocs.yml'
-      - '.github/**'
   schedule:
     - cron: '0 4 * * 0'
   workflow_dispatch:
@@ -118,21 +76,50 @@ jobs:
         env:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
+          # These backends have no dedicated lane below, so this catch-all is the
+          # only job that collects them. Without their credentials they self-skip
+          # and the job still reports success - the suites were never exercised.
+          COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
+          COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
+          API_USGS_PAT: ${{ secrets.API_USGS_PAT }}
+          GPORTAL_USERNAME: ${{ secrets.GPORTAL_USERNAME }}
+          GPORTAL_PASSWORD: ${{ secrets.GPORTAL_PASSWORD }}
+          JAXA_PTREE_USERNAME: ${{ secrets.JAXA_PTREE_USERNAME }}
+          JAXA_PTREE_PASSWORD: ${{ secrets.JAXA_PTREE_PASSWORD }}
+          OPENAQ_API_KEY: ${{ secrets.OPENAQ_API_KEY }}
+          FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+          NREL_API_KEY: ${{ secrets.NREL_API_KEY }}
+          NREL_EMAIL: ${{ secrets.NREL_EMAIL }}
+          OPENEO_CLIENT_ID: ${{ secrets.OPENEO_CLIENT_ID }}
+          OPENEO_CLIENT_SECRET: ${{ secrets.OPENEO_CLIENT_SECRET }}
+          GFW_API_KEY: ${{ secrets.GFW_API_KEY }}
         run: |
-          # The marker exclusions drop the suites that have their own lane
-          # below; the deselect drops the one test that segfaults the
-          # interpreter on Linux (issue #925) - it passes locally in ~6 s, so
-          # it is dropped here rather than skipped in the test file. Removing
-          # this line once #925 is fixed also brings back the three admin
-          # tests that sit behind it in the same file.
+          # The marker exclusions drop the suites that have their own lane below.
+          # The geoBoundaries ADM1 test that segfaults GDAL (#925) skips itself
+          # in the test file now, so no --deselect is needed here.
           #
-          # The node id is relative to the PACKAGE, not the repo: each package
-          # ships its own [tool.pytest.ini_options], so passing a package path
-          # moves pytest's rootdir there. A repo-relative id silently matches
-          # nothing.
+          # ONE rule: exclude exactly the backends that have a dedicated job in
+          # THIS file, so every backend runs in exactly one lane. Do not sync
+          # this list with tests-e2e-reusable.yml's per-theme catchall_marker -
+          # that file has its own lanes (ecmwf and osm among them) and copying
+          # its exclusions here would drop those backends from the cron
+          # entirely, since this workflow has no dedicated job for them.
+          #
+          # The list had drifted: earthdata, eumetsat and asf gained jobs here
+          # but were never excluded, so the catch-all collected their tests a
+          # second time - and, before their credentials were wired, only to skip
+          # them (one run reported 2 passed, 14 skipped). Running them twice also
+          # doubled the concurrent Earthdata Login token mints, the call that
+          # intermittently times out from CI.
+          report="$RUNNER_TEMP/e2e-shared.xml"
           uv run --locked pytest ${{ matrix.package }} -v \
-            -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat and not caravan" \
-            --deselect "tests/admin/test_admin_e2e.py::TestAdminLiveFetch::test_geoboundaries_country_adm1"
+            --junitxml="$report" \
+            -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat and not caravan and not earthdata and not eumetsat and not asf and not iucn and not wdpa"
+          # Complements earthlens.testing's in-process guard, which already fails
+          # a lane masked by *upstream* outages. That one counts only skips
+          # carrying its availability prefix, so a lane skipped for missing
+          # credentials still exits 0 and reports green. Catch that here.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-shared (${{ matrix.package }})"
 
   e2e-caravan:
     runs-on: ubuntu-latest
@@ -160,7 +147,13 @@ jobs:
         # `--locked` makes the run fail rather than silently re-resolve if
         # uv.lock has drifted, so the versions under test are the locked ones.
         run: |
-          uv run --locked pytest -m "e2e and caravan" -v
+          report="$RUNNER_TEMP/e2e-caravan.xml"
+          uv run --locked pytest -m "e2e and caravan" -v --junitxml="$report"
+          # Complements earthlens.testing's in-process guard, which already fails
+          # a lane masked by *upstream* outages. That one counts only skips
+          # carrying its availability prefix, so a lane skipped for missing
+          # credentials still exits 0 and reports green. Catch that here.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-caravan"
 
   e2e-gee:
     runs-on: ubuntu-latest
@@ -186,7 +179,28 @@ jobs:
           GEE_SERVICE_ACCOUNT: ${{ secrets.GEE_SERVICE_ACCOUNT }}
           GEE_SERVICE_KEY: ${{ secrets.GEE_SERVICE_KEY }}
         run: |
-          uv run --locked pytest -m "e2e and gee" -v
+          # The key reaches CI as JSON, but `ee.ServiceAccountCredentials` takes a
+          # *filename*. Passing the content where a path belongs is what put a
+          # private key into a public log: `open()` failed and the traceback
+          # printed the whole key. Write it to the runner's temp dir (wiped when
+          # the job ends) and hand the code a path, which every call site accepts.
+          # Only when the secret actually holds JSON. Materialising it
+          # unconditionally turns an *absent* secret into a non-empty path
+          # pointing at an empty file, which defeats the suite's own
+          # `skipif not GEE_SERVICE_KEY` guard: the lane would run against an
+          # empty key instead of skipping. Matches the reusable workflow.
+          case "$GEE_SERVICE_KEY" in
+            \{*) printf "%s" "$GEE_SERVICE_KEY" > "$RUNNER_TEMP/gee-key.json"
+                 GEE_SERVICE_KEY="$RUNNER_TEMP/gee-key.json"
+                 export GEE_SERVICE_KEY ;;
+          esac
+          report="$RUNNER_TEMP/e2e-gee.xml"
+          uv run --locked pytest -m "e2e and gee" -v --junitxml="$report"
+          # Complements earthlens.testing's in-process guard, which already fails
+          # a lane masked by *upstream* outages. That one counts only skips
+          # carrying its availability prefix, so a lane skipped for missing
+          # credentials still exits 0 and reports green. Catch that here.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-gee"
 
   e2e-earthdata:
     runs-on: ubuntu-latest
@@ -216,7 +230,13 @@ jobs:
           # Alternative to username/password: a single EDL bearer token.
           EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
         run: |
-          uv run --locked pytest -m "e2e and earthdata" -v
+          report="$RUNNER_TEMP/e2e-earthdata.xml"
+          uv run --locked pytest -m "e2e and earthdata" -v --junitxml="$report"
+          # Complements earthlens.testing's in-process guard, which already fails
+          # a lane masked by *upstream* outages. That one counts only skips
+          # carrying its availability prefix, so a lane skipped for missing
+          # credentials still exits 0 and reports green. Catch that here.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-earthdata"
 
   e2e-emdat:
     runs-on: ubuntu-latest
@@ -260,7 +280,13 @@ jobs:
       # half needs nothing but network and always runs.
       - name: Run live EM-DAT Dataverse e2e tests
         run: |
-          uv run --locked pytest -m "e2e and emdat and not gdis" -v
+          report="$RUNNER_TEMP/e2e-emdat.xml"
+          uv run --locked pytest -m "e2e and emdat and not gdis" -v --junitxml="$report"
+          # Complements earthlens.testing's in-process guard, which already fails
+          # a lane masked by *upstream* outages. That one counts only skips
+          # carrying its availability prefix, so a lane skipped for missing
+          # credentials still exits 0 and reports green. Catch that here.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-emdat"
 
       # GDIS rides NASA Earthdata Cloud, so it needs an Earthdata Login whose
       # account has also accepted the SEDAC data-use agreement. These tests are
@@ -299,7 +325,13 @@ jobs:
           EUMETSAT_CONSUMER_KEY: ${{ secrets.EUMETSAT_CONSUMER_KEY }}
           EUMETSAT_CONSUMER_SECRET: ${{ secrets.EUMETSAT_CONSUMER_SECRET }}
         run: |
-          uv run --locked pytest -m "e2e and eumetsat" -v
+          report="$RUNNER_TEMP/e2e-eumetsat.xml"
+          uv run --locked pytest -m "e2e and eumetsat" -v --junitxml="$report"
+          # Complements earthlens.testing's in-process guard, which already fails
+          # a lane masked by *upstream* outages. That one counts only skips
+          # carrying its availability prefix, so a lane skipped for missing
+          # credentials still exits 0 and reports green. Catch that here.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-eumetsat"
 
   e2e-stac:
     runs-on: ubuntu-latest
@@ -326,7 +358,13 @@ jobs:
           CDSE_S3_ACCESS_KEY: ${{ secrets.CDSE_S3_ACCESS_KEY }}
           CDSE_S3_SECRET_KEY: ${{ secrets.CDSE_S3_SECRET_KEY }}
         run: |
-          uv run --locked pytest -m "stac and e2e" -v
+          report="$RUNNER_TEMP/e2e-stac.xml"
+          uv run --locked pytest -m "stac and e2e" -v --junitxml="$report"
+          # Complements earthlens.testing's in-process guard, which already fails
+          # a lane masked by *upstream* outages. That one counts only skips
+          # carrying its availability prefix, so a lane skipped for missing
+          # credentials still exits 0 and reports green. Catch that here.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-stac"
 
   e2e-sentinel-hub:
     runs-on: ubuntu-latest
@@ -353,7 +391,13 @@ jobs:
           SENTINELHUB_CLIENT_ID: ${{ secrets.SENTINELHUB_CLIENT_ID }}
           SENTINELHUB_CLIENT_SECRET: ${{ secrets.SENTINELHUB_CLIENT_SECRET }}
         run: |
-          uv run --locked pytest -m "sentinel_hub and e2e" -v
+          report="$RUNNER_TEMP/e2e-sentinel-hub.xml"
+          uv run --locked pytest -m "sentinel_hub and e2e" -v --junitxml="$report"
+          # Complements earthlens.testing's in-process guard, which already fails
+          # a lane masked by *upstream* outages. That one counts only skips
+          # carrying its availability prefix, so a lane skipped for missing
+          # credentials still exits 0 and reports green. Catch that here.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-sentinel-hub"
 
   e2e-nwp:
     runs-on: ubuntu-latest
@@ -380,7 +424,13 @@ jobs:
         # Open Data are anonymous (no secrets); the suite skips anything that is
         # transiently unavailable.
         run: |
-          uv run --locked pytest -m "e2e and nwp" -v
+          report="$RUNNER_TEMP/e2e-nwp.xml"
+          uv run --locked pytest -m "e2e and nwp" -v --junitxml="$report"
+          # Complements earthlens.testing's in-process guard, which already fails
+          # a lane masked by *upstream* outages. That one counts only skips
+          # carrying its availability prefix, so a lane skipped for missing
+          # credentials still exits 0 and reports green. Catch that here.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-nwp"
 
   e2e-asf:
     runs-on: ubuntu-latest
@@ -411,7 +461,13 @@ jobs:
           EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
           EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
         run: |
-          uv run --locked pytest -m "e2e and asf" -v
+          report="$RUNNER_TEMP/e2e-asf.xml"
+          uv run --locked pytest -m "e2e and asf" -v --junitxml="$report"
+          # Complements earthlens.testing's in-process guard, which already fails
+          # a lane masked by *upstream* outages. That one counts only skips
+          # carrying its availability prefix, so a lane skipped for missing
+          # credentials still exits 0 and reports green. Catch that here.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-asf"
 
   e2e-iucn:
     runs-on: ubuntu-latest
@@ -437,7 +493,13 @@ jobs:
         env:
           IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
         run: |
-          uv run --locked pytest -m "e2e and iucn" -v
+          report="$RUNNER_TEMP/e2e-iucn.xml"
+          uv run --locked pytest -m "e2e and iucn" -v --junitxml="$report"
+          # Complements earthlens.testing's in-process guard, which already fails
+          # a lane masked by *upstream* outages. That one counts only skips
+          # carrying its availability prefix, so a lane skipped for missing
+          # credentials still exits 0 and reports green. Catch that here.
+          python .github/scripts/assert_tests_ran.py "$report" "e2e-iucn"
 
   e2e-wdpa:
     runs-on: ubuntu-latest
@@ -463,4 +525,9 @@ jobs:
         env:
           WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
         run: |
+          # No junit report or masked-lane assertion here, unlike every lane above:
+          # WDPA_TOKEN has not been issued yet, so this lane is expected to skip
+          # wholesale and the guard would fail it every run for something nobody
+          # can act on. The reusable workflow records the same exemption as
+          # `allow_all_skipped: true`.
           uv run --locked pytest -m "e2e and wdpa" -v

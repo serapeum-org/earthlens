@@ -4,7 +4,7 @@
 # loader enforces that. The glaciers surface is a small, hand-curated set (three
 # sources, five datasets), so this index equals the curated keys — there is no
 # larger auto-discovered universe to track. Verified live 2026-06-28 (see
-# planning/glaciers/captures/glaciers-sdk-facts.md).
+# the A1 gate captures).
 available_datasets:
   - rgi:outlines
   - glims:outlines

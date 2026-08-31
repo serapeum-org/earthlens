@@ -426,11 +426,20 @@ def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:
     accumulations — and `False` for state variables (temperature,
     pressure, humidity, ...).
 
-    Resolution rules:
+    Resolution rules (first match wins):
 
+    * `op="auto"` + `var_info.is_pre_aggregated=True` → `"mean"`
     * `op="auto"` + `var_info.is_flux=True` → `"sum"`
     * `op="auto"` + `var_info.is_flux=False` → `"mean"`
     * any explicit op → returned unchanged
+
+    `is_pre_aggregated` wins over `is_flux`: a flux variable from a
+    `derived-era5-*-daily-statistics` / `reanalysis-era5-*-monthly-means`
+    dataset is already a server-side daily / monthly aggregate, so `"auto"`
+    resolves to `"mean"` — a plain `"sum"` would re-accumulate the aggregates
+    and multiply by the number of samples per window (~30× for a monthly
+    window over daily statistics). `is_pre_aggregated` is read defensively
+    (`getattr`, default `False`) so a `var_info` without it behaves as before.
 
     This **replaces** the legacy `mean × days_later` scaling that
     `examples/post_process_ecmwf_netcdf.py:226` (pre-rewrite) used.
@@ -442,7 +451,8 @@ def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:
     Args:
         op: The :attr:`AggregationConfig.op` value, possibly `"auto"`.
         var_info: Catalog entry for the variable being aggregated.
-            Only `is_flux` is consulted; the rest is ignored.
+            Only `is_pre_aggregated` (if present) and `is_flux` are
+            consulted; the rest is ignored.
 
     Returns:
         str: The concrete operator name (`"mean"`, `"sum"`, `"min"`,
@@ -467,6 +477,18 @@ def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:
             'sum'
 
             ```
+        - A pre-aggregated flux variable resolves to `"mean"`, not `"sum"`:
+
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.aggregate import _resolve_op
+            >>> _resolve_op(
+            ...     "auto",
+            ...     SimpleNamespace(is_flux=True, is_pre_aggregated=True),
+            ... )
+            'mean'
+
+            ```
         - Explicit ops pass through verbatim:
 
             ```python
@@ -479,6 +501,8 @@ def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:
     """
     if op != "auto":
         return op
+    if getattr(var_info, "is_pre_aggregated", False):
+        return "mean"
     return "sum" if var_info.is_flux else "mean"
 
 
@@ -502,10 +526,10 @@ class AggregationConfig(BaseModel):
         out_dir: Directory the per-window GeoTIFFs are written to.
             Created (with parents) if absent. `None` skips the write
             step entirely and returns arrays in memory only.
-        cell_size: Pixel size in degrees, embedded in the output
-            filename as a metadata note. `0.125` for ERA5 native,
-            `0.1` for ERA5-Land. The geotransform itself is read off
-            the NetCDF — this is informational only.
+        cell_size: Pixel size in degrees, informational only. `0.125`
+            for ERA5 native, `0.1` for ERA5-Land. The geotransform
+            written to each GeoTIFF is read off the NetCDF, not from
+            this value, and it is not encoded in the filename.
         level: When the NetCDF has a `pressure_level` dimension, pin
             this level via :meth:`pyramids.netcdf.NetCDF.sel`. `None`
             (default) requires a 3-D NetCDF; pass an explicit level
@@ -607,14 +631,14 @@ class AggregatedWindow:
             >>> window = AggregatedWindow(
             ...     label=pd.Timestamp("2020-01-01"),
             ...     array=np.array([[1.0, 2.0]]),
-            ...     path=Path("out/t2m_1D_20200101.tif"),
+            ...     path=Path("out/t2m_reanalysis-era5-single-levels_1D_20200101.tif"),
             ... )
             >>> window.label.strftime("%Y-%m-%d")
             '2020-01-01'
             >>> float(window.array.mean())
             1.5
             >>> window.path.name
-            't2m_1D_20200101.tif'
+            't2m_reanalysis-era5-single-levels_1D_20200101.tif'
 
             ```
         - A discarded array leaves only the label and the path to read back:
@@ -625,12 +649,12 @@ class AggregatedWindow:
             >>> window = AggregatedWindow(
             ...     label=pd.Timestamp("2020-02-01"),
             ...     array=None,
-            ...     path=Path("out/t2m_1D_20200201.tif"),
+            ...     path=Path("out/t2m_reanalysis-era5-single-levels_1D_20200201.tif"),
             ... )
             >>> window.array is None
             True
             >>> window.path.name
-            't2m_1D_20200201.tif'
+            't2m_reanalysis-era5-single-levels_1D_20200201.tif'
 
             ```
     """
@@ -640,10 +664,118 @@ class AggregatedWindow:
     path: Path | None
 
 
+def _output_stem(var_info: Variable) -> str:
+    """Filename stem for a variable's aggregated GeoTIFF windows.
+
+    `<cds_variable>_<dataset_id or cds_dataset>` when the row carries either id,
+    mirroring the ECMWF backend's `.nc` naming so two datasets that share a
+    `cds_variable` never collide in one `out_dir` — whether that is two ordinary
+    datasets (ERA5 single-levels vs ERA5-Land `total_precipitation`) or the two
+    curated GloFAS streams (`cems-glofas-historical` consolidated vs
+    `-intermediate`, which also share `cds_dataset` and are told apart by
+    `dataset_id`). Falls back to the bare `cds_variable` for a `var_info` that
+    carries neither id — the s3 / erddap adapters — leaving those backends'
+    filenames unchanged.
+
+    Args:
+        var_info: The catalog row being aggregated. Read structurally
+            (`cds_variable`, and the optional `dataset_id` / `cds_dataset`), so a
+            row from any backend works.
+
+    Returns:
+        The filename stem, without the trailing `_<freq>_<window>.tif`.
+
+    Examples:
+        - An ECMWF row appends its dataset id (`dataset_id` == `cds_dataset` for
+          an ordinary row):
+
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.aggregate import _output_stem
+            >>> era5 = SimpleNamespace(
+            ...     cds_variable="total_precipitation",
+            ...     cds_dataset="reanalysis-era5-single-levels",
+            ...     dataset_id="reanalysis-era5-single-levels",
+            ... )
+            >>> _output_stem(era5)
+            'total_precipitation_reanalysis-era5-single-levels'
+
+            ```
+        - A curated override (a `dataset_id` differing from `cds_dataset`) uses
+          the `dataset_id`, so two configs of one dataset stay distinct:
+
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.aggregate import _output_stem
+            >>> glofas = SimpleNamespace(
+            ...     cds_variable="average_river_discharge_in_the_last_24_hours",
+            ...     cds_dataset="cems-glofas-historical",
+            ...     dataset_id="cems-glofas-historical-intermediate",
+            ... )
+            >>> _output_stem(glofas)
+            'average_river_discharge_in_the_last_24_hours_cems-glofas-historical-intermediate'
+
+            ```
+        - A backend row carrying neither id keeps the bare variable name:
+
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.aggregate import _output_stem
+            >>> _output_stem(SimpleNamespace(cds_variable="elevation"))
+            'elevation'
+
+            ```
+    """
+    stem: str = var_info.cds_variable
+    dataset = getattr(var_info, "dataset_id", None) or getattr(
+        var_info, "cds_dataset", None
+    )
+    if dataset:
+        stem = f"{stem}_{dataset}"
+    return stem
+
+
+def _date_range_mask(
+    time_axis: pd.DatetimeIndex, date_range: tuple[Any, Any] | None
+) -> np.ndarray | None:
+    """Boolean mask keeping only samples within an inclusive date range.
+
+    A CDS `year`/`month`/`day` request is a cross-product, so a daily window
+    spanning month boundaries pulls samples outside the requested span — a
+    `2022-06-25`..`2022-07-05` request also returns June 1-5 and July 25-30.
+    Masking the time axis to the requested `[start, end]` before windowing keeps
+    the aggregated output faithful to the request, and — unlike dropping whole
+    windows afterwards — stops a stray sample from polluting a window it happens
+    to share (June 1-5 would otherwise skew a monthly June mean).
+
+    Both bounds widen to whole days, so a `06:00`/`12:00`/`18:00` sample on the
+    end day is kept; a `None` bound leaves that side unbounded.
+
+    Args:
+        time_axis: The cube's time coordinate.
+        date_range: Inclusive `(start, end)` bounds, or `None` for no filtering.
+
+    Returns:
+        numpy.ndarray | None: A boolean mask over `time_axis`, or `None` when
+        `date_range` is `None` (the caller then skips the intersection entirely).
+    """
+    if date_range is None:
+        return None
+    start, end = date_range
+    mask = np.ones(len(time_axis), dtype=bool)
+    if start is not None:
+        mask &= np.asarray(time_axis >= pd.Timestamp(start).normalize())
+    if end is not None:
+        upper = pd.Timestamp(end).normalize() + pd.Timedelta(days=1)
+        mask &= np.asarray(time_axis < upper)
+    return mask
+
+
 def aggregate_netcdf(
     nc_path: Path | str,
     var_info: Variable,
     config: AggregationConfig,
+    date_range: tuple[Any, Any] | None = None,
 ) -> list[tuple[pd.Timestamp, np.ndarray | None, Path | None]]:
     """Slice a CDS-shaped NetCDF into per-window aggregated outputs.
 
@@ -658,10 +790,17 @@ def aggregate_netcdf(
         var_info: Catalog row for the variable being aggregated. Used
             to pick the variable from the NetCDF
             (`var_info.nc_variable`), seed the output filename
-            (`var_info.cds_variable`), and resolve `op="auto"`
+            (`var_info.cds_variable`, plus `dataset_id` for a curated
+            override — see :func:`_output_stem`), and resolve `op="auto"`
             (`var_info.is_flux`).
         config: Frozen :class:`AggregationConfig` describing the
             window, reduction, and output location.
+        date_range: Optional inclusive `(start, end)` bounds. When set,
+            samples outside the range are dropped before windowing, so the
+            output stays faithful to the requested span even when the source
+            cube over-covers it (a CDS `year`/`month`/`day` cross-product pulls
+            stray dates for a window spanning month boundaries). `None` keeps
+            every sample.
 
     Returns:
         list[tuple[pd.Timestamp, np.ndarray | None, Path | None]]: One
@@ -689,7 +828,9 @@ def aggregate_netcdf(
     """
     return [
         (window.label, window.array, window.path)
-        for window in iter_aggregate_netcdf(nc_path, var_info, config)
+        for window in iter_aggregate_netcdf(
+            nc_path, var_info, config, date_range=date_range
+        )
     ]
 
 
@@ -697,6 +838,7 @@ def iter_aggregate_netcdf(
     nc_path: Path | str,
     var_info: Variable,
     config: AggregationConfig,
+    date_range: tuple[Any, Any] | None = None,
 ) -> Iterator[AggregatedWindow]:
     """Yield one :class:`AggregatedWindow` per time window, streaming.
 
@@ -723,10 +865,16 @@ def iter_aggregate_netcdf(
         nc_path: Path to the NetCDF on disk.
         var_info: Catalog row for the variable being aggregated. Used to
             pick the variable from the NetCDF (`var_info.nc_variable`),
-            seed the output filename (`var_info.cds_variable`), and resolve
+            seed the output filename (`_output_stem` — `var_info.cds_variable`,
+            plus `dataset_id` for a curated override), and resolve
             `op="auto"` (`var_info.is_flux`).
         config: Frozen :class:`AggregationConfig` describing the window,
             reduction, output location, and whether to retain arrays.
+        date_range: Optional inclusive `(start, end)` bounds. Samples outside
+            the range are dropped before windowing, so the streamed windows
+            match the requested span even when the source cube over-covers it;
+            a window left empty by the filter is skipped. `None` keeps every
+            sample. See :func:`_date_range_mask`.
 
     Yields:
         AggregatedWindow: One per window, in time order.
@@ -776,7 +924,15 @@ def iter_aggregate_netcdf(
         if var is not opened[-1]:
             opened.append(var)
 
+        in_range = _date_range_mask(time_axis, date_range)
+        stem = _output_stem(var_info)
         for window_label, mask in window_groups(time_axis, config.freq):
+            if in_range is not None:
+                mask = np.asarray(mask) & in_range
+                if not mask.any():
+                    # The whole window fell outside the requested date range —
+                    # nothing to aggregate, so emit no GeoTIFF for it.
+                    continue
             slice_ = _read_window(var, mask)
             reduced = reduce_time_axis(
                 slice_, op=op, skipna=config.skipna, min_count=config.min_count
@@ -784,9 +940,7 @@ def iter_aggregate_netcdf(
 
             target: Path | None = None
             if out_dir is not None:
-                target = out_dir / (
-                    f"{var_info.cds_variable}_{config.freq}_{window_label:%Y%m%d}.tif"
-                )
+                target = out_dir / (f"{stem}_{config.freq}_{window_label:%Y%m%d}.tif")
                 Dataset.create_from_array(arr=reduced, geo=geo, epsg=4326).to_file(
                     str(target)
                 )

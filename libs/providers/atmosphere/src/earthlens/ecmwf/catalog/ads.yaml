@@ -3,7 +3,7 @@
 # The greenfield ADS store: global/European air quality, greenhouse gases, and
 # atmospheric composition, operated by ECMWF under Copernicus CAMS. Request
 # shapes + enum values are pinned from the live form.json
-# (`planning/ecmwf/captures/a1_form_cams-*.json`, 2026-08-01).
+# (the A1 gate captures, 2026-08-01).
 #
 # Two request families: `cams_date` (a single `date` range string + `time`, for
 # EAC4 / composition forecasts / GFAS / air-quality forecasts) and
@@ -169,8 +169,10 @@ datasets:
         units: unknown
       ash:
         cds_variable: ash
-        nc_variable: ash
-        units: unknown
+        nc_variable: sum
+        units: kg m-2 s-1
+        extras:
+          source: [shipping]
       benzene:
         cds_variable: benzene
         nc_variable: benzene
@@ -185,8 +187,10 @@ datasets:
         units: unknown
       bromoform:
         cds_variable: bromoform
-        nc_variable: bromoform
-        units: unknown
+        nc_variable: emi_oceans
+        units: kg m-2 s-1
+        extras:
+          source: [oceanic]
       butanes:
         cds_variable: butanes
         nc_variable: butanes
@@ -229,8 +233,10 @@ datasets:
         units: unknown
       elemental-carbon:
         cds_variable: elemental_carbon
-        nc_variable: elemental_carbon
-        units: unknown
+        nc_variable: sum
+        units: kg m-2 s-1
+        extras:
+          source: [shipping]
       esters:
         cds_variable: esters
         nc_variable: esters
@@ -401,12 +407,16 @@ datasets:
     variables:
       downward-uv-radiation-at-the-surface:
         cds_variable: downward_uv_radiation_at_the_surface
-        nc_variable: downward_uv_radiation_at_the_surface
-        units: unknown
+        nc_variable: uvb
+        units: J m**-2
+        extras:
+          step: ['0', '12', '15', '18', '21', '3', '6', '9']
       forecast-albedo:
         cds_variable: forecast_albedo
-        nc_variable: forecast_albedo
-        units: unknown
+        nc_variable: fal
+        units: (0 - 1)
+        extras:
+          step: ['0', '12', '15', '18', '21', '3', '6', '9']
       photosynthetically-active-radiation-at-the-surface:
         cds_variable: photosynthetically_active_radiation_at_the_surface
         nc_variable: photosynthetically_active_radiation_at_the_surface
@@ -738,16 +748,16 @@ datasets:
     variables:
       snow-albedo:
         cds_variable: snow_albedo
-        nc_variable: snow_albedo
-        units: unknown
+        nc_variable: asn
+        units: (0 - 1)
       ch4-column-mean-molar-fraction:
         cds_variable: ch4_column_mean_molar_fraction
-        nc_variable: ch4_column_mean_molar_fraction
-        units: unknown
+        nc_variable: tcch4
+        units: ppb
       co2-column-mean-molar-fraction:
         cds_variable: co2_column_mean_molar_fraction
-        nc_variable: co2_column_mean_molar_fraction
-        units: unknown
+        nc_variable: tcco2
+        units: ppm
       accumulated-carbon-dioxide-ecosystem-respiration:
         cds_variable: accumulated_carbon_dioxide_ecosystem_respiration
         nc_variable: accumulated_carbon_dioxide_ecosystem_respiration
@@ -806,8 +816,8 @@ datasets:
         units: unknown
       carbon-dioxide:
         cds_variable: carbon_dioxide
-        nc_variable: carbon_dioxide
-        units: unknown
+        nc_variable: co2
+        units: kg kg**-1
       methane:
         cds_variable: methane
         nc_variable: methane
@@ -838,12 +848,12 @@ datasets:
     variables:
       ch4-column-mean-molar-fraction:
         cds_variable: ch4_column_mean_molar_fraction
-        nc_variable: ch4_column_mean_molar_fraction
-        units: unknown
+        nc_variable: tcch4
+        units: ppb
       co2-column-mean-molar-fraction:
         cds_variable: co2_column_mean_molar_fraction
-        nc_variable: co2_column_mean_molar_fraction
-        units: unknown
+        nc_variable: tcco2
+        units: ppm
       total-column-carbon-monoxide:
         cds_variable: total_column_carbon_monoxide
         nc_variable: total_column_carbon_monoxide
@@ -1133,16 +1143,22 @@ datasets:
     variables:
       aerosol-radiation-effect:
         cds_variable: aerosol_radiation_effect
-        nc_variable: aerosol_radiation_effect
-        units: unknown
+        nc_variable: re_ari_anth_srf_sw_cs
+        units: Wm-2
+        extras:
+          aerosol_type: [anthropogenic, marine, mineral_dust, natural_land]
       aerosol-optical-depth-550nm:
         cds_variable: aerosol_optical_depth_550nm
-        nc_variable: aerosol_optical_depth_550nm
-        units: unknown
+        nc_variable: od550anth
+        units: '1'
+        extras:
+          aerosol_type: [anthropogenic, marine, mineral_dust, natural_land, total]
       aerosol-absorption-optical-depth-550nm:
         cds_variable: aerosol_absorption_optical_depth_550nm
-        nc_variable: aerosol_absorption_optical_depth_550nm
-        units: unknown
+        nc_variable: abs550anth
+        units: '1'
+        extras:
+          aerosol_type: [anthropogenic, marine, mineral_dust, natural_land]
   cams-global-radiative-forcings:
     endpoint: ads
     request_kind: form
@@ -1193,328 +1209,328 @@ datasets:
     variables:
       2m-dewpoint-temperature:
         cds_variable: 2m_dewpoint_temperature
-        nc_variable: 2m_dewpoint_temperature
-        units: unknown
+        nc_variable: d2m
+        units: K
       2m-temperature:
         cds_variable: 2m_temperature
-        nc_variable: 2m_temperature
-        units: unknown
+        nc_variable: t2m
+        units: K
       black-carbon-aerosol-optical-depth-550nm:
         cds_variable: black_carbon_aerosol_optical_depth_550nm
-        nc_variable: black_carbon_aerosol_optical_depth_550nm
-        units: unknown
+        nc_variable: bcaod550
+        units: '~'
       charnock:
         cds_variable: charnock
-        nc_variable: charnock
-        units: unknown
+        nc_variable: chnk
+        units: Numeric
       dust-aerosol-optical-depth-550nm:
         cds_variable: dust_aerosol_optical_depth_550nm
-        nc_variable: dust_aerosol_optical_depth_550nm
-        units: unknown
+        nc_variable: duaod550
+        units: '~'
       ice-temperature-layer-1:
         cds_variable: ice_temperature_layer_1
-        nc_variable: ice_temperature_layer_1
-        units: unknown
+        nc_variable: istl1
+        units: K
       leaf-area-index-high-vegetation:
         cds_variable: leaf_area_index_high_vegetation
-        nc_variable: leaf_area_index_high_vegetation
-        units: unknown
+        nc_variable: lai_hv
+        units: m**2 m**-2
       leaf-area-index-low-vegetation:
         cds_variable: leaf_area_index_low_vegetation
-        nc_variable: leaf_area_index_low_vegetation
-        units: unknown
+        nc_variable: lai_lv
+        units: m**2 m**-2
       mean-sea-level-pressure:
         cds_variable: mean_sea_level_pressure
-        nc_variable: mean_sea_level_pressure
-        units: unknown
+        nc_variable: msl
+        units: Pa
       organic-matter-aerosol-optical-depth-550nm:
         cds_variable: organic_matter_aerosol_optical_depth_550nm
-        nc_variable: organic_matter_aerosol_optical_depth_550nm
-        units: unknown
+        nc_variable: omaod550
+        units: '~'
       particulate-matter-2.5um:
         cds_variable: particulate_matter_2.5um
-        nc_variable: particulate_matter_2.5um
-        units: unknown
+        nc_variable: pm2p5
+        units: kg m**-3
       particulate-matter-10um:
         cds_variable: particulate_matter_10um
-        nc_variable: particulate_matter_10um
-        units: unknown
+        nc_variable: pm10
+        units: kg m**-3
       sea-salt-aerosol-optical-depth-550nm:
         cds_variable: sea_salt_aerosol_optical_depth_550nm
-        nc_variable: sea_salt_aerosol_optical_depth_550nm
-        units: unknown
+        nc_variable: ssaod550
+        units: '~'
       sea-surface-temperature:
         cds_variable: sea_surface_temperature
-        nc_variable: sea_surface_temperature
-        units: unknown
+        nc_variable: sst
+        units: K
       sea-ice-cover:
         cds_variable: sea_ice_cover
-        nc_variable: sea_ice_cover
-        units: unknown
+        nc_variable: siconc
+        units: (0 - 1)
       snow-albedo:
         cds_variable: snow_albedo
-        nc_variable: snow_albedo
-        units: unknown
+        nc_variable: asn
+        units: (0 - 1)
       snow-density:
         cds_variable: snow_density
-        nc_variable: snow_density
-        units: unknown
+        nc_variable: rsn
+        units: kg m**-3
       snow-depth:
         cds_variable: snow_depth
-        nc_variable: snow_depth
-        units: unknown
+        nc_variable: sd
+        units: m of water equivalent
       soil-temperature-level-1:
         cds_variable: soil_temperature_level_1
-        nc_variable: soil_temperature_level_1
-        units: unknown
+        nc_variable: stl1
+        units: K
       sulphate-aerosol-optical-depth-550nm:
         cds_variable: sulphate_aerosol_optical_depth_550nm
-        nc_variable: sulphate_aerosol_optical_depth_550nm
-        units: unknown
+        nc_variable: suaod550
+        units: '~'
       surface-pressure:
         cds_variable: surface_pressure
-        nc_variable: surface_pressure
-        units: unknown
+        nc_variable: sp
+        units: Pa
       temperature-of-snow-layer:
         cds_variable: temperature_of_snow_layer
-        nc_variable: temperature_of_snow_layer
-        units: unknown
+        nc_variable: tsn
+        units: K
       total-aerosol-optical-depth-550nm:
         cds_variable: total_aerosol_optical_depth_550nm
-        nc_variable: total_aerosol_optical_depth_550nm
-        units: unknown
+        nc_variable: aod550
+        units: '~'
       total-column-carbon-monoxide:
         cds_variable: total_column_carbon_monoxide
-        nc_variable: total_column_carbon_monoxide
-        units: unknown
+        nc_variable: tcco
+        units: kg m**-2
       total-column-ethane:
         cds_variable: total_column_ethane
-        nc_variable: total_column_ethane
-        units: unknown
+        nc_variable: tc_c2h6
+        units: kg m**-2
       total-column-formaldehyde:
         cds_variable: total_column_formaldehyde
-        nc_variable: total_column_formaldehyde
-        units: unknown
+        nc_variable: tchcho
+        units: kg m**-2
       total-column-hydroxyl-radical:
         cds_variable: total_column_hydroxyl_radical
-        nc_variable: total_column_hydroxyl_radical
-        units: unknown
+        nc_variable: tc_oh
+        units: kg m**-2
       total-column-isoprene:
         cds_variable: total_column_isoprene
-        nc_variable: total_column_isoprene
-        units: unknown
+        nc_variable: tc_c5h8
+        units: kg m**-2
       total-column-methane:
         cds_variable: total_column_methane
-        nc_variable: total_column_methane
-        units: unknown
+        nc_variable: tc_ch4
+        units: kg m**-2
       total-column-nitric-acid:
         cds_variable: total_column_nitric_acid
-        nc_variable: total_column_nitric_acid
-        units: unknown
+        nc_variable: tc_hno3
+        units: kg m**-2
       total-column-nitrogen-dioxide:
         cds_variable: total_column_nitrogen_dioxide
-        nc_variable: total_column_nitrogen_dioxide
-        units: unknown
+        nc_variable: tcno2
+        units: kg m**-2
       total-column-nitrogen-monoxide:
         cds_variable: total_column_nitrogen_monoxide
-        nc_variable: total_column_nitrogen_monoxide
-        units: unknown
+        nc_variable: tc_no
+        units: kg m**-2
       total-column-ozone:
         cds_variable: total_column_ozone
-        nc_variable: total_column_ozone
-        units: unknown
+        nc_variable: gtco3
+        units: kg m**-2
       total-column-peroxyacetyl-nitrate:
         cds_variable: total_column_peroxyacetyl_nitrate
-        nc_variable: total_column_peroxyacetyl_nitrate
-        units: unknown
+        nc_variable: tc_pan
+        units: kg m**-2
       total-column-propane:
         cds_variable: total_column_propane
-        nc_variable: total_column_propane
-        units: unknown
+        nc_variable: tc_c3h8
+        units: kg m**-2
       total-column-sulphur-dioxide:
         cds_variable: total_column_sulphur_dioxide
-        nc_variable: total_column_sulphur_dioxide
-        units: unknown
+        nc_variable: tcso2
+        units: kg m**-2
       total-column-water:
         cds_variable: total_column_water
-        nc_variable: total_column_water
-        units: unknown
+        nc_variable: tcw
+        units: kg m**-2
       total-column-water-vapour:
         cds_variable: total_column_water_vapour
-        nc_variable: total_column_water_vapour
-        units: unknown
+        nc_variable: tcwv
+        units: kg m**-2
       vertically-integrated-mass-of-dust-aerosol-0.03-0.55um:
         cds_variable: vertically_integrated_mass_of_dust_aerosol_0.03-0.55um
-        nc_variable: vertically_integrated_mass_of_dust_aerosol_0.03-0.55um
-        units: unknown
+        nc_variable: aermssdus
+        units: kg m**-2
       vertically-integrated-mass-of-dust-aerosol-0.55-9um:
         cds_variable: vertically_integrated_mass_of_dust_aerosol_0.55-9um
-        nc_variable: vertically_integrated_mass_of_dust_aerosol_0.55-9um
-        units: unknown
+        nc_variable: aermssdum
+        units: kg m**-2
       vertically-integrated-mass-of-dust-aerosol-9-20um:
         cds_variable: vertically_integrated_mass_of_dust_aerosol_9-20um
-        nc_variable: vertically_integrated_mass_of_dust_aerosol_9-20um
-        units: unknown
+        nc_variable: aermssdul
+        units: kg m**-2
       vertically-integrated-mass-of-hydrophilic-black-carbon-aerosol:
         cds_variable: vertically_integrated_mass_of_hydrophilic_black_carbon_aerosol
-        nc_variable: vertically_integrated_mass_of_hydrophilic_black_carbon_aerosol
-        units: unknown
+        nc_variable: aermssbchphil
+        units: kg m**-2
       vertically-integrated-mass-of-hydrophilic-organic-matter-aerosol:
         cds_variable: vertically_integrated_mass_of_hydrophilic_organic_matter_aerosol
-        nc_variable: vertically_integrated_mass_of_hydrophilic_organic_matter_aerosol
-        units: unknown
+        nc_variable: aermssomhphil
+        units: kg m**-2
       vertically-integrated-mass-of-hydrophobic-black-carbon-aerosol:
         cds_variable: vertically_integrated_mass_of_hydrophobic_black_carbon_aerosol
-        nc_variable: vertically_integrated_mass_of_hydrophobic_black_carbon_aerosol
-        units: unknown
+        nc_variable: aermssbchphob
+        units: kg m**-2
       vertically-integrated-mass-of-hydrophobic-organic-matter-aerosol:
         cds_variable: vertically_integrated_mass_of_hydrophobic_organic_matter_aerosol
-        nc_variable: vertically_integrated_mass_of_hydrophobic_organic_matter_aerosol
-        units: unknown
+        nc_variable: aermssomhphob
+        units: kg m**-2
       vertically-integrated-mass-of-sea-salt-aerosol-0.03-0.5um:
         cds_variable: vertically_integrated_mass_of_sea_salt_aerosol_0.03-0.5um
-        nc_variable: vertically_integrated_mass_of_sea_salt_aerosol_0.03-0.5um
-        units: unknown
+        nc_variable: aermsssss
+        units: kg m**-2
       vertically-integrated-mass-of-sea-salt-aerosol-0.5-5um:
         cds_variable: vertically_integrated_mass_of_sea_salt_aerosol_0.5-5um
-        nc_variable: vertically_integrated_mass_of_sea_salt_aerosol_0.5-5um
-        units: unknown
+        nc_variable: aermssssm
+        units: kg m**-2
       vertically-integrated-mass-of-sea-salt-aerosol-5-20um:
         cds_variable: vertically_integrated_mass_of_sea_salt_aerosol_5-20um
-        nc_variable: vertically_integrated_mass_of_sea_salt_aerosol_5-20um
-        units: unknown
+        nc_variable: aermssssl
+        units: kg m**-2
       vertically-integrated-mass-of-sulphate-aerosol:
         cds_variable: vertically_integrated_mass_of_sulphate_aerosol
-        nc_variable: vertically_integrated_mass_of_sulphate_aerosol
-        units: unknown
+        nc_variable: aermsssu
+        units: kg m**-2
       vertically-integrated-mass-of-sulphur-dioxide:
         cds_variable: vertically_integrated_mass_of_sulphur_dioxide
-        nc_variable: vertically_integrated_mass_of_sulphur_dioxide
-        units: unknown
+        nc_variable: aermssso2
+        units: kg m**-2
       carbon-monoxide:
         cds_variable: carbon_monoxide
-        nc_variable: carbon_monoxide
-        units: unknown
+        nc_variable: co
+        units: kg kg**-1
       dust-aerosol-0.03-0.55um-mixing-ratio:
         cds_variable: dust_aerosol_0.03-0.55um_mixing_ratio
-        nc_variable: dust_aerosol_0.03-0.55um_mixing_ratio
-        units: unknown
+        nc_variable: aermr04
+        units: kg kg**-1
       dust-aerosol-0.55-0.9um-mixing-ratio:
         cds_variable: dust_aerosol_0.55-0.9um_mixing_ratio
-        nc_variable: dust_aerosol_0.55-0.9um_mixing_ratio
-        units: unknown
+        nc_variable: aermr05
+        units: kg kg**-1
       dust-aerosol-0.9-20um-mixing-ratio:
         cds_variable: dust_aerosol_0.9-20um_mixing_ratio
-        nc_variable: dust_aerosol_0.9-20um_mixing_ratio
-        units: unknown
+        nc_variable: aermr06
+        units: kg kg**-1
       ethane:
         cds_variable: ethane
-        nc_variable: ethane
-        units: unknown
+        nc_variable: c2h6
+        units: kg kg**-1
       formaldehyde:
         cds_variable: formaldehyde
-        nc_variable: formaldehyde
-        units: unknown
+        nc_variable: hcho
+        units: kg kg**-1
       geopotential:
         cds_variable: geopotential
-        nc_variable: geopotential
-        units: unknown
+        nc_variable: z
+        units: m**2 s**-2
       hydrophilic-black-carbon-aerosol-mixing-ratio:
         cds_variable: hydrophilic_black_carbon_aerosol_mixing_ratio
-        nc_variable: hydrophilic_black_carbon_aerosol_mixing_ratio
-        units: unknown
+        nc_variable: aermr09
+        units: kg kg**-1
       hydrophilic-organic-matter-aerosol-mixing-ratio:
         cds_variable: hydrophilic_organic_matter_aerosol_mixing_ratio
-        nc_variable: hydrophilic_organic_matter_aerosol_mixing_ratio
-        units: unknown
+        nc_variable: aermr07
+        units: kg kg**-1
       hydrophobic-black-carbon-aerosol-mixing-ratio:
         cds_variable: hydrophobic_black_carbon_aerosol_mixing_ratio
-        nc_variable: hydrophobic_black_carbon_aerosol_mixing_ratio
-        units: unknown
+        nc_variable: aermr10
+        units: kg kg**-1
       hydrophobic-organic-matter-aerosol-mixing-ratio:
         cds_variable: hydrophobic_organic_matter_aerosol_mixing_ratio
-        nc_variable: hydrophobic_organic_matter_aerosol_mixing_ratio
-        units: unknown
+        nc_variable: aermr08
+        units: kg kg**-1
       hydroxyl-radical:
         cds_variable: hydroxyl_radical
-        nc_variable: hydroxyl_radical
-        units: unknown
+        nc_variable: oh
+        units: kg kg**-1
       isoprene:
         cds_variable: isoprene
-        nc_variable: isoprene
-        units: unknown
+        nc_variable: c5h8
+        units: kg kg**-1
       methane-chemistry:
         cds_variable: methane_chemistry
-        nc_variable: methane_chemistry
-        units: unknown
+        nc_variable: ch4_c
+        units: kg kg**-1
       nitric-acid:
         cds_variable: nitric_acid
-        nc_variable: nitric_acid
-        units: unknown
+        nc_variable: hno3
+        units: kg kg**-1
       nitrogen-dioxide:
         cds_variable: nitrogen_dioxide
-        nc_variable: nitrogen_dioxide
-        units: unknown
+        nc_variable: no2
+        units: kg kg**-1
       nitrogen-monoxide:
         cds_variable: nitrogen_monoxide
-        nc_variable: nitrogen_monoxide
-        units: unknown
+        nc_variable: 'no'
+        units: kg kg**-1
       ozone:
         cds_variable: ozone
-        nc_variable: ozone
-        units: unknown
+        nc_variable: go3
+        units: kg kg**-1
       peroxyacetyl-nitrate:
         cds_variable: peroxyacetyl_nitrate
-        nc_variable: peroxyacetyl_nitrate
-        units: unknown
+        nc_variable: pan
+        units: kg kg**-1
       potential-vorticity:
         cds_variable: potential_vorticity
-        nc_variable: potential_vorticity
-        units: unknown
+        nc_variable: pv
+        units: K m**2 kg**-1 s**-1
       propane:
         cds_variable: propane
-        nc_variable: propane
-        units: unknown
+        nc_variable: c3h8
+        units: kg kg**-1
       relative-humidity:
         cds_variable: relative_humidity
-        nc_variable: relative_humidity
-        units: unknown
+        nc_variable: r
+        units: '%'
       sea-salt-aerosol-0.03-0.5um-mixing-ratio:
         cds_variable: sea_salt_aerosol_0.03-0.5um_mixing_ratio
-        nc_variable: sea_salt_aerosol_0.03-0.5um_mixing_ratio
-        units: unknown
+        nc_variable: aermr01
+        units: kg kg**-1
       sea-salt-aerosol-0.5-5um-mixing-ratio:
         cds_variable: sea_salt_aerosol_0.5-5um_mixing_ratio
-        nc_variable: sea_salt_aerosol_0.5-5um_mixing_ratio
-        units: unknown
+        nc_variable: aermr02
+        units: kg kg**-1
       sea-salt-aerosol-5-20um-mixing-ratio:
         cds_variable: sea_salt_aerosol_5-20um_mixing_ratio
-        nc_variable: sea_salt_aerosol_5-20um_mixing_ratio
-        units: unknown
+        nc_variable: aermr03
+        units: kg kg**-1
       so2-precursor-mixing-ratio:
         cds_variable: so2_precursor_mixing_ratio
-        nc_variable: so2_precursor_mixing_ratio
-        units: unknown
+        nc_variable: aermr12
+        units: kg kg**-1
       specific-humidity:
         cds_variable: specific_humidity
-        nc_variable: specific_humidity
-        units: unknown
+        nc_variable: q
+        units: kg kg**-1
       sulphate-aerosol-mixing-ratio:
         cds_variable: sulphate_aerosol_mixing_ratio
-        nc_variable: sulphate_aerosol_mixing_ratio
-        units: unknown
+        nc_variable: aermr11
+        units: kg kg**-1
       sulphur-dioxide:
         cds_variable: sulphur_dioxide
-        nc_variable: sulphur_dioxide
-        units: unknown
+        nc_variable: so2
+        units: kg kg**-1
       temperature:
         cds_variable: temperature
-        nc_variable: temperature
-        units: unknown
+        nc_variable: t
+        units: K
       vertical-velocity:
         cds_variable: vertical_velocity
-        nc_variable: vertical_velocity
-        units: unknown
+        nc_variable: w
+        units: Pa s**-1
   cams-gridded-solar-radiation:
     endpoint: ads
     request_kind: form
@@ -1527,20 +1543,30 @@ datasets:
     variables:
       global-horizontal-irradiation:
         cds_variable: global_horizontal_irradiation
-        nc_variable: global_horizontal_irradiation
-        units: unknown
+        nc_variable: global_horizontal_clear_sky_irradiation
+        units: W h m-2
+        extras:
+          sky_type: [clear, observed_cloud]
+      # The hydrated name below is specific to the `sky_type: [clear]` pinned
+      # in this row's extras — under `sky_type: [all]` the file carries no
+      # `beam_horizontal_clear_sky_irradiation`, so changing that pin means
+      # re-probing this row rather than only the extras.
       direct-horizontal-irradiation:
         cds_variable: direct_horizontal_irradiation
-        nc_variable: direct_horizontal_irradiation
-        units: unknown
+        nc_variable: beam_horizontal_clear_sky_irradiation
+        units: W h m-2
       diffuse-horizontal-irradiation:
         cds_variable: diffuse_horizontal_irradiation
-        nc_variable: diffuse_horizontal_irradiation
-        units: unknown
+        nc_variable: diffuse_horizontal_clear_sky_irradiation
+        units: W h m-2
+        extras:
+          sky_type: [clear, observed_cloud]
       direct-normal-irradiation:
         cds_variable: direct_normal_irradiation
-        nc_variable: direct_normal_irradiation
-        units: unknown
+        nc_variable: beam_normal_clear_sky_irradiation
+        units: W h m-2
+        extras:
+          sky_type: [clear, observed_cloud]
   cams-solar-radiation-timeseries:
     endpoint: ads
     request_kind: cams_date

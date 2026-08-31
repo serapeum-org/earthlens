@@ -1,6 +1,6 @@
 <p align="center">
   <img src="docs/_images/branding/earthlens-brand-kit/docs/readme-banner.png" width="820"
-       alt="earthlens — 48 Earth-observation providers · one facade · modular install">
+       alt="earthlens — 61 Earth-observation providers · one facade · modular install">
 </p>
 
 [![Tests](https://github.com/serapeum-org/earthlens/actions/workflows/tests.yml/badge.svg)](https://github.com/serapeum-org/earthlens/actions/workflows/tests.yml)
@@ -28,8 +28,24 @@ Current release info
 earthlens — a unified Python client for satellite & climate data
 =====================================================================
 
+<p align="center">
+  <img src="docs/_images/animation/earthlens-satellites-bluemarble.webp" width="820"
+       alt="The satellite fleet earthlens can reach, in orbit — ground swaths sweeping across Earth">
+</p>
+
+<p align="center">
+  <sub>34 of the spacecraft behind earthlens' providers, on their published orbits. The trailing band under
+  each one is its instrument's real ground swath, and the trapezoid above it is the sensor footprint sweeping
+  that strip out.<br>
+  The clock counts <b>simulated orbital time at 270&times; real</b>, so 20 seconds of clip is 1.5 hours in
+  orbit. Earth turns 22.6&deg; in that window and a low orbiter gets about nine tenths of the way round —
+  which is how you read its ~90-minute period straight off the screen. The geostationary satellites look
+  frozen because they are keeping pace with the ground beneath them.</sub>
+</p>
+
+
 **earthlens** gives you one consistent Python API for downloading satellite,
-climate, and geospatial data from **48 providers** — climate reanalysis,
+climate, and geospatial data from **61 providers** — climate reanalysis,
 satellite imagery, ocean models, weather forecasts, natural-hazard feeds, air
 quality, biodiversity, population, and more — and turning the results into
 analysis-ready GeoTIFFs, GeoDataFrames, or tables.
@@ -82,12 +98,12 @@ study, or anything else downstream.
 Features
 --------
 
-- **48 backends, one facade.** `EarthLens(data_source=...)` routes to any
+- **61 backends, one facade.** `EarthLens(data_source=...)` routes to any
   provider without changing the rest of your code. Backends are discovered
   through entry points and imported lazily, so the SDK for a provider you never
   touch is never loaded.
 - **Cross-provider discovery.** `find("precipitation")` tells you which of the
-  48 providers serve a dataset, offline, before you commit to one; `search(...)`
+  61 providers serve a dataset, offline, before you commit to one; `search(...)`
   dry-runs a request and lists exactly what it would fetch.
 - **YAML variable catalogs** per provider — every variable carries metadata:
   NetCDF name, units, accumulation semantics (`is_flux`), allowed pressure
@@ -117,7 +133,7 @@ Features
 Supported data sources
 ----------------------
 
-`earthlens` wraps 48 providers behind the one `EarthLens(data_source=..., ...)` facade —
+`earthlens` wraps 61 providers behind the one `EarthLens(data_source=..., ...)` facade —
 pass the `data_source` value below and everything else (auth, request shaping, output
 format) is handled per-backend. See [Data Sources](https://serapeum-org.github.io/earthlens/examples/data-sources/)
 for the full walkthrough of each one.
@@ -465,7 +481,7 @@ Start here:
 | Page | What it covers |
 |---|---|
 | [Getting started](https://serapeum-org.github.io/earthlens/getting-started/) | Install to first file on disk. |
-| [Discovering datasets](https://serapeum-org.github.io/earthlens/discovery/) | `sources()` / `find()` / `search()` across all 48 providers. |
+| [Discovering datasets](https://serapeum-org.github.io/earthlens/discovery/) | `sources()` / `find()` / `search()` across all 61 providers. |
 | [Supported providers](https://serapeum-org.github.io/earthlens/reference/providers/) | Keys, output kinds, auth, and extras for every backend. |
 | [Temporal aggregation](https://serapeum-org.github.io/earthlens/aggregation/) | Reduce a stack into windowed composites. |
 | [Troubleshooting](https://serapeum-org.github.io/earthlens/troubleshooting/) | When a download fails, and what to change. |

@@ -1,6 +1,6 @@
 """Credentials and API-key resolution for the GFW datasets of the risk backend.
 
-Hosts :class:`GfwAuth`, an :class:`earthlens.base.AbstractAuth` subclass that
+Hosts :class:`GfwAuth`, an :class:`earthlens.base.SingleSecretAuth` subclass that
 resolves a single Global Forest Watch **`x-api-key`** from, in priority order,
 an explicit `api_key=` argument or the `GFW_API_KEY` environment variable. The
 GFW Data API requires a key on every `query/json` and geostore request; there
@@ -16,10 +16,11 @@ The shape:
 
 * :class:`GfwCredentials` is a frozen pydantic value object carrying the
   optional API key as a :class:`pydantic.SecretStr`.
-* :class:`GfwAuth` binds those credentials and resolves the key in
-  :meth:`GfwAuth.configure` — explicit key first, then the `GFW_API_KEY`
-  environment variable, then a clear :class:`AuthenticationError` naming how to
-  create a key (never an interactive prompt).
+* :class:`GfwAuth` binds those credentials and lets the shared
+  :meth:`earthlens.base.SingleSecretAuth.configure` resolve the key — explicit
+  key first, then the `GFW_API_KEY` environment variable, then a clear
+  :class:`AuthenticationError` naming how to create a key (never an interactive
+  prompt).
 * `configure()` is idempotent — a second call after
   :meth:`GfwAuth.is_authenticated` returns `True` short-circuits.
 
@@ -30,12 +31,10 @@ attached as the `x-api-key` header by
 
 from __future__ import annotations
 
-import os
-
 from pydantic import BaseModel, ConfigDict, SecretStr
 
-from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
+from earthlens.base.auth import SingleSecretAuth
 
 #: Where a user creates a free GFW API key (MyGFW account -> token -> key).
 _CREATE_KEY_URL = (
@@ -93,11 +92,12 @@ class GfwCredentials(BaseModel):
     api_key: SecretStr | None = None
 
 
-class GfwAuth(AbstractAuth[GfwCredentials]):
+class GfwAuth(SingleSecretAuth[GfwCredentials]):
     """Resolve and hold the Global Forest Watch API key.
 
-    Implements the :class:`earthlens.base.AbstractAuth` contract for a
-    single-secret source. Construction does not touch the environment;
+    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a
+    single-secret source: it declares its env var and provider name and
+    supplies `_explicit_credential` / `_connect`, while the inherited
     :meth:`configure` performs the resolution and is idempotent. After a
     successful `configure()`, the key is available via the :attr:`api_key`
     property for the HTTP helpers to attach as the `x-api-key` header.
@@ -126,46 +126,23 @@ class GfwAuth(AbstractAuth[GfwCredentials]):
             ```
     """
 
-    def __init__(self, credentials: GfwCredentials) -> None:
-        """Store credentials; does not resolve the key yet.
+    ENV_VARS = ("GFW_API_KEY",)
+    PROVIDER = "GFW"
+    CREDENTIAL_ARG = "api_key"
+    CREDENTIAL_HINT = f"Create a free key with a MyGFW account: {_CREATE_KEY_URL}."
+    AUTH_ERROR = AuthenticationError
 
-        Args:
-            credentials: The :class:`GfwCredentials` value object carrying the
-                optional API key.
-        """
-        super().__init__(credentials)
-        self._configured = False
-        self._key: str | None = None
+    #: The resolved key, set by `_connect`; `None` until `configure` runs.
+    _key: str | None = None
 
-    def configure(self) -> None:
-        """Resolve the API key so subsequent requests can authenticate.
+    def _explicit_credential(self) -> str | None:
+        """Return the explicit `api_key` off the credentials, if any."""
+        api_key = self._creds.api_key
+        return api_key.get_secret_value() if api_key is not None else None
 
-        Idempotent — short-circuits when :meth:`is_authenticated` already
-        returns `True`. On the first call, resolves the key in this order: the
-        explicit `api_key` on the credentials, then the `GFW_API_KEY`
-        environment variable.
-
-        Raises:
-            AuthenticationError: When neither source supplies a key. The
-                message names the `api_key=` argument, the `GFW_API_KEY` env
-                var, and the key-creation URL — it never blocks on an
-                interactive prompt.
-        """
-        if self.is_authenticated():
-            return
-        key = (
-            self._creds.api_key.get_secret_value()
-            if self._creds.api_key is not None
-            else os.environ.get("GFW_API_KEY")
-        )
-        if not key:
-            raise AuthenticationError(
-                "no GFW API key available: pass api_key= to EarthLens(...) for "
-                "a gfw dataset, or set the GFW_API_KEY environment variable. "
-                f"Create a free key with a MyGFW account: {_CREATE_KEY_URL}."
-            )
-        self._key = key
-        self.mark_configured()
+    def _connect(self, credential: str) -> None:
+        """Store the resolved key for the `api_key` property to read back."""
+        self._key = credential
 
     @property
     def api_key(self) -> str:

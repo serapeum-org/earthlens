@@ -31,6 +31,11 @@ class TestCategoriseDataset:
             ("efas-forecast", "efas"),
             ("cems-fire-historical-v1", "fire"),
             ("cems-fire-seasonal", "fire"),
+            ("tigge-forecasts", "ecds"),
+            ("s2s-forecasts", "ecds"),
+            ("s2s-reforecasts", "ecds"),
+            ("derived-fire-fuel-biomass", "xds"),
+            ("projections-fire-fuel-burned-area", "xds"),
         ],
     )
     def test_id_prefix_rules(self, dataset_id, expected):
@@ -72,3 +77,12 @@ class TestRulesTable:
         """Each rule's target category is one of the declared CATEGORIES."""
         unknown = {category for _, category in _RULES if category not in CATEGORIES}
         assert not unknown, f"rules target undeclared categories: {unknown}"
+
+    def test_every_endpoint_has_a_category(self):
+        """Each store slug is a declared category, so seeded rows get a shard."""
+        from earthlens.ecmwf.endpoints import ENDPOINTS
+
+        missing = {
+            slug for slug in ENDPOINTS if slug not in CATEGORIES and slug != "cds"
+        }
+        assert not missing, f"stores without a shard category: {missing}"

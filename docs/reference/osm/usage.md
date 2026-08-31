@@ -76,7 +76,8 @@ print(len(buildings), "building footprints")
 ```
 
 The first call downloads the extract (Malta is ~8.8 MB) to a cross-run cache
-(`~/.earthlens/cache/osm_pbf/` by default, override with `cache_dir=`); repeat
+(`osm_pbf/` under the shared earthlens cache directory by default — see
+[Configuration](../configuration.md) — override with `cache_dir=`); repeat
 calls reuse it. List the region keys with `Catalog().region_ids()`, or pass a
 raw Geofabrik path (any string with a `/`). Omit `lat_lim` / `lon_lim` to read
 the whole extract — the bbox-area cap does **not** apply to a `pbf` read.
@@ -182,7 +183,7 @@ an `[out:xml]` / `[out:csv]` override will not parse.
 | `max_bbox_deg2` | bbox-area cap (square degrees) — guards the planet-wide footgun (live protocols only) | `100.0` |
 | `region` | Geofabrik region key or raw path — **required** for a `pbf:*` query | `None` |
 | `engine` | `pbf` read engine: `"pyrosm"` (in-memory) or `"pyosmium"` (streaming) | `"pyrosm"` |
-| `cache_dir` | directory for cached `.osm.pbf` extracts | `~/.earthlens/cache/osm_pbf` |
+| `cache_dir` | directory for cached `.osm.pbf` extracts | `<cache_dir()>/osm_pbf` |
 
 !!! warning "Keep the bbox small (live protocols)"
     Overpass / ohsome are for small/targeted queries. A box larger than

@@ -20,12 +20,12 @@ here — this module only resolves URIs. Opening the store is
 
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from earthlens.base.http import HttpClient
+from earthlens.config import cache_dir
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -62,16 +62,13 @@ _IDENTITY_FACETS = (
 def default_cache_path() -> Path:
     """Return the default on-disk location for the cached CSV.
 
-    Honours the `EARTHLENS_CACHE` environment variable (a base cache directory);
-    otherwise falls back to `~/.earthlens/cache`. The CMIP6 CSV lands under a
-    `cmip6/` subdirectory.
+    Resolved from the shared earthlens cache directory (`set_cache_dir()` /
+    `EARTHLENS_CACHE`). The CMIP6 CSV lands under a `cmip6/` subdirectory.
 
     Returns:
-        Path: `<cache-base>/cmip6/pangeo-cmip6.csv`.
+        Path: `<cache_dir()>/cmip6/pangeo-cmip6.csv`.
     """
-    base = os.environ.get("EARTHLENS_CACHE")
-    root = Path(base) if base else Path.home() / ".earthlens" / "cache"
-    return root / "cmip6" / "pangeo-cmip6.csv"
+    return cache_dir() / "cmip6" / "pangeo-cmip6.csv"
 
 
 @dataclass(frozen=True)

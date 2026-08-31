@@ -1,0 +1,126 @@
+# ECMWF Data Store (ECDS) datasets for the ECMWF backend.
+#
+# Reached via the ECDS endpoint (`endpoint: ecds`) with the shared CDS Personal
+# Access Token — the same token authenticates against CDS / ADS / EWDS / ECDS /
+# XDS; only the URL differs (probing `profiles/v1/account` on each returns the
+# same account). See `earthlens.ecmwf.endpoints`.
+#
+# ECDS is ECMWF-hosted rather than Copernicus-branded, but runs the same CADS
+# software: the catalogue publishes `form.json` and `constraints.json` at the
+# usual paths, so the shipped pre-flight `RequestValidator` works unchanged.
+#
+# ECDS additionally requires a **portal-scope** policy, `terms-of-use-ecds`,
+# which is separate from any dataset licence and is invisible to a
+# dataset-scope licence check. Without it every retrieve returns 403 with
+# "user didn't accept all required site policies".
+#
+# TIGGE vocabulary is NOT the MARS/CDS idiom — the live `constraints.json` is
+# authoritative and differs from the sibling shards:
+#   origin      : ecmwf (not the MARS spelling `ecmf`); 13 centres total —
+#                 bom, cma, cptec, dwd, eccc, ecmwf, imd, jma, kma, mf, ncep,
+#                 ncmrwf, ukmo
+#   level_type  : single_level (not `surface`); also isentropic,
+#                 potential_vorticity, pressure
+#   variable    : 2_m_temperature (underscores around the `m`)
+#
+# Output shape: TIGGE returns a **flat** NetCDF (no zip wrapper) carrying its
+# native reduced-Gaussian representation — the retrieved file has a `values`
+# dimension, NOT `lat`/`lon`. The `area` selector subsets points; it does not
+# regrid. Consumers that need a regular grid must regrid downstream; earthlens
+# does not silently do it here.
+#
+# Verified live 2026-08-16 by retrieving each variable and reading the file:
+#   tigge-forecasts    2_m_temperature -> t2m   (K), flat NetCDF, dim `values`
+#   s2s-forecasts      2_m_temperature -> t2m   (K), flat NetCDF, lat/lon
+#   s2s-reforecasts    maximum_2_m_..._6_hours -> mx2t6 (K), flat NetCDF, lat/lon
+# S2S needed `s2s-licence` rev 5; holding rev 4 returns 403 (licences are
+# versioned, so comparing ids alone is not enough).
+#
+# Deliberately NOT curated yet: the other variables each dataset's constraints
+# expose (TIGGE alone offers 37). Only the variables below have been retrieved
+# and unit-verified; placeholder units have shipped wrong values before, so the
+# rest wait for a real download.
+
+datasets:
+  # S2S real-time forecasts. Same single-level ECMWF vocabulary as TIGGE, but
+  # the output comes back on a regular latitude/longitude grid rather than
+  # TIGGE's unstructured `values` representation (verified live 2026-08-16).
+  s2s-forecasts:
+    endpoint: ecds
+    request_kind: form
+    extras:
+      origin: [ecmwf]
+      level_type: [single_level]
+      # Pinned from the live constraints (2026-08-16); S2S expresses its lead
+      # as a range string, and `0_24` is the first 24-hour window.
+      forecast_type: [control_forecast]
+      leadtime_hour: ["0_24"]
+      time: ["00:00"]
+      data_format: netcdf
+    variables:
+      2m-temperature:
+        cds_variable: 2_m_temperature
+        nc_variable: t2m
+        units: K
+
+  # S2S reforecasts carry TWO date axes: `year`/`month`/`day` select the model
+  # cycle, and `hyear`/`hmonth`/`hday` select the reforecast run for it. The
+  # store only serves a reforecast on the model run's own calendar day, so the
+  # two axes must move together.
+  #
+  # `request_kind: glofas_hindcast` is NOT usable here: `_remap_date_keys`
+  # *renames* year->hyear, which would delete the model-cycle date this dataset
+  # also requires. `request_kind: s2s_reforecast` instead *copies* month/day
+  # into hmonth/hday, so the reforecast date tracks the request. Pinning them
+  # to a literal instead only worked when the requested date happened to match
+  # it, and silently returned no data otherwise.
+  #
+  # Only the reforecast YEAR is a per-row choice (`hyear`, below).
+  s2s-reforecasts:
+    endpoint: ecds
+    request_kind: s2s_reforecast
+    extras:
+      origin: [ecmwf]
+      level_type: [single_level]
+      # Pinned from the live constraints (2026-08-16). Reforecast leads are
+      # published every 6 h; 102 h is a mid-range representative value.
+      forecast_type: [control_forecast]
+      leadtime_hour: ["102"]
+      time: ["00:00"]
+      data_format: netcdf
+      # Only the reforecast YEAR is pinned; `hmonth`/`hday` are copied from
+      # the requested model-cycle date by `request_kind: s2s_reforecast`.
+      #
+      # `hyear` is NOT validated against the requested model cycle: each cycle
+      # publishes reforecasts for its own ~20-year window, and the valid
+      # (year, hyear) pairs live in the dataset's 29 317 constraint entries.
+      # 1995 is inside the window of the cycles verified live (2015), and the
+      # pre-flight constraint check rejects a pair the store does not serve —
+      # so a mismatch fails with a clear error rather than bad data. Deriving
+      # the window per cycle would need the constraints at request time.
+      hyear: ["1995"]
+    variables:
+      maximum-2m-temperature-in-the-last-6-hours:
+        cds_variable: maximum_2_m_temperature_in_the_last_6_hours
+        nc_variable: mx2t6
+        units: K
+
+  tigge-forecasts:
+    endpoint: ecds
+    request_kind: form
+    extras:
+      origin: [ecmwf]
+      level_type: [single_level]
+      # Pinned from the live constraints (2026-08-16). `forecast_type` also
+      # accepts perturbed_forecast / high_resolution_forecast, and TIGGE
+      # publishes 46 lead times; +24 h at 00:00 UTC is a representative
+      # single-field default. Use the passthrough for another combination.
+      forecast_type: [control_forecast]
+      leadtime_hour: ["24"]
+      time: ["00:00"]
+      data_format: netcdf
+    variables:
+      2m-temperature:
+        cds_variable: 2_m_temperature
+        nc_variable: t2m
+        units: K

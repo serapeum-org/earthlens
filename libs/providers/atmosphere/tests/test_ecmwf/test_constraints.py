@@ -462,6 +462,104 @@ class TestCombinatorialPartitionUnion:
         ).check()
 
 
+class TestCalendarImpossibleDates:
+    """The combinatorial check skips dates that cannot exist on the calendar.
+
+    A daily request spanning several months enumerates `day=[01..31]` against
+    every month, so the cross-product contains impossible dates like June 31.
+    CDS serves such a request by dropping the nonexistent days, but a real
+    `constraints.json` partitions `day` by month length and never lists them, so
+    the cover check must skip them rather than reject the whole request.
+    """
+
+    @staticmethod
+    def _month_length_constraints():
+        """Return entries that partition `day` by month length, like ERA5-SL."""
+        return [
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["2022", "2024"],
+                "month": ["07", "08"],
+                "day": [f"{d:02d}" for d in range(1, 32)],
+                "time": ["00:00"],
+            },
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["2022", "2024"],
+                "month": ["06"],
+                "day": [f"{d:02d}" for d in range(1, 31)],
+                "time": ["00:00"],
+            },
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["2022", "2024"],
+                "month": ["02"],
+                "day": [f"{d:02d}" for d in range(1, 30)],
+                "time": ["00:00"],
+            },
+        ]
+
+    def test_multi_month_daily_request_with_impossible_day_passes(self, monkeypatch):
+        """A June-August daily request enumerating day 31 passes (June 31 dropped)."""
+        _stub_urlopen(monkeypatch, self._month_length_constraints())
+        RequestValidator(
+            "reanalysis-era5-single-levels",
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["2022"],
+                "month": ["06", "07", "08"],
+                "day": [f"{d:02d}" for d in range(1, 32)],
+                "time": ["00:00"],
+            },
+        ).check()
+
+    def test_feb_29_common_year_tolerated(self, monkeypatch):
+        """Feb 29 of a common year passes: it is impossible, so CDS drops it."""
+        _stub_urlopen(monkeypatch, self._month_length_constraints())
+        RequestValidator(
+            "reanalysis-era5-single-levels",
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["2022"],
+                "month": ["02"],
+                "day": [f"{d:02d}" for d in range(1, 30)],
+                "time": ["00:00"],
+            },
+        ).check()
+
+    def test_calendar_valid_but_unserved_date_still_rejected(self, monkeypatch):
+        """A real date no entry serves (year 1850) still raises."""
+        _stub_urlopen(monkeypatch, self._month_length_constraints())
+        validator = RequestValidator(
+            "reanalysis-era5-single-levels",
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["1850"],
+                "month": ["06"],
+                "day": ["15"],
+                "time": ["00:00"],
+            },
+        )
+        with pytest.raises(ValueError, match="year"):
+            validator.check()
+
+    def test_helper_flags_only_impossible_dates(self):
+        """`_impossible_calendar_date` is True only for nonexistent dates."""
+        impossible = constraints_module._impossible_calendar_date
+        assert impossible({"month": "06", "day": "31"}) is True
+        assert impossible({"year": "2022", "month": "02", "day": "29"}) is True
+        assert impossible({"year": "2024", "month": "02", "day": "29"}) is False
+        assert impossible({"year": "2022", "month": "07", "day": "31"}) is False
+        assert impossible({"month": "06"}) is False
+        assert impossible({"month": "all", "day": "31"}) is False
+
+
 class TestDateValidity:
     """Tests for the M17 date sanity check."""
 
@@ -627,3 +725,67 @@ class TestFetchConstraints:
         monkeypatch.setattr(constraints_module.urllib.request, "urlopen", _fail)
         with pytest.raises(ValueError, match="non-https URL"):
             fetch_constraints("any-dataset")
+
+
+class TestDateRangeConstraints:
+    """The `date` field matches by range containment, not exact value.
+
+    A CAMS reanalysis (`cams_date` request kind) serves a single `date` range
+    string (`2003-01-01/2025-12-31`); a specific requested day / sub-range must
+    validate against it rather than requiring an exact string match.
+    """
+
+    _RANGE_ENTRY = [{"variable": ["2m_temperature"], "date": ["2003-01-01/2025-12-31"]}]
+
+    def test_date_sub_range_inside_passes(self, monkeypatch):
+        """A `date` sub-range inside the constraint range validates."""
+        _stub_urlopen(monkeypatch, self._RANGE_ENTRY)
+        RequestValidator(
+            "cams-global-reanalysis-eac4",
+            {"variable": ["2m_temperature"], "date": "2023-01-01/2023-01-01"},
+        ).check()
+
+    def test_single_date_inside_passes(self, monkeypatch):
+        """A single `date` day inside the constraint range validates."""
+        _stub_urlopen(monkeypatch, self._RANGE_ENTRY)
+        RequestValidator(
+            "cams-global-reanalysis-eac4",
+            {"variable": ["2m_temperature"], "date": "2010-06-15"},
+        ).check()
+
+    def test_date_outside_range_raises(self, monkeypatch):
+        """A `date` outside the constraint range is rejected."""
+        _stub_urlopen(monkeypatch, self._RANGE_ENTRY)
+        validator = RequestValidator(
+            "cams-global-reanalysis-eac4",
+            {"variable": ["2m_temperature"], "date": "2030-01-01/2030-01-01"},
+        )
+        with pytest.raises(ValueError, match="does not match"):
+            validator.check()
+
+
+class TestDateWithin:
+    """Tests for the `_date_within` range-containment helper."""
+
+    @pytest.mark.parametrize(
+        "request_date, constraint, expected",
+        [
+            ("2023-01-01/2023-01-01", "2003-01-01/2025-12-31", True),
+            ("2023-01-01", "2003-01-01/2025-12-31", True),
+            ("2003-01-01/2025-12-31", "2003-01-01/2025-12-31", True),
+            ("2030-01-01/2030-01-01", "2003-01-01/2025-12-31", False),
+            ("2002-12-31", "2003-01-01/2025-12-31", False),
+            ("2020-01-01", "2020-01-01", True),
+            ("2020-01-02", "2020-01-01", False),
+        ],
+    )
+    def test_containment(self, request_date, constraint, expected):
+        """A request date / range is served iff it falls within the constraint.
+
+        Args:
+            request_date: The request's `date` value (a day or `X/Y` range).
+            constraint: One constraint `date` value (a day or `A/B` range).
+            expected: Whether the request should count as within the constraint.
+        """
+        result = constraints_module._date_within(request_date, constraint)
+        assert result is expected, f"{request_date} within {constraint}: {result}"

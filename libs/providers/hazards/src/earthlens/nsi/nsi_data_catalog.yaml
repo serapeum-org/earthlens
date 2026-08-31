@@ -3,7 +3,7 @@
 # Three keyless US-federal REST sources, selected by the backend's `source=`
 # discriminator. Each row pins the endpoint, the natural output kind (per
 # instance), a friendly -> provider field map, and the public-domain licence.
-# Verified live 2026-08-09 (see planning/flood-risk/captures/nsi-a1-findings-2026-08-09.md);
+# Verified live 2026-08-09 (see the A1 gate captures);
 # `nfhl` is network-blocked from the build env and unit-tested against a canned
 # fixture with an xfail e2e.
 sources:

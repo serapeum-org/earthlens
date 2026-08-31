@@ -7,7 +7,7 @@ failure (offline / a throttled mirror) skips rather than fails.
 
 Run with:
 
-    pixi run -e dev pytest -m "osm and e2e" tests/osm
+    uv run pytest -m "osm and e2e" tests/osm
 """
 
 from __future__ import annotations
@@ -33,15 +33,26 @@ def _skip_on_network(exc: Exception) -> None:
     """Skip (not fail) when the failure is a transport problem, else re-raise.
 
     Transport dropouts (offline / a throttled mirror) skip, and so does a
-    public-endpoint throttle/block: a `403` / `429` from `api.ohsome.org` (a
-    keyless service) is the CI runner's IP being rate-limited, not a regression,
-    so the backend's typed `OhsomeUnavailableError` skips the lane rather than
-    reddening it (issue #1025). Anything else re-raises and fails.
+    public-endpoint unavailability: a `403` / `429` throttle (issue #1025) or a
+    `5xx` outage (issue #790) from `api.ohsome.org` (a keyless service) is a
+    transient upstream condition, not a regression, so the backend's typed
+    `OhsomeUnavailableError` skips the lane rather than reddening it. Anything
+    else re-raises and fails.
     """
     if isinstance(exc, (requests.ConnectionError, requests.Timeout)):
         pytest.skip(f"OSM service unreachable: {exc}")
-    if isinstance(exc, OhsomeUnavailableError) and exc.status_code in (403, 429):
-        pytest.skip(f"ohsome public endpoint throttled/blocked this runner: {exc}")
+    status = getattr(exc, "status_code", None)
+    # A 5xx on this tiny smoke bbox is only ever an upstream outage, never
+    # something the request shape provoked (ohsome answers 4xx for a bad
+    # filter/bbox/time), so skipping it here does not mask an earthlens defect —
+    # the offline TestOhsomeRoute suite is the real guardrail for the 5xx
+    # classification logic.
+    if (
+        isinstance(exc, OhsomeUnavailableError)
+        and status is not None
+        and (status in (403, 429) or 500 <= status < 600)
+    ):
+        pytest.skip(f"ohsome public endpoint unavailable (HTTP {status}): {exc}")
     raise exc
 
 

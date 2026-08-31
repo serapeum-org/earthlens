@@ -19,7 +19,7 @@ A request names one or more property ids plus optional depths / quantiles;
 metadata (`unit` / `mapped_units` / `scale_factor`) — SoilGrids stores every
 value as an integer that must be divided by `scale_factor` to reach the
 conventional `unit` (verified live 2026-07-01; see
-`planning/soilgrids/captures/soilgrids-sdk-facts.md`).
+the A1 gate captures).
 """
 
 from __future__ import annotations

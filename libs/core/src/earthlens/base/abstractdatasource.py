@@ -15,6 +15,8 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from earthlens.config import resolve_output_path
+
 if TYPE_CHECKING:
     from earthlens.base.http import HttpClient
 
@@ -709,6 +711,13 @@ class AbstractDataSource(ABC):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Whether the raw `end` bound named a whole calendar day rather than an
+    #: instant. Recorded in `_check_input_dates` by the backends that widen an
+    #: inclusive `end`; see `earthlens.base.end_is_date_only`. The `False`
+    #: default is the conservative one: a backend that never records it does
+    #: not widen.
+    _end_is_date_only: bool = False
+
     REQUIRES_TIME_WINDOW: bool = True
 
     SUPPORTS_POLYGON_AOI: bool = False
@@ -954,7 +963,7 @@ class AbstractDataSource(ABC):
         lon_lim: list[float],
         temporal_resolution: str = "daily",
         fmt: str = "%Y-%m-%d",
-        path: Path | str = "",
+        path: Path | str | None = None,
     ):
         """Initialize a data source instance.
 
@@ -991,8 +1000,14 @@ class AbstractDataSource(ABC):
             fmt: `strptime` format for `start` / `end`. Defaults
                 to `"%Y-%m-%d"`.
             path: Output directory. Resolved here and created on the first
-                download, not at construction. Defaults to the current
-                working directory.
+                download, not at construction. A relative value is anchored to
+                the current working directory. When omitted (`None`) it falls
+                back to the configured earthlens output directory
+                (`set_output_dir()` / `EARTHLENS_DATA_DIR`, else
+                `~/.earthlens/data`); see `earthlens.config`. Pass `path=""` to
+                ask for the working directory explicitly. The fallback is
+                resolved once, here, so a later `set_output_dir()` does not move
+                an already-constructed backend.
 
         Raises:
             ValueError: If :attr:`REQUIRES_TIME_WINDOW` is `True` and either
@@ -1017,7 +1032,11 @@ class AbstractDataSource(ABC):
         self.space = self._create_grid(lat_lim, lon_lim)
         self.time = self._check_input_dates(start, end, temporal_resolution, fmt)
 
-        self.root_dir = Path(path).absolute()
+        # An explicit `path=` wins; omitting it entirely falls back to the
+        # configured output dir (set_output_dir() / $EARTHLENS_DATA_DIR) so a
+        # project can be pointed at one location without threading `path=`.
+        # `path=""` stays the documented way to ask for the working directory.
+        self.root_dir = resolve_output_path(path)
         self.path = self.root_dir
 
     def _refuse_unsupported_aggregate(self) -> None:
@@ -1911,6 +1930,7 @@ class AbstractDataSource(ABC):
         label: str = "item",
         describe: Callable[[Any], str] | None = None,
         on_failure: Callable[[Any, BaseException], Any] | None = None,
+        fatal: tuple[type[Exception], ...] = (),
     ) -> tuple[list[Any], list[tuple[str, BaseException]]]:
         """Map `fn` over `items`, applying the caller's partial-failure policy.
 
@@ -1934,6 +1954,10 @@ class AbstractDataSource(ABC):
                 vector backends need, where a failed provider still occupies a
                 slot with an empty `FeatureCollection`. When omitted, failures
                 are simply absent from `results`.
+            fatal: Exception classes that always propagate, whatever `errors`
+                says — for a failure of the *service* rather than of one item,
+                where continuing would report an upstream outage as a set of
+                empty results.
 
         Returns:
             `(results, failures)` — one result per succeeding item, in order,
@@ -1942,7 +1966,8 @@ class AbstractDataSource(ABC):
 
         Raises:
             ValueError: If `errors` is not a recognised policy.
-            BaseException: The first item's exception when `errors="raise"`.
+            BaseException: The first item's exception when `errors="raise"`,
+                or any exception matching `fatal` under **every** policy.
         """
         policy = self.check_errors_policy(errors)
         failures: list[tuple[str, BaseException]] = []
@@ -1955,12 +1980,13 @@ class AbstractDataSource(ABC):
                 describe=describe,
                 on_failure=on_failure,
                 failures=failures,
+                fatal=fatal,
             )
         )
         if failures and policy == "warn":
             logger.warning(
                 f"{type(self).__name__}: {len(failures)} of {len(items)} "
-                f"{label}(s) failed; {len(results)} succeeded."
+                f"{label}(s) failed; {len(items) - len(failures)} succeeded."
             )
         return results, failures
 
@@ -2007,6 +2033,7 @@ class AbstractDataSource(ABC):
         describe: Callable[[Any], str] | None,
         on_failure: Callable[[Any, BaseException], Any] | None,
         failures: list[tuple[str, BaseException]],
+        fatal: tuple[type[Exception], ...] = (),
     ) -> Iterator[Any]:
         """Apply `fn` to each item under the failure policy, yielding as it goes.
 
@@ -2029,6 +2056,11 @@ class AbstractDataSource(ABC):
             failures: Accumulator the caller owns; each failure is appended as
                 `(description, exception)` so a caller that stops early still
                 sees what failed before it stopped.
+            fatal: Exception classes that always propagate, whatever the policy
+                — a service-level failure (the upstream refused to serve *any*
+                request) is not the per-item data gap `errors="warn"` exists to
+                absorb, and silently returning fewer items would report it as
+                "this item has no data".
 
         Yields:
             Any: Each successful `fn(item)` result, plus any `on_failure`
@@ -2036,7 +2068,8 @@ class AbstractDataSource(ABC):
 
         Raises:
             BaseException: The first item's exception when the policy is
-                `"raise"`.
+                `"raise"`, or any exception matching `fatal` under **every**
+                policy.
         """
         name = describe or str
         for item in items:
@@ -2048,7 +2081,7 @@ class AbstractDataSource(ABC):
             try:
                 value = fn(item)
             except Exception as exc:  # noqa: BLE001 - policy decides the fate
-                if errors is None or errors == "raise":
+                if errors is None or errors == "raise" or isinstance(exc, fatal):
                     raise
                 placeholder = self._record_failure(
                     item,

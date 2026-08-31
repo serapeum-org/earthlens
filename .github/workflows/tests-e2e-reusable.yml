@@ -23,6 +23,11 @@ on:
         description: "Thematic distribution: atmosphere|ocean|imagery|land|hazards."
         required: true
         type: string
+      timeout_minutes:
+        description: "Wall-clock cap (minutes) for each e2e matrix lane."
+        required: false
+        type: number
+        default: 45
 
 permissions:
   contents: read
@@ -58,10 +63,19 @@ jobs:
           atmosphere)
             providers=(
             '{"name":"nwp","path":"libs/providers/atmosphere/(src/earthlens|tests)/nwp/","marker":"e2e and nwp","groups":"groups: dev, extras: nwp","pkg":"libs/providers/atmosphere/tests/nwp"}'
+            # ECMWF/CDS gets its own lane: its live datastore requests queue
+            # server-side for tens of minutes, so bundling them into the catch-all
+            # made the whole atmosphere sweep overrun the lane timeout. Its tests
+            # live under `tests/test_ecmwf/` (not `tests/ecmwf/`), so the path and
+            # dedicated_backends spell that directory out explicitly. Uses
+            # `extras: all` (the env the catch-all already ran these tests in)
+            # because ECMWF spans both the `ecmwf` (cdsapi) and `ecmwf-modern`
+            # (ecmwf-datastores-client) extras.
+            '{"name":"ecmwf","path":"libs/providers/atmosphere/(src/earthlens/ecmwf|tests/test_ecmwf)/","marker":"e2e and ecmwf","groups":"groups: dev, extras: all","pkg":"libs/providers/atmosphere/tests/test_ecmwf"}'
             )
-            catchall_marker="e2e and not nwp"
+            catchall_marker="e2e and not nwp and not ecmwf"
             catchall_deselect=""
-            dedicated_backends="nwp"
+            dedicated_backends="nwp|ecmwf|test_ecmwf"
             ;;
           ocean)
             providers=(
@@ -73,7 +87,7 @@ jobs:
             ;;
           imagery)
             providers=(
-            '{"name":"gee","path":"libs/providers/imagery/(src/earthlens|tests)/gee/","marker":"e2e and gee","groups":"groups: dev, extras: gee","pkg":"libs/providers/imagery/tests/gee"}'
+            '{"name":"gee","path":"libs/providers/imagery/(src/earthlens|tests)/gee/","marker":"e2e and gee","groups":"groups: dev, extras: gee,eedai","pkg":"libs/providers/imagery/tests/gee"}'
             '{"name":"stac","path":"libs/providers/imagery/(src/earthlens|tests)/stac/","marker":"stac and e2e","groups":"groups: dev, extras: stac","pkg":"libs/providers/imagery/tests/stac"}'
             '{"name":"sentinel_hub","path":"libs/providers/imagery/(src/earthlens|tests)/sentinel_hub/","marker":"sentinel_hub and e2e","groups":"groups: dev, extras: sentinel-hub","pkg":"libs/providers/imagery/tests/sentinel_hub"}'
             '{"name":"earthdata","path":"libs/providers/imagery/(src/earthlens|tests)/earthdata/","marker":"e2e and earthdata","groups":"groups: dev, extras: earthdata","pkg":"libs/providers/imagery/tests/earthdata"}'
@@ -87,7 +101,7 @@ jobs:
           land)
             providers=(
             '{"name":"iucn","path":"libs/providers/land/(src/earthlens|tests)/iucn/","marker":"e2e and iucn","groups":"groups: dev","pkg":"libs/providers/land/tests/iucn"}'
-            '{"name":"wdpa","path":"libs/providers/land/(src/earthlens|tests)/wdpa/","marker":"e2e and wdpa","groups":"groups: dev","pkg":"libs/providers/land/tests/wdpa"}'
+            '{"name":"wdpa","path":"libs/providers/land/(src/earthlens|tests)/wdpa/","marker":"e2e and wdpa","groups":"groups: dev","pkg":"libs/providers/land/tests/wdpa","allow_all_skipped":true}'
             )
             catchall_marker="e2e and not iucn and not wdpa"
             catchall_deselect=""
@@ -99,7 +113,7 @@ jobs:
             '{"name":"osm","path":"libs/providers/hazards/(src/earthlens|tests)/osm/","marker":"e2e and osm","groups":"groups: dev, extras: osm","pkg":"libs/providers/hazards/tests/osm"}'
             )
             catchall_marker="e2e and not emdat and not osm and not osm_pbf"
-            catchall_deselect="tests/admin/test_admin_e2e.py::TestAdminLiveFetch::test_geoboundaries_country_adm1"
+            catchall_deselect=""
             dedicated_backends="emdat|osm"
             ;;
             *)
@@ -143,7 +157,7 @@ jobs:
           for row in "${providers[@]}"; do
             path_re="$(jq -r '.path' <<< "$row")"
             if [ "$run_all" -eq 1 ] || echo "$changed" | grep -Eq "$path_re"; then
-              includes+=("$(jq -c '{name, marker, groups, pkg, deselect: "", allow_empty: false}' <<< "$row")")
+              includes+=("$(jq -c '{name, marker, groups, pkg, deselect: "", allow_empty: false, allow_all_skipped: (.allow_all_skipped // false)}' <<< "$row")")
             fi
           done
 
@@ -164,7 +178,7 @@ jobs:
               --arg name "rest-of-$THEME" --arg marker "$catchall_marker" \
               --arg groups "groups: dev, extras: all" --arg deselect "$catchall_deselect" \
               --arg pkg "libs/providers/$THEME" --argjson allow_empty true \
-              '{name:$name, marker:$marker, groups:$groups, pkg:$pkg, deselect:$deselect, allow_empty:$allow_empty}')")
+              '{name:$name, marker:$marker, groups:$groups, pkg:$pkg, deselect:$deselect, allow_empty:$allow_empty, allow_all_skipped:false}')")
           fi
 
           if [ "${#includes[@]}" -eq 0 ]; then
@@ -183,7 +197,9 @@ jobs:
     runs-on: ubuntu-latest
     # A live provider host can hang (see the scheduled workflow's Dataverse
     # probe); cap the job rather than hold a runner for the 6-hour default.
-    timeout-minutes: 45
+    # The cap is a caller-tunable input (default 45) so a theme with slower
+    # live hosts can raise it without touching the other themes.
+    timeout-minutes: ${{ inputs.timeout_minutes }}
 
     strategy:
       fail-fast: false
@@ -230,10 +246,26 @@ jobs:
           SENTINELHUB_CLIENT_SECRET: ${{ secrets.SENTINELHUB_CLIENT_SECRET }}
           IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
           WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
+          COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
+          COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
+          API_USGS_PAT: ${{ secrets.API_USGS_PAT }}
+          GPORTAL_USERNAME: ${{ secrets.GPORTAL_USERNAME }}
+          GPORTAL_PASSWORD: ${{ secrets.GPORTAL_PASSWORD }}
+          JAXA_PTREE_USERNAME: ${{ secrets.JAXA_PTREE_USERNAME }}
+          JAXA_PTREE_PASSWORD: ${{ secrets.JAXA_PTREE_PASSWORD }}
+          OPENAQ_API_KEY: ${{ secrets.OPENAQ_API_KEY }}
+          FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+          NREL_API_KEY: ${{ secrets.NREL_API_KEY }}
+          NREL_EMAIL: ${{ secrets.NREL_EMAIL }}
+          OPENEO_CLIENT_ID: ${{ secrets.OPENEO_CLIENT_ID }}
+          OPENEO_CLIENT_SECRET: ${{ secrets.OPENEO_CLIENT_SECRET }}
+          GFW_API_KEY: ${{ secrets.GFW_API_KEY }}
           PKG: ${{ matrix.pkg }}
           MARKER: ${{ matrix.marker }}
           DESELECT: ${{ matrix.deselect }}
           ALLOW_EMPTY: ${{ matrix.allow_empty }}
+          ALLOW_ALL_SKIPPED: ${{ matrix.allow_all_skipped }}
+          LANE: ${{ matrix.name }}
         run: |
           # A dedicated lane targets only its backend's test dir; collecting the
           # whole package would import sibling backends' test modules (some
@@ -241,12 +273,21 @@ jobs:
           # catch-all installs extras: all and targets the whole package.
           # -rs prints each skip's reason, so an upstream-availability skip (see
           # earthlens.testing.pytest_runtest_call) is legible in the log.
+          # The GEE key arrives as JSON, but `ee.ServiceAccountCredentials` takes a
+          # *filename*; handing it the content made `open()` fail and print the key
+          # into a public log. Materialise it and pass a path instead.
+          case "$GEE_SERVICE_KEY" in
+            \{*) printf "%s" "$GEE_SERVICE_KEY" > "$RUNNER_TEMP/gee-key.json"
+                 GEE_SERVICE_KEY="$RUNNER_TEMP/gee-key.json"
+                 export GEE_SERVICE_KEY ;;
+          esac
           pkg="$PKG"
+          report="$RUNNER_TEMP/e2e-$LANE.xml"
           set +e
           if [ -n "$DESELECT" ]; then
-            uv run --locked pytest "$pkg" -m "$MARKER" --deselect "$DESELECT" -rs -v
+            uv run --locked pytest "$pkg" -m "$MARKER" --deselect "$DESELECT" -rs -v               --junitxml="$report"
           else
-            uv run --locked pytest "$pkg" -m "$MARKER" -rs -v
+            uv run --locked pytest "$pkg" -m "$MARKER" -rs -v --junitxml="$report"
           fi
           code=$?
           set -e
@@ -257,5 +298,12 @@ jobs:
           if [ "$code" -eq 5 ] && [ "$ALLOW_EMPTY" = "true" ]; then
             echo "no e2e tests collected for the changed area; treating as pass"
             exit 0
+          fi
+          # earthlens.testing's in-process guard already fails a lane masked by
+          # *upstream* outages, but it counts only skips carrying its
+          # availability prefix - so a lane skipped for missing credentials
+          # exits 0 and reports green. Catch that, unless declared empty.
+          if [ "$code" -eq 0 ] && [ "$ALLOW_ALL_SKIPPED" != "true" ]; then
+            python .github/scripts/assert_tests_ran.py "$report" "$LANE" || exit 1
           fi
           exit "$code"

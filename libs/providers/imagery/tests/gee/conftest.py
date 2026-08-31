@@ -30,7 +30,7 @@ def _clear_gee_module_caches():
     `_EXTENT_CACHE` (in `earthlens.gee.backend`) is module-level so
     repeated `GEE(...)` constructions against the same asset don't
     re-issue the 2-5 s `reduceColumns(minMax)` round trip — see L5 in
-    `planning/pr-diff-review-feat-gee-2026-05-17-2.md`. Without this
+    the GEE PR review. Without this
     clear, a test that mocks `_discover_ee_extent` and counts calls
     would see a stale hit from a previous test. We clear *before* the
     test runs (so any caller seeing the cache sees an empty one).

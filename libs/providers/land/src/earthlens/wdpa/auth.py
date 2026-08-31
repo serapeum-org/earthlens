@@ -1,6 +1,6 @@
 """Credentials and token resolution for the WDPA / Protected Planet backend.
 
-Hosts :class:`WdpaAuth`, an :class:`earthlens.base.AbstractAuth` subclass
+Hosts :class:`WdpaAuth`, an :class:`earthlens.base.SingleSecretAuth` subclass
 that resolves the Protected Planet **personal API token** from, in priority
 order, an explicit `token=` argument or the `WDPA_TOKEN` environment
 variable. The Protected Planet v4 API requires a token on every request,
@@ -13,10 +13,11 @@ The shape:
 
 * :class:`WdpaCredentials` is a frozen pydantic value object carrying the
   optional token as a :class:`pydantic.SecretStr`.
-* :class:`WdpaAuth` binds those credentials and resolves the token in
-  :meth:`WdpaAuth.configure` — explicit token first, then the `WDPA_TOKEN`
-  env var, then a clear :class:`AuthenticationError` naming the
-  token-request URL (never an interactive prompt).
+* :class:`WdpaAuth` binds those credentials and lets the shared
+  :meth:`earthlens.base.SingleSecretAuth.configure` resolve the token —
+  explicit token first, then the `WDPA_TOKEN` env var, then a clear
+  :class:`AuthenticationError` naming the token-request URL (never an
+  interactive prompt).
 
 The resolved token is read back via the :attr:`WdpaAuth.token` property and
 attached as the `token=` query parameter by `earthlens.wdpa._rest`.
@@ -24,12 +25,10 @@ attached as the `token=` query parameter by `earthlens.wdpa._rest`.
 
 from __future__ import annotations
 
-import os
-
 from pydantic import BaseModel, ConfigDict, SecretStr
 
-from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
+from earthlens.base.auth import SingleSecretAuth
 
 #: Where a user requests a personal Protected Planet API token.
 _TOKEN_URL = "https://api.protectedplanet.net/request"  # nosec B105 - not a secret (public URL / identifier)
@@ -78,11 +77,12 @@ class WdpaCredentials(BaseModel):
     token: SecretStr | None = None
 
 
-class WdpaAuth(AbstractAuth[WdpaCredentials]):
+class WdpaAuth(SingleSecretAuth[WdpaCredentials]):
     """Resolve and hold the Protected Planet API token (mandatory).
 
-    Implements the :class:`earthlens.base.AbstractAuth` contract for a
-    single-secret backend. Construction does not touch the environment;
+    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a
+    single-secret backend: it declares its env var and provider name and
+    supplies `_explicit_credential` / `_connect`, while the inherited
     :meth:`configure` performs the resolution and is idempotent. After a
     successful `configure()`, the token is available via the
     :attr:`token` property for `_rest` to attach as the `token=` query
@@ -105,46 +105,23 @@ class WdpaAuth(AbstractAuth[WdpaCredentials]):
             ```
     """
 
-    def __init__(self, credentials: WdpaCredentials) -> None:
-        """Store credentials; does not resolve the token yet.
+    ENV_VARS = ("WDPA_TOKEN",)
+    PROVIDER = "Protected Planet"
+    CREDENTIAL_ARG = "token"
+    CREDENTIAL_HINT = f"Request a token at {_TOKEN_URL}."
+    AUTH_ERROR = AuthenticationError
 
-        Args:
-            credentials: The :class:`WdpaCredentials` value object
-                carrying the optional token.
-        """
-        super().__init__(credentials)
-        self._configured = False
-        self._token: str | None = None
+    #: The resolved token, set by `_connect`; `None` until `configure` runs.
+    _token: str | None = None
 
-    def configure(self) -> None:
-        """Resolve the token so subsequent requests can authenticate.
+    def _explicit_credential(self) -> str | None:
+        """Return the explicit `token` off the credentials, if any."""
+        token = self._creds.token
+        return token.get_secret_value() if token is not None else None
 
-        Idempotent — short-circuits when :meth:`is_authenticated` already
-        returns `True`. On the first call, resolves the token in this
-        order: the explicit `token` on the credentials, then the
-        `WDPA_TOKEN` environment variable.
-
-        Raises:
-            AuthenticationError: When neither source supplies a token. The
-                message names the `token=` argument, the `WDPA_TOKEN` env
-                var, and the token-request URL — it never blocks on an
-                interactive prompt.
-        """
-        if self.is_authenticated():
-            return
-        token = (
-            self._creds.token.get_secret_value()
-            if self._creds.token is not None
-            else os.environ.get("WDPA_TOKEN")
-        )
-        if not token:
-            raise AuthenticationError(
-                "no Protected Planet token available: pass token= to WDPA(...) "
-                "or set the WDPA_TOKEN environment variable. Request a token at "
-                f"{_TOKEN_URL}."
-            )
-        self._token = token
-        self.mark_configured()
+    def _connect(self, credential: str) -> None:
+        """Store the resolved token for the `token` property to read back."""
+        self._token = credential
 
     @property
     def token(self) -> str:

@@ -54,7 +54,7 @@ jobs:
         run: |
           set -euo pipefail
           version=$(ls dist/earthlens-[0-9]*.whl | sed -E 's|.*/earthlens-([^-]+)-py3.*|\1|')
-          printf 'earthlens[all]==%s\npytest\npytest-cov\n' "${version}" \
+          printf 'earthlens[all]==%s\npytest\npytest-cov\nhypothesis\npsutil\n' "${version}" \
             > dist/requirements.in
           uv pip compile --generate-hashes --universal --python-version 3.11 \
             --find-links dist \

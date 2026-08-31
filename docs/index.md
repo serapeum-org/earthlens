@@ -1,4 +1,4 @@
-![earthlens — one Python facade for 48 Earth-observation data providers](_images/branding/earthlens-brand-kit/docs/docs-hero.png)
+![earthlens — one Python facade for 61 Earth-observation data providers](_images/branding/earthlens-brand-kit/docs/docs-hero.png)
 
 # earthlens
 
@@ -11,11 +11,43 @@
 [![codecov](https://codecov.io/gh/serapeum-org/earthlens/branch/main/graph/badge.svg)](https://codecov.io/gh/serapeum-org/earthlens)
 
 **earthlens** is a Python package providing a single, unified API for downloading
-satellite, climate, and geospatial data from **50 providers** — climate
+satellite, climate, and geospatial data from **61 providers** — climate
 reanalysis, satellite imagery, ocean models, weather forecasts, natural-hazard
 feeds, air quality, biodiversity, population, and more. Pick a `data_source`, describe the area
 and dates you want, and call `download()`; the matching backend handles auth,
 catalog lookup, request shaping, and writing the output.
+
+<figure markdown>
+  <video controls autoplay loop muted playsinline width="100%"
+         poster="_images/animation/earthlens-satellites-night.gif">
+    <source src="_images/animation/earthlens-satellites-night-1280.mp4" type="video/mp4">
+    <img src="_images/animation/earthlens-satellites-night.gif" width="100%"
+         alt="34 satellites orbiting a night-lit Earth, each low orbiter trailing its instrument's ground swath">
+  </video>
+
+<figcaption markdown>
+34 of the spacecraft behind earthlens' providers, drawn on their published orbits. Each trailing band is
+that instrument's real ground swath, and the trapezoid above it is the sensor's footprint sweeping it out.
+
+The clock counts **simulated orbital time at 270&times; real**: the 20-second clip covers 1.5 hours. Earth
+turns 22.6&deg; in that window and a low orbiter completes about nine tenths of a circuit, which is how its
+~90-minute period can be read straight off the screen. The geostationary satellites appear frozen because
+they are turning at exactly Earth's rate, holding station over the same ground.
+</figcaption>
+</figure>
+
+<script>
+  // A reader who has asked for reduced motion should not be handed a looping
+  // clip. autoplay is an attribute rather than a style, so CSS cannot reach it;
+  // dropping it leaves the poster frame and the controls already on the player.
+  (function () {
+    if (!window.matchMedia || !matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    document.querySelectorAll("video[autoplay]").forEach(function (v) {
+      v.removeAttribute("autoplay");
+      v.pause();
+    });
+  })();
+</script>
 
 ## Supported data sources
 

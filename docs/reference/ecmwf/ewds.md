@@ -58,17 +58,20 @@ lands at `<path>/river_discharge_in_the_last_24_hours_cems-glofas-forecast.nc`.
 
 ## Scope and follow-ups
 
-Only `cems-glofas-forecast` is curated in this release (verified end to end
-against live EWDS). The rest of the EWDS universe is reachable with the same
-token but not yet wired for download:
+The GloFAS, CEMS-fire, and EFAS families on EWDS are curated (added across the
+three-store work and #1039). Discharge on `cems-glofas-forecast` /
+`cems-glofas-historical` is verified end to end against live EWDS; the remaining
+variables and families carry constraint-derived request shapes with
+`units: unknown` placeholders pending per-variable live verification.
 
-| Dataset | Status / blocker |
+| Dataset | Status |
 |---|---|
 | `cems-glofas-forecast` | **Shipped** — verified live. |
-| `cems-glofas-reforecast`, `cems-glofas-historical` | Use `hyear`/`hmonth`/`hday` date keys — need a date-key remap. |
-| `cems-glofas-seasonal`, `cems-glofas-seasonal-reforecast` | Monthly + `leadtime_hour` shape. |
-| `cems-fire-historical-v1`, `cems-fire-seasonal` | Need their valid `product_type` / `dataset_type` / `system_version` combos pinned. |
-| `efas-*` | The public EFAS archive (licence-gated); EFAS real-time is partner-gated and out of scope. |
+| `cems-glofas-historical` | **Curated** — `request_kind: glofas` (ordinary `year`/`month`/`day`, no hindcast remap); discharge (`avg_dis`) verified live. |
+| `cems-glofas-historical-intermediate` | **Curated** — the ERA5T intermediate stream (`product_type: intermediate`), a second config of `cems-glofas-historical` via the per-row `cds_dataset` override; discharge verified live. |
+| `cems-glofas-reforecast`, `cems-glofas-seasonal`, `cems-glofas-seasonal-reforecast` | **Curated** — `glofas_hindcast` / `seasonal` / `seasonal_hindcast` request kinds. |
+| `cems-fire-historical-v1`, `cems-fire-seasonal` | **Curated** — CEMS fire-danger rows. |
+| `efas-*` | **Curated** — the EFAS forecast / historical / reforecast / seasonal suite. |
 
 See [Usage](usage.md) for the general request shape and
 [Catalog & tooling](catalog.md) for the catalog layout.

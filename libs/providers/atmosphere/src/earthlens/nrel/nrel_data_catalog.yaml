@@ -6,7 +6,7 @@
 # canonical value columns the parser keeps. The CSV download endpoints serve a
 # single POINT for a single `names=` (year, or `tmy`) per request.
 #
-# Facts pinned from the live API in planning/nrel/captures/nrel-sdk-facts.md
+# Facts pinned from the live API in the A1 gate captures.
 # (verified 2026-06-27). The legacy PSM v3.2.2 endpoints were superseded by the
 # GOES Aggregated PSM v4 product; `developer.nrel.gov` was retired 2026-05-29
 # in favour of `developer.nlr.gov` (the host lives in nrel/_helpers.NLR_HOST).

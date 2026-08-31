@@ -13,7 +13,7 @@
 # `argopy` 1.4.0 ERDDAP region fetch (TEMP / PSAL / PRES columns); the
 # bgc family is curated from the Argo BGC core-parameter list (a live
 # BGC fetch is blocked by an argopy/xarray data-mode-merge skew in the
-# pinned env — see planning/argo/captures/argo-sdk-facts.md).
+# pinned env — see the A1 gate captures).
 families:
   phy:
     description: "Core physical profile: temperature, salinity, pressure."

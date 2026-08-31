@@ -4,10 +4,17 @@ The ECMWF backend uses a curated YAML catalog (the
 `src/earthlens/ecmwf/catalog/` directory: per-family `*.yaml` files —
 `era5.yaml`, `carra.yaml`, … — plus an `_index.yaml` with the schema
 header and `available_datasets:` list) to map user-friendly variable
-codes to the request fields CDS actually accepts. The loader merges
-every file into one catalog at construction time. This page documents
-the catalog's structure, how it is maintained, and the tools that
-support catalog work.
+codes to the request fields the store actually accepts. The loader
+merges every file into one catalog at construction time. This page
+documents the catalog's structure, how it is maintained, and the tools
+that support catalog work.
+
+One catalog covers **five** data stores — the three Copernicus ones
+(CDS, ADS, EWDS) and the two ECMWF-hosted ones (ECDS, XDS). They all
+run the same CADS software and take the same request vocabulary, so a
+row differs only by its [`endpoint`](#endpoint) field; the `cds_*`
+field names below are historical and apply to every store. See
+[the five data stores](datastores.md) for the cross-store picture.
 
 ## At a glance
 
@@ -15,14 +22,13 @@ support catalog work.
 |---|---|
 | `src/earthlens/ecmwf/catalog/` | The catalog itself — per-family `*.yaml` + `_index.yaml`; schema below |
 | `src/earthlens/ecmwf/catalog.py` | The loader (`Catalog`, `Dataset`, `Variable`, …) |
-| `tools/ecmwf/refresh_available_datasets.py` | Auto-rewrites the `available_datasets:` index from the live CDS STAC catalogue |
-| `tools/ecmwf/audit_cds_datasets.py` | Walks `available_datasets:` and reports each dataset's `constraints.json` shape — coverage planning |
-| `earthlens datasets validate ecmwf --live` | Builds a `constraints.json`-valid minimal request per dataset and runs the pre-flight `RequestValidator` (no CDS submission) |
+| `earthlens datasets refresh ecmwf` | Diffs the `available_datasets:` index against every store's live catalogue API |
+| `earthlens datasets audit ecmwf --coverage` | Classifies the available universe into DONE / addressable / thin / table / missing — coverage planning |
+| `earthlens datasets validate ecmwf --live` | Builds a `constraints.json`-valid minimal request per dataset and runs the pre-flight `RequestValidator` (no submission) |
 | `earthlens datasets probe ecmwf <id> --deep` | Submits a real tiny retrieve for one dataset and extracts its NetCDF short names and units |
 | `earthlens datasets curate ecmwf <id> [--write]` | Seeds a loader-valid row from the live `form.json` (every variable, `unknown` placeholders); `--write` auto-files it into the family shard |
 | `earthlens datasets curate ecmwf --all --write` | Bulk-seeds **every** uncurated dataset (`available_datasets − datasets`) into its family shard from live forms |
 | `earthlens datasets curate ecmwf --fill-empty --write` | Bulk-hydrates the `units: unknown` placeholders in place from live tiny retrieves (licence-gated, best-effort) |
-| `tools/ecmwf/bulk_add_remaining.py` / `bulk_apply.py` / `bulk_inject.py` | Bulk-emit and inject YAML rows for the gated-dataset families (CARRA-means, ORAS5, etc.) |
 
 ## Catalog structure
 
@@ -38,17 +44,18 @@ describe each field; required vs optional is called out explicitly.
 ```yaml
 version: 3                                       # catalog schema version (informational)
 
-available_datasets:                              # inventory of CDS-hosted datasets (~134)
-  - <dataset_name_1>                             #   one entry per dataset CDS publishes
-  - <dataset_name_2>                             #   refreshed by tools/ecmwf/refresh_available_datasets.py
+available_datasets:                              # inventory across all five stores (~174)
+  - <dataset_name_1>                             #   one entry per dataset the stores publish
+  - <dataset_name_2>                             #   diffed by `earthlens datasets refresh ecmwf`
   - ...
 
-datasets:                                        # curated, user-addressable datasets (~37)
+datasets:                                        # curated, user-addressable datasets (~174)
 
   <dataset_name_1>:                              # one block per dataset the package supports
     product_type: [<value>]                      # REQUIRED — CDS product_type request field
     pressure_level: [<level>, <level>, ...]      # optional — default for pressure-level datasets
     request_kind: <kind>                         # optional — "form" | "oceanic_monthly" | "carra_means"
+    endpoint: <slug>                             # optional — "cds" (default) | ads | ewds | ecds | xds
     extras:                                      # optional — parent-level CDS request fields
       <key_1>: <value>                           #   merged into every variable's extras
       <key_2>: <value>                           #   per-variable overrides win on key collision
@@ -93,31 +100,34 @@ Bump it when the schema gains an incompatible new field.
 ##### `available_datasets`
 
 *Optional, but conventionally always present.* A flat list of every
-CDS dataset short name the Climate Data Store currently publishes —
-roughly 134 entries today. The list is maintained by
-`tools/ecmwf/refresh_available_datasets.py`, which hits CDS's live STAC API
-(`https://cds.climate.copernicus.eu/api/catalogue/v1/collections`),
-filters for the ECMWF / Copernicus entries the package targets, and
-rewrites just this block in place.
+dataset short name the five stores currently publish — roughly 174
+entries today, keyed under a per-store block in `_index.yaml`. The
+list is maintained by `earthlens datasets refresh ecmwf`, which hits
+each store's live catalogue API
+(`<store-root>/catalogue/v1/collections`), filters for the entries the
+package targets, and reports the diff against the bundled index.
 
 The runtime download path does **not** read `available_datasets` —
 nothing under `Catalog.download` or `_api()` consults it. The block is
 purely a discovery / inventory hint, surfaced as the
-`Catalog.available_datasets` attribute so external tools (notably
-`tools/ecmwf/audit_cds_datasets.py`) can iterate the full CDS inventory
-without hitting the network themselves. Users who want to know "what
-does CDS host that I might be able to ask for?" can read this list
-offline; users who want to actually request data can only use
-datasets that also appear under `datasets:`.
+`Catalog.available_datasets` attribute so tooling (notably
+`earthlens datasets audit ecmwf --coverage`) can iterate the full
+inventory without hitting the network itself. Users who want to know
+"what do these stores host that I might be able to ask for?" can read
+this list offline; users who want to actually request data can only
+use datasets that also appear under `datasets:`.
+
+`Catalog.store_for(<dataset_id>)` resolves any id in this list to the
+store that serves it.
 
 ##### `datasets`
 
-*Required.* The curated map from CDS dataset short name to a
-`Dataset` block. Roughly 37 entries today — one per dataset the
-package actually supports with variable definitions. The runtime
-download path uses this exclusively. Adding a new entry here
-(typically after probing CDS for the right variable shapes) is what
-makes a dataset usable through the package's `ECMWF` backend.
+*Required.* The curated map from dataset short name to a `Dataset`
+block. Roughly 174 entries today — one per dataset the package
+actually supports with variable definitions. The runtime download path
+uses this exclusively. Adding a new entry here (typically after
+probing the store for the right variable shapes) is what makes a
+dataset usable through the package's `ECMWF` backend.
 
 The map must be non-empty and at least one entry must declare at
 least one variable, or `Catalog()` raises `ValueError` at load time.
@@ -142,8 +152,8 @@ This becomes the default for every variable under this dataset and is
 written into each `Variable.product_type` field at load time. A
 per-variable row may override it (see the variable-level
 `product_type` field below). Check the dataset's live `constraints.json`
-if you're unsure which values are valid — `tools/ecmwf/audit_cds_datasets.py`
-will show you.
+if you're unsure which values are valid — `earthlens datasets audit
+ecmwf --coverage` will show you.
 
 ##### `pressure_level`
 
@@ -160,23 +170,63 @@ enforce that; it's the YAML author's responsibility.
 
 ##### `request_kind`
 
-*Optional.* String tag, one of `"form"` (default), `"oceanic_monthly"`,
-or `"carra_means"`. Drives the `_REQUEST_KIND_STRIPS` table in
-`src/earthlens/ecmwf/backend.py` — at request-build time, the named
-template-default fields are stripped from the request because the
-dataset rejects them.
+*Optional.* String tag, `"form"` by default. Drives the
+`_REQUEST_KIND_STRIPS` table in `src/earthlens/ecmwf/backend.py` — at
+request-build time, the named template-default fields are stripped
+from the request because the dataset rejects them. A few kinds also
+rewrite the date keys.
 
-- `"form"` (default) — strips nothing. Use for ERA5-style datasets.
-- `"oceanic_monthly"` — strips `day` / `time` / `area`. Use for ORAS5
-  and similar global-monthly ocean datasets that don't support bbox
-  cropping or sub-daily slicing.
-- `"carra_means"` — strips `time`. Use for CARRA-means and similar
-  pre-aggregated datasets that don't accept a `time` field because
-  the aggregation already covers the relevant window.
+| Kind | Strips | Use for |
+|---|---|---|
+| `form` (default) | — | ERA5-style datasets |
+| `oceanic_monthly` | `day`, `time`, `area` | ORAS5 and other global-monthly ocean datasets that support neither bbox cropping nor sub-daily slicing |
+| `carra_means` | `time` | CARRA-means and other pre-aggregated datasets whose aggregation already covers the window |
+| `glofas` | `time` | GloFAS (EWDS) — the horizon comes from `leadtime_hour` in `extras`, not a time-of-day |
+| `glofas_hindcast` | `time` | GloFAS/EFAS reforecast — **renames** `year`/`month`/`day` to `hyear`/`hmonth`/`hday` |
+| `s2s_reforecast` | — | S2S reforecast (ECDS) — **copies** `month`/`day` into `hmonth`/`hday`, keeping both date axes |
+| `seasonal` | `day`, `time` | Seasonal forecasts keyed by year/month + a lead |
+| `seasonal_hindcast` | `day`, `time` | EFAS seasonal reforecast — renames to `hyear`/`hmonth`, no `hday` |
+| `cams_date` | — | CAMS grid datasets (ADS) — a single `date` range string replaces year/month/day |
+| `cams_inversion` | `day`, `time`, `area` | CAMS GHG inversion + European air-quality reanalyses (global-gridded, reject `area`) |
+| `fire` | `time` | CEMS fire danger (EWDS) — daily date plus a `grid` selector |
+| `satellite_cdr` | `time` | Satellite Climate Data Records — zip-of-NetCDF response, no `data_format` choice |
+
+The two reforecast kinds differ in a way worth knowing: `glofas_hindcast`
+**renames** the date keys, so the original model-cycle date is gone,
+while `s2s_reforecast` **copies** them, because that dataset requires
+both the model cycle *and* the reforecast date. See
+[the ECDS page](ecds.md#reforecasts-have-two-date-axes).
 
 To add a new request-kind category, extend `_REQUEST_KIND_STRIPS` in
 code with the new key and the field tuple to strip, then use the new
 key in YAML.
+
+##### `endpoint`
+
+*Optional.* String slug naming which of the five stores serves this
+dataset — `"cds"` (the default when omitted), `"ads"`, `"ewds"`,
+`"ecds"`, or `"xds"`. It is the only field that differs between two
+otherwise-identical rows on different stores.
+
+The slug resolves to an API root and a credential through the
+`ENDPOINTS` table in `src/earthlens/ecmwf/endpoints.py`:
+
+| Slug | Store | API root | URL override | Key override |
+|---|---|---|---|---|
+| `cds` | Climate Data Store | `https://cds.climate.copernicus.eu/api` | `CDSAPI_URL` | `CDSAPI_KEY` |
+| `ads` | Atmosphere Data Store | `https://ads.atmosphere.copernicus.eu/api` | `ADS_URL` | `ADS_KEY` |
+| `ewds` | Early Warning Data Store | `https://ewds.climate.copernicus.eu/api` | `EWDS_URL` | `EWDS_KEY` |
+| `ecds` | ECMWF Data Store | `https://ecds.ecmwf.int/api` | `ECDS_URL` | `ECDS_KEY` |
+| `xds` | ECMWF Cross Data Store | `https://xds.ecmwf.int/api` | `XDS_URL` | `XDS_KEY` |
+
+The URL override applies to the catalog tooling as well as the client.
+Credentials fall back in the order *key override* → `CDSAPI_KEY` →
+`~/.cdsapirc`, so **one Personal Access Token authenticates all five**
+— there is no separate registration per store.
+
+The backend keeps one `cdsapi.Client` per endpoint, so a single
+`download()` spanning datasets on different stores works without any
+extra configuration.
 
 ##### `extras`
 
@@ -257,8 +307,8 @@ the NetCDF variable name following ECMWF's GRIB short-name convention,
 which is sometimes the request name with underscores collapsed (e.g.
 `2m_temperature` → `t2m`) but often something different (e.g.
 `total_precipitation` → `tp`). Discover the right value by submitting
-a probe via `tools/ecmwf/probe_cds_netcdf.py`, which downloads a real
-NetCDF and prints the variable's short name and units.
+a probe via `earthlens datasets probe ecmwf <id> --deep`, which downloads
+a real NetCDF and prints the variable's short name and units.
 
 ##### `units`
 
@@ -417,7 +467,7 @@ call.
 
 The same shape as the schema skeleton above, with real values
 substituted in. This is what an actual ERA5 dataset entry looks like
-in `cds_data_catalog.yaml`:
+in the `era5.yaml` shard:
 
 ```yaml
 datasets:
@@ -563,53 +613,51 @@ The two top-level blocks have **different ownership**:
 
 | Block | Authored by | Refreshed via |
 |---|---|---|
-| `available_datasets:` | The CDS server | `uv run python tools/ecmwf/refresh_available_datasets.py` |
-| `datasets:` | Hand or catalog automation | No script regenerates it from CDS — see below |
+| `available_datasets:` | The stores | `earthlens datasets refresh ecmwf` |
+| `datasets:` | Hand or catalog automation | `earthlens datasets curate ecmwf <id> --write` — see below |
 
-When CDS publishes a new dataset, run `refresh_available_datasets.py`
-and it appears in `available_datasets:` automatically. Adding it to
-`datasets:` (so the package can actually request data from it) is a
-separate, manual step requiring probes — see "Adding a new dataset"
-below.
+When a store publishes a new dataset, `refresh` reports it as missing
+from `available_datasets:`. Adding it to `datasets:` (so the package
+can actually request data from it) is a separate step requiring probes
+— see "Adding a new dataset" below.
 
 ## Discovery & probe tools
 
-### `tools/ecmwf/refresh_available_datasets.py`
+All catalog tooling lives in the `earthlens datasets` CLI; there are no
+standalone scripts. See [the CLI reference](../cli.md).
 
-Pulls the current STAC catalogue from
-`https://cds.climate.copernicus.eu/api/catalogue/v1/collections`,
-filters for the ECMWF / Copernicus Climate Data Store entries the
-package targets, and rewrites the `available_datasets:` block in
-`cds_data_catalog.yaml` in place. Other parts of the YAML (the
-`datasets:` curated map and the schema header comments) are preserved
-verbatim.
+### `earthlens datasets refresh ecmwf`
+
+Pulls the live catalogue from each of the five stores
+(`<store-root>/catalogue/v1/collections`), filters for the entries the
+package targets, and diffs the result against the bundled
+`available_datasets:` index — reporting per store what is new upstream
+and what the bundle lists that upstream no longer serves.
 
 ```bash
-uv run python tools/ecmwf/refresh_available_datasets.py
+earthlens datasets refresh ecmwf
 ```
 
-Run before each release so the catalogue file reflects whatever
-datasets CDS hosts on release day. Exits 0 on success, 1 on any
-HTTP / parse error.
+Run before each release so the index reflects whatever the stores host
+on release day.
 
-### `tools/ecmwf/audit_cds_datasets.py`
+### `earthlens datasets audit ecmwf --coverage`
 
-For each short name in `available_datasets:`, hits CDS's public
-`constraints.json` endpoint via `fetch_constraints` and prints:
+For each short name in `available_datasets:`, hits the store's public
+`constraints.json` endpoint via `fetch_constraints` and classifies it:
 
 - whether constraints are public,
 - how many distinct `variable` values appear,
 - which extra request fields beyond the ERA5 standard set are required.
 
 ```bash
-uv run python tools/ecmwf/audit_cds_datasets.py
+earthlens datasets audit ecmwf --coverage
 ```
 
-Output is grouped by category (`DONE` / `addressable` /
-`no-variable-key` / `no-or-empty-constraints`) so you can see at a
-glance which datasets are ready to add and which need bespoke
-modelling (typically extras keys like `domain`, `experiment`,
-`leadtime_hour`, …).
+Output is bucketed (`DONE` / `addressable` / `thin` / `table` /
+`missing`) so you can see at a glance which datasets are ready to add
+and which need bespoke modelling (typically extras keys like `domain`,
+`experiment`, `leadtime_hour`, …). It also names the next id to curate.
 
 ### `earthlens datasets validate ecmwf --live`
 
@@ -617,12 +665,16 @@ Per-dataset request-validity check. For each curated dataset it asks
 `Catalog.minimal_valid_request` for a known-valid request derived from
 `constraints.json` and runs the same pre-flight `RequestValidator` the
 backend uses — flagging datasets whose minimal request fails. It is
-stateless: no CDS credentials and no queue submission (datasets that
+stateless: no credentials and no queue submission (datasets that
 publish no constraints are skipped).
 
 ```bash
 earthlens datasets validate ecmwf --live
 ```
+
+The offline half of `validate` is not wired for this provider — ecmwf
+is live-only, because a row's validity is defined by the store's
+`constraints.json` rather than by anything checkable on disk.
 
 To confirm a single dataset actually serves data (and read its NetCDF
 short names / units), submit a real tiny retrieve with `probe --deep`:
@@ -631,59 +683,99 @@ short names / units), submit a real tiny retrieve with `probe --deep`:
 earthlens datasets probe ecmwf <dataset-short-name> --deep
 ```
 
-The probed NetCDF metadata is ready for nc-variable
-extraction by `probe_cds_netcdf.py` or hand inspection.
+`probe --deep` walks the returned NetCDF and reports each variable's
+`long_name`, `units`, and short name — the values you copy into the
+`datasets:` block as `nc_variable` and `units`.
 
-### `tools/ecmwf/probe_cds_netcdf.py`
-
-Submits a real retrieve for a *specific* set of CDS variables on a
-*specific* dataset, then walks the returned NetCDF to extract each
-variable's `long_name`, `units`, and short name. Writes a JSON
-sidecar mapping `cds_variable` → metadata that you copy into the
-`datasets:` block.
-
-```bash
-uv run python tools/ecmwf/probe_cds_netcdf.py \
-    --dataset reanalysis-era5-land \
-    --variables evaporation_from_bare_soil,total_evaporation \
-    --out C:/tmp/cds_probe/era5land_missing.json
-```
-
-Caches NetCDFs under `C:/tmp/cds_probe/<dataset>_<batch>.nc` so
-re-runs don't re-queue CDS.
-
-## Bulk-add tools (gated dataset families)
+## Bulk curation (gated dataset families)
 
 For dataset families like CARRA-means and ORAS5 that gate variables
 by `level_type` / `product_type` / `time_aggregation`, manual row
 authoring is tedious — each variable needs the right gating extras.
-The bulk-add scripts automate this.
+Two `curate` flags automate it.
 
-### `tools/ecmwf/bulk_add_remaining.py`
+### `earthlens datasets curate ecmwf --all --write`
 
-Walks `constraints.json` for each gated dataset, enumerates missing
-`cds_variable` names, and emits YAML rows using:
+Walks each uncurated id (`available_datasets − datasets`), reads its
+live `form.json`, and seeds a loader-valid row into the right family
+shard — every variable present, `units: unknown` as a placeholder.
+Per-row `extras` override the parent's `level_type` / `product_type` /
+`time_aggregation`, so one dataset key can host multiple
+`level_type`-scoped variables. Idempotent: existing rows are skipped.
 
-1. The catalog's existing `(cds_variable → nc_variable)` map (from
-   probes already done in earlier sessions), and
-2. A hand-curated extension table for `cds_variables` that haven't
-   been probed yet but follow ECMWF's GRIB short-name convention.
+### `earthlens datasets curate ecmwf --fill-empty --write`
 
-For each gated dataset, per-row `extras` override the parent's
-`level_type` / `product_type` / `time_aggregation` so the same
-dataset key can host multiple `level_type`-scoped vars.
+Replaces those `units: unknown` placeholders in place, hydrating each
+from a live tiny retrieve. Licence-gated and best-effort — a dataset
+whose licence you have not accepted is left untouched rather than
+guessed at.
 
-### `tools/ecmwf/bulk_apply.py`
+**One probe per placeholder.** A dataset's constraints partition it into
+blocks, and a variable is only retrievable under the selectors of a block
+that lists it, so the sweep asks for each placeholder variable by name in
+turn rather than probing the dataset once. That is what lets a
+multi-variable dataset finish: a single probe only ever describes whichever
+variable its constraints list first, so a stanza with four placeholders
+could never be completed by one.
 
-Applies the bulk-add output: for each gated dataset, appends the
-generated YAML rows into `cds_data_catalog.yaml`. Skips vars already
-present (by `cds_variable`). Idempotent — safe to re-run.
+Because the probe names the variable it wants, a lone data variable coming
+back identifies that row outright — the correspondence is established by
+the request rather than inferred from the names, and none of the matching
+rules below is consulted. A probe that answers with several data variables,
+or with none, falls through to those rules, which decline rather than guess.
 
-### `tools/ecmwf/bulk_inject.py`
+**Per-variable selectors are recorded.** The block that serves a variable
+carries the selectors that variable needs, so where they differ from the
+stanza's own `extras:` the difference is written as a per-variable override.
+GloFAS is the case this exists for — river discharge and runoff are served
+under `timespan: time_mean`, snow depth and soil wetness only under
+`instantaneous`:
 
-Same job as `bulk_apply.py` with a different injection strategy: finds
-the closing line of each dataset's `variables:` section and injects
-generated rows before the next dataset header. Also idempotent.
+```yaml
+      snow-depth-water-equivalent:
+        cds_variable: snow_depth_water_equivalent
+        nc_variable: sd
+        units: kg m-2
+        extras:
+          timespan: [instantaneous]
+```
+
+**Cost.** One retrieve per placeholder row, each under the same per-request
+deadline, so a wide dataset is a long sweep. A dataset whose first probe is
+refused is abandoned rather than retried for every remaining row, and rows
+filled before that are kept — the pass writes each shard as it goes, so
+re-running continues where the last one stopped. Use `--limit` to work
+through the catalog in batches.
+
+A dataset whose constraints do not partition by variable at all has no block
+to look a row up in; those fall back to a single whole-dataset probe and the
+matching rules below.
+
+Matching is deliberately conservative. The confident rules come first: an
+exact short-name match, then a token-subset match against the variable's
+`long_name`. Only a single leftover slug facing a single unused variable
+reaches the last-resort rule, and it pairs them only when the two names
+carry evidence of describing the same quantity — shared tokens covering
+at least half the slug, or an initialism (`sst` for
+`sea-surface-temperature`).
+
+Two limits of that last rule are worth knowing before you trust its
+output. Its evidence is a filter, not a proof. The coverage bar rejects
+the single-generic-word coincidence — `land-sea-mask` shares only `sea`
+with mean sea level pressure — but it cannot police the initialism arm,
+which has no shared tokens to measure and will still read `msl` as
+m(ask) s(ea) l(and). And it leans heavily on the retrieved variable's
+`long_name` — across the curated catalog, 89% of the rows that need more
+than an exact name match would fail the check if the retrieve carried no
+`long_name` at all. A NetCDF name that an already-hydrated row of the same
+dataset claims is withheld from it, so a re-run cannot make two rows fight
+over one variable, but most datasets reaching this rule have no hydrated
+row yet and so withhold nothing.
+
+A slug that stays ambiguous keeps its `unknown` placeholder, because a
+wrong `nc_variable` silently mis-extracts at `aggregate=` time, which is
+worse than an obvious gap. Those rows are counted separately in the
+command's summary, so they can be curated by hand.
 
 ## Adding a new dataset
 
@@ -693,8 +785,8 @@ the package doesn't yet support:
 1. **Surface the gap.**
 
     ```bash
-    uv run python tools/ecmwf/refresh_available_datasets.py
-    uv run python tools/ecmwf/audit_cds_datasets.py
+    earthlens datasets refresh ecmwf
+    earthlens datasets audit ecmwf --coverage
     ```
 
    The audit prints which datasets in `available_datasets:` have no
@@ -720,16 +812,18 @@ the package doesn't yet support:
       <dataset-short-name>:
         product_type: [<product-type-from-constraints>]
         request_kind: form     # or oceanic_monthly / carra_means
+        endpoint: cds          # omit for CDS; ads / ewds / ecds / xds otherwise
         extras: { ... }        # any gating fields the audit flagged
         variables:
           "<short-code>":
-            nc_variable: <from probe sidecar>
-            units: <from probe sidecar>
+            nc_variable: <from the probe>
+            units: <from the probe>
             types: state        # or flux for accumulated quantities
     ```
 
-   For gated families with many variables, run `bulk_add_remaining.py`
-   followed by `bulk_inject.py` instead.
+   For gated families with many variables, run
+   `earthlens datasets curate ecmwf --all --write` followed by
+   `--fill-empty --write` instead.
 
 4. **Verify** with a unit test using `Catalog().get_variable(...)`,
    then a live e2e test that actually downloads a small slice via the
@@ -743,10 +837,7 @@ add one more variable:
 1. Probe it for `nc_variable` / `units`:
 
     ```bash
-    uv run python tools/ecmwf/probe_cds_netcdf.py \
-        --dataset reanalysis-era5-single-levels \
-        --variables surface_pressure \
-        --out C:/tmp/cds_probe/era5_sp.json
+    earthlens datasets probe ecmwf reanalysis-era5-single-levels --deep
     ```
 
 2. Add the row under the dataset's `variables:` block in the YAML.
@@ -774,4 +865,4 @@ The runtime contract that the catalog YAML feeds:
 
 - [ECMWF backend reference](ecmwf.md) — class-level API reference.
 - `src/earthlens/ecmwf/catalog.py` — loader source; `Catalog.model_post_init` is the authoritative description of how YAML rows become `Variable` instances.
-- `planning/cdsapi/all-catalog.md` — historical record of the catalog's evolution and per-dataset coverage decisions.
+- [The five data stores](datastores.md) — how one catalog spans CDS, ADS, EWDS, ECDS and XDS.

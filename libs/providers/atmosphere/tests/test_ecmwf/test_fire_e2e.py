@@ -15,7 +15,7 @@ pytestmark = [pytest.mark.e2e]
 class TestFireE2E:
     """Live fire-historical retrieve on the EWDS endpoint."""
 
-    def test_live_fire_historical_returns_fwi(self, tmp_path):
+    def test_live_fire_historical_returns_fwi(self, tmp_path, download_within_budget):
         """A tiny cems-fire-historical-v1 retrieve returns a non-empty file."""
         lens = EarthLens(
             data_source="ecmwf",
@@ -27,7 +27,7 @@ class TestFireE2E:
             lon_lim=[0.0, 1.0],
             path=str(tmp_path),
         )
-        out = lens.download()
+        out = download_within_budget(lens)
         assert out
         assert out[0].exists()
         assert out[0].stat().st_size > 0

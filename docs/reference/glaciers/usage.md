@@ -96,6 +96,7 @@ Passing a non-`None` `aggregate=` raises `NotImplementedError`.
 ## The download cache
 
 RGI region zips, the GLIMS query GeoJSON, and the WGMS FoG archive are cached
-under `<path>/_glaciers_cache/` so repeat requests over the same region / archive
+under `glaciers/` in the shared earthlens cache directory so repeat requests
+over the same region / archive
 do not re-download. Point `path=` at a stable directory to keep the cache across
 runs.

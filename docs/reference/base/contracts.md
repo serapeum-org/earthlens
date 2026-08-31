@@ -1,6 +1,6 @@
 # Base contracts
 
-`earthlens.base` holds the contracts every one of the 48 provider backends implements. This page documents the
+`earthlens.base` holds the contracts every one of the 61 provider backends implements. This page documents the
 shared surface — what a backend must provide, what it gets for free, and the guarantees the base layer makes about
 memory, errors, and re-runs.
 
@@ -78,6 +78,12 @@ Backends that process a batch honour `errors=`:
 
 `ERROR_POLICIES` lists four accepted spellings but there are three behaviours: `check_errors_policy` normalises
 `"skip"` to `"ignore"`, so both take the same path.
+
+**Service failures are exempt.** A backend may mark exception classes `fatal` when passing work to `_run_items`,
+and those propagate whatever `errors=` says. The policy exists to absorb a *per-item* gap — this dataset has no
+data for your window — not a refusal by the upstream to serve anything at all. Dropping the latter would report an
+outage as every item being empty. `earthlens.ecmwf` marks
+[`CadsUnavailableError`](../ecmwf/datastores.md#when-a-store-is-throttling) fatal for exactly that reason.
 
 ## Streaming and connection pooling
 

@@ -5,7 +5,7 @@
 # CoastWatch ERDDAP serves the 15-arc-second GEBCO_2020 grid as a griddap
 # coverage whose single `elevation` band carries metres relative to sea
 # level (negative = below sea level). Pinned live in the A1 gate — see
-# planning/bathymetry/captures/bathymetry-sdk-facts.md.
+# the A1 gate captures.
 datasets:
   gebco_2020:
     title: GEBCO 2020 global terrain model (15 arc-second, topography + bathymetry)

@@ -21,7 +21,7 @@ from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import platformdirs
+from earthlens.config import cache_dir
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -259,7 +259,7 @@ def ensure_dir(path: Path | str) -> Path:
 
 def _idx_cache_root() -> Path:
     """Return the user's cache directory for cached NWP `.idx` files."""
-    return Path(platformdirs.user_cache_dir("earthlens")) / "nwp" / "idx"
+    return cache_dir() / "nwp" / "idx"
 
 
 def _key_from_url(url: str) -> str:
@@ -461,7 +461,7 @@ def get_idx(
 
     A repeated multi-step / multi-cycle fetch hits the network once
     per index instead of once per request. The cache lives under
-    `platformdirs.user_cache_dir("earthlens") / "nwp" / "idx"` with
+    `<cache_dir()>/nwp/idx` (the shared earthlens cache directory) with
     a stable per-URL filename and a 24-hour TTL; the TTL is overridable
     via the `EARTHLENS_NWP_IDX_TTL` environment variable, or by an
     explicit `ttl=` keyword that wins over both.

@@ -3,10 +3,16 @@
 `curate ecmwf --write` uses :func:`categorise_dataset` to pick which
 per-family `catalog/<category>.yaml` shard a freshly seeded row belongs in,
 so the maintainer no longer has to pass `--target` for the common case. The
-rules are pure id-prefix tests (CDS/ADS/EWDS dataset ids already encode their
-family in their name prefix), tried in order with first match winning; an id
-matching no rule lands in `other` (the same shard the `derived-*` / `sis-*` /
-`insitu-*` / `reanalysis-oras5*` / `reanalysis-uerra-*` ids already sit in).
+rules are pure id-prefix tests (dataset ids across CDS / ADS / EWDS / ECDS /
+XDS already encode their family in their name prefix), tried in order with
+first match winning; an id matching no rule lands in `other` (the same shard
+the `derived-*` / `sis-*` / `insitu-*` / `reanalysis-oras5*` /
+`reanalysis-uerra-*` ids already sit in).
+
+Prefixes must stay disjoint enough that a new rule cannot shadow an existing
+one: `derived-fire-fuel` and `projections-fire-fuel` are deliberately narrower
+than the bare `derived-` / `projections-` families so `derived-era5-*` and
+`projections-cmip5-*` keep their current shards.
 """
 
 from __future__ import annotations
@@ -25,6 +31,8 @@ CATEGORIES = [
     "ewds",
     "efas",
     "fire",
+    "ecds",
+    "xds",
     "other",
 ]
 
@@ -38,6 +46,13 @@ _RULES: list[tuple[str, str]] = [
     ("cems-glofas", "ewds"),
     ("cems-flood", "ewds"),
     ("efas-", "efas"),
+    # ECMWF-hosted stores. `projections-fire-fuel` is listed ahead of the
+    # `projections-cmip5` / `projections-cordex` rules for readability; the
+    # three prefixes do not overlap, so order between them is not load-bearing.
+    ("tigge-", "ecds"),
+    ("s2s-", "ecds"),
+    ("derived-fire-fuel", "xds"),
+    ("projections-fire-fuel", "xds"),
     ("reanalysis-pan-carra", "carra"),
     ("reanalysis-carra", "carra"),
     ("reanalysis-cerra", "cerra"),
@@ -50,11 +65,12 @@ _RULES: list[tuple[str, str]] = [
 
 
 def categorise_dataset(dataset_id: str) -> str:
-    """Return the per-family shard stem for one Copernicus dataset id.
+    """Return the per-family shard stem for one dataset id.
 
     Args:
-        dataset_id: The CDS / ADS / EWDS dataset id (e.g.
-            `reanalysis-era5-single-levels`, `cams-global-reanalysis-eac4`).
+        dataset_id: A dataset id from any store — CDS / ADS / EWDS / ECDS / XDS
+            (e.g. `reanalysis-era5-single-levels`, `cams-global-reanalysis-eac4`,
+            `tigge-forecasts`).
 
     Returns:
         The shard file stem the row belongs in (one of :data:`CATEGORIES`);
@@ -75,6 +91,19 @@ def categorise_dataset(dataset_id: str) -> str:
             >>> from earthlens.ecmwf._categories import categorise_dataset
             >>> categorise_dataset("cams-global-reanalysis-eac4")
             'ads'
+
+            ```
+        - The ECMWF-hosted stores get their own shards, and the narrow
+          fire-fuel prefixes do not disturb the broader families they sit in:
+
+            ```python
+            >>> from earthlens.ecmwf._categories import categorise_dataset
+            >>> categorise_dataset("tigge-forecasts")
+            'ecds'
+            >>> categorise_dataset("projections-fire-fuel-burned-area")
+            'xds'
+            >>> categorise_dataset("projections-cmip5-monthly-single-levels")
+            'cmip5'
 
             ```
         - An unrecognised id falls through to `other`:

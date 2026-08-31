@@ -7,7 +7,7 @@
 # extended NE-Atlantic domain — the coastal / shelf complement to the global
 # GEBCO / ETOPO DEMs. Unlike the ERDDAP-griddap rows, this coverage is read
 # over OGC WCS through pyramids `Dataset.from_wcs`. Pinned live in the A1 gate
-# — see planning/flood-risk/captures/emodnet-bathymetry-wcs-facts.md.
+# — see the A1 gate captures.
 #
 # GDAL's WCS driver reads this GeoServer only at WCS 1.0.0 with the colon
 # coverage id `emodnet:mean` (the 2.0.1 `emodnet__mean` id fails GDAL

@@ -980,3 +980,43 @@ class TestAggregateNoneStaysAccepted:
         config = object()
         backend.download(aggregate=config)
         assert seen["aggregate"] is config
+
+
+class TestRunItemsSummary:
+    """The warning line the partial-failure loop emits."""
+
+    @staticmethod
+    def _backend(tmp_path):
+        """Build the minimal backend used to exercise `_run_items`."""
+        return _build(_Minimal, tmp_path)
+
+    def test_placeholders_are_not_counted_as_successes(self, tmp_path):
+        """With `on_failure`, the summary counts real successes, not results.
+
+        Every failure contributes a placeholder to `results`, so counting that
+        list reports as many successes as there were items.
+        """
+        from loguru import logger as loguru_logger
+
+        def flaky(n):
+            if n == 2:
+                raise RuntimeError("boom")
+            return n
+
+        messages: list[str] = []
+        sink_id = loguru_logger.add(lambda message: messages.append(str(message)))
+        try:
+            self._backend(tmp_path)._run_items(
+                [1, 2, 3],
+                flaky,
+                label="thing",
+                on_failure=lambda item, _exc: f"empty-{item}",
+            )
+        finally:
+            loguru_logger.remove(sink_id)
+
+        summary = [m for m in messages if "thing(s) failed" in m]
+        assert summary, f"expected a partial-failure summary, got: {messages}"
+        assert "1 of 3 thing(s) failed; 2 succeeded" in summary[0], (
+            f"the summary should not count placeholders as successes: {summary[0]}"
+        )

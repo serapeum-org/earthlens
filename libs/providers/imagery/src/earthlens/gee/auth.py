@@ -24,11 +24,12 @@ from __future__ import annotations
 
 import base64
 import json
+import re
 from pathlib import Path
 from typing import Any, cast
 
 import ee
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, SecretStr
 
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
@@ -69,7 +70,8 @@ class EarthEngineCredentials(BaseModel):
         service_account: Service-account email, e.g.
             `my-sa@my-project.iam.gserviceaccount.com`.
         service_key: Path to the JSON key file, or the JSON content
-            as a string. `EarthEngineAuth.initialize` distinguishes
+            as a string, held as a `SecretStr` so it is never echoed in
+            `repr` or logs. `EarthEngineAuth.initialize` distinguishes
             the two by leading character.
         project: Cloud project id; if `None`, falls back to the key
             file's `project_id` field at `configure()` time.
@@ -100,13 +102,105 @@ class EarthEngineCredentials(BaseModel):
             True
 
             ```
+        - The key is stored redacted; the value comes back only on request:
+            ```python
+            >>> from earthlens.gee.auth import EarthEngineCredentials
+            >>> creds = EarthEngineCredentials(
+            ...     service_account="sa@p.iam",
+            ...     service_key="/path/to/key.json",
+            ... )
+            >>> creds.service_key
+            SecretStr('**********')
+            >>> creds.service_key.get_secret_value()
+            '/path/to/key.json'
+
+            ```
     """
 
     model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
 
     service_account: str
-    service_key: str
+    #: Held as a `SecretStr` so `repr()` and `str()` render `**********`
+    #: instead of the key. A plain `str` is coerced on construction, so
+    #: callers pass a path or JSON content unchanged; the one consumer
+    #: unwraps it with `get_secret_value()`.
+    service_key: SecretStr
     project: str | None = None
+
+
+def _is_inline_json(service_key: str) -> bool:
+    """Whether `service_key` carries the key's JSON rather than its path.
+
+    The same leading-character rule `_load_key_dict` applies, named once so
+    the credential call and the parse cannot disagree about which shape they
+    were handed.
+
+    Args:
+        service_key: Path to the service-account JSON file, or the JSON
+            content as a string.
+
+    Returns:
+        bool: True when the value is inline JSON.
+    """
+    return isinstance(service_key, str) and service_key.lstrip().startswith("{")
+
+
+#: Credential field names, matched only when quoted as a mapping key, so both
+#: JSON ("private_key":) and a Python repr ('private_key':) are caught while
+#: ordinary prose naming a field is not.
+_CREDENTIAL_KEY_RE = re.compile(
+    r"""['"](?:private_key|client_secret|refresh_token|client_email)['"]\s*:"""
+)
+#: The distinctive fragment of PEM armour, which carries no quoting at all and
+#: is therefore invisible to the mapping-key pattern above.
+_PEM_MARKER = "PRIVATE KEY"
+
+
+def _redact(message: str, service_key: str) -> str:
+    """Return `message` with any credential material removed.
+
+    Defence in depth for the error paths. `ee.ServiceAccountCredentials` takes
+    a *filename* positionally, so handing it inline JSON makes Python raise
+    `FileNotFoundError` with the whole key as the "filename" - which a
+    traceback then prints. Callers below break the exception chain, and this
+    strips the value from anything they do report.
+
+    Only an inline-JSON `service_key` is substituted. A path is not secret, and
+    redacting it made the commonest failure of all - a key file that is not
+    where it was said to be - report `No such file or directory: '<service key
+    redacted>'`, naming nothing the reader can act on. Both workflows pass a
+    path, so that was the usual case. Nor is a value of eight characters or
+    fewer substituted: no key is that short, and blanking such a needle would
+    corrupt incidental text without hiding anything.
+
+    Substring replacement alone is not enough either, and assuming it was is
+    what let a key reach a log in the first place. `OSError.__str__` reprs the
+    filename, so a multi-line key arrives with its newlines escaped and is no
+    longer byte-identical to the value held - the same mismatch that defeated
+    the platform's own secret masking. The escaped form is replaced too, and
+    any residual credential marker collapses the message rather than trusting
+    that the substitutions caught everything. The markers are `_PEM_MARKER`
+    for armoured key material and `_CREDENTIAL_KEY_RE` for a quoted credential
+    field name, and they are checked whatever `service_key` holds — which is
+    what protects the paths that pass no key at all.
+
+    Args:
+        message: The text about to be surfaced.
+        service_key: The key path or JSON content to strip; `""` when the
+            caller holds no key, leaving only the marker check.
+
+    Returns:
+        str: The message with credential material replaced, or
+            `"<service key redacted>"` alone when `_PEM_MARKER` or
+            `_CREDENTIAL_KEY_RE` still matches what is left.
+    """
+    cleaned = message
+    if _is_inline_json(service_key) and len(service_key) > 8:
+        for form in (service_key, repr(service_key)[1:-1]):
+            cleaned = cleaned.replace(form, "<service key redacted>")
+    if _PEM_MARKER in cleaned or _CREDENTIAL_KEY_RE.search(cleaned):
+        return "<service key redacted>"
+    return cleaned
 
 
 def _load_key_dict(service_key: str) -> dict[str, Any] | None:
@@ -115,11 +209,11 @@ def _load_key_dict(service_key: str) -> dict[str, Any] | None:
     Accepts either a filesystem path to the key file or the raw JSON
     string itself; returns `None` when `service_key` is neither (so the
     caller can still proceed with whatever `ee` accepts and only error
-    if `ee` itself rejects it). Distinguishes the two shapes by leading
-    character — a value that starts with `{` is treated as inline JSON,
-    everything else as a path (more robust than calling
-    `Path(...).is_file()` on what may be multi-line JSON content,
-    L2 in pr-diff-review).
+    if `ee` itself rejects it). `_is_inline_json` decides between the two
+    shapes — a leading `{` means inline JSON, anything else a path. That
+    is steadier than `Path(...).is_file()`, which merely answers `False`
+    for multi-line JSON content and so cannot tell inline content apart
+    from a path that does not exist.
 
     Args:
         service_key: Path to the service-account JSON file, or the JSON
@@ -131,7 +225,7 @@ def _load_key_dict(service_key: str) -> dict[str, Any] | None:
     """
     if not isinstance(service_key, str):
         return None
-    if service_key.lstrip().startswith("{"):
+    if _is_inline_json(service_key):
         try:
             return cast("dict[str, Any]", json.loads(service_key))
         except ValueError:
@@ -151,7 +245,7 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
     from the key file's `project_id`.
 
     Conforms to the cross-backend
-    :class:`earthlens.base.AbstractAuth` contract (C2): construction
+    :class:`earthlens.base.AbstractAuth` contract: construction
     still authenticates eagerly for backward compatibility, but the
     underlying work lives in :meth:`configure` and is idempotent —
     the second call after :meth:`is_authenticated` returns `True`
@@ -201,7 +295,9 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
         """
         creds = EarthEngineCredentials(
             service_account=service_account,
-            service_key=service_key,
+            # Wrapped explicitly rather than leaning on pydantic's coercion, so
+            # the annotation and the call agree and mypy can check the field.
+            service_key=SecretStr(service_key),
             project=project,
         )
         super().__init__(creds)
@@ -245,7 +341,7 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
             return
         self.project = self.initialize(
             self._creds.service_account,
-            self._creds.service_key,
+            self._creds.service_key.get_secret_value(),
             self._creds.project,
         )
 
@@ -285,10 +381,16 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
     ) -> str:
         """Authenticate the service account and call `ee.Initialize`.
 
+        The key is dispatched by its shape rather than by trial and error:
+        `_is_inline_json` decides whether it reaches
+        `ee.ServiceAccountCredentials` as `key_data=` (inline JSON) or
+        positionally (a filename), so the call that would embed the key in
+        an `open()` failure is never attempted.
+
         Args:
             service_account: The service-account email.
             service_key: Path to the service-account JSON key file, or
-                the JSON content as a string.
+                the JSON content as a string, told apart by a leading `{`.
             project: Cloud project id to scope the calls to. If omitted,
                 the key file's `project_id` is used.
 
@@ -296,9 +398,19 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
             The Cloud project id the connection was initialised with.
 
         Raises:
-            AuthenticationError: If the key cannot be loaded, no project
-                can be resolved, the project is not registered for Earth
-                Engine, or the service account lacks permission on it.
+            AuthenticationError: For every failure — no project could be
+                resolved, the credentials could not be built from the key,
+                the project is not registered for Earth Engine, the service
+                account lacks permission on it, or `ee.Initialize` failed for
+                any other reason. Which of those an `ee.EEException` is gets
+                decided by matching its raw text, whose needles are fixed
+                substrings holding no key material, while only the
+                `_redact`-ed text is interpolated into what is raised — so a
+                message `_redact` collapsed to the sentinel still reaches the
+                branch that names the unregistered project or the missing IAM
+                role, instead of degrading to the catch-all. Nothing is
+                chained (`raise ... from None`), because an `ee` error can
+                carry the key itself and a chained traceback would print it.
 
         Examples:
             - Initialise from a key file (requires network + a registered project):
@@ -330,50 +442,67 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
                 f"field. See {_SERVICE_ACCOUNT_DOCS}."
             )
 
+        # `ee.ServiceAccountCredentials` takes a *filename* positionally, so
+        # inline JSON must go to `key_data=`. Handing the content positionally
+        # makes `open()` raise FileNotFoundError with the whole key as the
+        # "filename", and the traceback then prints the private key - which is
+        # how a key reached a public CI log once. Choose by shape instead of
+        # letting the wrong call fail.
         try:
-            credentials = ee.ServiceAccountCredentials(service_account, service_key)
-        except ValueError:
-            try:
+            if _is_inline_json(service_key):
                 credentials = ee.ServiceAccountCredentials(
                     service_account, key_data=service_key
                 )
-            except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
-                raise AuthenticationError(
-                    "could not build service-account credentials from the "
-                    f"supplied key (account={service_account!r}). Check that "
-                    f"the key file/JSON is valid. See {_SERVICE_ACCOUNT_DOCS}."
-                ) from exc
+            else:
+                credentials = ee.ServiceAccountCredentials(service_account, service_key)
+        except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
+            # `from None`, not `from exc`: the cause's message can embed the
+            # key, and a chained traceback prints it. The detail is preserved
+            # through _redact instead, which cannot echo key material.
+            detail = _redact(str(exc), service_key)
+            raise AuthenticationError(
+                "could not build service-account credentials from the "
+                f"supplied key (account={service_account!r}): {detail}. Check "
+                f"that the key file/JSON is valid. See {_SERVICE_ACCOUNT_DOCS}."
+            ) from None
 
         try:
             ee.Initialize(credentials=credentials, project=resolved_project)
         except ee.EEException as exc:
-            message = str(exc)
-            if "not registered to use Earth Engine" in message:
+            # Classify on the raw text and report the redacted one. The needles
+            # are fixed substrings that hold no key material, so classification
+            # is safe on the raw message - whereas classifying on the redacted
+            # text loses the actionable branches whenever a credential marker
+            # collapsed it to the sentinel, which is the one case where naming
+            # the unregistered project or the missing IAM role matters most.
+            raw = str(exc)
+            message = _redact(raw, service_key)
+            if "not registered to use Earth Engine" in raw:
                 raise AuthenticationError(
                     f"Cloud project {resolved_project!r} is not registered "
                     f"to use Earth Engine. Register it at {_REGISTER_URL} "
                     "(pick the noncommercial track if eligible), then retry."
-                ) from exc
+                ) from None
             if (
-                "does not have required permission" in message
-                or "serviceUsageConsumer" in message
-                or "PERMISSION_DENIED" in message
+                "does not have required permission" in raw
+                or "serviceUsageConsumer" in raw
+                or "PERMISSION_DENIED" in raw
             ):
                 raise AuthenticationError(
                     f"service account {service_account!r} cannot use project "
                     f"{resolved_project!r}: grant it the "
                     "'roles/serviceusage.serviceUsageConsumer' and "
                     "'roles/earthengine.viewer' IAM roles on that project."
-                ) from exc
+                ) from None
             raise AuthenticationError(
                 f"Earth Engine initialisation failed for project "
                 f"{resolved_project!r}: {message}"
-            ) from exc
+            ) from None
         except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
             raise AuthenticationError(
                 f"Earth Engine initialisation failed for project "
-                f"{resolved_project!r}: {exc}"
-            ) from exc
+                f"{resolved_project!r}: {_redact(str(exc), service_key)}"
+            ) from None
 
         return resolved_project
 

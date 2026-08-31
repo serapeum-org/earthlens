@@ -6,7 +6,9 @@ from pathlib import Path
 
 import pytest
 
+from earthlens.overture import catalog as overture_catalog
 from earthlens.overture.catalog import CATALOG_PATH, Catalog, Theme
+from earthlens.overture.releases import is_release_id
 
 
 @pytest.mark.overture
@@ -139,12 +141,16 @@ class TestCatalog:
         """The bundled YAML ships a non-empty, well-formed release index."""
         releases = Catalog().available_releases
         assert releases, "the bundled catalog should ship a release index"
-        assert all(r[:2] == "20" for r in releases), releases
+        assert all(is_release_id(r) for r in releases), releases
 
-    def test_latest_release_matches_first_indexed(self):
-        """`latest_release` returns the first (newest) indexed release."""
+    def test_latest_release_is_the_newest_indexed(self):
+        """`latest_release` returns the newest release the bundled index carries."""
         cat = Catalog()
-        assert cat.latest_release() == cat.available_releases[0]
+        newest = sorted(
+            cat.available_releases,
+            key=lambda r: (r.split(".")[0], int(r.split(".")[1])),
+        )[-1]
+        assert cat.latest_release() == newest
 
     def test_latest_release_none_when_index_empty(self):
         """`latest_release` is `None` when the index is explicitly empty."""
@@ -152,12 +158,57 @@ class TestCatalog:
         assert cat.latest_release() is None
 
     def test_latest_release_returns_newest(self):
-        """`latest_release` returns the first (newest) of a supplied index."""
+        """`latest_release` returns the newest of a supplied index."""
         cat = Catalog(
             datasets=Catalog().datasets,
             available_releases=["2026-05-20.0", "2026-04-15.0"],
         )
         assert cat.latest_release() == "2026-05-20.0"
+
+    def test_latest_release_ignores_index_order(self):
+        """An ascending index — the order a refresh writes — still yields the newest."""
+        cat = Catalog(
+            datasets=Catalog().datasets,
+            available_releases=["2026-04-15.0", "2026-05-20.0"],
+        )
+        assert cat.latest_release() == "2026-05-20.0"
+
+    def test_latest_release_compares_the_ordinal_numerically(self):
+        """A two-digit ordinal beats a one-digit one from the same date."""
+        cat = Catalog(
+            datasets=Catalog().datasets,
+            available_releases=["2026-07-22.9", "2026-07-22.10"],
+        )
+        assert cat.latest_release() == "2026-07-22.10"
+
+    def test_latest_release_ignores_an_id_without_an_ordinal(self):
+        """An id with no ordinal is not a release id and loses to one that is."""
+        cat = Catalog(
+            datasets=Catalog().datasets,
+            available_releases=["2026-07-22.0", "2026-07-22"],
+        )
+        assert cat.latest_release() == "2026-07-22.0"
+
+    def test_latest_release_ignores_a_malformed_entry(self):
+        """A junk entry is skipped rather than sorted above a real release."""
+        cat = Catalog(
+            datasets=Catalog().datasets,
+            available_releases=["2026-07-22.0", "https:"],
+        )
+        assert cat.latest_release() == "2026-07-22.0"
+
+    def test_latest_release_none_when_every_entry_is_malformed(self):
+        """An index with nothing release-shaped resolves to no release at all."""
+        cat = Catalog(datasets=Catalog().datasets, available_releases=["https:"])
+        assert cat.latest_release() is None
+
+    def test_clear_catalog_cache_empties_the_parse_cache(self):
+        """Clearing the cache drops the memoised parse and reloading still works."""
+        Catalog()
+        assert overture_catalog._CATALOG_CACHE, "loading memoises the parse"
+        overture_catalog.clear_catalog_cache()
+        assert not overture_catalog._CATALOG_CACHE, "the cache is emptied"
+        assert Catalog().themes(), "the catalog reloads after a clear"
 
     def test_load_missing_themes_block_raises(self, tmp_path: Path):
         """A YAML without a `themes:` block is rejected."""

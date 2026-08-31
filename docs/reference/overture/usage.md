@@ -48,7 +48,7 @@ parquet statistics — no DuckDB), so only the rows inside the box are read.
 
 | Kwarg | Default | Meaning |
 |-------|---------|---------|
-| `release` | `None` | Overture release id (`"2026-05-20.0"`). `None` lets the SDK auto-target the newest release. List them with the refresh tool or `Catalog().available_releases`. |
+| `release` | `None` | Overture release id (`"2026-07-22.0"`). `None` targets the release Overture publishes now — auto-targeted by the SDK on the default path, resolved live on the DuckDB path. List them with the refresh tool or `Catalog().available_releases`. Pinning is reproducible only until Overture prunes that release from S3. |
 | `file_format` | `"geoparquet"` | Output format: `"geoparquet"` (default, lossless nested schema), `"gpkg"`, or `"geojson"`. |
 | `max_features` | `None` | Cap on rows kept per fetched type. When set, the read **streams** (via `record_batch_reader`) and stops early once the cap is reached, rather than fetching the whole bbox and discarding rows. `None` keeps all. |
 | `stream` | `False` | Force the streaming `record_batch_reader` path (lower peak memory) even without `max_features`. Streaming is used automatically whenever `max_features` is set. |
@@ -92,9 +92,30 @@ EarthLens(
 feature type. Filenames embed the theme, type, and release:
 
 ```
-out/overture_buildings_building_2026-05-20.0.parquet
+out/overture_buildings_building_2026-07-22.0.parquet
 out/overture_places_place_latest.parquet
 ```
+
+Which of the two you get follows one rule: **a name carries a release id when
+the backend knows it**, and `latest` when it does not.
+
+| Fetch | Filename stamp |
+|-------|----------------|
+| Any fetch with `release=` pinned | the pinned id |
+| Unpinned `where=` / `columns=` (DuckDB) | the release resolved for the glob |
+| Unpinned plain fetch (SDK) | `latest` |
+
+The SDK path is the odd one out because it hands `release=None` to the SDK and
+is never told which snapshot answered. Two consequences worth knowing:
+
+- A `_latest` file is **overwritten** by the next run, including across a
+  monthly rollover — convenient for a scratch directory, lossy if you meant to
+  keep both. A release-stamped file is not, so an unpinned DuckDB fetch
+  accumulates one file per release rather than overwriting.
+- The stamp does not encode `where=` / `columns=`, so a filtered and an
+  unfiltered fetch of the same theme, type, and release write to the **same
+  path** and the second silently replaces the first. Give them separate
+  `path=` directories when you need both.
 
 Every output carries a per-row **`license_id`** column and is tagged
 `EPSG:4326`. The SDK returns a CRS-less frame, so the backend sets the CRS
@@ -115,19 +136,36 @@ the size guard protects you from misusing.
 
 ## Catalog tooling
 
-`tools/overture/refresh_overture_catalog.py` maintains the bundled
-catalog:
+The `earthlens datasets` commands maintain the bundled catalog:
 
 ```bash
-# Rewrite the available_releases index from the live SDK / STAC catalog
-uv run python tools/overture/refresh_overture_catalog.py refresh
+# Diff the live SDK / STAC release list against the bundled index
+earthlens datasets refresh overture
+
+# ... and rewrite the available_releases index from it
+earthlens datasets refresh overture --write
 
 # Confirm every curated theme/default-type resolves against live data
-uv run python tools/overture/refresh_overture_catalog.py validate --strict
+earthlens datasets validate overture --live
 
 # Inspect one type's columns when curating a new theme
-uv run python tools/overture/refresh_overture_catalog.py probe building
+earthlens datasets probe overture building
 ```
+
+`No files found that match the pattern` from a DuckDB fetch means the release
+being globbed holds no objects on S3. It has more than one cause, and the log
+line just above it tells you which:
+
+- **A pinned release that has been pruned.** Drop the pin, or move it to one
+  Overture still publishes — the refresh above lists them. Most common.
+- **The live lookup failed and the backend fell back to the bundled index.**
+  A `WARNING` naming the bundled id precedes the error. This is a
+  reachability problem with `https://stac.overturemaps.org`, not an index
+  problem, so refreshing will not fix it.
+- **A theme/type that exists but is empty for that release** — rare, and the
+  bbox guard usually catches the mistake first.
+
+Refreshing the index is the right first move only for the first cause.
 
 ## Streaming vs in-memory reads
 
@@ -186,8 +224,10 @@ Notes:
 
 - **No DuckDB attribute pushdown without `where=`** — the plain fetch path uses
   the SDK's PyArrow bbox pushdown only; attribute filtering needs `where=`.
-- **No temporal axis** — pin a `release` for reproducibility; `None` drifts
-  to the newest monthly release.
+- **No temporal axis** — pin a `release` for reproducibility; `None` follows
+  the newest monthly release. A pin is reproducible only while that release
+  exists: Overture keeps the newest one (or two) on S3 and prunes the rest,
+  after which the pinned id resolves to nothing.
 - **`base` types carry mixed geometries** — `land` / `water` /
   `infrastructure` return a mix of polygons, lines, and points. Filter
   `geometry.geom_type` client-side if you need a single kind.

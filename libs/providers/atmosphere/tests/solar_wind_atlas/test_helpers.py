@@ -6,7 +6,9 @@ import io
 import zipfile
 from pathlib import Path
 
+import numpy as np
 import pytest
+from pyramids.dataset import Dataset
 
 from earthlens.base import SpatialExtent
 from earthlens.solar_wind_atlas import _helpers
@@ -27,10 +29,10 @@ def test_bbox_from_extent_returns_wsen() -> None:
     assert _helpers.bbox_from_extent(space) == [12.0, 55.0, 12.5, 55.5]
 
 
-def test_window_crop_opens_vsicurl_and_reads_part(
+def test_window_crop_opens_vsicurl_and_crops(
     fake_pyramids: type[FakeDataset], tmp_path: Path
 ) -> None:
-    """window_crop opens the /vsicurl path and extracts via read_part, not crop."""
+    """window_crop opens the /vsicurl path and windowed-crops it to the bbox."""
     out = tmp_path / "wind_100m.tif"
     result = _helpers.window_crop(
         "https://ndownloader.figshare.com/files/17247017",
@@ -39,54 +41,27 @@ def test_window_crop_opens_vsicurl_and_reads_part(
     )
     assert result == out
     assert fake_pyramids.recorder["opened"][0].startswith("/vsicurl/https://")
-    assert fake_pyramids.recorder["read_part"][0]["bbox"] == (12.0, 55.0, 12.5, 55.5)
+    crop = fake_pyramids.recorder["crop"][0]
+    assert crop["bbox"] == [12.0, 55.0, 12.5, 55.5]
+    assert crop["epsg"] == 4326
     assert fake_pyramids.recorder["written"] == str(out)
-    assert "create" in fake_pyramids.recorder
 
 
-def test_window_crop_window_size_matches_native_grid(
+def test_window_crop_degenerate_bbox_widened_before_crop(
     fake_pyramids: type[FakeDataset], tmp_path: Path
 ) -> None:
-    """A 0.5 deg bbox at the 0.0025 deg native grid reads a ~200x200 window."""
-    _helpers.window_crop(
-        "https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif"
-    )
-    part = fake_pyramids.recorder["read_part"][0]
-    assert part["dst_width"] == 200
-    assert part["dst_height"] == 200
+    """A zero-extent point bbox is widened to one source pixel before crop.
 
-
-def test_window_crop_clamps_degenerate_bbox_to_one_pixel(
-    fake_pyramids: type[FakeDataset], tmp_path: Path
-) -> None:
-    """A zero-extent point bbox still reads a 1x1 window instead of failing."""
+    crop(bbox=) requires a strictly positive box, so a point AOI must be
+    widened first; assert the collapsed edges are pushed out.
+    """
     _helpers.window_crop(
         "https://x/w.tif", [12.0, 55.0, 12.0, 55.0], tmp_path / "p.tif"
     )
-    part = fake_pyramids.recorder["read_part"][0]
-    assert part["dst_width"] == 1
-    assert part["dst_height"] == 1
-
-
-def test_window_crop_squeezes_single_band_3d(
-    fake_pyramids: type[FakeDataset], tmp_path: Path
-) -> None:
-    """A (1, H, W) read_part result is squeezed to (H, W) before writing."""
-    fake_pyramids.emit_3d = True
-    _helpers.window_crop(
-        "https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif"
-    )
-    assert fake_pyramids.recorder["create"][0]["shape"] == (200, 200)
-
-
-def test_window_crop_propagates_source_no_data(
-    fake_pyramids: type[FakeDataset], tmp_path: Path
-) -> None:
-    """The written GeoTIFF carries the source raster's no-data value, not -9999."""
-    _helpers.window_crop(
-        "https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif"
-    )
-    assert fake_pyramids.recorder["create"][0]["no_data_value"] == -32768.0
+    bbox = fake_pyramids.recorder["crop"][0]["bbox"]
+    assert bbox[2] > bbox[0], f"west edge not widened: {bbox}"
+    assert bbox[3] > bbox[1], f"south edge not widened: {bbox}"
+    assert fake_pyramids.recorder["written"] == str(tmp_path / "p.tif")
 
 
 def test_download_zip_cleans_partial_on_failure(
@@ -134,6 +109,65 @@ def test_download_zip_streams_once_then_caches(
     second = _helpers.download_zip(url, tmp_path)
     assert first == second == tmp_path / "World_GHI.zip"
     assert fake_get.calls == 1
+
+
+def _write_geotiff(
+    path: Path, *, no_data_value: float | None, fill: float | None = None
+) -> None:
+    """Write a 20x20 0.1-deg EPSG:4326 GeoTIFF for real windowed-crop tests.
+
+    `fill` writes a constant raster (use the no-data value for an all-no-data
+    source); otherwise a ramp of distinct values.
+    """
+    if fill is None:
+        arr = np.arange(400, dtype="float32").reshape(20, 20)
+    else:
+        arr = np.full((20, 20), fill, dtype="float32")
+    Dataset.create_from_array(
+        arr,
+        top_left_corner=(0.0, 0.0),
+        cell_size=0.1,
+        epsg=4326,
+        no_data_value=no_data_value,
+    ).to_file(str(path))
+
+
+class TestReadPartToGeotiffReal:
+    """`read_part_to_geotiff` against a real (local) pyramids raster."""
+
+    def test_windowed_crop_carries_source_no_data(self, tmp_path: Path) -> None:
+        """A normal window writes a subset carrying the source's own no-data."""
+        src = tmp_path / "src.tif"
+        _write_geotiff(src, no_data_value=-32768.0)
+        out = tmp_path / "out.tif"
+        _helpers.read_part_to_geotiff(str(src), [0.2, -0.6, 0.6, -0.2], out)
+        result = Dataset.read_file(str(out))
+        assert result.rows > 0, "a non-empty window is written"
+        assert result.columns > 0, "a non-empty window is written"
+        assert result.rows < 20, "only the AOI window read"
+        assert result.columns < 20, "only the AOI window read"
+        assert result.no_data_value[0] == -32768.0, "source no-data carried through"
+
+    def test_degenerate_point_yields_small_crop_not_raise(self, tmp_path: Path) -> None:
+        """A point AOI produces a small crop instead of raising (review H1)."""
+        src = tmp_path / "src.tif"
+        _write_geotiff(src, no_data_value=-9999.0)
+        out = tmp_path / "point.tif"
+        _helpers.read_part_to_geotiff(str(src), [0.35, -0.35, 0.35, -0.35], out)
+        result = Dataset.read_file(str(out))
+        assert 1 <= result.rows <= 2, f"rows should clamp small, got {result.rows}"
+        assert 1 <= result.columns <= 2, (
+            f"columns should clamp small, got {result.columns}"
+        )
+
+    def test_all_nodata_aoi_writes_crop_not_raise(self, tmp_path: Path) -> None:
+        """An all-no-data AOI writes an all-no-data crop instead of raising."""
+        src = tmp_path / "src.tif"
+        _write_geotiff(src, no_data_value=-9999.0, fill=-9999.0)
+        out = tmp_path / "empty.tif"
+        _helpers.read_part_to_geotiff(str(src), [0.2, -0.6, 0.6, -0.2], out)
+        result = Dataset.read_file(str(out))
+        assert bool((result.read_array() == -9999.0).all()), "written all-no-data"
 
 
 def test_download_cache_crop_downloads_then_windows(

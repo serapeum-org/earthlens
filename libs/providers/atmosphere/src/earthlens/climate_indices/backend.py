@@ -104,7 +104,7 @@ class ClimateIndices(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "monthly",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         output_format: OutputFormat = "csv",
     ):

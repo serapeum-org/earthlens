@@ -7,7 +7,7 @@ needed. A default `pytest` invocation skips them.
 
 Run with:
 
-    pixi run -e dev pytest -m "e2e and overture" tests/overture
+    uv run --locked pytest -m "e2e and overture" -v
 """
 
 from __future__ import annotations
@@ -19,7 +19,9 @@ import geopandas as gpd
 import pytest
 
 from earthlens.earthlens import EarthLens
-from earthlens.overture import LicenseWarning
+from earthlens.overture import LicenseWarning, query_overture
+from earthlens.overture.releases import is_release_id
+from earthlens.overture.releases import latest_release as live_latest_release
 
 #: A tiny bbox over a dense Manhattan block (Times Square), small enough to
 #: fetch in seconds and reliably non-empty for both places and buildings.
@@ -122,8 +124,39 @@ class TestOvertureLiveFetch:
         assert gdf.crs.to_epsg() == 4326
 
     def test_release_helpers_live(self):
-        """The SDK's release helpers resolve a real, recent release id."""
+        """The SDK's release helpers resolve a real, well-formed release id."""
         from overturemaps.core import get_latest_release
 
         release = get_latest_release()
-        assert release and release[:2] == "20", f"unexpected release {release!r}"
+        assert is_release_id(release), f"unexpected release {release!r}"
+
+    def test_duckdb_release_is_resolved_live(self, tmp_path: Path):
+        """The release the DuckDB path resolves has objects under it on S3."""
+        backend = EarthLens(
+            data_source="overture",
+            variables={"places": []},
+            lat_lim=_LAT_LIM,
+            lon_lim=_LON_LIM,
+            path=str(tmp_path),
+            where="confidence > 0.95",
+        ).datasource
+
+        release = backend._resolve_release()
+        assert is_release_id(release), f"resolved a non-release {release!r}"
+        assert release == live_latest_release(), (
+            "an unpinned DuckDB fetch must target the release Overture "
+            "publishes now, not whatever the bundled index happens to hold"
+        )
+
+        # The #931 failure was an id that resolved to nothing on S3, so glob
+        # the resolved release directly: an aged-out id raises
+        # `No files found that match the pattern` here rather than silently
+        # returning an empty frame.
+        gdf = query_overture(
+            "places",
+            "place",
+            release,
+            (_LON_LIM[0], _LAT_LIM[0], _LON_LIM[1], _LAT_LIM[1]),
+            limit=1,
+        )
+        assert len(gdf) == 1, f"release {release!r} served no rows for the block"

@@ -4,7 +4,7 @@
 # (tiled + overview pyramids) on public figshare (article 9420803,
 # data.dtu.dk), served via ndownloader.figshare.com -> presigned DTU S3 that
 # honours HTTP range requests (verified live — see the A1/A1b gate,
-# planning/solar_wind_atlas/captures/solar-wind-sdk-facts.md). They use the
+# the A1 gate captures). They use the
 # `vsicurl` transport: only the bbox window's byte ranges transfer, never the
 # whole multi-GB file. Catalogued here is the publicly windowable layer set;
 # per-height mean wind-speed at 10/50/150/200 m is not public on figshare

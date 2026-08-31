@@ -2,7 +2,7 @@
 
 Selected with `-m "e2e and nsi"`. `structures` and `nfip` hit real US-federal
 endpoints; the `nfhl` case is `xfail` because `hazards.fema.gov` is blocked from
-the build environment (see planning/flood-risk/captures/nsi-a1-findings-2026-08-09.md)
+the build environment (see the A1 gate captures)
 and only runs green from a reachable network.
 """
 

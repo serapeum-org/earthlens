@@ -8,6 +8,8 @@ small. CDS queue times are real — expect each test to block.
 
 from __future__ import annotations
 
+from functools import partial
+
 import pytest
 
 from earthlens.earthlens import EarthLens
@@ -22,7 +24,7 @@ _BBOX_LON = [-75.0, -74.0]
 class TestApiE2E:
     """End-to-end tests against the live Copernicus Climate Data Store."""
 
-    def test_live_single_level_download(self, tmp_path):
+    def test_live_single_level_download(self, tmp_path, download_within_budget):
         """Daily 2m_temperature on reanalysis-era5-single-levels."""
         ecmwf = ECMWF(
             start="2022-01-01",
@@ -36,14 +38,15 @@ class TestApiE2E:
             temporal_resolution="daily",
         )
 
-        target = ecmwf._api(
-            Catalog().get_variable("reanalysis-era5-single-levels", "2m-temperature")
+        variable = Catalog().get_variable(
+            "reanalysis-era5-single-levels", "2m-temperature"
         )
+        target = download_within_budget(partial(ecmwf._api, variable))
 
         assert target.exists(), f"NetCDF file not created at {target}"
         assert target.stat().st_size > 0, f"NetCDF file is empty: {target}"
 
-    def test_live_pressure_level_download(self, tmp_path):
+    def test_live_pressure_level_download(self, tmp_path, download_within_budget):
         """Daily temperature on reanalysis-era5-pressure-levels at 1000 hPa."""
         ecmwf = ECMWF(
             start="2022-01-01",
@@ -57,14 +60,15 @@ class TestApiE2E:
             temporal_resolution="daily",
         )
 
-        target = ecmwf._api(
-            Catalog().get_variable("reanalysis-era5-pressure-levels", "temperature")
+        variable = Catalog().get_variable(
+            "reanalysis-era5-pressure-levels", "temperature"
         )
+        target = download_within_budget(partial(ecmwf._api, variable))
 
         assert target.exists(), f"NetCDF file not created at {target}"
         assert target.stat().st_size > 0, f"NetCDF file is empty: {target}"
 
-    def test_live_monthly_aggregation(self, tmp_path):
+    def test_live_monthly_aggregation(self, tmp_path, download_within_budget):
         """Monthly 2m_temperature on the synthesized -monthly-means dataset.
 
         After the dataset/product_type decoupling, the monthly path
@@ -86,11 +90,10 @@ class TestApiE2E:
             temporal_resolution="monthly",
         )
 
-        target = ecmwf._api(
-            Catalog().get_variable(
-                "reanalysis-era5-single-levels-monthly-means", "2m-temperature"
-            )
+        variable = Catalog().get_variable(
+            "reanalysis-era5-single-levels-monthly-means", "2m-temperature"
         )
+        target = download_within_budget(partial(ecmwf._api, variable))
 
         assert target.exists(), f"NetCDF file not created at {target}"
         assert target.stat().st_size > 0, f"NetCDF file is empty: {target}"
@@ -102,7 +105,9 @@ class TestApiE2E:
 class TestFacadeE2E:
     """End-to-end tests for the `EarthLens` facade."""
 
-    def test_live_multi_variable_download_through_facade(self, tmp_path):
+    def test_live_multi_variable_download_through_facade(
+        self, tmp_path, download_within_budget
+    ):
         """`EarthLens(...).download()` chains every stage end-to-end."""
         earthlens = EarthLens(
             data_source="ecmwf",
@@ -120,7 +125,7 @@ class TestFacadeE2E:
             path=tmp_path,
         )
 
-        earthlens.download(progress_bar=False)
+        download_within_budget(partial(earthlens.download, progress_bar=False))
 
         # Each variable gets its own
         # <cds_variable>_<cds_dataset>.nc under tmp_path.
