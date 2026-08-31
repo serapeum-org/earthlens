@@ -319,10 +319,10 @@ radiation accumulations, `"%"` for cloud cover, `"m s**-1"` for wind
 speed.
 
 The package returns values in their **native ERA5 units** — no unit
-conversion happens during download. The string here is used in the
-output filename for traceability and as documentation; downstream
-code is responsible for any conversion the user wants (e.g. K → °C,
-m → mm).
+conversion happens during download. The string is documentation only:
+the output filename is built from `cds_variable` and the dataset id, and
+nothing else in the package reads `units`. Downstream code is responsible
+for any conversion the user wants (e.g. K → °C, m → mm).
 
 The value is transcribed from the producer's own `units` attribute and is
 **not normalised**, so the catalog spans many spellings of one unit —
@@ -330,8 +330,7 @@ The value is transcribed from the producer's own `units` attribute and is
 string for a ratio. Rows of a single stanza can disagree, because the file
 they describe does: `satellite-surface-radiation-budget` labels `SRS`
 `W/m^2` and `SOL` `W m-2`. Rewriting either would make this row misdescribe
-the granule it documents and change the output filename, so the spelling is
-left as found. **Compare units by parsing them, never by string equality.**
+the granule it documents, so the spelling is left as found. **Compare units by parsing them, never by string equality.**
 
 ##### `cds_variable`
 

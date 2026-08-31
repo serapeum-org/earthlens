@@ -540,8 +540,8 @@ class Variable(FluxableLeaf):
             (e.g. `"t2m"`); used by post-processing scripts to
             index `fh.variables[...]`. See
             `examples/post_process_ecmwf_netcdf.py`.
-        units: Raw unit string the producer emits for this variable
-            (used in the output filename). The package returns values
+        units: Raw unit string the producer emits for this variable,
+            carried for documentation. The package returns values
             in their native units; downstream code is responsible
             for any unit conversion. See `docs/examples/catalog.md`
             for the conversion factors typical ERA5 workflows apply.

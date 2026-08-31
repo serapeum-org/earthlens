@@ -261,9 +261,12 @@ class _ProbeSession:
             `FAPAR_ERR` and `FAPAR_QFLAG` would otherwise report the same
             "nothing offered" as a store that answered with an empty file, and
             those call for opposite actions — widen the row, or chase the store.
-        answered: How many probes came back describing something. Zero means no
-            constraints block names these rows at all, which is a different
-            problem from a probe that answered with nothing usable.
+        answered: How many probes came back describing something. Zero while
+            `issued` is above zero means the store was asked and answered with
+            nothing, which is a different problem from never having asked.
+        issued: How many probes were actually sent. Zero means the stanza named
+            no `cds_variable` to probe, so nothing can be said about what the
+            store would have returned.
     """
 
     def __init__(self, dataset_id: str, timeout: float | None) -> None:
@@ -274,6 +277,7 @@ class _ProbeSession:
         self.offered: set[str] = set()
         self.filtered: set[str] = set()
         self.answered = 0
+        self.issued = 0
 
     def __call__(
         self, cds_variable: str
@@ -295,6 +299,7 @@ class _ProbeSession:
         """
         if self.error is not None:
             return {}, {}
+        self.issued += 1
         try:
             meta, selectors = _probe_with_timeout(
                 self.dataset_id, cds_variable, self.timeout
@@ -984,6 +989,10 @@ def _hydrate_stanza_per_variable(
         dataset_id: The dataset id whose stanza to hydrate.
         probe: Callable taking a `cds_variable` and returning the
             `(metadata, selectors)` pair :func:`_retrieve_variable_meta` returns.
+        serving: Callable taking a `cds_variable` and returning the constraints
+            blocks that serve it, carrying the dataset's enumerated keys on
+            `.enumerated`. `None` skips the serveability check, which is what a
+            dataset publishing no constraints gets.
 
     Returns:
         A `(text, filled, declined)` triple — the rewritten shard text, the
@@ -1749,6 +1758,11 @@ def _declined_detail(session: _ProbeSession, declined: list[str]) -> str:
         A phrase naming either the missing data variables or the declined rows.
     """
     if not session.offered:
+        if session.issued == 0:
+            # Nothing was asked, so nothing can be said about what came back:
+            # a stanza whose placeholders name no `cds_variable` is skipped
+            # before any probe is issued.
+            return "no probe was issued - no row named a cds_variable"
         if not session.filtered:
             return "the store answered with no variables at all"
         held = sorted(session.filtered)
@@ -2174,7 +2188,8 @@ def bulk_hydrate_empty(
 
     Returns:
         A summary
-        `{candidates, hydrated, skipped, timed_out, unmatched, partial, filled}`
+        `{candidates, hydrated, skipped, timed_out, unmatched, partial,
+        filled, unremoved_scratch}`
         mapping. `unmatched` counts the retrieves that succeeded and still
         hydrated nothing; those are also counted in `skipped`, which stays the
         total of everything not hydrated. `partial` counts the datasets that
@@ -2193,7 +2208,7 @@ def bulk_hydrate_empty(
     # the same word a licence refusal gets.
     rows = {
         key: sum(
-            var.units == "unknown" and not getattr(var, "unhydratable", None)
+            var.units == "unknown" and not var.unhydratable
             for var in ds.variables.values()
         )
         for key, ds in catalog.datasets.items()

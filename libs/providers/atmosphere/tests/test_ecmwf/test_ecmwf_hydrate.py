@@ -365,6 +365,37 @@ _CLAIMED_BLOCK = """      total-precipitation:
 """
 
 
+class TestDeclinedDetailTellsTheTruth:
+    """The echo must not describe a response the sweep never received."""
+
+    def test_a_stanza_that_issued_nothing_says_so(self):
+        """Every placeholder lacking a cds_variable means no probe was sent."""
+        session = hydrate_mod._ProbeSession("a-dataset", None)
+
+        assert "no probe was issued" in hydrate_mod._declined_detail(session, ["x"])
+
+    def test_a_probe_that_returned_nothing_is_reported_as_the_store_answering(self):
+        """Asked and answered with nothing is a different fault from never asking."""
+        session = hydrate_mod._ProbeSession("a-dataset", None)
+        session.issued = 1
+
+        detail = hydrate_mod._declined_detail(session, ["x"])
+
+        assert "no variables at all" in detail
+        assert "no probe was issued" not in detail
+
+    def test_an_all_auxiliary_answer_names_what_was_held_back(self):
+        """A row to widen, not a store to chase."""
+        session = hydrate_mod._ProbeSession("a-dataset", None)
+        session.issued = 1
+        session.filtered = {"FAPAR_ERR"}
+
+        detail = hydrate_mod._declined_detail(session, ["x"])
+
+        assert "only coordinates and auxiliaries" in detail
+        assert "FAPAR_ERR" in detail
+
+
 class TestCallerDerivedSelectorsAreNotOverridden:
     """`extras` is merged last, so an override on a date key overrules the request."""
 
@@ -1272,10 +1303,18 @@ def _patch_catalog(monkeypatch, tmp_path, datasets):
     monkeypatch.setattr(ecmwf_catalog, "clear_catalog_cache", lambda: None)
 
 
-def _placeholder_dataset(*slugs):
-    """A fake Dataset whose named variables all carry the `unknown` sentinel."""
+def _placeholder_dataset(*slugs, unhydratable=None):
+    """A fake Dataset whose named variables all carry the `unknown` sentinel.
+
+    Carries `unhydratable` because `Variable` declares it: a stub missing a
+    field the model has lets the source read it defensively, which would turn a
+    later rename into every marked row silently re-entering the sweep.
+    """
     return SimpleNamespace(
-        variables={slug: SimpleNamespace(units="unknown") for slug in slugs}
+        variables={
+            slug: SimpleNamespace(units="unknown", unhydratable=unhydratable)
+            for slug in slugs
+        }
     )
 
 
@@ -1896,7 +1935,11 @@ class TestBulkHydrateEmpty:
                     "2m-temperature", "sea-surface-temperature"
                 ),
                 "other-dataset": SimpleNamespace(
-                    variables={"total-precipitation": SimpleNamespace(units="m")}
+                    variables={
+                        "total-precipitation": SimpleNamespace(
+                            units="m", unhydratable=None
+                        )
+                    }
                 ),
             },
         )

@@ -47,9 +47,9 @@
 #                                      per timestep on CDS, so monthly
 #                                      aggregation multiplies by the
 #                                      number of days in the slice.
-#       units:                         Required. Raw ERA5 unit string
-#                                      emitted by CDS (used in the
-#                                      output filename).
+#       units:                         Required. Raw unit string the
+#                                      producer emits, carried as
+#                                      documentation only.
 #       unhydratable:                  Optional. Why no live retrieve can
 #                                      ever fill this row, which makes
 #                                      `curate ecmwf --fill-empty` skip
