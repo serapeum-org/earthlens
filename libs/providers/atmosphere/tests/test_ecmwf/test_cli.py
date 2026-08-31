@@ -311,6 +311,55 @@ class TestRetrieveProbeUnpacksAZip:
         assert seen["path"].endswith("probe.nc")
 
 
+class TestDeepSampleRowPicksTheRowsProduct:
+    """Sampling the first listed block reads a name under a product never asked for."""
+
+    ROWS = [
+        {
+            "variable": ["2m_temperature"],
+            "statistic": ["24_hour_maximum"],
+            "version": ["1_1"],
+        },
+        {
+            "variable": ["2m_temperature"],
+            "statistic": ["24_hour_mean"],
+            "version": ["1_1"],
+        },
+    ]
+
+    def test_without_a_preference_the_first_serving_block_is_taken(self):
+        """The legacy behaviour, kept for callers that have no row to consult."""
+        chosen = ecmwf_cli._deep_sample_row(self.ROWS, "2m_temperature")
+
+        assert chosen["statistic"] == ["24_hour_maximum"]
+
+    def test_the_block_matching_the_rows_request_is_preferred(self):
+        """Otherwise the row documents a 24-hour maximum it will never request."""
+        chosen = ecmwf_cli._deep_sample_row(
+            self.ROWS, "2m_temperature", {"statistic": ["24_hour_mean"]}
+        )
+
+        assert chosen["statistic"] == ["24_hour_mean"], (
+            "the probe sampled a product the row does not ask for"
+        )
+
+    def test_a_preference_no_block_matches_falls_back(self):
+        """A row with an unusable request must still probe rather than yield nothing."""
+        chosen = ecmwf_cli._deep_sample_row(
+            self.ROWS, "2m_temperature", {"statistic": ["nothing_offered"]}
+        )
+
+        assert chosen is not None
+        assert chosen["statistic"] == ["24_hour_maximum"]
+
+    def test_a_variable_no_block_serves_is_still_none(self):
+        """Unchanged: there is nothing to sample."""
+        assert (
+            ecmwf_cli._deep_sample_row(self.ROWS, "not_offered", {"statistic": ["x"]})
+            is None
+        )
+
+
 class TestEndpointFor:
     """Which CADS instance a dataset id is served from."""
 

@@ -322,8 +322,32 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     return fallback
 
 
+def _conflicts_with(prefer: dict[str, Any], entry: dict[str, Any]) -> bool:
+    """Whether a constraints entry contradicts anything the row asks for.
+
+    Args:
+        prefer: The selectors the catalog row will send.
+        entry: One constraints entry serving the row's variable.
+
+    Returns:
+        True when the entry offers a key the row asks for and shares no value
+        with it. A key the entry omits is not a contradiction — the row may
+        simply be under-specified for that combination.
+    """
+    from earthlens.ecmwf._hydrate import _asked_values
+
+    for key, value in prefer.items():
+        asked = _asked_values(value)
+        offered = {str(item) for item in (entry.get(key) or [])}
+        if asked is not None and offered and not (asked & offered):
+            return True
+    return False
+
+
 def _deep_sample_row(
-    rows: list[dict[str, Any]], cds_variable: str | None = None
+    rows: list[dict[str, Any]],
+    cds_variable: str | None = None,
+    prefer: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     """Return the constraints entry to build a probe request from.
 
@@ -338,6 +362,12 @@ def _deep_sample_row(
         rows: The dataset's `constraints.json` entries.
         cds_variable: The variable the probe is for; `None` keeps the legacy
             behaviour of taking the first entry that enumerates any variable.
+        prefer: The selectors the catalog row will actually send. Taking the
+            first serving entry instead reads a name and unit under one product
+            and writes them into a row that requests another — which is how
+            `sis-agrometeorological-indicators/2m-temperature` came to document
+            a 24-hour maximum it never asks for. Falls back to the first entry
+            when nothing matches, so a row with no usable request still probes.
 
     Returns:
         The chosen entry, or `None` when `rows` is empty or no entry serves
@@ -347,10 +377,20 @@ def _deep_sample_row(
         return None
     if cds_variable is None:
         return next((entry for entry in rows if entry.get("variable")), rows[0])
-    return next(
-        (entry for entry in rows if cds_variable in (entry.get("variable") or [])),
-        None,
-    )
+    serving = [entry for entry in rows if cds_variable in (entry.get("variable") or [])]
+    if not serving:
+        return None
+    if prefer:
+        # Conflict-only, not the full serveability test: the point is to
+        # sample the product the row asks for, and a row that under-specifies
+        # a block should still sample it rather than fall back elsewhere.
+        matching = next(
+            (entry for entry in serving if not _conflicts_with(prefer, entry)),
+            None,
+        )
+        if matching is not None:
+            return matching
+    return serving[0]
 
 
 def _deep_sample_request(
@@ -536,7 +576,9 @@ def _required_selectors(
 
 
 def _ecmwf_deep_sample_variable(
-    dataset: str, cds_variable: str
+    dataset: str,
+    cds_variable: str,
+    prefer: dict[str, Any] | None = None,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     """Probe ONE variable and report the selectors its constraints block needs.
 
@@ -558,7 +600,7 @@ def _ecmwf_deep_sample_variable(
         serves `cds_variable`.
     """
     rows = _ecmwf_constraints(dataset)
-    row = _deep_sample_row(rows, cds_variable)
+    row = _deep_sample_row(rows, cds_variable, prefer)
     if row is None:
         return {}, {}
     request = _deep_sample_request(row, cds_variable)

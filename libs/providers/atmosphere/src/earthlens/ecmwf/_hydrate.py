@@ -176,7 +176,12 @@ def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
     return _ecmwf_deep_sample(dataset_id)
 
 
-def _probe_into(dataset_id: str, cds_variable: str, box: dict[str, Any]) -> None:
+def _probe_into(
+    dataset_id: str,
+    cds_variable: str,
+    box: dict[str, Any],
+    prefer: dict[str, Any] | None = None,
+) -> None:
     """Thread body: probe one variable, storing its result or error in `box`.
 
     Catches `BaseException`, not `Exception`: anything raised in here has to
@@ -189,7 +194,7 @@ def _probe_into(dataset_id: str, cds_variable: str, box: dict[str, Any]) -> None
         box: Mutable result cell shared with the caller thread.
     """
     try:
-        box["result"] = _retrieve_variable_meta(dataset_id, cds_variable)
+        box["result"] = _retrieve_variable_meta(dataset_id, cds_variable, prefer)
     except Exception as exc:  # noqa: BLE001 — surfaced to the caller thread
         box["error"] = exc
     except BaseException as exc:
@@ -201,7 +206,10 @@ def _probe_into(dataset_id: str, cds_variable: str, box: dict[str, Any]) -> None
 
 
 def _probe_with_timeout(
-    dataset_id: str, cds_variable: str, timeout: float | None
+    dataset_id: str,
+    cds_variable: str,
+    timeout: float | None,
+    prefer: dict[str, Any] | None = None,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     """Probe one variable under a deadline, so a stuck request cannot wedge the pass.
 
@@ -223,10 +231,12 @@ def _probe_with_timeout(
         its first timeout.
     """
     if not timeout:
-        return _retrieve_variable_meta(dataset_id, cds_variable)
+        return _retrieve_variable_meta(dataset_id, cds_variable, prefer)
     box: dict[str, Any] = {}
     thread = threading.Thread(
-        target=_probe_into, args=(dataset_id, cds_variable, box), daemon=True
+        target=_probe_into,
+        args=(dataset_id, cds_variable, box, prefer),
+        daemon=True,
     )
     thread.start()
     thread.join(timeout)
@@ -280,7 +290,7 @@ class _ProbeSession:
         self.issued = 0
 
     def __call__(
-        self, cds_variable: str
+        self, cds_variable: str, prefer: dict[str, Any] | None = None
     ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
         """Probe `cds_variable`, or return empty once the session has failed.
 
@@ -290,6 +300,8 @@ class _ProbeSession:
 
         Args:
             cds_variable: The CDS variable name to retrieve a slice of.
+            prefer: The selectors the catalog row will send, so the probe reads
+                the product that row asks for rather than the first listed.
 
         Returns:
             The `(metadata, selectors)` pair the probe returned — metadata maps
@@ -302,7 +314,7 @@ class _ProbeSession:
         self.issued += 1
         try:
             meta, selectors = _probe_with_timeout(
-                self.dataset_id, cds_variable, self.timeout
+                self.dataset_id, cds_variable, self.timeout, prefer
             )
             data = _data_variables(meta)
             self.offered.update(data)
@@ -1047,14 +1059,21 @@ def _hydrate_stanza_per_variable(
         if cds_variable is None:
             declined.append(slug)
             continue
-        meta, selectors = probe(cds_variable)
+        meta, selectors = probe(
+            cds_variable, {**dataset_extras, **_row_extras(new_block, slug)}
+        )
         chosen = _choose_for_slug(slug, meta, _claimed_nc_names(new_block))
         if chosen is None:
             declined.append(slug)
             continue
         name, units = chosen
-        override = _selector_override(selectors, dataset_extras)
         blocks = serving(cds_variable) if serving is not None else []
+        offering = {
+            key: {str(value) for block in blocks for value in (block.get(key) or [])}
+            for block in blocks
+            for key in block
+        }
+        override = _selector_override(selectors, dataset_extras, offering)
         # The same merge the audit performs: stanza, then whatever `extras:` the
         # row already carries on disk, then this pass's override. Judging only
         # `{stanza, override}` let a row with hand-set extras pass here and be
@@ -1112,7 +1131,7 @@ def _choose_for_slug(
 
 
 def _retrieve_variable_meta(
-    dataset_id: str, cds_variable: str
+    dataset_id: str, cds_variable: str, prefer: dict[str, Any] | None = None
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     """Probe one variable of a dataset; the second credentialed seam.
 
@@ -1123,6 +1142,9 @@ def _retrieve_variable_meta(
     Args:
         dataset_id: The Copernicus dataset id to sample.
         cds_variable: The `cds_variable` to request.
+        prefer: The selectors the catalog row will send, so the probe samples
+            the product the row asks for rather than whichever the constraints
+            happen to list first.
 
     Returns:
         A `(metadata, selectors)` pair as :func:`_ecmwf_deep_sample_variable`
@@ -1130,7 +1152,7 @@ def _retrieve_variable_meta(
     """
     from earthlens.ecmwf.cli import _ecmwf_deep_sample_variable
 
-    return _ecmwf_deep_sample_variable(dataset_id, cds_variable)
+    return _ecmwf_deep_sample_variable(dataset_id, cds_variable, prefer)
 
 
 def _slug_cds_variables(block: str) -> dict[str, str]:
@@ -1390,7 +1412,9 @@ _CALLER_DERIVED_KEYS = frozenset({"year", "month", "day", "time"})
 
 
 def _selector_override(
-    selectors: dict[str, Any], dataset_extras: dict[str, str]
+    selectors: dict[str, Any],
+    dataset_extras: dict[str, str],
+    offered: dict[str, set[str]] | None = None,
 ) -> dict[str, Any]:
     """Return the selectors a variable needs that the stanza does not already set.
 
@@ -1404,6 +1428,10 @@ def _selector_override(
         selectors: The serving constraints block's selectors for this variable.
         dataset_extras: The stanza's dataset-level `extras:` mapping, as parsed
             values so that re-spelling a list does not read as a disagreement.
+        offered: What the serving blocks offer per key, when known. An override
+            naming a key's entire offering records no requirement — it only
+            says the selector exists — so it is refused, the same reasoning the
+            caller-derived keys get.
 
     Returns:
         The subset of `selectors` that differs from `dataset_extras`, keyed the
@@ -1463,6 +1491,16 @@ def _selector_override(
     override: dict[str, Any] = {}
     for key, value in selectors.items():
         if key not in dataset_extras:
+            continue
+        if (
+            offered
+            and isinstance(value, list)
+            and len(value) > 1
+            and {str(item) for item in value} == offered.get(key, set())
+        ):
+            # The whole offering is not a requirement. It has already shipped
+            # `version: [v3.0, v3.1]` on five CAMS rows, which asks the store
+            # for two inventory versions at once.
             continue
         if key in _CALLER_DERIVED_KEYS and isinstance(value, list) and len(value) > 1:
             # The backend builds year/month/day from the caller's date range and
