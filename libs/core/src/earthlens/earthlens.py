@@ -502,7 +502,7 @@ class EarthLens:
             search and InSAR baseline `stack()` via `asf_search`;
             reuses NASA Earthdata Login auth from
             :class:`earthlens.earthdata.EarthdataAuth`. Keys
-            `"asf"` / `"alaska-satellite-facility"` / `"insar"`.
+            `"asf"` / `"alaska-satellite-facility"`; topic key `"asf:insar"`.
         :class:`earthlens.cmems.CMEMS`: Copernicus Marine ocean
             datasets via `copernicusmarine`.
         :class:`earthlens.earthdata.Earthdata`: NASA EOSDIS granules
@@ -555,7 +555,7 @@ class EarthLens:
             facet tuple (`source_id` / `experiment_id` / `variable_id` /
             `table_id`) resolves to the store(s) and pyramids writes a
             bbox/time NetCDF subset (`raster`); anonymous, no extra. Keys
-            `"cmip6"` / `"pangeo-cmip6"` / `"climate-projections"`.
+            `"cmip6"` / `"pangeo-cmip6"`; topic key `"cmip6:climate-projections"`.
         :class:`earthlens.goes.GOES`: NOAA GOES-R ABI geostationary imagery
             fetched whole (raw NetCDF granules, `raster`) from the anonymous
             `noaa-goes19` / `noaa-goes18` / `noaa-goes16` buckets by
@@ -588,7 +588,7 @@ class EarthLens:
             projections) over open HTTPS, reprojected / mosaicked / cropped
             to the AOI via `pyramids` as `raster` GeoTIFFs (one per
             product × epoch; `aggregate=` reduces across epochs); no
-            credentials; keys `"ghsl"` / `"ghs"` / `"human-settlement"`.
+            credentials; keys `"ghsl"` / `"ghs"`; topic key `"ghsl:human-settlement"`.
         :class:`earthlens.glaciers.Glaciers`: glacier outlines / fluctuations
             over three open sources — RGI 7.0 per-region outlines (UNESCO
             IHP-WINS) and GLIMS WFS time-series outlines as `vector`
@@ -1047,9 +1047,10 @@ class EarthLens:
 
         Raises:
             AmbiguousDataSourceError: If `data_source` is a bare generic topic
-                word (a `RESERVED_TOPICS` member). Such a word is reachable only
-                in qualified `source:topic` form; the message lists the
-                registered `source:topic` keys that serve it.
+                word (a `RESERVED_TOPICS` member) that at least one backend
+                serves in qualified `source:topic` form; the message lists those
+                keys. A reserved word no source qualifies yet is treated as an
+                ordinary unknown key (see below).
             ValueError: If `data_source` is not a registered key. The
                 message names the closest registered key (via `difflib`)
                 and lists the known keys.
@@ -1062,9 +1063,9 @@ class EarthLens:
                 raise AmbiguousDataSourceError(
                     f"{data_source!r} is a reserved topic; use one of: {claimants}."
                 )
-            raise AmbiguousDataSourceError(
-                f"{data_source!r} is a reserved topic; no source currently provides it."
-            )
+            # A reserved word no source qualifies yet is just an unknown key —
+            # fall through to the enumerating error with its did-you-mean hint,
+            # which points at the real keys (e.g. `precipitation` -> `chirps`).
         close = difflib.get_close_matches(data_source, list(cls.DataSources), n=1)
         hint = f" Did you mean {close[0]!r}?" if close else ""
         raise ValueError(

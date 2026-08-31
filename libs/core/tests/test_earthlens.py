@@ -127,6 +127,53 @@ class TestS3Backend:
 
 
 @pytest.mark.ecmwf
+class TestCheckSourceResolution:
+    """`EarthLens._check_source` resolves keys and guards reserved topics (C1)."""
+
+    @staticmethod
+    def _synthetic_registry(*keys):
+        """A `_LazyRegistry` over `keys` with throwaway specs (never resolved)."""
+        return _LazyRegistry({key: ("m", "C", "", {}) for key in keys})
+
+    def test_qualified_topic_key_resolves(self, monkeypatch):
+        """A registered `source:topic` key passes validation."""
+        monkeypatch.setattr(
+            EarthLens, "DataSources", self._synthetic_registry("dem", "dem:elevation")
+        )
+        EarthLens._check_source("dem:elevation")
+
+    def test_bare_reserved_word_raises_listing_claimants(self, monkeypatch):
+        """A bare reserved word raises, naming every qualified key that serves it."""
+        monkeypatch.setattr(
+            EarthLens,
+            "DataSources",
+            self._synthetic_registry("dem:elevation", "bathymetry:elevation"),
+        )
+        with pytest.raises(AmbiguousDataSourceError, match="reserved topic") as exc:
+            EarthLens._check_source("elevation")
+        assert "dem:elevation" in str(exc.value)
+        assert "bathymetry:elevation" in str(exc.value)
+
+    def test_unclaimed_reserved_word_falls_through_to_did_you_mean(self, monkeypatch):
+        """A reserved word no source qualifies is an ordinary unknown key."""
+        monkeypatch.setattr(EarthLens, "DataSources", self._synthetic_registry("chc"))
+        with pytest.raises(ValueError, match="is not a supported data source") as exc:
+            EarthLens._check_source("precipitation")
+        assert not isinstance(exc.value, AmbiguousDataSourceError)
+
+    def test_unknown_word_still_lists_valid_keys(self, monkeypatch):
+        """A non-reserved unknown key raises the enumerating ValueError."""
+        monkeypatch.setattr(
+            EarthLens, "DataSources", self._synthetic_registry("chc", "cmems")
+        )
+        with pytest.raises(ValueError, match="is not a supported data source"):
+            EarthLens._check_source("bogus")
+
+    def test_ambiguous_error_is_a_valueerror(self):
+        """`AmbiguousDataSourceError` subclasses `ValueError` for existing catchers."""
+        assert issubclass(AmbiguousDataSourceError, ValueError)
+
+
 class TestECMWFBackend:
     """Tests for the C1+L3 fix that registers ECMWF in the facade.
 
@@ -180,50 +227,6 @@ class TestECMWFBackend:
                 lon_lim=[-75.0, -74.0],
                 path=str(tmp_path),
             )
-
-    @staticmethod
-    def _synthetic_registry(*keys):
-        """A `_LazyRegistry` over `keys` with throwaway specs (never resolved)."""
-        return _LazyRegistry({key: ("m", "C", "", {}) for key in keys})
-
-    def test_qualified_topic_key_resolves(self, monkeypatch):
-        """A registered `source:topic` key passes validation."""
-        monkeypatch.setattr(
-            EarthLens, "DataSources", self._synthetic_registry("dem", "dem:elevation")
-        )
-        EarthLens._check_source("dem:elevation")
-
-    def test_bare_reserved_word_raises_listing_claimants(self, monkeypatch):
-        """A bare reserved word raises, naming every qualified key that serves it."""
-        monkeypatch.setattr(
-            EarthLens,
-            "DataSources",
-            self._synthetic_registry("dem:elevation", "bathymetry:elevation"),
-        )
-        with pytest.raises(AmbiguousDataSourceError, match="reserved topic") as exc:
-            EarthLens._check_source("elevation")
-        assert "dem:elevation" in str(exc.value)
-        assert "bathymetry:elevation" in str(exc.value)
-
-    def test_bare_reserved_word_without_claimant_says_so(self, monkeypatch):
-        """A reserved word no source exposes yet raises the no-provider message."""
-        monkeypatch.setattr(EarthLens, "DataSources", self._synthetic_registry("chc"))
-        with pytest.raises(
-            AmbiguousDataSourceError, match="no source currently provides it"
-        ):
-            EarthLens._check_source("precipitation")
-
-    def test_unknown_word_still_lists_valid_keys(self, monkeypatch):
-        """A non-reserved unknown key raises the enumerating ValueError."""
-        monkeypatch.setattr(
-            EarthLens, "DataSources", self._synthetic_registry("chc", "cmems")
-        )
-        with pytest.raises(ValueError, match="is not a supported data source"):
-            EarthLens._check_source("bogus")
-
-    def test_ambiguous_error_is_a_valueerror(self):
-        """`AmbiguousDataSourceError` subclasses `ValueError` for existing catchers."""
-        assert issubclass(AmbiguousDataSourceError, ValueError)
 
     def test_ecmwf_facade_propagates_constructor_arguments(self, tmp_path, monkeypatch):
         """The facade threads its constructor args into ECMWF unchanged."""
