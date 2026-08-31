@@ -365,6 +365,132 @@ _CLAIMED_BLOCK = """      total-precipitation:
 """
 
 
+class _FixtureBlocks:
+    """A `_ServingBlocks` stand-in over an in-memory constraints fixture."""
+
+    def __init__(self, rows):
+        self._rows = rows
+        self.enumerated = {key for block in rows for key in block}
+
+    def __call__(self, cds_variable):
+        """Return the fixture blocks that list `cds_variable`."""
+        return [r for r in self._rows if cds_variable in (r.get("variable") or [])]
+
+
+def _audit_catalog(monkeypatch, datasets):
+    """Point `audit_serveability` at a fake catalog instead of the shipped one."""
+    import earthlens.ecmwf as ecmwf_pkg
+
+    monkeypatch.setattr(
+        ecmwf_pkg, "Catalog", lambda: SimpleNamespace(datasets=datasets)
+    )
+
+
+class TestAuditServeability:
+    """The #1147 invariant as code, so its clean result can be re-derived."""
+
+    def test_a_row_no_block_can_serve_is_reported(self, monkeypatch):
+        """Without this the audit could report clean and mean nothing."""
+        _audit_catalog(
+            monkeypatch,
+            {
+                "a-dataset": SimpleNamespace(
+                    extras={"product_type": ["reanalysis"]},
+                    variables={
+                        "t2m": SimpleNamespace(
+                            units="K",
+                            unhydratable=None,
+                            cds_variable="2m_temperature",
+                            extras={},
+                        )
+                    },
+                )
+            },
+        )
+        blocks = [{"variable": ["2m_temperature"], "product_type": ["forecast"]}]
+
+        findings = hydrate_mod.audit_serveability(lambda name: _FixtureBlocks(blocks))
+
+        assert [(d, s) for d, s, _ in findings] == [("a-dataset", "t2m")]
+
+    def test_a_row_one_block_can_serve_is_not_reported(self, monkeypatch):
+        """The ordinary case must stay silent or the audit is noise."""
+        _audit_catalog(
+            monkeypatch,
+            {
+                "a-dataset": SimpleNamespace(
+                    extras={"product_type": ["forecast"]},
+                    variables={
+                        "t2m": SimpleNamespace(
+                            units="K",
+                            unhydratable=None,
+                            cds_variable="2m_temperature",
+                            extras={},
+                        )
+                    },
+                )
+            },
+        )
+        blocks = [{"variable": ["2m_temperature"], "product_type": ["forecast"]}]
+
+        assert hydrate_mod.audit_serveability(lambda name: _FixtureBlocks(blocks)) == []
+
+    @pytest.mark.parametrize(
+        ("units", "unhydratable"), [("unknown", None), ("unknown", "pseudo-slug")]
+    )
+    def test_a_placeholder_is_not_audited(self, monkeypatch, units, unhydratable):
+        """A row promising nothing cannot be failing to deliver it."""
+        _audit_catalog(
+            monkeypatch,
+            {
+                "a-dataset": SimpleNamespace(
+                    extras={"product_type": ["reanalysis"]},
+                    variables={
+                        "t2m": SimpleNamespace(
+                            units=units,
+                            unhydratable=unhydratable,
+                            cds_variable="2m_temperature",
+                            extras={},
+                        )
+                    },
+                )
+            },
+        )
+        blocks = [{"variable": ["2m_temperature"], "product_type": ["forecast"]}]
+
+        assert hydrate_mod.audit_serveability(lambda name: _FixtureBlocks(blocks)) == []
+
+    def test_a_dataset_with_no_constraints_is_not_judged(self, monkeypatch):
+        """Nothing to check against is not the same as failing the check."""
+        _audit_catalog(
+            monkeypatch,
+            {
+                "a-dataset": SimpleNamespace(
+                    extras={"product_type": ["reanalysis"]},
+                    variables={
+                        "t2m": SimpleNamespace(
+                            units="K",
+                            unhydratable=None,
+                            cds_variable="2m_temperature",
+                            extras={},
+                        )
+                    },
+                )
+            },
+        )
+
+        assert hydrate_mod.audit_serveability(lambda name: _FixtureBlocks([])) == []
+
+    @pytest.mark.e2e
+    def test_no_shipped_row_is_unserveable_against_the_live_store(self):
+        """The invariant on the real catalog, re-derivable rather than asserted."""
+        findings = hydrate_mod.audit_serveability()
+
+        assert not findings, "unserveable rows: " + "; ".join(
+            f"{dataset}/{slug}" for dataset, slug, _ in findings[:20]
+        )
+
+
 class TestRedactionCoversTheCommonShapes:
     """Sweep output is pasted into issues; a credential must not ride along."""
 

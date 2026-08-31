@@ -2047,6 +2047,51 @@ class _ServingBlocks:
         ]
 
 
+def audit_serveability(
+    blocks_for: Callable[[str], _ServingBlocks] | None = None,
+) -> list[tuple[str, str, dict[str, Any]]]:
+    """Find every curated row whose request no single serving block can answer.
+
+    The invariant behind #1147, as code rather than as a claim. A row can name a
+    real NetCDF variable with a correct unit and still be unfetchable, because
+    the selectors it sends — stanza `extras` merged with its own — match no
+    combination the store offers for that variable. Such a row looks curated and
+    returns nothing.
+
+    Placeholder rows are skipped: they promise nothing yet. So is a row whose
+    dataset publishes no constraints, since there is nothing to judge against.
+
+    Args:
+        blocks_for: Factory returning the serving-block lookup for a dataset id,
+            defaulting to the live one. Injected so the audit can run against a
+            fixture without reaching the network.
+
+    Returns:
+        One `(dataset_id, slug, effective_selectors)` per unserveable row, in
+        catalog order. Empty is the invariant holding.
+    """
+    from earthlens.ecmwf import Catalog
+
+    lookup_for = blocks_for or _serving_blocks_for
+    findings: list[tuple[str, str, dict[str, Any]]] = []
+    for name, dataset in Catalog().datasets.items():
+        stanza = dict(getattr(dataset, "extras", {}) or {})
+        lookup: _ServingBlocks | None = None
+        for slug, row in dataset.variables.items():
+            if row.units == "unknown" or row.unhydratable:
+                continue
+            if lookup is None:
+                lookup = lookup_for(name)
+            serving = lookup(row.cds_variable)
+            if not serving:
+                continue
+            effective = dict(stanza)
+            effective.update(getattr(row, "extras", {}) or {})
+            if not _selectors_are_serveable(effective, serving, lookup.enumerated):
+                findings.append((name, slug, effective))
+    return findings
+
+
 def _serving_blocks_for(dataset_id: str) -> _ServingBlocks:
     """Return a lazy lookup from `cds_variable` to the blocks serving it.
 
