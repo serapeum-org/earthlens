@@ -1,5 +1,22 @@
 # Change Log
 
+## 0.21.0 (2026-08-31)
+
+### BREAKING CHANGE
+
+- the bare topic keys insar, elevation, bare-earth-dem,
+human-settlement, climate-projections, teleconnections,
+european-flood-hazard, sea-level-forecast, coastal-forecast,
+twl-forecast and solar-pv are removed; use asf:insar, dem:elevation,
+fabdem:bare-earth-dem, ghsl:human-settlement, cmip6:climate-projections,
+climate-indices:teleconnections, jrc:european-flood-hazard,
+jrc:sea-level-forecast, jrc:coastal-forecast, jrc:twl-forecast and
+pvgis:solar-pv instead.
+
+### Feat
+
+- **core**: source:topic facade-key grammar with reserved topics (#1153)
+
 ## 0.20.0 (2026-08-31)
 
 ### BREAKING CHANGE
