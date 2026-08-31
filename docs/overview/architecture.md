@@ -62,6 +62,25 @@ from earthlens.core import AggregationConfig, aggregate_netcdf, __version__
 removes. Backend modules keep their dotted paths (`earthlens.chc`, `earthlens.gee`, …), which is how you reach a
 provider's `Catalog`.
 
+## Facade key naming
+
+A `data_source` key is one of two shapes, and the difference is a hard rule enforced by a test:
+
+- **A bare source/brand key** — a proper noun that names one origin and cannot be independently offered by another
+  source: `chc`, `cmems`, `gebco`, `nsrdb`, `planetary-computer`, `jrc-flood`, `amazon-s3`. Every backend has at
+  least one. These do not collide, so they stay bare.
+- **A qualified `source:topic` key** — a **generic domain word** (a subject several sources could serve) namespaced
+  under the source that provides it: `dem:elevation`, `jrc:sea-level-forecast`, `pvgis:solar-pv`.
+
+**A generic topic word is never a bare key.** The reserved generic words live in
+`earthlens._backends.RESERVED_TOPICS`; a bare one is forbidden — requesting it raises
+`AmbiguousDataSourceError` listing the `source:topic` keys that serve it (so `elevation` alone points at no single
+backend, while `dem:elevation` and a future `bathymetry:elevation` coexist), and a provider table that registers one
+bare fails CI. This makes a collision on the only axis that actually collides — generic subjects — impossible by
+construction as the catalog grows, rather than something a maintainer re-adjudicates per new provider. It follows the
+same qualified-namespace model as STAC collection ids, Docker's reserved `library/`, and Kubernetes API groups.
+Datasets within a backend are still chosen by `variables=` and the catalog, not by the key.
+
 ## The data-source contract
 
 `AbstractDataSource` is the core abstraction. Only **two** members are abstract — `download()` and

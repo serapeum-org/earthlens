@@ -67,7 +67,7 @@ perpendicular and temporal baselines:
 
 ```python
 el = EarthLens(
-    data_source="insar",             # alias for "asf"
+    data_source="asf:insar",             # topic key for "asf"
     variables=["sentinel-1-slc"],    # must be a stackable product
     reference="S1A_IW_SLC__1SDV_20240601T072115_20240601T072143_054132_06960B_6FE8",
     perpendicular_baseline=(-100.0, 100.0),  # metres, (min, max)

@@ -36,7 +36,7 @@ depth.epsg                  # 4326 (WGS84)
 array = depth.read_array()  # river-flood water depth in metres (-9999 = no data)
 ```
 
-The `efhm`, `jrc-flood-hazard`, and `european-flood-hazard` aliases route to the
+The `efhm`, `jrc-flood-hazard`, and `jrc:european-flood-hazard` aliases route to the
 same backend.
 
 ## Several return periods at once
@@ -85,14 +85,14 @@ passing `aggregate=` is rejected.
 ## Sea-level (Total Water Level) forecasts
 
 The same backend serves the JRC probabilistic sea-level forecasts. Select the
-gridded product with `product=`; the `coastal-forecast` key returns the global
+gridded product with `product=`; the `jrc:coastal-forecast` key returns the global
 per-country summary instead. By default the newest complete forecast cycle is
 used (`reference_time="latest"`); pass an explicit cycle to pin one.
 
 ```python
 # gridded medium-term TWL forecast, latest cycle, cropped to the North Sea
 paths = EarthLens(
-    data_source="sea-level-forecast",
+    data_source="jrc:sea-level-forecast",
     product="medium_term",           # or "subseasonal"
     lat_lim=[51.0, 53.0],
     lon_lim=[3.0, 5.0],
@@ -102,7 +102,7 @@ paths = EarthLens(
 
 # a specific cycle + a different field
 EarthLens(
-    data_source="sea-level-forecast",
+    data_source="jrc:sea-level-forecast",
     product="subseasonal",
     reference_time="2026-08-24T00",  # a recent cycle; older ones age out
     field="probabilityTWL_01_15-100",
@@ -112,7 +112,7 @@ EarthLens(
 ).download()
 
 # subseasonal global per-country coastal summary -> a pandas.DataFrame
-summary = EarthLens(data_source="coastal-forecast").download()
+summary = EarthLens(data_source="jrc:coastal-forecast").download()
 summary.head()
 ```
 

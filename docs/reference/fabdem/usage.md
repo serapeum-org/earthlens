@@ -38,7 +38,7 @@ dem.epsg                 # 4326 (WGS84)
 array = dem.read_array() # bare-earth elevation in metres
 ```
 
-The `fab-dem` and `bare-earth-dem` aliases route to the same backend.
+The `fab-dem` and `fabdem:bare-earth-dem` aliases route to the same backend.
 
 ## The non-commercial licence warning
 

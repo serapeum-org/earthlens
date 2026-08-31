@@ -4,6 +4,12 @@ This module is deliberately **import-light**: it holds only a plain data table
 and the `importlib.metadata` lookup, and imports no provider SDK. That is what
 lets `EarthLens.DataSources` stay lazy — resolving an entry point costs one
 small module import, never a backend's optional dependency.
+
+Facade-key grammar: a key is either a bare **source/brand** name (`chc`, `cmems`,
+`gebco`) or a qualified **`source:topic`** key (`dem:elevation`,
+`jrc:sea-level-forecast`). A generic topic word (a `RESERVED_TOPICS` member) is
+never a bare key — several sources can serve the same subject only when each
+qualifies it, so a bare topic word can never be silently owned by one backend.
 """
 
 from __future__ import annotations
