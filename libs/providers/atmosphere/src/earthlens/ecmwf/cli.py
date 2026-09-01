@@ -12,6 +12,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, cast
 
+from loguru import logger
+
 from earthlens.cli.toolkit import (
     COVERAGE_BUCKETS,
     get_json,
@@ -96,6 +98,27 @@ def refresher(_catalog: Any) -> dict[str, list[str]]:
     return grouped
 
 
+def serveability_auditor() -> list[tuple[str, str, dict[str, Any]]]:
+    """Report curated rows whose request no constraints block can answer.
+
+    The `serveability_auditor` role behind `earthlens datasets audit ecmwf
+    --serveable`. Reads the store's public constraints only — no retrieve, no
+    credentials.
+
+    Returns:
+        One `(dataset_id, slug, effective_selectors)` per row the store cannot
+        answer, empty when every curated row names a combination it serves.
+
+    Raises:
+        ConstraintsUnavailable: When a dataset's constraints could not be read,
+            since a silent clean result from a run that checked nothing is
+            worse than an error.
+    """
+    from earthlens.ecmwf._hydrate import audit_serveability
+
+    return audit_serveability()
+
+
 def coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
     """Classify every `available_datasets:` id across all five stores.
 
@@ -127,7 +150,7 @@ def coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
     return counts, sorted(buckets.get("addressable", []))
 
 
-def _ecmwf_constraints(dataset: str) -> list[dict[str, Any]]:
+def _ecmwf_constraints(dataset: str, strict: bool = False) -> list[dict[str, Any]]:
     """Return a dataset's public `constraints.json` rows (no creds).
 
     Resolves the dataset's CADS endpoint from the catalog so EWDS/ADS datasets
@@ -137,7 +160,9 @@ def _ecmwf_constraints(dataset: str) -> list[dict[str, Any]]:
     from earthlens.ecmwf.constraints import fetch_constraints
     from earthlens.ecmwf.endpoints import constraints_base_url
 
-    return fetch_constraints(dataset, constraints_base_url(_endpoint_for(dataset)))
+    return fetch_constraints(
+        dataset, constraints_base_url(_endpoint_for(dataset)), strict=strict
+    )
 
 
 def prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
@@ -264,11 +289,21 @@ def _read_via_pyramids(path: str) -> dict[str, dict[str, Any]]:
 
     container = NetCDF.read_file(path)
     schema: dict[str, dict[str, Any]] = {}
-    for name in container.variable_names or []:
-        variable = _exposed_variable(container, name)
-        meta = _variable_meta(variable) if variable is not None else None
-        if meta is not None:
-            schema[str(name)] = meta
+    try:
+        for name in container.variable_names or []:
+            variable = _exposed_variable(container, name)
+            meta = _variable_meta(variable) if variable is not None else None
+            if meta is not None:
+                schema[str(name)] = meta
+    finally:
+        # Released before returning: the probe reads inside a temporary
+        # directory, and on Windows a still-open handle makes removing that
+        # directory fail — which surfaces as a PermissionError on the dataset,
+        # indistinguishable from a licence refusal, after the data has already
+        # been retrieved and read.
+        close = getattr(container, "close", None)
+        if callable(close):
+            close()
     return schema
 
 
@@ -310,8 +345,32 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     return fallback
 
 
+def _conflicts_with(prefer: dict[str, Any], entry: dict[str, Any]) -> bool:
+    """Whether a constraints entry contradicts anything the row asks for.
+
+    Args:
+        prefer: The selectors the catalog row will send.
+        entry: One constraints entry serving the row's variable.
+
+    Returns:
+        True when the entry offers a key the row asks for and shares no value
+        with it. A key the entry omits is not a contradiction — the row may
+        simply be under-specified for that combination.
+    """
+    from earthlens.ecmwf._hydrate import _asked_values
+
+    for key, value in prefer.items():
+        asked = _asked_values(value)
+        offered = {str(item) for item in (entry.get(key) or [])}
+        if asked is not None and offered and not (asked & offered):
+            return True
+    return False
+
+
 def _deep_sample_row(
-    rows: list[dict[str, Any]], cds_variable: str | None = None
+    rows: list[dict[str, Any]],
+    cds_variable: str | None = None,
+    prefer: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     """Return the constraints entry to build a probe request from.
 
@@ -326,6 +385,13 @@ def _deep_sample_row(
         rows: The dataset's `constraints.json` entries.
         cds_variable: The variable the probe is for; `None` keeps the legacy
             behaviour of taking the first entry that enumerates any variable.
+        prefer: The selectors the catalog row will actually send. Taking the
+            first serving entry instead reads a name and unit under one product
+            and writes them into a row that requests another — which is how
+            `sis-agrometeorological-indicators/2m-temperature` came to document
+            a 24-hour maximum it never asks for. Matched in three tiers, and
+            falling back to the first entry when nothing matches, so a row with
+            no usable request still probes.
 
     Returns:
         The chosen entry, or `None` when `rows` is empty or no entry serves
@@ -335,10 +401,33 @@ def _deep_sample_row(
         return None
     if cds_variable is None:
         return next((entry for entry in rows if entry.get("variable")), rows[0])
-    return next(
-        (entry for entry in rows if cds_variable in (entry.get("variable") or [])),
-        None,
-    )
+    serving = [entry for entry in rows if cds_variable in (entry.get("variable") or [])]
+    if not serving:
+        return None
+    if prefer:
+        from earthlens.ecmwf._hydrate import _block_satisfies
+
+        # Three tiers, narrowest first. An entry the serveability guard itself
+        # accepts is best: the row can actually reach it, so the name and unit
+        # come from the product the row will request. The guard is strictly
+        # stronger than the conflict test - it also demands the row send every
+        # key the entry partitions on, and that each asked value be *offered*
+        # rather than merely overlapping - so picking on the conflict test
+        # alone could read metadata from an entry the row could never request
+        # while a different entry certified the row.
+        non_conflicting = [
+            entry for entry in serving if not _conflicts_with(prefer, entry)
+        ]
+        for entry in non_conflicting:
+            if _block_satisfies(prefer, entry):
+                return entry
+        # Then one that merely does not conflict: a row that under-specifies a
+        # block should still sample it rather than fall back elsewhere.
+        if non_conflicting:
+            return non_conflicting[0]
+    # Everything conflicts, so the row is unserveable whatever is read here and
+    # the guard declines it regardless.
+    return serving[0]
 
 
 def _deep_sample_request(
@@ -368,6 +457,31 @@ def _deep_sample_request(
     # A dataset with no variable dimension still needs the widget's "all".
     request.setdefault("variable", ["all"])
     return request
+
+
+#: Probe scratch directories a sweep could not remove, newest last. Read by
+#: the sweep summary so accumulating disk is attributable to a run rather than
+#: discovered later as unexplained directories under the cache root.
+UNREMOVED_SCRATCH: list[str] = []
+
+
+def _discard_scratch(scratch: str) -> None:
+    """Remove a probe's scratch directory, surviving a reader that still holds it.
+
+    Args:
+        scratch: The directory `_retrieve_probe` wrote its granule into.
+    """
+    import shutil
+
+    # `ignore_errors`, not `onexc`: the latter is 3.12+ and this package
+    # floors at 3.11, where the keyword raises TypeError from inside the
+    # `finally` that runs after a successful retrieve and read.
+    shutil.rmtree(scratch, ignore_errors=True)
+    if Path(scratch).exists():
+        UNREMOVED_SCRATCH.append(scratch)
+        logger.warning(
+            f"probe scratch left on disk (a reader still holds it): {scratch}"
+        )
 
 
 def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -408,8 +522,19 @@ def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str
     # under EARTHLENS_CACHE_DIR when set - a data volume, not the system disk -
     # and through TemporaryDirectory so each is removed once it has been read
     # rather than accumulating until something runs out of space.
+    #
+    # A failed removal must not discard a retrieve and a read that both
+    # succeeded. On Windows a reader that has not yet released the file makes
+    # removing the directory raise, and that raise arrives as a PermissionError
+    # - the same class the store raises for an unaccepted licence, which is a
+    # wrong answer to an operator asking why a dataset failed. So the removal
+    # is tolerated, but not silently: each survivor is named in a warning and
+    # counted, because a systemic release regression across a full sweep is
+    # hundreds of these and tens of GB, and a silent tolerance would leave an
+    # operator with neither the disk nor a reason for where it went.
     scratch_root = os.environ.get("EARTHLENS_CACHE_DIR") or None
-    with tempfile.TemporaryDirectory(dir=scratch_root) as scratch:
+    scratch = tempfile.mkdtemp(dir=scratch_root)
+    try:
         target = Path(scratch) / "probe.nc"
         endpoint = _endpoint_for(dataset)
         client = open_client(endpoint)
@@ -423,6 +548,8 @@ def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str
                         shutil.copyfileobj(src, dst)
                     target = inner
         return _read_netcdf_var_meta(str(target))
+    finally:
+        _discard_scratch(scratch)
 
 
 def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
@@ -486,7 +613,9 @@ def _required_selectors(
 
 
 def _ecmwf_deep_sample_variable(
-    dataset: str, cds_variable: str
+    dataset: str,
+    cds_variable: str,
+    prefer: dict[str, Any] | None = None,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     """Probe ONE variable and report the selectors its constraints block needs.
 
@@ -506,9 +635,12 @@ def _ecmwf_deep_sample_variable(
         served under (see :func:`_required_selectors`), not the combination this
         one probe happened to sample. Both are empty when no constraints block
         serves `cds_variable`.
+        prefer: Selectors the row already carries, so the probe reads its name
+            and unit from a block the row's own request can reach rather than
+            from whichever block the store happens to list first.
     """
     rows = _ecmwf_constraints(dataset)
-    row = _deep_sample_row(rows, cds_variable)
+    row = _deep_sample_row(rows, cds_variable, prefer)
     if row is None:
         return {}, {}
     request = _deep_sample_request(row, cds_variable)

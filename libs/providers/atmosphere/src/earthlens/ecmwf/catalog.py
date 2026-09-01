@@ -56,7 +56,7 @@ Examples:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
@@ -540,11 +540,28 @@ class Variable(FluxableLeaf):
             (e.g. `"t2m"`); used by post-processing scripts to
             index `fh.variables[...]`. See
             `examples/post_process_ecmwf_netcdf.py`.
-        units: Raw ERA5 unit string emitted by CDS for this variable
-            (used in the output filename). The package returns values
-            in their native ERA5 units; downstream code is responsible
+        units: Raw unit string the producer emits for this variable,
+            carried for documentation. The package returns values
+            in their native units; downstream code is responsible
             for any unit conversion. See `docs/examples/catalog.md`
             for the conversion factors typical ERA5 workflows apply.
+            Transcribed verbatim and never normalised, so one unit
+            appears under several spellings across the catalog and
+            sibling rows of a stanza may disagree where the granule
+            does. Compare by parsing, not by string equality.
+        unhydratable: Why a live retrieve can never fill this row's
+            `units` / `nc_variable`, or `None` while it is merely unfilled.
+            A placeholder waiting for a sweep and one no sweep can answer
+            look identical otherwise, so every re-run pays for the second
+            kind again and a reader cannot tell which is which. The only
+            value is `"pseudo-slug"`: the row is keyed `all` or
+            `all-variables`, naming every variable its dataset serves
+            rather than one of them, which resolves only where the dataset
+            serves exactly one — as `satellite-precipitation` and
+            `satellite-sea-surface-temperature` do, and those two are
+            hydrated and unmarked. Constrained to that one value because a
+            typo in a free string would still be truthy, still skip the
+            row, and never be noticed.
         cds_pressure_level: Optional list of pressure levels (as
             strings, e.g. `["1000"]`) for pressure-level datasets.
         product_type: CDS `product_type` request parameter. Picks
@@ -578,6 +595,55 @@ class Variable(FluxableLeaf):
             fall back to the ERA5 default (`ERA5_GRID_DEGREES`).
             Propagated from the parent dataset; used by
             `ECMWF._create_grid` to snap the bbox to the right grid.
+
+    Examples:
+        - A curated row carries the NetCDF name and unit a retrieve will return:
+
+            ```python
+            >>> from earthlens.ecmwf.catalog import Variable
+            >>> row = Variable(
+            ...     cds_dataset="reanalysis-era5-single-levels",
+            ...     cds_variable="2m_temperature",
+            ...     nc_variable="t2m",
+            ...     units="K",
+            ... )
+            >>> row.nc_variable
+            't2m'
+            >>> f"{row.cds_variable} arrives as {row.nc_variable} in {row.units}"
+            '2m_temperature arrives as t2m in K'
+
+            ```
+        - A placeholder keeps the `unknown` sentinel and mirrors its
+          `cds_variable`, which is what marks it as not yet curated:
+
+            ```python
+            >>> from earthlens.ecmwf.catalog import Variable
+            >>> row = Variable(
+            ...     cds_dataset="satellite-ozone-v1",
+            ...     cds_variable="atmosphere_mole_content_of_ozone",
+            ...     nc_variable="atmosphere_mole_content_of_ozone",
+            ...     units="unknown",
+            ... )
+            >>> row.units == "unknown" and row.unhydratable is None
+            True
+
+            ```
+        - A row no retrieve can ever fill carries the reason, so a sweep skips
+          it instead of paying for the same answer again:
+
+            ```python
+            >>> from earthlens.ecmwf.catalog import Variable
+            >>> row = Variable(
+            ...     cds_dataset="satellite-precipitation-microwave",
+            ...     cds_variable="all",
+            ...     nc_variable="all",
+            ...     units="unknown",
+            ...     unhydratable="pseudo-slug",
+            ... )
+            >>> row.unhydratable
+            'pseudo-slug'
+
+            ```
     """
 
     # `model_config` (frozen=True, extra="forbid") and the `types` field
@@ -594,6 +660,7 @@ class Variable(FluxableLeaf):
     request_kind: str = "form"
     endpoint: str = "cds"
     grid_resolution: float | None = None
+    unhydratable: Literal["pseudo-slug"] | None = None
 
     @field_validator("extras", mode="before")
     @classmethod

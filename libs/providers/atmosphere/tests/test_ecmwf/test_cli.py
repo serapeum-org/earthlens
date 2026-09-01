@@ -7,18 +7,24 @@ distribution (issue #863).
 from __future__ import annotations
 
 import importlib
+import json
+import pathlib
 import shutil
 import sys
+import tempfile
 import types
 from types import SimpleNamespace
 
 import pytest
 import yaml
+from loguru import logger
 from typer.testing import CliRunner
 
+import earthlens.ecmwf._helpers as ecmwf_helpers
 import earthlens.ecmwf._hydrate as hydrate_mod
 import earthlens.ecmwf._seed as seed_mod
 import earthlens.ecmwf.cli as ecmwf_cli
+import earthlens.ecmwf.endpoints as ecmwf_endpoints
 import earthlens.ecmwf.endpoints as endpoints
 from earthlens.cli.adapter import list_backends, load_catalog
 from earthlens.cli.app import app
@@ -215,7 +221,10 @@ class TestProber:
         monkeypatch.setattr(
             ecmwf_cli,
             "_ecmwf_constraints",
-            lambda d: [{"variable": ["2m_temperature", "tp"]}, {"variable": ["tp"]}],
+            lambda d, strict=False: [
+                {"variable": ["2m_temperature", "tp"]},
+                {"variable": ["tp"]},
+            ],
         )
         result = probe_dataset(_info(), "reanalysis-era5-single-levels")
         assert result.status == "ok", "ecmwf probe ran"
@@ -226,7 +235,10 @@ class TestProber:
         monkeypatch.setattr(
             ecmwf_cli,
             "_ecmwf_constraints",
-            lambda d: [{"variable": ["t2m", "sp"]}, {"variable": ["t2m", "msl"]}],
+            lambda d, strict=False: [
+                {"variable": ["t2m", "sp"]},
+                {"variable": ["t2m", "msl"]},
+            ],
         )
         result = probe_dataset(_info(), "reanalysis-era5-single-levels")
         assert sorted(result.assets) == ["msl", "sp", "t2m"], "vars unioned + sorted"
@@ -238,7 +250,7 @@ class TestProber:
         monkeypatch.setattr(
             constraints,
             "fetch_constraints",
-            lambda d, base_url=None: [{"variable": []}],
+            lambda d, base_url=None, strict=False: [{"variable": []}],
         )
         assert ecmwf_cli._ecmwf_constraints("x") == [{"variable": []}]
 
@@ -257,6 +269,473 @@ def _stub_client(monkeypatch, captured=None, seen_endpoints=None):
         return types.SimpleNamespace(retrieve=_retrieve)
 
     monkeypatch.setattr(endpoints, "open_client", _open_client)
+
+
+class TestRetrieveProbeUnpacksAZip:
+    """CADS answers some requests with a zip; every CAMS probe takes this path."""
+
+    def test_the_netcdf_inside_a_zip_is_the_one_read(self, monkeypatch, tmp_path):
+        """A zipped answer must be unpacked, not handed to the reader as-is."""
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+        monkeypatch.setattr(ecmwf_endpoints, "open_client", lambda endpoint: object())
+        monkeypatch.setenv("EARTHLENS_CACHE_DIR", str(tmp_path))
+        monkeypatch.setattr(
+            ecmwf_helpers, "_retrieve_with_retry", _write_zip_holding_one_netcdf
+        )
+        seen = {}
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_read_netcdf_var_meta",
+            lambda path: (
+                seen.setdefault("path", path) and {} or {"t2m": {"units": "K"}}
+            ),
+        )
+
+        result = ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
+
+        assert result == {"t2m": {"units": "K"}}
+        assert seen["path"].endswith("inner.nc"), (
+            f"the reader was handed {seen['path']}, not the unpacked granule"
+        )
+
+    def test_a_zip_holding_no_netcdf_is_read_as_downloaded(self, monkeypatch, tmp_path):
+        """With nothing to unpack the original file is still what gets read."""
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+        monkeypatch.setattr(ecmwf_endpoints, "open_client", lambda endpoint: object())
+        monkeypatch.setenv("EARTHLENS_CACHE_DIR", str(tmp_path))
+        monkeypatch.setattr(
+            ecmwf_helpers, "_retrieve_with_retry", _write_zip_holding_no_netcdf
+        )
+        seen: dict[str, str] = {}
+        monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", _recording_reader(seen))
+
+        ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
+
+        assert seen["path"].endswith("probe.nc")
+
+
+class TestDeepSampleRowPicksTheRowsProduct:
+    """Sampling the first listed block reads a name under a product never asked for."""
+
+    ROWS = [
+        {
+            "variable": ["2m_temperature"],
+            "statistic": ["24_hour_maximum"],
+            "version": ["1_1"],
+        },
+        {
+            "variable": ["2m_temperature"],
+            "statistic": ["24_hour_mean"],
+            "version": ["1_1"],
+        },
+    ]
+
+    def test_without_a_preference_the_first_serving_block_is_taken(self):
+        """The legacy behaviour, kept for callers that have no row to consult."""
+        chosen = ecmwf_cli._deep_sample_row(self.ROWS, "2m_temperature")
+
+        assert chosen["statistic"] == ["24_hour_maximum"]
+
+    def test_the_block_matching_the_rows_request_is_preferred(self):
+        """Otherwise the row documents a 24-hour maximum it will never request."""
+        chosen = ecmwf_cli._deep_sample_row(
+            self.ROWS, "2m_temperature", {"statistic": ["24_hour_mean"]}
+        )
+
+        assert chosen["statistic"] == ["24_hour_mean"], (
+            "the probe sampled a product the row does not ask for"
+        )
+
+    def test_a_preference_no_block_matches_falls_back(self):
+        """A row with an unusable request must still probe rather than yield nothing."""
+        chosen = ecmwf_cli._deep_sample_row(
+            self.ROWS, "2m_temperature", {"statistic": ["nothing_offered"]}
+        )
+
+        assert chosen is not None
+        assert chosen["statistic"] == ["24_hour_maximum"]
+
+    def test_a_variable_no_block_serves_is_still_none(self):
+        """Unchanged: there is nothing to sample."""
+        assert (
+            ecmwf_cli._deep_sample_row(self.ROWS, "not_offered", {"statistic": ["x"]})
+            is None
+        )
+
+
+class TestAuditServeableCommand:
+    """`datasets audit ecmwf --serveable`, so re-deriving needs no script."""
+
+    def test_a_clean_catalog_says_so(self, monkeypatch):
+        """Silence would leave a reader unsure the check ran."""
+        monkeypatch.setattr(ecmwf_cli, "serveability_auditor", lambda: [])
+
+        result = CliRunner().invoke(app, ["datasets", "audit", "ecmwf", "--serveable"])
+
+        assert result.exit_code == 0, result.output
+        assert "names a combination the store serves" in result.output
+
+    def test_findings_are_listed_with_what_the_row_asks_for(self, monkeypatch):
+        """A bare count would not say which selector to look at."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(
+            hydrate,
+            "audit_serveability",
+            lambda: [("a-dataset", "a-slug", {"product_type": ["reanalysis"]})],
+        )
+
+        result = CliRunner().invoke(app, ["datasets", "audit", "ecmwf", "--serveable"])
+
+        assert "a-dataset/a-slug" in result.output
+        assert "reanalysis" in result.output
+
+    def test_strict_exits_non_zero_when_rows_are_reported(self, monkeypatch):
+        """So a CI gate can fail on it."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(
+            hydrate, "audit_serveability", lambda: [("d", "s", {"x": ["y"]})]
+        )
+
+        result = CliRunner().invoke(
+            app, ["datasets", "audit", "ecmwf", "--serveable", "--strict"]
+        )
+
+        assert result.exit_code == 1, result.output
+
+    def test_an_unreadable_store_exits_two_rather_than_reporting_clean(
+        self, monkeypatch
+    ):
+        """A run that checked nothing must not look like a run that found nothing."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        def _unavailable():
+            raise hydrate.ConstraintsUnavailable("the store could not be read")
+
+        monkeypatch.setattr(hydrate, "audit_serveability", _unavailable)
+
+        result = CliRunner().invoke(app, ["datasets", "audit", "ecmwf", "--serveable"])
+
+        assert result.exit_code == 2, result.output
+        assert "could not check" in result.output
+
+    def test_json_emits_one_record_per_finding(self, monkeypatch):
+        """This is the shape a CI gate or a script actually consumes."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(
+            hydrate,
+            "audit_serveability",
+            lambda: [
+                ("a-dataset", "a-slug", {"product_type": ["reanalysis"]}),
+                ("b-dataset", "b-slug", {"version": ["v3.1"]}),
+            ],
+        )
+
+        result = CliRunner().invoke(
+            app, ["datasets", "audit", "ecmwf", "--serveable", "--json"]
+        )
+
+        assert result.exit_code == 0, result.output
+        assert json.loads(result.output) == [
+            {
+                "provider": "ecmwf",
+                "dataset": "a-dataset",
+                "slug": "a-slug",
+                "selectors": {"product_type": ["reanalysis"]},
+            },
+            {
+                "provider": "ecmwf",
+                "dataset": "b-dataset",
+                "slug": "b-slug",
+                "selectors": {"version": ["v3.1"]},
+            },
+        ]
+
+    def test_json_stays_parseable_when_nothing_is_found(self, monkeypatch):
+        """A consumer should not have to special-case the clean run."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(hydrate, "audit_serveability", lambda: [])
+
+        result = CliRunner().invoke(
+            app, ["datasets", "audit", "ecmwf", "--serveable", "--json"]
+        )
+
+        assert result.exit_code == 0, result.output
+        assert json.loads(result.output) == []
+
+    def test_json_and_strict_still_exits_one(self, monkeypatch):
+        """The gate has to fail even when its output is being piped."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(
+            hydrate, "audit_serveability", lambda: [("d", "s", {"x": ["y"]})]
+        )
+
+        result = CliRunner().invoke(
+            app,
+            ["datasets", "audit", "ecmwf", "--serveable", "--json", "--strict"],
+        )
+
+        assert result.exit_code == 1, result.output
+        assert json.loads(result.output)[0]["dataset"] == "d"
+
+    def test_a_provider_that_cannot_answer_is_named_not_dropped(self, monkeypatch):
+        """Reporting on a subset in silence reads as a clean bill of health."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(hydrate, "audit_serveability", lambda: [])
+
+        result = CliRunner().invoke(
+            app, ["datasets", "audit", "gee,ecmwf", "--serveable"]
+        )
+
+        assert result.exit_code == 0, result.output
+        assert "not checked (no serveability auditor): gee" in result.output, (
+            f"the skipped provider has to be named, got: {result.output!r}"
+        )
+        assert "names a combination the store serves" in result.output, (
+            "and the provider that could be checked still reports"
+        )
+
+    def test_coverage_and_serveable_together_are_refused(self):
+        """They ask different questions; silently honouring one hides the other."""
+        result = CliRunner().invoke(
+            app, ["datasets", "audit", "ecmwf", "--serveable", "--coverage"]
+        )
+
+        assert result.exit_code != 0, result.output
+        assert "pass one" in result.output
+
+    def test_a_provider_without_the_role_is_refused(self):
+        """Only a provider publishing `serveability_auditor` can answer this."""
+        result = CliRunner().invoke(app, ["datasets", "audit", "gee", "--serveable"])
+
+        assert result.exit_code == 2, result.output
+        assert "check its own requests" in result.output
+
+    def test_the_role_is_published_by_the_provider_not_named_in_core(self):
+        """Core must stay backend-agnostic; the handler lives with ecmwf."""
+        from earthlens._cli_tooling import dispatch_table
+
+        assert "ecmwf" in dispatch_table("serveability_auditor")
+
+
+class TestEndpointFor:
+    """Which CADS instance a dataset id is served from."""
+
+    @pytest.mark.parametrize(
+        ("dataset_id", "endpoint"),
+        [
+            ("cams-global-emission-inventories", "ads"),
+            ("cams-europe-air-quality-forecasts", "ads"),
+            ("cems-glofas-historical", "ewds"),
+            ("efas-historical", "ewds"),
+            ("reanalysis-era5-single-levels", "cds"),
+            ("satellite-ozone-v1", "cds"),
+        ],
+    )
+    def test_the_prefix_picks_the_store_when_the_catalog_says_nothing(
+        self, dataset_id, endpoint
+    ):
+        """A misrouted probe authenticates against the wrong store and fails."""
+        catalog = SimpleNamespace()
+
+        assert ecmwf_cli._ecmwf_endpoint_for(catalog, dataset_id) == endpoint, (
+            f"{dataset_id} routed to the wrong endpoint"
+        )
+
+    def test_the_catalogs_own_index_wins_over_the_prefix(self):
+        """A curated store assignment must not be second-guessed by a prefix rule."""
+        catalog = SimpleNamespace(store_for=lambda dataset_id: "xds")
+
+        assert ecmwf_cli._ecmwf_endpoint_for(catalog, "cams-anything") == "xds"
+
+    def test_an_empty_store_falls_through_to_the_prefix(self):
+        """An index that knows nothing about the id must not return an empty store."""
+        catalog = SimpleNamespace(store_for=lambda dataset_id: None)
+
+        assert ecmwf_cli._ecmwf_endpoint_for(catalog, "efas-historical") == "ewds"
+
+
+class TestDeepSampleVariable:
+    """The per-variable probe entry point."""
+
+    def test_a_dataset_no_block_serves_returns_two_empties(self, monkeypatch):
+        """Nothing to request means nothing to describe, and no retrieve is sent."""
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_constraints", lambda dataset, strict=False: []
+        )
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_retrieve_probe",
+            lambda *args, **kwargs: pytest.fail("no retrieve should be issued"),
+        )
+
+        assert ecmwf_cli._ecmwf_deep_sample_variable("a-dataset", "t2m") == ({}, {})
+
+
+class TestReadNetcdfVarMetaSubdatasets:
+    """A container whose variables live in subdatasets rather than at the root."""
+
+    def test_every_named_subdataset_is_read_and_merged(self, monkeypatch, tmp_path):
+        """Some CDS NetCDFs describe their variables one subdataset down."""
+        from osgeo import gdal
+
+        target = tmp_path / "granule.nc"
+        target.write_bytes(b"not really netcdf")
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_read_via_pyramids",
+            lambda path: (_ for _ in ()).throw(OSError("unreadable")),
+        )
+        monkeypatch.setattr(gdal, "Info", _info_with_two_subdatasets)
+        monkeypatch.setattr(ecmwf_cli, "_from_info", _info_to_meta)
+
+        meta = ecmwf_cli._read_netcdf_var_meta(str(target))
+
+        assert sorted(meta) == ["sst", "t2m"], f"subdatasets not merged: {sorted(meta)}"
+        assert meta["t2m"]["units"] == "K"
+
+    def test_a_root_exposing_variables_is_read_without_subdatasets(
+        self, monkeypatch, tmp_path
+    ):
+        """The ordinary container needs no second pass."""
+        from osgeo import gdal
+
+        target = tmp_path / "granule.nc"
+        target.write_bytes(b"not really netcdf")
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_read_via_pyramids",
+            lambda path: (_ for _ in ()).throw(OSError("unreadable")),
+        )
+        monkeypatch.setattr(gdal, "Info", lambda path, format=None: {"path": "t2m"})
+        monkeypatch.setattr(ecmwf_cli, "_from_info", _info_to_meta)
+
+        assert ecmwf_cli._read_netcdf_var_meta(str(target)) == {
+            "t2m": {"long_name": "2 metre temperature", "units": "K"}
+        }
+
+
+class TestDiscardScratch:
+    """Removing one probe's scratch directory, and what it records if it cannot."""
+
+    def test_an_ordinary_directory_is_removed_and_not_recorded(
+        self, monkeypatch, tmp_path
+    ):
+        """The common path leaves nothing on disk and nothing to report."""
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+        scratch = tmp_path / "probe"
+        scratch.mkdir()
+        (scratch / "granule.nc").write_bytes(b"x")
+
+        ecmwf_cli._discard_scratch(str(scratch))
+
+        assert not scratch.exists(), "the scratch directory survived"
+        assert ecmwf_cli.UNREMOVED_SCRATCH == []
+
+    def test_an_already_gone_directory_is_not_recorded(self, monkeypatch, tmp_path):
+        """Nothing is left behind, so there is nothing to attribute."""
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+
+        ecmwf_cli._discard_scratch(str(tmp_path / "never-created"))
+
+        assert ecmwf_cli.UNREMOVED_SCRATCH == []
+
+    def test_a_survivor_is_recorded_once_per_call(self, monkeypatch, tmp_path):
+        """The sweep summary counts these, so a double entry would overstate it."""
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+        monkeypatch.setattr(shutil, "rmtree", _refuse_to_remove)
+        scratch = tmp_path / "probe"
+        scratch.mkdir()
+
+        ecmwf_cli._discard_scratch(str(scratch))
+
+        assert ecmwf_cli.UNREMOVED_SCRATCH == [str(scratch)]
+
+
+def _write_zip_holding_one_netcdf(client, dataset, request, target, endpoint):
+    """Stand in for a store answering with a zipped granule."""
+    import zipfile
+
+    with zipfile.ZipFile(target, "w") as archive:
+        archive.writestr("inner.nc", b"granule bytes")
+
+
+def _write_zip_holding_no_netcdf(client, dataset, request, target, endpoint):
+    """Stand in for a zip carrying no NetCDF member at all."""
+    import zipfile
+
+    with zipfile.ZipFile(target, "w") as archive:
+        archive.writestr("readme.txt", b"no granule here")
+
+
+def _info_with_two_subdatasets(path, format=None):
+    """Stand in for gdal.Info over a container holding two subdatasets."""
+    if path.endswith(".nc"):
+        return {
+            "metadata": {
+                "SUBDATASETS": {
+                    "SUBDATASET_1_NAME": "NETCDF:granule.nc:t2m",
+                    "SUBDATASET_1_DESC": "the temperature field",
+                    "SUBDATASET_2_NAME": "NETCDF:granule.nc:sst",
+                    "SUBDATASET_2_DESC": "the sea surface field",
+                }
+            }
+        }
+    return {"path": path}
+
+
+def _info_to_meta(info):
+    """Turn a stubbed gdal.Info payload into the meta mapping the reader returns."""
+    path = str(info.get("path", ""))
+    if path.endswith("t2m"):
+        return {"t2m": {"long_name": "2 metre temperature", "units": "K"}}
+    if path.endswith("sst"):
+        return {"sst": {"long_name": "sea surface temperature", "units": "K"}}
+    return {}
+
+
+def _recording_reader(seen):
+    """A `_read_netcdf_var_meta` stand-in that records the path it was handed.
+
+    A lambda leaning on `x and {} or y` reads as a puzzle and silently inverts
+    if the recorded value is ever falsy.
+    """
+
+    def _read(path):
+        seen["path"] = path
+        return {"t2m": {"units": "K"}}
+
+    return _read
+
+
+def _refuse_to_remove(path, **kwargs):
+    """Stand in for a Windows reader that still holds the granule.
+
+    Patched onto `shutil.rmtree` for the duration of one call rather than a
+    directory made genuinely unremovable, since only Windows can produce that
+    state and the test has to fail on every platform when the fix goes.
+    """
+
+
+def _stub_probe_transport(monkeypatch, tmp_path):
+    """Point a probe at a local write instead of a store, scratch under `tmp_path`."""
+    monkeypatch.setattr(
+        ecmwf_helpers,
+        "_retrieve_with_retry",
+        lambda client, dataset, request, target, endpoint: pathlib.Path(
+            target
+        ).write_bytes(b"probe"),
+    )
+    monkeypatch.setattr(ecmwf_endpoints, "open_client", lambda endpoint: object())
+    monkeypatch.setattr(
+        ecmwf_cli, "_read_netcdf_var_meta", lambda path: {"x": {"units": "K"}}
+    )
+    monkeypatch.setenv("EARTHLENS_CACHE_DIR", str(tmp_path))
 
 
 class TestDeepProber:
@@ -278,7 +757,9 @@ class TestDeepProber:
         monkeypatch.setattr(
             ecmwf_cli,
             "_ecmwf_constraints",
-            lambda d: [{"variable": ["2m_temperature"], "year": ["2020"]}],
+            lambda d, strict=False: [
+                {"variable": ["2m_temperature"], "year": ["2020"]}
+            ],
         )
         _stub_client(monkeypatch)
         monkeypatch.setattr(
@@ -341,6 +822,69 @@ class TestDeepProber:
         ).to_netcdf(path)
         meta = ecmwf_cli._read_netcdf_var_meta(str(path))
         assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
+
+    def test_a_probe_survives_a_scratch_it_cannot_remove(self, monkeypatch, tmp_path):
+        """A removal that fails must not discard a retrieve and read that worked."""
+        _stub_probe_transport(monkeypatch, tmp_path)
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+        monkeypatch.setattr(shutil, "rmtree", _refuse_to_remove)
+
+        assert ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]}) == {
+            "x": {"units": "K"}
+        }
+
+    def test_an_unremovable_scratch_is_named_and_counted(self, monkeypatch, tmp_path):
+        """Silent tolerance would leave a sweep's tens of GB unattributable."""
+        _stub_probe_transport(monkeypatch, tmp_path)
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+        monkeypatch.setattr(shutil, "rmtree", _refuse_to_remove)
+        warnings: list[str] = []
+        sink = logger.add(warnings.append, level="WARNING")
+
+        try:
+            ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
+        finally:
+            logger.remove(sink)
+
+        assert len(ecmwf_cli.UNREMOVED_SCRATCH) == 1, "the survivor was not counted"
+        left = ecmwf_cli.UNREMOVED_SCRATCH[0]
+        assert pathlib.Path(left).exists()
+        assert any(left in message for message in warnings), (
+            "the path that could not be removed was never named"
+        )
+
+    def test_a_removable_scratch_leaves_nothing_behind(self, monkeypatch, tmp_path):
+        """The ordinary path still removes the granule and reports no survivor."""
+        _stub_probe_transport(monkeypatch, tmp_path)
+        monkeypatch.setattr(ecmwf_cli, "UNREMOVED_SCRATCH", [])
+
+        ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
+
+        assert ecmwf_cli.UNREMOVED_SCRATCH == []
+        assert list(tmp_path.iterdir()) == [], "the probe scratch was left on disk"
+
+    def test_the_reader_releases_its_container(self, monkeypatch, tmp_path):
+        """The handle has to be let go, which is what keeps the scratch removable."""
+        closed: list = []
+
+        class _Container:
+            variable_names = ["t2m"]
+
+            def get_variable(self, name):
+                return SimpleNamespace(
+                    band_units=["K"], global_attributes={"long_name": "temperature"}
+                )
+
+            def close(self):
+                closed.append(True)
+
+        module = SimpleNamespace(
+            NetCDF=SimpleNamespace(read_file=lambda p: _Container())
+        )
+        monkeypatch.setitem(sys.modules, "pyramids.netcdf", module)
+        schema = ecmwf_cli._read_via_pyramids(str(tmp_path / "cube.nc"))
+        assert schema == {"t2m": {"long_name": "temperature", "units": "K"}}
+        assert closed == [True], "the container was left open"
 
     def test_read_netcdf_var_meta_prefers_pyramids(self, monkeypatch, tmp_path):
         """pyramids owns NetCDF reading, so its answer is the one used."""

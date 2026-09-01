@@ -18,6 +18,7 @@ from __future__ import annotations
 import gc
 import os
 import tracemalloc
+import warnings
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock
@@ -1823,6 +1824,25 @@ def _write_real_nc(path, *, periods=6, rows=2, cols=3, nan_at=None):
     return values
 
 
+#: The one enumeration failure that says nothing about the code under test: the
+#: whole-system handle walk cannot fit the machine's current handle count.
+#:
+#: Matched on the message because psutil raises a bare `RuntimeError` for it,
+#: with nothing else to key on. Read verbatim from `_psutil_windows` in psutil
+#: 7.2.2; if a later release rewords it, this stops skipping and starts failing
+#: every handle-release test in the file, which is the safe direction but worth
+#: knowing. Both spellings are kept so either half of the phrase still matches.
+_ENUMERATION_CAPACITY_MARKERS = ("systemextendedhandleinformation", "buffer too big")
+
+
+def _is_enumeration_capacity_failure(error):
+    """Whether `error` is the machine being too busy to enumerate handles."""
+    text = str(error).lower()
+    # Both, not either: an unrelated psutil error mentioning "buffer too big"
+    # would otherwise skip every release check in this file.
+    return all(marker in text for marker in _ENUMERATION_CAPACITY_MARKERS)
+
+
 def _handles_on(path):
     """Entries this process holds open on `path`.
 
@@ -1835,30 +1855,82 @@ def _handles_on(path):
     path already open would not show up in a difference — which is precisely
     the leak a release check exists to catch.
 
-    Skips when the enumeration itself is unavailable. On Windows psutil raises
-    `RuntimeError: SystemExtendedHandleInformation buffer too big` once the
-    machine holds enough handles system-wide, which says nothing about whether
-    the aggregator released its own. Failing there would report a defect in
-    code the check never got far enough to observe.
+    Enumerating handles is a whole-system call on Windows and fails outright
+    when the machine holds too many (`SystemExtendedHandleInformation buffer
+    too big`). That says nothing about whether the aggregator released its own
+    handle — failing there would report a defect in code the check never got
+    far enough to observe — so the caller is skipped rather than failed.
+
+    Only that capacity failure is tolerated. This is the shared helper for every
+    release check in the file, so a blanket catch would turn any psutil problem
+    into a silent pass — an `AccessDenied`, say, should surface rather than
+    quietly disarm the release assertion. Anything else is raised, and the skip
+    warns on its way out so it is visible rather than merely absent.
     """
     try:
-        open_files = psutil.Process().open_files()
-    except (RuntimeError, psutil.Error) as err:
-        # Narrow to the one documented failure. A blanket catch would turn any
-        # psutil problem into a silent pass, which is the shape of bug this
-        # check exists to catch - an AccessDenied, say, should surface rather
-        # than quietly disarm the release assertion.
-        if "SystemExtendedHandleInformation" not in str(err):
+        handles = psutil.Process().open_files()
+    except (RuntimeError, psutil.Error) as exc:
+        if not _is_enumeration_capacity_failure(exc):
             raise
-        pytest.skip(f"psutil cannot enumerate this process's open files: {err}")
+        warnings.warn(
+            f"handle-release checks skipped: {exc}", RuntimeWarning, stacklevel=2
+        )
+        pytest.skip(f"this process's open handles cannot be enumerated: {exc}")
     found = []
-    for handle in open_files:
+    for handle in handles:
         try:
             if os.path.samefile(handle.path, path):
                 found.append(handle.path)
         except ValueError:
             continue
     return found
+
+
+def _open_files_out_of_capacity(self):
+    """Stand in for `psutil.Process.open_files` on a machine that is too busy.
+
+    Args:
+        self: The process the attribute is read from; unused.
+
+    Raises:
+        RuntimeError: The message Windows raises when the handle table will not
+            fit the enumeration buffer.
+    """
+    raise RuntimeError("SystemExtendedHandleInformation buffer too big")
+
+
+def _open_files_denied(self):
+    """Stand in for `psutil.Process.open_files` refusing the caller.
+
+    Args:
+        self: The process the attribute is read from; unused.
+
+    Raises:
+        psutil.AccessDenied: Always.
+    """
+    raise psutil.AccessDenied()
+
+
+class TestHandleEnumerationGuard:
+    """What the shared release-check helper tolerates, and what it must not."""
+
+    def test_a_capacity_failure_skips_the_caller(self, monkeypatch, tmp_path):
+        """The machine being too busy says nothing about the code under test."""
+        monkeypatch.setattr(psutil.Process, "open_files", _open_files_out_of_capacity)
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            with pytest.raises(pytest.skip.Exception, match="cannot be enumerated"):
+                _handles_on(tmp_path)
+
+        assert [w for w in caught if "handle-release checks skipped" in str(w.message)]
+
+    def test_any_other_enumeration_error_is_raised(self, monkeypatch, tmp_path):
+        """Swallowing it would skip every release check in this file, green."""
+        monkeypatch.setattr(psutil.Process, "open_files", _open_files_denied)
+
+        with pytest.raises(psutil.AccessDenied):
+            _handles_on(tmp_path)
 
 
 def _single_level_var():

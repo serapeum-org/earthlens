@@ -185,6 +185,7 @@ datasets:
         cds_variable: all_variables
         nc_variable: all_variables
         units: unknown
+        unhydratable: pseudo-slug
   satellite-earth-radiation-budget:
     endpoint: cds
     request_kind: satellite_cdr
@@ -201,10 +202,25 @@ datasets:
         cds_variable: incoming_shortwave_radiation
         nc_variable: incoming_shortwave_radiation
         units: unknown
+      # The store serves this field from EUMETSAT/CLARA-A3, NASA/CERES-EBAF and
+      # NOAA-NCEI/HIRS, and from no C3S/CCI block at all, so the stanza's
+      # origin and product_family cannot stand. CLARA-A3 is picked because it
+      # is the only one of the three offered under the stanza's
+      # interim_climate_data_record; CERES-EBAF is thematic-only. The stanza's
+      # monthly_mean is kept - EUMETSAT/CLARA-A3 serves both cadences - so this
+      # row differs from its neighbours in producer alone, not in cadence.
+      # sensor_on_satellite is dropped because no block serving this field
+      # partitions on it.
       outgoing-longwave-radiation:
         cds_variable: outgoing_longwave_radiation
         nc_variable: olr
         units: W m-2
+        extras:
+          origin:
+          - eumetsat
+          product_family:
+          - clara_a3
+          sensor_on_satellite: null
       outgoing-shortwave-radiation:
         cds_variable: outgoing_shortwave_radiation
         nc_variable: outgoing_shortwave_radiation
@@ -221,6 +237,7 @@ datasets:
         cds_variable: all_variables
         nc_variable: all_variables
         units: unknown
+        unhydratable: pseudo-slug
   satellite-fire-burned-area:
     endpoint: cds
     request_kind: satellite_cdr
@@ -256,6 +273,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-greenland-ice-sheet-velocity:
     endpoint: cds
     request_kind: satellite_cdr
@@ -273,6 +291,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-humidity-profiles:
     endpoint: cds
     request_kind: satellite_cdr
@@ -286,6 +305,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-ice-sheet-elevation-change:
     endpoint: cds
     request_kind: satellite_cdr
@@ -303,6 +323,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-ice-sheet-mass-balance:
     endpoint: cds
     request_kind: satellite_cdr
@@ -311,6 +332,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-ist-sst-global:
     endpoint: cds
     request_kind: satellite_cdr
@@ -326,6 +348,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-ist-sst-polar:
     endpoint: cds
     request_kind: satellite_cdr
@@ -341,6 +364,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-lai-fapar:
     endpoint: cds
     request_kind: satellite_cdr
@@ -355,12 +379,12 @@ datasets:
     variables:
       fapar:
         cds_variable: fapar
-        nc_variable: fapar
-        units: unknown
+        nc_variable: FAPAR
+        units: '1'
       lai:
         cds_variable: lai
-        nc_variable: lai
-        units: unknown
+        nc_variable: LAI
+        units: ''
   satellite-lake-water-level:
     endpoint: cds
     request_kind: satellite_cdr
@@ -377,6 +401,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-lake-water-temperature:
     endpoint: cds
     request_kind: satellite_cdr
@@ -389,6 +414,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-land-cover:
     endpoint: cds
     request_kind: satellite_cdr
@@ -402,6 +428,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-land-surface-temperature:
     endpoint: cds
     request_kind: satellite_cdr
@@ -413,8 +440,8 @@ datasets:
     variables:
       land-surface-temperature:
         cds_variable: land_surface_temperature
-        nc_variable: land_surface_temperature
-        units: unknown
+        nc_variable: lst
+        units: kelvin
   satellite-methane:
     endpoint: cds
     request_kind: satellite_cdr
@@ -487,6 +514,8 @@ datasets:
         cds_variable: atmosphere_mole_content_of_ozone
         nc_variable: atmosphere_mole_content_of_ozone
         units: unknown
+        extras:
+          vertical_aggregation: [total_columns_uv]
   satellite-precipitation-microwave:
     endpoint: cds
     request_kind: satellite_cdr
@@ -503,9 +532,12 @@ datasets:
         # `num_covered_hours`, an auxiliary coverage counter, because it was the
         # only unmatched data variable in the probe. That is a precipitation CDR,
         # so aggregate= would have reduced the hours-covered field and written it
-        # out as rainfall. Left as a placeholder pending a real per-variable probe.
+        # out as rainfall. The per-variable probe has since run and cannot pin it
+        # either - `all` is not one of the variables the file offers - hence the
+        # mark below, which stops a re-run paying for the same answer.
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-precipitation-microwave-infrared:
     endpoint: cds
     request_kind: satellite_cdr
@@ -519,6 +551,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-sea-ice-concentration:
     endpoint: cds
     request_kind: satellite_cdr
@@ -536,6 +569,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-sea-ice-drift:
     endpoint: cds
     request_kind: satellite_cdr
@@ -549,6 +583,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-sea-ice-edge-type:
     endpoint: cds
     request_kind: satellite_cdr
@@ -583,6 +618,8 @@ datasets:
         cds_variable: sea_ice_thickness
         nc_variable: sea_ice_thickness
         units: m
+        extras:
+          day: null
   satellite-sea-level-global:
     endpoint: cds
     request_kind: satellite_cdr
@@ -611,6 +648,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-snow-cover-extent:
     endpoint: cds
     request_kind: satellite_cdr
@@ -622,12 +660,12 @@ datasets:
     variables:
       snow-cover-fraction-viewable:
         cds_variable: snow_cover_fraction_viewable
-        nc_variable: snow_cover_fraction_viewable
-        units: unknown
+        nc_variable: scfv
+        units: percent
       snow-cover-fraction-on-ground:
         cds_variable: snow_cover_fraction_on_ground
-        nc_variable: snow_cover_fraction_on_ground
-        units: unknown
+        nc_variable: scfg
+        units: percent
   satellite-snow-water-equivalent:
     endpoint: cds
     request_kind: satellite_cdr
@@ -643,6 +681,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-surface-radiation-budget:
     endpoint: cds
     request_kind: satellite_cdr
@@ -660,13 +699,19 @@ datasets:
         nc_variable: SRS
         units: W/m^2
         extras:
-          product_family: [clara_a2]
+          day: null
+          product_family:
+          - clara_a2
+          sensor_on_satellite: null
       surface-upwelling-longwave-flux:
         cds_variable: surface_upwelling_longwave_flux
         nc_variable: SOL
         units: W m-2
         extras:
-          product_family: [clara_a2]
+          day: null
+          product_family:
+          - clara_a2
+          sensor_on_satellite: null
       surface-downwelling-shortwave-flux:
         cds_variable: surface_downwelling_shortwave_flux
         nc_variable: surface_downwelling_shortwave_flux
@@ -691,6 +736,7 @@ datasets:
         cds_variable: all_variables
         nc_variable: all_variables
         units: unknown
+        unhydratable: pseudo-slug
   satellite-terrestrial-water-storage:
     endpoint: cds
     request_kind: satellite_cdr
@@ -714,6 +760,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-total-column-water-vapour-ocean:
     endpoint: cds
     request_kind: satellite_cdr
@@ -730,6 +777,7 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug
   satellite-upper-troposphere-humidity:
     endpoint: cds
     request_kind: satellite_cdr

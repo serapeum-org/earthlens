@@ -123,6 +123,35 @@ datasets:
         cds_variable: particulate_matter_2.5um
         nc_variable: particulate_matter_2.5um
         units: unknown
+  # Why most rows here stay placeholders, verified by probing all 61 in one
+  # sweep (2026-08-31): under the stanza's `source: anthropogenic`, a
+  # single-species request returns one data variable PER EMISSION SECTOR -
+  # ene, fef, ind, mma, res, shp, slv, swd, tnr, tro - plus `sum` for all
+  # sectors, each long_name reading "Emissions of <species> for <sector>
+  # sector". Nothing in a species row says which sector it means, so the
+  # matcher declines rather than guess, and no probe can settle it. Filling
+  # these is a curation decision per row (a named sector, or `sum`).
+  #
+  # The rows that ARE filled are the ones overriding `source` to a value
+  # that returns a single variable: biogenic -> emiss_bio, oceanic ->
+  # emi_oceans, shipping -> sum.
+  #
+  # A second obstacle for 18 of them, and not the one an earlier version of
+  # this comment claimed. `v5.3` is offered under `anthropogenic` — acetylene,
+  # acids, alcohols and ammonia are all served at v2.1/v4.2/v5.3/v6.1/v6.2 —
+  # so no version retarget helps. 17 species (acetaldehyde, acetic-acid,
+  # acetone, the higher alkanes and alkenes, dibromomethane, dimethyl-sulphide,
+  # ethanol, formic-acid, hydrogen-cyanide, iodomethane, methanol,
+  # other-ketones, other-monoterpenes, pinene, sesquiterpenes, sulphate) have
+  # no `anthropogenic` block at all, and would need the stanza's `source`
+  # changed to one that serves them. `carbon-dioxide` is served under
+  # anthropogenic but only at v2.1/v4.2.
+  # The three rows overriding `source` to `shipping` / `oceanic` also carry
+  # their own `version`, because the stanza's `v5.3` is offered only under
+  # `anthropogenic`. Each takes the NEWEST version its source serves, which
+  # is what decides how far the record runs: bromoform reaches 2023 at v4.1
+  # but stops at 2018 on v2.1, and ash and elemental-carbon reach 2021 at
+  # v3.2 against 2018 on v2.1.
   cams-global-emission-inventories:
     endpoint: ads
     request_kind: form
@@ -161,8 +190,13 @@ datasets:
         units: unknown
       alpha-pinene:
         cds_variable: alpha_pinene
-        nc_variable: alpha_pinene
-        units: unknown
+        nc_variable: emiss_bio
+        units: kg m-2 s-1
+        extras:
+          source:
+          - biogenic
+          version:
+          - v3.1
       ammonia:
         cds_variable: ammonia
         nc_variable: ammonia
@@ -172,15 +206,23 @@ datasets:
         nc_variable: sum
         units: kg m-2 s-1
         extras:
-          source: [shipping]
+          source:
+          - shipping
+          version:
+          - v3.2
       benzene:
         cds_variable: benzene
         nc_variable: benzene
         units: unknown
       beta-pinene:
         cds_variable: beta_pinene
-        nc_variable: beta_pinene
-        units: unknown
+        nc_variable: emiss_bio
+        units: kg m-2 s-1
+        extras:
+          source:
+          - biogenic
+          version:
+          - v3.1
       black-carbon:
         cds_variable: black_carbon
         nc_variable: black_carbon
@@ -190,7 +232,10 @@ datasets:
         nc_variable: emi_oceans
         units: kg m-2 s-1
         extras:
-          source: [oceanic]
+          source:
+          - oceanic
+          version:
+          - v4.1
       butanes:
         cds_variable: butanes
         nc_variable: butanes
@@ -236,7 +281,10 @@ datasets:
         nc_variable: sum
         units: kg m-2 s-1
         extras:
-          source: [shipping]
+          source:
+          - shipping
+          version:
+          - v3.2
       esters:
         cds_variable: esters
         nc_variable: esters
@@ -295,16 +343,31 @@ datasets:
         units: unknown
       methyl-bromide:
         cds_variable: methyl_bromide
-        nc_variable: methyl_bromide
-        units: unknown
+        nc_variable: emiss_bio
+        units: kg m-2 s-1
+        extras:
+          source:
+          - biogenic
+          version:
+          - v3.1
       methyl-chloride:
         cds_variable: methyl_chloride
-        nc_variable: methyl_chloride
-        units: unknown
+        nc_variable: emiss_bio
+        units: kg m-2 s-1
+        extras:
+          source:
+          - biogenic
+          version:
+          - v3.1
       methyl-iodide:
         cds_variable: methyl_iodide
-        nc_variable: methyl_iodide
-        units: unknown
+        nc_variable: emiss_bio
+        units: kg m-2 s-1
+        extras:
+          source:
+          - biogenic
+          version:
+          - v3.1
       monoterpenes:
         cds_variable: monoterpenes
         nc_variable: monoterpenes
@@ -410,13 +473,29 @@ datasets:
         nc_variable: uvb
         units: J m**-2
         extras:
-          step: ['0', '12', '15', '18', '21', '3', '6', '9']
+          step:
+          - '0'
+          - '12'
+          - '15'
+          - '18'
+          - '21'
+          - '3'
+          - '6'
+          - '9'
       forecast-albedo:
         cds_variable: forecast_albedo
         nc_variable: fal
         units: (0 - 1)
         extras:
-          step: ['0', '12', '15', '18', '21', '3', '6', '9']
+          step:
+          - '0'
+          - '12'
+          - '15'
+          - '18'
+          - '21'
+          - '3'
+          - '6'
+          - '9'
       photosynthetically-active-radiation-at-the-surface:
         cds_variable: photosynthetically_active_radiation_at_the_surface
         nc_variable: photosynthetically_active_radiation_at_the_surface
@@ -818,6 +897,9 @@ datasets:
         cds_variable: carbon_dioxide
         nc_variable: co2
         units: kg kg**-1
+        extras:
+          pressure_level:
+          - '1000'
       methane:
         cds_variable: methane
         nc_variable: methane
@@ -1146,19 +1228,38 @@ datasets:
         nc_variable: re_ari_anth_srf_sw_cs
         units: Wm-2
         extras:
-          aerosol_type: [anthropogenic, marine, mineral_dust, natural_land]
+          aerosol_type:
+          - anthropogenic
+          - marine
+          - mineral_dust
+          - natural_land
+          band:
+          - short_wave
+          level:
+          - surface
+          sky_type:
+          - clear_sky
       aerosol-optical-depth-550nm:
         cds_variable: aerosol_optical_depth_550nm
         nc_variable: od550anth
         units: '1'
         extras:
-          aerosol_type: [anthropogenic, marine, mineral_dust, natural_land, total]
+          aerosol_type:
+          - anthropogenic
+          - marine
+          - mineral_dust
+          - natural_land
+          - total
       aerosol-absorption-optical-depth-550nm:
         cds_variable: aerosol_absorption_optical_depth_550nm
         nc_variable: abs550anth
         units: '1'
         extras:
-          aerosol_type: [anthropogenic, marine, mineral_dust, natural_land]
+          aerosol_type:
+          - anthropogenic
+          - marine
+          - mineral_dust
+          - natural_land
   cams-global-radiative-forcings:
     endpoint: ads
     request_kind: form
@@ -1411,126 +1512,219 @@ datasets:
         cds_variable: carbon_monoxide
         nc_variable: co
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       dust-aerosol-0.03-0.55um-mixing-ratio:
         cds_variable: dust_aerosol_0.03-0.55um_mixing_ratio
         nc_variable: aermr04
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       dust-aerosol-0.55-0.9um-mixing-ratio:
         cds_variable: dust_aerosol_0.55-0.9um_mixing_ratio
         nc_variable: aermr05
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       dust-aerosol-0.9-20um-mixing-ratio:
         cds_variable: dust_aerosol_0.9-20um_mixing_ratio
         nc_variable: aermr06
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       ethane:
         cds_variable: ethane
         nc_variable: c2h6
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       formaldehyde:
         cds_variable: formaldehyde
         nc_variable: hcho
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       geopotential:
         cds_variable: geopotential
         nc_variable: z
         units: m**2 s**-2
+        extras:
+          pressure_level:
+          - '1000'
       hydrophilic-black-carbon-aerosol-mixing-ratio:
         cds_variable: hydrophilic_black_carbon_aerosol_mixing_ratio
         nc_variable: aermr09
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       hydrophilic-organic-matter-aerosol-mixing-ratio:
         cds_variable: hydrophilic_organic_matter_aerosol_mixing_ratio
         nc_variable: aermr07
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       hydrophobic-black-carbon-aerosol-mixing-ratio:
         cds_variable: hydrophobic_black_carbon_aerosol_mixing_ratio
         nc_variable: aermr10
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       hydrophobic-organic-matter-aerosol-mixing-ratio:
         cds_variable: hydrophobic_organic_matter_aerosol_mixing_ratio
         nc_variable: aermr08
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       hydroxyl-radical:
         cds_variable: hydroxyl_radical
         nc_variable: oh
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       isoprene:
         cds_variable: isoprene
         nc_variable: c5h8
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       methane-chemistry:
         cds_variable: methane_chemistry
         nc_variable: ch4_c
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       nitric-acid:
         cds_variable: nitric_acid
         nc_variable: hno3
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       nitrogen-dioxide:
         cds_variable: nitrogen_dioxide
         nc_variable: no2
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       nitrogen-monoxide:
         cds_variable: nitrogen_monoxide
         nc_variable: 'no'
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       ozone:
         cds_variable: ozone
         nc_variable: go3
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       peroxyacetyl-nitrate:
         cds_variable: peroxyacetyl_nitrate
         nc_variable: pan
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       potential-vorticity:
         cds_variable: potential_vorticity
         nc_variable: pv
         units: K m**2 kg**-1 s**-1
+        extras:
+          pressure_level:
+          - '1000'
       propane:
         cds_variable: propane
         nc_variable: c3h8
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       relative-humidity:
         cds_variable: relative_humidity
         nc_variable: r
         units: '%'
+        extras:
+          pressure_level:
+          - '1000'
       sea-salt-aerosol-0.03-0.5um-mixing-ratio:
         cds_variable: sea_salt_aerosol_0.03-0.5um_mixing_ratio
         nc_variable: aermr01
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       sea-salt-aerosol-0.5-5um-mixing-ratio:
         cds_variable: sea_salt_aerosol_0.5-5um_mixing_ratio
         nc_variable: aermr02
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       sea-salt-aerosol-5-20um-mixing-ratio:
         cds_variable: sea_salt_aerosol_5-20um_mixing_ratio
         nc_variable: aermr03
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       so2-precursor-mixing-ratio:
         cds_variable: so2_precursor_mixing_ratio
         nc_variable: aermr12
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       specific-humidity:
         cds_variable: specific_humidity
         nc_variable: q
         units: kg kg**-1
+        extras:
+          pressure_level:
+          - '1000'
       sulphate-aerosol-mixing-ratio:
         cds_variable: sulphate_aerosol_mixing_ratio
         nc_variable: aermr11
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       sulphur-dioxide:
         cds_variable: sulphur_dioxide
         nc_variable: so2
         units: kg kg**-1
+        extras:
+          model_level:
+          - '60'
       temperature:
         cds_variable: temperature
         nc_variable: t
         units: K
+        extras:
+          pressure_level:
+          - '1000'
       vertical-velocity:
         cds_variable: vertical_velocity
         nc_variable: w
         units: Pa s**-1
+        extras:
+          pressure_level:
+          - '1000'
   cams-gridded-solar-radiation:
     endpoint: ads
     request_kind: form
@@ -1546,7 +1740,9 @@ datasets:
         nc_variable: global_horizontal_clear_sky_irradiation
         units: W h m-2
         extras:
-          sky_type: [clear, observed_cloud]
+          sky_type:
+          - clear
+          - observed_cloud
       # The hydrated name below is specific to the `sky_type: [clear]` pinned
       # in this row's extras — under `sky_type: [all]` the file carries no
       # `beam_horizontal_clear_sky_irradiation`, so changing that pin means
@@ -1560,13 +1756,17 @@ datasets:
         nc_variable: diffuse_horizontal_clear_sky_irradiation
         units: W h m-2
         extras:
-          sky_type: [clear, observed_cloud]
+          sky_type:
+          - clear
+          - observed_cloud
       direct-normal-irradiation:
         cds_variable: direct_normal_irradiation
         nc_variable: beam_normal_clear_sky_irradiation
         units: W h m-2
         extras:
-          sky_type: [clear, observed_cloud]
+          sky_type:
+          - clear
+          - observed_cloud
   cams-solar-radiation-timeseries:
     endpoint: ads
     request_kind: cams_date
@@ -1581,3 +1781,4 @@ datasets:
         cds_variable: all
         nc_variable: all
         units: unknown
+        unhydratable: pseudo-slug

@@ -35,6 +35,7 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "categoriser": "earthlens.ecmwf.cli:categoriser",
         "hydrator": "earthlens.ecmwf.cli:hydrator",
         "seeder": "earthlens.ecmwf.cli:seeder",
+        "serveability_auditor": "earthlens.ecmwf.cli:serveability_auditor",
     },
     "goes": {"validator": "earthlens.goes.cli:validator"},
     "mswep": {"validator": "earthlens.mswep.cli:validator"},

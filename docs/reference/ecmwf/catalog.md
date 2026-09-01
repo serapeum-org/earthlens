@@ -24,6 +24,7 @@ field names below are historical and apply to every store. See
 | `src/earthlens/ecmwf/catalog.py` | The loader (`Catalog`, `Dataset`, `Variable`, …) |
 | `earthlens datasets refresh ecmwf` | Diffs the `available_datasets:` index against every store's live catalogue API |
 | `earthlens datasets audit ecmwf --coverage` | Classifies the available universe into DONE / addressable / thin / table / missing — coverage planning |
+| `earthlens datasets audit ecmwf --serveable` | Reports every curated row whose merged selectors match no single `constraints.json` block, so a retrieve returns nothing — the invariant behind #1147. Unauthenticated, no retrieve; `--strict` exits non-zero for a CI gate |
 | `earthlens datasets validate ecmwf --live` | Builds a `constraints.json`-valid minimal request per dataset and runs the pre-flight `RequestValidator` (no submission) |
 | `earthlens datasets probe ecmwf <id> --deep` | Submits a real tiny retrieve for one dataset and extracts its NetCDF short names and units |
 | `earthlens datasets curate ecmwf <id> [--write]` | Seeds a loader-valid row from the live `form.json` (every variable, `unknown` placeholders); `--write` auto-files it into the family shard |
@@ -319,10 +320,19 @@ radiation accumulations, `"%"` for cloud cover, `"m s**-1"` for wind
 speed.
 
 The package returns values in their **native ERA5 units** — no unit
-conversion happens during download. The string here is used in the
-output filename for traceability and as documentation; downstream
-code is responsible for any conversion the user wants (e.g. K → °C,
-m → mm).
+conversion happens during download. The string is documentation only:
+the output filename is built from `cds_variable` and the dataset id, and
+nothing else in the package reads `units`. Downstream code is responsible
+for any conversion the user wants (e.g. K → °C, m → mm).
+
+The value is transcribed from the producer's own `units` attribute and is
+**not normalised**, so the catalog spans many spellings of one unit —
+`W m**-2`, `W m-2`, `W/m^2`; `K` and `kelvin`; `1`, `%`, and an empty
+string for a ratio. Rows of a single stanza can disagree, because the file
+they describe does: `satellite-surface-radiation-budget` labels `SRS`
+`W/m^2` and `SOL` `W m-2`. Rewriting either would make this row misdescribe
+the granule it documents, so the spelling is left as found.
+**Compare units by parsing them, never by string equality.**
 
 ##### `cds_variable`
 
@@ -439,6 +449,29 @@ is a flat list, not a dict).
 `pressure_level`. Most pressure-level variables inherit the parent
 default; use this only when one specific variable should pull a
 different level set than the rest of its dataset family. Rare.
+
+##### `unhydratable`
+
+*Optional.* String. Why a live probe can never fill this row's `units` /
+`nc_variable`. Absent means the row is simply not filled yet, and
+`earthlens datasets curate ecmwf --fill-empty` will try it; present means no
+retrieve can answer it, and the sweep skips the row rather than spending a
+request and a queue slot to rediscover that.
+
+Write the key only when the row is terminal. `unhydratable: null` (and `~`,
+and an empty value) load as absent, so they mean *pending* — the sweep will
+still probe such a row. There is no spelling of the key that means "skip me"
+other than a reason string.
+
+The only value in use is `pseudo-slug`: the row is keyed `all` or
+`all-variables`, naming every variable its dataset serves rather than one of
+them. That is resolvable only where the dataset serves exactly one variable —
+`satellite-precipitation` and `satellite-sea-surface-temperature` are hydrated
+that way and carry no mark. The mark records that this row has more than one
+candidate and so can never be pinned to a single variable.
+
+Without this, a placeholder waiting for a sweep and one no sweep can ever
+answer look identical, so every re-run pays for the second kind again.
 
 ##### `request_kind` (per-row)
 
