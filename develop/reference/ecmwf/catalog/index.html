@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24506,7 +24506,8 @@ for any conversion the user wants (e.g. K → °C, m → mm).</p>
 string for a ratio. Rows of a single stanza can disagree, because the file
 they describe does: <code>satellite-surface-radiation-budget</code> labels <code>SRS</code>
 <code>W/m^2</code> and <code>SOL</code> <code>W m-2</code>. Rewriting either would make this row misdescribe
-the granule it documents, so the spelling is left as found. <strong>Compare units by parsing them, never by string equality.</strong></p>
+the granule it documents, so the spelling is left as found.
+<strong>Compare units by parsing them, never by string equality.</strong></p>
 <h5 id="cds_variable"><a class="toclink" href="#cds_variable"><code>cds_variable</code></a><a class="headerlink" href="#cds_variable" title="Permanent link">#</a></h5>
 <p><em>Optional.</em> String. The exact <code>variable</code> request name CDS expects,
 e.g. <code>"2m_temperature"</code>, <code>"total_precipitation"</code>. Defaults to the
