@@ -74,6 +74,73 @@ class TestRefresher:
         assert outcome.written == "", "nothing is written on a failed crawl"
 
 
+_TABLEDAP_DDS = """Dataset {
+  Sequence {
+    Float64 time;
+    Float32 ATMP;
+    Float32 WTMP;
+    String station;
+  } s;
+} s;
+"""
+
+_GRIDDAP_DDS = """Dataset {
+  Float64 time[time = 10];
+  Float32 latitude[latitude = 20];
+  Float32 longitude[longitude = 30];
+  GRID {
+    ARRAY:
+      Float32 chlorophyll[time = 10][latitude = 20][longitude = 30];
+    MAPS:
+      Float64 time[time = 10];
+  } chlorophyll;
+} erdX;
+"""
+
+
+class TestVariablesFor:
+    """Tests for the ERDDAP variable-lister used by the catalog audit."""
+
+    def test_tabledap_dds_yields_served_columns(self, monkeypatch):
+        """A tabledap `.dds` yields its served columns with casing preserved."""
+        calls: list[str] = []
+        monkeypatch.setattr(
+            erddap_cli,
+            "get_text",
+            lambda url: calls.append(url) or _TABLEDAP_DDS,
+        )
+        record = SimpleNamespace(
+            server_url="https://x/erddap/",
+            protocol="tabledap",
+            dataset_id="cwwcNDBCMet",
+        )
+        served = erddap_cli.variables_for(record)
+        assert "WTMP" in served, "served column present"
+        assert "wtmp" not in served, "server casing preserved"
+        assert calls == ["https://x/erddap/tabledap/cwwcNDBCMet.dds"]
+
+    def test_griddap_dds_yields_grid_variable_and_dimensions(self, monkeypatch):
+        """A griddap `.dds` yields the grid variable plus its dimensions."""
+        monkeypatch.setattr(erddap_cli, "get_text", lambda url: _GRIDDAP_DDS)
+        record = SimpleNamespace(
+            server_url="https://x/erddap", protocol="griddap", dataset_id="erdX"
+        )
+        served = erddap_cli.variables_for(record)
+        assert "chlorophyll" in served
+        assert {"time", "latitude", "longitude"} <= served
+
+    def test_non_dds_body_raises(self, monkeypatch):
+        """A 200 non-DDS body raises, not parses to an empty (mass-drift) set."""
+        monkeypatch.setattr(
+            erddap_cli, "get_text", lambda url: "<html>under maintenance</html>"
+        )
+        record = SimpleNamespace(
+            server_url="https://x/erddap", protocol="tabledap", dataset_id="cwwcNDBCMet"
+        )
+        with pytest.raises(ValueError, match="did not return a DDS"):
+            erddap_cli.variables_for(record)
+
+
 class TestCoverage:
     """Tests for the ERDDAP `audit --coverage` classifier."""
 

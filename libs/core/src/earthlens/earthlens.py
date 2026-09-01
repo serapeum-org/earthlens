@@ -28,7 +28,12 @@ from typing import TYPE_CHECKING, Any, cast
 
 from loguru import logger
 
-from earthlens._backends import discover_backends
+from earthlens._backends import (
+    RESERVED_TOPICS,
+    AmbiguousDataSourceError,
+    discover_backends,
+    topic_claimants,
+)
 from earthlens.base import split_time
 from earthlens.base.spatial import resolve_aoi
 from earthlens.config import output_dir
@@ -447,30 +452,32 @@ class EarthLens:
             ```python
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
-            ['admin', 'admin-boundaries', 'airnow', 'alaska-satellite-facility', 'amazon-s3', 'aqueduct',
-             'aqueduct-flood-risk', 'aqueduct-floods', 'argo', 'argo-floats', 'argopy', 'asf',
-             'bare-earth-dem', 'bathymetry', 'bdc', 'brazil-data-cube', 'caravan', 'caravan-grdc',
-             'catrare', 'cdse', 'chc', 'chirps', 'climate-indices', 'climate-projections',
-             'climate_indices', 'cmems', 'cmip6', 'cop-dem', 'copernicus-dem', 'dea',
-             'deafrica', 'dem', 'digital-earth-africa', 'digital-earth-australia', 'drought', 'earth-search',
-             'earthdata', 'ecmwf', 'edo', 'eea-aq', 'efhm', 'elevation',
-             'emdat', 'eodc', 'erddap', 'etopo', 'eumetsat', 'european-flood-hazard', 'fab-dem',
-             'fabdem', 'fdsn', 'firms', 'flodis', 'flopros', 'g-portal',
-             'gbif', 'gdacs', 'gdis', 'gdo', 'gebco', 'gee',
-             'geoboundaries', 'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
-             'global-forest-watch', 'global-solar-atlas', 'global-wind-atlas', 'gloh2o', 'goes', 'google-earth-engine',
-             'grdc-caravan', 'gsa', 'gwa', 'hanze', 'hdx', 'himawari',
-             'human-settlement', 'inform', 'insar', 'ioos', 'isimip', 'isric',
-             'iucn', 'jaxa', 'jaxa-earth', 'jrc-flood', 'jrc-flood-hazard', 'landsat',
-             'mswep', 'mswx', 'national-water-model', 'natural-earth', 'nexrad', 'nfhl',
-             'nfip', 'nrel', 'nsi', 'nsrdb', 'nwis', 'nwm',
-             'nwp', 'obis', 'ohsome', 'openaq', 'openeo', 'openstreetmap',
-             'osm', 'overpass', 'overture', 'pangeo-cmip6', 'planetary-computer', 'protected-planet',
-             'ptree', 'pvgis', 'radar', 'radklim', 'radolan', 'redlist',
-             'rgi', 'risk-indicators', 'sensor-community', 'sentinel-hub', 'sentinelhub', 'soilgrids',
-             'solar-pv', 'solar-wind-atlas', 'stac', 'teleconnections', 'thinkhazard', 'tiger',
-             'tropycal', 'usdm', 'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda',
-             'wdpa', 'wgms', 'wind-toolkit', 'world-pop', 'worldpop']
+            ['admin', 'admin-boundaries', 'airnow', 'alaska-satellite-facility',
+             'amazon-s3', 'aqueduct', 'aqueduct-flood-risk', 'aqueduct-floods', 'argo',
+             'argo-floats', 'argopy', 'asf', 'asf:insar', 'bathymetry', 'bdc',
+             'brazil-data-cube', 'caravan', 'caravan-grdc', 'catrare', 'cdse', 'chc',
+             'chirps', 'climate-indices', 'climate-indices:teleconnections',
+             'climate_indices', 'cmems', 'cmip6', 'cmip6:climate-projections', 'cop-dem',
+             'copernicus-dem', 'dea', 'deafrica', 'dem', 'dem:elevation',
+             'digital-earth-africa', 'digital-earth-australia', 'drought', 'earth-search',
+             'earthdata', 'ecmwf', 'edo', 'eea-aq', 'efhm', 'emdat', 'eodc', 'erddap',
+             'etopo', 'eumetsat', 'fab-dem', 'fabdem', 'fabdem:bare-earth-dem', 'fdsn',
+             'firms', 'flodis', 'flopros', 'g-portal', 'gbif', 'gdacs', 'gdis', 'gdo',
+             'gebco', 'gee', 'geoboundaries', 'gfw', 'ghs', 'ghsl', 'ghsl:human-settlement',
+             'glaciers', 'glims', 'global-forest-watch', 'global-solar-atlas',
+             'global-wind-atlas', 'gloh2o', 'goes', 'google-earth-engine', 'grdc-caravan',
+             'gsa', 'gwa', 'hanze', 'hdx', 'himawari', 'inform', 'ioos', 'isimip', 'isric',
+             'iucn', 'jaxa', 'jaxa-earth', 'jrc-flood', 'jrc-flood-hazard', 'jrc-sea-level',
+             'jrc:coastal-forecast', 'jrc:european-flood-hazard', 'jrc:sea-level-forecast',
+             'jrc:twl-forecast', 'landsat', 'mswep', 'mswx', 'national-water-model',
+             'natural-earth', 'nexrad', 'nfhl', 'nfip', 'nrel', 'nsi', 'nsrdb', 'nwis',
+             'nwm', 'nwp', 'obis', 'ohsome', 'openaq', 'openeo', 'openstreetmap', 'osm',
+             'overpass', 'overture', 'pangeo-cmip6', 'planetary-computer',
+             'protected-planet', 'ptree', 'pvgis', 'pvgis:solar-pv', 'radar', 'radklim',
+             'radolan', 'redlist', 'rgi', 'risk-indicators', 'sensor-community',
+             'sentinel-hub', 'sentinelhub', 'soilgrids', 'solar-wind-atlas', 'stac',
+             'thinkhazard', 'tiger', 'tropycal', 'usdm', 'usgs-landsat', 'usgs-nwis',
+             'usgs-water', 'veda', 'wdpa', 'wgms', 'wind-toolkit', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:
@@ -495,7 +502,7 @@ class EarthLens:
             search and InSAR baseline `stack()` via `asf_search`;
             reuses NASA Earthdata Login auth from
             :class:`earthlens.earthdata.EarthdataAuth`. Keys
-            `"asf"` / `"alaska-satellite-facility"` / `"insar"`.
+            `"asf"` / `"alaska-satellite-facility"`; topic key `"asf:insar"`.
         :class:`earthlens.cmems.CMEMS`: Copernicus Marine ocean
             datasets via `copernicusmarine`.
         :class:`earthlens.earthdata.Earthdata`: NASA EOSDIS granules
@@ -548,7 +555,7 @@ class EarthLens:
             facet tuple (`source_id` / `experiment_id` / `variable_id` /
             `table_id`) resolves to the store(s) and pyramids writes a
             bbox/time NetCDF subset (`raster`); anonymous, no extra. Keys
-            `"cmip6"` / `"pangeo-cmip6"` / `"climate-projections"`.
+            `"cmip6"` / `"pangeo-cmip6"`; topic key `"cmip6:climate-projections"`.
         :class:`earthlens.goes.GOES`: NOAA GOES-R ABI geostationary imagery
             fetched whole (raw NetCDF granules, `raster`) from the anonymous
             `noaa-goes19` / `noaa-goes18` / `noaa-goes16` buckets by
@@ -581,7 +588,7 @@ class EarthLens:
             projections) over open HTTPS, reprojected / mosaicked / cropped
             to the AOI via `pyramids` as `raster` GeoTIFFs (one per
             product × epoch; `aggregate=` reduces across epochs); no
-            credentials; keys `"ghsl"` / `"ghs"` / `"human-settlement"`.
+            credentials; keys `"ghsl"` / `"ghs"`; topic key `"ghsl:human-settlement"`.
         :class:`earthlens.glaciers.Glaciers`: glacier outlines / fluctuations
             over three open sources — RGI 7.0 per-region outlines (UNESCO
             IHP-WINS) and GLIMS WFS time-series outlines as `vector`
@@ -662,19 +669,19 @@ class EarthLens:
         Args:
             data_source: Backend key. One of the registered keys in
                 :attr:`DataSources` — `"chc"` (alias `"chirps"`),
-                `"climate-indices"` (aliases `"climate_indices"` /
-                `"teleconnections"`),
-                `"amazon-s3"`, `"asf"` (aliases
-                `"alaska-satellite-facility"` / `"insar"`),
+                `"climate-indices"` (alias `"climate_indices"`; topic key
+                `"climate-indices:teleconnections"`),
+                `"amazon-s3"`, `"asf"` (alias
+                `"alaska-satellite-facility"`; topic key `"asf:insar"`),
                 `"cmems"`, `"earthdata"`, `"ecmwf"`,
                 `"eumetsat"`, `"fdsn"`, `"firms"`, `"gdacs"`, `"gee"`
-                (alias `"google-earth-engine"`), `"ghsl"` (aliases
-                `"ghs"` / `"human-settlement"`), `"glaciers"` (aliases
+                (alias `"google-earth-engine"`), `"ghsl"` (alias
+                `"ghs"`; topic key `"ghsl:human-settlement"`), `"glaciers"` (aliases
                 `"rgi"` / `"glims"` / `"wgms"`), `"hdx"`,
                 `"nrel"` (aliases `"nsrdb"` / `"wind-toolkit"`), `"nwp"`,
                 `"openaq"`, `"openeo"`, `"overture"`, `"radar"` (alias
                 `"nexrad"`), `"sentinel-hub"` (alias `"sentinelhub"`),
-                `"pvgis"` (alias `"solar-pv"`),
+                `"pvgis"` (topic key `"pvgis:solar-pv"`),
                 `"stac"` (with endpoint aliases `"planetary-computer"` /
                 `"earth-search"` / `"cdse"`), `"tropycal"`,
                 `"usgs-water"` (aliases `"usgs-nwis"` / `"nwis"`),
@@ -1039,17 +1046,32 @@ class EarthLens:
             data_source: The backend key to validate.
 
         Raises:
+            AmbiguousDataSourceError: If `data_source` is a bare generic topic
+                word (a `RESERVED_TOPICS` member) that at least one backend
+                serves in qualified `source:topic` form; the message lists those
+                keys. A reserved word no source qualifies yet is treated as an
+                ordinary unknown key (see below).
             ValueError: If `data_source` is not a registered key. The
                 message names the closest registered key (via `difflib`)
                 and lists the known keys.
         """
-        if data_source not in cls.DataSources:
-            close = difflib.get_close_matches(data_source, list(cls.DataSources), n=1)
-            hint = f" Did you mean {close[0]!r}?" if close else ""
-            raise ValueError(
-                f"{data_source!r} is not a supported data source. "
-                f"Known: {sorted(cls.DataSources)}.{hint}"
-            )
+        if data_source in cls.DataSources:
+            return
+        if ":" not in data_source and data_source in RESERVED_TOPICS:
+            claimants = topic_claimants(cls.DataSources, data_source)
+            if claimants:
+                raise AmbiguousDataSourceError(
+                    f"{data_source!r} is a reserved topic; use one of: {claimants}."
+                )
+            # A reserved word no source qualifies yet is just an unknown key —
+            # fall through to the enumerating error with its did-you-mean hint,
+            # which points at the real keys (e.g. `precipitation` -> `chirps`).
+        close = difflib.get_close_matches(data_source, list(cls.DataSources), n=1)
+        hint = f" Did you mean {close[0]!r}?" if close else ""
+        raise ValueError(
+            f"{data_source!r} is not a supported data source. "
+            f"Known: {sorted(cls.DataSources)}.{hint}"
+        )
 
     #: Constructor parameter names the facade owns and supplies itself.
     #: Everything else a backend declares is a backend-specific option,

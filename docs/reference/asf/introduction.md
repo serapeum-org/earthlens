@@ -116,7 +116,7 @@ EarthLens(data_source="asf",                    # canonical key
           ...)
 EarthLens(data_source="alaska-satellite-facility",  # full-name alias
           ...)
-EarthLens(data_source="insar",                  # capability alias
+EarthLens(data_source="asf:insar",                  # capability topic key
           ...)
 ```
 

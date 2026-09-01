@@ -8,16 +8,23 @@ curated `server_url`'s `allDatasets` table; every read is public.
 
 from __future__ import annotations
 
+import re
 from typing import Any, cast
 
 from earthlens.cli.toolkit import (
     COVERAGE_BUCKETS,
     get_json,
+    get_text,
     index_writer,
 )
 
 #: Persists a live dataset-id fetch into the bundled `available_datasets:` block.
 writer = index_writer("available_datasets")
+
+#: A `.dds` variable declaration: `<Type> <name>` followed by `[` (a dimensioned
+#: grid/array) or `;` (a scalar/table column). Captures the name and skips the
+#: `Dataset`/`Sequence`/`GRID`/`ARRAY`/`MAPS`/`}` structural lines.
+_DDS_VARIABLE = re.compile(r"^\s*[A-Za-z]\w*\s+([A-Za-z]\w*)\s*[\[;]", re.MULTILINE)
 
 
 def _dataset_ids(server_url: str) -> list[str]:
@@ -54,6 +61,42 @@ def refresher(catalog: Any) -> dict[str, list[str]]:
     """
     servers = sorted({row.server_url for row in catalog.datasets.values()})
     return {server: _dataset_ids(server) for server in servers}
+
+
+def variables_for(record: Any) -> set[str]:
+    """Return the variable names an ERDDAP dataset serves live.
+
+    Fetches the dataset's `.dds` (Dataset Descriptor Structure) and parses the
+    declared names — the data columns of a tabledap `Sequence` and the grid
+    variables plus dimensions of a griddap `Grid`. The catalog audit diffs a
+    curated `variables:` list against this set to flag a variable the server
+    stopped serving or re-cased (e.g. `wtmp` -> `WTMP`), which the id-level audit
+    cannot see. Registered as the `variable_lister` role for `erddap`.
+
+    Args:
+        record: A curated ERDDAP `Dataset` row, carrying `server_url`,
+            `protocol`, and `dataset_id`.
+
+    Returns:
+        The set of variable names the server declares for the dataset. This
+        rests on ERDDAP destination names being `[A-Za-z][A-Za-z0-9_]*` (the
+        `.dds` grammar the regex matches), so the set is a superset of the data
+        variables and a curated name absent from it is real drift, while extra
+        dimension names never cause a false positive. A variable the `.dds`
+        grammar cannot express (e.g. a DAP structure type) is a known limitation
+        — it would read as drift, not be silently mis-parsed.
+
+    Raises:
+        ValueError: If the response is not a DDS — a 200 carrying a maintenance
+            or interstitial page — so the audit reports an errored fetch instead
+            of parsing an empty set and flagging every curated variable as drift.
+    """
+    base = record.server_url.rstrip("/")
+    url = f"{base}/{record.protocol}/{record.dataset_id}.dds"
+    dds = get_text(url)
+    if "Dataset {" not in dds:
+        raise ValueError(f"{url} did not return a DDS")
+    return set(_DDS_VARIABLE.findall(dds))
 
 
 def _structures(catalog: Any) -> dict[str, str]:

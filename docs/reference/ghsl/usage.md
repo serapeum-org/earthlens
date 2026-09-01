@@ -6,7 +6,7 @@
 from earthlens.core import EarthLens
 
 paths = EarthLens(
-    data_source="ghsl",              # or "ghs" / "human-settlement"
+    data_source="ghsl",              # or "ghs"; topic key "ghsl:human-settlement"
     variables=["GHS_POP"],           # product keys or friendly aliases
     start="2020-01-01",
     end="2020-12-31",

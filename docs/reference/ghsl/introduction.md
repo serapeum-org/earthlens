@@ -38,7 +38,7 @@ Given a bbox + time window + a list of product keys, the backend:
 
 writing **one GeoTIFF per `(product, epoch)`**. Multi-epoch requests support
 `aggregate=` (reduced across epochs). The unified facade key is `"ghsl"`
-(aliases `"ghs"`, `"human-settlement"`).
+(aliases `"ghs"`, `"ghsl:human-settlement"`).
 
 ## Install
 

@@ -1,5 +1,49 @@
 # Change Log
 
+## 0.21.0 (2026-08-31)
+
+### BREAKING CHANGE
+
+- the bare topic keys insar, elevation, bare-earth-dem,
+human-settlement, climate-projections, teleconnections,
+european-flood-hazard, sea-level-forecast, coastal-forecast,
+twl-forecast and solar-pv are removed; use asf:insar, dem:elevation,
+fabdem:bare-earth-dem, ghsl:human-settlement, cmip6:climate-projections,
+climate-indices:teleconnections, jrc:european-flood-hazard,
+jrc:sea-level-forecast, jrc:coastal-forecast, jrc:twl-forecast and
+pvgis:solar-pv instead.
+
+### Feat
+
+- **core**: source:topic facade-key grammar with reserved topics (#1153)
+
+## 0.20.0 (2026-08-31)
+
+### BREAKING CHANGE
+
+- `earthlens.jrc_flood` is renamed to `earthlens.jrc` and
+the `JRCFlood` class to `JRC`. Import sites must move to
+`from earthlens.jrc import JRC`. No facade key changes: `efhm`,
+`jrc-flood`, `jrc-flood-hazard` and `european-flood-hazard` keep working
+and the EFHM request shape is unchanged.
+
+### Feat
+
+- **jrc**: add the sea-level (TWL) forecasts and unify the JRC backend (#1143)
+- **gee**: widen the EEDAI fast-path beyond single EPSG:4326 images (#1103)
+- **ecmwf**: override the catalog's pressure level per retrieval (#1120)
+
+### Fix
+
+- **erddap**: follow CoastWatch's dataset rename, and close the CI gaps it exposed (#1128)
+- **eumetsat**: allow unprojected tailoring and drop satpy from the eclipse showcase (#1127)
+- **gee**: migrate the EEDAI reader to pyramids-eo 0.5.0's window=Window API (#1122)
+
+### Refactor
+
+- **showcase**: port eclipse_geometry_3d.ipynb's globe to cleopatra's TexturedGlobeGlyph (#1123)
+- **showcase**: adopt cleopatra 0.34.0's ported globe, watermark and animation helpers (#1114)
+
 ## 0.19.0 (2026-08-29)
 
 ### Feat

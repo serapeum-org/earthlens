@@ -45,7 +45,7 @@ _POLYGON_CAPABLE = {
     "FABDEM",
     "GEE",
     "GHSL",
-    "JRCFlood",
+    "JRC",
     "NWP",
     "S3",
     "SoilGrids",

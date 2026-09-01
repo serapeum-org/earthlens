@@ -52,7 +52,7 @@ df.groupby("index")["source"].first()
 # oni        noaa-psl
 ```
 
-The `"climate_indices"` and `"teleconnections"` aliases route to the same
+The `"climate_indices"` and `"climate-indices:teleconnections"` aliases route to the same
 backend.
 
 ## Pivoting to wide form

@@ -67,7 +67,7 @@ with their thematic distribution and work out of the box.
 | `flopros` | hazards | `gdacs` | hazards |
 | `glaciers` | land | `hanze` | hazards |
 | `isimip` | atmosphere | `iucn` | land |
-| `jrc-flood` | hazards | `mswep` | atmosphere |
+| `jrc` | hazards | `mswep` | atmosphere |
 | `nrel` | atmosphere | `nsi` | hazards |
 | `openaq` | atmosphere | `pvgis` | atmosphere |
 | `radklim` | atmosphere | `risk-indicators` | hazards |

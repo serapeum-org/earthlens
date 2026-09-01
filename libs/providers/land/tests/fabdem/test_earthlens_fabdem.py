@@ -11,7 +11,7 @@ from earthlens.earthlens import EarthLens
 
 pytestmark = pytest.mark.fabdem
 
-KEYS = ["fabdem", "fab-dem", "bare-earth-dem"]
+KEYS = ["fabdem", "fab-dem", "fabdem:bare-earth-dem"]
 
 #: The FABDEM src package files that must never import xarray (raster I/O is pyramids').
 _SRC_DIR = Path(earthlens.fabdem.__file__).parent
@@ -53,9 +53,9 @@ class TestFacadeConstruction:
         assert el.datasource.OUTPUT_KIND == "raster"
 
     def test_alias_routes_to_fabdem(self, tmp_path):
-        """`data_source="bare-earth-dem"` constructs the `FABDEM` backend."""
+        """`data_source="fabdem:bare-earth-dem"` constructs the `FABDEM` backend."""
         el = EarthLens(
-            data_source="bare-earth-dem",
+            data_source="fabdem:bare-earth-dem",
             lat_lim=[50.4, 50.6],
             lon_lim=[0.4, 0.6],
             path=tmp_path,

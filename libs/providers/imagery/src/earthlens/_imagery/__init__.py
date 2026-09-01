@@ -17,7 +17,7 @@ __all__ = ["BACKENDS"]
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'asf': ('earthlens.asf', 'ASF', 'asf', {}),
     'alaska-satellite-facility': ('earthlens.asf', 'ASF', 'asf', {}),
-    'insar': ('earthlens.asf', 'ASF', 'asf', {}),
+    'asf:insar': ('earthlens.asf', 'ASF', 'asf', {}),
     'earthdata': ('earthlens.earthdata', 'Earthdata', 'earthdata', {}),
     'eumetsat': ('earthlens.eumetsat', 'EUMETSAT', 'eumetsat', {}),
     'gee': ('earthlens.gee', 'GEE', 'gee', {}),

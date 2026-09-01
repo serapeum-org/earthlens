@@ -12,14 +12,14 @@ buckets in `eu-central-1`, both cover the whole global land surface as
 
 ## Discoverability aliases
 
-The four keys `dem`, `copernicus-dem`, `cop-dem`, and `elevation` all
+The four keys `dem`, `copernicus-dem`, `cop-dem`, and `dem:elevation` all
 route to the same backend — pick whichever reads best in your code:
 
 ```python
 EarthLens(data_source="dem", ...)
 EarthLens(data_source="copernicus-dem", ...)
 EarthLens(data_source="cop-dem", ...)
-EarthLens(data_source="elevation", ...)
+EarthLens(data_source="dem:elevation", ...)
 ```
 
 ## Coverage

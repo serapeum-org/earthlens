@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-hazards"
-version = "0.19.0"
+version = "0.21.0"
 description = "hazard, humanitarian and vector-basemap backends for earthlens"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -33,7 +33,7 @@ requires-python = ">=3.11,<4"
 # this distribution brings the backends' code without their dependencies —
 # `pip install earthlens-hazards[<backend>]` adds exactly one backend's SDK.
 dependencies = [
-    "earthlens-core ==0.19.0",
+    "earthlens-core ==0.21.0",
     # Two backends read `.xlsx` with `pandas.read_excel`, which needs openpyxl:
     # `emdat:events` reads the EM-DAT archive workbook, and the `inform:*` rows
     # read JRC's published INFORM Risk release workbook (their default source).
@@ -85,7 +85,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.aqueduct*", "earthlens.emdat*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.flodis*", "earthlens.flopros*", "earthlens.gdacs*", "earthlens.hanze*", "earthlens.hdx*", "earthlens.jrc_flood*", "earthlens.nsi*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
+include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.aqueduct*", "earthlens.emdat*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.flodis*", "earthlens.flopros*", "earthlens.gdacs*", "earthlens.hanze*", "earthlens.hdx*", "earthlens.jrc*", "earthlens.nsi*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -117,7 +117,7 @@ markers = [
     "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
     "hanze: tests for the HANZE historical European flood-impacts backend (public Zenodo record 20478847, CC-BY-4.0, no extra SDK — core HttpClient + pandas + pyramids).",
     "hdx: tests for the Humanitarian Data Exchange backend (requires the `hdx` extra: hdx-python-api).",
-    "jrc_flood: tests for the JRC European Flood Hazard Map backend (river-flood water depth per return period, Europe + Mediterranean; open HTTPS from the JRC, no extra SDK — core requests + pyramids `/vsicurl` windowed reads; CC-BY 4.0).",
+    "jrc: tests for the JRC European Flood Hazard Map backend (river-flood water depth per return period, Europe + Mediterranean; open HTTPS from the JRC, no extra SDK — core requests + pyramids `/vsicurl` windowed reads; CC-BY 4.0).",
     "integration: exercises multiple modules together with mocked I/O.",
     "osm: tests for the OpenStreetMap backend (requires the `osm` extra: overpy + ohsome; two public keyless protocols — Overpass current-state via overpy, OSM history via ohsome; the non-e2e suite fakes both SDKs).",
     "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; requires the `osm-pbf` extra: pyrosm + osmium/pyosmium; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract).",

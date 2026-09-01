@@ -289,3 +289,83 @@ class TestMain:
         assert "::error::?:" in capsys.readouterr().out, (
             "the placeholder name is missing"
         )
+
+    def test_a_variable_audit_error_fails_the_gate(self, checker, tmp_path, capsys):
+        """A row that passed the id audit but errored its variable fetch fails the gate.
+
+        The id-level audit can be `ok` while the variable dimension could not run
+        (`variable_status="error"`); without this the gate would go green having
+        verified no variable drift.
+        """
+        report = _report(
+            tmp_path / "a.json",
+            {
+                "provider": "erddap",
+                "status": "ok",
+                "variable_status": "error",
+                "variable_detail": "404 Not Found",
+            },
+        )
+        assert checker.main([str(report)]) == 1, "a variable-audit error must fail"
+        out = capsys.readouterr().out
+        assert "::error::erddap: variable audit could not run" in out, (
+            f"the variable-audit error is not surfaced: {out}"
+        )
+        assert "404 Not Found" in out, f"the reason is not surfaced: {out}"
+
+    def test_a_transient_variable_audit_error_warns_rather_than_fails(
+        self, checker, tmp_path, capsys
+    ):
+        """A briefly-unreachable variable fetch warns, mirroring the id-level rule."""
+        report = _report(
+            tmp_path / "a.json",
+            {
+                "provider": "erddap",
+                "status": "ok",
+                "variable_status": "error",
+                "variable_detail": "503 service unavailable",
+            },
+        )
+        assert checker.main([str(report)]) == 0, "a transient variable error must warn"
+        out = capsys.readouterr().out
+        assert "::warning::erddap: variable audit could not reach" in out, (
+            f"expected a transient variable warning: {out}"
+        )
+        assert "::error::" not in out, (
+            f"a transient variable error was escalated: {out}"
+        )
+
+    def test_a_variable_audit_ok_row_passes(self, checker, tmp_path):
+        """A row whose variable audit ran cleanly does not fail the gate."""
+        report = _report(
+            tmp_path / "a.json",
+            {"provider": "erddap", "status": "ok", "variable_status": "ok"},
+        )
+        assert checker.main([str(report)]) == 0, "a clean variable audit must pass"
+
+    def test_a_non_dds_variable_body_warns_like_a_503(self, checker, tmp_path, capsys):
+        """A 200 maintenance/interstitial body ("did not return a DDS") is transient.
+
+        The same server answering 503 only warns, so a 200 holding page must not
+        fail the gate harder than a 503 would.
+        """
+        report = _report(
+            tmp_path / "a.json",
+            {
+                "provider": "erddap",
+                "status": "ok",
+                "variable_status": "error",
+                "variable_detail": (
+                    "cwwcNDBCMet: https://x/erddap/tabledap/cwwcNDBCMet.dds "
+                    "did not return a DDS"
+                ),
+            },
+        )
+        assert checker.main([str(report)]) == 0, (
+            "a maintenance page must warn, not fail"
+        )
+        out = capsys.readouterr().out
+        assert "::warning::erddap: variable audit could not reach" in out, (
+            f"the non-DDS body was not treated as transient: {out}"
+        )
+        assert "::error::" not in out, f"a non-DDS body was escalated: {out}"

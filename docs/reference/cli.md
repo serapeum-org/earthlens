@@ -46,14 +46,16 @@ earthlens datasets validate all                # every provider
 
 Canonical ids: `airnow`, `argo`, `asf`, `bathymetry`, `caravan`, `catrare`, `chc`, `climate-indices`, `cmems`, `dem`, `earthdata`,
 `ecmwf`,
-`eea-aq`, `erddap`, `eumetsat`, `fabdem`, `fdsn`, `firms`, `flodis`, `flopros`, `gbif`, `gdacs`, `gee`, `ghsl`, `glaciers`, `goes`, `hanze`, `hdx`, `iucn`, `jaxa`, `jrc-flood`, `nwm`, `nwp`,
+`eea-aq`, `erddap`, `eumetsat`, `fabdem`, `fdsn`, `firms`, `flodis`, `flopros`, `gbif`, `gdacs`, `gee`, `ghsl`, `glaciers`, `goes`, `hanze`, `hdx`, `iucn`, `jaxa`, `jrc`, `nwm`, `nwp`,
 `obis`, `openaq`, `openeo`, `overture`, `pvgis`, `radar`, `risk-indicators`, `s3`, `sensor-community`, `sentinel_hub`, `soilgrids`,
 `stac`, `tropycal`, `usgs_water`, `wdpa`, `worldpop`. Common aliases include `amazon-s3`, `chirps`,
 `google-earth-engine`, `argo-floats`/`argopy`, `ioos` (erddap), `gebco`/`etopo` (bathymetry),
-`climate_indices`/`teleconnections` (climate indices), `copernicus-dem`/`cop-dem`/`elevation` (dem),
-`fab-dem`/`bare-earth-dem` (fabdem), `efhm`/`jrc-flood-hazard`/`european-flood-hazard` (jrc-flood),
+`climate_indices`/`climate-indices:teleconnections` (climate indices), `copernicus-dem`/`cop-dem`/`dem:elevation` (dem),
+`fab-dem`/`fabdem:bare-earth-dem` (fabdem),
+`efhm`/`jrc-flood`/`jrc-flood-hazard`/`jrc:european-flood-hazard` and
+`jrc:sea-level-forecast`/`jrc-sea-level`/`jrc:coastal-forecast`/`jrc:twl-forecast` (jrc),
 `sentinel-hub`/`sentinelhub`, `nexrad`,
-`nwis`/`usgs-water`, `world-pop`, `human-settlement`/`ghs`, `solar-pv` (pvgis),
+`nwis`/`usgs-water`, `world-pop`, `ghsl:human-settlement`/`ghs`, `pvgis:solar-pv` (pvgis),
 `thinkhazard`/`inform`/`gfw`/`global-forest-watch` (risk indicators),
 `rgi`/`glims`/`wgms` (glaciers), `isric` (soilgrids),
 `caravan-grdc`/`grdc-caravan` (caravan - the open GRDC discharge route),
@@ -213,11 +215,14 @@ earthlens datasets refresh ghsl --tiles          # regenerate the tile grid
 ### `audit <providers>` — curated-vs-live drift (and coverage)
 
 Like `refresh`, but focused on the **curated** rows: flags `broken` curated ids the provider no longer
-serves (the drift a CI gate fails on) and, informationally, live ids missing from the index.
+serves (the drift a CI gate fails on) and, informationally, live ids missing from the index. For providers
+whose listing endpoint enumerates a dataset's variables (currently `erddap`, via each dataset's `.dds`), it
+also flags a curated **variable** the provider stopped serving or re-cased (e.g. `wtmp` → `WTMP`); providers
+that cannot enumerate variables report `unsupported` for that dimension, never a false `ok`.
 
 | Option | Meaning |
 |--------|---------|
-| `--strict` | exit non-zero if any curated dataset is no longer served live |
+| `--strict` | exit non-zero if any curated dataset id — or a curated variable a provider stopped serving — is no longer served live |
 | `--coverage` | switch to a **curation-coverage** report — classify the available universe into DONE / addressable / thin / table / missing, and list the highest-value ids to curate next (`gee`, `erddap`) |
 | `--serveable` | switch to a **serveability** report — list the curated rows whose own selectors match no combination the store offers, so a download returns nothing (providers publishing the `serveability_auditor` role; `ecmwf` today) |
 | `-j, --json` | JSON output |

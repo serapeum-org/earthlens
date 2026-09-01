@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-core"
-version = "0.19.0"
+version = "0.21.0"
 description = "Core abstractions, facade and CLI for earthlens — no provider SDKs"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -34,7 +34,7 @@ requires-python = ">=3.11,<4"
 # unconditionally-registered console script. No provider SDK belongs here —
 # those live in the thematic provider distributions' own dependencies.
 dependencies = [
-    "pyramids-gis >=0.58.0",
+    "pyramids-gis >=0.58.1",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",

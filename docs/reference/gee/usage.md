@@ -166,11 +166,47 @@ gee = GEE(
 | `"ee"` | Always `getDownloadURL` — the historical path. |
 | `"eedai"` | Force the reader; raises if the request does not qualify. |
 
-A request qualifies only when nothing server-side shapes the image:
-a single `ee_type="image"` asset (not a reduced collection), no
-`cloud_mask`, no `filters`, `export_via="url"`, and `crs="EPSG:4326"`.
-Everything else stays on Earth Engine, which is the only engine that can
-run a computation graph or export to Drive / GCS / an asset.
+A request qualifies when nothing server-side has to shape the image: no
+`cloud_mask`, no `filters`, and `export_via="url"`. That covers both a
+single `ee_type="image"` asset and an `ee_type="image_collection"`, which
+the reader composites client-side per time bucket with the same reducer
+Earth Engine would have used. The output CRS may be `"EPSG:4326"` or any
+metre-based projected CRS. Everything else stays on Earth Engine, which is
+the only engine that can run a computation graph or export to Drive / GCS /
+an asset.
+
+A collection is sized before it is served, because the reader downloads
+every scene in the bucket and holds them to reduce. It goes back to Earth
+Engine's server-side reduce when the bucket has too many scenes, when the
+scene stack would not fit one pass, or when the reducer is `mosaic` — Earth
+Engine's is last-wins, while the reader returns the first scene of the
+stack, so they are not the same composite.
+
+With a collection you can also narrow which scenes are read:
+
+```python
+EarthLens(
+    data_source="gee",
+    variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+    reducer="median",
+    property_filter="CLOUDY_PIXEL_PERCENTAGE < 20",
+    ...
+)
+```
+
+`property_filter` is an OGR attribute-filter string on the collection's own
+scene properties. It is separate from `filters` because those are Earth
+Engine closures with no string form. It applies only on this path — a single
+image, or a request Earth Engine ends up serving, ignores it and says so in
+a warning. **Build it in code, never from untrusted input**: it reaches the
+catalog query without escaping.
+
+One caveat worth knowing: the reader takes each band's nodata from the
+scene's own dataset and the EEDAI driver declares none, so its statistical
+reducers fold a scene's fill pixels into the result where Earth Engine would
+mask them. The two agree wherever the scenes carry no fill over the AOI. There
+is no way to supply the fill from here — the composite read takes no `nodata`
+argument — so pass `engine="ee"` when you need Earth Engine's masking exactly.
 
 What you gain: no 32768-px synchronous cap and no HTTP/zip round-trip,
 so `auto_split` is unnecessary. What to know before switching:

@@ -45,9 +45,9 @@ plain HTTP and pull in no additional SDK.
 | Overture Maps vector basemap | `overture` | vector | none (public) | `overture` | [Overture](overture/introduction.md) |
 | USGS Water — NWIS / Water Data | `usgs-water`, `usgs-nwis`, `nwis` | tabular | none | `usgs-water` | [USGS Water](usgs-water/introduction.md) |
 | Caravan large-sample hydrology (incl. the open GRDC subset) | `caravan`, `caravan-grdc`, `grdc-caravan` | tabular | none (CC-BY-4.0) | — | [Caravan](caravan/introduction.md) |
-| JRC Global Human Settlement Layer | `ghsl`, `ghs`, `human-settlement` | raster | none (open HTTPS) | — | [GHSL](ghsl/introduction.md) |
+| JRC Global Human Settlement Layer | `ghsl`, `ghs`, `ghsl:human-settlement` | raster | none (open HTTPS) | — | [GHSL](ghsl/introduction.md) |
 | WorldPop population data hub | `worldpop`, `world-pop` | mixed (rasters + age/sex tables) | none (CC-BY-4.0) | `worldpop` (optional) | [WorldPop](worldpop/introduction.md) |
-| Alaska Satellite Facility (SAR search + InSAR baselines) | `asf`, `alaska-satellite-facility`, `insar` | raster | NASA Earthdata Login (reuses `earthdata`) | `asf` | [ASF](asf/introduction.md) |
+| Alaska Satellite Facility (SAR search + InSAR baselines) | `asf`, `alaska-satellite-facility`, `asf:insar` | raster | NASA Earthdata Login (reuses `earthdata`) | `asf` | [ASF](asf/introduction.md) |
 | JAXA Earth-observation archive (jaxa-earth STAC/COG + G-Portal SFTP) | `jaxa`, `jaxa-earth`, `g-portal` | raster | none (jaxa-earth) / G-Portal SFTP credentials | `jaxa` | [JAXA](jaxa/introduction.md) |
 | GBIF species occurrences | `gbif` | vector | none (anonymous) | `gbif` | [GBIF](gbif/introduction.md) |
 | OBIS marine occurrences | `obis` | vector | none (anonymous) | `obis` | [OBIS](obis/introduction.md) |
@@ -59,14 +59,14 @@ plain HTTP and pull in no additional SDK.
 | Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER) | `admin`, `admin-boundaries`, `geoboundaries`, `natural-earth`, `tiger` | vector | none (public) | — | [Administrative boundaries](admin/introduction.md) |
 | ISRIC SoilGrids 2.0 soil properties (250 m, OGC WCS) | `soilgrids`, `isric` | raster | none (public, CC-BY 4.0) | — | [SoilGrids](soilgrids/introduction.md) |
 | Drought indicators (USDM / Copernicus EDO + GDO / CSIC SPEIbase) | `drought`, `usdm`, `edo`, `gdo` | per-dataset (vector USDM polygons / raster EDO+GDO+SPEIbase) | none | — | [Drought](drought/introduction.md) |
-| Climate indices — NOAA PSL teleconnections (ENSO / NAO / PDO / …) | `climate-indices`, `climate_indices`, `teleconnections` | tabular | none (public) | — | [Climate indices](climate_indices/introduction.md) |
-| CMIP6 climate projections (Pangeo cloud archive) | `cmip6`, `climate-projections`, `pangeo-cmip6` | raster | none (public) | — | [CMIP6](cmip6/introduction.md) |
-| Copernicus DEM global land elevation | `dem`, `cop-dem`, `copernicus-dem`, `elevation` | raster | unsigned AWS (public bucket) | `s3` | [DEM](dem/introduction.md) |
+| Climate indices — NOAA PSL teleconnections (ENSO / NAO / PDO / …) | `climate-indices`, `climate_indices`, `climate-indices:teleconnections` | tabular | none (public) | — | [Climate indices](climate_indices/introduction.md) |
+| CMIP6 climate projections (Pangeo cloud archive) | `cmip6`, `cmip6:climate-projections`, `pangeo-cmip6` | raster | none (public) | — | [CMIP6](cmip6/introduction.md) |
+| Copernicus DEM global land elevation | `dem`, `cop-dem`, `copernicus-dem`, `dem:elevation` | raster | unsigned AWS (public bucket) | `s3` | [DEM](dem/introduction.md) |
 | Glacier outlines and mass balance (RGI / GLIMS / WGMS) | `glaciers`, `rgi`, `glims`, `wgms` | vector | none (public) | — | [Glaciers](glaciers/introduction.md) |
 | NOAA GOES-R ABI geostationary imagery | `goes` | raster | unsigned AWS (public bucket) | `s3` | [GOES](goes/introduction.md) |
 | NREL solar and wind resource (NSRDB / WIND Toolkit) | `nrel`, `nsrdb`, `wind-toolkit` | tabular | API key (`NREL_API_KEY` + `NREL_EMAIL`) | — | [NREL](nrel/introduction.md) |
 | OpenStreetMap features (Overpass / ohsome / PBF extracts) | `osm`, `openstreetmap`, `overpass`, `ohsome` | vector | none (public) | `osm` | [OSM](osm/introduction.md) |
-| PVGIS solar radiation and PV performance (EU JRC) | `pvgis`, `solar-pv` | tabular | none (public) | — | [PVGIS](pvgis/introduction.md) |
+| PVGIS solar radiation and PV performance (EU JRC) | `pvgis`, `pvgis:solar-pv` | tabular | none (public) | — | [PVGIS](pvgis/introduction.md) |
 | Risk indicators (ThinkHazard! / INFORM / Global Forest Watch) | `risk-indicators`, `thinkhazard`, `inform`, `gfw`, `global-forest-watch` | tabular | none, except GFW (`GFW_API_KEY`) | — | [Risk indicators](risk_indicators/introduction.md) |
 | Global Solar Atlas and Global Wind Atlas (World Bank / ESMAP) | `solar-wind-atlas`, `global-solar-atlas`, `global-wind-atlas`, `gsa`, `gwa` | raster | none (public) | — | [Solar & Wind Atlas](solar_wind_atlas/introduction.md) |
 
