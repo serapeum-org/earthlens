@@ -365,6 +365,17 @@ _CLAIMED_BLOCK = """      total-precipitation:
 """
 
 
+class _UnreachableBlocks:
+    """A lookup whose constraints fetch failed, as `_ServingBlocks` reports it."""
+
+    enumerated: set[str] = set()
+    unreachable = True
+
+    def __call__(self, cds_variable):
+        """Return nothing, the same as a dataset publishing no constraints."""
+        return []
+
+
 class _FixtureBlocks:
     """A `_ServingBlocks` stand-in over an in-memory constraints fixture."""
 
@@ -691,9 +702,105 @@ class TestRowExtras:
 
         assert hydrate_mod._row_extras(block, slug) == {}
 
-    def test_unparseable_text_reads_empty_rather_than_raising(self):
-        """A splice in progress must not take the sweep down."""
-        assert hydrate_mod._row_extras("      t2m:\n    : : :\n", "t2m") == {}
+    def test_unparseable_extras_read_empty_rather_than_raising(self):
+        """A splice in progress must not take the sweep down.
+
+        The body has to match the row shape first, or this returns empty
+        without ever reaching the parse it is meant to exercise.
+        """
+        block = (
+            "      t2m:\n"
+            "        cds_variable: 2m_temperature\n"
+            "        extras:\n"
+            "          product_type: [forecast\n"
+        )
+
+        assert hydrate_mod._row_extras(block, "t2m") == {}
+
+
+class TestOverrideRefusesAWholeOffering:
+    """Naming every value the store offers records no requirement."""
+
+    def test_an_override_equal_to_the_offering_is_refused(self):
+        """It shipped `version: [v3.0, v3.1]`, asking for two versions at once."""
+        offered = {"version": {"v3.0", "v3.1"}}
+
+        assert (
+            hydrate_mod._selector_override(
+                {"version": ["v3.0", "v3.1"]}, {"version": ["v5.3"]}, offered
+            )
+            == {}
+        )
+
+    def test_a_narrowing_override_is_still_recorded(self):
+        """Choosing one of several is a real requirement."""
+        offered = {"version": {"v3.0", "v3.1"}}
+
+        assert hydrate_mod._selector_override(
+            {"version": ["v3.1"]}, {"version": ["v5.3"]}, offered
+        ) == {"version": ["v3.1"]}
+
+    def test_without_a_known_offering_nothing_is_refused(self):
+        """The caller may not know what the blocks offer."""
+        assert hydrate_mod._selector_override(
+            {"version": ["v3.0", "v3.1"]}, {"version": ["v5.3"]}
+        ) == {"version": ["v3.0", "v3.1"]}
+
+
+class TestAuditRefusesToReportCleanWhenItCouldNotLook:
+    """A run that never read the constraints has not checked anything."""
+
+    def test_an_unreachable_dataset_raises_rather_than_returning_empty(
+        self, monkeypatch
+    ):
+        """A DNS blip would otherwise turn the whole invariant green."""
+        _audit_catalog(
+            monkeypatch,
+            {
+                "a-dataset": SimpleNamespace(
+                    extras={},
+                    variables={
+                        "x": SimpleNamespace(
+                            units="K",
+                            unhydratable=None,
+                            cds_variable="t2m",
+                            extras={},
+                        )
+                    },
+                )
+            },
+        )
+
+        with pytest.raises(hydrate_mod.ConstraintsUnavailable, match="a-dataset"):
+            hydrate_mod.audit_serveability(lambda name: _UnreachableBlocks())
+
+    def test_the_same_run_reports_findings_when_asked_not_to_be_strict(
+        self, monkeypatch
+    ):
+        """`strict=False` audits what is reachable instead of refusing."""
+        _audit_catalog(
+            monkeypatch,
+            {
+                "a-dataset": SimpleNamespace(
+                    extras={},
+                    variables={
+                        "x": SimpleNamespace(
+                            units="K",
+                            unhydratable=None,
+                            cds_variable="t2m",
+                            extras={},
+                        )
+                    },
+                )
+            },
+        )
+
+        assert (
+            hydrate_mod.audit_serveability(
+                lambda name: _UnreachableBlocks(), strict=False
+            )
+            == []
+        )
 
 
 class TestAuditReportsAMissingVariable:
