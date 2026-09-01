@@ -389,8 +389,9 @@ def _deep_sample_row(
             first serving entry instead reads a name and unit under one product
             and writes them into a row that requests another — which is how
             `sis-agrometeorological-indicators/2m-temperature` came to document
-            a 24-hour maximum it never asks for. Falls back to the first entry
-            when nothing matches, so a row with no usable request still probes.
+            a 24-hour maximum it never asks for. Matched in three tiers, and
+            falling back to the first entry when nothing matches, so a row with
+            no usable request still probes.
 
     Returns:
         The chosen entry, or `None` when `rows` is empty or no entry serves
@@ -404,15 +405,28 @@ def _deep_sample_row(
     if not serving:
         return None
     if prefer:
-        # Conflict-only, not the full serveability test: the point is to
-        # sample the product the row asks for, and a row that under-specifies
-        # a block should still sample it rather than fall back elsewhere.
-        matching = next(
-            (entry for entry in serving if not _conflicts_with(prefer, entry)),
-            None,
-        )
-        if matching is not None:
-            return matching
+        from earthlens.ecmwf._hydrate import _block_satisfies
+
+        # Three tiers, narrowest first. An entry the serveability guard itself
+        # accepts is best: the row can actually reach it, so the name and unit
+        # come from the product the row will request. The guard is strictly
+        # stronger than the conflict test - it also demands the row send every
+        # key the entry partitions on, and that each asked value be *offered*
+        # rather than merely overlapping - so picking on the conflict test
+        # alone could read metadata from an entry the row could never request
+        # while a different entry certified the row.
+        non_conflicting = [
+            entry for entry in serving if not _conflicts_with(prefer, entry)
+        ]
+        for entry in non_conflicting:
+            if _block_satisfies(prefer, entry):
+                return entry
+        # Then one that merely does not conflict: a row that under-specifies a
+        # block should still sample it rather than fall back elsewhere.
+        if non_conflicting:
+            return non_conflicting[0]
+    # Everything conflicts, so the row is unserveable whatever is read here and
+    # the guard declines it regardless.
     return serving[0]
 
 

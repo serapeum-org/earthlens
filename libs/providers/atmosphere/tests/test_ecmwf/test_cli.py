@@ -7,6 +7,7 @@ distribution (issue #863).
 from __future__ import annotations
 
 import importlib
+import json
 import pathlib
 import shutil
 import sys
@@ -418,6 +419,95 @@ class TestAuditServeableCommand:
 
         assert result.exit_code == 2, result.output
         assert "could not check" in result.output
+
+    def test_json_emits_one_record_per_finding(self, monkeypatch):
+        """This is the shape a CI gate or a script actually consumes."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(
+            hydrate,
+            "audit_serveability",
+            lambda: [
+                ("a-dataset", "a-slug", {"product_type": ["reanalysis"]}),
+                ("b-dataset", "b-slug", {"version": ["v3.1"]}),
+            ],
+        )
+
+        result = CliRunner().invoke(
+            app, ["datasets", "audit", "ecmwf", "--serveable", "--json"]
+        )
+
+        assert result.exit_code == 0, result.output
+        assert json.loads(result.output) == [
+            {
+                "provider": "ecmwf",
+                "dataset": "a-dataset",
+                "slug": "a-slug",
+                "selectors": {"product_type": ["reanalysis"]},
+            },
+            {
+                "provider": "ecmwf",
+                "dataset": "b-dataset",
+                "slug": "b-slug",
+                "selectors": {"version": ["v3.1"]},
+            },
+        ]
+
+    def test_json_stays_parseable_when_nothing_is_found(self, monkeypatch):
+        """A consumer should not have to special-case the clean run."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(hydrate, "audit_serveability", lambda: [])
+
+        result = CliRunner().invoke(
+            app, ["datasets", "audit", "ecmwf", "--serveable", "--json"]
+        )
+
+        assert result.exit_code == 0, result.output
+        assert json.loads(result.output) == []
+
+    def test_json_and_strict_still_exits_one(self, monkeypatch):
+        """The gate has to fail even when its output is being piped."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(
+            hydrate, "audit_serveability", lambda: [("d", "s", {"x": ["y"]})]
+        )
+
+        result = CliRunner().invoke(
+            app,
+            ["datasets", "audit", "ecmwf", "--serveable", "--json", "--strict"],
+        )
+
+        assert result.exit_code == 1, result.output
+        assert json.loads(result.output)[0]["dataset"] == "d"
+
+    def test_a_provider_that_cannot_answer_is_named_not_dropped(self, monkeypatch):
+        """Reporting on a subset in silence reads as a clean bill of health."""
+        import earthlens.ecmwf._hydrate as hydrate
+
+        monkeypatch.setattr(hydrate, "audit_serveability", lambda: [])
+
+        result = CliRunner().invoke(
+            app, ["datasets", "audit", "gee,ecmwf", "--serveable"]
+        )
+
+        assert result.exit_code == 0, result.output
+        assert "not checked (no serveability auditor): gee" in result.output, (
+            f"the skipped provider has to be named, got: {result.output!r}"
+        )
+        assert "names a combination the store serves" in result.output, (
+            "and the provider that could be checked still reports"
+        )
+
+    def test_coverage_and_serveable_together_are_refused(self):
+        """They ask different questions; silently honouring one hides the other."""
+        result = CliRunner().invoke(
+            app, ["datasets", "audit", "ecmwf", "--serveable", "--coverage"]
+        )
+
+        assert result.exit_code != 0, result.output
+        assert "pass one" in result.output
 
     def test_a_provider_without_the_role_is_refused(self):
         """Only a provider publishing `serveability_auditor` can answer this."""

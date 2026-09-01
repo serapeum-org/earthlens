@@ -1312,6 +1312,11 @@ _BLOCK_KEYS_NOT_REQUESTED = frozenset(
         "time",
         "date",
         "area",
+        # Only for the *required*-key half of the guard: a row that nulls
+        # `data_format` sends none and the store defaults it. When the row does
+        # send one - which is every row that does not null it, since
+        # `effective_selectors` seeds the backend's netCDF - the offer loop
+        # checks it like any other selector.
         "data_format",
         # The hindcast forms key on `hmonth` / `hday`, which the backend copies
         # from the caller's dates. A row pinning them would fix itself to one
@@ -1353,6 +1358,12 @@ _ROW_FIELD_SELECTORS = {
 }
 
 
+#: The format `ECMWF._build_request` writes into every request, unconditionally.
+#: Read from `backend.py`; a row opts out by setting `data_format: null` in its
+#: extras, which drops the key rather than changing it.
+_BACKEND_DATA_FORMAT = "netcdf"
+
+
 def effective_selectors(stanza: dict[str, Any], row: Any) -> dict[str, Any]:
     """Return every selector a retrieve built from `row` will actually send.
 
@@ -1374,6 +1385,14 @@ def effective_selectors(stanza: dict[str, Any], row: Any) -> dict[str, Any]:
         value = getattr(row, field, None)
         if value:
             effective.setdefault(key, value)
+    # The backend writes `data_format` itself and always asks for netCDF, so a
+    # row that says nothing about it still sends it and a store offering only
+    # GRIB for that variable answers nothing. Seeding the default here is what
+    # makes the ordinary offer loop judge it. A row whose extras set the key to
+    # `None` really does omit it - `_apply_extras_and_strips` pops it - so that
+    # spelling is left alone.
+    if "data_format" not in effective:
+        effective["data_format"] = _BACKEND_DATA_FORMAT
     return effective
 
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import collections
 import re
 import textwrap
 import time
@@ -98,6 +99,11 @@ _TWO_STANZA = """datasets:
         nc_variable: sea_surface_temperature
         units: unknown
 """
+
+
+#: The slug `audit_serveability` reports for a dataset whose constraints it
+#: could not read at all, as opposed to a row the store cannot serve.
+_UNREADABLE = "<constraints unreadable>"
 
 
 class TestRewriteStanza:
@@ -633,7 +639,12 @@ class TestUnserveableSelectors:
             {"product_type": ["analysis"], "day": ["01"]}, row, lookup
         )
 
-        assert effective == {"product_type": ["reanalysis"], "day": ["01"]}
+        assert effective == {
+            "product_type": ["reanalysis"],
+            "day": ["01"],
+            # Seeded, not curated: the backend writes this into every request.
+            "data_format": "netcdf",
+        }
 
     def test_a_variable_the_store_does_not_offer_is_reported(self):
         """Where the dataset partitions on `variable`, absence means not offered."""
@@ -653,6 +664,25 @@ class TestUnserveableSelectors:
             hydrate_mod._unserveable_selectors({"product_type": ["x"]}, row, lookup)
             is None
         )
+
+    def test_a_grib_only_block_cannot_serve_a_row(self):
+        """The backend always asks for netCDF, so GRIB-only serves nothing."""
+        row = SimpleNamespace(cds_variable="fwi", extras={})
+        lookup = _FixtureBlocks([{"variable": ["fwi"], "data_format": ["grib"]}])
+
+        effective = hydrate_mod._unserveable_selectors({}, row, lookup)
+
+        assert effective is not None, (
+            "a row asking netCDF of a GRIB-only block fetches nothing"
+        )
+        assert effective["data_format"] == "netcdf"
+
+    def test_a_row_that_nulls_the_format_leaves_the_store_to_choose(self):
+        """`data_format: null` pops the key, so the store applies its default."""
+        row = SimpleNamespace(cds_variable="fwi", extras={"data_format": None})
+        lookup = _FixtureBlocks([{"variable": ["fwi"], "data_format": ["grib"]}])
+
+        assert hydrate_mod._unserveable_selectors({}, row, lookup) is None
 
 
 class TestQuoteIfNumberShaped:
@@ -996,32 +1026,43 @@ class TestAuditServeability:
         except hydrate_mod.ConstraintsUnavailable as exc:
             pytest.xfail(f"the store could not be read, so nothing was checked: {exc}")
 
+        # Counts, not just names: a bare allow-list hides a regression inside
+        # a dataset that already reports, which is how a whole batch of rows
+        # slipped past an earlier round of this work. Each number is the live
+        # finding count for that dataset, so the assertion fails if a row is
+        # broken *or* if one is quietly fixed and the entry goes stale.
         known = {
             # Repairing these means choosing which data version, period,
             # ensemble member or model a caller gets - a curation decision,
             # tracked on the pull request rather than guessed at here.
-            "derived-near-surface-meteorological-variables",
-            "insitu-gridded-observations-global-and-regional",
-            "projections-cmip5-monthly-single-levels",
-            "sis-agrometeorological-indicators",
-            "sis-ecde-climate-indicators",
-            "sis-european-risk-extreme-precipitation-indicators",
-            "sis-tourism-fire-danger-indicators",
+            "derived-near-surface-meteorological-variables": 8,
+            "insitu-gridded-observations-global-and-regional": 1,
+            "projections-cmip5-monthly-single-levels": 3,
+            "sis-ecde-climate-indicators": 4,
+            "sis-european-risk-extreme-precipitation-indicators": 2,
+            "sis-tourism-fire-danger-indicators": 1,
             # A different defect, also pre-existing: these name a variable the
             # store does not offer at all, which the repo's own RequestValidator
             # already reports. Fixing them means finding the current name.
-            "reanalysis-era5-single-levels",
-            "reanalysis-era5-single-levels-monthly-means",
-            "reanalysis-pan-carra-means",
-            # And one the store itself answers 500 for, so it cannot be checked
-            # from here at all.
-            "cems-glofas-historical-intermediate",
+            "reanalysis-era5-single-levels": 1,
+            "reanalysis-era5-single-levels-monthly-means": 5,
+            "reanalysis-pan-carra-means": 3,
         }
-        unexpected = [
-            f"{dataset}/{slug}" for dataset, slug, _ in findings if dataset not in known
-        ]
+        # A dataset the store could not answer for at all is reported as one
+        # `<constraints unreadable>` row. That is the host's state on the day,
+        # not the catalog's, so it is excluded rather than counted -
+        # `cems-glofas-historical-intermediate` answers 500 as of writing.
+        counted = collections.Counter(
+            dataset for dataset, slug, _ in findings if slug != _UNREADABLE
+        )
 
-        assert not unexpected, "newly unserveable rows: " + "; ".join(unexpected[:20])
+        assert counted == known, (
+            "the live serveability baseline moved: "
+            f"newly reporting {sorted(set(counted) - set(known))}, "
+            f"no longer reporting {sorted(set(known) - set(counted))}, "
+            "changed counts "
+            f"{ {k: (known.get(k), counted.get(k)) for k in set(known) | set(counted) if known.get(k) != counted.get(k)} }"
+        )
 
 
 class TestRedactionCoversTheCommonShapes:
@@ -1166,10 +1207,16 @@ class TestNoShippedRowOverrulesTheCallersDates:
         """Such a row silently replaces whatever range was asked for."""
         from earthlens.ecmwf import Catalog
 
+        # Read from the constant rather than restated: the writer's refusal
+        # and this catalog check are the same rule, and spelling it twice is
+        # how the two last drifted apart.
+        keys = sorted(hydrate_mod._CALLER_DERIVED_KEYS)
+        assert keys, "the rule must name at least one key to be worth checking"
+
         offenders = []
         for name, dataset in Catalog().datasets.items():
             for slug, row in dataset.variables.items():
-                for key in ("year", "month", "day"):
+                for key in keys:
                     value = (row.extras or {}).get(key)
                     if isinstance(value, list) and len(value) > 1:
                         offenders.append(f"{name}/{slug}: {key}={len(value)} values")

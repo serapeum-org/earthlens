@@ -24,6 +24,7 @@ field names below are historical and apply to every store. See
 | `src/earthlens/ecmwf/catalog.py` | The loader (`Catalog`, `Dataset`, `Variable`, …) |
 | `earthlens datasets refresh ecmwf` | Diffs the `available_datasets:` index against every store's live catalogue API |
 | `earthlens datasets audit ecmwf --coverage` | Classifies the available universe into DONE / addressable / thin / table / missing — coverage planning |
+| `earthlens datasets audit ecmwf --serveable` | Reports every curated row whose merged selectors match no single `constraints.json` block, so a retrieve returns nothing — the invariant behind #1147. Unauthenticated, no retrieve; `--strict` exits non-zero for a CI gate |
 | `earthlens datasets validate ecmwf --live` | Builds a `constraints.json`-valid minimal request per dataset and runs the pre-flight `RequestValidator` (no submission) |
 | `earthlens datasets probe ecmwf <id> --deep` | Submits a real tiny retrieve for one dataset and extracts its NetCDF short names and units |
 | `earthlens datasets curate ecmwf <id> [--write]` | Seeds a loader-valid row from the live `form.json` (every variable, `unknown` placeholders); `--write` auto-files it into the family shard |
