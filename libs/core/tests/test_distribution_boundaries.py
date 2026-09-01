@@ -59,6 +59,78 @@ def _core_imports(path: Path):
                 yield node.module, alias.name
 
 
+#: GDAL and its siblings belong to pyramids, never to earthlens. `osgeo` is not
+#: even importable on its own here -- pyramids vendors it and puts it on the
+#: path as a side effect of being imported -- so a bare import is both a layering
+#: break and a latent `ModuleNotFoundError`.
+_BANNED_GIS_MODULES = frozenset({"osgeo", "gdal", "ogr", "osr"})
+
+#: The one place allowed to reach for GDAL, and why. `gdal_module()` reads a CF
+#: `time` coordinate's `units` through the multidim API, because under the HDF5
+#: driver (which GDAL picks for any NetCDF-4 over `/vsicurl` on Windows) that
+#: attribute never reaches `meta_data.get_dimension().attrs`, and
+#: `MDArray.GetUnit()` is the only route to the epoch.
+#:
+#: Blocked on serapeum-org/pyramids#1078. When that lands, delete the import in
+#: `_helpers.py` *and* this entry -- the assertion below is a subset check, so
+#: an empty allowance keeps passing.
+_GDAL_ALLOWED = frozenset({"libs/providers/hazards/src/earthlens/jrc/_helpers.py"})
+
+
+def _earthlens_sources() -> list[Path]:
+    """Return every shipped earthlens source file, core and providers alike."""
+    return sorted(
+        path
+        for pattern in (
+            "libs/core/src/earthlens/**/*.py",
+            "libs/providers/*/src/earthlens/**/*.py",
+        )
+        for path in _ROOT.glob(pattern)
+        if "build" not in path.parts
+    )
+
+
+def _gis_imports(path: Path) -> list[tuple[int, str]]:
+    """Return `(lineno, what)` for every banned GIS import in `path`.
+
+    Walks the AST rather than grepping, so `from osgeo.gdal import Translate`,
+    `import osgeo.gdal as g`, multi-line `from ... import (...)` continuations
+    and dynamic `importlib.import_module("osgeo")` are all caught.
+    """
+    found: list[tuple[int, str]] = []
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name.split(".", 1)[0] in _BANNED_GIS_MODULES:
+                    found.append((node.lineno, alias.name))
+        elif isinstance(node, ast.ImportFrom):
+            if (node.module or "").split(".", 1)[0] in _BANNED_GIS_MODULES:
+                found.append((node.lineno, f"from {node.module}"))
+        elif isinstance(node, ast.Call):
+            target = None
+            func = node.func
+            if (
+                isinstance(func, ast.Attribute)
+                and func.attr == "import_module"
+                and node.args
+                and isinstance(node.args[0], ast.Constant)
+                and isinstance(node.args[0].value, str)
+            ):
+                target = node.args[0].value
+            elif (
+                isinstance(func, ast.Name)
+                and func.id == "__import__"
+                and node.args
+                and isinstance(node.args[0], ast.Constant)
+                and isinstance(node.args[0].value, str)
+            ):
+                target = node.args[0].value
+            if target and target.split(".", 1)[0] in _BANNED_GIS_MODULES:
+                found.append((node.lineno, f"dynamic:{target}"))
+    return found
+
+
 _SOURCES = _provider_sources()
 _IDS = [str(path.relative_to(_ROOT)).replace("\\", "/") for path in _SOURCES]
 
@@ -1506,3 +1578,45 @@ class TestSingleSecretAuthAdoption:
             f"these single-secret backends still read os.environ instead of "
             f"delegating the fallback to SingleSecretAuth: {offenders}"
         )
+
+
+class TestNoDirectGdal:
+    """GIS I/O goes through pyramids; `osgeo` has exactly one sanctioned site."""
+
+    def test_no_unsanctioned_gdal_import(self):
+        """Every earthlens source is free of GDAL beyond the declared allowance."""
+        offenders = {
+            str(path.relative_to(_ROOT)).replace("\\", "/"): _gis_imports(path)
+            for path in _earthlens_sources()
+        }
+        offenders = {name: hits for name, hits in offenders.items() if hits}
+        unsanctioned = {
+            name: hits for name, hits in offenders.items() if name not in _GDAL_ALLOWED
+        }
+        assert unsanctioned == {}, (
+            "GIS I/O belongs to pyramids -- use Dataset / NetCDF / FeatureCollection. "
+            "If pyramids genuinely cannot do it, file an issue there and add the site "
+            f"to _GDAL_ALLOWED with the issue number: {unsanctioned}"
+        )
+
+    def test_the_allowance_is_still_used(self):
+        """A stale allowance is a lie about the codebase, so it must still bite."""
+        live = {
+            str(path.relative_to(_ROOT)).replace("\\", "/")
+            for path in _earthlens_sources()
+            if _gis_imports(path)
+        }
+        assert _GDAL_ALLOWED <= live, (
+            "_GDAL_ALLOWED names a file that no longer imports GDAL; drop the entry: "
+            f"{sorted(_GDAL_ALLOWED - live)}"
+        )
+
+    def test_the_sanctioned_site_imports_pyramids_first(self):
+        """`osgeo` only resolves once pyramids has vendored it onto the path."""
+        for name in _GDAL_ALLOWED:
+            source = (_ROOT / name).read_text(encoding="utf-8")
+            gdal_at = source.index("from osgeo import")
+            assert "import pyramids" in source[:gdal_at], (
+                f"{name} imports osgeo without importing pyramids first, which "
+                "raises ModuleNotFoundError outside an already-loaded process"
+            )

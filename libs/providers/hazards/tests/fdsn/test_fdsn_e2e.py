@@ -104,7 +104,7 @@ class TestShakemapLiveSideOutput:
 
     def test_writes_georeferenced_shakemap(self, tmp_path: Path):
         """A large USGS event yields a georeferenced ShakeMap GeoTIFF."""
-        from osgeo import gdal, osr
+        from pyramids.dataset import Dataset
 
         fc = FDSN(
             start="2023-02-06",
@@ -121,17 +121,13 @@ class TestShakemapLiveSideOutput:
         rasters = sorted((tmp_path / "shakemap").rglob("mmi_mean.tif"))
         assert rasters, "expected a ShakeMap GeoTIFF per event"
 
-        dataset = gdal.Open(str(rasters[0]))
-        try:
-            assert dataset.GetDriver().ShortName == "GTiff"
-            spatial_ref = osr.SpatialReference(wkt=dataset.GetProjection())
-            assert spatial_ref.GetAuthorityCode(None) == "4326", (
-                "the CRS should carry an EPSG authority code"
-            )
-            assert dataset.RasterXSize > 1, "the grid should have real width"
-            assert dataset.RasterYSize > 1, "the grid should have real height"
-        finally:
-            dataset = None
+        dataset = Dataset.read_file(rasters[0])
+        assert dataset.driver_type == "geotiff"
+        assert dataset.epsg == 4326, (
+            f"the CRS should resolve to EPSG:4326, got {dataset.epsg}"
+        )
+        assert dataset.columns > 1, "the grid should have real width"
+        assert dataset.rows > 1, "the grid should have real height"
 
         # Exact contents, not an allowlist of forbidden suffixes: GDAL drops a
         # `.prj` beside the grid when its CRS is assigned, which a suffix filter

@@ -431,7 +431,7 @@ class TestFltToGeotiff:
 
     def test_writes_georeferenced_tif(self, tmp_path: Path):
         """The GeoTIFF carries EPSG:4326 and the grid's shape."""
-        from osgeo import gdal, osr
+        from pyramids.dataset import Dataset
 
         archive = tmp_path / "raster.zip"
         archive.write_bytes(_make_archive(layers=("mmi_mean",)))
@@ -439,18 +439,13 @@ class TestFltToGeotiff:
         dest = _helpers.flt_to_geotiff(extracted["mmi_mean"], tmp_path / "mmi_mean.tif")
 
         assert dest.is_file()
-        dataset = gdal.Open(str(dest))
-        try:
-            assert dataset.GetDriver().ShortName == "GTiff"
-            assert dataset.RasterXSize == _COLS
-            assert dataset.RasterYSize == _ROWS
-            spatial_ref = osr.SpatialReference(wkt=dataset.GetProjection())
-            assert spatial_ref.GetAuthorityCode(None) == "4326", (
-                "the CRS should carry an EPSG authority code, not merely the "
-                "digits 4326 somewhere in its WKT"
-            )
-        finally:
-            dataset = None
+        dataset = Dataset.read_file(dest)
+        assert dataset.driver_type == "geotiff"
+        assert dataset.columns == _COLS
+        assert dataset.rows == _ROWS
+        assert dataset.epsg == 4326, (
+            f"the CRS should resolve to EPSG:4326, got {dataset.epsg}"
+        )
 
 
 class TestFltToGeotiffFailures:
