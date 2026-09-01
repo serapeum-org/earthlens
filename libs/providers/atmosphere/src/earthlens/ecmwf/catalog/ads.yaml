@@ -146,6 +146,12 @@ datasets:
   # no `anthropogenic` block at all, and would need the stanza's `source`
   # changed to one that serves them. `carbon-dioxide` is served under
   # anthropogenic but only at v2.1/v4.2.
+  # The three rows overriding `source` to `shipping` / `oceanic` also carry
+  # their own `version`, because the stanza's `v5.3` is offered only under
+  # `anthropogenic`. Each takes the NEWEST version its source serves, which
+  # is what decides how far the record runs: bromoform reaches 2023 at v4.1
+  # but stops at 2018 on v2.1, and ash and elemental-carbon reach 2021 at
+  # v3.2 against 2018 on v2.1.
   cams-global-emission-inventories:
     endpoint: ads
     request_kind: form
@@ -203,7 +209,7 @@ datasets:
           source:
           - shipping
           version:
-          - v2.1
+          - v3.2
       benzene:
         cds_variable: benzene
         nc_variable: benzene
@@ -229,7 +235,7 @@ datasets:
           source:
           - oceanic
           version:
-          - v2.1
+          - v4.1
       butanes:
         cds_variable: butanes
         nc_variable: butanes
@@ -278,7 +284,7 @@ datasets:
           source:
           - shipping
           version:
-          - v2.1
+          - v3.2
       esters:
         cds_variable: esters
         nc_variable: esters

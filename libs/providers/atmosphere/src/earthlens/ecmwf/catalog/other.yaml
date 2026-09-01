@@ -3383,6 +3383,8 @@ datasets:
         nc_variable: Derived_Relative_Humidity_2m_Max_24h
         units: '%'
         extras:
+          statistic:
+          - 24_hour_maximum
           version: ['2_0']
       2m-temperature:
         cds_variable: 2m_temperature

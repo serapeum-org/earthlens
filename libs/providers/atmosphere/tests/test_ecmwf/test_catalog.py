@@ -1244,6 +1244,36 @@ class TestShippedCatalogInvariants:
             "placeholder rows carrying a probed nc_variable: " + "; ".join(divergent)
         )
 
+    def test_a_row_naming_a_statistic_in_its_variable_records_it(self):
+        """A name ending `_Max_24h` must say which statistic produced it.
+
+        `2m-relative-humidity-derived` was hydrated to the 24-hour maximum
+        without recording `statistic`, so the request it sends is not the one
+        the name came from.
+        """
+        from earthlens.ecmwf import Catalog
+
+        suffixes = {"_Max_24h": "24_hour_maximum", "_Min_24h": "24_hour_minimum"}
+        silent = []
+        for name, dataset in Catalog().datasets.items():
+            for slug, row in dataset.variables.items():
+                if row.units == "unknown":
+                    continue
+                nc = str(row.nc_variable)
+                wanted = next(
+                    (stat for suffix, stat in suffixes.items() if nc.endswith(suffix)),
+                    None,
+                )
+                if wanted is None:
+                    continue
+                asked = (row.extras or {}).get("statistic")
+                if not asked or wanted not in [str(v) for v in asked]:
+                    silent.append(f"{name}/{slug} -> {nc} asks {asked}")
+
+        assert not silent, "rows whose name names a statistic they never request: " + (
+            "; ".join(silent)
+        )
+
     def test_a_curated_row_names_a_variable_and_a_unit(self):
         """The converse: a row that has lost the sentinel has both halves filled."""
         from earthlens.ecmwf import Catalog
