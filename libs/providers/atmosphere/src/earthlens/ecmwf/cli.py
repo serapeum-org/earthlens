@@ -150,7 +150,7 @@ def coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
     return counts, sorted(buckets.get("addressable", []))
 
 
-def _ecmwf_constraints(dataset: str) -> list[dict[str, Any]]:
+def _ecmwf_constraints(dataset: str, strict: bool = False) -> list[dict[str, Any]]:
     """Return a dataset's public `constraints.json` rows (no creds).
 
     Resolves the dataset's CADS endpoint from the catalog so EWDS/ADS datasets
@@ -160,7 +160,9 @@ def _ecmwf_constraints(dataset: str) -> list[dict[str, Any]]:
     from earthlens.ecmwf.constraints import fetch_constraints
     from earthlens.ecmwf.endpoints import constraints_base_url
 
-    return fetch_constraints(dataset, constraints_base_url(_endpoint_for(dataset)))
+    return fetch_constraints(
+        dataset, constraints_base_url(_endpoint_for(dataset)), strict=strict
+    )
 
 
 def prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:

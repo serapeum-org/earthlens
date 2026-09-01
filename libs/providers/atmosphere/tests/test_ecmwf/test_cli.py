@@ -220,7 +220,10 @@ class TestProber:
         monkeypatch.setattr(
             ecmwf_cli,
             "_ecmwf_constraints",
-            lambda d: [{"variable": ["2m_temperature", "tp"]}, {"variable": ["tp"]}],
+            lambda d, strict=False: [
+                {"variable": ["2m_temperature", "tp"]},
+                {"variable": ["tp"]},
+            ],
         )
         result = probe_dataset(_info(), "reanalysis-era5-single-levels")
         assert result.status == "ok", "ecmwf probe ran"
@@ -231,7 +234,10 @@ class TestProber:
         monkeypatch.setattr(
             ecmwf_cli,
             "_ecmwf_constraints",
-            lambda d: [{"variable": ["t2m", "sp"]}, {"variable": ["t2m", "msl"]}],
+            lambda d, strict=False: [
+                {"variable": ["t2m", "sp"]},
+                {"variable": ["t2m", "msl"]},
+            ],
         )
         result = probe_dataset(_info(), "reanalysis-era5-single-levels")
         assert sorted(result.assets) == ["msl", "sp", "t2m"], "vars unioned + sorted"
@@ -243,7 +249,7 @@ class TestProber:
         monkeypatch.setattr(
             constraints,
             "fetch_constraints",
-            lambda d, base_url=None: [{"variable": []}],
+            lambda d, base_url=None, strict=False: [{"variable": []}],
         )
         assert ecmwf_cli._ecmwf_constraints("x") == [{"variable": []}]
 
@@ -471,7 +477,9 @@ class TestDeepSampleVariable:
 
     def test_a_dataset_no_block_serves_returns_two_empties(self, monkeypatch):
         """Nothing to request means nothing to describe, and no retrieve is sent."""
-        monkeypatch.setattr(ecmwf_cli, "_ecmwf_constraints", lambda dataset: [])
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_constraints", lambda dataset, strict=False: []
+        )
         monkeypatch.setattr(
             ecmwf_cli,
             "_retrieve_probe",
@@ -661,7 +669,9 @@ class TestDeepProber:
         monkeypatch.setattr(
             ecmwf_cli,
             "_ecmwf_constraints",
-            lambda d: [{"variable": ["2m_temperature"], "year": ["2020"]}],
+            lambda d, strict=False: [
+                {"variable": ["2m_temperature"], "year": ["2020"]}
+            ],
         )
         _stub_client(monkeypatch)
         monkeypatch.setattr(

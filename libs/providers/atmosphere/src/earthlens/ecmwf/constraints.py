@@ -82,14 +82,27 @@ _UNIVERSAL_KEYS: frozenset[str] = frozenset({"area", "data_format", "format", "g
 _CACHE: dict[str, list[dict[str, Any]] | None] = {}
 
 
+class ConstraintsFetchFailed(OSError):
+    """The constraints document could not be fetched, as opposed to being empty.
+
+    Only raised under `fetch_constraints(..., strict=True)`. The default is to
+    degrade to "no constraints" so a retrieve still goes to CDS and lets the
+    store reject it; a caller auditing the catalog needs the difference,
+    because silence from a fetch that never happened is not a clean result.
+    """
+
+
 def fetch_constraints(
-    dataset: str, base_url: str | None = None
+    dataset: str, base_url: str | None = None, strict: bool = False
 ) -> list[dict[str, Any]]:
     """Fetch and cache the constraints document for `dataset`.
 
     Args:
         dataset: CDS dataset short name
             (e.g. `"reanalysis-era5-single-levels"`).
+        strict: Raise `ConstraintsFetchFailed` when the document cannot be
+            fetched, instead of returning an empty list. Off by default, so the
+            retrieve path keeps degrading gracefully.
         base_url: CADS instance API root the dataset lives on (e.g.
             `"https://ewds.climate.copernicus.eu/api"`). When `None`, the CDS
             catalogue host is used. Non-CDS datasets (EWDS GloFAS, …) must pass
@@ -145,10 +158,19 @@ def fetch_constraints(
             # documents that could trick the validator.
             with urllib.request.urlopen(url, timeout=15) as resp:  # nosec B310
                 payload = json.loads(resp.read())
-        except (urllib.error.URLError, ValueError, OSError):
+        except (urllib.error.URLError, ValueError, OSError) as exc:
             # Network failure or non-JSON response — treat as
             # "no constraints" so callers fall back to letting CDS
-            # itself reject the request.
+            # itself reject the request. A caller that cannot tell those
+            # apart, such as the serveability audit, asks for `strict`.
+            not_published = isinstance(exc, urllib.error.HTTPError) and exc.code == 404
+            if strict and not not_published:
+                # A 404 is the store saying this dataset publishes no
+                # constraints, which is an answer. Anything else — a refused
+                # connection, a timeout, a proxy's HTML — is the absence of one.
+                raise ConstraintsFetchFailed(
+                    f"could not fetch constraints for {dataset!r}: {exc}"
+                ) from exc
             payload = None
         if not isinstance(payload, list):
             logger.debug(

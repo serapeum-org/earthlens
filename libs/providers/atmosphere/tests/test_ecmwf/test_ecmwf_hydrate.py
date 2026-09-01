@@ -750,10 +750,8 @@ class TestOverrideRefusesAWholeOffering:
 class TestAuditRefusesToReportCleanWhenItCouldNotLook:
     """A run that never read the constraints has not checked anything."""
 
-    def test_an_unreachable_dataset_raises_rather_than_returning_empty(
-        self, monkeypatch
-    ):
-        """A DNS blip would otherwise turn the whole invariant green."""
+    def test_a_total_outage_raises_rather_than_returning_empty(self, monkeypatch):
+        """Nothing readable means the run has no opinion; empty would read clean."""
         _audit_catalog(
             monkeypatch,
             {
@@ -774,10 +772,51 @@ class TestAuditRefusesToReportCleanWhenItCouldNotLook:
         with pytest.raises(hydrate_mod.ConstraintsUnavailable, match="a-dataset"):
             hydrate_mod.audit_serveability(lambda name: _UnreachableBlocks())
 
-    def test_the_same_run_reports_findings_when_asked_not_to_be_strict(
+    def test_one_unreadable_dataset_is_reported_rather_than_aborting(self, monkeypatch):
+        """CEMS answers 500 for one dataset; that must not abort the other 173."""
+        _audit_catalog(
+            monkeypatch,
+            {
+                "readable": SimpleNamespace(
+                    extras={},
+                    variables={
+                        "x": SimpleNamespace(
+                            units="K",
+                            unhydratable=None,
+                            cds_variable="t2m",
+                            extras={},
+                        )
+                    },
+                ),
+                "broken": SimpleNamespace(
+                    extras={},
+                    variables={
+                        "y": SimpleNamespace(
+                            units="K",
+                            unhydratable=None,
+                            cds_variable="t2m",
+                            extras={},
+                        )
+                    },
+                ),
+            },
+        )
+        blocks = [{"variable": ["t2m"]}]
+
+        findings = hydrate_mod.audit_serveability(
+            lambda name: (
+                _UnreachableBlocks() if name == "broken" else _FixtureBlocks(blocks)
+            )
+        )
+
+        assert findings == [("broken", "<constraints unreadable>", {})], (
+            "an unreadable dataset must be visible, and the readable one clean"
+        )
+
+    def test_not_being_strict_stays_quiet_about_what_it_could_not_read(
         self, monkeypatch
     ):
-        """`strict=False` audits what is reachable instead of refusing."""
+        """`strict=False` audits what is reachable without raising."""
         _audit_catalog(
             monkeypatch,
             {
@@ -795,12 +834,11 @@ class TestAuditRefusesToReportCleanWhenItCouldNotLook:
             },
         )
 
-        assert (
-            hydrate_mod.audit_serveability(
-                lambda name: _UnreachableBlocks(), strict=False
-            )
-            == []
+        findings = hydrate_mod.audit_serveability(
+            lambda name: _UnreachableBlocks(), strict=False
         )
+
+        assert findings == [("a-dataset", "<constraints unreadable>", {})]
 
 
 class TestAuditReportsAMissingVariable:
@@ -971,30 +1009,22 @@ class TestAuditServeability:
             # Repairing these means choosing which data version, period,
             # ensemble member or model a caller gets - a curation decision,
             # tracked on the pull request rather than guessed at here.
-            "cems-glofas-reforecast",
-            "cems-glofas-seasonal-reforecast",
             "derived-near-surface-meteorological-variables",
-            "efas-historical",
-            "efas-reforecast",
-            "efas-seasonal-reforecast",
             "insitu-gridded-observations-global-and-regional",
-            "projections-climate-atlas",
             "projections-cmip5-monthly-single-levels",
-            "projections-cmip6",
             "sis-agrometeorological-indicators",
             "sis-ecde-climate-indicators",
             "sis-european-risk-extreme-precipitation-indicators",
-            "sis-extreme-indices-cmip6",
             "sis-tourism-fire-danger-indicators",
-            "multi-origin-c3s-atlas",
-            "cams-global-emission-inventories",
             # A different defect, also pre-existing: these name a variable the
             # store does not offer at all, which the repo's own RequestValidator
-            # already reports. Fixing them means finding the current name, not
-            # adjusting a selector.
-            "reanalysis-pan-carra-means",
+            # already reports. Fixing them means finding the current name.
             "reanalysis-era5-single-levels",
             "reanalysis-era5-single-levels-monthly-means",
+            "reanalysis-pan-carra-means",
+            # And one the store itself answers 500 for, so it cannot be checked
+            # from here at all.
+            "cems-glofas-historical-intermediate",
         }
         unexpected = [
             f"{dataset}/{slug}" for dataset, slug, _ in findings if dataset not in known
@@ -1053,7 +1083,9 @@ class TestServingBlocksAreFetchedLazily:
 
         calls = []
         monkeypatch.setattr(
-            ecmwf_cli, "_ecmwf_constraints", lambda ds: calls.append(ds) or []
+            ecmwf_cli,
+            "_ecmwf_constraints",
+            lambda ds, strict=False: calls.append(ds) or [],
         )
 
         lookup = hydrate_mod._serving_blocks_for("a-dataset")
@@ -1068,7 +1100,9 @@ class TestServingBlocksAreFetchedLazily:
 
         calls = []
         monkeypatch.setattr(
-            ecmwf_cli, "_ecmwf_constraints", lambda ds: calls.append(ds) or []
+            ecmwf_cli,
+            "_ecmwf_constraints",
+            lambda ds, strict=False: calls.append(ds) or [],
         )
 
         lookup = hydrate_mod._serving_blocks_for("a-dataset")
@@ -1461,7 +1495,9 @@ class TestSelectorsAreServeablePerBlock:
             {"variable": ["t2m"], "product_type": ["forecast"]},
             {"variable": ["sst"], "sensor_on_satellite": ["slstr"]},
         ]
-        monkeypatch.setattr(ecmwf_cli, "_ecmwf_constraints", lambda ds: blocks)
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_constraints", lambda ds, strict=False: blocks
+        )
         lookup = hydrate_mod._ServingBlocks("a-dataset")
 
         assert [b["product_type"] for b in lookup("t2m")] == [["forecast"]]
@@ -1478,7 +1514,7 @@ class TestServingBlocksFor:
         monkeypatch.setattr(
             ecmwf_cli,
             "_ecmwf_constraints",
-            lambda dataset: [
+            lambda dataset, strict=False: [
                 {"variable": ["t2m"], "year": ["2020"]},
                 {"variable": ["sst"], "year": ["2021"]},
                 {"variable": ["t2m", "sst"], "year": ["2022"]},

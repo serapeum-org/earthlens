@@ -1005,7 +1005,9 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
 def _hydrate_stanza_per_variable(
     text: str,
     dataset_id: str,
-    probe: Callable[[str], tuple[dict[str, dict[str, Any]], dict[str, Any]]],
+    probe: Callable[
+        [str, dict[str, Any]], tuple[dict[str, dict[str, Any]], dict[str, Any]]
+    ],
     serving: Callable[[str], list[dict[str, Any]]] | None = None,
 ) -> tuple[str, list[str], list[str]]:
     """Fill every placeholder of one stanza, probing each variable on its own.
@@ -1026,8 +1028,9 @@ def _hydrate_stanza_per_variable(
     Args:
         text: The full per-family catalog shard text.
         dataset_id: The dataset id whose stanza to hydrate.
-        probe: Callable taking a `cds_variable` and returning the
-            `(metadata, selectors)` pair :func:`_retrieve_variable_meta` returns.
+        probe: Callable taking a `cds_variable` and the selectors the row will
+            send, returning the `(metadata, selectors)` pair
+            :func:`_retrieve_variable_meta` returns.
         serving: Callable taking a `cds_variable` and returning the constraints
             blocks that serve it, carrying the dataset's enumerated keys on
             `.enumerated`. `None` skips the serveability check, which is what a
@@ -1261,11 +1264,34 @@ _BLOCK_KEYS_NOT_REQUESTED = frozenset(
         "data_format",
         # The hindcast forms key on `hmonth` / `hday`, which the backend copies
         # from the caller's dates. A row pinning them would fix itself to one
-        # date. `hyear` is not here: that one really does come from `extras`.
+        # date.
         "hmonth",
         "hday",
     }
 )
+
+#: Request kinds where the backend also renames the caller's `year` to `hyear`,
+#: so a row of that kind is not expected to carry it. `s2s_reforecast` is not
+#: one of them: it sends both the forecast and the reforecast date, and its
+#: `hyear` really does come from `extras`. Read from `_remap_date_keys` in
+#: `backend.py`, whose pairs differ per kind.
+_HINDCAST_YEAR_KINDS = frozenset({"glofas_hindcast", "seasonal_hindcast"})
+
+
+def _keys_the_backend_supplies(row: Any) -> frozenset[str]:
+    """Block keys this row is not expected to carry.
+
+    Args:
+        row: The catalog row whose request is being judged.
+
+    Returns:
+        `_BLOCK_KEYS_NOT_REQUESTED`, plus `hyear` for the request kinds whose
+        backend hook renames the caller's `year` into it.
+    """
+    if getattr(row, "request_kind", None) in _HINDCAST_YEAR_KINDS:
+        return _BLOCK_KEYS_NOT_REQUESTED | {"hyear"}
+    return _BLOCK_KEYS_NOT_REQUESTED
+
 
 #: Selector values a row carries as typed fields rather than in `extras`,
 #: mapped to the request key the backend sends them under. A check reading
@@ -1323,7 +1349,10 @@ def _asked_values(want: Any) -> set[str] | None:
 
 
 def _block_satisfies(
-    effective: dict[str, Any], block: dict[str, Any], enumerated: set[str]
+    effective: dict[str, Any],
+    block: dict[str, Any],
+    enumerated: set[str],
+    not_required: frozenset[str] = _BLOCK_KEYS_NOT_REQUESTED,
 ) -> bool:
     """Whether one constraints block can answer the whole request a row sends.
 
@@ -1363,7 +1392,7 @@ def _block_satisfies(
             # one it does not is rejected whole. Intersection would pass it.
             return False
     for key in block:
-        if key in _BLOCK_KEYS_NOT_REQUESTED:
+        if key in not_required:
             continue
         if _asked_values(effective.get(key)) is None:
             # The block partitions on this key, so a request omitting it is
@@ -1377,6 +1406,7 @@ def _selectors_are_serveable(
     effective: dict[str, Any],
     serving: list[dict[str, Any]],
     enumerated: set[str] | None = None,
+    not_required: frozenset[str] = _BLOCK_KEYS_NOT_REQUESTED,
 ) -> bool:
     """Whether one serving block can satisfy every selector the row will send.
 
@@ -1400,13 +1430,22 @@ def _selectors_are_serveable(
         return True
     if enumerated is None:
         enumerated = {key for block in serving for key in block}
-    return any(_block_satisfies(effective, block, enumerated) for block in serving)
+    return any(
+        _block_satisfies(effective, block, enumerated, not_required)
+        for block in serving
+    )
 
 
-#: Selectors the backend derives from the caller's start/end dates. An
+#: Selectors the backend builds from the caller's start/end dates. An
 #: override on one of these does not add information, it overrules the
 #: request, because `_apply_extras_and_strips` merges extras last.
-_CALLER_DERIVED_KEYS = frozenset({"year", "month", "day", "time"})
+#:
+#: `time` is deliberately absent. The backend sets it as a *default*
+#: (`request["time"] = ["00:00"]`) which extras then merge over, so a row
+#: whose product is only served at another hour — `efas-historical` at
+#: 06:00 — has to be able to record it. Listing it here made the writer
+#: refuse the only requirement such a row has.
+_CALLER_DERIVED_KEYS = frozenset({"year", "month", "day"})
 
 
 def _selector_override(
@@ -2214,7 +2253,7 @@ class _ServingBlocks:
             from earthlens.ecmwf.cli import _ecmwf_constraints
 
             try:
-                self._rows = _ecmwf_constraints(self._dataset_id) or []
+                self._rows = _ecmwf_constraints(self._dataset_id, strict=True) or []
             except Exception as exc:  # noqa: BLE001 - uncheckable is not fatal
                 logger.debug(f"no constraints for {self._dataset_id}: {exc}")
                 self._rows = []
@@ -2325,7 +2364,9 @@ def _unserveable_selectors(
             return {"variable": [row.cds_variable]}
         return None
     effective = effective_selectors(stanza, row)
-    if _selectors_are_serveable(effective, serving, lookup.enumerated):
+    if _selectors_are_serveable(
+        effective, serving, lookup.enumerated, _keys_the_backend_supplies(row)
+    ):
         return None
     return effective
 
@@ -2357,17 +2398,21 @@ def audit_serveability(
         blocks_for: Factory returning the serving-block lookup for a dataset id,
             defaulting to the live one. Injected so the audit can run against a
             fixture without reaching the network.
-        strict: Raise `ConstraintsUnavailable` when any dataset's constraints
-            could not be read, rather than returning a clean result from a run
-            that checked nothing. Pass `False` to audit what is reachable.
+        strict: Raise `ConstraintsUnavailable` when nothing at all could be
+            read, rather than returning a clean result from a run that checked
+            nothing. Pass `False` to audit whatever is reachable and stay
+            silent about the rest.
 
     Returns:
         One `(dataset_id, slug, effective_selectors)` per unserveable row, in
         catalog order. Empty is the invariant holding.
 
     Raises:
-        ConstraintsUnavailable: Under `strict`, when a dataset's constraints
-            could not be fetched, so the audit's silence would be uninformed.
+        ConstraintsUnavailable: Under `strict`, when *no* dataset's constraints
+            could be read, so the audit has no opinion and an empty list would
+            read as a clean bill of health. A store failing on some datasets
+            reports those as findings instead, since one dataset answering 500
+            must not abort the audit of the rest.
 
     Examples:
         - A store that constrains nothing serves every row, so nothing is
@@ -2425,6 +2470,7 @@ def audit_serveability(
     lookup_for = blocks_for or _serving_blocks_for
     findings: list[tuple[str, str, dict[str, Any]]] = []
     unreachable: list[str] = []
+    readable = 0
     for name, dataset in Catalog().datasets.items():
         rows = [
             (slug, row)
@@ -2441,11 +2487,22 @@ def audit_serveability(
                 findings.append((name, slug, effective))
         if getattr(lookup, "unreachable", False):
             unreachable.append(name)
-    if strict and unreachable:
+        else:
+            readable += 1
+    if strict and unreachable and not readable:
+        # Nothing was readable at all, so this run has no opinion to offer and
+        # returning an empty list would read as a clean bill of health.
         raise ConstraintsUnavailable(
-            f"constraints unreadable for {len(unreachable)} dataset(s), so this "
-            f"audit checked nothing for them: {', '.join(sorted(unreachable)[:5])}"
+            f"constraints unreadable for all {len(unreachable)} dataset(s), so "
+            f"this audit checked nothing: {', '.join(sorted(unreachable)[:5])}"
         )
+    # A store that errors on one dataset — CEMS answers 500 for
+    # `cems-glofas-historical-intermediate` — must not abort an audit of the
+    # other 173, nor vanish from it. Each is reported so the result is never
+    # silently clean, and a caller can tell "unreadable" from "unserveable".
+    findings.extend(
+        (name, "<constraints unreadable>", {}) for name in sorted(unreachable)
+    )
     return findings
 
 
