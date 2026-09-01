@@ -24475,7 +24475,6 @@ eclipse so much more dramatically.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.patches</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circle</span><span class="p">,</span> <span class="n">FancyBboxPatch</span><span class="p">,</span> <span class="n">Wedge</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">osgeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdal</span>  <span class="c1"># needs the `import pyramids` above, which vendors it</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyproj</span><span class="w"> </span><span class="kn">import</span> <span class="n">CRS</span><span class="p">,</span> <span class="n">Transformer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
@@ -24500,7 +24499,6 @@ eclipse so much more dramatically.</p>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
-<span class="n">gdal</span><span class="o">.</span><span class="n">UseExceptions</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">"figure.dpi"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">80</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import gc
@@ -24522,7 +24520,6 @@ from dotenv import find_dotenv, load_dotenv
 from IPython.display import Image, display
 from loguru import logger
 from matplotlib.patches import Circle, FancyBboxPatch, Wedge
-from osgeo import gdal  # needs the `import pyramids` above, which vendors it
 from pyproj import CRS, Transformer
 from pyramids.dataset import Dataset
 from pyramids.dataset.collection import DatasetCollection
@@ -24547,7 +24544,6 @@ from earthlens.core import EarthLens, cache_dir
 
 warnings.filterwarnings("ignore")
 logger.remove()
-gdal.UseExceptions()
 plt.rcParams["figure.dpi"] = 80</div>
 </div>
 </div>
@@ -25276,15 +25272,14 @@ invents imagery — both only attenuate or tint pixels that already carry data.<
 
 <span class="k">def</span><span class="w"> </span><span class="nf">soften_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Read an RGBA GeoTIFF frame, clean its seam and boundary, write it back in place."""</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">gdal</span><span class="o">.</span><span class="n">GA_Update</span><span class="p">)</span>
-    <span class="n">bands</span> <span class="o">=</span> <span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">ReadAsArray</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">RasterCount</span><span class="p">)]</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">bands</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()))</span>
     <span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">(</span><span class="n">bands</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="n">bands</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="p">(</span><span class="n">rgb</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">soften</span><span class="p">(</span><span class="n">declip_cyan</span><span class="p">(</span><span class="n">rgb</span><span class="p">),</span> <span class="n">alpha</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-        <span class="n">ds</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">WriteArray</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">])</span>
-    <span class="n">ds</span><span class="o">.</span><span class="n">FlushCache</span><span class="p">()</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">band</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># flush the in-place writes before the next frame reads them</span>
     <span class="k">return</span> <span class="n">path</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">def declip_cyan(rgb, tol=10.0, sigma=22.0, strength=0.9):
@@ -25371,15 +25366,14 @@ def soften(rgb, alpha, feather=14.0, glow=0.55, glow_rgb=(0.60, 0.78, 1.0), trim
 
 def soften_file(path, **kwargs):
     """Read an RGBA GeoTIFF frame, clean its seam and boundary, write it back in place."""
-    ds = gdal.Open(str(path), gdal.GA_Update)
-    bands = [ds.GetRasterBand(i + 1).ReadAsArray() for i in range(ds.RasterCount)]
+    ds = Dataset.read_file(path, read_only=False)
+    bands = list(np.asarray(ds.read_array()))
     rgb = np.dstack(bands[:3])
     alpha = bands[3] if len(bands) &gt; 3 else (rgb.max(axis=2) &gt; 0).astype(np.uint8) * 255
     out = soften(declip_cyan(rgb), alpha, **kwargs)
     for i in range(3):
-        ds.GetRasterBand(i + 1).WriteArray(out[..., i])
-    ds.FlushCache()
-    ds = None
+        ds.write_array(out[..., i], band=i)
+    ds.close()  # flush the in-place writes before the next frame reads them
     return path</div>
 </div>
 </div>
