@@ -1046,6 +1046,95 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
     return block
 
 
+def _hydrate_one_row(
+    block: str,
+    slug: str,
+    cds_names: dict[str, str],
+    dataset_extras: dict[str, Any],
+    probe: Callable[
+        [str, dict[str, Any]], tuple[dict[str, dict[str, Any]], dict[str, Any]]
+    ],
+    serving: Callable[[str], list[dict[str, Any]]] | None,
+) -> tuple[str, str, dict[str, Any]] | None:
+    """Probe one placeholder row and decide what to write into it.
+
+    Declines rather than guesses in three cases: the row names no
+    `cds_variable`, the probe returns nothing this row can claim, or the
+    request that would be written matches no block the store serves. A
+    placeholder says less than a wrong row, but says it truthfully.
+
+    Args:
+        block: The stanza text as rewritten so far, so names bound by rows
+            filled earlier in this pass are visible.
+        slug: The row to hydrate.
+        cds_names: Slug to `cds_variable` for the whole stanza.
+        dataset_extras: The stanza's `extras:` mapping.
+        probe: Callable taking a `cds_variable` and the selectors the row will
+            send, returning the `(metadata, selectors)` pair.
+        serving: Callable returning the blocks serving a `cds_variable`, or
+            `None` for a dataset publishing no constraints.
+
+    Returns:
+        A `(name, units, override)` triple to write, or `None` to decline.
+    """
+    cds_variable = cds_names.get(slug)
+    if cds_variable is None:
+        return None
+    meta, selectors = probe(
+        cds_variable, {**dataset_extras, **_row_extras(block, slug)}
+    )
+    chosen = _choose_for_slug(slug, meta, _claimed_nc_names(block))
+    if chosen is None:
+        return None
+    name, units = chosen
+    blocks = serving(cds_variable) if serving is not None else []
+    offering = {
+        key: {
+            str(value)
+            for serving_block in blocks
+            for value in (serving_block.get(key) or [])
+        }
+        for serving_block in blocks
+        for key in serving_block
+    }
+    override = _selector_override(selectors, dataset_extras, offering)
+    if blocks and not _selectors_are_serveable(
+        _written_selectors(block, slug, dataset_extras, override), blocks
+    ):
+        # The name was read under a product this row will not ask for, so
+        # writing it would ship a request the store cannot answer.
+        return None
+    return name, units, override
+
+
+def _written_selectors(
+    block: str, slug: str, dataset_extras: dict[str, Any], override: dict[str, Any]
+) -> dict[str, Any]:
+    """Return the request the row would send once this pass's override lands.
+
+    The same merge the audit performs: stanza, then whatever `extras:` the row
+    already carries on disk, then this pass's override - and finally the typed
+    fields the request also carries, which live on the model rather than in
+    `extras`. Judging any narrower slice let a row pass the writer and be
+    reported by the audit afterwards, two definitions of serveable for one row.
+
+    Args:
+        block: The stanza text to read the row's on-disk values from.
+        slug: The row being written.
+        dataset_extras: The stanza's `extras:` mapping.
+        override: The per-row selector override this pass would write.
+
+    Returns:
+        The merged selectors, as the store will see them.
+    """
+    written = {**dataset_extras, **_row_extras(block, slug), **override}
+    for field, request_key in _ROW_FIELD_SELECTORS.items():
+        carried = _row_field(block, slug, field)
+        if carried:
+            written.setdefault(request_key, carried)
+    return written
+
+
 def _hydrate_stanza_per_variable(
     text: str,
     dataset_id: str,
@@ -1096,46 +1185,13 @@ def _hydrate_stanza_per_variable(
     filled: list[str] = []
     declined: list[str] = []
     for slug in placeholders:
-        cds_variable = cds_names.get(slug)
-        if cds_variable is None:
-            declined.append(slug)
-            continue
-        meta, selectors = probe(
-            cds_variable, {**dataset_extras, **_row_extras(new_block, slug)}
+        hydrated = _hydrate_one_row(
+            new_block, slug, cds_names, dataset_extras, probe, serving
         )
-        chosen = _choose_for_slug(slug, meta, _claimed_nc_names(new_block))
-        if chosen is None:
+        if hydrated is None:
             declined.append(slug)
             continue
-        name, units = chosen
-        blocks = serving(cds_variable) if serving is not None else []
-        offering = {
-            key: {
-                str(value)
-                for serving_block in blocks
-                for value in (serving_block.get(key) or [])
-            }
-            for serving_block in blocks
-            for key in serving_block
-        }
-        override = _selector_override(selectors, dataset_extras, offering)
-        # The same merge the audit performs: stanza, then whatever `extras:` the
-        # row already carries on disk, then this pass's override — and finally
-        # the typed fields the request also carries, which live on the model
-        # rather than in `extras`. Judging any narrower slice let a row pass
-        # here and be reported by the audit afterwards, two definitions of
-        # serveable for one row.
-        written = {**dataset_extras, **_row_extras(new_block, slug), **override}
-        for field, request_key in _ROW_FIELD_SELECTORS.items():
-            carried = _row_field(new_block, slug, field)
-            if carried:
-                written.setdefault(request_key, carried)
-        if blocks and not _selectors_are_serveable(written, blocks):
-            # The name was read under a product this row will not ask for, so
-            # writing it would ship a request the store cannot answer. A
-            # placeholder says less but says it truthfully.
-            declined.append(slug)
-            continue
+        name, units, override = hydrated
         new_block = _fill_variable(new_block, slug, name, units)
         new_block = _fill_variable_extras(new_block, slug, override)
         filled.append(slug)

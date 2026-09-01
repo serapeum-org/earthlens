@@ -82,6 +82,72 @@ _UNIVERSAL_KEYS: frozenset[str] = frozenset({"area", "data_format", "format", "g
 _CACHE: dict[str, list[dict[str, Any]] | None] = {}
 
 
+def _constraints_url(dataset: str, base_url: str | None) -> str:
+    """Build the constraints URL for a dataset, refusing a non-https one.
+
+    Args:
+        dataset: The Copernicus dataset id.
+        base_url: CADS instance API root, or `None` for the default template.
+
+    Returns:
+        The `constraints.json` URL.
+
+    Raises:
+        ValueError: If the URL is not https. Plaintext http would let a
+            MITM-injected constraints document steer the validator.
+    """
+    if base_url:
+        url = (
+            f"{base_url.rstrip('/')}/catalogue/v1/collections/"
+            f"{dataset}/constraints.json"
+        )
+    else:
+        url = CONSTRAINTS_URL_TEMPLATE.format(dataset=dataset)
+    if not url.startswith("https://"):
+        raise ValueError(f"refusing to fetch constraints from non-https URL: {url!r}")
+    return url
+
+
+def _fetch_payload(url: str, dataset: str, *, strict: bool) -> Any:
+    """Fetch and decode one constraints document.
+
+    Args:
+        url: The https URL to read, already scheme-checked.
+        dataset: The dataset id, for the error message.
+        strict: Raise rather than degrade when the document cannot be fetched.
+
+    Returns:
+        The decoded JSON, or `None` when it could not be read and `strict` is
+        off.
+
+    Raises:
+        ConstraintsFetchFailed: Under `strict`, when the fetch failed for any
+            reason other than a 404.
+    """
+    try:
+        # Scheme validated by `_constraints_url` — bandit B310 (file:// /
+        # ftp:// vectors) does not apply, and plaintext http is ruled out
+        # there to defeat MITM-injected constraint documents.
+        with urllib.request.urlopen(url, timeout=15) as resp:  # nosec B310
+            return json.loads(resp.read())
+    # `URLError` and its `HTTPError` subclass are both `OSError`s, so naming
+    # them here as well would be redundant. `ValueError` covers the decode.
+    except (OSError, ValueError) as exc:
+        # Network failure or non-JSON response — treat as "no constraints" so
+        # callers fall back to letting CDS itself reject the request. A caller
+        # that cannot tell those apart, such as the serveability audit, asks
+        # for `strict`.
+        not_published = isinstance(exc, urllib.error.HTTPError) and exc.code == 404
+        if strict and not not_published:
+            # A 404 is the store saying this dataset publishes no constraints,
+            # which is an answer. Anything else — a refused connection, a
+            # timeout, a proxy's HTML — is the absence of one.
+            raise ConstraintsFetchFailed(
+                f"could not fetch constraints for {dataset!r}: {exc}"
+            ) from exc
+        return None
+
+
 class ConstraintsFetchFailed(OSError):
     """The constraints document could not be fetched, as opposed to being empty.
 
@@ -140,38 +206,8 @@ def fetch_constraints(
     """
     cache_key = f"{base_url or ''}|{dataset}"
     if cache_key not in _CACHE:
-        if base_url:
-            url = (
-                f"{base_url.rstrip('/')}/catalogue/v1/collections/"
-                f"{dataset}/constraints.json"
-            )
-        else:
-            url = CONSTRAINTS_URL_TEMPLATE.format(dataset=dataset)
-        if not url.startswith("https://"):
-            raise ValueError(
-                f"refusing to fetch constraints from non-https URL: {url!r}"
-            )
-        try:
-            # Scheme validated above — bandit B310 (file:// / ftp://
-            # vectors) does not apply, and we additionally rule out
-            # plaintext http to defeat MITM-injected constraint
-            # documents that could trick the validator.
-            with urllib.request.urlopen(url, timeout=15) as resp:  # nosec B310
-                payload = json.loads(resp.read())
-        except (urllib.error.URLError, ValueError, OSError) as exc:
-            # Network failure or non-JSON response — treat as
-            # "no constraints" so callers fall back to letting CDS
-            # itself reject the request. A caller that cannot tell those
-            # apart, such as the serveability audit, asks for `strict`.
-            not_published = isinstance(exc, urllib.error.HTTPError) and exc.code == 404
-            if strict and not not_published:
-                # A 404 is the store saying this dataset publishes no
-                # constraints, which is an answer. Anything else — a refused
-                # connection, a timeout, a proxy's HTML — is the absence of one.
-                raise ConstraintsFetchFailed(
-                    f"could not fetch constraints for {dataset!r}: {exc}"
-                ) from exc
-            payload = None
+        url = _constraints_url(dataset, base_url)
+        payload = _fetch_payload(url, dataset, strict=strict)
         if not isinstance(payload, list):
             logger.debug(
                 f"no constraints available for {dataset!r} at {url}; "

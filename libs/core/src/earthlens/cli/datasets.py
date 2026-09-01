@@ -919,7 +919,10 @@ def _report_serveability(
     for name in usable:
         try:
             rows = auditors[name]()
-        except Exception as exc:  # noqa: BLE001 - reported, not raised, per provider
+        # Whatever a provider's auditor raises is reported as that provider's
+        # result rather than propagated, so one unreachable store does not
+        # look like a crash in the command.
+        except Exception as exc:  # noqa: BLE001
             typer.echo(f"{name}: could not check: {exc}")
             raise typer.Exit(code=2) from exc
         findings.extend((name, dataset, slug, sel) for dataset, slug, sel in rows)
