@@ -24288,13 +24288,23 @@ that cannot enumerate variables report <code>unsupported</code> for that dimensi
 <td>switch to a <strong>curation-coverage</strong> report — classify the available universe into DONE / addressable / thin / table / missing, and list the highest-value ids to curate next (<code>gee</code>, <code>erddap</code>)</td>
 </tr>
 <tr>
+<td><code>--serveable</code></td>
+<td>switch to a <strong>serveability</strong> report — list the curated rows whose own selectors match no combination the store offers, so a download returns nothing (providers publishing the <code>serveability_auditor</code> role; <code>ecmwf</code> today)</td>
+</tr>
+<tr>
 <td><code>-j, --json</code></td>
 <td>JSON output</td>
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>audit<span class="w"> </span>stac<span class="w"> </span>--strict<span class="w">           </span><span class="c1"># CI drift gate</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>audit<span class="w"> </span>gee<span class="w"> </span>--coverage<span class="w">          </span><span class="c1"># what&#39;s worth curating next</span>
+<p><code>--serveable</code> answers a narrower question than drift. Drift asks whether the dataset still exists;
+<code>--serveable</code> asks whether each row's request is answerable — a row can name a real variable with the
+right unit and still fetch nothing, because the selectors it sends (its stanza's <code>extras</code> merged with
+its own) match no single constraints block. It is unauthenticated and issues no retrieve.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>audit<span class="w"> </span>stac<span class="w"> </span>--strict<span class="w">            </span><span class="c1"># CI drift gate</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>audit<span class="w"> </span>gee<span class="w"> </span>--coverage<span class="w">           </span><span class="c1"># what&#39;s worth curating next</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>audit<span class="w"> </span>ecmwf<span class="w"> </span>--serveable<span class="w">        </span><span class="c1"># rows whose request answers nothing</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>audit<span class="w"> </span>ecmwf<span class="w"> </span>--serveable<span class="w"> </span>--strict<span class="w"> </span>--json<span class="w">   </span><span class="c1"># as a CI gate, piped</span>
 </code></pre></div>
 <h3 id="validate-providers-per-entry-checks-offline-lint-optional-live"><a class="toclink" href="#validate-providers-per-entry-checks-offline-lint-optional-live"><code>validate &lt;providers&gt;</code> — per-entry checks (offline lint, optional live)</a><a class="headerlink" href="#validate-providers-per-entry-checks-offline-lint-optional-live" title="Permanent link">#</a></h3>
 <p>For curated-enumeration providers (no discoverable upstream index, so <code>refresh</code>/<code>audit</code> do not apply),
@@ -24479,6 +24489,10 @@ availability and bundled catalog dataset count.</p>
 <tr>
 <td>gate CI on curated-vs-live drift</td>
 <td><code>datasets audit &lt;p&gt; --strict</code></td>
+</tr>
+<tr>
+<td>find curated rows the store cannot answer</td>
+<td><code>datasets audit &lt;p&gt; --serveable</code></td>
 </tr>
 <tr>
 <td>see what's worth curating next</td>
