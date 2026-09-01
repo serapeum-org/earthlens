@@ -299,12 +299,8 @@ class TestRetrieveProbeUnpacksAZip:
         monkeypatch.setattr(
             ecmwf_helpers, "_retrieve_with_retry", _write_zip_holding_no_netcdf
         )
-        seen = {}
-        monkeypatch.setattr(
-            ecmwf_cli,
-            "_read_netcdf_var_meta",
-            lambda path: seen.setdefault("path", path) and {} or {},
-        )
+        seen: dict[str, str] = {}
+        monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", _recording_reader(seen))
 
         ecmwf_cli._retrieve_probe("a-dataset", {"variable": ["x"]})
 
@@ -607,8 +603,27 @@ def _info_to_meta(info):
     return {}
 
 
+def _recording_reader(seen):
+    """A `_read_netcdf_var_meta` stand-in that records the path it was handed.
+
+    A lambda leaning on `x and {} or y` reads as a puzzle and silently inverts
+    if the recorded value is ever falsy.
+    """
+
+    def _read(path):
+        seen["path"] = path
+        return {"t2m": {"units": "K"}}
+
+    return _read
+
+
 def _refuse_to_remove(path, **kwargs):
-    """Stand in for a Windows reader that still holds the granule."""
+    """Stand in for a Windows reader that still holds the granule.
+
+    Patched onto `shutil.rmtree` for the duration of one call rather than a
+    directory made genuinely unremovable, since only Windows can produce that
+    state and the test has to fail on every platform when the fix goes.
+    """
 
 
 def _stub_probe_transport(monkeypatch, tmp_path):

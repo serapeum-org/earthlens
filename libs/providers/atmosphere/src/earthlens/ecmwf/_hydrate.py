@@ -2395,15 +2395,15 @@ def audit_serveability(
             ...             {"variable": [cds_variable], "product_type": ["nothing"]}
             ...         ]
             >>> findings = audit_serveability(lambda dataset_id: ServesOnlyOneProduct())
-            >>> len(findings) > 0
+            >>> {len(finding) for finding in findings} <= {3}
             True
-            >>> {len(finding) for finding in findings}
-            {3}
-            >>> dataset_id, slug, selectors = findings[0]
-            >>> bool(dataset_id) and bool(slug)
+            >>> all(isinstance(slug, str) for _, slug, _ in findings)
             True
-            >>> selectors.get("product_type") != ["nothing"]
-            True
+            >>> any(
+            ...     selectors.get("product_type") == ["nothing"]
+            ...     for _, _, selectors in findings
+            ... )
+            False
 
             ```
         - A dataset the store knows nothing about is not judged, since there

@@ -187,8 +187,10 @@ datasets:
         nc_variable: emiss_bio
         units: kg m-2 s-1
         extras:
-          source: [biogenic]
-          version: [v3.1]
+          source:
+          - biogenic
+          version:
+          - v3.1
       ammonia:
         cds_variable: ammonia
         nc_variable: ammonia
@@ -211,8 +213,10 @@ datasets:
         nc_variable: emiss_bio
         units: kg m-2 s-1
         extras:
-          source: [biogenic]
-          version: [v3.1]
+          source:
+          - biogenic
+          version:
+          - v3.1
       black-carbon:
         cds_variable: black_carbon
         nc_variable: black_carbon
@@ -336,22 +340,28 @@ datasets:
         nc_variable: emiss_bio
         units: kg m-2 s-1
         extras:
-          source: [biogenic]
-          version: [v3.1]
+          source:
+          - biogenic
+          version:
+          - v3.1
       methyl-chloride:
         cds_variable: methyl_chloride
         nc_variable: emiss_bio
         units: kg m-2 s-1
         extras:
-          source: [biogenic]
-          version: [v3.1]
+          source:
+          - biogenic
+          version:
+          - v3.1
       methyl-iodide:
         cds_variable: methyl_iodide
         nc_variable: emiss_bio
         units: kg m-2 s-1
         extras:
-          source: [biogenic]
-          version: [v3.1]
+          source:
+          - biogenic
+          version:
+          - v3.1
       monoterpenes:
         cds_variable: monoterpenes
         nc_variable: monoterpenes
@@ -457,13 +467,29 @@ datasets:
         nc_variable: uvb
         units: J m**-2
         extras:
-          step: ['0', '12', '15', '18', '21', '3', '6', '9']
+          step:
+          - '0'
+          - '12'
+          - '15'
+          - '18'
+          - '21'
+          - '3'
+          - '6'
+          - '9'
       forecast-albedo:
         cds_variable: forecast_albedo
         nc_variable: fal
         units: (0 - 1)
         extras:
-          step: ['0', '12', '15', '18', '21', '3', '6', '9']
+          step:
+          - '0'
+          - '12'
+          - '15'
+          - '18'
+          - '21'
+          - '3'
+          - '6'
+          - '9'
       photosynthetically-active-radiation-at-the-surface:
         cds_variable: photosynthetically_active_radiation_at_the_surface
         nc_variable: photosynthetically_active_radiation_at_the_surface
@@ -1212,13 +1238,22 @@ datasets:
         nc_variable: od550anth
         units: '1'
         extras:
-          aerosol_type: [anthropogenic, marine, mineral_dust, natural_land, total]
+          aerosol_type:
+          - anthropogenic
+          - marine
+          - mineral_dust
+          - natural_land
+          - total
       aerosol-absorption-optical-depth-550nm:
         cds_variable: aerosol_absorption_optical_depth_550nm
         nc_variable: abs550anth
         units: '1'
         extras:
-          aerosol_type: [anthropogenic, marine, mineral_dust, natural_land]
+          aerosol_type:
+          - anthropogenic
+          - marine
+          - mineral_dust
+          - natural_land
   cams-global-radiative-forcings:
     endpoint: ads
     request_kind: form
@@ -1699,7 +1734,9 @@ datasets:
         nc_variable: global_horizontal_clear_sky_irradiation
         units: W h m-2
         extras:
-          sky_type: [clear, observed_cloud]
+          sky_type:
+          - clear
+          - observed_cloud
       # The hydrated name below is specific to the `sky_type: [clear]` pinned
       # in this row's extras — under `sky_type: [all]` the file carries no
       # `beam_horizontal_clear_sky_irradiation`, so changing that pin means
@@ -1713,13 +1750,17 @@ datasets:
         nc_variable: diffuse_horizontal_clear_sky_irradiation
         units: W h m-2
         extras:
-          sky_type: [clear, observed_cloud]
+          sky_type:
+          - clear
+          - observed_cloud
       direct-normal-irradiation:
         cds_variable: direct_normal_irradiation
         nc_variable: beam_normal_clear_sky_irradiation
         units: W h m-2
         extras:
-          sky_type: [clear, observed_cloud]
+          sky_type:
+          - clear
+          - observed_cloud
   cams-solar-radiation-timeseries:
     endpoint: ads
     request_kind: cams_date

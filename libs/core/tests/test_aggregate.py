@@ -1832,13 +1832,15 @@ def _write_real_nc(path, *, periods=6, rows=2, cols=3, nan_at=None):
 #: 7.2.2; if a later release rewords it, this stops skipping and starts failing
 #: every handle-release test in the file, which is the safe direction but worth
 #: knowing. Both spellings are kept so either half of the phrase still matches.
-_ENUMERATION_CAPACITY_MARKERS = ("buffer too big", "systemextendedhandleinformation")
+_ENUMERATION_CAPACITY_MARKERS = ("systemextendedhandleinformation", "buffer too big")
 
 
 def _is_enumeration_capacity_failure(error):
     """Whether `error` is the machine being too busy to enumerate handles."""
     text = str(error).lower()
-    return any(marker in text for marker in _ENUMERATION_CAPACITY_MARKERS)
+    # Both, not either: an unrelated psutil error mentioning "buffer too big"
+    # would otherwise skip every release check in this file.
+    return all(marker in text for marker in _ENUMERATION_CAPACITY_MARKERS)
 
 
 def _handles_on(path):

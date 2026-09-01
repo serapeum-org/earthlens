@@ -330,7 +330,8 @@ The value is transcribed from the producer's own `units` attribute and is
 string for a ratio. Rows of a single stanza can disagree, because the file
 they describe does: `satellite-surface-radiation-budget` labels `SRS`
 `W/m^2` and `SOL` `W m-2`. Rewriting either would make this row misdescribe
-the granule it documents, so the spelling is left as found. **Compare units by parsing them, never by string equality.**
+the granule it documents, so the spelling is left as found.
+**Compare units by parsing them, never by string equality.**
 
 ##### `cds_variable`
 
