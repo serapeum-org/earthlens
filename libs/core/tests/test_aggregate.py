@@ -1886,18 +1886,37 @@ def _handles_on(path):
     return found
 
 
+def _open_files_out_of_capacity(self):
+    """Stand in for `psutil.Process.open_files` on a machine that is too busy.
+
+    Args:
+        self: The process the attribute is read from; unused.
+
+    Raises:
+        RuntimeError: The message Windows raises when the handle table will not
+            fit the enumeration buffer.
+    """
+    raise RuntimeError("SystemExtendedHandleInformation buffer too big")
+
+
+def _open_files_denied(self):
+    """Stand in for `psutil.Process.open_files` refusing the caller.
+
+    Args:
+        self: The process the attribute is read from; unused.
+
+    Raises:
+        psutil.AccessDenied: Always.
+    """
+    raise psutil.AccessDenied()
+
+
 class TestHandleEnumerationGuard:
     """What the shared release-check helper tolerates, and what it must not."""
 
     def test_a_capacity_failure_skips_the_caller(self, monkeypatch, tmp_path):
         """The machine being too busy says nothing about the code under test."""
-        monkeypatch.setattr(
-            psutil.Process,
-            "open_files",
-            lambda self: (_ for _ in ()).throw(
-                RuntimeError("SystemExtendedHandleInformation buffer too big")
-            ),
-        )
+        monkeypatch.setattr(psutil.Process, "open_files", _open_files_out_of_capacity)
 
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
@@ -1908,11 +1927,7 @@ class TestHandleEnumerationGuard:
 
     def test_any_other_enumeration_error_is_raised(self, monkeypatch, tmp_path):
         """Swallowing it would skip every release check in this file, green."""
-        monkeypatch.setattr(
-            psutil.Process,
-            "open_files",
-            lambda self: (_ for _ in ()).throw(psutil.AccessDenied()),
-        )
+        monkeypatch.setattr(psutil.Process, "open_files", _open_files_denied)
 
         with pytest.raises(psutil.AccessDenied):
             _handles_on(tmp_path)

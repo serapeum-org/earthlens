@@ -871,15 +871,22 @@ def _curate_fill_empty(
     )
 
 
-def _report_serveability(providers: str, json_output: bool, strict: bool) -> None:
+def _report_serveability(
+    selected: list[BackendInfo], json_output: bool, strict: bool
+) -> None:
     """Print the rows whose request the store cannot answer, and exit non-zero.
 
     Dispatches on the `serveability_auditor` role rather than naming a provider,
     so core stays backend-agnostic: a provider that can check its own requests
     publishes the role, and one that cannot simply does not appear here.
 
+    Takes the selection `audit` already resolved rather than re-reading the raw
+    argument. Re-splitting it would compare registry *aliases* against canonical
+    provider ids, so a provider reachable under an alias would resolve for the
+    drift audit and be rejected here.
+
     Args:
-        providers: The provider selection from the command line.
+        selected: The backends `audit` resolved from the command line.
         json_output: Emit the findings as JSON rather than as a table.
         strict: Exit non-zero when anything is reported.
 
@@ -892,18 +899,20 @@ def _report_serveability(providers: str, json_output: bool, strict: bool) -> Non
     from earthlens._cli_tooling import dispatch_table
 
     auditors = dispatch_table("serveability_auditor")
-    wanted = (
-        sorted(auditors)
-        if providers.strip().lower() == "all"
-        else [name.strip() for name in providers.split(",") if name.strip()]
-    )
-    usable = [name for name in wanted if name in auditors]
+    usable = sorted({info.provider for info in selected} & set(auditors))
     if not usable:
         typer.echo(
             "--serveable needs a provider that can check its own requests; "
             f"available: {sorted(auditors) or 'none'}"
         )
         raise typer.Exit(code=2)
+    # Say which of the requested providers cannot answer the question, rather
+    # than reporting on a subset and letting it read as a clean result.
+    skipped = sorted({info.provider for info in selected} - set(auditors))
+    if skipped and not json_output:
+        err_console().print(
+            f"[dim]not checked (no serveability auditor): {', '.join(skipped)}[/dim]"
+        )
 
     findings: list[tuple[str, str, str, dict[str, object]]] = []
     for name in usable:
@@ -987,17 +996,21 @@ def audit(
     (table), or gone (missing), and lists the highest-value `addressable` ids
     to curate next (currently gee only).
     """
+    if coverage and serveable:
+        raise typer.BadParameter(
+            "--coverage and --serveable ask different questions; pass one"
+        )
     selected = _select_refresh_backends(providers)
     if coverage:
         _audit_coverage(selected, json_output=json_output)
+        return
+    if serveable:
+        _report_serveability(selected, json_output, strict)
         return
     if not json_output:
         err_console().print(
             f"[dim]Auditing {len(selected)} provider(s) against live...[/dim]"
         )
-    if serveable:
-        _report_serveability(providers, json_output, strict)
-        return
 
     outcomes = [audit_one(info) for info in selected]
 

@@ -367,8 +367,6 @@ class TestAuditServeableCommand:
 
     def test_a_clean_catalog_says_so(self, monkeypatch):
         """Silence would leave a reader unsure the check ran."""
-        import earthlens.ecmwf._hydrate as hydrate
-
         monkeypatch.setattr(ecmwf_cli, "serveability_auditor", lambda: [])
 
         result = CliRunner().invoke(app, ["datasets", "audit", "ecmwf", "--serveable"])

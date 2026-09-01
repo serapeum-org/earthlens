@@ -806,9 +806,7 @@ class TestAuditRefusesToReportCleanWhenItCouldNotLook:
             "an unreadable dataset must be visible, and the readable one clean"
         )
 
-    def test_not_being_strict_stays_quiet_about_what_it_could_not_read(
-        self, monkeypatch
-    ):
+    def test_not_being_strict_returns_rather_than_raising(self, monkeypatch):
         """`strict=False` audits what is reachable without raising."""
         _audit_catalog(
             monkeypatch,

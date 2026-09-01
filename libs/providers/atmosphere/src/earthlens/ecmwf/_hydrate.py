@@ -176,6 +176,13 @@ def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
     return _ecmwf_deep_sample(dataset_id)
 
 
+# `cli.py` and this module import each other's privates, and the cycle is
+# only survivable because every one of those imports sits inside a
+# function: this module reaches into `cli` for `_ecmwf_constraints` and
+# `_ecmwf_deep_sample*`, and `cli` reaches back for `_asked_values`.
+# Promoting any of them to a module-level import breaks
+# `import earthlens.ecmwf`. Keep them function-local until the shared
+# selector vocabulary moves to a third module.
 def _probe_into(
     dataset_id: str,
     cds_variable: str,
@@ -192,6 +199,9 @@ def _probe_into(
         dataset_id: The Copernicus dataset id to sample.
         cds_variable: The `cds_variable` to request.
         box: Mutable result cell shared with the caller thread.
+        prefer: Selectors the row already carries, so the probe reads its name
+            and unit from a block the row's own request can reach rather than
+            from whichever block the store happens to list first.
     """
     try:
         box["result"] = _retrieve_variable_meta(dataset_id, cds_variable, prefer)
@@ -229,6 +239,9 @@ def _probe_with_timeout(
         deadline; the retrieve it holds is abandoned, not cancelled. At most one
         such thread is left per dataset, because the session stops probing after
         its first timeout.
+        prefer: Selectors the row already carries, so the probe reads its name
+            and unit from a block the row's own request can reach rather than
+            from whichever block the store happens to list first.
     """
     if not timeout:
         return _retrieve_variable_meta(dataset_id, cds_variable, prefer)
@@ -1097,9 +1110,13 @@ def _hydrate_stanza_per_variable(
         name, units = chosen
         blocks = serving(cds_variable) if serving is not None else []
         offering = {
-            key: {str(value) for block in blocks for value in (block.get(key) or [])}
-            for block in blocks
-            for key in block
+            key: {
+                str(value)
+                for serving_block in blocks
+                for value in (serving_block.get(key) or [])
+            }
+            for serving_block in blocks
+            for key in serving_block
         }
         override = _selector_override(selectors, dataset_extras, offering)
         # The same merge the audit performs: stanza, then whatever `extras:` the
@@ -2246,11 +2263,15 @@ def _hydrated_detail(session: _ProbeSession, declined: list[str]) -> str:
 class _ServingBlocks:
     """Lookup from a `cds_variable` to the constraints blocks serving it.
 
-    A class rather than a closure or a bound `partial` because the serveability
-    check needs two things from one object: the blocks for a variable, and every
-    key the *whole* dataset partitions on. A key the serving blocks omit while
-    other blocks enumerate it is a conflict rather than a free choice, and only
-    the full block set can tell those apart.
+    A class rather than a closure or a bound `partial` because the audit needs
+    two things from one object: the blocks for a variable, and every key the
+    *whole* dataset partitions on. The second is what separates "this dataset
+    does not partition by variable at all" from "the store does not offer this
+    variable", which are otherwise the same empty block list.
+
+    It does *not* decide serveability. A key the serving blocks omit is
+    unconstrained for those blocks, whether or not some other block enumerates
+    it - see `_block_satisfies`.
 
     The constraints are fetched on first use rather than at construction: the
     caller builds one of these per dataset before knowing whether the stanza has
@@ -2434,7 +2455,9 @@ def audit_serveability(
             ...             {"variable": [cds_variable], "product_type": ["nothing"]}
             ...         ]
             >>> findings = audit_serveability(lambda dataset_id: ServesOnlyOneProduct())
-            >>> {len(finding) for finding in findings} <= {3}
+            >>> len(findings) > 0
+            True
+            >>> {len(finding) for finding in findings} == {3}
             True
             >>> all(isinstance(slug, str) for _, slug, _ in findings)
             True

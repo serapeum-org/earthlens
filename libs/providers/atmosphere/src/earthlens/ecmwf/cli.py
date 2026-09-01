@@ -621,6 +621,9 @@ def _ecmwf_deep_sample_variable(
         served under (see :func:`_required_selectors`), not the combination this
         one probe happened to sample. Both are empty when no constraints block
         serves `cds_variable`.
+        prefer: Selectors the row already carries, so the probe reads its name
+            and unit from a block the row's own request can reach rather than
+            from whichever block the store happens to list first.
     """
     rows = _ecmwf_constraints(dataset)
     row = _deep_sample_row(rows, cds_variable, prefer)

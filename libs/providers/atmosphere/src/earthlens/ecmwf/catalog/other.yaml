@@ -2672,6 +2672,16 @@ datasets:
         units: K
         extras:
           level: ['1', '10', '100', '1000', '150', '20', '200', '250', '30', '300', '400', '5', '50', '500', '600', '70', '700', '850', '925']
+      # The only row in this stanza that does not come from ACCESS-CM2: this
+      # field is a fixed (time-invariant) soil property, and the seven models
+      # publishing it - AWI-CM-1-1-MR, AWI-ESM-1-1-LR, INM-CM4-8, INM-CM5-0,
+      # MPI-ESM1-2-HR, MPI-ESM1-2-LR, MPI-ESM-1-2-HAM - do not include
+      # ACCESS-CM2. AWI-CM-1-1-MR is taken as the first alphabetically; there
+      # is no better tie-break, so a caller combining this with the stanza's
+      # other variables is mixing GCMs and should override `model` themselves.
+      # `level` is dropped because no block serving this field partitions on
+      # it, and `temporal_resolution` must be `fixed` rather than the stanza's
+      # `monthly`.
       capacity-of-soil-to-store-water:
         cds_variable: capacity_of_soil_to_store_water
         nc_variable: mrsofc

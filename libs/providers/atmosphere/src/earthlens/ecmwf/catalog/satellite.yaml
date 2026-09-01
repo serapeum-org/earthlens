@@ -202,6 +202,15 @@ datasets:
         cds_variable: incoming_shortwave_radiation
         nc_variable: incoming_shortwave_radiation
         units: unknown
+      # The store serves this field from EUMETSAT/CLARA-A3, NASA/CERES-EBAF and
+      # NOAA-NCEI/HIRS, and from no C3S/CCI block at all, so the stanza's
+      # origin and product_family cannot stand. CLARA-A3 is picked because it
+      # is the only one of the three offered under the stanza's
+      # interim_climate_data_record; CERES-EBAF is thematic-only. The stanza's
+      # monthly_mean is kept - EUMETSAT/CLARA-A3 serves both cadences - so this
+      # row differs from its neighbours in producer alone, not in cadence.
+      # sensor_on_satellite is dropped because no block serving this field
+      # partitions on it.
       outgoing-longwave-radiation:
         cds_variable: outgoing_longwave_radiation
         nc_variable: olr
@@ -212,8 +221,6 @@ datasets:
           product_family:
           - clara_a3
           sensor_on_satellite: null
-          time_aggregation:
-          - daily_mean
       outgoing-shortwave-radiation:
         cds_variable: outgoing_shortwave_radiation
         nc_variable: outgoing_shortwave_radiation
