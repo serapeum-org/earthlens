@@ -893,6 +893,37 @@ def _extras_span(lines: list[str]) -> tuple[int, int] | None:
     return found, stop
 
 
+def _row_field(block: str, slug: str, field: str) -> Any:
+    """Return one typed field a row carries in the stanza text.
+
+    `product_type` and `cds_pressure_level` reach the request without passing
+    through `extras`, so a guard reading only `extras` judges a different
+    request from the one that will be sent.
+
+    Args:
+        block: The stanza's `variables:` text.
+        slug: The row to read.
+        field: The model field name to read.
+
+    Returns:
+        The field's value, or `None` when the row does not carry it.
+    """
+    for match in _VARIABLE_BLOCK.finditer(block):
+        if match.group("slug") != slug:
+            continue
+        body = match.group("body")
+        dedented = "".join(
+            line[8:] if line.startswith(" " * 8) else line
+            for line in body.splitlines(keepends=True)
+        )
+        try:
+            parsed = yaml.safe_load(dedented) or {}
+        except yaml.YAMLError:
+            return None
+        return parsed.get(field) if isinstance(parsed, dict) else None
+    return None
+
+
 def _row_extras(block: str, slug: str) -> dict[str, Any]:
     """Return the `extras:` one row already carries in the stanza text.
 
@@ -1032,8 +1063,7 @@ def _hydrate_stanza_per_variable(
             send, returning the `(metadata, selectors)` pair
             :func:`_retrieve_variable_meta` returns.
         serving: Callable taking a `cds_variable` and returning the constraints
-            blocks that serve it, carrying the dataset's enumerated keys on
-            `.enumerated`. `None` skips the serveability check, which is what a
+            blocks that serve it. `None` skips the serveability check, which is what a
             dataset publishing no constraints gets.
 
     Returns:
@@ -1073,13 +1103,17 @@ def _hydrate_stanza_per_variable(
         }
         override = _selector_override(selectors, dataset_extras, offering)
         # The same merge the audit performs: stanza, then whatever `extras:` the
-        # row already carries on disk, then this pass's override. Judging only
-        # `{stanza, override}` let a row with hand-set extras pass here and be
-        # reported by the audit afterwards — two definitions of serveable.
+        # row already carries on disk, then this pass's override — and finally
+        # the typed fields the request also carries, which live on the model
+        # rather than in `extras`. Judging any narrower slice let a row pass
+        # here and be reported by the audit afterwards, two definitions of
+        # serveable for one row.
         written = {**dataset_extras, **_row_extras(new_block, slug), **override}
-        if blocks and not _selectors_are_serveable(
-            written, blocks, getattr(serving, "enumerated", None)
-        ):
+        for field, request_key in _ROW_FIELD_SELECTORS.items():
+            carried = _row_field(new_block, slug, field)
+            if carried:
+                written.setdefault(request_key, carried)
+        if blocks and not _selectors_are_serveable(written, blocks):
             # The name was read under a product this row will not ask for, so
             # writing it would ship a request the store cannot answer. A
             # placeholder says less but says it truthfully.
@@ -1351,7 +1385,7 @@ def _asked_values(want: Any) -> set[str] | None:
 def _block_satisfies(
     effective: dict[str, Any],
     block: dict[str, Any],
-    enumerated: set[str],
+    *,
     not_required: frozenset[str] = _BLOCK_KEYS_NOT_REQUESTED,
 ) -> bool:
     """Whether one constraints block can answer the whole request a row sends.
@@ -1366,9 +1400,9 @@ def _block_satisfies(
     Args:
         effective: The row's selectors, stanza extras merged with its own.
         block: One constraints block serving the row's variable.
-        enumerated: Every key any block of the dataset constrains. Kept for
-            callers and for the required-key check below; a key this block
-            omits is read as unconstrained rather than as a conflict.
+        not_required: Block keys this row is not expected to carry, since the
+            backend fills them in. Varies by request kind - see
+            :func:`_keys_the_backend_supplies`.
 
     Returns:
         True when this single block can serve the request.
@@ -1405,7 +1439,7 @@ def _block_satisfies(
 def _selectors_are_serveable(
     effective: dict[str, Any],
     serving: list[dict[str, Any]],
-    enumerated: set[str] | None = None,
+    *,
     not_required: frozenset[str] = _BLOCK_KEYS_NOT_REQUESTED,
 ) -> bool:
     """Whether one serving block can satisfy every selector the row will send.
@@ -1419,8 +1453,6 @@ def _selectors_are_serveable(
     Args:
         effective: The row's selectors, stanza extras merged with its own.
         serving: The constraints blocks that serve the row's variable.
-        enumerated: Every key any block of the dataset constrains; defaults to
-            the keys the serving blocks constrain.
 
     Returns:
         True when at least one serving block satisfies the whole request, and
@@ -1428,10 +1460,8 @@ def _selectors_are_serveable(
     """
     if not serving:
         return True
-    if enumerated is None:
-        enumerated = {key for block in serving for key in block}
     return any(
-        _block_satisfies(effective, block, enumerated, not_required)
+        _block_satisfies(effective, block, not_required=not_required)
         for block in serving
     )
 
@@ -2231,7 +2261,6 @@ class _ServingBlocks:
         dataset_id: The Copernicus dataset id whose constraints to consult.
 
     Attributes:
-        enumerated: Every key any block of the dataset constrains.
         unreachable: Whether the fetch failed, as opposed to the store
             publishing no constraints. Both leave no blocks to judge against,
             but only the first means the check did not happen.
@@ -2264,48 +2293,13 @@ class _ServingBlocks:
     def enumerated(self) -> set[str]:
         """Every key any block of the dataset constrains.
 
+        Read by the audit to tell "this dataset does not partition by variable"
+        from "the store does not offer this variable". The serveability guard
+        no longer takes it: a key a block omits is unconstrained for that block,
+        so knowing what other blocks enumerate does not change the answer.
+
         Returns:
-            The union of keys across the dataset's blocks. A key in here that a
-            serving block omits belongs to another product, so a row sending it
-            cannot be served; a key absent from this set constrains nothing.
-
-        Examples:
-            - Every key the dataset partitions on, gathered across all blocks,
-              not only the ones serving a given variable:
-
-                ```python
-                >>> from earthlens.ecmwf._hydrate import _ServingBlocks
-                >>> lookup = _ServingBlocks("a-dataset")
-                >>> lookup._rows = [
-                ...     {"variable": ["t2m"], "product_type": ["analysis"]},
-                ...     {"variable": ["sst"], "leadtime_hour": ["3"]},
-                ... ]
-                >>> sorted(lookup.enumerated)
-                ['leadtime_hour', 'product_type', 'variable']
-
-                ```
-            - And which decides whether a key a block *requires* is missing:
-              the `sst` block partitions on `leadtime_hour`, so a request that
-              names none cannot be answered by it:
-
-                ```python
-                >>> from earthlens.ecmwf._hydrate import (
-                ...     _ServingBlocks,
-                ...     _selectors_are_serveable,
-                ... )
-                >>> lookup = _ServingBlocks("a-dataset")
-                >>> lookup._rows = [
-                ...     {"variable": ["t2m"], "product_type": ["analysis"]},
-                ...     {"variable": ["sst"], "leadtime_hour": ["3"]},
-                ... ]
-                >>> _selectors_are_serveable({}, lookup("sst"), lookup.enumerated)
-                False
-                >>> _selectors_are_serveable(
-                ...     {"leadtime_hour": ["3"]}, lookup("sst"), lookup.enumerated
-                ... )
-                True
-
-                ```
+            The union of keys across the dataset's blocks.
         """
         return {key for block in self._load() for key in block}
 
@@ -2365,7 +2359,7 @@ def _unserveable_selectors(
         return None
     effective = effective_selectors(stanza, row)
     if _selectors_are_serveable(
-        effective, serving, lookup.enumerated, _keys_the_backend_supplies(row)
+        effective, serving, not_required=_keys_the_backend_supplies(row)
     ):
         return None
     return effective

@@ -447,7 +447,7 @@ class TestBlockSatisfies:
         block = {"product_type": ["forecast"], "year": ["2020"]}
 
         assert hydrate_mod._block_satisfies(
-            {"product_type": ["forecast"], "year": ["2020"]}, block, set(block)
+            {"product_type": ["forecast"], "year": ["2020"]}, block
         )
 
     def test_one_disagreeing_key_is_enough_to_refuse(self):
@@ -455,7 +455,7 @@ class TestBlockSatisfies:
         block = {"product_type": ["forecast"], "year": ["2020"]}
 
         assert not hydrate_mod._block_satisfies(
-            {"product_type": ["forecast"], "year": ["2021"]}, block, set(block)
+            {"product_type": ["forecast"], "year": ["2021"]}, block
         )
 
     @pytest.mark.parametrize("value", [None, [], "surface_level", 3])
@@ -464,7 +464,7 @@ class TestBlockSatisfies:
         block = {"product_type": ["forecast"]}
 
         assert hydrate_mod._block_satisfies(
-            {"product_type": ["forecast"], "level": value}, block, set(block)
+            {"product_type": ["forecast"], "level": value}, block
         )
 
     def test_a_key_absent_everywhere_is_a_free_choice(self):
@@ -472,15 +472,12 @@ class TestBlockSatisfies:
         assert hydrate_mod._block_satisfies(
             {"product_type": ["forecast"], "spatial_extent": ["catchment"]},
             {"product_type": ["forecast"]},
-            {"product_type"},
         )
 
     def test_a_key_absent_here_but_enumerated_elsewhere_is_a_conflict(self):
         """It belongs to another product, so this block cannot answer it."""
         assert not hydrate_mod._block_satisfies(
-            {"leadtime_hour": ["3"]},
-            {"product_type": ["analysis"]},
-            {"product_type", "leadtime_hour"},
+            {"leadtime_hour": ["3"]}, {"product_type": ["analysis"]}
         )
 
 
@@ -511,16 +508,14 @@ class TestBlockSatisfiesReadsScalars:
         block = {"level_type": ["surface"]}
 
         assert not hydrate_mod._block_satisfies(
-            {"level_type": "single_levels"}, block, set(block)
+            {"level_type": "single_levels"}, block
         ), "a scalar selector conflicting with the block was not judged"
 
     def test_an_agreeing_scalar_is_accepted(self):
         """The ordinary case must still pass."""
         block = {"level_type": ["single_levels"]}
 
-        assert hydrate_mod._block_satisfies(
-            {"level_type": "single_levels"}, block, set(block)
-        )
+        assert hydrate_mod._block_satisfies({"level_type": "single_levels"}, block)
 
 
 class TestBlockSatisfiesChecksWhatTheBlockRequires:
@@ -532,16 +527,14 @@ class TestBlockSatisfiesChecksWhatTheBlockRequires:
         block = {"product_type": ["forecast"], "leadtime_hour": ["3"]}
 
         assert not hydrate_mod._block_satisfies(
-            {"product_type": ["forecast"]}, block, set(block)
+            {"product_type": ["forecast"]}, block
         ), "the row omits a key every serving block requires"
 
     def test_the_same_row_is_served_by_a_block_that_requires_nothing_more(self):
         """Which is why the analysis blocks, enumerating no leadtime_hour, serve it."""
         block = {"product_type": ["analysis"]}
 
-        assert hydrate_mod._block_satisfies(
-            {"product_type": ["analysis"]}, block, set(block)
-        )
+        assert hydrate_mod._block_satisfies({"product_type": ["analysis"]}, block)
 
     @pytest.mark.parametrize(
         "key",
@@ -551,9 +544,9 @@ class TestBlockSatisfiesChecksWhatTheBlockRequires:
         """These come from the caller's range and bbox, not from the catalog row."""
         block = {"product_type": ["forecast"], key: ["whatever"]}
 
-        assert hydrate_mod._block_satisfies(
-            {"product_type": ["forecast"]}, block, set(block)
-        ), f"{key} was treated as the row's responsibility"
+        assert hydrate_mod._block_satisfies({"product_type": ["forecast"]}, block), (
+            f"{key} was treated as the row's responsibility"
+        )
 
 
 class TestEffectiveSelectors:
@@ -1108,7 +1101,7 @@ class TestServingBlocksAreFetchedLazily:
         lookup = hydrate_mod._serving_blocks_for("a-dataset")
         lookup("t2m")
         lookup("sst")
-        _ = lookup.enumerated
+        lookup("t2m")
 
         assert calls == ["a-dataset"]
 
@@ -1480,15 +1473,14 @@ class TestSelectorsAreServeablePerBlock:
         assert hydrate_mod._selectors_are_serveable(
             {"data_format": ["grib"], "product_type": ["monthly_averaged_reanalysis"]},
             serving,
-            {"data_format", "product_type"},
         )
 
     def test_nothing_to_judge_against_is_permitted(self):
         """A dataset publishing no constraints is written as before, not refused."""
         assert hydrate_mod._selectors_are_serveable({"product_type": ["x"]}, [])
 
-    def test_the_lookup_carries_the_datasets_enumerated_keys(self, monkeypatch):
-        """The per-block check needs the whole block set, not just the serving ones."""
+    def test_the_lookup_returns_only_the_blocks_serving_one_variable(self, monkeypatch):
+        """That selection is the whole of its job now."""
         import earthlens.ecmwf.cli as ecmwf_cli
 
         blocks = [
@@ -1501,7 +1493,7 @@ class TestSelectorsAreServeablePerBlock:
         lookup = hydrate_mod._ServingBlocks("a-dataset")
 
         assert [b["product_type"] for b in lookup("t2m")] == [["forecast"]]
-        assert lookup.enumerated == {"variable", "product_type", "sensor_on_satellite"}
+        assert lookup("nothing-serves-this") == []
 
 
 class TestServingBlocksFor:
