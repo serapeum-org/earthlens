@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -26545,7 +26545,36 @@ gate <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-919">919</a></span>
 <span class="normal"><a href="#__codelineno-0-920">920</a></span>
 <span class="normal"><a href="#__codelineno-0-921">921</a></span>
-<span class="normal"><a href="#__codelineno-0-922">922</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="k">class</span><span class="w"> </span><span class="nc">EUMETSAT</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-922">922</a></span>
+<span class="normal"><a href="#__codelineno-0-923">923</a></span>
+<span class="normal"><a href="#__codelineno-0-924">924</a></span>
+<span class="normal"><a href="#__codelineno-0-925">925</a></span>
+<span class="normal"><a href="#__codelineno-0-926">926</a></span>
+<span class="normal"><a href="#__codelineno-0-927">927</a></span>
+<span class="normal"><a href="#__codelineno-0-928">928</a></span>
+<span class="normal"><a href="#__codelineno-0-929">929</a></span>
+<span class="normal"><a href="#__codelineno-0-930">930</a></span>
+<span class="normal"><a href="#__codelineno-0-931">931</a></span>
+<span class="normal"><a href="#__codelineno-0-932">932</a></span>
+<span class="normal"><a href="#__codelineno-0-933">933</a></span>
+<span class="normal"><a href="#__codelineno-0-934">934</a></span>
+<span class="normal"><a href="#__codelineno-0-935">935</a></span>
+<span class="normal"><a href="#__codelineno-0-936">936</a></span>
+<span class="normal"><a href="#__codelineno-0-937">937</a></span>
+<span class="normal"><a href="#__codelineno-0-938">938</a></span>
+<span class="normal"><a href="#__codelineno-0-939">939</a></span>
+<span class="normal"><a href="#__codelineno-0-940">940</a></span>
+<span class="normal"><a href="#__codelineno-0-941">941</a></span>
+<span class="normal"><a href="#__codelineno-0-942">942</a></span>
+<span class="normal"><a href="#__codelineno-0-943">943</a></span>
+<span class="normal"><a href="#__codelineno-0-944">944</a></span>
+<span class="normal"><a href="#__codelineno-0-945">945</a></span>
+<span class="normal"><a href="#__codelineno-0-946">946</a></span>
+<span class="normal"><a href="#__codelineno-0-947">947</a></span>
+<span class="normal"><a href="#__codelineno-0-948">948</a></span>
+<span class="normal"><a href="#__codelineno-0-949">949</a></span>
+<span class="normal"><a href="#__codelineno-0-950">950</a></span>
+<span class="normal"><a href="#__codelineno-0-951">951</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="k">class</span><span class="w"> </span><span class="nc">EUMETSAT</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;EUMETSAT Data Store backend (per-collection output kind).</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    Wraps `eumdac` so a user can search a curated EUMETSAT collection by</span>
@@ -27066,207 +27095,236 @@ gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-719" name="__codelineno-0-719"></a>            <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-720" name="__codelineno-0-720"></a>                <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_poll_customisation</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>
 <a id="__codelineno-0-721" name="__codelineno-0-721"></a>                <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;DONE&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a>                    <span class="n">product_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a>                    <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a>                    <span class="n">used_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a>                    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cust</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a>                        <span class="c1"># De-dupe within a customisation so two outputs sharing</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a>                        <span class="c1"># a basename do not overwrite each other (L2).</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a>                        <span class="n">out_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dedupe_name</span><span class="p">(</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a>                            <span class="n">safe_product_filename</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)),</span> <span class="n">used_names</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>                        <span class="p">)</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a>                        <span class="n">target</span> <span class="o">=</span> <span class="n">product_dir</span> <span class="o">/</span> <span class="n">out_name</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a>                        <span class="k">with</span> <span class="n">cust</span><span class="o">.</span><span class="n">stream_output</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a>                            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span>
-<a id="__codelineno-0-734" name="__codelineno-0-734"></a>                        <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-735" name="__codelineno-0-735"></a>                    <span class="k">return</span> <span class="n">written</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a>                <span class="n">tail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logfile_tail</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>                <span class="k">if</span> <span class="p">(</span>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a>                    <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;FAILED&quot;</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a>                    <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">TAILOR_SUBMIT_RETRIES</span>
-<a id="__codelineno-0-740" name="__codelineno-0-740"></a>                    <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">m</span> <span class="ow">in</span> <span class="n">tail</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">_TRANSIENT_OUTCOME_MARKERS</span><span class="p">)</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a>                <span class="p">):</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a>                        <span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> ended FAILED on a &quot;</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a>                        <span class="sa">f</span><span class="s2">&quot;transient infrastructure error; resubmitting (attempt &quot;</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">TAILOR_SUBMIT_RETRIES</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">tail</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a>                    <span class="c1"># Delete the abandoned job BEFORE resubmitting so the retry</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a>                    <span class="c1"># does not leak quota (G7); null it so `finally` does not</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a>                    <span class="c1"># double-delete.</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_safe_delete</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a>                    <span class="n">cust</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a>                <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a>                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a>                        <span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> ended </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">tail</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a>            <span class="k">finally</span><span class="p">:</span>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a>                <span class="k">if</span> <span class="n">cust</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_safe_delete</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>  <span class="c1"># ALWAYS free quota (G7)</span>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a>            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">TAILOR_SUBMIT_BACKOFF_S</span> <span class="o">*</span> <span class="n">attempt</span><span class="p">)</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a>        <span class="c1"># The final attempt always returns (DONE) or raises (non-retryable),</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a>        <span class="c1"># so control never reaches here; kept to satisfy the type checker.</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>  <span class="c1"># pragma: no cover</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a>            <span class="s2">&quot;Data Tailor customisation did not resolve within the retry budget.&quot;</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="p">)</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_safe_delete</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete a customisation, never letting cleanup mask the real error.</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">        Called from the `_tailor_one` `finally` (`G7`). A `delete()` that</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">        itself raises must not replace the original `RuntimeError` /</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">        `TimeoutError`, nor abort the remaining products in the batch — so</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">        the failure is logged and swallowed.</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">            cust: The `eumdac` `Customisation` handle to delete.</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>            <span class="n">cust</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - cleanup must never mask the cause</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> delete failed: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_submit_customisation</span><span class="p">(</span><span class="n">datatailor</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">chain</span><span class="p">):</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Submit a customisation, retrying transient EPCS failures (`G8`).</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">        The EUMETSAT EPCS endpoint intermittently returns `502 Bad</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">        Gateway`; a submit that fails with a transient marker is retried</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a><span class="sd">        up to `TAILOR_SUBMIT_RETRIES` times with a linear backoff. A</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">        non-transient error (e.g. an invalid product id) is re-raised</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">        immediately.</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">        Note:</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a><span class="sd">            If a create actually succeeds server-side but its response is</span>
-<a id="__codelineno-0-795" name="__codelineno-0-795"></a><span class="sd">            lost (a dropped connection / timeout — the classified-transient</span>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">            cases), the retry submits a **second** customisation and the</span>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="sd">            first is orphaned: the client never gets its handle, so it is</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a><span class="sd">            not polled or deleted and lingers against the quota. The EPCS</span>
-<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">            API offers no idempotency key to prevent this; recover by</span>
-<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">            sweeping stale jobs (`eumdac.DataTailor(token).customisations`).</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">            datatailor: The live `eumdac.DataTailor` client.</span>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">            product: The `eumdac` product handle to customise.</span>
-<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">            chain: The `eumdac.tailor_models.Chain` describing the job.</span>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">            The `eumdac` `Customisation` handle for the submitted job.</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">            RuntimeError: When a transient submit keeps failing after</span>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">                `TAILOR_SUBMIT_RETRIES` attempts.</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">            Exception: Any non-transient submit error, re-raised as-is.</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a>        <span class="n">last_exc</span><span class="p">:</span> <span class="ne">Exception</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">TAILOR_SUBMIT_RETRIES</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a>                <span class="k">return</span> <span class="n">datatailor</span><span class="o">.</span><span class="n">new_customisation</span><span class="p">(</span><span class="n">product</span><span class="p">,</span> <span class="n">chain</span><span class="p">)</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - classified below</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a>                <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">mark</span> <span class="ow">in</span> <span class="n">message</span> <span class="k">for</span> <span class="n">mark</span> <span class="ow">in</span> <span class="n">_TRANSIENT_MARKERS</span><span class="p">):</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>                    <span class="k">raise</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a>                <span class="n">last_exc</span> <span class="o">=</span> <span class="n">exc</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a>                <span class="k">if</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">TAILOR_SUBMIT_RETRIES</span><span class="p">:</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a>                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">TAILOR_SUBMIT_BACKOFF_S</span> <span class="o">*</span> <span class="n">attempt</span><span class="p">)</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a>            <span class="sa">f</span><span class="s2">&quot;Data Tailor submit failed after </span><span class="si">{</span><span class="n">TAILOR_SUBMIT_RETRIES</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a>            <span class="sa">f</span><span class="s2">&quot;transient attempts: </span><span class="si">{</span><span class="n">last_exc</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">last_exc</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a>                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_customisation</span><span class="p">(</span><span class="n">cust</span><span class="p">,</span> <span class="n">product_dir</span><span class="p">)</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a>                <span class="n">tail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logfile_tail</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_retryable_infra_failure</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">tail</span><span class="p">,</span> <span class="n">attempt</span><span class="p">):</span>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a>                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a>                        <span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> ended </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">tail</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a>                    <span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> ended FAILED on a transient &quot;</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a>                    <span class="sa">f</span><span class="s2">&quot;infrastructure error; resubmitting (attempt </span><span class="si">{</span><span class="n">attempt</span><span class="si">}</span><span class="s2">/&quot;</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">TAILOR_SUBMIT_RETRIES</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">tail</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a>                <span class="p">)</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a>                <span class="c1"># Delete the abandoned job BEFORE resubmitting so the retry does</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a>                <span class="c1"># not leak quota (G7); null it so `finally` does not double-delete.</span>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_safe_delete</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a>                <span class="n">cust</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>            <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>                <span class="k">if</span> <span class="n">cust</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_safe_delete</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>  <span class="c1"># ALWAYS free quota (G7)</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a>            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">TAILOR_SUBMIT_BACKOFF_S</span> <span class="o">*</span> <span class="n">attempt</span><span class="p">)</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>        <span class="c1"># The final attempt always returns (DONE) or raises (non-retryable),</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a>        <span class="c1"># so control never reaches here; kept to satisfy the type checker.</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>  <span class="c1"># pragma: no cover</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a>            <span class="s2">&quot;Data Tailor customisation did not resolve within the retry budget.&quot;</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>        <span class="p">)</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_stream_customisation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cust</span><span class="p">,</span> <span class="n">product_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Stream a `DONE` customisation&#39;s outputs into `product_dir`.</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">        Creates `product_dir` and copies each output there, de-duping output</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="sd">        basenames so two outputs that sanitise to the same name do not</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a><span class="sd">        overwrite each other (`L2`).</span>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">            cust: The `DONE` `eumdac` `Customisation` handle.</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">            product_dir: The per-product output directory.</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">            list[Path]: The written output paths, in customisation order.</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a>        <span class="n">product_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="n">used_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cust</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a>            <span class="n">out_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dedupe_name</span><span class="p">(</span><span class="n">safe_product_filename</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)),</span> <span class="n">used_names</span><span class="p">)</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>            <span class="n">target</span> <span class="o">=</span> <span class="n">product_dir</span> <span class="o">/</span> <span class="n">out_name</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a>            <span class="k">with</span> <span class="n">cust</span><span class="o">.</span><span class="n">stream_output</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a>                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>        <span class="k">return</span> <span class="n">written</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_is_retryable_infra_failure</span><span class="p">(</span><span class="n">status</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tail</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether a terminal status is a retryable infrastructure `FAILED`.</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">        `True` only for a `FAILED` whose log tail matches an infrastructure</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">        marker (`_TRANSIENT_OUTCOME_MARKERS`) with retry budget left; a bad</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">        request (no marker) and any `KILLED` / other terminal status return</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">        `False` so they fail fast (`#1145`).</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">            status: The terminal customisation status.</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">            tail: The customisation&#39;s log tail.</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">            attempt: The 1-based attempt number just completed.</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">            bool: `True` if the customisation should be resubmitted.</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>        <span class="k">return</span> <span class="p">(</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>            <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;FAILED&quot;</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>            <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">TAILOR_SUBMIT_RETRIES</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a>            <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">marker</span> <span class="ow">in</span> <span class="n">tail</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">_TRANSIENT_OUTCOME_MARKERS</span><span class="p">)</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a>        <span class="p">)</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_safe_delete</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete a customisation, never letting cleanup mask the real error.</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">        Called from the `_tailor_one` `finally` (`G7`). A `delete()` that</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">        itself raises must not replace the original `RuntimeError` /</span>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">        `TimeoutError`, nor abort the remaining products in the batch — so</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">        the failure is logged and swallowed.</span>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">            cust: The `eumdac` `Customisation` handle to delete.</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a>            <span class="n">cust</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - cleanup must never mask the cause</span>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> delete failed: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_submit_customisation</span><span class="p">(</span><span class="n">datatailor</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">chain</span><span class="p">):</span>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Submit a customisation, retrying transient EPCS failures (`G8`).</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="sd">        The EUMETSAT EPCS endpoint intermittently returns `502 Bad</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">        Gateway`; a submit that fails with a transient marker is retried</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">        up to `TAILOR_SUBMIT_RETRIES` times with a linear backoff. A</span>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">        non-transient error (e.g. an invalid product id) is re-raised</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">        immediately.</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">        Note:</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">            If a create actually succeeds server-side but its response is</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">            lost (a dropped connection / timeout — the classified-transient</span>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">            cases), the retry submits a **second** customisation and the</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">            first is orphaned: the client never gets its handle, so it is</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">            not polled or deleted and lingers against the quota. The EPCS</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">            API offers no idempotency key to prevent this; recover by</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">            sweeping stale jobs (`eumdac.DataTailor(token).customisations`).</span>
 <a id="__codelineno-0-830" name="__codelineno-0-830"></a>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_poll_customisation</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Poll a customisation until it stops being active; return its status.</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="sd">        Polls `cust.status` while it is `_TAILOR_ACTIVE` (`QUEUED` /</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">        `RUNNING`), sleeping `TAILOR_POLL_INITIAL_S` and growing the delay</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="sd">        by `TAILOR_POLL_BACKOFF` up to `TAILOR_POLL_MAX_S`. Any other status</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a><span class="sd">        is terminal and is returned immediately — so `DONE` succeeds and</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="sd">        `FAILED` / `KILLED` / an unexpected stuck state (e.g. `INACTIVE`)</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">        fail fast rather than polling to the timeout. Gives up after</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">        `TAILOR_POLL_TIMEOUT_S` so a job stuck *active* cannot hang forever</span>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">        (`G8`); the *sleep* between polls is clamped to the remaining budget.</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">        The deadline is a **soft** bound, though: it is only checked between</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">        polls, so a persistently stalled `cust.status` — which eumdac retries a</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">        few times internally, each up to the injected read bound — can push the</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">        real wait one bounded-call cycle (~`connect + read` × eumdac&#39;s retries)</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">        past the budget before the loop rechecks and raises. That is a small</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">        slop on a finite bound, versus the pre-fix unbounded hang.</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">        Each `cust.status` read is a bounded HTTP call (the caller runs under</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">        `_bounded_http`, #1146). A single poll that hits a **transient**</span>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">        transport error — a stalled read/connect or a dropped connection — is</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">        **not** fatal: the job may still be progressing server-side, so it is</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">        treated like &quot;still active&quot; and polling continues until the wall-clock</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">        deadline (#1146). A **permanent** error is not caught and fails fast:</span>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">        eumdac wraps an HTTP 4xx/5xx response into an `EumdacError` (not a</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">        `requests` exception), which propagates straight out.</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">            cust: The `eumdac` `Customisation` handle to poll.</span>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">            str: The terminal status (`&quot;DONE&quot;`, `&quot;FAILED&quot;`, `&quot;KILLED&quot;`, or</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">                any non-active value the service reports).</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">            TimeoutError: When the job is still active (or its status could</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">                not be read) after `TAILOR_POLL_TIMEOUT_S`.</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>  <span class="c1"># lazy — guaranteed by earthlens-core, only needed live</span>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a>        <span class="c1"># Only a genuinely *transient* transport error is ridden out: a stalled</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a>        <span class="c1"># read/connect or a dropped connection. A permanent error is NOT caught</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a>        <span class="c1"># so it fails fast — eumdac already wraps an HTTP 4xx/5xx response into a</span>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a>        <span class="c1"># (non-`RequestException`) `EumdacError`, and any other `requests` error</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a>        <span class="c1"># (a malformed URL, say) is a real fault, not a blip.</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a>        <span class="n">transient</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a>            <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">Timeout</span><span class="p">,</span>
-<a id="__codelineno-0-879" name="__codelineno-0-879"></a>            <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span>
-<a id="__codelineno-0-880" name="__codelineno-0-880"></a>            <span class="ne">TimeoutError</span><span class="p">,</span>
-<a id="__codelineno-0-881" name="__codelineno-0-881"></a>        <span class="p">)</span>
-<a id="__codelineno-0-882" name="__codelineno-0-882"></a>        <span class="n">deadline</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">+</span> <span class="n">TAILOR_POLL_TIMEOUT_S</span>
-<a id="__codelineno-0-883" name="__codelineno-0-883"></a>        <span class="n">delay</span> <span class="o">=</span> <span class="n">TAILOR_POLL_INITIAL_S</span>
-<a id="__codelineno-0-884" name="__codelineno-0-884"></a>        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-<a id="__codelineno-0-885" name="__codelineno-0-885"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-886" name="__codelineno-0-886"></a>                <span class="n">status</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cust</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-<a id="__codelineno-0-887" name="__codelineno-0-887"></a>            <span class="k">except</span> <span class="n">transient</span><span class="p">:</span>
-<a id="__codelineno-0-888" name="__codelineno-0-888"></a>                <span class="c1"># A single poll HTTP call stalled or dropped; the customisation</span>
-<a id="__codelineno-0-889" name="__codelineno-0-889"></a>                <span class="c1"># may still be running, so keep polling until the wall-clock</span>
-<a id="__codelineno-0-890" name="__codelineno-0-890"></a>                <span class="c1"># deadline rather than aborting a healthy long-running job.</span>
-<a id="__codelineno-0-891" name="__codelineno-0-891"></a>                <span class="n">status</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-892" name="__codelineno-0-892"></a>            <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_TAILOR_ACTIVE</span><span class="p">:</span>
-<a id="__codelineno-0-893" name="__codelineno-0-893"></a>                <span class="k">return</span> <span class="n">status</span>
-<a id="__codelineno-0-894" name="__codelineno-0-894"></a>            <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
-<a id="__codelineno-0-895" name="__codelineno-0-895"></a>            <span class="k">if</span> <span class="n">now</span> <span class="o">&gt;=</span> <span class="n">deadline</span><span class="p">:</span>
-<a id="__codelineno-0-896" name="__codelineno-0-896"></a>                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
-<a id="__codelineno-0-897" name="__codelineno-0-897"></a>                    <span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> did not finish &quot;</span>
-<a id="__codelineno-0-898" name="__codelineno-0-898"></a>                    <span class="sa">f</span><span class="s2">&quot;within </span><span class="si">{</span><span class="n">TAILOR_POLL_TIMEOUT_S</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">s (last status &quot;</span>
-<a id="__codelineno-0-899" name="__codelineno-0-899"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">status</span><span class="si">!r}</span><span class="s2">).&quot;</span>
-<a id="__codelineno-0-900" name="__codelineno-0-900"></a>                <span class="p">)</span>
-<a id="__codelineno-0-901" name="__codelineno-0-901"></a>            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">delay</span><span class="p">,</span> <span class="n">deadline</span> <span class="o">-</span> <span class="n">now</span><span class="p">))</span>
-<a id="__codelineno-0-902" name="__codelineno-0-902"></a>            <span class="n">delay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">delay</span> <span class="o">*</span> <span class="n">TAILOR_POLL_BACKOFF</span><span class="p">,</span> <span class="n">TAILOR_POLL_MAX_S</span><span class="p">)</span>
-<a id="__codelineno-0-903" name="__codelineno-0-903"></a>
-<a id="__codelineno-0-904" name="__codelineno-0-904"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-905" name="__codelineno-0-905"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_logfile_tail</span><span class="p">(</span><span class="n">cust</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-906" name="__codelineno-0-906"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the tail of a customisation&#39;s server log, if any.</span>
-<a id="__codelineno-0-907" name="__codelineno-0-907"></a>
-<a id="__codelineno-0-908" name="__codelineno-0-908"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-909" name="__codelineno-0-909"></a><span class="sd">            cust: The `eumdac` `Customisation` handle.</span>
-<a id="__codelineno-0-910" name="__codelineno-0-910"></a><span class="sd">            limit: Maximum number of trailing characters to return.</span>
-<a id="__codelineno-0-911" name="__codelineno-0-911"></a>
-<a id="__codelineno-0-912" name="__codelineno-0-912"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-913" name="__codelineno-0-913"></a><span class="sd">            str: The last `limit` characters of `cust.logfile`, or a</span>
-<a id="__codelineno-0-914" name="__codelineno-0-914"></a><span class="sd">                placeholder when no log is available.</span>
-<a id="__codelineno-0-915" name="__codelineno-0-915"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-916" name="__codelineno-0-916"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-917" name="__codelineno-0-917"></a>            <span class="n">log</span> <span class="o">=</span> <span class="n">cust</span><span class="o">.</span><span class="n">logfile</span>
-<a id="__codelineno-0-918" name="__codelineno-0-918"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - a missing log must not mask the failure</span>
-<a id="__codelineno-0-919" name="__codelineno-0-919"></a>            <span class="n">log</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-920" name="__codelineno-0-920"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">log</span><span class="p">:</span>
-<a id="__codelineno-0-921" name="__codelineno-0-921"></a>            <span class="k">return</span> <span class="s2">&quot;(no customisation log available)&quot;</span>
-<a id="__codelineno-0-922" name="__codelineno-0-922"></a>        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="p">)[</span><span class="o">-</span><span class="n">limit</span><span class="p">:]</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">            datatailor: The live `eumdac.DataTailor` client.</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="sd">            product: The `eumdac` product handle to customise.</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">            chain: The `eumdac.tailor_models.Chain` describing the job.</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="sd">            The `eumdac` `Customisation` handle for the submitted job.</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">            RuntimeError: When a transient submit keeps failing after</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">                `TAILOR_SUBMIT_RETRIES` attempts.</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">            Exception: Any non-transient submit error, re-raised as-is.</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a>        <span class="n">last_exc</span><span class="p">:</span> <span class="ne">Exception</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a>        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">TAILOR_SUBMIT_RETRIES</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a>                <span class="k">return</span> <span class="n">datatailor</span><span class="o">.</span><span class="n">new_customisation</span><span class="p">(</span><span class="n">product</span><span class="p">,</span> <span class="n">chain</span><span class="p">)</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - classified below</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a>                <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">mark</span> <span class="ow">in</span> <span class="n">message</span> <span class="k">for</span> <span class="n">mark</span> <span class="ow">in</span> <span class="n">_TRANSIENT_MARKERS</span><span class="p">):</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a>                    <span class="k">raise</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a>                <span class="n">last_exc</span> <span class="o">=</span> <span class="n">exc</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a>                <span class="k">if</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">TAILOR_SUBMIT_RETRIES</span><span class="p">:</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a>                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">TAILOR_SUBMIT_BACKOFF_S</span> <span class="o">*</span> <span class="n">attempt</span><span class="p">)</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a>            <span class="sa">f</span><span class="s2">&quot;Data Tailor submit failed after </span><span class="si">{</span><span class="n">TAILOR_SUBMIT_RETRIES</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a>            <span class="sa">f</span><span class="s2">&quot;transient attempts: </span><span class="si">{</span><span class="n">last_exc</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">last_exc</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_poll_customisation</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Poll a customisation until it stops being active; return its status.</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">        Polls `cust.status` while it is `_TAILOR_ACTIVE` (`QUEUED` /</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">        `RUNNING`), sleeping `TAILOR_POLL_INITIAL_S` and growing the delay</span>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">        by `TAILOR_POLL_BACKOFF` up to `TAILOR_POLL_MAX_S`. Any other status</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">        is terminal and is returned immediately — so `DONE` succeeds and</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">        `FAILED` / `KILLED` / an unexpected stuck state (e.g. `INACTIVE`)</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">        fail fast rather than polling to the timeout. Gives up after</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">        `TAILOR_POLL_TIMEOUT_S` so a job stuck *active* cannot hang forever</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="sd">        (`G8`); the *sleep* between polls is clamped to the remaining budget.</span>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">        The deadline is a **soft** bound, though: it is only checked between</span>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">        polls, so a persistently stalled `cust.status` — which eumdac retries a</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">        few times internally, each up to the injected read bound — can push the</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">        real wait one bounded-call cycle (~`connect + read` × eumdac&#39;s retries)</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="sd">        past the budget before the loop rechecks and raises. That is a small</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="sd">        slop on a finite bound, versus the pre-fix unbounded hang.</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">        Each `cust.status` read is a bounded HTTP call (the caller runs under</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">        `_bounded_http`, #1146). A single poll that hits a **transient**</span>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a><span class="sd">        transport error — a stalled read/connect or a dropped connection — is</span>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">        **not** fatal: the job may still be progressing server-side, so it is</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">        treated like &quot;still active&quot; and polling continues until the wall-clock</span>
+<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">        deadline (#1146). A **permanent** error is not caught and fails fast:</span>
+<a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">        eumdac wraps an HTTP 4xx/5xx response into an `EumdacError` (not a</span>
+<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">        `requests` exception), which propagates straight out.</span>
+<a id="__codelineno-0-887" name="__codelineno-0-887"></a>
+<a id="__codelineno-0-888" name="__codelineno-0-888"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-889" name="__codelineno-0-889"></a><span class="sd">            cust: The `eumdac` `Customisation` handle to poll.</span>
+<a id="__codelineno-0-890" name="__codelineno-0-890"></a>
+<a id="__codelineno-0-891" name="__codelineno-0-891"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-892" name="__codelineno-0-892"></a><span class="sd">            str: The terminal status (`&quot;DONE&quot;`, `&quot;FAILED&quot;`, `&quot;KILLED&quot;`, or</span>
+<a id="__codelineno-0-893" name="__codelineno-0-893"></a><span class="sd">                any non-active value the service reports).</span>
+<a id="__codelineno-0-894" name="__codelineno-0-894"></a>
+<a id="__codelineno-0-895" name="__codelineno-0-895"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-896" name="__codelineno-0-896"></a><span class="sd">            TimeoutError: When the job is still active (or its status could</span>
+<a id="__codelineno-0-897" name="__codelineno-0-897"></a><span class="sd">                not be read) after `TAILOR_POLL_TIMEOUT_S`.</span>
+<a id="__codelineno-0-898" name="__codelineno-0-898"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-899" name="__codelineno-0-899"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>  <span class="c1"># lazy — guaranteed by earthlens-core, only needed live</span>
+<a id="__codelineno-0-900" name="__codelineno-0-900"></a>
+<a id="__codelineno-0-901" name="__codelineno-0-901"></a>        <span class="c1"># Only a genuinely *transient* transport error is ridden out: a stalled</span>
+<a id="__codelineno-0-902" name="__codelineno-0-902"></a>        <span class="c1"># read/connect or a dropped connection. A permanent error is NOT caught</span>
+<a id="__codelineno-0-903" name="__codelineno-0-903"></a>        <span class="c1"># so it fails fast — eumdac already wraps an HTTP 4xx/5xx response into a</span>
+<a id="__codelineno-0-904" name="__codelineno-0-904"></a>        <span class="c1"># (non-`RequestException`) `EumdacError`, and any other `requests` error</span>
+<a id="__codelineno-0-905" name="__codelineno-0-905"></a>        <span class="c1"># (a malformed URL, say) is a real fault, not a blip.</span>
+<a id="__codelineno-0-906" name="__codelineno-0-906"></a>        <span class="n">transient</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-907" name="__codelineno-0-907"></a>            <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">Timeout</span><span class="p">,</span>
+<a id="__codelineno-0-908" name="__codelineno-0-908"></a>            <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span>
+<a id="__codelineno-0-909" name="__codelineno-0-909"></a>            <span class="ne">TimeoutError</span><span class="p">,</span>
+<a id="__codelineno-0-910" name="__codelineno-0-910"></a>        <span class="p">)</span>
+<a id="__codelineno-0-911" name="__codelineno-0-911"></a>        <span class="n">deadline</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">+</span> <span class="n">TAILOR_POLL_TIMEOUT_S</span>
+<a id="__codelineno-0-912" name="__codelineno-0-912"></a>        <span class="n">delay</span> <span class="o">=</span> <span class="n">TAILOR_POLL_INITIAL_S</span>
+<a id="__codelineno-0-913" name="__codelineno-0-913"></a>        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<a id="__codelineno-0-914" name="__codelineno-0-914"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-915" name="__codelineno-0-915"></a>                <span class="n">status</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cust</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+<a id="__codelineno-0-916" name="__codelineno-0-916"></a>            <span class="k">except</span> <span class="n">transient</span><span class="p">:</span>
+<a id="__codelineno-0-917" name="__codelineno-0-917"></a>                <span class="c1"># A single poll HTTP call stalled or dropped; the customisation</span>
+<a id="__codelineno-0-918" name="__codelineno-0-918"></a>                <span class="c1"># may still be running, so keep polling until the wall-clock</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a>                <span class="c1"># deadline rather than aborting a healthy long-running job.</span>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a>                <span class="n">status</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a>            <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_TAILOR_ACTIVE</span><span class="p">:</span>
+<a id="__codelineno-0-922" name="__codelineno-0-922"></a>                <span class="k">return</span> <span class="n">status</span>
+<a id="__codelineno-0-923" name="__codelineno-0-923"></a>            <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+<a id="__codelineno-0-924" name="__codelineno-0-924"></a>            <span class="k">if</span> <span class="n">now</span> <span class="o">&gt;=</span> <span class="n">deadline</span><span class="p">:</span>
+<a id="__codelineno-0-925" name="__codelineno-0-925"></a>                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
+<a id="__codelineno-0-926" name="__codelineno-0-926"></a>                    <span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> did not finish &quot;</span>
+<a id="__codelineno-0-927" name="__codelineno-0-927"></a>                    <span class="sa">f</span><span class="s2">&quot;within </span><span class="si">{</span><span class="n">TAILOR_POLL_TIMEOUT_S</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">s (last status &quot;</span>
+<a id="__codelineno-0-928" name="__codelineno-0-928"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">status</span><span class="si">!r}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-929" name="__codelineno-0-929"></a>                <span class="p">)</span>
+<a id="__codelineno-0-930" name="__codelineno-0-930"></a>            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">delay</span><span class="p">,</span> <span class="n">deadline</span> <span class="o">-</span> <span class="n">now</span><span class="p">))</span>
+<a id="__codelineno-0-931" name="__codelineno-0-931"></a>            <span class="n">delay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">delay</span> <span class="o">*</span> <span class="n">TAILOR_POLL_BACKOFF</span><span class="p">,</span> <span class="n">TAILOR_POLL_MAX_S</span><span class="p">)</span>
+<a id="__codelineno-0-932" name="__codelineno-0-932"></a>
+<a id="__codelineno-0-933" name="__codelineno-0-933"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-934" name="__codelineno-0-934"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_logfile_tail</span><span class="p">(</span><span class="n">cust</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-935" name="__codelineno-0-935"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the tail of a customisation&#39;s server log, if any.</span>
+<a id="__codelineno-0-936" name="__codelineno-0-936"></a>
+<a id="__codelineno-0-937" name="__codelineno-0-937"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-938" name="__codelineno-0-938"></a><span class="sd">            cust: The `eumdac` `Customisation` handle.</span>
+<a id="__codelineno-0-939" name="__codelineno-0-939"></a><span class="sd">            limit: Maximum number of trailing characters to return.</span>
+<a id="__codelineno-0-940" name="__codelineno-0-940"></a>
+<a id="__codelineno-0-941" name="__codelineno-0-941"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-942" name="__codelineno-0-942"></a><span class="sd">            str: The last `limit` characters of `cust.logfile`, or a</span>
+<a id="__codelineno-0-943" name="__codelineno-0-943"></a><span class="sd">                placeholder when no log is available.</span>
+<a id="__codelineno-0-944" name="__codelineno-0-944"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-945" name="__codelineno-0-945"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-946" name="__codelineno-0-946"></a>            <span class="n">log</span> <span class="o">=</span> <span class="n">cust</span><span class="o">.</span><span class="n">logfile</span>
+<a id="__codelineno-0-947" name="__codelineno-0-947"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - a missing log must not mask the failure</span>
+<a id="__codelineno-0-948" name="__codelineno-0-948"></a>            <span class="n">log</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-949" name="__codelineno-0-949"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">log</span><span class="p">:</span>
+<a id="__codelineno-0-950" name="__codelineno-0-950"></a>            <span class="k">return</span> <span class="s2">&quot;(no customisation log available)&quot;</span>
+<a id="__codelineno-0-951" name="__codelineno-0-951"></a>        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="p">)[</span><span class="o">-</span><span class="n">limit</span><span class="p">:]</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -33057,7 +33115,36 @@ gate <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-919">919</a></span>
 <span class="normal"><a href="#__codelineno-0-920">920</a></span>
 <span class="normal"><a href="#__codelineno-0-921">921</a></span>
-<span class="normal"><a href="#__codelineno-0-922">922</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="k">class</span><span class="w"> </span><span class="nc">EUMETSAT</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-922">922</a></span>
+<span class="normal"><a href="#__codelineno-0-923">923</a></span>
+<span class="normal"><a href="#__codelineno-0-924">924</a></span>
+<span class="normal"><a href="#__codelineno-0-925">925</a></span>
+<span class="normal"><a href="#__codelineno-0-926">926</a></span>
+<span class="normal"><a href="#__codelineno-0-927">927</a></span>
+<span class="normal"><a href="#__codelineno-0-928">928</a></span>
+<span class="normal"><a href="#__codelineno-0-929">929</a></span>
+<span class="normal"><a href="#__codelineno-0-930">930</a></span>
+<span class="normal"><a href="#__codelineno-0-931">931</a></span>
+<span class="normal"><a href="#__codelineno-0-932">932</a></span>
+<span class="normal"><a href="#__codelineno-0-933">933</a></span>
+<span class="normal"><a href="#__codelineno-0-934">934</a></span>
+<span class="normal"><a href="#__codelineno-0-935">935</a></span>
+<span class="normal"><a href="#__codelineno-0-936">936</a></span>
+<span class="normal"><a href="#__codelineno-0-937">937</a></span>
+<span class="normal"><a href="#__codelineno-0-938">938</a></span>
+<span class="normal"><a href="#__codelineno-0-939">939</a></span>
+<span class="normal"><a href="#__codelineno-0-940">940</a></span>
+<span class="normal"><a href="#__codelineno-0-941">941</a></span>
+<span class="normal"><a href="#__codelineno-0-942">942</a></span>
+<span class="normal"><a href="#__codelineno-0-943">943</a></span>
+<span class="normal"><a href="#__codelineno-0-944">944</a></span>
+<span class="normal"><a href="#__codelineno-0-945">945</a></span>
+<span class="normal"><a href="#__codelineno-0-946">946</a></span>
+<span class="normal"><a href="#__codelineno-0-947">947</a></span>
+<span class="normal"><a href="#__codelineno-0-948">948</a></span>
+<span class="normal"><a href="#__codelineno-0-949">949</a></span>
+<span class="normal"><a href="#__codelineno-0-950">950</a></span>
+<span class="normal"><a href="#__codelineno-0-951">951</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="k">class</span><span class="w"> </span><span class="nc">EUMETSAT</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;EUMETSAT Data Store backend (per-collection output kind).</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    Wraps `eumdac` so a user can search a curated EUMETSAT collection by</span>
@@ -33578,207 +33665,236 @@ gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-719" name="__codelineno-0-719"></a>            <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-720" name="__codelineno-0-720"></a>                <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_poll_customisation</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>
 <a id="__codelineno-0-721" name="__codelineno-0-721"></a>                <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;DONE&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a>                    <span class="n">product_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a>                    <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a>                    <span class="n">used_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a>                    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cust</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a>                        <span class="c1"># De-dupe within a customisation so two outputs sharing</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a>                        <span class="c1"># a basename do not overwrite each other (L2).</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a>                        <span class="n">out_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dedupe_name</span><span class="p">(</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a>                            <span class="n">safe_product_filename</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)),</span> <span class="n">used_names</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>                        <span class="p">)</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a>                        <span class="n">target</span> <span class="o">=</span> <span class="n">product_dir</span> <span class="o">/</span> <span class="n">out_name</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a>                        <span class="k">with</span> <span class="n">cust</span><span class="o">.</span><span class="n">stream_output</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a>                            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span>
-<a id="__codelineno-0-734" name="__codelineno-0-734"></a>                        <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-735" name="__codelineno-0-735"></a>                    <span class="k">return</span> <span class="n">written</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a>                <span class="n">tail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logfile_tail</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>                <span class="k">if</span> <span class="p">(</span>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a>                    <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;FAILED&quot;</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a>                    <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">TAILOR_SUBMIT_RETRIES</span>
-<a id="__codelineno-0-740" name="__codelineno-0-740"></a>                    <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">m</span> <span class="ow">in</span> <span class="n">tail</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">_TRANSIENT_OUTCOME_MARKERS</span><span class="p">)</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a>                <span class="p">):</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a>                        <span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> ended FAILED on a &quot;</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a>                        <span class="sa">f</span><span class="s2">&quot;transient infrastructure error; resubmitting (attempt &quot;</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attempt</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">TAILOR_SUBMIT_RETRIES</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">tail</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a>                    <span class="c1"># Delete the abandoned job BEFORE resubmitting so the retry</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a>                    <span class="c1"># does not leak quota (G7); null it so `finally` does not</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a>                    <span class="c1"># double-delete.</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_safe_delete</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a>                    <span class="n">cust</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a>                <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a>                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a>                        <span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> ended </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">tail</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a>            <span class="k">finally</span><span class="p">:</span>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a>                <span class="k">if</span> <span class="n">cust</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_safe_delete</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>  <span class="c1"># ALWAYS free quota (G7)</span>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a>            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">TAILOR_SUBMIT_BACKOFF_S</span> <span class="o">*</span> <span class="n">attempt</span><span class="p">)</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a>        <span class="c1"># The final attempt always returns (DONE) or raises (non-retryable),</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a>        <span class="c1"># so control never reaches here; kept to satisfy the type checker.</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>  <span class="c1"># pragma: no cover</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a>            <span class="s2">&quot;Data Tailor customisation did not resolve within the retry budget.&quot;</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="p">)</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_safe_delete</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete a customisation, never letting cleanup mask the real error.</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">        Called from the `_tailor_one` `finally` (`G7`). A `delete()` that</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">        itself raises must not replace the original `RuntimeError` /</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">        `TimeoutError`, nor abort the remaining products in the batch — so</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">        the failure is logged and swallowed.</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">            cust: The `eumdac` `Customisation` handle to delete.</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>            <span class="n">cust</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - cleanup must never mask the cause</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> delete failed: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_submit_customisation</span><span class="p">(</span><span class="n">datatailor</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">chain</span><span class="p">):</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Submit a customisation, retrying transient EPCS failures (`G8`).</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">        The EUMETSAT EPCS endpoint intermittently returns `502 Bad</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">        Gateway`; a submit that fails with a transient marker is retried</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a><span class="sd">        up to `TAILOR_SUBMIT_RETRIES` times with a linear backoff. A</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">        non-transient error (e.g. an invalid product id) is re-raised</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">        immediately.</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">        Note:</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a><span class="sd">            If a create actually succeeds server-side but its response is</span>
-<a id="__codelineno-0-795" name="__codelineno-0-795"></a><span class="sd">            lost (a dropped connection / timeout — the classified-transient</span>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">            cases), the retry submits a **second** customisation and the</span>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="sd">            first is orphaned: the client never gets its handle, so it is</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a><span class="sd">            not polled or deleted and lingers against the quota. The EPCS</span>
-<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">            API offers no idempotency key to prevent this; recover by</span>
-<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">            sweeping stale jobs (`eumdac.DataTailor(token).customisations`).</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">            datatailor: The live `eumdac.DataTailor` client.</span>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">            product: The `eumdac` product handle to customise.</span>
-<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">            chain: The `eumdac.tailor_models.Chain` describing the job.</span>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">            The `eumdac` `Customisation` handle for the submitted job.</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">            RuntimeError: When a transient submit keeps failing after</span>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">                `TAILOR_SUBMIT_RETRIES` attempts.</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">            Exception: Any non-transient submit error, re-raised as-is.</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a>        <span class="n">last_exc</span><span class="p">:</span> <span class="ne">Exception</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">TAILOR_SUBMIT_RETRIES</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a>                <span class="k">return</span> <span class="n">datatailor</span><span class="o">.</span><span class="n">new_customisation</span><span class="p">(</span><span class="n">product</span><span class="p">,</span> <span class="n">chain</span><span class="p">)</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - classified below</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a>                <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">mark</span> <span class="ow">in</span> <span class="n">message</span> <span class="k">for</span> <span class="n">mark</span> <span class="ow">in</span> <span class="n">_TRANSIENT_MARKERS</span><span class="p">):</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>                    <span class="k">raise</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a>                <span class="n">last_exc</span> <span class="o">=</span> <span class="n">exc</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a>                <span class="k">if</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">TAILOR_SUBMIT_RETRIES</span><span class="p">:</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a>                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">TAILOR_SUBMIT_BACKOFF_S</span> <span class="o">*</span> <span class="n">attempt</span><span class="p">)</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a>            <span class="sa">f</span><span class="s2">&quot;Data Tailor submit failed after </span><span class="si">{</span><span class="n">TAILOR_SUBMIT_RETRIES</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a>            <span class="sa">f</span><span class="s2">&quot;transient attempts: </span><span class="si">{</span><span class="n">last_exc</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">last_exc</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a>                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_customisation</span><span class="p">(</span><span class="n">cust</span><span class="p">,</span> <span class="n">product_dir</span><span class="p">)</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a>                <span class="n">tail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logfile_tail</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_retryable_infra_failure</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">tail</span><span class="p">,</span> <span class="n">attempt</span><span class="p">):</span>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a>                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a>                        <span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> ended </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">tail</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a>                    <span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> ended FAILED on a transient &quot;</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a>                    <span class="sa">f</span><span class="s2">&quot;infrastructure error; resubmitting (attempt </span><span class="si">{</span><span class="n">attempt</span><span class="si">}</span><span class="s2">/&quot;</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">TAILOR_SUBMIT_RETRIES</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">tail</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a>                <span class="p">)</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a>                <span class="c1"># Delete the abandoned job BEFORE resubmitting so the retry does</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a>                <span class="c1"># not leak quota (G7); null it so `finally` does not double-delete.</span>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_safe_delete</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a>                <span class="n">cust</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>            <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>                <span class="k">if</span> <span class="n">cust</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_safe_delete</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span>  <span class="c1"># ALWAYS free quota (G7)</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a>            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">TAILOR_SUBMIT_BACKOFF_S</span> <span class="o">*</span> <span class="n">attempt</span><span class="p">)</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>        <span class="c1"># The final attempt always returns (DONE) or raises (non-retryable),</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a>        <span class="c1"># so control never reaches here; kept to satisfy the type checker.</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>  <span class="c1"># pragma: no cover</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a>            <span class="s2">&quot;Data Tailor customisation did not resolve within the retry budget.&quot;</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>        <span class="p">)</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_stream_customisation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cust</span><span class="p">,</span> <span class="n">product_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Stream a `DONE` customisation&#39;s outputs into `product_dir`.</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">        Creates `product_dir` and copies each output there, de-duping output</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="sd">        basenames so two outputs that sanitise to the same name do not</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a><span class="sd">        overwrite each other (`L2`).</span>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">            cust: The `DONE` `eumdac` `Customisation` handle.</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">            product_dir: The per-product output directory.</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">            list[Path]: The written output paths, in customisation order.</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a>        <span class="n">product_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="n">used_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cust</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a>            <span class="n">out_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dedupe_name</span><span class="p">(</span><span class="n">safe_product_filename</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)),</span> <span class="n">used_names</span><span class="p">)</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>            <span class="n">target</span> <span class="o">=</span> <span class="n">product_dir</span> <span class="o">/</span> <span class="n">out_name</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a>            <span class="k">with</span> <span class="n">cust</span><span class="o">.</span><span class="n">stream_output</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a>                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>        <span class="k">return</span> <span class="n">written</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_is_retryable_infra_failure</span><span class="p">(</span><span class="n">status</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tail</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether a terminal status is a retryable infrastructure `FAILED`.</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">        `True` only for a `FAILED` whose log tail matches an infrastructure</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">        marker (`_TRANSIENT_OUTCOME_MARKERS`) with retry budget left; a bad</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">        request (no marker) and any `KILLED` / other terminal status return</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">        `False` so they fail fast (`#1145`).</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">            status: The terminal customisation status.</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">            tail: The customisation&#39;s log tail.</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">            attempt: The 1-based attempt number just completed.</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">            bool: `True` if the customisation should be resubmitted.</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>        <span class="k">return</span> <span class="p">(</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>            <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;FAILED&quot;</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>            <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">TAILOR_SUBMIT_RETRIES</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a>            <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">marker</span> <span class="ow">in</span> <span class="n">tail</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">_TRANSIENT_OUTCOME_MARKERS</span><span class="p">)</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a>        <span class="p">)</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_safe_delete</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete a customisation, never letting cleanup mask the real error.</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">        Called from the `_tailor_one` `finally` (`G7`). A `delete()` that</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">        itself raises must not replace the original `RuntimeError` /</span>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">        `TimeoutError`, nor abort the remaining products in the batch — so</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">        the failure is logged and swallowed.</span>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">            cust: The `eumdac` `Customisation` handle to delete.</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a>            <span class="n">cust</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - cleanup must never mask the cause</span>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> delete failed: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_submit_customisation</span><span class="p">(</span><span class="n">datatailor</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">chain</span><span class="p">):</span>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Submit a customisation, retrying transient EPCS failures (`G8`).</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="sd">        The EUMETSAT EPCS endpoint intermittently returns `502 Bad</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">        Gateway`; a submit that fails with a transient marker is retried</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">        up to `TAILOR_SUBMIT_RETRIES` times with a linear backoff. A</span>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">        non-transient error (e.g. an invalid product id) is re-raised</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">        immediately.</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">        Note:</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">            If a create actually succeeds server-side but its response is</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">            lost (a dropped connection / timeout — the classified-transient</span>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">            cases), the retry submits a **second** customisation and the</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">            first is orphaned: the client never gets its handle, so it is</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">            not polled or deleted and lingers against the quota. The EPCS</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">            API offers no idempotency key to prevent this; recover by</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">            sweeping stale jobs (`eumdac.DataTailor(token).customisations`).</span>
 <a id="__codelineno-0-830" name="__codelineno-0-830"></a>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_poll_customisation</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Poll a customisation until it stops being active; return its status.</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="sd">        Polls `cust.status` while it is `_TAILOR_ACTIVE` (`QUEUED` /</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">        `RUNNING`), sleeping `TAILOR_POLL_INITIAL_S` and growing the delay</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="sd">        by `TAILOR_POLL_BACKOFF` up to `TAILOR_POLL_MAX_S`. Any other status</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a><span class="sd">        is terminal and is returned immediately — so `DONE` succeeds and</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="sd">        `FAILED` / `KILLED` / an unexpected stuck state (e.g. `INACTIVE`)</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">        fail fast rather than polling to the timeout. Gives up after</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">        `TAILOR_POLL_TIMEOUT_S` so a job stuck *active* cannot hang forever</span>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">        (`G8`); the *sleep* between polls is clamped to the remaining budget.</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">        The deadline is a **soft** bound, though: it is only checked between</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">        polls, so a persistently stalled `cust.status` — which eumdac retries a</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">        few times internally, each up to the injected read bound — can push the</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">        real wait one bounded-call cycle (~`connect + read` × eumdac&#39;s retries)</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">        past the budget before the loop rechecks and raises. That is a small</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">        slop on a finite bound, versus the pre-fix unbounded hang.</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">        Each `cust.status` read is a bounded HTTP call (the caller runs under</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">        `_bounded_http`, #1146). A single poll that hits a **transient**</span>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">        transport error — a stalled read/connect or a dropped connection — is</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">        **not** fatal: the job may still be progressing server-side, so it is</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">        treated like &quot;still active&quot; and polling continues until the wall-clock</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">        deadline (#1146). A **permanent** error is not caught and fails fast:</span>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">        eumdac wraps an HTTP 4xx/5xx response into an `EumdacError` (not a</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">        `requests` exception), which propagates straight out.</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">            cust: The `eumdac` `Customisation` handle to poll.</span>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">            str: The terminal status (`&quot;DONE&quot;`, `&quot;FAILED&quot;`, `&quot;KILLED&quot;`, or</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">                any non-active value the service reports).</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">            TimeoutError: When the job is still active (or its status could</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">                not be read) after `TAILOR_POLL_TIMEOUT_S`.</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>  <span class="c1"># lazy — guaranteed by earthlens-core, only needed live</span>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a>        <span class="c1"># Only a genuinely *transient* transport error is ridden out: a stalled</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a>        <span class="c1"># read/connect or a dropped connection. A permanent error is NOT caught</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a>        <span class="c1"># so it fails fast — eumdac already wraps an HTTP 4xx/5xx response into a</span>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a>        <span class="c1"># (non-`RequestException`) `EumdacError`, and any other `requests` error</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a>        <span class="c1"># (a malformed URL, say) is a real fault, not a blip.</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a>        <span class="n">transient</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a>            <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">Timeout</span><span class="p">,</span>
-<a id="__codelineno-0-879" name="__codelineno-0-879"></a>            <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span>
-<a id="__codelineno-0-880" name="__codelineno-0-880"></a>            <span class="ne">TimeoutError</span><span class="p">,</span>
-<a id="__codelineno-0-881" name="__codelineno-0-881"></a>        <span class="p">)</span>
-<a id="__codelineno-0-882" name="__codelineno-0-882"></a>        <span class="n">deadline</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">+</span> <span class="n">TAILOR_POLL_TIMEOUT_S</span>
-<a id="__codelineno-0-883" name="__codelineno-0-883"></a>        <span class="n">delay</span> <span class="o">=</span> <span class="n">TAILOR_POLL_INITIAL_S</span>
-<a id="__codelineno-0-884" name="__codelineno-0-884"></a>        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-<a id="__codelineno-0-885" name="__codelineno-0-885"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-886" name="__codelineno-0-886"></a>                <span class="n">status</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cust</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-<a id="__codelineno-0-887" name="__codelineno-0-887"></a>            <span class="k">except</span> <span class="n">transient</span><span class="p">:</span>
-<a id="__codelineno-0-888" name="__codelineno-0-888"></a>                <span class="c1"># A single poll HTTP call stalled or dropped; the customisation</span>
-<a id="__codelineno-0-889" name="__codelineno-0-889"></a>                <span class="c1"># may still be running, so keep polling until the wall-clock</span>
-<a id="__codelineno-0-890" name="__codelineno-0-890"></a>                <span class="c1"># deadline rather than aborting a healthy long-running job.</span>
-<a id="__codelineno-0-891" name="__codelineno-0-891"></a>                <span class="n">status</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-892" name="__codelineno-0-892"></a>            <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_TAILOR_ACTIVE</span><span class="p">:</span>
-<a id="__codelineno-0-893" name="__codelineno-0-893"></a>                <span class="k">return</span> <span class="n">status</span>
-<a id="__codelineno-0-894" name="__codelineno-0-894"></a>            <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
-<a id="__codelineno-0-895" name="__codelineno-0-895"></a>            <span class="k">if</span> <span class="n">now</span> <span class="o">&gt;=</span> <span class="n">deadline</span><span class="p">:</span>
-<a id="__codelineno-0-896" name="__codelineno-0-896"></a>                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
-<a id="__codelineno-0-897" name="__codelineno-0-897"></a>                    <span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> did not finish &quot;</span>
-<a id="__codelineno-0-898" name="__codelineno-0-898"></a>                    <span class="sa">f</span><span class="s2">&quot;within </span><span class="si">{</span><span class="n">TAILOR_POLL_TIMEOUT_S</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">s (last status &quot;</span>
-<a id="__codelineno-0-899" name="__codelineno-0-899"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">status</span><span class="si">!r}</span><span class="s2">).&quot;</span>
-<a id="__codelineno-0-900" name="__codelineno-0-900"></a>                <span class="p">)</span>
-<a id="__codelineno-0-901" name="__codelineno-0-901"></a>            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">delay</span><span class="p">,</span> <span class="n">deadline</span> <span class="o">-</span> <span class="n">now</span><span class="p">))</span>
-<a id="__codelineno-0-902" name="__codelineno-0-902"></a>            <span class="n">delay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">delay</span> <span class="o">*</span> <span class="n">TAILOR_POLL_BACKOFF</span><span class="p">,</span> <span class="n">TAILOR_POLL_MAX_S</span><span class="p">)</span>
-<a id="__codelineno-0-903" name="__codelineno-0-903"></a>
-<a id="__codelineno-0-904" name="__codelineno-0-904"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-905" name="__codelineno-0-905"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_logfile_tail</span><span class="p">(</span><span class="n">cust</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-906" name="__codelineno-0-906"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the tail of a customisation&#39;s server log, if any.</span>
-<a id="__codelineno-0-907" name="__codelineno-0-907"></a>
-<a id="__codelineno-0-908" name="__codelineno-0-908"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-909" name="__codelineno-0-909"></a><span class="sd">            cust: The `eumdac` `Customisation` handle.</span>
-<a id="__codelineno-0-910" name="__codelineno-0-910"></a><span class="sd">            limit: Maximum number of trailing characters to return.</span>
-<a id="__codelineno-0-911" name="__codelineno-0-911"></a>
-<a id="__codelineno-0-912" name="__codelineno-0-912"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-913" name="__codelineno-0-913"></a><span class="sd">            str: The last `limit` characters of `cust.logfile`, or a</span>
-<a id="__codelineno-0-914" name="__codelineno-0-914"></a><span class="sd">                placeholder when no log is available.</span>
-<a id="__codelineno-0-915" name="__codelineno-0-915"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-916" name="__codelineno-0-916"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-917" name="__codelineno-0-917"></a>            <span class="n">log</span> <span class="o">=</span> <span class="n">cust</span><span class="o">.</span><span class="n">logfile</span>
-<a id="__codelineno-0-918" name="__codelineno-0-918"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - a missing log must not mask the failure</span>
-<a id="__codelineno-0-919" name="__codelineno-0-919"></a>            <span class="n">log</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-920" name="__codelineno-0-920"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">log</span><span class="p">:</span>
-<a id="__codelineno-0-921" name="__codelineno-0-921"></a>            <span class="k">return</span> <span class="s2">&quot;(no customisation log available)&quot;</span>
-<a id="__codelineno-0-922" name="__codelineno-0-922"></a>        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="p">)[</span><span class="o">-</span><span class="n">limit</span><span class="p">:]</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">            datatailor: The live `eumdac.DataTailor` client.</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="sd">            product: The `eumdac` product handle to customise.</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">            chain: The `eumdac.tailor_models.Chain` describing the job.</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="sd">            The `eumdac` `Customisation` handle for the submitted job.</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">            RuntimeError: When a transient submit keeps failing after</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">                `TAILOR_SUBMIT_RETRIES` attempts.</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">            Exception: Any non-transient submit error, re-raised as-is.</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a>        <span class="n">last_exc</span><span class="p">:</span> <span class="ne">Exception</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a>        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">TAILOR_SUBMIT_RETRIES</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a>                <span class="k">return</span> <span class="n">datatailor</span><span class="o">.</span><span class="n">new_customisation</span><span class="p">(</span><span class="n">product</span><span class="p">,</span> <span class="n">chain</span><span class="p">)</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - classified below</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a>                <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">mark</span> <span class="ow">in</span> <span class="n">message</span> <span class="k">for</span> <span class="n">mark</span> <span class="ow">in</span> <span class="n">_TRANSIENT_MARKERS</span><span class="p">):</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a>                    <span class="k">raise</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a>                <span class="n">last_exc</span> <span class="o">=</span> <span class="n">exc</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a>                <span class="k">if</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">TAILOR_SUBMIT_RETRIES</span><span class="p">:</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a>                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">TAILOR_SUBMIT_BACKOFF_S</span> <span class="o">*</span> <span class="n">attempt</span><span class="p">)</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a>            <span class="sa">f</span><span class="s2">&quot;Data Tailor submit failed after </span><span class="si">{</span><span class="n">TAILOR_SUBMIT_RETRIES</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a>            <span class="sa">f</span><span class="s2">&quot;transient attempts: </span><span class="si">{</span><span class="n">last_exc</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">last_exc</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_poll_customisation</span><span class="p">(</span><span class="n">cust</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Poll a customisation until it stops being active; return its status.</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">        Polls `cust.status` while it is `_TAILOR_ACTIVE` (`QUEUED` /</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">        `RUNNING`), sleeping `TAILOR_POLL_INITIAL_S` and growing the delay</span>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">        by `TAILOR_POLL_BACKOFF` up to `TAILOR_POLL_MAX_S`. Any other status</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">        is terminal and is returned immediately — so `DONE` succeeds and</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">        `FAILED` / `KILLED` / an unexpected stuck state (e.g. `INACTIVE`)</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">        fail fast rather than polling to the timeout. Gives up after</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">        `TAILOR_POLL_TIMEOUT_S` so a job stuck *active* cannot hang forever</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="sd">        (`G8`); the *sleep* between polls is clamped to the remaining budget.</span>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">        The deadline is a **soft** bound, though: it is only checked between</span>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">        polls, so a persistently stalled `cust.status` — which eumdac retries a</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">        few times internally, each up to the injected read bound — can push the</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">        real wait one bounded-call cycle (~`connect + read` × eumdac&#39;s retries)</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="sd">        past the budget before the loop rechecks and raises. That is a small</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="sd">        slop on a finite bound, versus the pre-fix unbounded hang.</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">        Each `cust.status` read is a bounded HTTP call (the caller runs under</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">        `_bounded_http`, #1146). A single poll that hits a **transient**</span>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a><span class="sd">        transport error — a stalled read/connect or a dropped connection — is</span>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">        **not** fatal: the job may still be progressing server-side, so it is</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">        treated like &quot;still active&quot; and polling continues until the wall-clock</span>
+<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">        deadline (#1146). A **permanent** error is not caught and fails fast:</span>
+<a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">        eumdac wraps an HTTP 4xx/5xx response into an `EumdacError` (not a</span>
+<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">        `requests` exception), which propagates straight out.</span>
+<a id="__codelineno-0-887" name="__codelineno-0-887"></a>
+<a id="__codelineno-0-888" name="__codelineno-0-888"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-889" name="__codelineno-0-889"></a><span class="sd">            cust: The `eumdac` `Customisation` handle to poll.</span>
+<a id="__codelineno-0-890" name="__codelineno-0-890"></a>
+<a id="__codelineno-0-891" name="__codelineno-0-891"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-892" name="__codelineno-0-892"></a><span class="sd">            str: The terminal status (`&quot;DONE&quot;`, `&quot;FAILED&quot;`, `&quot;KILLED&quot;`, or</span>
+<a id="__codelineno-0-893" name="__codelineno-0-893"></a><span class="sd">                any non-active value the service reports).</span>
+<a id="__codelineno-0-894" name="__codelineno-0-894"></a>
+<a id="__codelineno-0-895" name="__codelineno-0-895"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-896" name="__codelineno-0-896"></a><span class="sd">            TimeoutError: When the job is still active (or its status could</span>
+<a id="__codelineno-0-897" name="__codelineno-0-897"></a><span class="sd">                not be read) after `TAILOR_POLL_TIMEOUT_S`.</span>
+<a id="__codelineno-0-898" name="__codelineno-0-898"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-899" name="__codelineno-0-899"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>  <span class="c1"># lazy — guaranteed by earthlens-core, only needed live</span>
+<a id="__codelineno-0-900" name="__codelineno-0-900"></a>
+<a id="__codelineno-0-901" name="__codelineno-0-901"></a>        <span class="c1"># Only a genuinely *transient* transport error is ridden out: a stalled</span>
+<a id="__codelineno-0-902" name="__codelineno-0-902"></a>        <span class="c1"># read/connect or a dropped connection. A permanent error is NOT caught</span>
+<a id="__codelineno-0-903" name="__codelineno-0-903"></a>        <span class="c1"># so it fails fast — eumdac already wraps an HTTP 4xx/5xx response into a</span>
+<a id="__codelineno-0-904" name="__codelineno-0-904"></a>        <span class="c1"># (non-`RequestException`) `EumdacError`, and any other `requests` error</span>
+<a id="__codelineno-0-905" name="__codelineno-0-905"></a>        <span class="c1"># (a malformed URL, say) is a real fault, not a blip.</span>
+<a id="__codelineno-0-906" name="__codelineno-0-906"></a>        <span class="n">transient</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-907" name="__codelineno-0-907"></a>            <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">Timeout</span><span class="p">,</span>
+<a id="__codelineno-0-908" name="__codelineno-0-908"></a>            <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span>
+<a id="__codelineno-0-909" name="__codelineno-0-909"></a>            <span class="ne">TimeoutError</span><span class="p">,</span>
+<a id="__codelineno-0-910" name="__codelineno-0-910"></a>        <span class="p">)</span>
+<a id="__codelineno-0-911" name="__codelineno-0-911"></a>        <span class="n">deadline</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">+</span> <span class="n">TAILOR_POLL_TIMEOUT_S</span>
+<a id="__codelineno-0-912" name="__codelineno-0-912"></a>        <span class="n">delay</span> <span class="o">=</span> <span class="n">TAILOR_POLL_INITIAL_S</span>
+<a id="__codelineno-0-913" name="__codelineno-0-913"></a>        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<a id="__codelineno-0-914" name="__codelineno-0-914"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-915" name="__codelineno-0-915"></a>                <span class="n">status</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cust</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+<a id="__codelineno-0-916" name="__codelineno-0-916"></a>            <span class="k">except</span> <span class="n">transient</span><span class="p">:</span>
+<a id="__codelineno-0-917" name="__codelineno-0-917"></a>                <span class="c1"># A single poll HTTP call stalled or dropped; the customisation</span>
+<a id="__codelineno-0-918" name="__codelineno-0-918"></a>                <span class="c1"># may still be running, so keep polling until the wall-clock</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a>                <span class="c1"># deadline rather than aborting a healthy long-running job.</span>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a>                <span class="n">status</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a>            <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_TAILOR_ACTIVE</span><span class="p">:</span>
+<a id="__codelineno-0-922" name="__codelineno-0-922"></a>                <span class="k">return</span> <span class="n">status</span>
+<a id="__codelineno-0-923" name="__codelineno-0-923"></a>            <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+<a id="__codelineno-0-924" name="__codelineno-0-924"></a>            <span class="k">if</span> <span class="n">now</span> <span class="o">&gt;=</span> <span class="n">deadline</span><span class="p">:</span>
+<a id="__codelineno-0-925" name="__codelineno-0-925"></a>                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
+<a id="__codelineno-0-926" name="__codelineno-0-926"></a>                    <span class="sa">f</span><span class="s2">&quot;Data Tailor customisation </span><span class="si">{</span><span class="n">cust</span><span class="si">}</span><span class="s2"> did not finish &quot;</span>
+<a id="__codelineno-0-927" name="__codelineno-0-927"></a>                    <span class="sa">f</span><span class="s2">&quot;within </span><span class="si">{</span><span class="n">TAILOR_POLL_TIMEOUT_S</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">s (last status &quot;</span>
+<a id="__codelineno-0-928" name="__codelineno-0-928"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">status</span><span class="si">!r}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-929" name="__codelineno-0-929"></a>                <span class="p">)</span>
+<a id="__codelineno-0-930" name="__codelineno-0-930"></a>            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">delay</span><span class="p">,</span> <span class="n">deadline</span> <span class="o">-</span> <span class="n">now</span><span class="p">))</span>
+<a id="__codelineno-0-931" name="__codelineno-0-931"></a>            <span class="n">delay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">delay</span> <span class="o">*</span> <span class="n">TAILOR_POLL_BACKOFF</span><span class="p">,</span> <span class="n">TAILOR_POLL_MAX_S</span><span class="p">)</span>
+<a id="__codelineno-0-932" name="__codelineno-0-932"></a>
+<a id="__codelineno-0-933" name="__codelineno-0-933"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-934" name="__codelineno-0-934"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_logfile_tail</span><span class="p">(</span><span class="n">cust</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-935" name="__codelineno-0-935"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the tail of a customisation&#39;s server log, if any.</span>
+<a id="__codelineno-0-936" name="__codelineno-0-936"></a>
+<a id="__codelineno-0-937" name="__codelineno-0-937"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-938" name="__codelineno-0-938"></a><span class="sd">            cust: The `eumdac` `Customisation` handle.</span>
+<a id="__codelineno-0-939" name="__codelineno-0-939"></a><span class="sd">            limit: Maximum number of trailing characters to return.</span>
+<a id="__codelineno-0-940" name="__codelineno-0-940"></a>
+<a id="__codelineno-0-941" name="__codelineno-0-941"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-942" name="__codelineno-0-942"></a><span class="sd">            str: The last `limit` characters of `cust.logfile`, or a</span>
+<a id="__codelineno-0-943" name="__codelineno-0-943"></a><span class="sd">                placeholder when no log is available.</span>
+<a id="__codelineno-0-944" name="__codelineno-0-944"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-945" name="__codelineno-0-945"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-946" name="__codelineno-0-946"></a>            <span class="n">log</span> <span class="o">=</span> <span class="n">cust</span><span class="o">.</span><span class="n">logfile</span>
+<a id="__codelineno-0-947" name="__codelineno-0-947"></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - a missing log must not mask the failure</span>
+<a id="__codelineno-0-948" name="__codelineno-0-948"></a>            <span class="n">log</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-949" name="__codelineno-0-949"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">log</span><span class="p">:</span>
+<a id="__codelineno-0-950" name="__codelineno-0-950"></a>            <span class="k">return</span> <span class="s2">&quot;(no customisation log available)&quot;</span>
+<a id="__codelineno-0-951" name="__codelineno-0-951"></a>        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="p">)[</span><span class="o">-</span><span class="n">limit</span><span class="p">:]</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
