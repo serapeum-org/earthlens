@@ -814,11 +814,14 @@ class EUMETSAT(AbstractDataSource):
         wall-clock never overshoots the timeout.
 
         Each `cust.status` read is a bounded HTTP call (the caller runs under
-        `_bounded_http`, #1146). A single poll that times out or drops its
-        connection is **not** fatal — the job may still be progressing
-        server-side — so it is treated like "still active" and polling
-        continues until the wall-clock deadline, which is what actually caps
-        the wait now that the deadline is a real wall-clock bound (#1146).
+        `_bounded_http`, #1146). A single poll that hits a **transient**
+        transport error — a stalled read/connect or a dropped connection — is
+        **not** fatal: the job may still be progressing server-side, so it is
+        treated like "still active" and polling continues until the wall-clock
+        deadline, which is what actually caps the wait now that the deadline is
+        a real wall-clock bound (#1146). A **permanent** error is not caught and
+        fails fast: eumdac wraps an HTTP 4xx/5xx response into an `EumdacError`
+        (not a `requests` exception), which propagates straight out.
 
         Args:
             cust: The `eumdac` `Customisation` handle to poll.
@@ -833,12 +836,22 @@ class EUMETSAT(AbstractDataSource):
         """
         import requests  # lazy — guaranteed by earthlens-core, only needed live
 
+        # Only a genuinely *transient* transport error is ridden out: a stalled
+        # read/connect or a dropped connection. A permanent error is NOT caught
+        # so it fails fast — eumdac already wraps an HTTP 4xx/5xx response into a
+        # (non-`RequestException`) `EumdacError`, and any other `requests` error
+        # (a malformed URL, say) is a real fault, not a blip.
+        transient = (
+            requests.exceptions.Timeout,
+            requests.exceptions.ConnectionError,
+            TimeoutError,
+        )
         deadline = time.monotonic() + TAILOR_POLL_TIMEOUT_S
         delay = TAILOR_POLL_INITIAL_S
         while True:
             try:
                 status = str(cust.status).upper()
-            except (requests.exceptions.RequestException, TimeoutError):
+            except transient:
                 # A single poll HTTP call stalled or dropped; the customisation
                 # may still be running, so keep polling until the wall-clock
                 # deadline rather than aborting a healthy long-running job.

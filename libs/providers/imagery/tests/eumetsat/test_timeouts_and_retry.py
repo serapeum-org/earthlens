@@ -121,6 +121,16 @@ def test_poll_rides_out_transient_http_error_then_returns(monkeypatch):
     assert EUMETSAT._poll_customisation(cust) == "DONE"
 
 
+def test_poll_permanent_error_propagates_fast(monkeypatch):
+    """A permanent (non-transient) poll error fails fast, not after the budget."""
+    import requests
+
+    monkeypatch.setattr(be, "TAILOR_POLL_TIMEOUT_S", 9999.0)  # a stall would hang
+    cust = _FakeCustomisation(statuses=[requests.exceptions.HTTPError("404 Not Found")])
+    with pytest.raises(requests.exceptions.HTTPError):
+        EUMETSAT._poll_customisation(cust)
+
+
 def test_poll_wall_clock_timeout_on_persistent_http_error(monkeypatch):
     """A persistently unreadable status times out on the wall-clock budget."""
     import requests
