@@ -538,12 +538,19 @@ class EUMETSAT(AbstractDataSource):
             return self._tailor(tailor)
         return self._api_via_search_fetch()
 
+    @_bounded_http_calls
     def _tailor(self, tailor: TailorConfig) -> list[Path]:
         """Run the Data Tailor branch for every matching product (`G2`).
 
         Rejects a non-eligible request up front (`G5`), then searches the
         Data Store and customises each product in turn, returning the
         flattened list of customised output paths.
+
+        Bounded by `@_bounded_http_calls` (#1146) so the whole tailor path —
+        including `configure()` / `datatailor()` here, before the (also-bounded)
+        `_search` / `_tailor_one` — is time-bounded even if a future `eumdac`
+        makes those client constructors issue HTTP eagerly. The nested bounded
+        calls reuse this wrap (the context manager is re-entrant).
 
         Args:
             tailor: The `TailorConfig` describing the customisation.
@@ -615,11 +622,17 @@ class EUMETSAT(AbstractDataSource):
         A customisation that ends `FAILED` on a transient EUMETSAT-side
         infrastructure fault — its log tail matching
         `_TRANSIENT_OUTCOME_MARKERS` (a stale NFS handle, a full disk) — is
-        **resubmitted** within the `TAILOR_SUBMIT_RETRIES` budget rather
-        than surfaced, the abandoned job being deleted first so quota is not
+        **resubmitted** up to `TAILOR_SUBMIT_RETRIES` times rather than
+        surfaced, the abandoned job being deleted first so quota is not
         leaked (#1145). A `FAILED` from a bad request (no marker), and any
         `KILLED` / other terminal status, still fails fast on the first
         attempt.
+
+        Note `TAILOR_SUBMIT_RETRIES` bounds this outcome loop *and*, separately,
+        the transient-*submit* retry inside `_submit_customisation`; the two are
+        independent and compound, so a product hitting both flaky submits and
+        transient `FAILED`s can issue up to `TAILOR_SUBMIT_RETRIES ** 2` submits
+        in the (rare) worst case.
 
         A `tailor.crs` of `None` means "do not reproject": `Chain.projection`
         is `None`, which `Chain.asdict()` drops before the request is built,
@@ -690,8 +703,10 @@ class EUMETSAT(AbstractDataSource):
             subdir = self._dedupe_name(subdir, used_dirs)
         product_dir = self.root_dir / subdir
         # Submit → poll → (stream on DONE). A FAILED on a transient EUMETSAT-side
-        # infrastructure fault is resubmitted within the shared retry budget,
-        # deleting the abandoned job first so quota is not leaked (#1145).
+        # infrastructure fault is resubmitted up to TAILOR_SUBMIT_RETRIES times,
+        # deleting the abandoned job first so quota is not leaked (#1145). (This
+        # outcome budget is independent of the transient-submit retries inside
+        # _submit_customisation; see the method docstring for the compounding.)
         for attempt in range(1, TAILOR_SUBMIT_RETRIES + 1):
             cust = self._submit_customisation(datatailor, product_handle, chain)
             try:
