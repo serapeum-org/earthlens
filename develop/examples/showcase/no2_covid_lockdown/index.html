@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24629,7 +24629,7 @@ dip, rebound).</li>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_dotenv</span><span class="p">,</span> <span class="n">load_dotenv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>  <span class="c1"># pyramids' own reading + plotting</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>  <span class="c1"># pyramids' own reading + plotting</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
@@ -24645,7 +24645,7 @@ import numpy as np
 import pandas as pd
 from dotenv import find_dotenv, load_dotenv
 from loguru import logger
-from pyramids.dataset import Dataset, GeoReference  # pyramids' own reading + plotting
+from pyramids.dataset import Dataset  # pyramids' own reading + plotting
 
 from earthlens.core import EarthLens
 
@@ -24744,16 +24744,14 @@ geotransform/EPSG — so pyramids can colour-map and georeference it via
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_arr</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Colour-map a single-band derived grid (the NO2 column) with pyramids Dataset.plot."""</span>
-    <span class="k">return</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
-        <span class="n">arr</span><span class="o">=</span><span class="n">arr</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float32"</span><span class="p">),</span>
-        <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">like</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">like</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
+    <span class="k">return</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
+        <span class="n">arr</span><span class="o">=</span><span class="n">arr</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float32"</span><span class="p">),</span> <span class="n">geo</span><span class="o">=</span><span class="n">like</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">like</span><span class="o">.</span><span class="n">epsg</span>
     <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">def plot_arr(arr, like, ax, **kw):
     """Colour-map a single-band derived grid (the NO2 column) with pyramids Dataset.plot."""
-    return Dataset.from_array(
-        arr=arr[None, :, :].astype("float32"),
-        geo_ref=GeoReference(geo=like.geotransform, epsg=like.epsg),
+    return Dataset.create_from_array(
+        arr=arr[None, :, :].astype("float32"), geo=like.geotransform, epsg=like.epsg
     ).plot(band=0, ax=ax, **kw)</div>
 </div>
 </div>

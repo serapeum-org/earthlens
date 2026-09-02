@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24362,7 +24362,7 @@ the copy bundled with <code>imageio-ffmpeg</code> — so no separate install is 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
@@ -24379,7 +24379,7 @@ import numpy as np
 import pandas as pd
 from cleopatra.glyphs.gridded.array_glyph import FrameLabel
 from IPython.display import HTML
-from pyramids.dataset import Dataset, GeoReference
+from pyramids.dataset import Dataset
 from pyramids.dataset.collection import DatasetCollection
 from pyramids.netcdf import NetCDF
 
@@ -24459,9 +24459,7 @@ was fixed upstream) — so we read the full reprojected band and crop it with pl
     <span class="n">green</span> <span class="o">=</span> <span class="mf">0.45</span> <span class="o">*</span> <span class="n">red</span> <span class="o">+</span> <span class="mf">0.10</span> <span class="o">*</span> <span class="n">veggie</span> <span class="o">+</span> <span class="mf">0.45</span> <span class="o">*</span> <span class="n">blue</span>  <span class="c1"># CIMSS synthetic green</span>
     <span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">([</span><span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">2.2</span><span class="p">)</span>
     <span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">rgb</span> <span class="o">*</span> <span class="mf">255.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"uint8"</span><span class="p">)</span>
-    <span class="n">scene</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
-        <span class="n">arr</span><span class="o">=</span><span class="n">rgb</span><span class="p">,</span> <span class="n">no_data_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">rgb</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">no_data_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">scene</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">def goes_band_to_latlon(nc_path, band, bbox):
@@ -24492,9 +24490,7 @@ def render_true_colour(nc_path, dst, bbox):
     green = 0.45 * red + 0.10 * veggie + 0.45 * blue  # CIMSS synthetic green
     rgb = np.power(np.clip([red, green, blue], 0.0, 1.0), 1 / 2.2)
     rgb = np.nan_to_num(rgb * 255.0).astype("uint8")
-    scene = Dataset.from_array(
-        arr=rgb, no_data_value=0, geo_ref=GeoReference(geo=geo, epsg=4326)
-    )
+    scene = Dataset.create_from_array(arr=rgb, geo=geo, epsg=4326, no_data_value=0)
     scene.to_file(str(dst))</div>
 </div>
 </div>
