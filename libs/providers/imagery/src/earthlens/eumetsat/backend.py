@@ -719,40 +719,21 @@ class EUMETSAT(AbstractDataSource):
             try:
                 status = self._poll_customisation(cust)
                 if status == "DONE":
-                    product_dir.mkdir(parents=True, exist_ok=True)
-                    written: list[Path] = []
-                    used_names: set[str] = set()
-                    for name in cust.outputs:
-                        # De-dupe within a customisation so two outputs sharing
-                        # a basename do not overwrite each other (L2).
-                        out_name = self._dedupe_name(
-                            safe_product_filename(str(name)), used_names
-                        )
-                        target = product_dir / out_name
-                        with cust.stream_output(name) as src, open(target, "wb") as fh:
-                            shutil.copyfileobj(src, fh)
-                        written.append(target)
-                    return written
+                    return self._stream_customisation(cust, product_dir)
                 tail = self._logfile_tail(cust)
-                if (
-                    status == "FAILED"
-                    and attempt < TAILOR_SUBMIT_RETRIES
-                    and any(m in tail.lower() for m in _TRANSIENT_OUTCOME_MARKERS)
-                ):
-                    logger.warning(
-                        f"Data Tailor customisation {cust} ended FAILED on a "
-                        f"transient infrastructure error; resubmitting (attempt "
-                        f"{attempt}/{TAILOR_SUBMIT_RETRIES}): {tail}"
-                    )
-                    # Delete the abandoned job BEFORE resubmitting so the retry
-                    # does not leak quota (G7); null it so `finally` does not
-                    # double-delete.
-                    self._safe_delete(cust)
-                    cust = None
-                else:
+                if not self._is_retryable_infra_failure(status, tail, attempt):
                     raise RuntimeError(
                         f"Data Tailor customisation {cust} ended {status}: {tail}"
                     )
+                logger.warning(
+                    f"Data Tailor customisation {cust} ended FAILED on a transient "
+                    f"infrastructure error; resubmitting (attempt {attempt}/"
+                    f"{TAILOR_SUBMIT_RETRIES}): {tail}"
+                )
+                # Delete the abandoned job BEFORE resubmitting so the retry does
+                # not leak quota (G7); null it so `finally` does not double-delete.
+                self._safe_delete(cust)
+                cust = None
             finally:
                 if cust is not None:
                     self._safe_delete(cust)  # ALWAYS free quota (G7)
@@ -761,6 +742,54 @@ class EUMETSAT(AbstractDataSource):
         # so control never reaches here; kept to satisfy the type checker.
         raise RuntimeError(  # pragma: no cover
             "Data Tailor customisation did not resolve within the retry budget."
+        )
+
+    def _stream_customisation(self, cust, product_dir: Path) -> list[Path]:
+        """Stream a `DONE` customisation's outputs into `product_dir`.
+
+        Creates `product_dir` and copies each output there, de-duping output
+        basenames so two outputs that sanitise to the same name do not
+        overwrite each other (`L2`).
+
+        Args:
+            cust: The `DONE` `eumdac` `Customisation` handle.
+            product_dir: The per-product output directory.
+
+        Returns:
+            list[Path]: The written output paths, in customisation order.
+        """
+        product_dir.mkdir(parents=True, exist_ok=True)
+        written: list[Path] = []
+        used_names: set[str] = set()
+        for name in cust.outputs:
+            out_name = self._dedupe_name(safe_product_filename(str(name)), used_names)
+            target = product_dir / out_name
+            with cust.stream_output(name) as src, open(target, "wb") as fh:
+                shutil.copyfileobj(src, fh)
+            written.append(target)
+        return written
+
+    @staticmethod
+    def _is_retryable_infra_failure(status: str, tail: str, attempt: int) -> bool:
+        """Whether a terminal status is a retryable infrastructure `FAILED`.
+
+        `True` only for a `FAILED` whose log tail matches an infrastructure
+        marker (`_TRANSIENT_OUTCOME_MARKERS`) with retry budget left; a bad
+        request (no marker) and any `KILLED` / other terminal status return
+        `False` so they fail fast (`#1145`).
+
+        Args:
+            status: The terminal customisation status.
+            tail: The customisation's log tail.
+            attempt: The 1-based attempt number just completed.
+
+        Returns:
+            bool: `True` if the customisation should be resubmitted.
+        """
+        return (
+            status == "FAILED"
+            and attempt < TAILOR_SUBMIT_RETRIES
+            and any(marker in tail.lower() for marker in _TRANSIENT_OUTCOME_MARKERS)
         )
 
     @staticmethod
