@@ -96,9 +96,9 @@ def array_to_raster(
     Returns:
         A new `pyramids.Dataset`.
     """
-    from pyramids.dataset import Dataset
+    from pyramids.dataset import Dataset, GeoReference
 
-    dataset = Dataset.create_from_array(arr=arr, geo=geo, epsg=epsg)
+    dataset = Dataset.from_array(arr=arr, geo_ref=GeoReference(geo=geo, epsg=epsg))
     if wrap_longitude:
         dataset = dataset.wrap_longitude()
     return dataset

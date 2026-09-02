@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 
 from earthlens.chc.backend import CHIRPS, _snap_bbox_outward
 
@@ -76,11 +76,10 @@ class TestClipAndNormaliseWindow:
     @staticmethod
     def _granule() -> Dataset:
         """A 100x360 one-degree granule spanning the whole _FAKE_GEO extent."""
-        return Dataset.create_from_array(
+        return Dataset.from_array(
             arr=np.ones((100, 360), dtype=np.float32),
-            geo=tuple(_FAKE_GEO),
-            epsg=4326,
             no_data_value=None,
+            geo_ref=GeoReference(geo=tuple(_FAKE_GEO), epsg=4326),
         )
 
     def test_aligned_bbox_window(self):
@@ -115,11 +114,10 @@ class TestClipAndNormaliseWindow:
         """
         pitch = 0.05
         geo = (-180.0, pitch, 0.0, 40.0, 0.0, -pitch)  # 1600 rows x 7200 cols
-        granule = Dataset.create_from_array(
+        granule = Dataset.from_array(
             arr=np.ones((1600, 7200), dtype=np.float32),
-            geo=geo,
-            epsg=4326,
             no_data_value=None,
+            geo_ref=GeoReference(geo=geo, epsg=4326),
         )
         chirps = _chirps_with_bbox(lat_lim=[3.72, 12.28], lon_lim=[-9.03, -0.07])
         out = chirps._clip_and_normalise(granule)

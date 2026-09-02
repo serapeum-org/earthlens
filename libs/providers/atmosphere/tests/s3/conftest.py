@@ -97,12 +97,13 @@ class FakePaginator:
 @pytest.fixture
 def tiny_cog(tmp_path_factory) -> Path:
     """A 1-degree synthetic GeoTIFF covering [6, 0, 7, 1] in EPSG:4326."""
-    from pyramids.dataset import Dataset
+    from pyramids.dataset import Dataset, GeoReference
 
     path = tmp_path_factory.mktemp("fixtures") / "tile.tif"
     arr = np.arange(100, dtype="float32").reshape(1, 10, 10)
-    ds = Dataset.create_from_array(
-        arr=arr, top_left_corner=(6.0, 1.0), cell_size=0.1, epsg=4326
+    ds = Dataset.from_array(
+        arr=arr,
+        geo_ref=GeoReference(top_left_corner=(6.0, 1.0), cell_size=0.1, epsg=4326),
     )
     ds.to_file(str(path))
     return path

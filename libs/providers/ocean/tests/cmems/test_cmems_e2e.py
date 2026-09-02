@@ -97,7 +97,7 @@ class TestCmemsLiveSubset:
         Exercises the real pyramids contract `_aggregate_one` relies on (no stubs):
         `get_time_variable` decodes the CF `time` axis, `_window_labels` buckets it,
         and `reduce("time", groupby=labels)` collapses to one slice per window written
-        through `Dataset.create_from_array`. Three June 2020 days -> one monthly window.
+        through `Dataset.from_array`. Three June 2020 days -> one monthly window.
         """
         el = EarthLens(
             data_source="cmems",

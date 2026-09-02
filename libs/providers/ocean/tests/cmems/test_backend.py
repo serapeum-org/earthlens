@@ -144,7 +144,7 @@ class _FakeDatasetWriter:
 
 class _FakeDataset:
     @staticmethod
-    def create_from_array(arr, geo, epsg) -> _FakeDatasetWriter:
+    def from_array(arr, geo_ref=None, **kwargs) -> _FakeDatasetWriter:
         return _FakeDatasetWriter([])
 
 
@@ -158,6 +158,11 @@ def _install_fake_pyramids_reduce(monkeypatch: pytest.MonkeyPatch) -> None:
 
     dataset_mod = types.ModuleType("pyramids.dataset")
     dataset_mod.Dataset = _FakeDataset
+    # The real value object: pyramids.base.georeference is not faked, and the
+    # aggregate path imports GeoReference from pyramids.dataset.
+    from pyramids.base.georeference import GeoReference
+
+    dataset_mod.GeoReference = GeoReference
     monkeypatch.setitem(sys.modules, "pyramids.dataset", dataset_mod)
 
 

@@ -453,7 +453,7 @@ class TestNormaliseLongitude:
 def _real_dataset(*, global_360: bool):
     """Build a real pyramids EPSG:4326 Dataset, whole-globe 0–360 or a small window."""
     import numpy as np
-    from pyramids.dataset import Dataset
+    from pyramids.dataset import Dataset, GeoReference
 
     if global_360:
         arr = np.arange(32, dtype="float32").reshape(1, 4, 8)
@@ -461,7 +461,7 @@ def _real_dataset(*, global_360: bool):
     else:
         arr = np.arange(100, dtype="float32").reshape(1, 10, 10)
         geo = (10.0, 1.0, 0.0, 20.0, 0.0, -1.0)
-    return Dataset.create_from_array(arr=arr, geo=geo, epsg=4326)
+    return Dataset.from_array(arr=arr, geo_ref=GeoReference(geo=geo, epsg=4326))
 
 
 class TestNormaliseLongitudeRealPyramids:

@@ -44,7 +44,7 @@ import pandas as pd
 from joblib import Parallel, delayed
 from loguru import logger
 from pyramids._io import extract_from_gz
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 from tqdm import tqdm
 
 from earthlens.base import (
@@ -1028,11 +1028,10 @@ class CHIRPS(AbstractDataSource):
             data = np.where(data < 0, nodata_sentinel, data).astype(
                 data.dtype, copy=False
             )
-            full = Dataset.create_from_array(
+            full = Dataset.from_array(
                 data,
-                geo=raster.geotransform,
-                epsg=raster.epsg,
                 no_data_value=nodata_sentinel,
+                geo_ref=GeoReference(geo=raster.geotransform, epsg=raster.epsg),
             )
             return crop_to_aoi(full, self.space, bbox=request_bbox, touch=False)
         # Bbox path: crop first, normalise the window. A global CHIRPS daily
@@ -1051,11 +1050,10 @@ class CHIRPS(AbstractDataSource):
         window = np.where(window < 0, nodata_sentinel, window).astype(
             window.dtype, copy=False
         )
-        return Dataset.create_from_array(
+        return Dataset.from_array(
             window,
-            geo=cropped.geotransform,
-            epsg=cropped.epsg,
             no_data_value=nodata_sentinel,
+            geo_ref=GeoReference(geo=cropped.geotransform, epsg=cropped.epsg),
         )
 
     def _check_bbox_overlaps(

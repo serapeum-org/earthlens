@@ -545,13 +545,12 @@ class TestFunctionalDownload:
 def _write_ones_tif(path):
     """Write a tiny all-ones GeoTIFF to `path` for load() tests."""
     import numpy as np
-    from pyramids.dataset import Dataset
+    from pyramids.dataset import Dataset, GeoReference
 
-    Dataset.create_from_array(
+    Dataset.from_array(
         np.ones((4, 4), "float32"),
-        geo=(0.0, 1.0, 0.0, 4.0, 0.0, -1.0),
-        epsg=4326,
         no_data_value=-9999.0,
+        geo_ref=GeoReference(geo=(0.0, 1.0, 0.0, 4.0, 0.0, -1.0), epsg=4326),
     ).to_file(str(path))
 
 
@@ -606,16 +605,15 @@ class TestFacadeLoad:
     def test_load_reads_netcdf_into_netcdf(self, tmp_path):
         """A written .nc path is read into a pyramids NetCDF, not a Dataset."""
         import numpy as np
-        from pyramids.dataset import Dataset
+        from pyramids.dataset import Dataset, GeoReference
         from pyramids.netcdf import NetCDF
 
         from earthlens.earthlens import _load_result
 
         nc = tmp_path / "cube.nc"
-        Dataset.create_from_array(
+        Dataset.from_array(
             np.ones((4, 4), "float32"),
-            geo=(0.0, 1.0, 0.0, 4.0, 0.0, -1.0),
-            epsg=4326,
+            geo_ref=GeoReference(geo=(0.0, 1.0, 0.0, 4.0, 0.0, -1.0), epsg=4326),
         ).to_file(str(nc))
         out = _load_result([nc])
         assert isinstance(out[0], NetCDF), (

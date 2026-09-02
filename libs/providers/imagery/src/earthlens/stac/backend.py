@@ -492,7 +492,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         requested band's grid. `no_data_value` is threaded through so the grid
         template adopts a dtype-safe fill — pyramids' earlier `from_band_files`
         default of -9999 overflowed unsigned dtypes such as `uint16`; that is
-        fixed upstream, so the previous `Dataset.align` + `create_from_array`
+        fixed upstream, so the previous `Dataset.align` + `from_array`
         workaround is no longer needed.
 
         Args:
@@ -555,7 +555,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         Returns:
             The per-window COG paths.
         """
-        from pyramids.dataset import Dataset, DatasetCollection
+        from pyramids.dataset import Dataset, DatasetCollection, GeoReference
         from pyramids.dataset.cog import write_cog
 
         op = "mean" if config.op == "auto" else config.op
@@ -585,7 +585,9 @@ class STAC(LazyClientMixin, AbstractDataSource):
             for label, array in reduced.items():
                 target = out_dir / f"{safe_key}_{op}_{config.freq}_{label}{part}.tif"
                 write_cog(
-                    Dataset.create_from_array(arr=array, geo=geo, epsg=epsg),
+                    Dataset.from_array(
+                        arr=array, geo_ref=GeoReference(geo=geo, epsg=epsg)
+                    ),
                     str(target),
                 )
                 written.append(target)

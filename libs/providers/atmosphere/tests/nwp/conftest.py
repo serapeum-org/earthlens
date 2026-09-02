@@ -210,11 +210,14 @@ class _FakeAggDataset:
         return _FakeRef()
 
     @classmethod
-    def create_from_array(
-        cls, arr: Any = None, geo: Any = None, epsg: Any = None
-    ) -> tuple:
+    def from_array(cls, arr: Any = None, geo_ref: Any = None, **kwargs: Any) -> tuple:
         """Return a sentinel 'dataset' carrying the reduced array."""
-        return ("dataset", arr, geo, epsg)
+        return (
+            "dataset",
+            arr,
+            getattr(geo_ref, "geo", None),
+            getattr(geo_ref, "epsg", None),
+        )
 
 
 @pytest.fixture

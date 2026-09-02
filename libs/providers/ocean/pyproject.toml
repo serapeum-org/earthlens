@@ -42,7 +42,7 @@ dependencies = [
 argo = ["argopy >=1.4"]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 erddap = ["erddapy >=3.0"]
-nwm = ["earthlens-core[s3]", "pyramids-gis[parquet] >=0.58.1"]
+nwm = ["earthlens-core[s3]", "pyramids-gis[parquet] >=0.59.0"]
 usgs-water = ["dataretrieval >=1.1.4"]
 obis = ["pyobis >=1.6.1"]
 

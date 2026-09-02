@@ -407,7 +407,7 @@ class CMEMS(AbstractDataSource):
         by mean), windows the `time` axis by `config.freq` using
         :meth:`pyramids.netcdf.NetCDF.reduce`, then writes one GeoTIFF
         per variable per window via
-        :meth:`pyramids.dataset.Dataset.create_from_array` — the same
+        :meth:`pyramids.dataset.Dataset.from_array` — the same
         proven raster-write path :func:`earthlens.aggregate.aggregate_netcdf`
         uses for the ECMWF backend, so CMEMS aggregate output is shaped
         like ECMWF's (per-window GeoTIFFs, not a multidimensional

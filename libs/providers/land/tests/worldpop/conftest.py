@@ -14,7 +14,7 @@ import types
 import numpy as np
 import pytest
 import requests
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 
 #: The WGS84 extent the tiny test GeoTIFF covers (a Kenya-sized box).
 TIF_WEST, TIF_SOUTH, TIF_EAST, TIF_NORTH = 33.9, -4.7, 41.9, 5.0
@@ -51,7 +51,9 @@ def tiny_tif_bytes(tmp_path_factory) -> bytes:
     px = (TIF_EAST - TIF_WEST) / cols
     py = (TIF_NORTH - TIF_SOUTH) / rows
     geo = (TIF_WEST, px, 0.0, TIF_NORTH, 0.0, -py)
-    Dataset.create_from_array(arr=arr, geo=geo, epsg=4326).to_file(str(path))
+    Dataset.from_array(arr=arr, geo_ref=GeoReference(geo=geo, epsg=4326)).to_file(
+        str(path)
+    )
     return path.read_bytes()
 
 

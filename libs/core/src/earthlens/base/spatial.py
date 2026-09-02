@@ -15,6 +15,7 @@ from typing import Any, cast
 
 from loguru import logger
 from pyramids.base.remote import CloudConfig
+from pyramids.dataset import GeoReference
 from pyramids.feature import bbox as _pyramids_bbox
 
 #: `/vsicurl` HTTP tuning for a remote-raster read: suppress per-open sidecar
@@ -587,11 +588,10 @@ def windowed_bbox_crop(dataset: Any, bbox: Sequence[float], *, epsg: Any = 4326)
         from pyramids.dataset import Dataset
 
         no_data = fallback.no_data_value
-        return Dataset.create_from_array(
+        return Dataset.from_array(
             arr=fallback.read_array(),
-            geo=fallback.geotransform,
-            epsg=fallback.epsg,
             no_data_value=no_data[0] if isinstance(no_data, (list, tuple)) else no_data,
+            geo_ref=GeoReference(geo=fallback.geotransform, epsg=fallback.epsg),
         )
 
 

@@ -316,7 +316,8 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
         )
         return _FakeDataset(href, epsg, shape)
 
-    def _create_from_array(arr=None, geo=None, epsg=None, no_data_value=None, **kwargs):
+    def _from_array(arr=None, geo_ref=None, no_data_value=None, **kwargs):
+        epsg = getattr(geo_ref, "epsg", None)
         fp.create_calls.append({"no_data_value": no_data_value, "epsg": epsg})
         return _FakeDataset(epsg=epsg)
 
@@ -325,10 +326,15 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
         (),
         {
             "read_file": staticmethod(_read_file),
-            "create_from_array": staticmethod(_create_from_array),
+            "from_array": staticmethod(_from_array),
         },
     )
     dataset_mod.DatasetCollection = _FakeDatasetCollection
+    # The real value object: pyramids.base.georeference is not faked, and the
+    # backend imports GeoReference from pyramids.dataset alongside Dataset.
+    from pyramids.base.georeference import GeoReference
+
+    dataset_mod.GeoReference = GeoReference
     monkeypatch.setitem(sys.modules, "pyramids.dataset", dataset_mod)
 
     bbox_mod = types.ModuleType("pyramids.feature.bbox")

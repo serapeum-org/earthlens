@@ -5,7 +5,7 @@ importable without the `[jaxa]` extra. The branch builds an
 `ImageCollection`, walks the strict required filter chain
 (`filter_date` → `filter_resolution` → `filter_bounds` → `select` →
 `get_images`), and writes each returned numpy array to a north-up GeoTIFF
-via `pyramids.dataset.Dataset.create_from_array(...).to_file(...)`.
+via `pyramids.dataset.Dataset.from_array(...).to_file(...)`.
 
 The strict filter order was confirmed empirically against the installed
 `jaxa.earth` 0.1.6 — calling the methods out of order raises explicit
@@ -63,7 +63,7 @@ def _geo_tuple(
         shape: `(rows, cols)` of the 2-D array.
 
     Returns:
-        Six floats matching pyramids' `Dataset.create_from_array(geo=...)`.
+        Six floats matching pyramids' `Dataset.from_array(geo_ref=GeoReference(geo=...))`.
     """
     rows, cols = shape
     lon_min, lon_max = min(lonlim), max(lonlim)
@@ -128,7 +128,7 @@ def fetch_jaxa_earth(
     (`filter_date` → `filter_resolution` → `filter_bounds` → `select` →
     `get_images`), squeezes the returned 4-D tensor to a 2-D plane, and
     writes one GeoTIFF per band via
-    `pyramids.dataset.Dataset.create_from_array`. Every collection probed
+    `pyramids.dataset.Dataset.from_array`. Every collection probed
     during A1 returned a north-up array, so no flip is applied — add a
     per-collection rule at the write site if a south-up collection
     surfaces later.
@@ -163,6 +163,7 @@ def fetch_jaxa_earth(
             "Install it via the [jaxa] extra: pip install 'earthlens[jaxa]'."
         ) from exc
     from pyramids.dataset import Dataset as PyrDataset
+    from pyramids.dataset import GeoReference
 
     if not dataset.collection:
         raise ValueError(
@@ -202,7 +203,7 @@ def fetch_jaxa_earth(
         lonlim = _flatten_pair(raster.lonlim)
         geo = _geo_tuple(latlim, lonlim, arr_2d.shape)
 
-        ds_out = PyrDataset.create_from_array(arr_2d, geo=geo, epsg=4326)
+        ds_out = PyrDataset.from_array(arr_2d, geo_ref=GeoReference(geo=geo, epsg=4326))
         target = out_dir / f"{dataset.key}_{band}.tif"
         ds_out.to_file(str(target))
         written.append(target)
