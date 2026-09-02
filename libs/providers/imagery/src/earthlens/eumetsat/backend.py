@@ -151,7 +151,14 @@ def _bounded_http(timeout: tuple[float, float] = TAILOR_HTTP_TIMEOUT_S):
 
     @functools.wraps(original)
     def _request(self, *args, **kwargs):
-        kwargs.setdefault("timeout", timeout)
+        # Inject the default only when the caller gave no timeout — as a keyword
+        # or positionally. `timeout` is the 9th positional parameter of
+        # `Session.request` (method, url, params, data, headers, cookies, files,
+        # auth, timeout), i.e. `args[8]`; guarding on `len(args)` avoids a
+        # "multiple values for 'timeout'" TypeError if it is ever passed
+        # positionally.
+        if "timeout" not in kwargs and len(args) < 9:
+            kwargs["timeout"] = timeout
         return original(self, *args, **kwargs)
 
     _request._earthlens_bounded = True  # type: ignore[attr-defined]

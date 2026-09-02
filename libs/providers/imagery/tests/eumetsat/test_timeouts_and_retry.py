@@ -66,6 +66,37 @@ def test_bounded_http_injects_and_preserves_timeout(monkeypatch):
     assert calls == [be.TAILOR_HTTP_TIMEOUT_S, 5]
 
 
+def _recording_request(
+    self,
+    method,
+    url,
+    params=None,
+    data=None,
+    headers=None,
+    cookies=None,
+    files=None,
+    auth=None,
+    timeout="MISSING",
+    **kwargs,
+):
+    """A `Session.request` stand-in that captures the resolved `timeout`."""
+    _recording_request.seen = timeout
+    return "resp"
+
+
+def test_bounded_http_tolerates_positional_timeout(monkeypatch):
+    """A `timeout` passed positionally is preserved, not double-injected (L1)."""
+    import requests
+
+    monkeypatch.setattr(requests.sessions.Session, "request", _recording_request)
+    with be._bounded_http():
+        # timeout is the 9th positional arg after self; must not collide
+        requests.sessions.Session.request(
+            object(), "GET", "http://x", None, None, None, None, None, None, 7
+        )
+    assert _recording_request.seen == 7
+
+
 def test_bounded_http_reentrant_and_restored():
     """Nested `_bounded_http` reuses the outer wrap and restores on exit."""
     import requests
