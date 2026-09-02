@@ -53,50 +53,23 @@ _GLOBAL_GEO = (-180.0, 0.25, 0.0, 90.0, 0.0, -0.25)
 _COASTAL_CSV = "GID_0,NAME_0,summary_TWL_1_10\nABW,Aruba,2\nNLD,Netherlands,9\n"
 
 
-class _FakeMDArray:
-    """A CF `time` coordinate returning days since a stated epoch."""
+class _FakeCube:
+    """The slice of pyramids' `NetCDF` that `band_valid_times` touches.
 
-    def __init__(self, values, units="days since 1950-01-01"):
-        self._values = values
-        self._units = units
+    pyramids decodes the CF `time` coordinate itself, so the fake hands back
+    finished labels rather than raw offsets plus an epoch.
+    """
 
-    def ReadAsArray(self):  # noqa: N802 - mirrors GDAL's method name
-        return np.asarray(self._values)
+    def __init__(self, labels):
+        self._labels = labels
 
-    def GetUnit(self):  # noqa: N802 - mirrors GDAL's method name
-        return self._units
-
-
-class _FakeRootGroup:
-    """A root group exposing one named MDArray."""
-
-    def __init__(self, values):
-        self._values = values
-
-    def OpenMDArray(self, name):  # noqa: N802 - mirrors GDAL's method name
-        return _FakeMDArray(self._values)
+    def get_time_variable(self, time_format=None):
+        return self._labels
 
 
-class _FakeMDDataset:
-    """A multidim dataset wrapping a fake root group."""
-
-    def __init__(self, values):
-        self._values = values
-
-    def GetRootGroup(self):  # noqa: N802 - mirrors GDAL's method name
-        return _FakeRootGroup(self._values)
-
-
-class _FakeGdal:
-    """The slice of `osgeo.gdal` that `band_valid_times` touches."""
-
-    OF_MULTIDIM_RASTER = 0
-
-    def __init__(self, values):
-        self._values = values
-
-    def OpenEx(self, url, flags):  # noqa: N802 - mirrors GDAL's method name
-        return _FakeMDDataset(self._values)
+def _fake_cube_reader(labels):
+    """Return a `NetCDF.read_file` stand-in serving `labels` as the time axis."""
+    return lambda *args, **kwargs: _FakeCube(labels)
 
 
 def _raise_503(url):
@@ -174,18 +147,24 @@ class _FakeTimeVariable:
 class _FakeContainer:
     """A NetCDF container yielding a fake data variable plus a `time` axis."""
 
-    def __init__(self, variable):
+    def __init__(self, variable, time_labels=None):
         self._variable = variable
+        self._time_labels = time_labels
 
     def get_variable(self, name):
         if name == "time":
             return _FakeTimeVariable()
         return self._variable
 
+    def get_time_variable(self, time_format=None):
+        return self._time_labels
 
-def _fake_read_file(_url, variable=None):
+
+def _fake_read_file(_url, variable=None, time_labels=None):
     """Stand-in for `NetCDF.read_file` returning a fake container."""
-    return _FakeContainer(variable if variable is not None else _FakeVariable())
+    return _FakeContainer(
+        variable if variable is not None else _FakeVariable(), time_labels
+    )
 
 
 class _FakeIntVariable(_FakeVariable):
@@ -561,32 +540,31 @@ class TestNetworkSeams:
 
 
 class TestBandValidTimes:
-    """`band_valid_times` reads the CF time axis through the gdal seam."""
+    """`band_valid_times` reads the CF time axis through pyramids."""
 
     @pytest.mark.real_band_names
     def test_time_axis_becomes_band_labels(self, monkeypatch):
         """A field whose bands are the time axis gets real valid times."""
+        labels = ["2026-08-26T00:00", "2026-08-27T00:00", "2026-08-28T00:00"]
         monkeypatch.setattr(
-            _helpers, "gdal_module", lambda: _FakeGdal([27996.0, 27997.0, 27998.0])
+            "pyramids.netcdf.NetCDF.read_file", _fake_cube_reader(labels)
         )
-        assert _helpers.band_valid_times("irrelevant", 3) == [
-            "2026-08-26T00:00",
-            "2026-08-27T00:00",
-            "2026-08-28T00:00",
-        ]
+        assert _helpers.band_valid_times("irrelevant", 3) == labels
 
     @pytest.mark.real_band_names
     def test_aggregate_field_keeps_positional_names(self, monkeypatch):
         """A 2-D aggregate (1 band, 16-step axis) is never mislabelled."""
         monkeypatch.setattr(
-            _helpers, "gdal_module", lambda: _FakeGdal(list(range(27996, 28012)))
+            "pyramids.netcdf.NetCDF.read_file",
+            _fake_cube_reader([f"2026-08-{26 + n:02d}T00:00" for n in range(16)]),
         )
         assert _helpers.band_valid_times("irrelevant", 1) == ["step_1"]
 
     @pytest.mark.real_band_names
-    def test_gdal_module_returns_the_vendored_gdal(self):
-        """The seam hands back the real GDAL module."""
-        assert hasattr(_helpers.gdal_module(), "OpenEx")
+    def test_an_undecodable_axis_keeps_positional_names(self, monkeypatch):
+        """pyramids returning no labels degrades to step_N, never raises."""
+        monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", _fake_cube_reader(None))
+        assert _helpers.band_valid_times("irrelevant", 2) == ["step_1", "step_2"]
 
 
 class TestGeographicAffineGuard:
@@ -671,9 +649,13 @@ class TestBandNamesReachTheOutput:
             ["mediumTermTWLforecastGridded_x.nc"],
         )
         monkeypatch.setattr(_helpers, "_http_text", http)
-        monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", _fake_read_file)
         monkeypatch.setattr(
-            _helpers, "gdal_module", lambda: _FakeGdal([27996.0 + n for n in range(16)])
+            "pyramids.netcdf.NetCDF.read_file",
+            lambda url, variable=None: _fake_read_file(
+                url,
+                variable,
+                time_labels=[f"2026-08-{26 + n:02d}T00:00" for n in range(16)],
+            ),
         )
         backend = JRC(
             dataset="sea_level",
@@ -1058,7 +1040,7 @@ class TestHelperEdges:
     @pytest.mark.real_band_names
     def test_band_valid_times_falls_back_when_time_is_unreadable(self, monkeypatch):
         """An unreadable time axis degrades to positional band names, never raises."""
-        monkeypatch.setattr(_helpers, "gdal_module", _raise_runtime)
+        monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", _raise_runtime)
         assert _helpers.band_valid_times("irrelevant", 3) == [
             "step_1",
             "step_2",
@@ -1119,10 +1101,6 @@ class TestHelperEdges:
                 http_text=_boom,
             )
 
-    def test_unparseable_time_units_fall_back_to_the_default_epoch(self):
-        """An unrecognised date in the units falls back rather than raising."""
-        assert _helpers._parse_cf_epoch("days since not-a-date").year == 1950
-
     def test_ambiguous_glob_match_raises(self):
         """Two files matching one glob is a layout change, not a pick-the-first."""
         html = (
@@ -1167,12 +1145,6 @@ class TestHelperEdges:
             _helpers.require_geographic_affine(
                 (-180.0, 0.25, 0.1, 90.0, 0.1, -0.25), 1440, 720, "x"
             )
-
-    def test_cf_epoch_is_read_from_the_units(self):
-        """The epoch comes from the file's units, not a hardcoded constant."""
-        assert _helpers._parse_cf_epoch("days since 2000-01-01").year == 2000
-        assert _helpers._parse_cf_epoch(None).year == 1950
-        assert _helpers._parse_cf_epoch("hours since 2000-01-01").year == 1950
 
     def test_find_cycle_file_is_case_sensitive(self):
         """Glob matching is case-sensitive, so it behaves the same on all platforms."""

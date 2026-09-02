@@ -577,13 +577,20 @@ class TestDeepSampleVariable:
         assert ecmwf_cli._ecmwf_deep_sample_variable("a-dataset", "t2m") == ({}, {})
 
 
-class TestReadNetcdfVarMetaSubdatasets:
-    """A container whose variables live in subdatasets rather than at the root."""
+class TestReadNetcdfVarMeta:
+    """Reading goes through pyramids; an unreadable container has nothing to add."""
 
-    def test_every_named_subdataset_is_read_and_merged(self, monkeypatch, tmp_path):
-        """Some CDS NetCDFs describe their variables one subdataset down."""
-        from osgeo import gdal
+    def test_the_pyramids_schema_is_returned_verbatim(self, monkeypatch, tmp_path):
+        """Whatever pyramids describes is what the caller gets."""
+        target = tmp_path / "granule.nc"
+        target.write_bytes(b"not really netcdf")
+        schema = {"t2m": {"long_name": "2 metre temperature", "units": "K"}}
+        monkeypatch.setattr(ecmwf_cli, "_read_via_pyramids", lambda path: schema)
 
+        assert ecmwf_cli._read_netcdf_var_meta(str(target)) == schema
+
+    def test_a_raising_read_degrades_to_an_empty_schema(self, monkeypatch, tmp_path):
+        """A caller hydrating a row gets "nothing to add", never an exception."""
         target = tmp_path / "granule.nc"
         target.write_bytes(b"not really netcdf")
         monkeypatch.setattr(
@@ -591,33 +598,8 @@ class TestReadNetcdfVarMetaSubdatasets:
             "_read_via_pyramids",
             lambda path: (_ for _ in ()).throw(OSError("unreadable")),
         )
-        monkeypatch.setattr(gdal, "Info", _info_with_two_subdatasets)
-        monkeypatch.setattr(ecmwf_cli, "_from_info", _info_to_meta)
 
-        meta = ecmwf_cli._read_netcdf_var_meta(str(target))
-
-        assert sorted(meta) == ["sst", "t2m"], f"subdatasets not merged: {sorted(meta)}"
-        assert meta["t2m"]["units"] == "K"
-
-    def test_a_root_exposing_variables_is_read_without_subdatasets(
-        self, monkeypatch, tmp_path
-    ):
-        """The ordinary container needs no second pass."""
-        from osgeo import gdal
-
-        target = tmp_path / "granule.nc"
-        target.write_bytes(b"not really netcdf")
-        monkeypatch.setattr(
-            ecmwf_cli,
-            "_read_via_pyramids",
-            lambda path: (_ for _ in ()).throw(OSError("unreadable")),
-        )
-        monkeypatch.setattr(gdal, "Info", lambda path, format=None: {"path": "t2m"})
-        monkeypatch.setattr(ecmwf_cli, "_from_info", _info_to_meta)
-
-        assert ecmwf_cli._read_netcdf_var_meta(str(target)) == {
-            "t2m": {"long_name": "2 metre temperature", "units": "K"}
-        }
+        assert ecmwf_cli._read_netcdf_var_meta(str(target)) == {}
 
 
 class TestDiscardScratch:
@@ -895,42 +877,25 @@ class TestDeepProber:
         )
         assert ecmwf_cli._read_netcdf_var_meta(str(path)) == {"tp": {"units": "m"}}
 
-    def test_read_netcdf_var_meta_falls_back_when_pyramids_is_empty(
+    def test_read_netcdf_var_meta_returns_empty_when_pyramids_finds_nothing(
         self, monkeypatch, tmp_path
     ):
-        """Every hydrated row was read by the classic walk; it must keep working."""
-        import numpy as np
-        import xarray as xr
-
+        """A container pyramids cannot describe adds nothing, rather than raising."""
         path = tmp_path / "probe.nc"
-        xr.Dataset(
-            {
-                "t2m": (
-                    ("lat", "lon"),
-                    np.ones((2, 2), "f4"),
-                    {"units": "K", "long_name": "2 metre temperature"},
-                )
-            },
-            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
-        ).to_netcdf(path)
+        path.write_bytes(b"not really a netcdf")
         monkeypatch.setattr(ecmwf_cli, "_read_via_pyramids", lambda p: {})
-        meta = ecmwf_cli._read_netcdf_var_meta(str(path))
-        assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
 
-    def test_read_netcdf_var_meta_falls_back_when_pyramids_raises(
+        assert ecmwf_cli._read_netcdf_var_meta(str(path)) == {}
+
+    def test_read_netcdf_var_meta_swallows_a_pyramids_error(
         self, monkeypatch, tmp_path
     ):
-        """An unreadable container must not lose a file the classic walk can read."""
-        import numpy as np
-        import xarray as xr
-
+        """A raising read degrades to an empty schema, never propagates."""
         path = tmp_path / "probe.nc"
-        xr.Dataset(
-            {"tp": (("lat", "lon"), np.ones((2, 2), "f4"), {"units": "m"})},
-            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
-        ).to_netcdf(path)
+        path.write_bytes(b"not really a netcdf")
         monkeypatch.setattr(ecmwf_cli, "_read_via_pyramids", _raise_unreadable)
-        assert ecmwf_cli._read_netcdf_var_meta(str(path))["tp"]["units"] == "m"
+
+        assert ecmwf_cli._read_netcdf_var_meta(str(path)) == {}
 
     def test_variable_meta_reads_a_gridded_variable(self):
         """A gridded variable arrives as a pyramids Variable."""

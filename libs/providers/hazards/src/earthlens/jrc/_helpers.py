@@ -17,17 +17,14 @@ import fnmatch
 import math
 import re
 from collections.abc import Callable, Sequence
-from datetime import datetime, timedelta
+from datetime import datetime
 from functools import lru_cache
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
-import numpy as np
 import requests
 from loguru import logger
 
 if TYPE_CHECKING:  # pragma: no cover - import-time only for the annotations
-    from types import ModuleType
-
     from earthlens.base.http import HttpClient
 
 #: Root of the JRC CEMS-EFAS flood-hazard directory (anonymous HTTPS, no auth).
@@ -417,43 +414,13 @@ def find_cycle_file(
     return matches[0]
 
 
-#: Fallback CF epoch when the cube's `time` units cannot be parsed.
-_TIME_EPOCH = datetime(1950, 1, 1)
-
-
-def _parse_cf_epoch(units: str | None) -> datetime:
-    """Parse a CF `days since <date>` unit string into its epoch.
-
-    Args:
-        units: The coordinate's unit string, e.g. `"days since 1950-01-01"`.
-
-    Returns:
-        datetime: The parsed epoch, or the documented 1950-01-01 default when the
-            units are missing or in an unexpected form (band naming is
-            best-effort and must never fail the fetch).
-    """
-    if not units or " since " not in units:
-        return _TIME_EPOCH
-    amount, _, rest = units.partition(" since ")
-    if amount.strip().lower() != "days":
-        logger.warning(f"JRC: unexpected time units {units!r}; band labels may be off")
-        return _TIME_EPOCH
-    stamp = rest.strip().replace("T", " ").split(".")[0]
-    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d"):
-        try:
-            return datetime.strptime(stamp, fmt)
-        except ValueError:
-            continue
-    return _TIME_EPOCH
-
-
 def band_valid_times(url: str, steps: int) -> list[str]:
     """Name each output band by the forecast valid time it holds.
 
     The cubes carry a CF `time` coordinate (`days since 1950-01-01`) that becomes
     the written GeoTIFF's band axis; without these names a band is unidentifiable
-    without going back to the source. `time` is a *coordinate*, so it is reachable
-    through GDAL's multidimensional API rather than the container's data variables.
+    without going back to the source. pyramids decodes that coordinate — offsets
+    and epoch together — so the whole read is one call.
 
     Args:
         url: The `/vsicurl/`-prefixed cube URL to read the coordinate from.
@@ -464,49 +431,21 @@ def band_valid_times(url: str, steps: int) -> list[str]:
             `step_<n>` fallback when the coordinate cannot be read.
     """
     try:
-        gdal = gdal_module()
+        from pyramids.netcdf import NetCDF
 
-        dataset = gdal.OpenEx(url, gdal.OF_MULTIDIM_RASTER)
-        try:
-            array = dataset.GetRootGroup().OpenMDArray("time")
-            axis = np.asarray(array.ReadAsArray()).ravel()
-            epoch = _parse_cf_epoch(array.GetUnit())
-        finally:
-            # Release the second remote handle this opens; leaving it to the GC
-            # holds a /vsicurl connection open per fetch.
-            dataset = None
+        labels = NetCDF.read_file(url).get_time_variable(time_format="%Y-%m-%dT%H:%M")
         # Compare the FULL axis, unsliced: a 2-D aggregate field (e.g. a 15-day
         # exceedance probability) has one band while the cube's time axis has
         # many, and slicing first would confidently mislabel it with step 0's
         # timestamp. Only a field whose bands ARE the time axis gets valid times.
-        if axis.size == steps:
-            return [
-                (epoch + timedelta(days=float(v))).strftime("%Y-%m-%dT%H:%M")
-                for v in axis
-            ]
+        if labels is not None and len(labels) == steps:
+            return list(labels)
     except Exception as exc:  # noqa: BLE001 - naming is best-effort; never fail
         logger.warning(
             f"JRC: could not read the cube's time axis ({type(exc).__name__}: "
             f"{exc}); bands fall back to positional step_N names."
         )
     return [f"step_{index + 1}" for index in range(steps)]
-
-
-def gdal_module() -> ModuleType:
-    """Return the vendored `osgeo.gdal` module.
-
-    Imported through this one accessor so the multidim reads below have a single
-    seam a test can replace, and so `osgeo` is imported lazily (it only resolves
-    once `pyramids` has put its vendored copy on the path).
-
-    Returns:
-        ModuleType: The `osgeo.gdal` module.
-    """
-    from osgeo import gdal
-
-    # osgeo ships no stubs, so the import is Any; the cast restores the
-    # declared return type without weakening it.
-    return cast("ModuleType", gdal)
 
 
 def require_geographic_affine(
