@@ -16,6 +16,21 @@ _OLCI = "EO:EUM:DAT:0409"  # s3-olci-l1-efr, tailor_product_type OLL1EFR
 _STALE = "2026 ERROR [Errno 116] Stale file handle: /var/dtws/users/x/OUTPUTS/y"
 
 
+@pytest.fixture(autouse=True)
+def _restore_session_request():
+    """Safety net: restore the real `Session.request` after every test.
+
+    The `_bounded_http` tests patch the global `requests.Session.request`; if a
+    regression broke `_bounded_http`'s own restore, this teardown stops a leaked
+    wrapper from cascading into unrelated tests.
+    """
+    import requests
+
+    original = requests.sessions.Session.request
+    yield
+    requests.sessions.Session.request = original
+
+
 def _backend(fake_eumdac, tmp_path, variables, **kwargs):
     """Build an EUMETSAT backend wired to the fake `eumdac`."""
     return EUMETSAT(

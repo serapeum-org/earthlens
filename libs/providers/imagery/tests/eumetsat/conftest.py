@@ -138,7 +138,7 @@ class _FakeCustomisation:
         self.events: list[tuple[str, str]] | None = None
 
     @property
-    def status(self) -> str:
+    def status(self) -> Any:
         value = self._statuses.pop(0) if len(self._statuses) > 1 else self._statuses[0]
         # A scripted exception simulates a stalled / dropped poll HTTP call.
         if isinstance(value, BaseException):
