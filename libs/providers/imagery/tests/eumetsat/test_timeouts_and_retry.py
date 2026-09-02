@@ -80,6 +80,17 @@ def test_bounded_http_reentrant_and_restored():
     assert requests.sessions.Session.request is original  # fully restored
 
 
+def test_bounded_http_restores_on_exception():
+    """`_bounded_http` restores `Session.request` even if the block raises."""
+    import requests
+
+    original = requests.sessions.Session.request
+    with pytest.raises(RuntimeError, match="boom"):
+        with be._bounded_http():
+            raise RuntimeError("boom")
+    assert requests.sessions.Session.request is original  # not leaked
+
+
 def test_network_methods_are_bounded():
     """The three networked backend methods carry the timeout decorator."""
     for name in ("_search", "_fetch", "_tailor_one"):
