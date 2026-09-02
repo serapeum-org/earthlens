@@ -68,17 +68,23 @@ def test_bounded_http_injects_and_preserves_timeout(monkeypatch):
     """`_bounded_http` injects the default timeout, but preserves an explicit one."""
     import requests
 
-    calls: list = []
-
-    def _recorder(self, *args, **kwargs):
-        calls.append(kwargs.get("timeout", "MISSING"))
-        return "resp"
-
-    monkeypatch.setattr(requests.sessions.Session, "request", _recorder)
+    _capturing_request.calls = []
+    monkeypatch.setattr(requests.sessions.Session, "request", _capturing_request)
     with be._bounded_http():
         requests.sessions.Session.request(object(), "GET", "http://x")
         requests.sessions.Session.request(object(), "GET", "http://x", timeout=5)
-    assert calls == [be.TAILOR_HTTP_TIMEOUT_S, 5]
+    assert _capturing_request.calls == [be.EUMDAC_HTTP_TIMEOUT_S, 5]
+
+
+def test_bounded_http_explicit_timeout_overrides_default(monkeypatch):
+    """An explicit `_bounded_http(timeout=...)` is injected instead of the constant."""
+    import requests
+
+    _capturing_request.calls = []
+    monkeypatch.setattr(requests.sessions.Session, "request", _capturing_request)
+    with be._bounded_http(timeout=(1.0, 2.0)):
+        requests.sessions.Session.request(object(), "GET", "http://x")
+    assert _capturing_request.calls == [(1.0, 2.0)]
 
 
 def _recording_request(
@@ -97,6 +103,15 @@ def _recording_request(
     """A `Session.request` stand-in that captures the resolved `timeout`."""
     _recording_request.seen = timeout
     return "resp"
+
+
+def _capturing_request(self, *args, **kwargs):
+    """A `Session.request` stand-in that records each call's `timeout` kwarg."""
+    _capturing_request.calls.append(kwargs.get("timeout", "MISSING"))
+    return "resp"
+
+
+_capturing_request.calls = []
 
 
 def test_bounded_http_tolerates_positional_timeout(monkeypatch):
@@ -139,7 +154,7 @@ def test_bounded_http_restores_on_exception():
 
 def test_network_methods_are_bounded():
     """The three networked backend methods carry the timeout decorator."""
-    for name in ("_search", "_fetch", "_tailor_one"):
+    for name in ("_search", "_fetch", "_tailor", "_tailor_one"):
         assert hasattr(getattr(EUMETSAT, name), "__wrapped__"), name
 
 
