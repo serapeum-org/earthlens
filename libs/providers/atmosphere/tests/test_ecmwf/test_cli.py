@@ -655,32 +655,6 @@ def _write_zip_holding_no_netcdf(client, dataset, request, target, endpoint):
         archive.writestr("readme.txt", b"no granule here")
 
 
-def _info_with_two_subdatasets(path, format=None):
-    """Stand in for gdal.Info over a container holding two subdatasets."""
-    if path.endswith(".nc"):
-        return {
-            "metadata": {
-                "SUBDATASETS": {
-                    "SUBDATASET_1_NAME": "NETCDF:granule.nc:t2m",
-                    "SUBDATASET_1_DESC": "the temperature field",
-                    "SUBDATASET_2_NAME": "NETCDF:granule.nc:sst",
-                    "SUBDATASET_2_DESC": "the sea surface field",
-                }
-            }
-        }
-    return {"path": path}
-
-
-def _info_to_meta(info):
-    """Turn a stubbed gdal.Info payload into the meta mapping the reader returns."""
-    path = str(info.get("path", ""))
-    if path.endswith("t2m"):
-        return {"t2m": {"long_name": "2 metre temperature", "units": "K"}}
-    if path.endswith("sst"):
-        return {"sst": {"long_name": "sea surface temperature", "units": "K"}}
-    return {}
-
-
 def _recording_reader(seen):
     """A `_read_netcdf_var_meta` stand-in that records the path it was handed.
 
