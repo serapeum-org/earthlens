@@ -46,7 +46,7 @@ import contextlib
 import functools
 import shutil
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from pathlib import Path
 from typing import ParamSpec, TypeVar
 
@@ -88,7 +88,7 @@ TAILOR_SUBMIT_BACKOFF_S = 2.0
 _TAILOR_ACTIVE = frozenset({"QUEUED", "RUNNING"})
 #: Substrings that mark a submit error as transient (worth retrying) — the
 #: EUMETSAT EPCS endpoint intermittently 502s (`A1`/`G8`). A bounded-call
-#: timeout (`TAILOR_HTTP_TIMEOUT_S`) surfaces as a `requests` timeout whose
+#: timeout (`EUMDAC_HTTP_TIMEOUT_S`) surfaces as a `requests` timeout whose
 #: message contains `"timed out"` / `"connection"`, so a stalled *submit* is
 #: retried by this same set (#1146).
 _TRANSIENT_MARKERS = (
@@ -100,11 +100,13 @@ _TRANSIENT_MARKERS = (
     "connection",
 )
 #: Per-call `(connect, read)` socket timeout injected into every eumdac HTTP
-#: request (Data Store + Data Tailor). `eumdac` sets no timeout and exposes no
-#: session to configure, so without this a stalled socket blocks forever and
-#: defeats `TAILOR_POLL_TIMEOUT_S` (#1146). The read bound is per socket read,
-#: so it caps a *stalled* stream without killing a slow-but-alive one.
-TAILOR_HTTP_TIMEOUT_S: tuple[float, float] = (30.0, 300.0)
+#: request — Data Store **and** Data Tailor, including native product streaming
+#: in `_fetch`. `eumdac` sets no timeout and exposes no session to configure, so
+#: without this a stalled socket blocks forever and defeats
+#: `TAILOR_POLL_TIMEOUT_S` (#1146). The read bound is per socket read, so it caps
+#: a *stalled* stream without killing a slow-but-alive one (the only risk is a
+#: server that takes longer than the read bound to emit the first byte).
+EUMDAC_HTTP_TIMEOUT_S: tuple[float, float] = (30.0, 300.0)
 #: Substrings in a `FAILED` customisation's log tail that mark the failure as a
 #: transient EUMETSAT-side infrastructure fault (NFS / disk), worth resubmitting
 #: rather than surfacing — as opposed to a bad request, which fails fast (#1145).
@@ -120,7 +122,7 @@ _R = TypeVar("_R")
 
 
 @contextlib.contextmanager
-def _bounded_http(timeout: tuple[float, float] = TAILOR_HTTP_TIMEOUT_S):
+def _bounded_http(timeout: tuple[float, float] | None = None) -> Iterator[None]:
     """Give every `requests` call a default `(connect, read)` timeout.
 
     `eumdac` issues module-level `requests.get` / `post` / … (it owns no
@@ -136,13 +138,18 @@ def _bounded_http(timeout: tuple[float, float] = TAILOR_HTTP_TIMEOUT_S):
     scope; the guard only covers nesting on one thread.
 
     Args:
-        timeout: The `(connect, read)` timeout in seconds to inject.
+        timeout: The `(connect, read)` timeout in seconds to inject. `None`
+            (the default, used by `_bounded_http_calls`) reads the current
+            `EUMDAC_HTTP_TIMEOUT_S` at call time, so patching that constant
+            takes effect through the decorator path.
 
     Yields:
         None: for the duration of the bounded block.
     """
     import requests  # lazy — guaranteed by earthlens-core, only needed live
 
+    if timeout is None:
+        timeout = EUMDAC_HTTP_TIMEOUT_S
     session = requests.sessions.Session
     original = session.request
     if getattr(original, "_earthlens_bounded", False):
@@ -832,18 +839,22 @@ class EUMETSAT(AbstractDataSource):
         `FAILED` / `KILLED` / an unexpected stuck state (e.g. `INACTIVE`)
         fail fast rather than polling to the timeout. Gives up after
         `TAILOR_POLL_TIMEOUT_S` so a job stuck *active* cannot hang forever
-        (`G8`); the final sleep is clamped to the remaining budget so the
-        wall-clock never overshoots the timeout.
+        (`G8`); the *sleep* between polls is clamped to the remaining budget.
+        The deadline is a **soft** bound, though: it is only checked between
+        polls, so a persistently stalled `cust.status` — which eumdac retries a
+        few times internally, each up to the injected read bound — can push the
+        real wait one bounded-call cycle (~`connect + read` × eumdac's retries)
+        past the budget before the loop rechecks and raises. That is a small
+        slop on a finite bound, versus the pre-fix unbounded hang.
 
         Each `cust.status` read is a bounded HTTP call (the caller runs under
         `_bounded_http`, #1146). A single poll that hits a **transient**
         transport error — a stalled read/connect or a dropped connection — is
         **not** fatal: the job may still be progressing server-side, so it is
         treated like "still active" and polling continues until the wall-clock
-        deadline, which is what actually caps the wait now that the deadline is
-        a real wall-clock bound (#1146). A **permanent** error is not caught and
-        fails fast: eumdac wraps an HTTP 4xx/5xx response into an `EumdacError`
-        (not a `requests` exception), which propagates straight out.
+        deadline (#1146). A **permanent** error is not caught and fails fast:
+        eumdac wraps an HTTP 4xx/5xx response into an `EumdacError` (not a
+        `requests` exception), which propagates straight out.
 
         Args:
             cust: The `eumdac` `Customisation` handle to poll.
