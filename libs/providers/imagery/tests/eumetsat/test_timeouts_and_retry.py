@@ -141,14 +141,19 @@ def test_bounded_http_reentrant_and_restored():
     assert requests.sessions.Session.request is original  # fully restored
 
 
+def _raise_inside_bounded_http():
+    """Raise inside a `_bounded_http` block (helper for the restore test)."""
+    with be._bounded_http():
+        raise RuntimeError("boom")
+
+
 def test_bounded_http_restores_on_exception():
     """`_bounded_http` restores `Session.request` even if the block raises."""
     import requests
 
     original = requests.sessions.Session.request
     with pytest.raises(RuntimeError, match="boom"):
-        with be._bounded_http():
-            raise RuntimeError("boom")
+        _raise_inside_bounded_http()
     assert requests.sessions.Session.request is original  # not leaked
 
 
@@ -225,7 +230,8 @@ def test_failed_infra_marker_resubmits_deleting_before_retry(
         ("submit", "c2"),
         ("delete", "c2"),
     ]
-    assert failed.deleted == 1 and done.deleted == 1
+    assert failed.deleted == 1
+    assert done.deleted == 1
 
 
 def test_failed_bad_request_fails_fast_without_retry(fake_eumdac, tmp_path):
@@ -235,8 +241,9 @@ def test_failed_bad_request_fails_fast_without_retry(fake_eumdac, tmp_path):
     )
     fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    cfg = TailorConfig()
     with pytest.raises(RuntimeError, match="FAILED"):
-        backend.download(progress_bar=False, tailor=TailorConfig())
+        backend.download(progress_bar=False, tailor=cfg)
     assert len(fake_eumdac.tailor.submitted) == 1
 
 
@@ -251,8 +258,9 @@ def test_failed_infra_marker_exhausts_retry_budget(fake_eumdac, tmp_path, monkey
     fake_eumdac.tailor.customisations = list(custs)
     fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    cfg = TailorConfig()
     with pytest.raises(RuntimeError, match="FAILED"):
-        backend.download(progress_bar=False, tailor=TailorConfig())
+        backend.download(progress_bar=False, tailor=cfg)
     assert len(fake_eumdac.tailor.submitted) == be.TAILOR_SUBMIT_RETRIES
     assert all(c.deleted == 1 for c in custs)
 
@@ -264,6 +272,7 @@ def test_killed_is_not_retried_even_with_infra_log(fake_eumdac, tmp_path):
     )
     fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1")]
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+    cfg = TailorConfig()
     with pytest.raises(RuntimeError, match="KILLED"):
-        backend.download(progress_bar=False, tailor=TailorConfig())
+        backend.download(progress_bar=False, tailor=cfg)
     assert len(fake_eumdac.tailor.submitted) == 1
