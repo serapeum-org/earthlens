@@ -3429,6 +3429,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#earthlens.gee.catalog.Catalog.get_catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_catalog
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#earthlens.gee.catalog.Catalog.get_task_status" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -18252,6 +18263,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Showcase - how much worse is a rarer flood, and how your window changes the answer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -24097,6 +24136,17 @@
     <span class="md-ellipsis">
       
         get_band
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#earthlens.gee.catalog.Catalog.get_catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_catalog
       
     </span>
   </a>
@@ -32004,7 +32054,26 @@ asset id the package knows about.</p>
 <span class="normal"><a href="#__codelineno-0-899">899</a></span>
 <span class="normal"><a href="#__codelineno-0-900">900</a></span>
 <span class="normal"><a href="#__codelineno-0-901">901</a></span>
-<span class="normal"><a href="#__codelineno-0-902">902</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-902">902</a></span>
+<span class="normal"><a href="#__codelineno-0-903">903</a></span>
+<span class="normal"><a href="#__codelineno-0-904">904</a></span>
+<span class="normal"><a href="#__codelineno-0-905">905</a></span>
+<span class="normal"><a href="#__codelineno-0-906">906</a></span>
+<span class="normal"><a href="#__codelineno-0-907">907</a></span>
+<span class="normal"><a href="#__codelineno-0-908">908</a></span>
+<span class="normal"><a href="#__codelineno-0-909">909</a></span>
+<span class="normal"><a href="#__codelineno-0-910">910</a></span>
+<span class="normal"><a href="#__codelineno-0-911">911</a></span>
+<span class="normal"><a href="#__codelineno-0-912">912</a></span>
+<span class="normal"><a href="#__codelineno-0-913">913</a></span>
+<span class="normal"><a href="#__codelineno-0-914">914</a></span>
+<span class="normal"><a href="#__codelineno-0-915">915</a></span>
+<span class="normal"><a href="#__codelineno-0-916">916</a></span>
+<span class="normal"><a href="#__codelineno-0-917">917</a></span>
+<span class="normal"><a href="#__codelineno-0-918">918</a></span>
+<span class="normal"><a href="#__codelineno-0-919">919</a></span>
+<span class="normal"><a href="#__codelineno-0-920">920</a></span>
+<span class="normal"><a href="#__codelineno-0-921">921</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;YAML-backed catalog of Earth Engine datasets for the GEE backend.</span>
 <a id="__codelineno-0-581" name="__codelineno-0-581"></a>
 <a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">    Reads every `*.yaml` file under :data:`CATALOG_PATH` (the</span>
@@ -32188,146 +32257,165 @@ asset id the package knows about.</p>
 <a id="__codelineno-0-760" name="__codelineno-0-760"></a>    <span class="c1"># `get_provider(slug)` (with did-you-mean hint) lifted to</span>
 <a id="__codelineno-0-761" name="__codelineno-0-761"></a>    <span class="c1"># :class:`earthlens.base.AbstractCatalog`.</span>
 <a id="__codelineno-0-762" name="__codelineno-0-762"></a>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_band</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">band_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Band</span><span class="p">:</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Band` for `(dataset_id, band_id)`.</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated dataset map (asset id → :class:`Dataset`).</span>
 <a id="__codelineno-0-765" name="__codelineno-0-765"></a>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">            dataset_id: The Earth Engine asset id.</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">            band_id: The band id within that dataset.</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">            The matching :class:`Band`.</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">            ValueError: If the dataset or the band is unknown.</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">            - Read a precipitation band&#39;s unit:</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_band(&quot;UCSB-CHG/CHIRPS/DAILY&quot;, &quot;precipitation&quot;).units</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="sd">                &#39;mm/d&#39;</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">            The :attr:`datasets` mapping.</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">            - The map is keyed by Earth Engine asset id:</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">                &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">                &gt;&gt;&gt; &quot;ESA/WorldCover/v200&quot; in cat.get_catalog()</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">                True</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">                &gt;&gt;&gt; cat.get_catalog()[&quot;ESA/WorldCover/v200&quot;].title</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">                &#39;ESA WorldCover 10m v200 (2021)&#39;</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-781" name="__codelineno-0-781"></a>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">            - Read a Sentinel-2 band&#39;s centre wavelength:</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_band(&quot;COPERNICUS/S2_SR_HARMONIZED&quot;, &quot;B4&quot;).wavelength</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">                0.6645</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">        See Also:</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">            get_variable: Identical; provided for naming parity with</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">                `earthlens.ecmwf.Catalog.get_variable`.</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Band&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span><span class="o">.</span><span class="n">get_band</span><span class="p">(</span><span class="n">band_id</span><span class="p">))</span>
-<a id="__codelineno-0-795" name="__codelineno-0-795"></a>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">band_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Band</span><span class="p">:</span>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Alias of :meth:`get_band` (name parity with the ECMWF catalog).</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a>
-<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">            dataset_id: The Earth Engine asset id.</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">            band_id: The band id within that dataset.</span>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">            The matching :class:`Band`.</span>
-<a id="__codelineno-0-805" name="__codelineno-0-805"></a>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">            - Same result as :meth:`get_band`:</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_variable(&quot;USGS/SRTMGL1_003&quot;, &quot;elevation&quot;).units</span>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">                &#39;m&#39;</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_band</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">,</span> <span class="n">band_id</span><span class="p">)</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>    <span class="c1"># -- job / task tracking shortcuts -----------------------------------</span>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a>    <span class="c1"># Thin delegations to `earthlens.gee.jobs` so callers can stay on the</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a>    <span class="c1"># catalog object instead of importing the jobs module separately —</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a>    <span class="c1"># parity with `earthlens.ecmwf.Catalog.list_recent_jobs`.</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">list_recent_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskInfo</span><span class="p">]:</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;List recent Earth Engine batch tasks (delegates to `gee.jobs`).</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">            **kwargs: Forwarded verbatim to</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">                :func:`earthlens.gee.jobs.list_recent_tasks` —</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">                `state` / `max_age_min` / `task_type` /</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">                `description_prefix` / `project` / `limit`.</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">            A list of :class:`earthlens.gee.jobs.TaskInfo`, newest first.</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_band</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">band_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Band</span><span class="p">:</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Band` for `(dataset_id, band_id)`.</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">            dataset_id: The Earth Engine asset id.</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">            band_id: The band id within that dataset.</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">            The matching :class:`Band`.</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">            ValueError: If the dataset or the band is unknown.</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">            - Read a precipitation band&#39;s unit:</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_band(&quot;UCSB-CHG/CHIRPS/DAILY&quot;, &quot;precipitation&quot;).units</span>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">                &#39;mm/d&#39;</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">            - Read a Sentinel-2 band&#39;s centre wavelength:</span>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_band(&quot;COPERNICUS/S2_SR_HARMONIZED&quot;, &quot;B4&quot;).wavelength</span>
+<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">                0.6645</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">        See Also:</span>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">            get_variable: Identical; provided for naming parity with</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">                `earthlens.ecmwf.Catalog.get_variable`.</span>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Band&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span><span class="o">.</span><span class="n">get_band</span><span class="p">(</span><span class="n">band_id</span><span class="p">))</span>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">band_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Band</span><span class="p">:</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Alias of :meth:`get_band` (name parity with the ECMWF catalog).</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">            dataset_id: The Earth Engine asset id.</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">            band_id: The band id within that dataset.</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">            The matching :class:`Band`.</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">            - Same result as :meth:`get_band`:</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_variable(&quot;USGS/SRTMGL1_003&quot;, &quot;elevation&quot;).units</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">                &#39;m&#39;</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_recent_tasks</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_band</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">,</span> <span class="n">band_id</span><span class="p">)</span>
 <a id="__codelineno-0-834" name="__codelineno-0-834"></a>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a>        <span class="k">return</span> <span class="n">list_recent_tasks</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_task_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskInfo</span><span class="p">:</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one task&#39;s status by id (delegates to `gee.jobs`).</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="c1"># -- job / task tracking shortcuts -----------------------------------</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a>    <span class="c1"># Thin delegations to `earthlens.gee.jobs` so callers can stay on the</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a>    <span class="c1"># catalog object instead of importing the jobs module separately —</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>    <span class="c1"># parity with `earthlens.ecmwf.Catalog.list_recent_jobs`.</span>
 <a id="__codelineno-0-839" name="__codelineno-0-839"></a>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">            task_id: Bare task id or full operation name.</span>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">            **kwargs: Forwarded to</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">                :func:`earthlens.gee.jobs.get_task_status` —</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">                currently just `project`.</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">            A :class:`earthlens.gee.jobs.TaskInfo`.</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_task_status</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a>        <span class="k">return</span> <span class="n">get_task_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">audit_recent_tasks</span><span class="p">(</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a>        <span class="n">max_age_min</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskInfo</span><span class="p">]]:</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Group recent batch tasks by state — the task-side `health()`.</span>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">        Walks :func:`earthlens.gee.jobs.list_recent_tasks` with the</span>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">        given `max_age_min` (default: 7 days) and any extra filters</span>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">        from `**kwargs`, then groups the results by `TaskInfo.state`.</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">        Useful for &quot;are any of yesterday&#39;s exports stuck or failed?&quot;</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">        eyeballing.</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">            max_age_min: Window length in minutes. Defaults to 7 days</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">                — long enough to cover a typical weekly batch.</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">            **kwargs: Forwarded to</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">                :func:`earthlens.gee.jobs.list_recent_tasks` —</span>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="sd">                `task_type` / `description_prefix` / `project` / `limit`.</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">                Do not pass `state` here (the helper groups by state</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">                itself); a `state` kwarg would silently narrow the</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">                report.</span>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="sd">            `{state_name: [TaskInfo, ...], ...}` for every state that</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="sd">            appears in the window. Empty dict if no tasks match.</span>
-<a id="__codelineno-0-879" name="__codelineno-0-879"></a>
-<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-881" name="__codelineno-0-881"></a><span class="sd">            - Eyeball this week&#39;s exports for the SRTM asset:</span>
-<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">                &gt;&gt;&gt; report = Catalog().audit_recent_tasks(  # doctest: +SKIP</span>
-<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">                ...     description_prefix=&quot;USGS_SRTMGL1_003&quot;,</span>
-<a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">                ... )</span>
-<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">                &gt;&gt;&gt; for failed in report.get(&quot;FAILED&quot;, []):  # doctest: +SKIP</span>
-<a id="__codelineno-0-887" name="__codelineno-0-887"></a><span class="sd">                ...     print(failed.id, failed.error_message)</span>
-<a id="__codelineno-0-888" name="__codelineno-0-888"></a>
-<a id="__codelineno-0-889" name="__codelineno-0-889"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-890" name="__codelineno-0-890"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-891" name="__codelineno-0-891"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_recent_tasks</span>
-<a id="__codelineno-0-892" name="__codelineno-0-892"></a>
-<a id="__codelineno-0-893" name="__codelineno-0-893"></a>        <span class="k">if</span> <span class="s2">&quot;state&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-<a id="__codelineno-0-894" name="__codelineno-0-894"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-895" name="__codelineno-0-895"></a>                <span class="s2">&quot;audit_recent_tasks groups by state — don&#39;t pass `state=`; &quot;</span>
-<a id="__codelineno-0-896" name="__codelineno-0-896"></a>                <span class="s2">&quot;filter on the returned dict instead.&quot;</span>
-<a id="__codelineno-0-897" name="__codelineno-0-897"></a>            <span class="p">)</span>
-<a id="__codelineno-0-898" name="__codelineno-0-898"></a>        <span class="n">tasks</span> <span class="o">=</span> <span class="n">list_recent_tasks</span><span class="p">(</span><span class="n">max_age_min</span><span class="o">=</span><span class="n">max_age_min</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-899" name="__codelineno-0-899"></a>        <span class="n">report</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskInfo</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-900" name="__codelineno-0-900"></a>        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
-<a id="__codelineno-0-901" name="__codelineno-0-901"></a>            <span class="n">report</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-<a id="__codelineno-0-902" name="__codelineno-0-902"></a>        <span class="k">return</span> <span class="n">report</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">list_recent_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskInfo</span><span class="p">]:</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;List recent Earth Engine batch tasks (delegates to `gee.jobs`).</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">            **kwargs: Forwarded verbatim to</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">                :func:`earthlens.gee.jobs.list_recent_tasks` —</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">                `state` / `max_age_min` / `task_type` /</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">                `description_prefix` / `project` / `limit`.</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">            A list of :class:`earthlens.gee.jobs.TaskInfo`, newest first.</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_recent_tasks</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a>        <span class="k">return</span> <span class="n">list_recent_tasks</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_task_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskInfo</span><span class="p">:</span>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one task&#39;s status by id (delegates to `gee.jobs`).</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">            task_id: Bare task id or full operation name.</span>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">            **kwargs: Forwarded to</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">                :func:`earthlens.gee.jobs.get_task_status` —</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">                currently just `project`.</span>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">            A :class:`earthlens.gee.jobs.TaskInfo`.</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_task_status</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a>        <span class="k">return</span> <span class="n">get_task_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">audit_recent_tasks</span><span class="p">(</span>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a>        <span class="n">max_age_min</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskInfo</span><span class="p">]]:</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Group recent batch tasks by state — the task-side `health()`.</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">        Walks :func:`earthlens.gee.jobs.list_recent_tasks` with the</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">        given `max_age_min` (default: 7 days) and any extra filters</span>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a><span class="sd">        from `**kwargs`, then groups the results by `TaskInfo.state`.</span>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">        Useful for &quot;are any of yesterday&#39;s exports stuck or failed?&quot;</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">        eyeballing.</span>
+<a id="__codelineno-0-884" name="__codelineno-0-884"></a>
+<a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">            max_age_min: Window length in minutes. Defaults to 7 days</span>
+<a id="__codelineno-0-887" name="__codelineno-0-887"></a><span class="sd">                — long enough to cover a typical weekly batch.</span>
+<a id="__codelineno-0-888" name="__codelineno-0-888"></a><span class="sd">            **kwargs: Forwarded to</span>
+<a id="__codelineno-0-889" name="__codelineno-0-889"></a><span class="sd">                :func:`earthlens.gee.jobs.list_recent_tasks` —</span>
+<a id="__codelineno-0-890" name="__codelineno-0-890"></a><span class="sd">                `task_type` / `description_prefix` / `project` / `limit`.</span>
+<a id="__codelineno-0-891" name="__codelineno-0-891"></a><span class="sd">                Do not pass `state` here (the helper groups by state</span>
+<a id="__codelineno-0-892" name="__codelineno-0-892"></a><span class="sd">                itself); a `state` kwarg would silently narrow the</span>
+<a id="__codelineno-0-893" name="__codelineno-0-893"></a><span class="sd">                report.</span>
+<a id="__codelineno-0-894" name="__codelineno-0-894"></a>
+<a id="__codelineno-0-895" name="__codelineno-0-895"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-896" name="__codelineno-0-896"></a><span class="sd">            `{state_name: [TaskInfo, ...], ...}` for every state that</span>
+<a id="__codelineno-0-897" name="__codelineno-0-897"></a><span class="sd">            appears in the window. Empty dict if no tasks match.</span>
+<a id="__codelineno-0-898" name="__codelineno-0-898"></a>
+<a id="__codelineno-0-899" name="__codelineno-0-899"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-900" name="__codelineno-0-900"></a><span class="sd">            - Eyeball this week&#39;s exports for the SRTM asset:</span>
+<a id="__codelineno-0-901" name="__codelineno-0-901"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-902" name="__codelineno-0-902"></a><span class="sd">                &gt;&gt;&gt; report = Catalog().audit_recent_tasks(  # doctest: +SKIP</span>
+<a id="__codelineno-0-903" name="__codelineno-0-903"></a><span class="sd">                ...     description_prefix=&quot;USGS_SRTMGL1_003&quot;,</span>
+<a id="__codelineno-0-904" name="__codelineno-0-904"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-905" name="__codelineno-0-905"></a><span class="sd">                &gt;&gt;&gt; for failed in report.get(&quot;FAILED&quot;, []):  # doctest: +SKIP</span>
+<a id="__codelineno-0-906" name="__codelineno-0-906"></a><span class="sd">                ...     print(failed.id, failed.error_message)</span>
+<a id="__codelineno-0-907" name="__codelineno-0-907"></a>
+<a id="__codelineno-0-908" name="__codelineno-0-908"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-909" name="__codelineno-0-909"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-910" name="__codelineno-0-910"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_recent_tasks</span>
+<a id="__codelineno-0-911" name="__codelineno-0-911"></a>
+<a id="__codelineno-0-912" name="__codelineno-0-912"></a>        <span class="k">if</span> <span class="s2">&quot;state&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+<a id="__codelineno-0-913" name="__codelineno-0-913"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-914" name="__codelineno-0-914"></a>                <span class="s2">&quot;audit_recent_tasks groups by state — don&#39;t pass `state=`; &quot;</span>
+<a id="__codelineno-0-915" name="__codelineno-0-915"></a>                <span class="s2">&quot;filter on the returned dict instead.&quot;</span>
+<a id="__codelineno-0-916" name="__codelineno-0-916"></a>            <span class="p">)</span>
+<a id="__codelineno-0-917" name="__codelineno-0-917"></a>        <span class="n">tasks</span> <span class="o">=</span> <span class="n">list_recent_tasks</span><span class="p">(</span><span class="n">max_age_min</span><span class="o">=</span><span class="n">max_age_min</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-918" name="__codelineno-0-918"></a>        <span class="n">report</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskInfo</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a>        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a>            <span class="n">report</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a>        <span class="k">return</span> <span class="n">report</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -32463,26 +32551,7 @@ report.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/gee/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-853">853</a></span>
-<span class="normal"><a href="#__codelineno-0-854">854</a></span>
-<span class="normal"><a href="#__codelineno-0-855">855</a></span>
-<span class="normal"><a href="#__codelineno-0-856">856</a></span>
-<span class="normal"><a href="#__codelineno-0-857">857</a></span>
-<span class="normal"><a href="#__codelineno-0-858">858</a></span>
-<span class="normal"><a href="#__codelineno-0-859">859</a></span>
-<span class="normal"><a href="#__codelineno-0-860">860</a></span>
-<span class="normal"><a href="#__codelineno-0-861">861</a></span>
-<span class="normal"><a href="#__codelineno-0-862">862</a></span>
-<span class="normal"><a href="#__codelineno-0-863">863</a></span>
-<span class="normal"><a href="#__codelineno-0-864">864</a></span>
-<span class="normal"><a href="#__codelineno-0-865">865</a></span>
-<span class="normal"><a href="#__codelineno-0-866">866</a></span>
-<span class="normal"><a href="#__codelineno-0-867">867</a></span>
-<span class="normal"><a href="#__codelineno-0-868">868</a></span>
-<span class="normal"><a href="#__codelineno-0-869">869</a></span>
-<span class="normal"><a href="#__codelineno-0-870">870</a></span>
-<span class="normal"><a href="#__codelineno-0-871">871</a></span>
-<span class="normal"><a href="#__codelineno-0-872">872</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-872">872</a></span>
 <span class="normal"><a href="#__codelineno-0-873">873</a></span>
 <span class="normal"><a href="#__codelineno-0-874">874</a></span>
 <span class="normal"><a href="#__codelineno-0-875">875</a></span>
@@ -32512,56 +32581,75 @@ report.</p>
 <span class="normal"><a href="#__codelineno-0-899">899</a></span>
 <span class="normal"><a href="#__codelineno-0-900">900</a></span>
 <span class="normal"><a href="#__codelineno-0-901">901</a></span>
-<span class="normal"><a href="#__codelineno-0-902">902</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="k">def</span><span class="w"> </span><span class="nf">audit_recent_tasks</span><span class="p">(</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a>    <span class="n">max_age_min</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskInfo</span><span class="p">]]:</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Group recent batch tasks by state — the task-side `health()`.</span>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">    Walks :func:`earthlens.gee.jobs.list_recent_tasks` with the</span>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">    given `max_age_min` (default: 7 days) and any extra filters</span>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">    from `**kwargs`, then groups the results by `TaskInfo.state`.</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">    Useful for &quot;are any of yesterday&#39;s exports stuck or failed?&quot;</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">    eyeballing.</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">        max_age_min: Window length in minutes. Defaults to 7 days</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">            — long enough to cover a typical weekly batch.</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">        **kwargs: Forwarded to</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">            :func:`earthlens.gee.jobs.list_recent_tasks` —</span>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="sd">            `task_type` / `description_prefix` / `project` / `limit`.</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">            Do not pass `state` here (the helper groups by state</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">            itself); a `state` kwarg would silently narrow the</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">            report.</span>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="sd">        `{state_name: [TaskInfo, ...], ...}` for every state that</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="sd">        appears in the window. Empty dict if no tasks match.</span>
-<a id="__codelineno-0-879" name="__codelineno-0-879"></a>
-<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-881" name="__codelineno-0-881"></a><span class="sd">        - Eyeball this week&#39;s exports for the SRTM asset:</span>
-<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">            &gt;&gt;&gt; report = Catalog().audit_recent_tasks(  # doctest: +SKIP</span>
-<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">            ...     description_prefix=&quot;USGS_SRTMGL1_003&quot;,</span>
-<a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">            &gt;&gt;&gt; for failed in report.get(&quot;FAILED&quot;, []):  # doctest: +SKIP</span>
-<a id="__codelineno-0-887" name="__codelineno-0-887"></a><span class="sd">            ...     print(failed.id, failed.error_message)</span>
-<a id="__codelineno-0-888" name="__codelineno-0-888"></a>
-<a id="__codelineno-0-889" name="__codelineno-0-889"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-890" name="__codelineno-0-890"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-891" name="__codelineno-0-891"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_recent_tasks</span>
-<a id="__codelineno-0-892" name="__codelineno-0-892"></a>
-<a id="__codelineno-0-893" name="__codelineno-0-893"></a>    <span class="k">if</span> <span class="s2">&quot;state&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-<a id="__codelineno-0-894" name="__codelineno-0-894"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-895" name="__codelineno-0-895"></a>            <span class="s2">&quot;audit_recent_tasks groups by state — don&#39;t pass `state=`; &quot;</span>
-<a id="__codelineno-0-896" name="__codelineno-0-896"></a>            <span class="s2">&quot;filter on the returned dict instead.&quot;</span>
-<a id="__codelineno-0-897" name="__codelineno-0-897"></a>        <span class="p">)</span>
-<a id="__codelineno-0-898" name="__codelineno-0-898"></a>    <span class="n">tasks</span> <span class="o">=</span> <span class="n">list_recent_tasks</span><span class="p">(</span><span class="n">max_age_min</span><span class="o">=</span><span class="n">max_age_min</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-899" name="__codelineno-0-899"></a>    <span class="n">report</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskInfo</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-900" name="__codelineno-0-900"></a>    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
-<a id="__codelineno-0-901" name="__codelineno-0-901"></a>        <span class="n">report</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-<a id="__codelineno-0-902" name="__codelineno-0-902"></a>    <span class="k">return</span> <span class="n">report</span>
+<span class="normal"><a href="#__codelineno-0-902">902</a></span>
+<span class="normal"><a href="#__codelineno-0-903">903</a></span>
+<span class="normal"><a href="#__codelineno-0-904">904</a></span>
+<span class="normal"><a href="#__codelineno-0-905">905</a></span>
+<span class="normal"><a href="#__codelineno-0-906">906</a></span>
+<span class="normal"><a href="#__codelineno-0-907">907</a></span>
+<span class="normal"><a href="#__codelineno-0-908">908</a></span>
+<span class="normal"><a href="#__codelineno-0-909">909</a></span>
+<span class="normal"><a href="#__codelineno-0-910">910</a></span>
+<span class="normal"><a href="#__codelineno-0-911">911</a></span>
+<span class="normal"><a href="#__codelineno-0-912">912</a></span>
+<span class="normal"><a href="#__codelineno-0-913">913</a></span>
+<span class="normal"><a href="#__codelineno-0-914">914</a></span>
+<span class="normal"><a href="#__codelineno-0-915">915</a></span>
+<span class="normal"><a href="#__codelineno-0-916">916</a></span>
+<span class="normal"><a href="#__codelineno-0-917">917</a></span>
+<span class="normal"><a href="#__codelineno-0-918">918</a></span>
+<span class="normal"><a href="#__codelineno-0-919">919</a></span>
+<span class="normal"><a href="#__codelineno-0-920">920</a></span>
+<span class="normal"><a href="#__codelineno-0-921">921</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="k">def</span><span class="w"> </span><span class="nf">audit_recent_tasks</span><span class="p">(</span>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a>    <span class="n">max_age_min</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskInfo</span><span class="p">]]:</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Group recent batch tasks by state — the task-side `health()`.</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">    Walks :func:`earthlens.gee.jobs.list_recent_tasks` with the</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">    given `max_age_min` (default: 7 days) and any extra filters</span>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a><span class="sd">    from `**kwargs`, then groups the results by `TaskInfo.state`.</span>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">    Useful for &quot;are any of yesterday&#39;s exports stuck or failed?&quot;</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">    eyeballing.</span>
+<a id="__codelineno-0-884" name="__codelineno-0-884"></a>
+<a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">        max_age_min: Window length in minutes. Defaults to 7 days</span>
+<a id="__codelineno-0-887" name="__codelineno-0-887"></a><span class="sd">            — long enough to cover a typical weekly batch.</span>
+<a id="__codelineno-0-888" name="__codelineno-0-888"></a><span class="sd">        **kwargs: Forwarded to</span>
+<a id="__codelineno-0-889" name="__codelineno-0-889"></a><span class="sd">            :func:`earthlens.gee.jobs.list_recent_tasks` —</span>
+<a id="__codelineno-0-890" name="__codelineno-0-890"></a><span class="sd">            `task_type` / `description_prefix` / `project` / `limit`.</span>
+<a id="__codelineno-0-891" name="__codelineno-0-891"></a><span class="sd">            Do not pass `state` here (the helper groups by state</span>
+<a id="__codelineno-0-892" name="__codelineno-0-892"></a><span class="sd">            itself); a `state` kwarg would silently narrow the</span>
+<a id="__codelineno-0-893" name="__codelineno-0-893"></a><span class="sd">            report.</span>
+<a id="__codelineno-0-894" name="__codelineno-0-894"></a>
+<a id="__codelineno-0-895" name="__codelineno-0-895"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-896" name="__codelineno-0-896"></a><span class="sd">        `{state_name: [TaskInfo, ...], ...}` for every state that</span>
+<a id="__codelineno-0-897" name="__codelineno-0-897"></a><span class="sd">        appears in the window. Empty dict if no tasks match.</span>
+<a id="__codelineno-0-898" name="__codelineno-0-898"></a>
+<a id="__codelineno-0-899" name="__codelineno-0-899"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-900" name="__codelineno-0-900"></a><span class="sd">        - Eyeball this week&#39;s exports for the SRTM asset:</span>
+<a id="__codelineno-0-901" name="__codelineno-0-901"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-902" name="__codelineno-0-902"></a><span class="sd">            &gt;&gt;&gt; report = Catalog().audit_recent_tasks(  # doctest: +SKIP</span>
+<a id="__codelineno-0-903" name="__codelineno-0-903"></a><span class="sd">            ...     description_prefix=&quot;USGS_SRTMGL1_003&quot;,</span>
+<a id="__codelineno-0-904" name="__codelineno-0-904"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-905" name="__codelineno-0-905"></a><span class="sd">            &gt;&gt;&gt; for failed in report.get(&quot;FAILED&quot;, []):  # doctest: +SKIP</span>
+<a id="__codelineno-0-906" name="__codelineno-0-906"></a><span class="sd">            ...     print(failed.id, failed.error_message)</span>
+<a id="__codelineno-0-907" name="__codelineno-0-907"></a>
+<a id="__codelineno-0-908" name="__codelineno-0-908"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-909" name="__codelineno-0-909"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-910" name="__codelineno-0-910"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_recent_tasks</span>
+<a id="__codelineno-0-911" name="__codelineno-0-911"></a>
+<a id="__codelineno-0-912" name="__codelineno-0-912"></a>    <span class="k">if</span> <span class="s2">&quot;state&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+<a id="__codelineno-0-913" name="__codelineno-0-913"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-914" name="__codelineno-0-914"></a>            <span class="s2">&quot;audit_recent_tasks groups by state — don&#39;t pass `state=`; &quot;</span>
+<a id="__codelineno-0-915" name="__codelineno-0-915"></a>            <span class="s2">&quot;filter on the returned dict instead.&quot;</span>
+<a id="__codelineno-0-916" name="__codelineno-0-916"></a>        <span class="p">)</span>
+<a id="__codelineno-0-917" name="__codelineno-0-917"></a>    <span class="n">tasks</span> <span class="o">=</span> <span class="n">list_recent_tasks</span><span class="p">(</span><span class="n">max_age_min</span><span class="o">=</span><span class="n">max_age_min</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-918" name="__codelineno-0-918"></a>    <span class="n">report</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskInfo</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a>    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a>        <span class="n">report</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a>    <span class="k">return</span> <span class="n">report</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -32696,6 +32784,126 @@ report.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/gee/catalog.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-782">782</a></span>
+<span class="normal"><a href="#__codelineno-0-783">783</a></span>
+<span class="normal"><a href="#__codelineno-0-784">784</a></span>
+<span class="normal"><a href="#__codelineno-0-785">785</a></span>
+<span class="normal"><a href="#__codelineno-0-786">786</a></span>
+<span class="normal"><a href="#__codelineno-0-787">787</a></span>
+<span class="normal"><a href="#__codelineno-0-788">788</a></span>
+<span class="normal"><a href="#__codelineno-0-789">789</a></span>
+<span class="normal"><a href="#__codelineno-0-790">790</a></span>
+<span class="normal"><a href="#__codelineno-0-791">791</a></span>
+<span class="normal"><a href="#__codelineno-0-792">792</a></span>
+<span class="normal"><a href="#__codelineno-0-793">793</a></span>
+<span class="normal"><a href="#__codelineno-0-794">794</a></span>
+<span class="normal"><a href="#__codelineno-0-795">795</a></span>
+<span class="normal"><a href="#__codelineno-0-796">796</a></span>
+<span class="normal"><a href="#__codelineno-0-797">797</a></span>
+<span class="normal"><a href="#__codelineno-0-798">798</a></span>
+<span class="normal"><a href="#__codelineno-0-799">799</a></span>
+<span class="normal"><a href="#__codelineno-0-800">800</a></span>
+<span class="normal"><a href="#__codelineno-0-801">801</a></span>
+<span class="normal"><a href="#__codelineno-0-802">802</a></span>
+<span class="normal"><a href="#__codelineno-0-803">803</a></span>
+<span class="normal"><a href="#__codelineno-0-804">804</a></span>
+<span class="normal"><a href="#__codelineno-0-805">805</a></span>
+<span class="normal"><a href="#__codelineno-0-806">806</a></span>
+<span class="normal"><a href="#__codelineno-0-807">807</a></span>
+<span class="normal"><a href="#__codelineno-0-808">808</a></span>
+<span class="normal"><a href="#__codelineno-0-809">809</a></span>
+<span class="normal"><a href="#__codelineno-0-810">810</a></span>
+<span class="normal"><a href="#__codelineno-0-811">811</a></span>
+<span class="normal"><a href="#__codelineno-0-812">812</a></span>
+<span class="normal"><a href="#__codelineno-0-813">813</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_band</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">band_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Band</span><span class="p">:</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Band` for `(dataset_id, band_id)`.</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">        dataset_id: The Earth Engine asset id.</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">        band_id: The band id within that dataset.</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">        The matching :class:`Band`.</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">        ValueError: If the dataset or the band is unknown.</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">        - Read a precipitation band&#39;s unit:</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_band(&quot;UCSB-CHG/CHIRPS/DAILY&quot;, &quot;precipitation&quot;).units</span>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">            &#39;mm/d&#39;</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">        - Read a Sentinel-2 band&#39;s centre wavelength:</span>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_band(&quot;COPERNICUS/S2_SR_HARMONIZED&quot;, &quot;B4&quot;).wavelength</span>
+<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">            0.6645</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">    See Also:</span>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">        get_variable: Identical; provided for naming parity with</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">            `earthlens.ecmwf.Catalog.get_variable`.</span>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Band&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span><span class="o">.</span><span class="n">get_band</span><span class="p">(</span><span class="n">band_id</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="earthlens.gee.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.gee.catalog.Catalog.get_catalog" class="toclink">
+            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
+
+</a><a href="#earthlens.gee.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the curated dataset map (asset id → :class:<code>Dataset</code>).</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>The</code></td>            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.gee.catalog.Dataset&lt;/code&gt;)" href="#earthlens.gee.catalog.Dataset">Dataset</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>attr:<code>datasets</code> mapping.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <ul>
+<li>The map is keyed by Earth Engine asset id:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="s2">&quot;ESA/WorldCover/v200&quot;</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_catalog</span><span class="p">()</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kc">True</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_catalog</span><span class="p">()[</span><span class="s2">&quot;ESA/WorldCover/v200&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">title</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="s1">&#39;ESA WorldCover 10m v200 (2021)&#39;</span>
+</code></pre></div></li>
+</ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>libs/providers/imagery/src/earthlens/gee/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-763">763</a></span>
 <span class="normal"><a href="#__codelineno-0-764">764</a></span>
 <span class="normal"><a href="#__codelineno-0-765">765</a></span>
@@ -32713,52 +32921,24 @@ report.</p>
 <span class="normal"><a href="#__codelineno-0-777">777</a></span>
 <span class="normal"><a href="#__codelineno-0-778">778</a></span>
 <span class="normal"><a href="#__codelineno-0-779">779</a></span>
-<span class="normal"><a href="#__codelineno-0-780">780</a></span>
-<span class="normal"><a href="#__codelineno-0-781">781</a></span>
-<span class="normal"><a href="#__codelineno-0-782">782</a></span>
-<span class="normal"><a href="#__codelineno-0-783">783</a></span>
-<span class="normal"><a href="#__codelineno-0-784">784</a></span>
-<span class="normal"><a href="#__codelineno-0-785">785</a></span>
-<span class="normal"><a href="#__codelineno-0-786">786</a></span>
-<span class="normal"><a href="#__codelineno-0-787">787</a></span>
-<span class="normal"><a href="#__codelineno-0-788">788</a></span>
-<span class="normal"><a href="#__codelineno-0-789">789</a></span>
-<span class="normal"><a href="#__codelineno-0-790">790</a></span>
-<span class="normal"><a href="#__codelineno-0-791">791</a></span>
-<span class="normal"><a href="#__codelineno-0-792">792</a></span>
-<span class="normal"><a href="#__codelineno-0-793">793</a></span>
-<span class="normal"><a href="#__codelineno-0-794">794</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_band</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">band_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Band</span><span class="p">:</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Band` for `(dataset_id, band_id)`.</span>
+<span class="normal"><a href="#__codelineno-0-780">780</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated dataset map (asset id → :class:`Dataset`).</span>
 <a id="__codelineno-0-765" name="__codelineno-0-765"></a>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">        dataset_id: The Earth Engine asset id.</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">        band_id: The band id within that dataset.</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">        The matching :class:`Band`.</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">        ValueError: If the dataset or the band is unknown.</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">        - Read a precipitation band&#39;s unit:</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_band(&quot;UCSB-CHG/CHIRPS/DAILY&quot;, &quot;precipitation&quot;).units</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="sd">            &#39;mm/d&#39;</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">        - Read a Sentinel-2 band&#39;s centre wavelength:</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_band(&quot;COPERNICUS/S2_SR_HARMONIZED&quot;, &quot;B4&quot;).wavelength</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">            0.6645</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">    See Also:</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">        get_variable: Identical; provided for naming parity with</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">            `earthlens.ecmwf.Catalog.get_variable`.</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Band&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span><span class="o">.</span><span class="n">get_band</span><span class="p">(</span><span class="n">band_id</span><span class="p">))</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">        The :attr:`datasets` mapping.</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">        - The map is keyed by Earth Engine asset id:</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">            &gt;&gt;&gt; &quot;ESA/WorldCover/v200&quot; in cat.get_catalog()</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">            True</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">            &gt;&gt;&gt; cat.get_catalog()[&quot;ESA/WorldCover/v200&quot;].title</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">            &#39;ESA WorldCover 10m v200 (2021)&#39;</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -32853,35 +33033,35 @@ currently just <code>project</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/gee/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-837">837</a></span>
-<span class="normal"><a href="#__codelineno-0-838">838</a></span>
-<span class="normal"><a href="#__codelineno-0-839">839</a></span>
-<span class="normal"><a href="#__codelineno-0-840">840</a></span>
-<span class="normal"><a href="#__codelineno-0-841">841</a></span>
-<span class="normal"><a href="#__codelineno-0-842">842</a></span>
-<span class="normal"><a href="#__codelineno-0-843">843</a></span>
-<span class="normal"><a href="#__codelineno-0-844">844</a></span>
-<span class="normal"><a href="#__codelineno-0-845">845</a></span>
-<span class="normal"><a href="#__codelineno-0-846">846</a></span>
-<span class="normal"><a href="#__codelineno-0-847">847</a></span>
-<span class="normal"><a href="#__codelineno-0-848">848</a></span>
-<span class="normal"><a href="#__codelineno-0-849">849</a></span>
-<span class="normal"><a href="#__codelineno-0-850">850</a></span>
-<span class="normal"><a href="#__codelineno-0-851">851</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_task_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskInfo</span><span class="p">:</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch one task&#39;s status by id (delegates to `gee.jobs`).</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">        task_id: Bare task id or full operation name.</span>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">        **kwargs: Forwarded to</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">            :func:`earthlens.gee.jobs.get_task_status` —</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">            currently just `project`.</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">        A :class:`earthlens.gee.jobs.TaskInfo`.</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_task_status</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a>    <span class="k">return</span> <span class="n">get_task_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-856">856</a></span>
+<span class="normal"><a href="#__codelineno-0-857">857</a></span>
+<span class="normal"><a href="#__codelineno-0-858">858</a></span>
+<span class="normal"><a href="#__codelineno-0-859">859</a></span>
+<span class="normal"><a href="#__codelineno-0-860">860</a></span>
+<span class="normal"><a href="#__codelineno-0-861">861</a></span>
+<span class="normal"><a href="#__codelineno-0-862">862</a></span>
+<span class="normal"><a href="#__codelineno-0-863">863</a></span>
+<span class="normal"><a href="#__codelineno-0-864">864</a></span>
+<span class="normal"><a href="#__codelineno-0-865">865</a></span>
+<span class="normal"><a href="#__codelineno-0-866">866</a></span>
+<span class="normal"><a href="#__codelineno-0-867">867</a></span>
+<span class="normal"><a href="#__codelineno-0-868">868</a></span>
+<span class="normal"><a href="#__codelineno-0-869">869</a></span>
+<span class="normal"><a href="#__codelineno-0-870">870</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_task_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskInfo</span><span class="p">:</span>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch one task&#39;s status by id (delegates to `gee.jobs`).</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">        task_id: Bare task id or full operation name.</span>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">        **kwargs: Forwarded to</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">            :func:`earthlens.gee.jobs.get_task_status` —</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">            currently just `project`.</span>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">        A :class:`earthlens.gee.jobs.TaskInfo`.</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_task_status</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a>    <span class="k">return</span> <span class="n">get_task_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -32983,43 +33163,43 @@ currently just <code>project</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/gee/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-796">796</a></span>
-<span class="normal"><a href="#__codelineno-0-797">797</a></span>
-<span class="normal"><a href="#__codelineno-0-798">798</a></span>
-<span class="normal"><a href="#__codelineno-0-799">799</a></span>
-<span class="normal"><a href="#__codelineno-0-800">800</a></span>
-<span class="normal"><a href="#__codelineno-0-801">801</a></span>
-<span class="normal"><a href="#__codelineno-0-802">802</a></span>
-<span class="normal"><a href="#__codelineno-0-803">803</a></span>
-<span class="normal"><a href="#__codelineno-0-804">804</a></span>
-<span class="normal"><a href="#__codelineno-0-805">805</a></span>
-<span class="normal"><a href="#__codelineno-0-806">806</a></span>
-<span class="normal"><a href="#__codelineno-0-807">807</a></span>
-<span class="normal"><a href="#__codelineno-0-808">808</a></span>
-<span class="normal"><a href="#__codelineno-0-809">809</a></span>
-<span class="normal"><a href="#__codelineno-0-810">810</a></span>
-<span class="normal"><a href="#__codelineno-0-811">811</a></span>
-<span class="normal"><a href="#__codelineno-0-812">812</a></span>
-<span class="normal"><a href="#__codelineno-0-813">813</a></span>
-<span class="normal"><a href="#__codelineno-0-814">814</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">band_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Band</span><span class="p">:</span>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias of :meth:`get_band` (name parity with the ECMWF catalog).</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a>
-<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">        dataset_id: The Earth Engine asset id.</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">        band_id: The band id within that dataset.</span>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">        The matching :class:`Band`.</span>
-<a id="__codelineno-0-805" name="__codelineno-0-805"></a>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">        - Same result as :meth:`get_band`:</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_variable(&quot;USGS/SRTMGL1_003&quot;, &quot;elevation&quot;).units</span>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">            &#39;m&#39;</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_band</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">,</span> <span class="n">band_id</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-815">815</a></span>
+<span class="normal"><a href="#__codelineno-0-816">816</a></span>
+<span class="normal"><a href="#__codelineno-0-817">817</a></span>
+<span class="normal"><a href="#__codelineno-0-818">818</a></span>
+<span class="normal"><a href="#__codelineno-0-819">819</a></span>
+<span class="normal"><a href="#__codelineno-0-820">820</a></span>
+<span class="normal"><a href="#__codelineno-0-821">821</a></span>
+<span class="normal"><a href="#__codelineno-0-822">822</a></span>
+<span class="normal"><a href="#__codelineno-0-823">823</a></span>
+<span class="normal"><a href="#__codelineno-0-824">824</a></span>
+<span class="normal"><a href="#__codelineno-0-825">825</a></span>
+<span class="normal"><a href="#__codelineno-0-826">826</a></span>
+<span class="normal"><a href="#__codelineno-0-827">827</a></span>
+<span class="normal"><a href="#__codelineno-0-828">828</a></span>
+<span class="normal"><a href="#__codelineno-0-829">829</a></span>
+<span class="normal"><a href="#__codelineno-0-830">830</a></span>
+<span class="normal"><a href="#__codelineno-0-831">831</a></span>
+<span class="normal"><a href="#__codelineno-0-832">832</a></span>
+<span class="normal"><a href="#__codelineno-0-833">833</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">band_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Band</span><span class="p">:</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias of :meth:`get_band` (name parity with the ECMWF catalog).</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">        dataset_id: The Earth Engine asset id.</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">        band_id: The band id within that dataset.</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">        The matching :class:`Band`.</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">        - Same result as :meth:`get_band`:</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_variable(&quot;USGS/SRTMGL1_003&quot;, &quot;elevation&quot;).units</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">            &#39;m&#39;</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_band</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">,</span> <span class="n">band_id</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -33270,35 +33450,35 @@ CI hygiene checks.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/gee/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-821">821</a></span>
-<span class="normal"><a href="#__codelineno-0-822">822</a></span>
-<span class="normal"><a href="#__codelineno-0-823">823</a></span>
-<span class="normal"><a href="#__codelineno-0-824">824</a></span>
-<span class="normal"><a href="#__codelineno-0-825">825</a></span>
-<span class="normal"><a href="#__codelineno-0-826">826</a></span>
-<span class="normal"><a href="#__codelineno-0-827">827</a></span>
-<span class="normal"><a href="#__codelineno-0-828">828</a></span>
-<span class="normal"><a href="#__codelineno-0-829">829</a></span>
-<span class="normal"><a href="#__codelineno-0-830">830</a></span>
-<span class="normal"><a href="#__codelineno-0-831">831</a></span>
-<span class="normal"><a href="#__codelineno-0-832">832</a></span>
-<span class="normal"><a href="#__codelineno-0-833">833</a></span>
-<span class="normal"><a href="#__codelineno-0-834">834</a></span>
-<span class="normal"><a href="#__codelineno-0-835">835</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_recent_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskInfo</span><span class="p">]:</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;List recent Earth Engine batch tasks (delegates to `gee.jobs`).</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">        **kwargs: Forwarded verbatim to</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">            :func:`earthlens.gee.jobs.list_recent_tasks` —</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">            `state` / `max_age_min` / `task_type` /</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">            `description_prefix` / `project` / `limit`.</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">        A list of :class:`earthlens.gee.jobs.TaskInfo`, newest first.</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_recent_tasks</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="k">return</span> <span class="n">list_recent_tasks</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-840">840</a></span>
+<span class="normal"><a href="#__codelineno-0-841">841</a></span>
+<span class="normal"><a href="#__codelineno-0-842">842</a></span>
+<span class="normal"><a href="#__codelineno-0-843">843</a></span>
+<span class="normal"><a href="#__codelineno-0-844">844</a></span>
+<span class="normal"><a href="#__codelineno-0-845">845</a></span>
+<span class="normal"><a href="#__codelineno-0-846">846</a></span>
+<span class="normal"><a href="#__codelineno-0-847">847</a></span>
+<span class="normal"><a href="#__codelineno-0-848">848</a></span>
+<span class="normal"><a href="#__codelineno-0-849">849</a></span>
+<span class="normal"><a href="#__codelineno-0-850">850</a></span>
+<span class="normal"><a href="#__codelineno-0-851">851</a></span>
+<span class="normal"><a href="#__codelineno-0-852">852</a></span>
+<span class="normal"><a href="#__codelineno-0-853">853</a></span>
+<span class="normal"><a href="#__codelineno-0-854">854</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_recent_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskInfo</span><span class="p">]:</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;List recent Earth Engine batch tasks (delegates to `gee.jobs`).</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">        **kwargs: Forwarded verbatim to</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">            :func:`earthlens.gee.jobs.list_recent_tasks` —</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">            `state` / `max_age_min` / `task_type` /</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">            `description_prefix` / `project` / `limit`.</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">        A list of :class:`earthlens.gee.jobs.TaskInfo`, newest first.</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_recent_tasks</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a>    <span class="k">return</span> <span class="n">list_recent_tasks</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

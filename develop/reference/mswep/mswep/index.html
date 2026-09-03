@@ -8663,6 +8663,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#earthlens.mswep.Catalog.get_catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_catalog
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#earthlens.mswep.Catalog.get_product" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -9249,6 +9260,17 @@
     <span class="md-ellipsis">
       
         check_not_provisional
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#earthlens.mswep.catalog.Catalog.get_catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_catalog
       
     </span>
   </a>
@@ -19022,6 +19044,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Showcase - how much worse is a rarer flood, and how your window changes the answer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -24752,6 +24802,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#earthlens.mswep.Catalog.get_catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_catalog
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#earthlens.mswep.Catalog.get_product" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -25338,6 +25399,17 @@
     <span class="md-ellipsis">
       
         check_not_provisional
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#earthlens.mswep.catalog.Catalog.get_catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_catalog
       
     </span>
   </a>
@@ -26436,7 +26508,15 @@ warns and points at rclone for bulk transfers.</p>
 <span class="normal"><a href="#__codelineno-0-618">618</a></span>
 <span class="normal"><a href="#__codelineno-0-619">619</a></span>
 <span class="normal"><a href="#__codelineno-0-620">620</a></span>
-<span class="normal"><a href="#__codelineno-0-621">621</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-621">621</a></span>
+<span class="normal"><a href="#__codelineno-0-622">622</a></span>
+<span class="normal"><a href="#__codelineno-0-623">623</a></span>
+<span class="normal"><a href="#__codelineno-0-624">624</a></span>
+<span class="normal"><a href="#__codelineno-0-625">625</a></span>
+<span class="normal"><a href="#__codelineno-0-626">626</a></span>
+<span class="normal"><a href="#__codelineno-0-627">627</a></span>
+<span class="normal"><a href="#__codelineno-0-628">628</a></span>
+<span class="normal"><a href="#__codelineno-0-629">629</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Product catalog for the MSWEP / MSWX backend.</span>
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a>
 <a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">    Reads the bundled `mswep_data_catalog.yaml` (shipped as package</span>
@@ -26531,54 +26611,62 @@ warns and points at rclone for bulk transfers.</p>
 <a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="n">payload</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;MSWEP&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-572" name="__codelineno-0-572"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
 <a id="__codelineno-0-573" name="__codelineno-0-573"></a>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MswepProduct</span><span class="p">:</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`MswepProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MswepProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
 <a id="__codelineno-0-576" name="__codelineno-0-576"></a>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">            key: A product key (`&quot;mswep&quot;`, `&quot;mswx&quot;`).</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">            MswepProduct: The matching product row.</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">            ValueError: If `key` is not a registered product.</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;MswepProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">            dict[str, MswepProduct]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MswepProduct</span><span class="p">:</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`MswepProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            key: A product key (`&quot;mswep&quot;`, `&quot;mswx&quot;`).</span>
 <a id="__codelineno-0-587" name="__codelineno-0-587"></a>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">            MswepProduct: The matching product row.</span>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">            list[str]: `[&quot;mswep&quot;, &quot;mswx&quot;]`.</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">            ValueError: If `key` is not a registered product.</span>
 <a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;MswepProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 <a id="__codelineno-0-595" name="__codelineno-0-595"></a>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_not_provisional</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Raise when a catalog row is an unverified placeholder.</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">        Guards the four constants that could not be confirmed without an</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">        approved GloH2O share. Resolving against one would build a Drive</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">        path that does not exist — and because a missing granule is</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">        logged and skipped, the request would return a silently partial</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">        result instead of failing.</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">            row: The catalog row to check.</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">            what: Description of the row, quoted in the error.</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">            ProvisionalValueError: When `row.provisional` is `True`.</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;provisional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>            <span class="k">return</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>        <span class="k">raise</span> <span class="n">ProvisionalValueError</span><span class="p">(</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2"> is marked provisional in the MSWEP catalog: its value &quot;</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a>            <span class="s2">&quot;could not be verified without an approved GloH2O Drive share, so &quot;</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>            <span class="s2">&quot;resolving against it would build a path that does not exist and &quot;</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a>            <span class="s2">&quot;return an empty result. Confirm the real value inside your share &quot;</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>            <span class="s2">&quot;and drop `provisional: true` from mswep_data_catalog.yaml.&quot;</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a>        <span class="p">)</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">            list[str]: `[&quot;mswep&quot;, &quot;mswx&quot;]`.</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_not_provisional</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Raise when a catalog row is an unverified placeholder.</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">        Guards the four constants that could not be confirmed without an</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">        approved GloH2O share. Resolving against one would build a Drive</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">        path that does not exist — and because a missing granule is</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">        logged and skipped, the request would return a silently partial</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">        result instead of failing.</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">            row: The catalog row to check.</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">            what: Description of the row, quoted in the error.</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">            ProvisionalValueError: When `row.provisional` is `True`.</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;provisional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a>            <span class="k">return</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>        <span class="k">raise</span> <span class="n">ProvisionalValueError</span><span class="p">(</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2"> is marked provisional in the MSWEP catalog: its value &quot;</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a>            <span class="s2">&quot;could not be verified without an approved GloH2O Drive share, so &quot;</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a>            <span class="s2">&quot;resolving against it would build a path that does not exist and &quot;</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>            <span class="s2">&quot;return an empty result. Confirm the real value inside your share &quot;</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a>            <span class="s2">&quot;and drop `provisional: true` from mswep_data_catalog.yaml.&quot;</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>        <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26690,15 +26778,7 @@ result instead of failing.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-596">596</a></span>
-<span class="normal"><a href="#__codelineno-0-597">597</a></span>
-<span class="normal"><a href="#__codelineno-0-598">598</a></span>
-<span class="normal"><a href="#__codelineno-0-599">599</a></span>
-<span class="normal"><a href="#__codelineno-0-600">600</a></span>
-<span class="normal"><a href="#__codelineno-0-601">601</a></span>
-<span class="normal"><a href="#__codelineno-0-602">602</a></span>
-<span class="normal"><a href="#__codelineno-0-603">603</a></span>
-<span class="normal"><a href="#__codelineno-0-604">604</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-604">604</a></span>
 <span class="normal"><a href="#__codelineno-0-605">605</a></span>
 <span class="normal"><a href="#__codelineno-0-606">606</a></span>
 <span class="normal"><a href="#__codelineno-0-607">607</a></span>
@@ -26715,32 +26795,98 @@ result instead of failing.</p>
 <span class="normal"><a href="#__codelineno-0-618">618</a></span>
 <span class="normal"><a href="#__codelineno-0-619">619</a></span>
 <span class="normal"><a href="#__codelineno-0-620">620</a></span>
-<span class="normal"><a href="#__codelineno-0-621">621</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="nd">@staticmethod</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_not_provisional</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise when a catalog row is an unverified placeholder.</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">    Guards the four constants that could not be confirmed without an</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">    approved GloH2O share. Resolving against one would build a Drive</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">    path that does not exist — and because a missing granule is</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">    logged and skipped, the request would return a silently partial</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">    result instead of failing.</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">        row: The catalog row to check.</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">        what: Description of the row, quoted in the error.</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">        ProvisionalValueError: When `row.provisional` is `True`.</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;provisional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>        <span class="k">return</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>    <span class="k">raise</span> <span class="n">ProvisionalValueError</span><span class="p">(</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2"> is marked provisional in the MSWEP catalog: its value &quot;</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a>        <span class="s2">&quot;could not be verified without an approved GloH2O Drive share, so &quot;</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>        <span class="s2">&quot;resolving against it would build a path that does not exist and &quot;</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a>        <span class="s2">&quot;return an empty result. Confirm the real value inside your share &quot;</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>        <span class="s2">&quot;and drop `provisional: true` from mswep_data_catalog.yaml.&quot;</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-621">621</a></span>
+<span class="normal"><a href="#__codelineno-0-622">622</a></span>
+<span class="normal"><a href="#__codelineno-0-623">623</a></span>
+<span class="normal"><a href="#__codelineno-0-624">624</a></span>
+<span class="normal"><a href="#__codelineno-0-625">625</a></span>
+<span class="normal"><a href="#__codelineno-0-626">626</a></span>
+<span class="normal"><a href="#__codelineno-0-627">627</a></span>
+<span class="normal"><a href="#__codelineno-0-628">628</a></span>
+<span class="normal"><a href="#__codelineno-0-629">629</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="nd">@staticmethod</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_not_provisional</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise when a catalog row is an unverified placeholder.</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">    Guards the four constants that could not be confirmed without an</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">    approved GloH2O share. Resolving against one would build a Drive</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">    path that does not exist — and because a missing granule is</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">    logged and skipped, the request would return a silently partial</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">    result instead of failing.</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        row: The catalog row to check.</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">        what: Description of the row, quoted in the error.</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">        ProvisionalValueError: When `row.provisional` is `True`.</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;provisional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a>        <span class="k">return</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>    <span class="k">raise</span> <span class="n">ProvisionalValueError</span><span class="p">(</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2"> is marked provisional in the MSWEP catalog: its value &quot;</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a>        <span class="s2">&quot;could not be verified without an approved GloH2O Drive share, so &quot;</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a>        <span class="s2">&quot;resolving against it would build a path that does not exist and &quot;</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>        <span class="s2">&quot;return an empty result. Confirm the real value inside your share &quot;</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a>        <span class="s2">&quot;and drop `provisional: true` from mswep_data_catalog.yaml.&quot;</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="earthlens.mswep.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.mswep.Catalog.get_catalog" class="toclink">
+            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
+
+</a><a href="#earthlens.mswep.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the product map (satisfies the abstract contract).</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;MswepProduct&lt;/code&gt; (&lt;code&gt;earthlens.mswep.catalog.MswepProduct&lt;/code&gt;)" href="#earthlens.mswep.catalog.MswepProduct">MswepProduct</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>dict[str, MswepProduct]: Same object as :attr:<code>datasets</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/catalog.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-574">574</a></span>
+<span class="normal"><a href="#__codelineno-0-575">575</a></span>
+<span class="normal"><a href="#__codelineno-0-576">576</a></span>
+<span class="normal"><a href="#__codelineno-0-577">577</a></span>
+<span class="normal"><a href="#__codelineno-0-578">578</a></span>
+<span class="normal"><a href="#__codelineno-0-579">579</a></span>
+<span class="normal"><a href="#__codelineno-0-580">580</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MswepProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">        dict[str, MswepProduct]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26840,31 +26986,31 @@ result instead of failing.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-574">574</a></span>
-<span class="normal"><a href="#__codelineno-0-575">575</a></span>
-<span class="normal"><a href="#__codelineno-0-576">576</a></span>
-<span class="normal"><a href="#__codelineno-0-577">577</a></span>
-<span class="normal"><a href="#__codelineno-0-578">578</a></span>
-<span class="normal"><a href="#__codelineno-0-579">579</a></span>
-<span class="normal"><a href="#__codelineno-0-580">580</a></span>
-<span class="normal"><a href="#__codelineno-0-581">581</a></span>
-<span class="normal"><a href="#__codelineno-0-582">582</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-582">582</a></span>
 <span class="normal"><a href="#__codelineno-0-583">583</a></span>
 <span class="normal"><a href="#__codelineno-0-584">584</a></span>
 <span class="normal"><a href="#__codelineno-0-585">585</a></span>
-<span class="normal"><a href="#__codelineno-0-586">586</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MswepProduct</span><span class="p">:</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`MswepProduct` for `key`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">        key: A product key (`&quot;mswep&quot;`, `&quot;mswx&quot;`).</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">        MswepProduct: The matching product row.</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">        ValueError: If `key` is not a registered product.</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;MswepProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-586">586</a></span>
+<span class="normal"><a href="#__codelineno-0-587">587</a></span>
+<span class="normal"><a href="#__codelineno-0-588">588</a></span>
+<span class="normal"><a href="#__codelineno-0-589">589</a></span>
+<span class="normal"><a href="#__codelineno-0-590">590</a></span>
+<span class="normal"><a href="#__codelineno-0-591">591</a></span>
+<span class="normal"><a href="#__codelineno-0-592">592</a></span>
+<span class="normal"><a href="#__codelineno-0-593">593</a></span>
+<span class="normal"><a href="#__codelineno-0-594">594</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MswepProduct</span><span class="p">:</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`MswepProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">        key: A product key (`&quot;mswep&quot;`, `&quot;mswx&quot;`).</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">        MswepProduct: The matching product row.</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">        ValueError: If `key` is not a registered product.</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;MswepProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27135,19 +27281,19 @@ missing, empty, or has a malformed row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-588">588</a></span>
-<span class="normal"><a href="#__codelineno-0-589">589</a></span>
-<span class="normal"><a href="#__codelineno-0-590">590</a></span>
-<span class="normal"><a href="#__codelineno-0-591">591</a></span>
-<span class="normal"><a href="#__codelineno-0-592">592</a></span>
-<span class="normal"><a href="#__codelineno-0-593">593</a></span>
-<span class="normal"><a href="#__codelineno-0-594">594</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">        list[str]: `[&quot;mswep&quot;, &quot;mswx&quot;]`.</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-596">596</a></span>
+<span class="normal"><a href="#__codelineno-0-597">597</a></span>
+<span class="normal"><a href="#__codelineno-0-598">598</a></span>
+<span class="normal"><a href="#__codelineno-0-599">599</a></span>
+<span class="normal"><a href="#__codelineno-0-600">600</a></span>
+<span class="normal"><a href="#__codelineno-0-601">601</a></span>
+<span class="normal"><a href="#__codelineno-0-602">602</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">        list[str]: `[&quot;mswep&quot;, &quot;mswx&quot;]`.</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -36937,7 +37083,15 @@ warns and points at rclone for bulk transfers.</p>
 <span class="normal"><a href="#__codelineno-0-618">618</a></span>
 <span class="normal"><a href="#__codelineno-0-619">619</a></span>
 <span class="normal"><a href="#__codelineno-0-620">620</a></span>
-<span class="normal"><a href="#__codelineno-0-621">621</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-621">621</a></span>
+<span class="normal"><a href="#__codelineno-0-622">622</a></span>
+<span class="normal"><a href="#__codelineno-0-623">623</a></span>
+<span class="normal"><a href="#__codelineno-0-624">624</a></span>
+<span class="normal"><a href="#__codelineno-0-625">625</a></span>
+<span class="normal"><a href="#__codelineno-0-626">626</a></span>
+<span class="normal"><a href="#__codelineno-0-627">627</a></span>
+<span class="normal"><a href="#__codelineno-0-628">628</a></span>
+<span class="normal"><a href="#__codelineno-0-629">629</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Product catalog for the MSWEP / MSWX backend.</span>
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a>
 <a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">    Reads the bundled `mswep_data_catalog.yaml` (shipped as package</span>
@@ -37032,54 +37186,62 @@ warns and points at rclone for bulk transfers.</p>
 <a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="n">payload</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;MSWEP&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-572" name="__codelineno-0-572"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
 <a id="__codelineno-0-573" name="__codelineno-0-573"></a>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MswepProduct</span><span class="p">:</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`MswepProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MswepProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
 <a id="__codelineno-0-576" name="__codelineno-0-576"></a>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">            key: A product key (`&quot;mswep&quot;`, `&quot;mswx&quot;`).</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">            MswepProduct: The matching product row.</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">            ValueError: If `key` is not a registered product.</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;MswepProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">            dict[str, MswepProduct]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MswepProduct</span><span class="p">:</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`MswepProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            key: A product key (`&quot;mswep&quot;`, `&quot;mswx&quot;`).</span>
 <a id="__codelineno-0-587" name="__codelineno-0-587"></a>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">            MswepProduct: The matching product row.</span>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">            list[str]: `[&quot;mswep&quot;, &quot;mswx&quot;]`.</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">            ValueError: If `key` is not a registered product.</span>
 <a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;MswepProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 <a id="__codelineno-0-595" name="__codelineno-0-595"></a>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_not_provisional</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Raise when a catalog row is an unverified placeholder.</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">        Guards the four constants that could not be confirmed without an</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">        approved GloH2O share. Resolving against one would build a Drive</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">        path that does not exist — and because a missing granule is</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">        logged and skipped, the request would return a silently partial</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">        result instead of failing.</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">            row: The catalog row to check.</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">            what: Description of the row, quoted in the error.</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">            ProvisionalValueError: When `row.provisional` is `True`.</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;provisional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>            <span class="k">return</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>        <span class="k">raise</span> <span class="n">ProvisionalValueError</span><span class="p">(</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2"> is marked provisional in the MSWEP catalog: its value &quot;</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a>            <span class="s2">&quot;could not be verified without an approved GloH2O Drive share, so &quot;</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>            <span class="s2">&quot;resolving against it would build a path that does not exist and &quot;</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a>            <span class="s2">&quot;return an empty result. Confirm the real value inside your share &quot;</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>            <span class="s2">&quot;and drop `provisional: true` from mswep_data_catalog.yaml.&quot;</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a>        <span class="p">)</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">            list[str]: `[&quot;mswep&quot;, &quot;mswx&quot;]`.</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_not_provisional</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Raise when a catalog row is an unverified placeholder.</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">        Guards the four constants that could not be confirmed without an</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">        approved GloH2O share. Resolving against one would build a Drive</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">        path that does not exist — and because a missing granule is</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">        logged and skipped, the request would return a silently partial</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">        result instead of failing.</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">            row: The catalog row to check.</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">            what: Description of the row, quoted in the error.</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">            ProvisionalValueError: When `row.provisional` is `True`.</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;provisional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a>            <span class="k">return</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>        <span class="k">raise</span> <span class="n">ProvisionalValueError</span><span class="p">(</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2"> is marked provisional in the MSWEP catalog: its value &quot;</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a>            <span class="s2">&quot;could not be verified without an approved GloH2O Drive share, so &quot;</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a>            <span class="s2">&quot;resolving against it would build a path that does not exist and &quot;</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>            <span class="s2">&quot;return an empty result. Confirm the real value inside your share &quot;</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a>            <span class="s2">&quot;and drop `provisional: true` from mswep_data_catalog.yaml.&quot;</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>        <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -37191,15 +37353,7 @@ result instead of failing.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-596">596</a></span>
-<span class="normal"><a href="#__codelineno-0-597">597</a></span>
-<span class="normal"><a href="#__codelineno-0-598">598</a></span>
-<span class="normal"><a href="#__codelineno-0-599">599</a></span>
-<span class="normal"><a href="#__codelineno-0-600">600</a></span>
-<span class="normal"><a href="#__codelineno-0-601">601</a></span>
-<span class="normal"><a href="#__codelineno-0-602">602</a></span>
-<span class="normal"><a href="#__codelineno-0-603">603</a></span>
-<span class="normal"><a href="#__codelineno-0-604">604</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-604">604</a></span>
 <span class="normal"><a href="#__codelineno-0-605">605</a></span>
 <span class="normal"><a href="#__codelineno-0-606">606</a></span>
 <span class="normal"><a href="#__codelineno-0-607">607</a></span>
@@ -37216,32 +37370,98 @@ result instead of failing.</p>
 <span class="normal"><a href="#__codelineno-0-618">618</a></span>
 <span class="normal"><a href="#__codelineno-0-619">619</a></span>
 <span class="normal"><a href="#__codelineno-0-620">620</a></span>
-<span class="normal"><a href="#__codelineno-0-621">621</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="nd">@staticmethod</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_not_provisional</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise when a catalog row is an unverified placeholder.</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">    Guards the four constants that could not be confirmed without an</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">    approved GloH2O share. Resolving against one would build a Drive</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">    path that does not exist — and because a missing granule is</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">    logged and skipped, the request would return a silently partial</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">    result instead of failing.</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">        row: The catalog row to check.</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">        what: Description of the row, quoted in the error.</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">        ProvisionalValueError: When `row.provisional` is `True`.</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;provisional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a>        <span class="k">return</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a>    <span class="k">raise</span> <span class="n">ProvisionalValueError</span><span class="p">(</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2"> is marked provisional in the MSWEP catalog: its value &quot;</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a>        <span class="s2">&quot;could not be verified without an approved GloH2O Drive share, so &quot;</span>
-<a id="__codelineno-0-618" name="__codelineno-0-618"></a>        <span class="s2">&quot;resolving against it would build a path that does not exist and &quot;</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a>        <span class="s2">&quot;return an empty result. Confirm the real value inside your share &quot;</span>
-<a id="__codelineno-0-620" name="__codelineno-0-620"></a>        <span class="s2">&quot;and drop `provisional: true` from mswep_data_catalog.yaml.&quot;</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-621">621</a></span>
+<span class="normal"><a href="#__codelineno-0-622">622</a></span>
+<span class="normal"><a href="#__codelineno-0-623">623</a></span>
+<span class="normal"><a href="#__codelineno-0-624">624</a></span>
+<span class="normal"><a href="#__codelineno-0-625">625</a></span>
+<span class="normal"><a href="#__codelineno-0-626">626</a></span>
+<span class="normal"><a href="#__codelineno-0-627">627</a></span>
+<span class="normal"><a href="#__codelineno-0-628">628</a></span>
+<span class="normal"><a href="#__codelineno-0-629">629</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="nd">@staticmethod</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_not_provisional</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise when a catalog row is an unverified placeholder.</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">    Guards the four constants that could not be confirmed without an</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">    approved GloH2O share. Resolving against one would build a Drive</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">    path that does not exist — and because a missing granule is</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">    logged and skipped, the request would return a silently partial</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">    result instead of failing.</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        row: The catalog row to check.</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">        what: Description of the row, quoted in the error.</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">        ProvisionalValueError: When `row.provisional` is `True`.</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;provisional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a>        <span class="k">return</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a>    <span class="k">raise</span> <span class="n">ProvisionalValueError</span><span class="p">(</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2"> is marked provisional in the MSWEP catalog: its value &quot;</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a>        <span class="s2">&quot;could not be verified without an approved GloH2O Drive share, so &quot;</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a>        <span class="s2">&quot;resolving against it would build a path that does not exist and &quot;</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>        <span class="s2">&quot;return an empty result. Confirm the real value inside your share &quot;</span>
+<a id="__codelineno-0-628" name="__codelineno-0-628"></a>        <span class="s2">&quot;and drop `provisional: true` from mswep_data_catalog.yaml.&quot;</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a>    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="earthlens.mswep.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.mswep.catalog.Catalog.get_catalog" class="toclink">
+            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
+
+</a><a href="#earthlens.mswep.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the product map (satisfies the abstract contract).</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;MswepProduct&lt;/code&gt; (&lt;code&gt;earthlens.mswep.catalog.MswepProduct&lt;/code&gt;)" href="#earthlens.mswep.catalog.MswepProduct">MswepProduct</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>dict[str, MswepProduct]: Same object as :attr:<code>datasets</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/catalog.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-574">574</a></span>
+<span class="normal"><a href="#__codelineno-0-575">575</a></span>
+<span class="normal"><a href="#__codelineno-0-576">576</a></span>
+<span class="normal"><a href="#__codelineno-0-577">577</a></span>
+<span class="normal"><a href="#__codelineno-0-578">578</a></span>
+<span class="normal"><a href="#__codelineno-0-579">579</a></span>
+<span class="normal"><a href="#__codelineno-0-580">580</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MswepProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the product map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">        dict[str, MswepProduct]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -37341,31 +37561,31 @@ result instead of failing.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-574">574</a></span>
-<span class="normal"><a href="#__codelineno-0-575">575</a></span>
-<span class="normal"><a href="#__codelineno-0-576">576</a></span>
-<span class="normal"><a href="#__codelineno-0-577">577</a></span>
-<span class="normal"><a href="#__codelineno-0-578">578</a></span>
-<span class="normal"><a href="#__codelineno-0-579">579</a></span>
-<span class="normal"><a href="#__codelineno-0-580">580</a></span>
-<span class="normal"><a href="#__codelineno-0-581">581</a></span>
-<span class="normal"><a href="#__codelineno-0-582">582</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-582">582</a></span>
 <span class="normal"><a href="#__codelineno-0-583">583</a></span>
 <span class="normal"><a href="#__codelineno-0-584">584</a></span>
 <span class="normal"><a href="#__codelineno-0-585">585</a></span>
-<span class="normal"><a href="#__codelineno-0-586">586</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MswepProduct</span><span class="p">:</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`MswepProduct` for `key`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">        key: A product key (`&quot;mswep&quot;`, `&quot;mswx&quot;`).</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">        MswepProduct: The matching product row.</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">        ValueError: If `key` is not a registered product.</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;MswepProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-586">586</a></span>
+<span class="normal"><a href="#__codelineno-0-587">587</a></span>
+<span class="normal"><a href="#__codelineno-0-588">588</a></span>
+<span class="normal"><a href="#__codelineno-0-589">589</a></span>
+<span class="normal"><a href="#__codelineno-0-590">590</a></span>
+<span class="normal"><a href="#__codelineno-0-591">591</a></span>
+<span class="normal"><a href="#__codelineno-0-592">592</a></span>
+<span class="normal"><a href="#__codelineno-0-593">593</a></span>
+<span class="normal"><a href="#__codelineno-0-594">594</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MswepProduct</span><span class="p">:</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`MswepProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">        key: A product key (`&quot;mswep&quot;`, `&quot;mswx&quot;`).</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">        MswepProduct: The matching product row.</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">        ValueError: If `key` is not a registered product.</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;MswepProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -37636,19 +37856,19 @@ missing, empty, or has a malformed row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-588">588</a></span>
-<span class="normal"><a href="#__codelineno-0-589">589</a></span>
-<span class="normal"><a href="#__codelineno-0-590">590</a></span>
-<span class="normal"><a href="#__codelineno-0-591">591</a></span>
-<span class="normal"><a href="#__codelineno-0-592">592</a></span>
-<span class="normal"><a href="#__codelineno-0-593">593</a></span>
-<span class="normal"><a href="#__codelineno-0-594">594</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">        list[str]: `[&quot;mswep&quot;, &quot;mswx&quot;]`.</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-596">596</a></span>
+<span class="normal"><a href="#__codelineno-0-597">597</a></span>
+<span class="normal"><a href="#__codelineno-0-598">598</a></span>
+<span class="normal"><a href="#__codelineno-0-599">599</a></span>
+<span class="normal"><a href="#__codelineno-0-600">600</a></span>
+<span class="normal"><a href="#__codelineno-0-601">601</a></span>
+<span class="normal"><a href="#__codelineno-0-602">602</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="k">def</span><span class="w"> </span><span class="nf">products</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered product keys, sorted.</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">        list[str]: `[&quot;mswep&quot;, &quot;mswx&quot;]`.</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
