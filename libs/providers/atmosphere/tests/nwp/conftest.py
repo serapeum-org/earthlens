@@ -210,7 +210,14 @@ class _FakeAggDataset:
         return _FakeRef()
 
     @classmethod
-    def from_array(cls, arr: Any = None, geo_ref: Any = None, **kwargs: Any) -> tuple:
+    def from_array(
+        cls,
+        arr: Any = None,
+        *,
+        geo_ref: Any = None,
+        no_data_value: Any = None,
+        path: Any = None,
+    ) -> tuple:
         """Return a sentinel 'dataset' carrying the reduced array."""
         return (
             "dataset",

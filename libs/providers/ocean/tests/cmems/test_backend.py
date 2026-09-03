@@ -144,7 +144,9 @@ class _FakeDatasetWriter:
 
 class _FakeDataset:
     @staticmethod
-    def from_array(arr, geo_ref=None, **kwargs) -> _FakeDatasetWriter:
+    def from_array(
+        arr, *, geo_ref=None, no_data_value=None, path=None
+    ) -> _FakeDatasetWriter:
         return _FakeDatasetWriter([])
 
 

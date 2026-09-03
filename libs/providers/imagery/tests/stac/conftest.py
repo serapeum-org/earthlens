@@ -316,7 +316,7 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
         )
         return _FakeDataset(href, epsg, shape)
 
-    def _from_array(arr=None, geo_ref=None, no_data_value=None, **kwargs):
+    def _from_array(arr=None, *, geo_ref=None, no_data_value=None, path=None):
         epsg = getattr(geo_ref, "epsg", None)
         fp.create_calls.append({"no_data_value": no_data_value, "epsg": epsg})
         return _FakeDataset(epsg=epsg)
