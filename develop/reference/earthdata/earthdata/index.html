@@ -2498,17 +2498,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.earthdata.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.earthdata.Catalog.get_daac" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2791,17 +2780,6 @@
     <span class="md-ellipsis">
       
         auto_datasets
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.earthdata.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -18330,34 +18308,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -24099,17 +24049,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.earthdata.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.earthdata.Catalog.get_daac" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24392,17 +24331,6 @@
     <span class="md-ellipsis">
       
         auto_datasets
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.earthdata.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -25267,19 +25195,7 @@ value is an :class:<code>EarthdataDataset</code>.</p>
 <span class="normal"><a href="#__codelineno-0-688">688</a></span>
 <span class="normal"><a href="#__codelineno-0-689">689</a></span>
 <span class="normal"><a href="#__codelineno-0-690">690</a></span>
-<span class="normal"><a href="#__codelineno-0-691">691</a></span>
-<span class="normal"><a href="#__codelineno-0-692">692</a></span>
-<span class="normal"><a href="#__codelineno-0-693">693</a></span>
-<span class="normal"><a href="#__codelineno-0-694">694</a></span>
-<span class="normal"><a href="#__codelineno-0-695">695</a></span>
-<span class="normal"><a href="#__codelineno-0-696">696</a></span>
-<span class="normal"><a href="#__codelineno-0-697">697</a></span>
-<span class="normal"><a href="#__codelineno-0-698">698</a></span>
-<span class="normal"><a href="#__codelineno-0-699">699</a></span>
-<span class="normal"><a href="#__codelineno-0-700">700</a></span>
-<span class="normal"><a href="#__codelineno-0-701">701</a></span>
-<span class="normal"><a href="#__codelineno-0-702">702</a></span>
-<span class="normal"><a href="#__codelineno-0-703">703</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-691">691</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset catalog for the NASA Earthdata backend.</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data)</span>
@@ -25485,66 +25401,54 @@ value is an :class:<code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-641" name="__codelineno-0-641"></a>                <span class="sa">f</span><span class="s2">&quot;Known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">daacs</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
 <a id="__codelineno-0-642" name="__codelineno-0-642"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 <a id="__codelineno-0-643" name="__codelineno-0-643"></a>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EarthdataDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">daac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDataset</span><span class="p">:</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key (optionally disambiguated by DAAC).</span>
 <a id="__codelineno-0-646" name="__codelineno-0-646"></a>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">            dict[str, EarthdataDataset]: One entry per curated dataset.</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">                Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">daac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDataset</span><span class="p">:</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key (optionally disambiguated by DAAC).</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">        Most keys map one-to-one to a curated row; `get_dataset` (with</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">        its did-you-mean) handles those. The `daac=` filter exists for</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">        the rare case where two curated rows share a `short_name`</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">        served by different providers and the caller distinguishes</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">        them by DAAC.</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">            key: Curated dataset key (a member of :attr:`datasets`).</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">            daac: Optional DAAC id to disambiguate; when given, the</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">                resolved row&#39;s `daac` must match.</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">            EarthdataDataset: The resolved row.</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean hint)</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">                or when `daac=` is given but does not match the row.</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">                Both not-found conditions raise `ValueError`, matching</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">                :meth:`get_dataset`.</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">            - Resolve a key and read its provider:</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;GPM_3IMERGHHL_07&quot;).provider</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">                &#39;GES_DISC&#39;</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">            - A wrong `daac=` filter is rejected:</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;ATL08_006&quot;, daac=&quot;GES DISC&quot;)</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">                Traceback (most recent call last):</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a><span class="sd">                    ...</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="sd">                ValueError: dataset &#39;ATL08_006&#39; resolves to DAAC &#39;NSIDC&#39;, not the requested daac=&#39;GES DISC&#39;.</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>        <span class="k">if</span> <span class="n">daac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dataset</span><span class="o">.</span><span class="n">daac</span> <span class="o">!=</span> <span class="n">daac</span><span class="p">:</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>                <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> resolves to DAAC </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">, &quot;</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>                <span class="sa">f</span><span class="s2">&quot;not the requested daac=</span><span class="si">{</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>            <span class="p">)</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>        <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        Most keys map one-to-one to a curated row; `get_dataset` (with</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        its did-you-mean) handles those. The `daac=` filter exists for</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        the rare case where two curated rows share a `short_name`</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">        served by different providers and the caller distinguishes</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        them by DAAC.</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">            key: Curated dataset key (a member of :attr:`datasets`).</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">            daac: Optional DAAC id to disambiguate; when given, the</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">                resolved row&#39;s `daac` must match.</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">            EarthdataDataset: The resolved row.</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean hint)</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">                or when `daac=` is given but does not match the row.</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a><span class="sd">                Both not-found conditions raise `ValueError`, matching</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">                :meth:`get_dataset`.</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">            - Resolve a key and read its provider:</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;GPM_3IMERGHHL_07&quot;).provider</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">                &#39;GES_DISC&#39;</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">            - A wrong `daac=` filter is rejected:</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;ATL08_006&quot;, daac=&quot;GES DISC&quot;)</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">                Traceback (most recent call last):</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">                    ...</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">                ValueError: dataset &#39;ATL08_006&#39; resolves to DAAC &#39;NSIDC&#39;, not the requested daac=&#39;GES DISC&#39;.</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>        <span class="k">if</span> <span class="n">daac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dataset</span><span class="o">.</span><span class="n">daac</span> <span class="o">!=</span> <span class="n">daac</span><span class="p">:</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>                <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> resolves to DAAC </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">, &quot;</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>                <span class="sa">f</span><span class="s2">&quot;not the requested daac=</span><span class="si">{</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>            <span class="p">)</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="k">return</span> <span class="n">dataset</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25609,75 +25513,6 @@ value is an :class:<code>EarthdataDataset</code>.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.earthdata.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.earthdata.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.earthdata.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the structural per-dataset map.</p>
-<p>Satisfies the abstract base's contract; the actual parsing is
-done in :func:<code>model_post_init</code>.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;EarthdataDataset&lt;/code&gt; (&lt;code&gt;earthlens.earthdata.catalog.EarthdataDataset&lt;/code&gt;)" href="#earthlens.earthdata.catalog.EarthdataDataset">EarthdataDataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, EarthdataDataset]: One entry per curated dataset.
-Same object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/imagery/src/earthlens/earthdata/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-644">644</a></span>
-<span class="normal"><a href="#__codelineno-0-645">645</a></span>
-<span class="normal"><a href="#__codelineno-0-646">646</a></span>
-<span class="normal"><a href="#__codelineno-0-647">647</a></span>
-<span class="normal"><a href="#__codelineno-0-648">648</a></span>
-<span class="normal"><a href="#__codelineno-0-649">649</a></span>
-<span class="normal"><a href="#__codelineno-0-650">650</a></span>
-<span class="normal"><a href="#__codelineno-0-651">651</a></span>
-<span class="normal"><a href="#__codelineno-0-652">652</a></span>
-<span class="normal"><a href="#__codelineno-0-653">653</a></span>
-<span class="normal"><a href="#__codelineno-0-654">654</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EarthdataDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">    done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        dict[str, EarthdataDataset]: One entry per curated dataset.</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -26489,7 +26324,19 @@ Both not-found conditions raise <code>ValueError</code>, matching
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/earthdata/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-656">656</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-644">644</a></span>
+<span class="normal"><a href="#__codelineno-0-645">645</a></span>
+<span class="normal"><a href="#__codelineno-0-646">646</a></span>
+<span class="normal"><a href="#__codelineno-0-647">647</a></span>
+<span class="normal"><a href="#__codelineno-0-648">648</a></span>
+<span class="normal"><a href="#__codelineno-0-649">649</a></span>
+<span class="normal"><a href="#__codelineno-0-650">650</a></span>
+<span class="normal"><a href="#__codelineno-0-651">651</a></span>
+<span class="normal"><a href="#__codelineno-0-652">652</a></span>
+<span class="normal"><a href="#__codelineno-0-653">653</a></span>
+<span class="normal"><a href="#__codelineno-0-654">654</a></span>
+<span class="normal"><a href="#__codelineno-0-655">655</a></span>
+<span class="normal"><a href="#__codelineno-0-656">656</a></span>
 <span class="normal"><a href="#__codelineno-0-657">657</a></span>
 <span class="normal"><a href="#__codelineno-0-658">658</a></span>
 <span class="normal"><a href="#__codelineno-0-659">659</a></span>
@@ -26524,66 +26371,54 @@ Both not-found conditions raise <code>ValueError</code>, matching
 <span class="normal"><a href="#__codelineno-0-688">688</a></span>
 <span class="normal"><a href="#__codelineno-0-689">689</a></span>
 <span class="normal"><a href="#__codelineno-0-690">690</a></span>
-<span class="normal"><a href="#__codelineno-0-691">691</a></span>
-<span class="normal"><a href="#__codelineno-0-692">692</a></span>
-<span class="normal"><a href="#__codelineno-0-693">693</a></span>
-<span class="normal"><a href="#__codelineno-0-694">694</a></span>
-<span class="normal"><a href="#__codelineno-0-695">695</a></span>
-<span class="normal"><a href="#__codelineno-0-696">696</a></span>
-<span class="normal"><a href="#__codelineno-0-697">697</a></span>
-<span class="normal"><a href="#__codelineno-0-698">698</a></span>
-<span class="normal"><a href="#__codelineno-0-699">699</a></span>
-<span class="normal"><a href="#__codelineno-0-700">700</a></span>
-<span class="normal"><a href="#__codelineno-0-701">701</a></span>
-<span class="normal"><a href="#__codelineno-0-702">702</a></span>
-<span class="normal"><a href="#__codelineno-0-703">703</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">daac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDataset</span><span class="p">:</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key (optionally disambiguated by DAAC).</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">    Most keys map one-to-one to a curated row; `get_dataset` (with</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">    its did-you-mean) handles those. The `daac=` filter exists for</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">    the rare case where two curated rows share a `short_name`</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">    served by different providers and the caller distinguishes</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">    them by DAAC.</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">        key: Curated dataset key (a member of :attr:`datasets`).</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">        daac: Optional DAAC id to disambiguate; when given, the</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">            resolved row&#39;s `daac` must match.</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">        EarthdataDataset: The resolved row.</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean hint)</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">            or when `daac=` is given but does not match the row.</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">            Both not-found conditions raise `ValueError`, matching</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">            :meth:`get_dataset`.</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">        - Resolve a key and read its provider:</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;GPM_3IMERGHHL_07&quot;).provider</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">            &#39;GES_DISC&#39;</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">        - A wrong `daac=` filter is rejected:</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;ATL08_006&quot;, daac=&quot;GES DISC&quot;)</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="sd">            ValueError: dataset &#39;ATL08_006&#39; resolves to DAAC &#39;NSIDC&#39;, not the requested daac=&#39;GES DISC&#39;.</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>    <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>    <span class="k">if</span> <span class="n">daac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dataset</span><span class="o">.</span><span class="n">daac</span> <span class="o">!=</span> <span class="n">daac</span><span class="p">:</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> resolves to DAAC </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">, &quot;</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="sa">f</span><span class="s2">&quot;not the requested daac=</span><span class="si">{</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="p">)</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>    <span class="k">return</span> <span class="n">dataset</span>
+<span class="normal"><a href="#__codelineno-0-691">691</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">daac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDataset</span><span class="p">:</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key (optionally disambiguated by DAAC).</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">    Most keys map one-to-one to a curated row; `get_dataset` (with</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">    its did-you-mean) handles those. The `daac=` filter exists for</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">    the rare case where two curated rows share a `short_name`</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">    served by different providers and the caller distinguishes</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    them by DAAC.</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">        key: Curated dataset key (a member of :attr:`datasets`).</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">        daac: Optional DAAC id to disambiguate; when given, the</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">            resolved row&#39;s `daac` must match.</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">        EarthdataDataset: The resolved row.</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean hint)</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">            or when `daac=` is given but does not match the row.</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a><span class="sd">            Both not-found conditions raise `ValueError`, matching</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">            :meth:`get_dataset`.</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">        - Resolve a key and read its provider:</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;GPM_3IMERGHHL_07&quot;).provider</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">            &#39;GES_DISC&#39;</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">        - A wrong `daac=` filter is rejected:</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;ATL08_006&quot;, daac=&quot;GES DISC&quot;)</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">            ValueError: dataset &#39;ATL08_006&#39; resolves to DAAC &#39;NSIDC&#39;, not the requested daac=&#39;GES DISC&#39;.</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>    <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>    <span class="k">if</span> <span class="n">daac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dataset</span><span class="o">.</span><span class="n">daac</span> <span class="o">!=</span> <span class="n">daac</span><span class="p">:</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>            <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> resolves to DAAC </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">, &quot;</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>            <span class="sa">f</span><span class="s2">&quot;not the requested daac=</span><span class="si">{</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="p">)</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>    <span class="k">return</span> <span class="n">dataset</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -33088,19 +32923,7 @@ value is an :class:<code>EarthdataDataset</code>.</p>
 <span class="normal"><a href="#__codelineno-0-688">688</a></span>
 <span class="normal"><a href="#__codelineno-0-689">689</a></span>
 <span class="normal"><a href="#__codelineno-0-690">690</a></span>
-<span class="normal"><a href="#__codelineno-0-691">691</a></span>
-<span class="normal"><a href="#__codelineno-0-692">692</a></span>
-<span class="normal"><a href="#__codelineno-0-693">693</a></span>
-<span class="normal"><a href="#__codelineno-0-694">694</a></span>
-<span class="normal"><a href="#__codelineno-0-695">695</a></span>
-<span class="normal"><a href="#__codelineno-0-696">696</a></span>
-<span class="normal"><a href="#__codelineno-0-697">697</a></span>
-<span class="normal"><a href="#__codelineno-0-698">698</a></span>
-<span class="normal"><a href="#__codelineno-0-699">699</a></span>
-<span class="normal"><a href="#__codelineno-0-700">700</a></span>
-<span class="normal"><a href="#__codelineno-0-701">701</a></span>
-<span class="normal"><a href="#__codelineno-0-702">702</a></span>
-<span class="normal"><a href="#__codelineno-0-703">703</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-691">691</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset catalog for the NASA Earthdata backend.</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data)</span>
@@ -33306,66 +33129,54 @@ value is an :class:<code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-641" name="__codelineno-0-641"></a>                <span class="sa">f</span><span class="s2">&quot;Known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">daacs</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
 <a id="__codelineno-0-642" name="__codelineno-0-642"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 <a id="__codelineno-0-643" name="__codelineno-0-643"></a>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EarthdataDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">daac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDataset</span><span class="p">:</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key (optionally disambiguated by DAAC).</span>
 <a id="__codelineno-0-646" name="__codelineno-0-646"></a>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">            dict[str, EarthdataDataset]: One entry per curated dataset.</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">                Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">daac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDataset</span><span class="p">:</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key (optionally disambiguated by DAAC).</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">        Most keys map one-to-one to a curated row; `get_dataset` (with</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">        its did-you-mean) handles those. The `daac=` filter exists for</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">        the rare case where two curated rows share a `short_name`</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">        served by different providers and the caller distinguishes</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">        them by DAAC.</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">            key: Curated dataset key (a member of :attr:`datasets`).</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">            daac: Optional DAAC id to disambiguate; when given, the</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">                resolved row&#39;s `daac` must match.</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">            EarthdataDataset: The resolved row.</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean hint)</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">                or when `daac=` is given but does not match the row.</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">                Both not-found conditions raise `ValueError`, matching</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">                :meth:`get_dataset`.</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">            - Resolve a key and read its provider:</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;GPM_3IMERGHHL_07&quot;).provider</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">                &#39;GES_DISC&#39;</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">            - A wrong `daac=` filter is rejected:</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;ATL08_006&quot;, daac=&quot;GES DISC&quot;)</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">                Traceback (most recent call last):</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a><span class="sd">                    ...</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="sd">                ValueError: dataset &#39;ATL08_006&#39; resolves to DAAC &#39;NSIDC&#39;, not the requested daac=&#39;GES DISC&#39;.</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>        <span class="k">if</span> <span class="n">daac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dataset</span><span class="o">.</span><span class="n">daac</span> <span class="o">!=</span> <span class="n">daac</span><span class="p">:</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>                <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> resolves to DAAC </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">, &quot;</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>                <span class="sa">f</span><span class="s2">&quot;not the requested daac=</span><span class="si">{</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>            <span class="p">)</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>        <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        Most keys map one-to-one to a curated row; `get_dataset` (with</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        its did-you-mean) handles those. The `daac=` filter exists for</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        the rare case where two curated rows share a `short_name`</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">        served by different providers and the caller distinguishes</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        them by DAAC.</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">            key: Curated dataset key (a member of :attr:`datasets`).</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">            daac: Optional DAAC id to disambiguate; when given, the</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">                resolved row&#39;s `daac` must match.</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">            EarthdataDataset: The resolved row.</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean hint)</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">                or when `daac=` is given but does not match the row.</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a><span class="sd">                Both not-found conditions raise `ValueError`, matching</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">                :meth:`get_dataset`.</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">            - Resolve a key and read its provider:</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;GPM_3IMERGHHL_07&quot;).provider</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">                &#39;GES_DISC&#39;</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">            - A wrong `daac=` filter is rejected:</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;ATL08_006&quot;, daac=&quot;GES DISC&quot;)</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">                Traceback (most recent call last):</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">                    ...</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">                ValueError: dataset &#39;ATL08_006&#39; resolves to DAAC &#39;NSIDC&#39;, not the requested daac=&#39;GES DISC&#39;.</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>        <span class="k">if</span> <span class="n">daac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dataset</span><span class="o">.</span><span class="n">daac</span> <span class="o">!=</span> <span class="n">daac</span><span class="p">:</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>                <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> resolves to DAAC </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">, &quot;</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>                <span class="sa">f</span><span class="s2">&quot;not the requested daac=</span><span class="si">{</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>            <span class="p">)</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="k">return</span> <span class="n">dataset</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -33430,75 +33241,6 @@ value is an :class:<code>EarthdataDataset</code>.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.earthdata.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.earthdata.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.earthdata.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the structural per-dataset map.</p>
-<p>Satisfies the abstract base's contract; the actual parsing is
-done in :func:<code>model_post_init</code>.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;EarthdataDataset&lt;/code&gt; (&lt;code&gt;earthlens.earthdata.catalog.EarthdataDataset&lt;/code&gt;)" href="#earthlens.earthdata.catalog.EarthdataDataset">EarthdataDataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, EarthdataDataset]: One entry per curated dataset.
-Same object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/imagery/src/earthlens/earthdata/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-644">644</a></span>
-<span class="normal"><a href="#__codelineno-0-645">645</a></span>
-<span class="normal"><a href="#__codelineno-0-646">646</a></span>
-<span class="normal"><a href="#__codelineno-0-647">647</a></span>
-<span class="normal"><a href="#__codelineno-0-648">648</a></span>
-<span class="normal"><a href="#__codelineno-0-649">649</a></span>
-<span class="normal"><a href="#__codelineno-0-650">650</a></span>
-<span class="normal"><a href="#__codelineno-0-651">651</a></span>
-<span class="normal"><a href="#__codelineno-0-652">652</a></span>
-<span class="normal"><a href="#__codelineno-0-653">653</a></span>
-<span class="normal"><a href="#__codelineno-0-654">654</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EarthdataDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">    done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        dict[str, EarthdataDataset]: One entry per curated dataset.</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -34310,7 +34052,19 @@ Both not-found conditions raise <code>ValueError</code>, matching
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/earthdata/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-656">656</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-644">644</a></span>
+<span class="normal"><a href="#__codelineno-0-645">645</a></span>
+<span class="normal"><a href="#__codelineno-0-646">646</a></span>
+<span class="normal"><a href="#__codelineno-0-647">647</a></span>
+<span class="normal"><a href="#__codelineno-0-648">648</a></span>
+<span class="normal"><a href="#__codelineno-0-649">649</a></span>
+<span class="normal"><a href="#__codelineno-0-650">650</a></span>
+<span class="normal"><a href="#__codelineno-0-651">651</a></span>
+<span class="normal"><a href="#__codelineno-0-652">652</a></span>
+<span class="normal"><a href="#__codelineno-0-653">653</a></span>
+<span class="normal"><a href="#__codelineno-0-654">654</a></span>
+<span class="normal"><a href="#__codelineno-0-655">655</a></span>
+<span class="normal"><a href="#__codelineno-0-656">656</a></span>
 <span class="normal"><a href="#__codelineno-0-657">657</a></span>
 <span class="normal"><a href="#__codelineno-0-658">658</a></span>
 <span class="normal"><a href="#__codelineno-0-659">659</a></span>
@@ -34345,66 +34099,54 @@ Both not-found conditions raise <code>ValueError</code>, matching
 <span class="normal"><a href="#__codelineno-0-688">688</a></span>
 <span class="normal"><a href="#__codelineno-0-689">689</a></span>
 <span class="normal"><a href="#__codelineno-0-690">690</a></span>
-<span class="normal"><a href="#__codelineno-0-691">691</a></span>
-<span class="normal"><a href="#__codelineno-0-692">692</a></span>
-<span class="normal"><a href="#__codelineno-0-693">693</a></span>
-<span class="normal"><a href="#__codelineno-0-694">694</a></span>
-<span class="normal"><a href="#__codelineno-0-695">695</a></span>
-<span class="normal"><a href="#__codelineno-0-696">696</a></span>
-<span class="normal"><a href="#__codelineno-0-697">697</a></span>
-<span class="normal"><a href="#__codelineno-0-698">698</a></span>
-<span class="normal"><a href="#__codelineno-0-699">699</a></span>
-<span class="normal"><a href="#__codelineno-0-700">700</a></span>
-<span class="normal"><a href="#__codelineno-0-701">701</a></span>
-<span class="normal"><a href="#__codelineno-0-702">702</a></span>
-<span class="normal"><a href="#__codelineno-0-703">703</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">daac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDataset</span><span class="p">:</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key (optionally disambiguated by DAAC).</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">    Most keys map one-to-one to a curated row; `get_dataset` (with</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">    its did-you-mean) handles those. The `daac=` filter exists for</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">    the rare case where two curated rows share a `short_name`</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">    served by different providers and the caller distinguishes</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">    them by DAAC.</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">        key: Curated dataset key (a member of :attr:`datasets`).</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">        daac: Optional DAAC id to disambiguate; when given, the</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">            resolved row&#39;s `daac` must match.</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">        EarthdataDataset: The resolved row.</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean hint)</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">            or when `daac=` is given but does not match the row.</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">            Both not-found conditions raise `ValueError`, matching</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">            :meth:`get_dataset`.</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">        - Resolve a key and read its provider:</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;GPM_3IMERGHHL_07&quot;).provider</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">            &#39;GES_DISC&#39;</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">        - A wrong `daac=` filter is rejected:</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;ATL08_006&quot;, daac=&quot;GES DISC&quot;)</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="sd">            ValueError: dataset &#39;ATL08_006&#39; resolves to DAAC &#39;NSIDC&#39;, not the requested daac=&#39;GES DISC&#39;.</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>    <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>    <span class="k">if</span> <span class="n">daac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dataset</span><span class="o">.</span><span class="n">daac</span> <span class="o">!=</span> <span class="n">daac</span><span class="p">:</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> resolves to DAAC </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">, &quot;</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="sa">f</span><span class="s2">&quot;not the requested daac=</span><span class="si">{</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="p">)</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>    <span class="k">return</span> <span class="n">dataset</span>
+<span class="normal"><a href="#__codelineno-0-691">691</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">daac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDataset</span><span class="p">:</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key (optionally disambiguated by DAAC).</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">    Most keys map one-to-one to a curated row; `get_dataset` (with</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">    its did-you-mean) handles those. The `daac=` filter exists for</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">    the rare case where two curated rows share a `short_name`</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">    served by different providers and the caller distinguishes</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    them by DAAC.</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">        key: Curated dataset key (a member of :attr:`datasets`).</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">        daac: Optional DAAC id to disambiguate; when given, the</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">            resolved row&#39;s `daac` must match.</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">        EarthdataDataset: The resolved row.</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean hint)</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">            or when `daac=` is given but does not match the row.</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a><span class="sd">            Both not-found conditions raise `ValueError`, matching</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">            :meth:`get_dataset`.</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">        - Resolve a key and read its provider:</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;GPM_3IMERGHHL_07&quot;).provider</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">            &#39;GES_DISC&#39;</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">        - A wrong `daac=` filter is rejected:</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">            &gt;&gt;&gt; from earthlens.earthdata import Catalog</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;ATL08_006&quot;, daac=&quot;GES DISC&quot;)</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">            ValueError: dataset &#39;ATL08_006&#39; resolves to DAAC &#39;NSIDC&#39;, not the requested daac=&#39;GES DISC&#39;.</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>    <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>    <span class="k">if</span> <span class="n">daac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dataset</span><span class="o">.</span><span class="n">daac</span> <span class="o">!=</span> <span class="n">daac</span><span class="p">:</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>            <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> resolves to DAAC </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">, &quot;</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>            <span class="sa">f</span><span class="s2">&quot;not the requested daac=</span><span class="si">{</span><span class="n">daac</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="p">)</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>    <span class="k">return</span> <span class="n">dataset</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

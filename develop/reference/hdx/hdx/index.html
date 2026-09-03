@@ -8981,17 +8981,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#earthlens.hdx.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.hdx.Catalog.get_dataset" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -9174,17 +9163,6 @@
   
     <nav class="md-nav" aria-label="Catalog">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.hdx.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#earthlens.hdx.catalog.Catalog.get_dataset" class="md-nav__link">
@@ -18098,34 +18076,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -23834,17 +23784,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#earthlens.hdx.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.hdx.Catalog.get_dataset" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24027,17 +23966,6 @@
   
     <nav class="md-nav" aria-label="Catalog">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.hdx.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#earthlens.hdx.catalog.Catalog.get_dataset" class="md-nav__link">
@@ -24490,19 +24418,7 @@ value is an :class:<code>HdxDataset</code>.</p>
 <span class="normal"><a href="#__codelineno-0-451">451</a></span>
 <span class="normal"><a href="#__codelineno-0-452">452</a></span>
 <span class="normal"><a href="#__codelineno-0-453">453</a></span>
-<span class="normal"><a href="#__codelineno-0-454">454</a></span>
-<span class="normal"><a href="#__codelineno-0-455">455</a></span>
-<span class="normal"><a href="#__codelineno-0-456">456</a></span>
-<span class="normal"><a href="#__codelineno-0-457">457</a></span>
-<span class="normal"><a href="#__codelineno-0-458">458</a></span>
-<span class="normal"><a href="#__codelineno-0-459">459</a></span>
-<span class="normal"><a href="#__codelineno-0-460">460</a></span>
-<span class="normal"><a href="#__codelineno-0-461">461</a></span>
-<span class="normal"><a href="#__codelineno-0-462">462</a></span>
-<span class="normal"><a href="#__codelineno-0-463">463</a></span>
-<span class="normal"><a href="#__codelineno-0-464">464</a></span>
-<span class="normal"><a href="#__codelineno-0-465">465</a></span>
-<span class="normal"><a href="#__codelineno-0-466">466</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset catalog for the Humanitarian Data Exchange backend.</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data)</span>
@@ -24590,93 +24506,81 @@ value is an :class:<code>HdxDataset</code>.</p>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="n">catalog</span><span class="o">.</span><span class="n">_available_rows</span> <span class="o">=</span> <span class="n">rows</span>
 <a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="k">return</span> <span class="n">catalog</span>
 <a id="__codelineno-0-379" name="__codelineno-0-379"></a>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">HdxDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a key against the curated then the full HDX index.</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            dict[str, HdxDataset]: One entry per curated dataset. Same</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                object as :attr:`datasets`.</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a key against the curated then the full HDX index.</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        Curated `datasets` (hand-vetted, with full metadata) win.</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">        Otherwise, any id in the full long-tail index (the whole</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">        `data.humdata.org` catalogue) resolves to a synthesised</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        recorded in `_available.json` (empty for the few ids the CKAN</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        `package_search` walk does not expose). The `hdx_id` is the only</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">        load-bearing field — the backend fetches the dataset live via</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        `Dataset.read_from_hdx` — so the row is fully usable. This is the</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        long-tail fallback, mirroring `earthlens.earthdata`&#39;s `_auto`</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        resolution. An unknown id raises with a did-you-mean hint.</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">            name: A curated key (e.g. `&quot;kontur-population&quot;`) or any HDX</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">                dataset id in the available index.</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            HdxDataset: The curated row, or a thin synthesised row for an</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">                available id.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            ValueError: When `name` is in neither the curated map nor the</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">                available index.</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>            <span class="k">return</span> <span class="n">HdxDataset</span><span class="p">(</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>                <span class="n">hdx_id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>                <span class="n">org</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>                <span class="n">title</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>            <span class="p">)</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>        <span class="c1"># Fuzzy-match against the curated keys only: a mistyped key is</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="c1"># almost always a near-miss of a curated name, and running difflib</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="c1"># over the ~41k-id long tail on every miss would be needlessly slow.</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog_kind</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> curated + </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>            <span class="sa">f</span><span class="s2">&quot;available).</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="p">)</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its :class:`HdxDataset` row.</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        Thin wrapper over the base :meth:`get_dataset` (which raises a</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key), named</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        `resolve` to match the Earthdata backend&#39;s catalog surface.</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">            key: Curated dataset key (a member of :attr:`datasets`).</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">            HdxDataset: The resolved row.</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">                hint).</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">            - Resolve a key and read its HDX id:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">                &gt;&gt;&gt; from earthlens.hdx import Catalog</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;kontur-population&quot;).hdx_id</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">                &#39;kontur-population-dataset&#39;</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        Curated `datasets` (hand-vetted, with full metadata) win.</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        Otherwise, any id in the full long-tail index (the whole</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        `data.humdata.org` catalogue) resolves to a synthesised</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        recorded in `_available.json` (empty for the few ids the CKAN</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        `package_search` walk does not expose). The `hdx_id` is the only</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        load-bearing field — the backend fetches the dataset live via</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        `Dataset.read_from_hdx` — so the row is fully usable. This is the</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        long-tail fallback, mirroring `earthlens.earthdata`&#39;s `_auto`</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        resolution. An unknown id raises with a did-you-mean hint.</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">            name: A curated key (e.g. `&quot;kontur-population&quot;`) or any HDX</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">                dataset id in the available index.</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">            HdxDataset: The curated row, or a thin synthesised row for an</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">                available id.</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            ValueError: When `name` is in neither the curated map nor the</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">                available index.</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>            <span class="k">return</span> <span class="n">HdxDataset</span><span class="p">(</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>                <span class="n">hdx_id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>                <span class="n">org</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>                <span class="n">title</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="p">)</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="c1"># Fuzzy-match against the curated keys only: a mistyped key is</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="c1"># almost always a near-miss of a curated name, and running difflib</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="c1"># over the ~41k-id long tail on every miss would be needlessly slow.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog_kind</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> curated + </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>            <span class="sa">f</span><span class="s2">&quot;available).</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="p">)</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its :class:`HdxDataset` row.</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        Thin wrapper over the base :meth:`get_dataset` (which raises a</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key), named</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        `resolve` to match the Earthdata backend&#39;s catalog surface.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            key: Curated dataset key (a member of :attr:`datasets`).</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">            HdxDataset: The resolved row.</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">                hint).</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">            - Resolve a key and read its HDX id:</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">                &gt;&gt;&gt; from earthlens.hdx import Catalog</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;kontur-population&quot;).hdx_id</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">                &#39;kontur-population-dataset&#39;</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24692,75 +24596,6 @@ value is an :class:<code>HdxDataset</code>.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.hdx.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.hdx.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.hdx.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the structural per-dataset map.</p>
-<p>Satisfies the abstract base's contract; the actual parsing is
-done in :func:<code>model_post_init</code>.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;HdxDataset&lt;/code&gt; (&lt;code&gt;earthlens.hdx.catalog.HdxDataset&lt;/code&gt;)" href="#earthlens.hdx.catalog.HdxDataset">HdxDataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, HdxDataset]: One entry per curated dataset. Same
-object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/hdx/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span>
-<span class="normal"><a href="#__codelineno-0-383">383</a></span>
-<span class="normal"><a href="#__codelineno-0-384">384</a></span>
-<span class="normal"><a href="#__codelineno-0-385">385</a></span>
-<span class="normal"><a href="#__codelineno-0-386">386</a></span>
-<span class="normal"><a href="#__codelineno-0-387">387</a></span>
-<span class="normal"><a href="#__codelineno-0-388">388</a></span>
-<span class="normal"><a href="#__codelineno-0-389">389</a></span>
-<span class="normal"><a href="#__codelineno-0-390">390</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">HdxDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        dict[str, HdxDataset]: One entry per curated dataset. Same</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            object as :attr:`datasets`.</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -24868,7 +24703,19 @@ available index.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/hdx/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-392">392</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-380">380</a></span>
+<span class="normal"><a href="#__codelineno-0-381">381</a></span>
+<span class="normal"><a href="#__codelineno-0-382">382</a></span>
+<span class="normal"><a href="#__codelineno-0-383">383</a></span>
+<span class="normal"><a href="#__codelineno-0-384">384</a></span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span>
+<span class="normal"><a href="#__codelineno-0-389">389</a></span>
+<span class="normal"><a href="#__codelineno-0-390">390</a></span>
+<span class="normal"><a href="#__codelineno-0-391">391</a></span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
 <span class="normal"><a href="#__codelineno-0-394">394</a></span>
 <span class="normal"><a href="#__codelineno-0-395">395</a></span>
@@ -24902,65 +24749,53 @@ available index.</p>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
 <span class="normal"><a href="#__codelineno-0-424">424</a></span>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
-<span class="normal"><a href="#__codelineno-0-426">426</a></span>
-<span class="normal"><a href="#__codelineno-0-427">427</a></span>
-<span class="normal"><a href="#__codelineno-0-428">428</a></span>
-<span class="normal"><a href="#__codelineno-0-429">429</a></span>
-<span class="normal"><a href="#__codelineno-0-430">430</a></span>
-<span class="normal"><a href="#__codelineno-0-431">431</a></span>
-<span class="normal"><a href="#__codelineno-0-432">432</a></span>
-<span class="normal"><a href="#__codelineno-0-433">433</a></span>
-<span class="normal"><a href="#__codelineno-0-434">434</a></span>
-<span class="normal"><a href="#__codelineno-0-435">435</a></span>
-<span class="normal"><a href="#__codelineno-0-436">436</a></span>
-<span class="normal"><a href="#__codelineno-0-437">437</a></span>
-<span class="normal"><a href="#__codelineno-0-438">438</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a key against the curated then the full HDX index.</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">    Curated `datasets` (hand-vetted, with full metadata) win.</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">    Otherwise, any id in the full long-tail index (the whole</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">    `data.humdata.org` catalogue) resolves to a synthesised</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">    :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">    recorded in `_available.json` (empty for the few ids the CKAN</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">    `package_search` walk does not expose). The `hdx_id` is the only</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">    load-bearing field — the backend fetches the dataset live via</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    `Dataset.read_from_hdx` — so the row is fully usable. This is the</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    long-tail fallback, mirroring `earthlens.earthdata`&#39;s `_auto`</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    resolution. An unknown id raises with a did-you-mean hint.</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        name: A curated key (e.g. `&quot;kontur-population&quot;`) or any HDX</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            dataset id in the available index.</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        HdxDataset: The curated row, or a thin synthesised row for an</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            available id.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        ValueError: When `name` is in neither the curated map nor the</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            available index.</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>    <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="k">return</span> <span class="n">HdxDataset</span><span class="p">(</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>            <span class="n">hdx_id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>            <span class="n">org</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>            <span class="n">title</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="p">)</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>    <span class="c1"># Fuzzy-match against the curated keys only: a mistyped key is</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>    <span class="c1"># almost always a near-miss of a curated name, and running difflib</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>    <span class="c1"># over the ~41k-id long tail on every miss would be needlessly slow.</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog_kind</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> curated + </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="sa">f</span><span class="s2">&quot;available).</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-426">426</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a key against the curated then the full HDX index.</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">    Curated `datasets` (hand-vetted, with full metadata) win.</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    Otherwise, any id in the full long-tail index (the whole</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">    `data.humdata.org` catalogue) resolves to a synthesised</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    recorded in `_available.json` (empty for the few ids the CKAN</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    `package_search` walk does not expose). The `hdx_id` is the only</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    load-bearing field — the backend fetches the dataset live via</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    `Dataset.read_from_hdx` — so the row is fully usable. This is the</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    long-tail fallback, mirroring `earthlens.earthdata`&#39;s `_auto`</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    resolution. An unknown id raises with a did-you-mean hint.</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        name: A curated key (e.g. `&quot;kontur-population&quot;`) or any HDX</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            dataset id in the available index.</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        HdxDataset: The curated row, or a thin synthesised row for an</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            available id.</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        ValueError: When `name` is in neither the curated map nor the</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">            available index.</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>    <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>    <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="k">return</span> <span class="n">HdxDataset</span><span class="p">(</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>            <span class="n">hdx_id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>            <span class="n">org</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>            <span class="n">title</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>        <span class="p">)</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>    <span class="c1"># Fuzzy-match against the curated keys only: a mistyped key is</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="c1"># almost always a near-miss of a curated name, and running difflib</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="c1"># over the ~41k-id long tail on every miss would be needlessly slow.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog_kind</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> curated + </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="sa">f</span><span class="s2">&quot;available).</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25323,7 +25158,19 @@ hint).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/hdx/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-440">440</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-428">428</a></span>
+<span class="normal"><a href="#__codelineno-0-429">429</a></span>
+<span class="normal"><a href="#__codelineno-0-430">430</a></span>
+<span class="normal"><a href="#__codelineno-0-431">431</a></span>
+<span class="normal"><a href="#__codelineno-0-432">432</a></span>
+<span class="normal"><a href="#__codelineno-0-433">433</a></span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span>
+<span class="normal"><a href="#__codelineno-0-435">435</a></span>
+<span class="normal"><a href="#__codelineno-0-436">436</a></span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span>
+<span class="normal"><a href="#__codelineno-0-439">439</a></span>
+<span class="normal"><a href="#__codelineno-0-440">440</a></span>
 <span class="normal"><a href="#__codelineno-0-441">441</a></span>
 <span class="normal"><a href="#__codelineno-0-442">442</a></span>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
@@ -25337,45 +25184,33 @@ hint).</p>
 <span class="normal"><a href="#__codelineno-0-451">451</a></span>
 <span class="normal"><a href="#__codelineno-0-452">452</a></span>
 <span class="normal"><a href="#__codelineno-0-453">453</a></span>
-<span class="normal"><a href="#__codelineno-0-454">454</a></span>
-<span class="normal"><a href="#__codelineno-0-455">455</a></span>
-<span class="normal"><a href="#__codelineno-0-456">456</a></span>
-<span class="normal"><a href="#__codelineno-0-457">457</a></span>
-<span class="normal"><a href="#__codelineno-0-458">458</a></span>
-<span class="normal"><a href="#__codelineno-0-459">459</a></span>
-<span class="normal"><a href="#__codelineno-0-460">460</a></span>
-<span class="normal"><a href="#__codelineno-0-461">461</a></span>
-<span class="normal"><a href="#__codelineno-0-462">462</a></span>
-<span class="normal"><a href="#__codelineno-0-463">463</a></span>
-<span class="normal"><a href="#__codelineno-0-464">464</a></span>
-<span class="normal"><a href="#__codelineno-0-465">465</a></span>
-<span class="normal"><a href="#__codelineno-0-466">466</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its :class:`HdxDataset` row.</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">    Thin wrapper over the base :meth:`get_dataset` (which raises a</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key), named</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    `resolve` to match the Earthdata backend&#39;s catalog surface.</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">        key: Curated dataset key (a member of :attr:`datasets`).</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">        HdxDataset: The resolved row.</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">            hint).</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        - Resolve a key and read its HDX id:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">            &gt;&gt;&gt; from earthlens.hdx import Catalog</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;kontur-population&quot;).hdx_id</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">            &#39;kontur-population-dataset&#39;</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its :class:`HdxDataset` row.</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">    Thin wrapper over the base :meth:`get_dataset` (which raises a</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key), named</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">    `resolve` to match the Earthdata backend&#39;s catalog surface.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        key: Curated dataset key (a member of :attr:`datasets`).</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        HdxDataset: The resolved row.</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            hint).</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        - Resolve a key and read its HDX id:</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">            &gt;&gt;&gt; from earthlens.hdx import Catalog</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;kontur-population&quot;).hdx_id</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">            &#39;kontur-population-dataset&#39;</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29347,19 +29182,7 @@ value is an :class:<code>HdxDataset</code>.</p>
 <span class="normal"><a href="#__codelineno-0-451">451</a></span>
 <span class="normal"><a href="#__codelineno-0-452">452</a></span>
 <span class="normal"><a href="#__codelineno-0-453">453</a></span>
-<span class="normal"><a href="#__codelineno-0-454">454</a></span>
-<span class="normal"><a href="#__codelineno-0-455">455</a></span>
-<span class="normal"><a href="#__codelineno-0-456">456</a></span>
-<span class="normal"><a href="#__codelineno-0-457">457</a></span>
-<span class="normal"><a href="#__codelineno-0-458">458</a></span>
-<span class="normal"><a href="#__codelineno-0-459">459</a></span>
-<span class="normal"><a href="#__codelineno-0-460">460</a></span>
-<span class="normal"><a href="#__codelineno-0-461">461</a></span>
-<span class="normal"><a href="#__codelineno-0-462">462</a></span>
-<span class="normal"><a href="#__codelineno-0-463">463</a></span>
-<span class="normal"><a href="#__codelineno-0-464">464</a></span>
-<span class="normal"><a href="#__codelineno-0-465">465</a></span>
-<span class="normal"><a href="#__codelineno-0-466">466</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset catalog for the Humanitarian Data Exchange backend.</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data)</span>
@@ -29447,93 +29270,81 @@ value is an :class:<code>HdxDataset</code>.</p>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="n">catalog</span><span class="o">.</span><span class="n">_available_rows</span> <span class="o">=</span> <span class="n">rows</span>
 <a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="k">return</span> <span class="n">catalog</span>
 <a id="__codelineno-0-379" name="__codelineno-0-379"></a>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">HdxDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a key against the curated then the full HDX index.</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            dict[str, HdxDataset]: One entry per curated dataset. Same</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                object as :attr:`datasets`.</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a key against the curated then the full HDX index.</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        Curated `datasets` (hand-vetted, with full metadata) win.</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">        Otherwise, any id in the full long-tail index (the whole</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">        `data.humdata.org` catalogue) resolves to a synthesised</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        recorded in `_available.json` (empty for the few ids the CKAN</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        `package_search` walk does not expose). The `hdx_id` is the only</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">        load-bearing field — the backend fetches the dataset live via</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        `Dataset.read_from_hdx` — so the row is fully usable. This is the</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        long-tail fallback, mirroring `earthlens.earthdata`&#39;s `_auto`</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        resolution. An unknown id raises with a did-you-mean hint.</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">            name: A curated key (e.g. `&quot;kontur-population&quot;`) or any HDX</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">                dataset id in the available index.</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            HdxDataset: The curated row, or a thin synthesised row for an</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">                available id.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            ValueError: When `name` is in neither the curated map nor the</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">                available index.</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>            <span class="k">return</span> <span class="n">HdxDataset</span><span class="p">(</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>                <span class="n">hdx_id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>                <span class="n">org</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>                <span class="n">title</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>            <span class="p">)</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>        <span class="c1"># Fuzzy-match against the curated keys only: a mistyped key is</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="c1"># almost always a near-miss of a curated name, and running difflib</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="c1"># over the ~41k-id long tail on every miss would be needlessly slow.</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog_kind</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> curated + </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>            <span class="sa">f</span><span class="s2">&quot;available).</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="p">)</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its :class:`HdxDataset` row.</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        Thin wrapper over the base :meth:`get_dataset` (which raises a</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key), named</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        `resolve` to match the Earthdata backend&#39;s catalog surface.</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">            key: Curated dataset key (a member of :attr:`datasets`).</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">            HdxDataset: The resolved row.</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">                hint).</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">            - Resolve a key and read its HDX id:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">                &gt;&gt;&gt; from earthlens.hdx import Catalog</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;kontur-population&quot;).hdx_id</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">                &#39;kontur-population-dataset&#39;</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        Curated `datasets` (hand-vetted, with full metadata) win.</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        Otherwise, any id in the full long-tail index (the whole</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        `data.humdata.org` catalogue) resolves to a synthesised</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        recorded in `_available.json` (empty for the few ids the CKAN</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        `package_search` walk does not expose). The `hdx_id` is the only</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        load-bearing field — the backend fetches the dataset live via</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        `Dataset.read_from_hdx` — so the row is fully usable. This is the</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        long-tail fallback, mirroring `earthlens.earthdata`&#39;s `_auto`</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        resolution. An unknown id raises with a did-you-mean hint.</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">            name: A curated key (e.g. `&quot;kontur-population&quot;`) or any HDX</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">                dataset id in the available index.</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">            HdxDataset: The curated row, or a thin synthesised row for an</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">                available id.</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            ValueError: When `name` is in neither the curated map nor the</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">                available index.</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>            <span class="k">return</span> <span class="n">HdxDataset</span><span class="p">(</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>                <span class="n">hdx_id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>                <span class="n">org</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>                <span class="n">title</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="p">)</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="c1"># Fuzzy-match against the curated keys only: a mistyped key is</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="c1"># almost always a near-miss of a curated name, and running difflib</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="c1"># over the ~41k-id long tail on every miss would be needlessly slow.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog_kind</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> curated + </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>            <span class="sa">f</span><span class="s2">&quot;available).</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="p">)</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its :class:`HdxDataset` row.</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        Thin wrapper over the base :meth:`get_dataset` (which raises a</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key), named</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        `resolve` to match the Earthdata backend&#39;s catalog surface.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            key: Curated dataset key (a member of :attr:`datasets`).</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">            HdxDataset: The resolved row.</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">                hint).</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">            - Resolve a key and read its HDX id:</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">                &gt;&gt;&gt; from earthlens.hdx import Catalog</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;kontur-population&quot;).hdx_id</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">                &#39;kontur-population-dataset&#39;</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29549,75 +29360,6 @@ value is an :class:<code>HdxDataset</code>.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.hdx.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.hdx.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.hdx.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the structural per-dataset map.</p>
-<p>Satisfies the abstract base's contract; the actual parsing is
-done in :func:<code>model_post_init</code>.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;HdxDataset&lt;/code&gt; (&lt;code&gt;earthlens.hdx.catalog.HdxDataset&lt;/code&gt;)" href="#earthlens.hdx.catalog.HdxDataset">HdxDataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, HdxDataset]: One entry per curated dataset. Same
-object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/hdx/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span>
-<span class="normal"><a href="#__codelineno-0-383">383</a></span>
-<span class="normal"><a href="#__codelineno-0-384">384</a></span>
-<span class="normal"><a href="#__codelineno-0-385">385</a></span>
-<span class="normal"><a href="#__codelineno-0-386">386</a></span>
-<span class="normal"><a href="#__codelineno-0-387">387</a></span>
-<span class="normal"><a href="#__codelineno-0-388">388</a></span>
-<span class="normal"><a href="#__codelineno-0-389">389</a></span>
-<span class="normal"><a href="#__codelineno-0-390">390</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">HdxDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        dict[str, HdxDataset]: One entry per curated dataset. Same</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            object as :attr:`datasets`.</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -29725,7 +29467,19 @@ available index.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/hdx/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-392">392</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-380">380</a></span>
+<span class="normal"><a href="#__codelineno-0-381">381</a></span>
+<span class="normal"><a href="#__codelineno-0-382">382</a></span>
+<span class="normal"><a href="#__codelineno-0-383">383</a></span>
+<span class="normal"><a href="#__codelineno-0-384">384</a></span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span>
+<span class="normal"><a href="#__codelineno-0-389">389</a></span>
+<span class="normal"><a href="#__codelineno-0-390">390</a></span>
+<span class="normal"><a href="#__codelineno-0-391">391</a></span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
 <span class="normal"><a href="#__codelineno-0-394">394</a></span>
 <span class="normal"><a href="#__codelineno-0-395">395</a></span>
@@ -29759,65 +29513,53 @@ available index.</p>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
 <span class="normal"><a href="#__codelineno-0-424">424</a></span>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
-<span class="normal"><a href="#__codelineno-0-426">426</a></span>
-<span class="normal"><a href="#__codelineno-0-427">427</a></span>
-<span class="normal"><a href="#__codelineno-0-428">428</a></span>
-<span class="normal"><a href="#__codelineno-0-429">429</a></span>
-<span class="normal"><a href="#__codelineno-0-430">430</a></span>
-<span class="normal"><a href="#__codelineno-0-431">431</a></span>
-<span class="normal"><a href="#__codelineno-0-432">432</a></span>
-<span class="normal"><a href="#__codelineno-0-433">433</a></span>
-<span class="normal"><a href="#__codelineno-0-434">434</a></span>
-<span class="normal"><a href="#__codelineno-0-435">435</a></span>
-<span class="normal"><a href="#__codelineno-0-436">436</a></span>
-<span class="normal"><a href="#__codelineno-0-437">437</a></span>
-<span class="normal"><a href="#__codelineno-0-438">438</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a key against the curated then the full HDX index.</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">    Curated `datasets` (hand-vetted, with full metadata) win.</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">    Otherwise, any id in the full long-tail index (the whole</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">    `data.humdata.org` catalogue) resolves to a synthesised</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">    :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">    recorded in `_available.json` (empty for the few ids the CKAN</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">    `package_search` walk does not expose). The `hdx_id` is the only</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">    load-bearing field — the backend fetches the dataset live via</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    `Dataset.read_from_hdx` — so the row is fully usable. This is the</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    long-tail fallback, mirroring `earthlens.earthdata`&#39;s `_auto`</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    resolution. An unknown id raises with a did-you-mean hint.</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        name: A curated key (e.g. `&quot;kontur-population&quot;`) or any HDX</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            dataset id in the available index.</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        HdxDataset: The curated row, or a thin synthesised row for an</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            available id.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        ValueError: When `name` is in neither the curated map nor the</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            available index.</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>    <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="k">return</span> <span class="n">HdxDataset</span><span class="p">(</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>            <span class="n">hdx_id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>            <span class="n">org</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>            <span class="n">title</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="p">)</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>    <span class="c1"># Fuzzy-match against the curated keys only: a mistyped key is</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>    <span class="c1"># almost always a near-miss of a curated name, and running difflib</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>    <span class="c1"># over the ~41k-id long tail on every miss would be needlessly slow.</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog_kind</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> curated + </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="sa">f</span><span class="s2">&quot;available).</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-426">426</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a key against the curated then the full HDX index.</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">    Curated `datasets` (hand-vetted, with full metadata) win.</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    Otherwise, any id in the full long-tail index (the whole</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">    `data.humdata.org` catalogue) resolves to a synthesised</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    recorded in `_available.json` (empty for the few ids the CKAN</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    `package_search` walk does not expose). The `hdx_id` is the only</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    load-bearing field — the backend fetches the dataset live via</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    `Dataset.read_from_hdx` — so the row is fully usable. This is the</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    long-tail fallback, mirroring `earthlens.earthdata`&#39;s `_auto`</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    resolution. An unknown id raises with a did-you-mean hint.</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        name: A curated key (e.g. `&quot;kontur-population&quot;`) or any HDX</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            dataset id in the available index.</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        HdxDataset: The curated row, or a thin synthesised row for an</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            available id.</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        ValueError: When `name` is in neither the curated map nor the</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">            available index.</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>    <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>    <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="k">return</span> <span class="n">HdxDataset</span><span class="p">(</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>            <span class="n">hdx_id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>            <span class="n">org</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>            <span class="n">title</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>        <span class="p">)</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>    <span class="c1"># Fuzzy-match against the curated keys only: a mistyped key is</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="c1"># almost always a near-miss of a curated name, and running difflib</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="c1"># over the ~41k-id long tail on every miss would be needlessly slow.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog_kind</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> curated + </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="sa">f</span><span class="s2">&quot;available).</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -30180,7 +29922,19 @@ hint).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/hdx/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-440">440</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-428">428</a></span>
+<span class="normal"><a href="#__codelineno-0-429">429</a></span>
+<span class="normal"><a href="#__codelineno-0-430">430</a></span>
+<span class="normal"><a href="#__codelineno-0-431">431</a></span>
+<span class="normal"><a href="#__codelineno-0-432">432</a></span>
+<span class="normal"><a href="#__codelineno-0-433">433</a></span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span>
+<span class="normal"><a href="#__codelineno-0-435">435</a></span>
+<span class="normal"><a href="#__codelineno-0-436">436</a></span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span>
+<span class="normal"><a href="#__codelineno-0-439">439</a></span>
+<span class="normal"><a href="#__codelineno-0-440">440</a></span>
 <span class="normal"><a href="#__codelineno-0-441">441</a></span>
 <span class="normal"><a href="#__codelineno-0-442">442</a></span>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
@@ -30194,45 +29948,33 @@ hint).</p>
 <span class="normal"><a href="#__codelineno-0-451">451</a></span>
 <span class="normal"><a href="#__codelineno-0-452">452</a></span>
 <span class="normal"><a href="#__codelineno-0-453">453</a></span>
-<span class="normal"><a href="#__codelineno-0-454">454</a></span>
-<span class="normal"><a href="#__codelineno-0-455">455</a></span>
-<span class="normal"><a href="#__codelineno-0-456">456</a></span>
-<span class="normal"><a href="#__codelineno-0-457">457</a></span>
-<span class="normal"><a href="#__codelineno-0-458">458</a></span>
-<span class="normal"><a href="#__codelineno-0-459">459</a></span>
-<span class="normal"><a href="#__codelineno-0-460">460</a></span>
-<span class="normal"><a href="#__codelineno-0-461">461</a></span>
-<span class="normal"><a href="#__codelineno-0-462">462</a></span>
-<span class="normal"><a href="#__codelineno-0-463">463</a></span>
-<span class="normal"><a href="#__codelineno-0-464">464</a></span>
-<span class="normal"><a href="#__codelineno-0-465">465</a></span>
-<span class="normal"><a href="#__codelineno-0-466">466</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its :class:`HdxDataset` row.</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">    Thin wrapper over the base :meth:`get_dataset` (which raises a</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key), named</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    `resolve` to match the Earthdata backend&#39;s catalog surface.</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">        key: Curated dataset key (a member of :attr:`datasets`).</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">        HdxDataset: The resolved row.</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">            hint).</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        - Resolve a key and read its HDX id:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">            &gt;&gt;&gt; from earthlens.hdx import Catalog</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;kontur-population&quot;).hdx_id</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">            &#39;kontur-population-dataset&#39;</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its :class:`HdxDataset` row.</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">    Thin wrapper over the base :meth:`get_dataset` (which raises a</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key), named</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">    `resolve` to match the Earthdata backend&#39;s catalog surface.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        key: Curated dataset key (a member of :attr:`datasets`).</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        HdxDataset: The resolved row.</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            hint).</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        - Resolve a key and read its HDX id:</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">            &gt;&gt;&gt; from earthlens.hdx import Catalog</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;kontur-population&quot;).hdx_id</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">            &#39;kontur-population-dataset&#39;</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
