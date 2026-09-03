@@ -1669,3 +1669,96 @@ class TestNoDirectGdal:
                     "importing pyramids first in that same function, which raises "
                     "ModuleNotFoundError outside an already-loaded process"
                 )
+
+
+#: Every spelling that reaches GDAL, paired with the id it reports under. The
+#: guard is only worth its name if it catches all of them, and nothing here is
+#: hypothetical -- the bare `import_module` form slipped through until it was
+#: probed, because the matcher keyed off the AST node shape instead of the
+#: callee's name.
+_GDAL_SPELLINGS = [
+    ("plain", "import osgeo" + chr(10)),
+    ("dotted", "import osgeo.gdal" + chr(10)),
+    ("aliased", "import osgeo.gdal as g" + chr(10)),
+    ("from", "from osgeo import gdal" + chr(10)),
+    ("from-dotted", "from osgeo.gdal import Translate" + chr(10)),
+    ("sibling-ogr", "from ogr import Open" + chr(10)),
+    ("sibling-osr", "import osr" + chr(10)),
+    (
+        "dynamic-dotted",
+        "import importlib" + chr(10) + 'importlib.import_module("osgeo")' + chr(10),
+    ),
+    (
+        "dynamic-bare",
+        "from importlib import import_module"
+        + chr(10)
+        + 'import_module("osgeo")'
+        + chr(10),
+    ),
+    ("dynamic-dunder", '__import__("osgeo")' + chr(10)),
+]
+
+#: Sources that must NOT trip the guard, so it stays usable.
+_INNOCENT_SOURCES = [
+    ("pyramids", "import pyramids" + chr(10)),
+    ("pyramids-from", "from pyramids.dataset import Dataset" + chr(10)),
+    (
+        "unrelated-dynamic",
+        "import importlib" + chr(10) + 'importlib.import_module("json")' + chr(10),
+    ),
+    ("name-merely-contains-osgeo", "import osgeohelper" + chr(10)),
+]
+
+
+class TestGdalGuardDetection:
+    """The GDAL guard is only as good as what `_gis_imports` can see."""
+
+    @pytest.mark.parametrize(
+        "source",
+        [src for _, src in _GDAL_SPELLINGS],
+        ids=[i for i, _ in _GDAL_SPELLINGS],
+    )
+    def test_every_gdal_spelling_is_caught(self, source, tmp_path):
+        """Each way of reaching GDAL is detected, static or dynamic."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(source, encoding="utf-8")
+        assert _gis_imports(probe), f"guard missed this import:{chr(10)}{source}"
+
+    @pytest.mark.parametrize(
+        "source",
+        [src for _, src in _INNOCENT_SOURCES],
+        ids=[i for i, _ in _INNOCENT_SOURCES],
+    )
+    def test_innocent_sources_are_left_alone(self, source, tmp_path):
+        """A guard that fires on ordinary imports would be turned off."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(source, encoding="utf-8")
+        assert _gis_imports(probe) == [], f"guard false-positived on:{chr(10)}{source}"
+
+    def test_reports_the_line_it_found(self, tmp_path):
+        """The offender's line number is reported so the failure is actionable."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(
+            "x = 1" + chr(10) + "from osgeo import gdal" + chr(10), encoding="utf-8"
+        )
+        assert _gis_imports(probe) == [(2, "from osgeo")]
+
+    def test_is_banned_gis_import_matches_only_import_nodes(self):
+        """The node predicate accepts GDAL imports and rejects anything else."""
+        banned = ast.parse("from osgeo import gdal").body[0]
+        innocent = ast.parse("import pyramids").body[0]
+        call = ast.parse("f()").body[0]
+        assert _is_banned_gis_import(banned)
+        assert not _is_banned_gis_import(innocent)
+        assert not _is_banned_gis_import(call)
+
+    def test_imports_pyramids_matches_only_the_vendoring_import(self):
+        """The pyramids predicate is what makes the ordering assertion meaningful."""
+        plain = ast.parse("import pyramids").body[0]
+        submodule = ast.parse("import pyramids.dataset").body[0]
+        from_form = ast.parse("from pyramids import dataset").body[0]
+        assert _imports_pyramids(plain)
+        assert _imports_pyramids(submodule)
+        assert not _imports_pyramids(from_form), (
+            "a from-import does not run the package side effect that vendors osgeo"
+        )
