@@ -1635,15 +1635,13 @@ class TestNoDirectGdal:
         )
 
     def test_the_sanctioned_site_imports_pyramids_first(self):
-        """`osgeo` only resolves once pyramids has vendored it onto the path.
-
-        Asserted on the AST, and per enclosing function, because the rule is
-        that pyramids is imported inside the function that needs GDAL -- a
-        module-scope import would satisfy a "somewhere earlier in the file"
-        check while breaking the rule. Matching nodes rather than the literal
-        text also keeps the test reporting a failure, not a `ValueError`, if
-        the site ever switches to `import osgeo.gdal`.
-        """
+        """`osgeo` only resolves once pyramids has vendored it onto the path."""
+        # Asserted per enclosing function, not per file: the rule is that
+        # pyramids is imported inside the function that reaches for GDAL, and a
+        # module-scope import would pass a "somewhere earlier in the file"
+        # check while breaking it. Matching AST nodes rather than literal text
+        # also keeps this reporting a failure, not a ValueError, if the site
+        # ever switches to `import osgeo.gdal`.
         for name in sorted(_GDAL_ALLOWED):
             path = _ROOT / name
             tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))

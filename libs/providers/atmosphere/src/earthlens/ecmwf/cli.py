@@ -260,7 +260,8 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     Reading goes through pyramids, which owns NetCDF I/O for this repo. An
     unreadable container yields an empty mapping rather than raising, so a
     caller hydrating a catalog row degrades to "nothing to add" instead of
-    failing the walk.
+    failing the walk. The swallowed error is logged at `DEBUG`, so a hydration
+    run that quietly produced nothing can still be traced to its cause.
 
     Args:
         path: Path to a NetCDF file written by a `cdsapi` retrieve.
