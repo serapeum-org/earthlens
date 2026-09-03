@@ -543,6 +543,8 @@ class HttpClient:
         status_forcelist: HTTP statuses that trigger a retry.
         max_backoff: Ceiling in seconds on any single retry wait.
         retry_on_exceptions: Transport exception types that trigger a retry.
+        retry_unsafe_methods: Whether a transport failure may replay a
+            non-idempotent verb such as `POST`.
         raise_for_status: Whether the final response is `raise_for_status`-ed.
         min_interval: Minimum seconds between consecutive requests.
 
@@ -602,10 +604,17 @@ class HttpClient:
                 large `Retry-After` cannot pin the thread indefinitely.
                 `None` disables the cap.
             retry_on_exceptions: Exception types that also trigger a retry
-                when raised by the transport (e.g.
-                `(requests.ConnectionError, requests.Timeout)`). Empty
-                (the default) retries on status only, never on a raised
-                exception.
+                when raised by the transport. Defaults to
+                :data:`DEFAULT_RETRY_EXCEPTIONS` — a refused or reset
+                connection, a timeout, a body truncated mid-stream. Pass
+                `()` to retry on status only.
+            retry_unsafe_methods: Whether a transport failure may replay a
+                non-idempotent verb. `False` (the default) retries only the
+                methods in :data:`IDEMPOTENT_METHODS`, because a request
+                that failed in transit may still have reached the server,
+                so replaying a `POST` risks a double submission. Set `True`
+                when the endpoint is known to be replay-safe. Retries
+                triggered by a *status* are unaffected.
             retry_predicate: An optional callback `(response) -> bool`
                 that, when it returns `True`, marks a response retryable
                 even if its status is not in `status_forcelist` (e.g. a

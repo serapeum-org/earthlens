@@ -625,13 +625,26 @@ def native_parameters(backend_cls: type) -> frozenset[str]:
         wrapper synthesised. Empty when the signature cannot be read.
 
     Examples:
-        - CHIRPS takes `aoi=` only through the wrapper:
+        - CHIRPS takes `aoi=` only through the wrapper, so it is not native
+          even though the signature advertises it:
             ```python
+            >>> import inspect
             >>> from earthlens.base.abstractdatasource import native_parameters
             >>> from earthlens.chc import CHIRPS
+            >>> "aoi" in inspect.signature(CHIRPS.__init__).parameters
+            True
             >>> "aoi" in native_parameters(CHIRPS)
             False
-            >>> "lat_lim" in native_parameters(CHIRPS)
+            >>> sorted(native_parameters(CHIRPS))[:3]
+            ['end', 'fmt', 'lat_lim']
+
+            ```
+        - WorldPop declares its own richer `aoi=`, so it reports as native
+          and the facade forwards the value untouched:
+            ```python
+            >>> from earthlens.base.abstractdatasource import native_parameters
+            >>> from earthlens.worldpop import WorldPop
+            >>> "aoi" in native_parameters(WorldPop)
             True
 
             ```
@@ -2471,12 +2484,25 @@ class AbstractCatalog(BaseModel):
             Any: The `{key: row}` mapping backing this catalog.
 
         Examples:
-            - The default is the `datasets` mapping itself:
+            - Read the rows and inspect one:
+                ```python
+                >>> from earthlens.chc import Catalog
+                >>> rows = Catalog().get_catalog()
+                >>> "africa-daily" in rows
+                True
+                >>> sorted(rows["africa-daily"].variables)
+                ['precipitation']
+
+                ```
+            - It is the same mapping the dict surface reads, so `len` and
+              iteration agree with it:
                 ```python
                 >>> from earthlens.chc import Catalog
                 >>> catalog = Catalog()
-                >>> catalog.get_catalog() is catalog.datasets
+                >>> len(catalog.get_catalog()) == len(catalog)
                 True
+                >>> sorted(catalog.get_catalog())[:2]
+                ['africa-2-monthly', 'africa-3-monthly']
 
                 ```
         """
