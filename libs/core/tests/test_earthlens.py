@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import glob
+import inspect
 import os
 import pathlib
 import shutil
@@ -15,6 +16,7 @@ import pytest
 
 from earthlens._backends import AmbiguousDataSourceError
 from earthlens.aggregate import AggregationConfig
+from earthlens.base.abstractdatasource import native_parameters
 from earthlens.chc import CHIRPS
 from earthlens.earthlens import EarthLens, _LazyRegistry
 from earthlens.ecmwf import ECMWF
@@ -444,7 +446,8 @@ class TestTopLevelReExports:
     """Pin the `earthlens.core` public surface (L2)."""
 
     def test_earthlens_facade_importable_from_package_root(self):
-        """`from earthlens.core import EarthLens` resolves to the facade class."""
+        """`from earthlens.base.abstractdatasource import native_parameters
+        from earthlens.core import EarthLens` resolves to the facade class."""
         import earthlens.core
 
         assert earthlens.core.EarthLens is EarthLens, (
@@ -1446,3 +1449,40 @@ class TestFacadeAoi:
                 aoi="USA",
                 buffer=0.5,
             )
+
+
+@pytest.mark.unit
+class TestErgonomicKwargsAreDiscoverable:
+    """The wrapper advertises the kwargs it adds, without confusing detection.
+
+    `functools.wraps` restores the unwrapped signature, so the four ergonomic
+    parameters used to be invisible to `help()`, IDE autocomplete and every
+    signature-driven tool while working perfectly at runtime.
+    """
+
+    @pytest.mark.parametrize("name", ["aoi", "buffer", "cadence", "dataset"])
+    def test_every_backend_advertises_the_ergonomic_kwargs(self, name):
+        """Each wrapper-added kwarg appears in every backend's signature."""
+        missing = []
+        for key in sorted(EarthLens.DataSources):
+            backend = EarthLens.DataSources[key]
+            if name not in inspect.signature(backend.__init__).parameters:
+                missing.append(backend.__name__)
+        assert not missing, f"{name} is hidden on {sorted(set(missing))}"
+
+    def test_no_signature_lists_a_parameter_twice(self):
+        """A backend declaring its own `aoi=` does not get a second one."""
+        for key in sorted(EarthLens.DataSources):
+            backend = EarthLens.DataSources[key]
+            names = list(inspect.signature(backend.__init__).parameters)
+            assert len(names) == len(set(names)), f"{backend.__name__}: {names}"
+
+    def test_native_parameters_still_distinguishes_a_real_aoi(self):
+        """The advertised kwargs must not make every backend look aoi-native.
+
+        The facade routes `aoi=` verbatim to a backend that interprets it
+        itself and resolves it to `lat_lim`/`lon_lim` for one that does not, so
+        conflating the two silently changes what every request selects.
+        """
+        assert "aoi" in native_parameters(EarthLens.DataSources["worldpop"])
+        assert "aoi" not in native_parameters(EarthLens.DataSources["chc"])

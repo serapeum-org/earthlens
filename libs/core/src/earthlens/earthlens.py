@@ -35,6 +35,7 @@ from earthlens._backends import (
     topic_claimants,
 )
 from earthlens.base import split_time
+from earthlens.base.abstractdatasource import native_parameters
 from earthlens.base.spatial import resolve_aoi
 from earthlens.config import output_dir
 
@@ -959,7 +960,7 @@ class EarthLens:
         # ISO3 / bbox / GeoDataFrame) instead receives `aoi` verbatim and
         # interprets it itself.
         clip_geometry = None
-        if aoi is not None and "aoi" in backend_params:
+        if aoi is not None and "aoi" in native_parameters(backend_cls):
             if buffer is not None:
                 raise ValueError(
                     f"buffer= is not supported by the {data_source!r} backend, "

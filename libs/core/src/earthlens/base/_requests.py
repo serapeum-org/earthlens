@@ -7,8 +7,9 @@ and reusable by the one-shot functional entry point.
 
 from __future__ import annotations
 
-import inspect
 from typing import Any
+
+from earthlens.base.abstractdatasource import native_parameters
 
 
 def normalize_dataset_variables(
@@ -86,7 +87,7 @@ def normalize_dataset_variables(
     """
     if dataset is None:
         result: dict[str, Any] = {"variables": variables}
-    elif "dataset" in inspect.signature(backend_cls).parameters:
+    elif "dataset" in native_parameters(backend_cls):
         result = {"dataset": dataset, "variables": variables}
     elif isinstance(variables, dict):
         raise ValueError(

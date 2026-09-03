@@ -607,6 +607,46 @@ def _passed_aggregate(function: Any, args: tuple[Any, ...], kw: dict[str, Any]) 
     return bound.arguments.get("aggregate") is not None
 
 
+def native_parameters(backend_cls: type) -> frozenset[str]:
+    """Parameter names a backend's own `__init__` declares.
+
+    The `__init_subclass__` wrapper advertises `aoi`, `buffer`, `cadence` and
+    `dataset` on every backend's signature so they are discoverable, which means
+    a plain `"aoi" in inspect.signature(cls.__init__).parameters` can no longer
+    distinguish a backend that interprets `aoi=` *itself* (WorldPop's ISO3 /
+    GeoDataFrame form) from one the wrapper resolves for. Callers that need that
+    distinction ask here instead of introspecting directly.
+
+    Args:
+        backend_cls: An `AbstractDataSource` subclass.
+
+    Returns:
+        frozenset[str]: The declared names, minus the ergonomic ones the
+        wrapper synthesised. Empty when the signature cannot be read.
+
+    Examples:
+        - CHIRPS takes `aoi=` only through the wrapper:
+            ```python
+            >>> from earthlens.base.abstractdatasource import native_parameters
+            >>> from earthlens.chc import CHIRPS
+            >>> "aoi" in native_parameters(CHIRPS)
+            False
+            >>> "lat_lim" in native_parameters(CHIRPS)
+            True
+
+            ```
+    """
+    init = getattr(backend_cls, "__init__", None)
+    if init is None:
+        return frozenset()
+    synthetic = getattr(init, "_ergonomic_params", frozenset())
+    try:
+        declared = frozenset(inspect.signature(init).parameters)
+    except (TypeError, ValueError):
+        return frozenset()
+    return declared - synthetic
+
+
 def _describe_remote_product(product: Any) -> str:
     """Render a product for the :meth:`AbstractDataSource._run_items` log lines.
 
@@ -886,6 +926,39 @@ class AbstractDataSource(ABC):
                 self._attach_clip_geometry(clip_geometry)
 
         __init__._ergonomic = True  # type: ignore[attr-defined]
+        # `functools.wraps` copies `__wrapped__`, and `inspect.signature`
+        # follows it by default — so without this the four parameters the
+        # wrapper adds are invisible to `help()`, to IDE autocomplete and to
+        # every signature-driven tool, on a backend that accepts them happily
+        # at runtime. Re-advertise them as keyword-only, appended to whatever
+        # the backend already declares, and drop any the backend names itself
+        # so a native `aoi=` / `dataset=` is not listed twice.
+        try:
+            native = inspect.signature(orig)
+            existing = set(native.parameters)
+            extra = [
+                inspect.Parameter(name, inspect.Parameter.KEYWORD_ONLY, default=None)
+                for name in ("aoi", "buffer", "cadence", "dataset")
+                if name not in existing
+            ]
+            __init__._ergonomic_params = frozenset(  # type: ignore[attr-defined]
+                p.name for p in extra
+            )
+            if extra:
+                params = list(native.parameters.values())
+                # Keyword-only parameters must precede any **kwargs.
+                var_kw = [p for p in params if p.kind is inspect.Parameter.VAR_KEYWORD]
+                head = [
+                    p for p in params if p.kind is not inspect.Parameter.VAR_KEYWORD
+                ]
+                __init__.__signature__ = native.replace(  # type: ignore[attr-defined]
+                    parameters=head + extra + var_kw
+                )
+        except (TypeError, ValueError):
+            # A constructor whose signature cannot be read (a C-level or
+            # exotic callable) keeps the wrapped signature rather than losing
+            # the wrapper.
+            pass
         cls.__init__ = __init__  # type: ignore[method-assign]
 
     @classmethod
