@@ -214,7 +214,7 @@ class _FakeAggDataset:
         cls,
         arr: Any = None,
         *,
-        geo_ref: Any = None,
+        geo_ref: Any,
         no_data_value: Any = None,
         path: Any = None,
     ) -> tuple:
