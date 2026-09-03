@@ -81,12 +81,12 @@ DEFAULT_MAX_BACKOFF = 300.0
 #: transient `5xx` gateway/unavailable family.
 DEFAULT_STATUS_FORCELIST: tuple[int, ...] = (429, 500, 502, 503, 504)
 
-#: Transport-level exceptions retried by default. These are the failures that
-#: never reach an HTTP status — a refused or reset connection, a DNS blip, a
-#: handshake or read that timed out, a response body truncated mid-stream — so
-#: `status_forcelist` cannot describe them. Leaving this empty meant a TCP reset
-#: partway through a multi-gigabyte granule aborted the whole download while the
-#: retry engine sat unused.
+#: Transport-level exceptions the retry loop inspects. These are the failures
+#: that never reach an HTTP status — a refused or reset connection, a DNS blip,
+#: a handshake or read that timed out, a response body truncated mid-stream — so
+#: `status_forcelist` cannot describe them. Membership here only means "the loop
+#: looks at it"; :func:`classify_transport_error` then decides whether it is
+#: retryable at all and which budget it spends.
 #:
 #: `requests.RequestException` is deliberately NOT the entry here: it is the
 #: base of `HTTPError` too, so retrying on it would re-issue requests for 4xx
@@ -97,15 +97,157 @@ DEFAULT_RETRY_EXCEPTIONS: tuple[type[BaseException], ...] = (
     requests.exceptions.ChunkedEncodingError,
 )
 
-#: Methods whose retry after a *transport* failure is safe without the caller
-#: saying so. A request that never completed may still have reached the server,
-#: so replaying `POST` could double-submit an order, a job or a paid query;
-#: replaying `GET` cannot. This mirrors urllib3's `Retry.DEFAULT_ALLOWED_METHODS`
-#: and applies only to the exception path — a retryable *status* is replayed for
-#: any method, as before, because the server answered and asked for it.
+#: Transport failures that are never retried, however they are classified. A
+#: certificate that does not validate and a proxy that is misconfigured are
+#: deterministic: the next attempt reproduces them exactly, so retrying only
+#: delays the same error by the whole back-off budget. Both subclass
+#: `requests.ConnectionError`, so they would otherwise be swept in by it.
 #:
-#: A caller that knows its `POST` is safe to replay (a search endpoint, an
-#: idempotent RPC) opts in with `retry_unsafe_methods=True`.
+#: This mirrors urllib3, whose `Retry._is_connection_error` narrows to a connect
+#: *timeout* rather than accepting every connection error.
+NON_RETRYABLE_EXCEPTIONS: tuple[type[BaseException], ...] = (
+    requests.exceptions.SSLError,
+    requests.exceptions.ProxyError,
+)
+
+#: Retries allowed for a failure in the *connect* phase, counted separately from
+#: :data:`DEFAULT_READ_RETRIES`. Deliberately small: a refused connection, an
+#: unresolvable name or a connect timeout almost always means the host is down
+#: or blocked, and a generous budget turns a fast, clear failure into a slow
+#: one. With the default connect timeout this bounds a dead host at about two
+#: attempts rather than six.
+DEFAULT_CONNECT_RETRIES = 1
+
+#: Retries allowed for a failure in the *read* phase — a socket reset partway
+#: through a response, a read timeout, a truncated body. This is the genuinely
+#: transient case worth retrying, so it keeps the full budget. `None` means
+#: "use `max_retries`".
+DEFAULT_READ_RETRIES: int | None = None
+
+#: Statuses a server uses to ask for a later retry, rather than to report that
+#: it already failed. `429` and `503` (and `413`, per RFC 9110) are an explicit
+#: "come back later", so replaying them is safe for any method. The remaining
+#: `status_forcelist` entries — `500`, `502`, `504` — mean the server received
+#: the request and may have acted on it before failing, so those are replayed
+#: only for idempotent methods. Matches urllib3's `RETRY_AFTER_STATUS_CODES`.
+RETRY_AFTER_STATUS_CODES: frozenset[int] = frozenset({413, 429, 503})
+
+#: Substrings of the wrapped exception's class name identifying a failure raised
+#: while *establishing* the connection. Matched by name rather than by importing
+#: `urllib3`: it is `requests`' dependency, not a declared one of this package,
+#: and the wrapped cause is an implementation detail of theirs.
+_CONNECT_CAUSE_NAMES = ("NewConnection", "NameResolution", "ConnectTimeout", "MaxRetry")
+
+#: The same, for a failure raised once the connection was established and the
+#: request had therefore been delivered.
+_READ_CAUSE_NAMES = ("Protocol", "ReadTimeout", "IncompleteRead", "Decode")
+
+
+def _causes(exc: BaseException):
+    """Yield a transport exception and every cause wrapped inside it.
+
+    `requests` puts the underlying urllib3 error in `args[0]` rather than in
+    `__cause__`, and that error wraps the socket error the same way, so both the
+    exception chain and the arguments are walked.
+
+    Args:
+        exc: The exception to unwrap.
+
+    Yields:
+        BaseException: Each nested cause, outermost first.
+    """
+    seen: set[int] = set()
+    queue: list[BaseException] = [exc]
+    while queue:
+        current = queue.pop(0)
+        if id(current) in seen:
+            continue
+        seen.add(id(current))
+        yield current
+        for nxt in (current.__cause__, current.__context__):
+            if isinstance(nxt, BaseException):
+                queue.append(nxt)
+        for arg in getattr(current, "args", ()):
+            if isinstance(arg, BaseException):
+                queue.append(arg)
+
+
+def classify_transport_error(exc: BaseException) -> str | None:
+    """Say whether a transport failure is retryable, and which budget it spends.
+
+    Splits the failure the way urllib3's `Retry` does, because the two kinds
+    warrant opposite policies. A **connect** failure means the request was never
+    delivered, so replaying it is safe for any method but rarely productive —
+    the host is usually down or blocked. A **read** failure means the server
+    accepted the request and the response broke afterwards, so it may already
+    have acted on it, but the failure itself is the transient one worth
+    retrying.
+
+    Args:
+        exc: The exception raised by the transport.
+
+    Returns:
+        str | None: `"connect"`, `"read"`, or `None` when the failure is
+        deterministic and must not be retried at all.
+
+    Examples:
+        - A connect timeout spends the connect budget:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import classify_transport_error
+            >>> classify_transport_error(requests.exceptions.ConnectTimeout())
+            'connect'
+
+            ```
+        - A body that stops mid-stream spends the read budget:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import classify_transport_error
+            >>> classify_transport_error(requests.exceptions.ChunkedEncodingError())
+            'read'
+
+            ```
+        - A certificate that does not validate is never retried:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import classify_transport_error
+            >>> classify_transport_error(requests.exceptions.SSLError()) is None
+            True
+
+            ```
+    """
+    if isinstance(exc, NON_RETRYABLE_EXCEPTIONS):
+        return None
+    if isinstance(exc, requests.exceptions.ConnectTimeout):
+        return "connect"
+    if isinstance(
+        exc,
+        (requests.exceptions.ReadTimeout, requests.exceptions.ChunkedEncodingError),
+    ):
+        return "read"
+    if isinstance(exc, requests.ConnectionError):
+        # `requests` collapses both phases into one class, so the wrapped cause
+        # is the only thing separating "never connected" from "connected, then
+        # the socket died".
+        for cause in _causes(exc):
+            if isinstance(cause, (ConnectionResetError, ConnectionAbortedError)):
+                return "read"
+            if isinstance(cause, ConnectionRefusedError):
+                return "connect"
+            name = type(cause).__name__
+            if any(marker in name for marker in _READ_CAUSE_NAMES):
+                return "read"
+            if any(marker in name for marker in _CONNECT_CAUSE_NAMES):
+                return "connect"
+        # An unrecognised connection error spends the smaller budget, so an
+        # unknown case fails fast rather than burning the full one on something
+        # that may never succeed.
+        return "connect"
+    if isinstance(exc, requests.exceptions.Timeout):
+        return "read"
+    return None
+
+
 IDEMPOTENT_METHODS: frozenset[str] = frozenset(
     {"GET", "HEAD", "OPTIONS", "TRACE", "PUT", "DELETE"}
 )
@@ -543,7 +685,9 @@ class HttpClient:
         status_forcelist: HTTP statuses that trigger a retry.
         max_backoff: Ceiling in seconds on any single retry wait.
         retry_on_exceptions: Transport exception types that trigger a retry.
-        retry_unsafe_methods: Whether a transport failure may replay a
+        connect_retries: Retry budget for connect-phase failures.
+        read_retries: Retry budget for read-phase failures.
+        retry_unsafe_methods: Whether a read-phase failure may replay a
             non-idempotent verb such as `POST`.
         raise_for_status: Whether the final response is `raise_for_status`-ed.
         min_interval: Minimum seconds between consecutive requests.
@@ -572,6 +716,8 @@ class HttpClient:
         retry_on_exceptions: tuple[type[BaseException], ...] = (
             DEFAULT_RETRY_EXCEPTIONS
         ),
+        connect_retries: int = DEFAULT_CONNECT_RETRIES,
+        read_retries: int | None = DEFAULT_READ_RETRIES,
         retry_unsafe_methods: bool = False,
         retry_predicate: Callable[[requests.Response], bool] | None = None,
         raise_for_status: bool = True,
@@ -608,13 +754,22 @@ class HttpClient:
                 :data:`DEFAULT_RETRY_EXCEPTIONS` — a refused or reset
                 connection, a timeout, a body truncated mid-stream. Pass
                 `()` to retry on status only.
-            retry_unsafe_methods: Whether a transport failure may replay a
-                non-idempotent verb. `False` (the default) retries only the
-                methods in :data:`IDEMPOTENT_METHODS`, because a request
-                that failed in transit may still have reached the server,
-                so replaying a `POST` risks a double submission. Set `True`
-                when the endpoint is known to be replay-safe. Retries
-                triggered by a *status* are unaffected.
+            connect_retries: Retries allowed for a failure in the connect
+                phase, counted separately from `read_retries`. Small by
+                default (:data:`DEFAULT_CONNECT_RETRIES`) because a host
+                that will not accept a connection rarely starts doing so
+                within a back-off window.
+            read_retries: Retries allowed for a failure after the connection
+                was established — a reset mid-response, a read timeout, a
+                truncated body. `None` (the default) means `max_retries`.
+                This is the transient case a retry actually helps.
+            retry_unsafe_methods: Whether a *read*-phase failure may replay a
+                non-idempotent verb. `False` (the default) replays only the
+                methods in :data:`IDEMPOTENT_METHODS`, because a response
+                that broke after the request was delivered may already have
+                been acted on, so replaying a `POST` risks a double
+                submission. Connect-phase failures are replayed for any
+                method regardless, since the request was never delivered.
             retry_predicate: An optional callback `(response) -> bool`
                 that, when it returns `True`, marks a response retryable
                 even if its status is not in `status_forcelist` (e.g. a
@@ -641,6 +796,8 @@ class HttpClient:
         self.status_forcelist = tuple(status_forcelist)
         self.max_backoff = max_backoff
         self.retry_on_exceptions = tuple(retry_on_exceptions)
+        self.connect_retries = connect_retries
+        self.read_retries = max_retries if read_retries is None else read_retries
         self.retry_unsafe_methods = retry_unsafe_methods
         self._retry_predicate = retry_predicate
         self.raise_for_status = raise_for_status
@@ -1045,31 +1202,59 @@ class HttpClient:
             self.raise_for_status if raise_for_status is None else raise_for_status
         )
         attempt = 0
+        spent = {"connect": 0, "read": 0}
         while True:
             self._throttle()
             try:
                 response = self._send(method, url, **kwargs)
             except self.retry_on_exceptions as exc:
-                if attempt >= self.max_retries:
+                kind = classify_transport_error(exc)
+                if kind is None:
+                    # Deterministic — the next attempt reproduces it exactly.
                     raise
-                # A transport failure gives no proof the server did not receive
-                # and act on the request, so a non-idempotent method is replayed
-                # only when the caller says it is safe.
-                if not (
+                budget = (
+                    self.connect_retries if kind == "connect" else self.read_retries
+                )
+                if spent[kind] >= budget:
+                    raise
+                # A *read* failure means the request was delivered and the
+                # server may already have acted, so a non-idempotent verb is
+                # replayed only when the caller vouches for it. A *connect*
+                # failure never reached the server, so it is safe for any verb.
+                if kind == "read" and not (
                     self.retry_unsafe_methods or method.upper() in IDEMPOTENT_METHODS
                 ):
+                    logger.debug(
+                        f"{type(exc).__name__} on {redact_url(url)}; not retrying "
+                        f"a {method.upper()} after a read-phase failure "
+                        f"(pass retry_unsafe_methods=True if it is replay-safe)"
+                    )
                     raise
                 wait = self._backoff_wait(None, attempt)
                 logger.warning(
-                    f"{type(exc).__name__} on {redact_url(url)}; retry "
-                    f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
+                    f"{type(exc).__name__} ({kind}) on {redact_url(url)}; retry "
+                    f"{spent[kind] + 1}/{budget} after {wait:.1f}s"
                 )
                 self._sleep(wait)
+                spent[kind] += 1
                 attempt += 1
                 continue
             retryable = response.status_code in self.status_forcelist or (
                 self._retry_predicate is not None and self._retry_predicate(response)
             )
+            if (
+                retryable
+                and response.status_code not in RETRY_AFTER_STATUS_CODES
+                and not (
+                    self.retry_unsafe_methods or method.upper() in IDEMPOTENT_METHODS
+                )
+            ):
+                # `500` / `502` / `504` report that the server already had the
+                # request, so replaying a non-idempotent verb risks the same
+                # double submission the read-phase gate prevents. A `429` /
+                # `503` / `413` is the server asking for a later attempt, which
+                # is safe for any method.
+                retryable = False
             if retryable and attempt < self.max_retries:
                 retry_after = _parse_retry_after(response.headers.get("Retry-After"))
                 wait = self._backoff_wait(retry_after, attempt)

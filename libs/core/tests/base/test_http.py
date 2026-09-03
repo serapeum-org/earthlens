@@ -10,6 +10,7 @@ import pytest
 import requests
 
 from earthlens.base.http import (
+    DEFAULT_CONNECT_RETRIES,
     DEFAULT_RETRY_EXCEPTIONS,
     DEFAULT_STATUS_FORCELIST,
     DEFAULT_TIMEOUT,
@@ -107,6 +108,16 @@ class _FlakySession:
 
     def post(self, url: str, **kwargs: Any) -> _Resp:
         return self.get(url, **kwargs)
+
+
+def _read_reset() -> requests.ConnectionError:
+    """A connection error that carries a mid-response reset as its cause."""
+    return requests.ConnectionError(ConnectionResetError("connection reset by peer"))
+
+
+def _connect_refused() -> requests.ConnectionError:
+    """A connection error that carries a refused connect as its cause."""
+    return requests.ConnectionError(ConnectionRefusedError("connection refused"))
 
 
 class _Clock:
@@ -467,10 +478,8 @@ class TestRetryOnExceptions:
     """Retrying on configured transport exceptions."""
 
     def test_retries_configured_exception_then_succeeds(self):
-        """A configured exception is retried with back-off, then succeeds."""
-        session = _FlakySession(
-            2, requests.ConnectionError("boom"), _Resp(body={"ok": 1})
-        )
+        """A configured read-phase exception is retried with back-off, then succeeds."""
+        session = _FlakySession(2, _read_reset(), _Resp(body={"ok": 1}))
         waits: list[float] = []
         client = HttpClient(
             session=session,
@@ -479,8 +488,8 @@ class TestRetryOnExceptions:
             retry_on_exceptions=(requests.ConnectionError,),
         )
         assert client.get_json("http://x") == {"ok": 1}
-        assert session.calls == 3
-        assert waits == [2.0, 4.0]
+        assert session.calls == 3, f"expected 3 attempts, got {session.calls}"
+        assert waits == [2.0, 4.0], f"unexpected back-off schedule: {waits}"
 
     def test_unconfigured_exception_propagates_immediately(self):
         """An exception not in retry_on_exceptions is not retried.
@@ -493,16 +502,45 @@ class TestRetryOnExceptions:
         client = HttpClient(session=session)
         with pytest.raises(requests.TooManyRedirects):
             client.get("http://x")
-        assert session.calls == 1
+        assert session.calls == 1, f"expected no retry, got {session.calls} attempts"
 
-    def test_transport_errors_are_retried_by_default(self):
-        """A reset connection is retried without the caller configuring it."""
-        session = _FlakySession(
-            2, requests.ConnectionError("reset"), _Resp(body={"ok": 1})
-        )
+    def test_read_failures_are_retried_by_default(self):
+        """A socket reset mid-response is retried without the caller configuring it."""
+        session = _FlakySession(2, _read_reset(), _Resp(body={"ok": 1}))
         client = HttpClient(session=session, sleep=lambda _: None)
         assert client.get_json("http://x") == {"ok": 1}
-        assert session.calls == 3
+        assert session.calls == 3, f"expected 3 attempts, got {session.calls}"
+
+    def test_connect_failures_get_the_smaller_budget(self):
+        """A host that will not accept a connection fails fast, not after six tries.
+
+        The connect budget is deliberately separate: a refused connection rarely
+        starts succeeding within a back-off window, so spending the full read
+        budget on it turns a clear failure into a slow one.
+        """
+        session = _FlakySession(9, _connect_refused(), _Resp(body={"ok": 1}))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=5)
+        with pytest.raises(requests.ConnectionError):
+            client.get("http://x")
+        assert session.calls == DEFAULT_CONNECT_RETRIES + 1, (
+            f"connect budget should cap attempts at {DEFAULT_CONNECT_RETRIES + 1}, "
+            f"got {session.calls}"
+        )
+
+    @pytest.mark.parametrize(
+        "exc_name", ["SSLError", "ProxyError"], ids=["ssl", "proxy"]
+    )
+    def test_deterministic_failures_are_never_retried(self, exc_name):
+        """A bad certificate or proxy is reproduced exactly, so it is not replayed."""
+        exc = getattr(requests.exceptions, exc_name)("nope")
+        session = _FlakySession(1, exc, _Resp(body={"ok": 1}))
+        client = HttpClient(session=session, sleep=lambda _: None)
+        with pytest.raises(requests.exceptions.RequestException):
+            client.get("http://x")
+        assert session.calls == 1, (
+            f"{exc_name} is deterministic and must not be retried; "
+            f"got {session.calls} attempts"
+        )
 
     def test_default_retry_set_excludes_http_error(self):
         """`HTTPError` stays out, so 4xx responses are never replayed."""
@@ -510,26 +548,31 @@ class TestRetryOnExceptions:
             issubclass(requests.HTTPError, exc) for exc in DEFAULT_RETRY_EXCEPTIONS
         )
 
-    def test_post_is_not_replayed_after_a_transport_failure(self):
-        """A non-idempotent verb is not retried: the server may have acted."""
-        session = _FlakySession(
-            1, requests.ConnectionError("reset"), _Resp(body={"ok": 1})
-        )
+    def test_post_is_not_replayed_after_a_read_failure(self):
+        """A non-idempotent verb is not replayed: the server may have acted."""
+        session = _FlakySession(1, _read_reset(), _Resp(body={"ok": 1}))
         client = HttpClient(session=session, sleep=lambda _: None)
         with pytest.raises(requests.ConnectionError):
             client.post("http://x")
-        assert session.calls == 1
+        assert session.calls == 1, f"POST must not replay, got {session.calls} attempts"
+
+    def test_post_is_replayed_after_a_connect_failure(self):
+        """A connect failure never reached the server, so replaying it is safe."""
+        session = _FlakySession(1, _connect_refused(), _Resp(body={"ok": 1}))
+        client = HttpClient(session=session, sleep=lambda _: None)
+        client.post("http://x")
+        assert session.calls == 2, (
+            f"a connect failure is safe to replay for any verb, got {session.calls}"
+        )
 
     def test_post_is_replayed_when_the_caller_opts_in(self):
         """`retry_unsafe_methods=True` is the caller vouching for replay safety."""
-        session = _FlakySession(
-            2, requests.ConnectionError("reset"), _Resp(body={"ok": 1})
-        )
+        session = _FlakySession(2, _read_reset(), _Resp(body={"ok": 1}))
         client = HttpClient(
             session=session, sleep=lambda _: None, retry_unsafe_methods=True
         )
         client.post("http://x")
-        assert session.calls == 3
+        assert session.calls == 3, f"expected 3 attempts, got {session.calls}"
 
     def test_exhausted_exception_reraises(self):
         """A persistent configured exception re-raises after the budget."""
