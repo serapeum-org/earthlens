@@ -95,7 +95,10 @@ def _gis_imports(path: Path) -> list[tuple[int, str]]:
 
     Walks the AST rather than grepping, so `from osgeo.gdal import Translate`,
     `import osgeo.gdal as g`, multi-line `from ... import (...)` continuations
-    and dynamic `importlib.import_module("osgeo")` are all caught.
+    and the dynamic forms are all caught. "Dynamic" covers both spellings that
+    reach the same place: `importlib.import_module("osgeo")` and a bare
+    `import_module("osgeo")` pulled in with `from importlib import
+    import_module`, plus `__import__("osgeo")`.
     """
     found: list[tuple[int, str]] = []
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
@@ -108,19 +111,21 @@ def _gis_imports(path: Path) -> list[tuple[int, str]]:
             if (node.module or "").split(".", 1)[0] in _BANNED_GIS_MODULES:
                 found.append((node.lineno, f"from {node.module}"))
         elif isinstance(node, ast.Call):
-            target = None
+            # Match on the callee's NAME, not on the node shape: an attribute
+            # call (`importlib.import_module`) and a plain name call (a bare
+            # `import_module` imported from importlib, or `__import__`) reach
+            # the same place, and keying off the shape silently missed the
+            # bare form.
             func = node.func
+            if isinstance(func, ast.Attribute):
+                called: str | None = func.attr
+            elif isinstance(func, ast.Name):
+                called = func.id
+            else:
+                called = None
+            target = None
             if (
-                isinstance(func, ast.Attribute)
-                and func.attr == "import_module"
-                and node.args
-                and isinstance(node.args[0], ast.Constant)
-                and isinstance(node.args[0].value, str)
-            ):
-                target = node.args[0].value
-            elif (
-                isinstance(func, ast.Name)
-                and func.id == "__import__"
+                called in {"import_module", "__import__"}
                 and node.args
                 and isinstance(node.args[0], ast.Constant)
                 and isinstance(node.args[0].value, str)
