@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -18175,34 +18175,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -27024,7 +26996,7 @@ The facade reads the instance value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="sd">        the GeoTIFF carries no embedded SRS so `pyramids.Dataset.crop`&#39;s</span>
 <a id="__codelineno-0-741" name="__codelineno-0-741"></a><span class="sd">        cutline path is a no-op. We therefore compute the pixel window from</span>
 <a id="__codelineno-0-742" name="__codelineno-0-742"></a><span class="sd">        the raster&#39;s own bounding box and rebuild the trimmed raster with</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">        `Dataset.create_from_array` — a purely local operation that honours</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">        `Dataset.from_array` — a purely local operation that honours</span>
 <a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="sd">        the requested bbox regardless of what the server returned. Latitude,</span>
 <a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">        already clipped server-side, is windowed again harmlessly; if the</span>
 <a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        server ever starts honouring `Long`, the window simply re-selects the</span>
@@ -27042,36 +27014,36 @@ The facade reads the instance value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">            original file untouched and logs a warning in that case).</span>
 <a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-760" name="__codelineno-0-760"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="n">arr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a>        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">bbox</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a>        <span class="n">cell_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cols</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a>        <span class="n">cell_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">rows</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a>        <span class="n">col_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">west</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a>        <span class="n">col_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">east</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="n">cols</span><span class="p">)</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>        <span class="n">row_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">north</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a>        <span class="n">row_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="n">rows</span><span class="p">)</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>        <span class="k">if</span> <span class="n">col_stop</span> <span class="o">&lt;=</span> <span class="n">col_start</span> <span class="ow">or</span> <span class="n">row_stop</span> <span class="o">&lt;=</span> <span class="n">row_start</span><span class="p">:</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>            <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>        <span class="n">window</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">row_start</span><span class="p">:</span><span class="n">row_stop</span><span class="p">,</span> <span class="n">col_start</span><span class="p">:</span><span class="n">col_stop</span><span class="p">]</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a>        <span class="n">geo</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>            <span class="n">x_min</span> <span class="o">+</span> <span class="n">col_start</span> <span class="o">*</span> <span class="n">cell_x</span><span class="p">,</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>            <span class="n">cell_x</span><span class="p">,</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a>            <span class="mf">0.0</span><span class="p">,</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>            <span class="n">y_max</span> <span class="o">-</span> <span class="n">row_start</span> <span class="o">*</span> <span class="n">cell_y</span><span class="p">,</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>            <span class="mf">0.0</span><span class="p">,</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>            <span class="o">-</span><span class="n">cell_y</span><span class="p">,</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>        <span class="p">)</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a>        <span class="n">nodata</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span> <span class="k">else</span> <span class="kc">None</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>        <span class="k">return</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>            <span class="n">arr</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>            <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeoReference</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="n">arr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a>        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a>        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">bbox</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a>        <span class="n">cell_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cols</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>        <span class="n">cell_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">rows</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a>        <span class="n">col_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">west</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a>        <span class="n">col_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">east</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="n">cols</span><span class="p">)</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a>        <span class="n">row_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">north</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a>        <span class="n">row_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="n">rows</span><span class="p">)</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a>        <span class="k">if</span> <span class="n">col_stop</span> <span class="o">&lt;=</span> <span class="n">col_start</span> <span class="ow">or</span> <span class="n">row_stop</span> <span class="o">&lt;=</span> <span class="n">row_start</span><span class="p">:</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a>            <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>        <span class="n">window</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">row_start</span><span class="p">:</span><span class="n">row_stop</span><span class="p">,</span> <span class="n">col_start</span><span class="p">:</span><span class="n">col_stop</span><span class="p">]</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a>        <span class="n">geo</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a>            <span class="n">x_min</span> <span class="o">+</span> <span class="n">col_start</span> <span class="o">*</span> <span class="n">cell_x</span><span class="p">,</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>            <span class="n">cell_x</span><span class="p">,</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a>            <span class="mf">0.0</span><span class="p">,</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a>            <span class="n">y_max</span> <span class="o">-</span> <span class="n">row_start</span> <span class="o">*</span> <span class="n">cell_y</span><span class="p">,</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a>            <span class="mf">0.0</span><span class="p">,</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a>            <span class="o">-</span><span class="n">cell_y</span><span class="p">,</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>        <span class="p">)</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a>        <span class="n">nodata</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a>        <span class="k">return</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="n">arr</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>            <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">),</span>
 <a id="__codelineno-0-791" name="__codelineno-0-791"></a>        <span class="p">)</span>
 <a id="__codelineno-0-792" name="__codelineno-0-792"></a>
 <a id="__codelineno-0-793" name="__codelineno-0-793"></a>    <span class="nd">@staticmethod</span>
@@ -29565,7 +29537,7 @@ The facade reads the instance value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="sd">        the GeoTIFF carries no embedded SRS so `pyramids.Dataset.crop`&#39;s</span>
 <a id="__codelineno-0-741" name="__codelineno-0-741"></a><span class="sd">        cutline path is a no-op. We therefore compute the pixel window from</span>
 <a id="__codelineno-0-742" name="__codelineno-0-742"></a><span class="sd">        the raster&#39;s own bounding box and rebuild the trimmed raster with</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">        `Dataset.create_from_array` — a purely local operation that honours</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">        `Dataset.from_array` — a purely local operation that honours</span>
 <a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="sd">        the requested bbox regardless of what the server returned. Latitude,</span>
 <a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">        already clipped server-side, is windowed again harmlessly; if the</span>
 <a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        server ever starts honouring `Long`, the window simply re-selects the</span>
@@ -29583,36 +29555,36 @@ The facade reads the instance value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">            original file untouched and logs a warning in that case).</span>
 <a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-760" name="__codelineno-0-760"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="n">arr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a>        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">bbox</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a>        <span class="n">cell_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cols</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a>        <span class="n">cell_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">rows</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a>        <span class="n">col_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">west</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a>        <span class="n">col_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">east</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="n">cols</span><span class="p">)</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>        <span class="n">row_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">north</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a>        <span class="n">row_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="n">rows</span><span class="p">)</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>        <span class="k">if</span> <span class="n">col_stop</span> <span class="o">&lt;=</span> <span class="n">col_start</span> <span class="ow">or</span> <span class="n">row_stop</span> <span class="o">&lt;=</span> <span class="n">row_start</span><span class="p">:</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>            <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>        <span class="n">window</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">row_start</span><span class="p">:</span><span class="n">row_stop</span><span class="p">,</span> <span class="n">col_start</span><span class="p">:</span><span class="n">col_stop</span><span class="p">]</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a>        <span class="n">geo</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>            <span class="n">x_min</span> <span class="o">+</span> <span class="n">col_start</span> <span class="o">*</span> <span class="n">cell_x</span><span class="p">,</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>            <span class="n">cell_x</span><span class="p">,</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a>            <span class="mf">0.0</span><span class="p">,</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>            <span class="n">y_max</span> <span class="o">-</span> <span class="n">row_start</span> <span class="o">*</span> <span class="n">cell_y</span><span class="p">,</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>            <span class="mf">0.0</span><span class="p">,</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>            <span class="o">-</span><span class="n">cell_y</span><span class="p">,</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>        <span class="p">)</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a>        <span class="n">nodata</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span> <span class="k">else</span> <span class="kc">None</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>        <span class="k">return</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>            <span class="n">arr</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>            <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeoReference</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bbox</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="n">arr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a>        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a>        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">bbox</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a>        <span class="n">cell_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cols</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>        <span class="n">cell_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">rows</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a>        <span class="n">col_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">west</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a>        <span class="n">col_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">east</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_x</span><span class="p">)),</span> <span class="n">cols</span><span class="p">)</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a>        <span class="n">row_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">north</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a>        <span class="n">row_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">/</span> <span class="n">cell_y</span><span class="p">)),</span> <span class="n">rows</span><span class="p">)</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a>        <span class="k">if</span> <span class="n">col_stop</span> <span class="o">&lt;=</span> <span class="n">col_start</span> <span class="ow">or</span> <span class="n">row_stop</span> <span class="o">&lt;=</span> <span class="n">row_start</span><span class="p">:</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a>            <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>        <span class="n">window</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">row_start</span><span class="p">:</span><span class="n">row_stop</span><span class="p">,</span> <span class="n">col_start</span><span class="p">:</span><span class="n">col_stop</span><span class="p">]</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a>        <span class="n">geo</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a>            <span class="n">x_min</span> <span class="o">+</span> <span class="n">col_start</span> <span class="o">*</span> <span class="n">cell_x</span><span class="p">,</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>            <span class="n">cell_x</span><span class="p">,</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a>            <span class="mf">0.0</span><span class="p">,</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a>            <span class="n">y_max</span> <span class="o">-</span> <span class="n">row_start</span> <span class="o">*</span> <span class="n">cell_y</span><span class="p">,</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a>            <span class="mf">0.0</span><span class="p">,</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a>            <span class="o">-</span><span class="n">cell_y</span><span class="p">,</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>        <span class="p">)</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a>        <span class="n">nodata</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">no_data_value</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a>        <span class="k">return</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="n">arr</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>            <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">),</span>
 <a id="__codelineno-0-791" name="__codelineno-0-791"></a>        <span class="p">)</span>
 <a id="__codelineno-0-792" name="__codelineno-0-792"></a>
 <a id="__codelineno-0-793" name="__codelineno-0-793"></a>    <span class="nd">@staticmethod</span>

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -17842,34 +17842,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -24454,7 +24426,7 @@ frames line up into an animation.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.patches</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circle</span><span class="p">,</span> <span class="n">FancyBboxPatch</span><span class="p">,</span> <span class="n">Wedge</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
@@ -24478,7 +24450,7 @@ from cleopatra.styling.watermark import stamp_mark
 from IPython.display import Image, display
 from loguru import logger
 from matplotlib.patches import Circle, FancyBboxPatch, Wedge
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 from pyramids.dataset.collection import DatasetCollection
 from pyramids.netcdf import NetCDF
 
@@ -24855,7 +24827,7 @@ for d in (REGION_DIR, GLOBE_DIR):
 
     <span class="k">def</span><span class="w"> </span><span class="nf">cmi</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
         <span class="c1"># Warp the geostationary band straight to the lat/lon map window: pyramids reads</span>
-        <span class="c1"># the GOES geos CRS from the granule and reprojects (bilinear). Off-disk</span>
+        <span class="c1"># the GOES geos CRS from the granule and reprojects via GDAL (bilinear). Off-disk</span>
         <span class="c1"># pixels come back masked -&gt; fill with 0 so space stays black.</span>
         <span class="n">view</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">warped_view</span><span class="p">(</span>
             <span class="mi">4326</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"bilinear"</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="n">CELL</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
@@ -24878,11 +24850,10 @@ for d in (REGION_DIR, GLOBE_DIR):
     <span class="n">green</span> <span class="o">=</span> <span class="mf">0.45</span> <span class="o">*</span> <span class="n">red</span> <span class="o">+</span> <span class="mf">0.10</span> <span class="o">*</span> <span class="n">veg</span> <span class="o">+</span> <span class="mf">0.45</span> <span class="o">*</span> <span class="n">blue</span>  <span class="c1"># CIMSS synthetic green</span>
     <span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">([</span><span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">2.2</span><span class="p">)</span>  <span class="c1"># (3, H, W), gamma</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">rgb</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">255.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"uint8"</span><span class="p">)</span>
-    <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
+    <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
         <span class="n">arr</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span>
-        <span class="n">geo</span><span class="o">=</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">CELL</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">CELL</span><span class="p">),</span>
-        <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span>
         <span class="n">no_data_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">CELL</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">CELL</span><span class="p">),</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">def render_region(nc_path, dst):
@@ -24891,7 +24862,7 @@ for d in (REGION_DIR, GLOBE_DIR):
 
     def cmi(name):
         # Warp the geostationary band straight to the lat/lon map window: pyramids reads
-        # the GOES geos CRS from the granule and reprojects (bilinear). Off-disk
+        # the GOES geos CRS from the granule and reprojects via GDAL (bilinear). Off-disk
         # pixels come back masked -&gt; fill with 0 so space stays black.
         view = nc.get_variable(name).warped_view(
             4326, method="bilinear", cell_size=CELL, bbox=(W, S, E, N)
@@ -24914,11 +24885,10 @@ for d in (REGION_DIR, GLOBE_DIR):
     green = 0.45 * red + 0.10 * veg + 0.45 * blue  # CIMSS synthetic green
     rgb = np.power(np.clip([red, green, blue], 0.0, 1.0), 1 / 2.2)  # (3, H, W), gamma
     arr = (np.clip(np.stack(rgb), 0.0, 1.0) * 255.0).astype("uint8")
-    Dataset.create_from_array(
+    Dataset.from_array(
         arr=arr,
-        geo=(W, CELL, 0.0, N, 0.0, -CELL),
-        epsg=4326,
         no_data_value=0,
+        geo_ref=GeoReference(geo=(W, CELL, 0.0, N, 0.0, -CELL), epsg=4326),
     ).to_file(str(dst))</div>
 </div>
 </div>
@@ -24975,8 +24945,10 @@ for d in (REGION_DIR, GLOBE_DIR):
     <span class="k">if</span> <span class="n">target</span> <span class="o">&gt;</span> <span class="n">width</span><span class="p">:</span>
         <span class="n">pad</span> <span class="o">=</span> <span class="p">(</span><span class="n">target</span> <span class="o">-</span> <span class="n">width</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
         <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="n">pad</span><span class="p">,</span> <span class="n">target</span> <span class="o">-</span> <span class="n">width</span> <span class="o">-</span> <span class="n">pad</span><span class="p">)))</span>
-    <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
-        <span class="n">arr</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">no_data_value</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
+        <span class="n">arr</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span>
+        <span class="n">no_data_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span>
 
 
@@ -24985,7 +24957,9 @@ for d in (REGION_DIR, GLOBE_DIR):
     <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">columns</span> <span class="o">/</span> <span class="n">ds</span><span class="o">.</span><span class="n">rows</span> <span class="o">-</span> <span class="n">GLOBE_ASPECT</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">columns</span> <span class="o">/</span> <span class="n">ds</span><span class="o">.</span><span class="n">rows</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ratio</span> <span class="o">-</span> <span class="n">GLOBE_ASPECT</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">def render_globe(nc_path, dst):
     """True-colour the native geostationary full disk (the round-Earth view), downsampled."""
@@ -25018,8 +24992,10 @@ for d in (REGION_DIR, GLOBE_DIR):
     if target &gt; width:
         pad = (target - width) // 2
         arr = np.pad(arr, ((0, 0), (0, 0), (pad, target - width - pad)))
-    Dataset.create_from_array(
-        arr=arr, geo=(0.0, 1.0, 0.0, 0.0, 0.0, -1.0), epsg=4326, no_data_value=0
+    Dataset.from_array(
+        arr=arr,
+        no_data_value=0,
+        geo_ref=GeoReference(geo=(0.0, 1.0, 0.0, 0.0, 0.0, -1.0), epsg=4326),
     ).to_file(str(dst))
 
 
@@ -25028,7 +25004,9 @@ def wide_canvas(path):
     if not path.exists():
         return False
     ds = Dataset.read_file(path)
-    return abs(ds.columns / ds.rows - GLOBE_ASPECT) &lt; 0.01</div>
+    ratio = ds.columns / ds.rows
+    ds.close()
+    return abs(ratio - GLOBE_ASPECT) &lt; 0.01</div>
 </div>
 </div>
 </div>

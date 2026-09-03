@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -18198,34 +18198,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -25576,7 +25548,7 @@ time windowing) into per-<code>(variable, window)</code> GeoTIFFs.</p>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        by mean), windows the `time` axis by `config.freq` using</span>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        :meth:`pyramids.netcdf.NetCDF.reduce`, then writes one GeoTIFF</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        per variable per window via</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        :meth:`pyramids.dataset.Dataset.create_from_array` — the same</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        :meth:`pyramids.dataset.Dataset.from_array` — the same</span>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        proven raster-write path :func:`earthlens.aggregate.aggregate_netcdf`</span>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        uses for the ECMWF backend, so CMEMS aggregate output is shaped</span>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        like ECMWF&#39;s (per-window GeoTIFFs, not a multidimensional</span>
@@ -30184,7 +30156,7 @@ time windowing) into per-<code>(variable, window)</code> GeoTIFFs.</p>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        by mean), windows the `time` axis by `config.freq` using</span>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        :meth:`pyramids.netcdf.NetCDF.reduce`, then writes one GeoTIFF</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        per variable per window via</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        :meth:`pyramids.dataset.Dataset.create_from_array` — the same</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        :meth:`pyramids.dataset.Dataset.from_array` — the same</span>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        proven raster-write path :func:`earthlens.aggregate.aggregate_netcdf`</span>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        uses for the ECMWF backend, so CMEMS aggregate output is shaped</span>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        like ECMWF&#39;s (per-window GeoTIFFs, not a multidimensional</span>
