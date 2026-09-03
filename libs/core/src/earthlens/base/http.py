@@ -57,7 +57,12 @@ from tqdm import tqdm
 Timeout = float | tuple[float, float]
 
 #: Per-request timeout (seconds) applied when a call passes no `timeout`.
-DEFAULT_TIMEOUT: Timeout = 60.0
+#: A `(connect, read)` pair rather than one number: a host that is down or
+#: firewalled fails its TCP handshake in 10s instead of occupying a thread for
+#: a full minute, while a slow-but-alive transfer keeps the 60s read budget it
+#: had before. Bounding both phases with one value made the short failure and
+#: the long transfer share a budget that could only suit one of them.
+DEFAULT_TIMEOUT: Timeout = (10.0, 60.0)
 
 #: Maximum retries for a retryable status before the last response's
 #: error is raised.
@@ -75,6 +80,35 @@ DEFAULT_MAX_BACKOFF = 300.0
 #: HTTP statuses that trigger a retry. `429` (rate-limited) plus the
 #: transient `5xx` gateway/unavailable family.
 DEFAULT_STATUS_FORCELIST: tuple[int, ...] = (429, 500, 502, 503, 504)
+
+#: Transport-level exceptions retried by default. These are the failures that
+#: never reach an HTTP status — a refused or reset connection, a DNS blip, a
+#: handshake or read that timed out, a response body truncated mid-stream — so
+#: `status_forcelist` cannot describe them. Leaving this empty meant a TCP reset
+#: partway through a multi-gigabyte granule aborted the whole download while the
+#: retry engine sat unused.
+#:
+#: `requests.RequestException` is deliberately NOT the entry here: it is the
+#: base of `HTTPError` too, so retrying on it would re-issue requests for 4xx
+#: responses that will never succeed.
+DEFAULT_RETRY_EXCEPTIONS: tuple[type[BaseException], ...] = (
+    requests.ConnectionError,
+    requests.exceptions.Timeout,
+    requests.exceptions.ChunkedEncodingError,
+)
+
+#: Methods whose retry after a *transport* failure is safe without the caller
+#: saying so. A request that never completed may still have reached the server,
+#: so replaying `POST` could double-submit an order, a job or a paid query;
+#: replaying `GET` cannot. This mirrors urllib3's `Retry.DEFAULT_ALLOWED_METHODS`
+#: and applies only to the exception path — a retryable *status* is replayed for
+#: any method, as before, because the server answered and asked for it.
+#:
+#: A caller that knows its `POST` is safe to replay (a search endpoint, an
+#: idempotent RPC) opts in with `retry_unsafe_methods=True`.
+IDEMPOTENT_METHODS: frozenset[str] = frozenset(
+    {"GET", "HEAD", "OPTIONS", "TRACE", "PUT", "DELETE"}
+)
 
 #: Streaming chunk size (bytes) for :meth:`HttpClient.download` — 1 MiB.
 DEFAULT_CHUNK_SIZE = 1 << 20
@@ -533,7 +567,10 @@ class HttpClient:
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
         status_forcelist: tuple[int, ...] = DEFAULT_STATUS_FORCELIST,
         max_backoff: float | None = DEFAULT_MAX_BACKOFF,
-        retry_on_exceptions: tuple[type[BaseException], ...] = (),
+        retry_on_exceptions: tuple[type[BaseException], ...] = (
+            DEFAULT_RETRY_EXCEPTIONS
+        ),
+        retry_unsafe_methods: bool = False,
         retry_predicate: Callable[[requests.Response], bool] | None = None,
         raise_for_status: bool = True,
         min_interval: float = 0.0,
@@ -595,6 +632,7 @@ class HttpClient:
         self.status_forcelist = tuple(status_forcelist)
         self.max_backoff = max_backoff
         self.retry_on_exceptions = tuple(retry_on_exceptions)
+        self.retry_unsafe_methods = retry_unsafe_methods
         self._retry_predicate = retry_predicate
         self.raise_for_status = raise_for_status
         self.min_interval = min_interval
@@ -1004,6 +1042,14 @@ class HttpClient:
                 response = self._send(method, url, **kwargs)
             except self.retry_on_exceptions as exc:
                 if attempt >= self.max_retries:
+                    raise
+                # A transport failure gives no proof the server did not receive
+                # and act on the request, so a non-idempotent method is replayed
+                # only when the caller says it is safe.
+                if not (
+                    self.retry_unsafe_methods
+                    or method.upper() in IDEMPOTENT_METHODS
+                ):
                     raise
                 wait = self._backoff_wait(None, attempt)
                 logger.warning(
