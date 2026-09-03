@@ -12,6 +12,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, cast
 
+from loguru import logger
+
 from earthlens.cli.toolkit import (
     COVERAGE_BUCKETS,
     get_json,
@@ -269,7 +271,11 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     """
     try:
         return _read_via_pyramids(path)
-    except Exception:  # noqa: BLE001 — an unreadable container has nothing to add
+    except Exception as error:  # noqa: BLE001 — an unreadable container adds nothing
+        # Degrading to {} is deliberate, but silence makes a genuine read failure
+        # indistinguishable from a container that simply carries no variable
+        # metadata. Log it so a puzzling catalog walk has something to go on.
+        logger.debug(f"No variable metadata read from {path}: {error!r}")
         return {}
 
 
