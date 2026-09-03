@@ -430,10 +430,12 @@ def band_valid_times(url: str, steps: int) -> list[str]:
         list[str]: One `YYYY-MM-DDTHH:MM` label per band, or a positional
             `step_<n>` fallback when the coordinate cannot be read.
     """
+    cube = None
     try:
         from pyramids.netcdf import NetCDF
 
-        labels = NetCDF.read_file(url).get_time_variable(time_format="%Y-%m-%dT%H:%M")
+        cube = NetCDF.read_file(url)
+        labels = cube.get_time_variable(time_format="%Y-%m-%dT%H:%M")
         # Compare the FULL axis, unsliced: a 2-D aggregate field (e.g. a 15-day
         # exceedance probability) has one band while the cube's time axis has
         # many, and slicing first would confidently mislabel it with step 0's
@@ -445,6 +447,12 @@ def band_valid_times(url: str, steps: int) -> list[str]:
             f"JRC: could not read the cube's time axis ({type(exc).__name__}: "
             f"{exc}); bands fall back to positional step_N names."
         )
+    finally:
+        # Release the remote handle this opens: naming runs once per fetch, and
+        # leaving it to the GC holds a /vsicurl connection open until then.
+        close = getattr(cube, "close", None)
+        if callable(close):
+            close()
     return [f"step_{index + 1}" for index in range(steps)]
 
 
