@@ -713,9 +713,7 @@ class HttpClient:
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
         status_forcelist: tuple[int, ...] = DEFAULT_STATUS_FORCELIST,
         max_backoff: float | None = DEFAULT_MAX_BACKOFF,
-        retry_on_exceptions: tuple[type[BaseException], ...] = (
-            DEFAULT_RETRY_EXCEPTIONS
-        ),
+        retry_on_exceptions: tuple[type[BaseException], ...] = DEFAULT_RETRY_EXCEPTIONS,
         connect_retries: int = DEFAULT_CONNECT_RETRIES,
         read_retries: int | None = DEFAULT_READ_RETRIES,
         retry_unsafe_methods: bool = False,
