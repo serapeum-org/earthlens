@@ -165,7 +165,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Layer]]:
     return _CATALOG_CACHE[key]
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Layer]):
     """Variable / transport catalog for the Solar & Wind Atlas backend.
 
     Merges the bundled `catalog/` directory's per-atlas `*.yaml` files and

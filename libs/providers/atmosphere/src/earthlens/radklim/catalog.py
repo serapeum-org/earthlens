@@ -130,7 +130,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[RadklimProduct]):
     """Catalog of DWD RADKLIM / RADOLAN products.
 
     Reads the bundled `radklim_data_catalog.yaml` (shipped as package data) and

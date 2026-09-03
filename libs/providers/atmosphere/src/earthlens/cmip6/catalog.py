@@ -199,7 +199,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Cmip6Variable]):
     """Config + curated-vocabulary catalog for the CMIP6 backend.
 
     Reads the bundled `cmip6_data_catalog.yaml` (shipped as package data) and

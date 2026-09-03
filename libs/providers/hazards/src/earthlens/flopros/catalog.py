@@ -114,7 +114,7 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
     return value
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[FloprosDataset]):
     """Catalog for the FLOPROS flood-protection-standard backend.
 
     Reads the bundled `flopros_data_catalog.yaml` (shipped as package data) and

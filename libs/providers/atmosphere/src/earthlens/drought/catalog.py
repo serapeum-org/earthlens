@@ -225,7 +225,7 @@ class Dataset(BaseModel):
     license_note: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Dataset catalog for the `earthlens.drought` backend.
 
     Reads the bundled `catalog/` directory (shipped as package data) and

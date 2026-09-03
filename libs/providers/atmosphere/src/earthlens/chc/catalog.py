@@ -623,7 +623,7 @@ def _load_catalog_directory(
     return available, regions_map, structural
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Variable catalog for the CHIRPS FTP data source.
 
     Reads the per-family `catalog/*.yaml` files (shipped as package data) and

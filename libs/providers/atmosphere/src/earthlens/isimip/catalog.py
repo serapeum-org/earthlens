@@ -186,7 +186,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Variable]):
     """Config + curated-vocabulary catalog for the ISIMIP backend.
 
     Reads the bundled `isimip_data_catalog.yaml` (shipped as package data) and

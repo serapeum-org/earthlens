@@ -190,7 +190,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
     return _CATALOG_CACHE[key]
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Administrative-boundary source catalog for the admin backend.
 
     Merges the bundled `catalog/` directory's per-provider `*.yaml` files and

@@ -435,7 +435,7 @@ class EarthdataDataset(BaseModel):
     temporal: TemporalCoverage = Field(default_factory=TemporalCoverage)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[EarthdataDataset]):
     """Dataset catalog for the NASA Earthdata backend.
 
     Reads the bundled `catalog/` directory (shipped as package data)

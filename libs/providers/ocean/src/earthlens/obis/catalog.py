@@ -119,7 +119,7 @@ class Species(BaseModel):
     title: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Species]):
     """Species catalog for the OBIS occurrence backend.
 
     Reads the bundled `obis_data_catalog.yaml` (shipped as package data)

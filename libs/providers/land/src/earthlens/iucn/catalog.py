@@ -115,7 +115,7 @@ class Country(BaseModel):
     region: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Country]):
     """Country catalog for the IUCN Red List backend.
 
     Reads the bundled `iucn_data_catalog.yaml` (shipped as package data) and

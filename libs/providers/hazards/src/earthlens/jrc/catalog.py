@@ -157,7 +157,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Product catalog for the JRC hazard backend.
 
     Reads the bundled `jrc_data_catalog.yaml` and exposes its rows (the EFHM

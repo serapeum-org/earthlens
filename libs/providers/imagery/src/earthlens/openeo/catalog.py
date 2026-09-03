@@ -331,7 +331,7 @@ def _load_catalog_data(
     return cached_value
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Collection]):
     """YAML-backed catalog of openEO collections and curated recipes.
 
     Reads every `*.yaml` under :data:`CATALOG_PATH` on construction and merges

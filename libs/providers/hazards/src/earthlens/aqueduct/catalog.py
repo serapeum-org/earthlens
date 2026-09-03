@@ -189,7 +189,7 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
     return value
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[AdminLevel]):
     """Catalog for the Aqueduct riverine flood-risk backend.
 
     Reads the bundled `aqueduct_data_catalog.yaml` (shipped as package data) and

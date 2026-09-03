@@ -247,7 +247,7 @@ def _load_products(path: Path) -> dict[str, Product]:
     return load_catalog(path, _CATALOG_CACHE, _parse_products, provider="WorldPop")
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Product]):
     """Product / sub-alias availability catalog for the WorldPop backend.
 
     Reads the bundled `worldpop_data_catalog.yaml` and exposes its

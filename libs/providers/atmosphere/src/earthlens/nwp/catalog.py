@@ -251,7 +251,7 @@ class NWPModel(BaseModel):
     description: str | None = None
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[NWPModel]):
     """Model catalog for the NWP backend.
 
     Reads the bundled `nwp_data_catalog.yaml` (shipped as package data)

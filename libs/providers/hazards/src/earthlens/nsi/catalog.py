@@ -183,7 +183,7 @@ class Source(BaseModel):
         return self
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Source]):
     """Source catalog for the NSI backend.
 
     Reads the bundled `nsi_data_catalog.yaml` (shipped as package data) and

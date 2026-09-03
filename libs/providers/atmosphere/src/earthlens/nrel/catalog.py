@@ -133,7 +133,7 @@ class Product(BaseModel):
     description: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Product]):
     """Product catalog for the NREL backend.
 
     Reads the bundled `nrel_data_catalog.yaml` (shipped as package data) and

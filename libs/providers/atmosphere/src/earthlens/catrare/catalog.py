@@ -138,7 +138,7 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
     return value
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[CatRaReDataset]):
     """Catalog for the CatRaRE heavy-rainfall event-catalogue backend.
 
     Reads the bundled `catrare_data_catalog.yaml` (shipped as package data) and

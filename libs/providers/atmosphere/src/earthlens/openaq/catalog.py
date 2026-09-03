@@ -126,7 +126,7 @@ def _parse_parameters(files: list[Path]) -> dict[str, Parameter]:
     return parameters
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Parameter]):
     """Pollutant-parameter catalog for the OpenAQ backend.
 
     Reads the bundled `openaq_data_catalog.yaml` (shipped as package

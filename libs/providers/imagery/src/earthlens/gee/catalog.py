@@ -576,7 +576,7 @@ class Dataset(BaseModel):
 _load_providers = _load_providers_base
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """YAML-backed catalog of Earth Engine datasets for the GEE backend.
 
     Reads every `*.yaml` file under :data:`CATALOG_PATH` (the

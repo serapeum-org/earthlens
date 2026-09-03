@@ -224,7 +224,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[GOESProduct]):
     """Product / domain / satellite catalog for the GOES ABI backend.
 
     Reads the bundled `goes_data_catalog.yaml` (shipped as package data)

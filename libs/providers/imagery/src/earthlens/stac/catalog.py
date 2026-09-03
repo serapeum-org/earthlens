@@ -267,7 +267,7 @@ def _load_catalog_data(
     return _CATALOG_CACHE[key]
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Collection]):
     """YAML-backed catalog of STAC endpoints, collections, and assets.
 
     Reads every `*.yaml` under :data:`CATALOG_PATH` on construction and merges

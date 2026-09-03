@@ -441,7 +441,7 @@ class Extension(BaseModel):
         return release
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Extension]):
     """Extension and variable catalog for the Caravan backend.
 
     Reads the bundled `caravan_data_catalog.yaml` (shipped as package data) and

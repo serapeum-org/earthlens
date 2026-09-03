@@ -99,7 +99,7 @@ def _parse_argo_catalog(files: list[Path]):
     return families
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Family]):
     """Parameter-family catalog for the Argo backend.
 
     Reads the bundled `argo_data_catalog.yaml` (shipped as package data)

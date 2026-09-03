@@ -359,7 +359,7 @@ class Dataset(BaseModel):
     variables: dict[str, Variable] = Field(default_factory=dict)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Variable catalog for the Copernicus Marine backend.
 
     Reads the bundled `catalog/` directory (shipped as package data)

@@ -99,7 +99,7 @@ class Station(BaseModel):
     state: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Station]):
     """Catalog of NEXRAD WSR-88D sites.
 
     Reads the bundled `radar_data_catalog.yaml` and exposes its `stations:` block

@@ -143,7 +143,7 @@ class Parameter(BaseModel):
     services: list[str] = Field(default_factory=list)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Parameter]):
     """Parameter-code catalog for the USGS Water backend.
 
     Reads the bundled `usgs_water_data_catalog.yaml` (shipped as

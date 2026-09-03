@@ -141,7 +141,7 @@ class Provider(BaseModel):
     docs_url: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Provider]):
     """Provider catalog for the FDSN seismic-event backend.
 
     Reads the bundled `fdsn_data_catalog.yaml` (shipped as package

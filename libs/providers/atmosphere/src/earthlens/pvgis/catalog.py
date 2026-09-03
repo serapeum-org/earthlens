@@ -121,7 +121,7 @@ class Product(BaseModel):
     description: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Product]):
     """Product catalog for the PVGIS backend.
 
     Reads the bundled `pvgis_data_catalog.yaml` (shipped as package data) and

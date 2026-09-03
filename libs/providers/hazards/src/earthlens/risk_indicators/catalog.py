@@ -213,7 +213,7 @@ class Dataset(BaseModel):
         return self
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Dataset catalog for the risk-indicators backend.
 
     Reads the bundled `risk_indicators_data_catalog.yaml` (shipped as package

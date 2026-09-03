@@ -272,7 +272,7 @@ def _parse_s3_catalog(files: list[Path]):
     return (datasets, available)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Registry of the AWS Open-Data S3 datasets the backend can fetch.
 
     Reads the bundled `s3_data_catalog.yaml` and exposes its `datasets:`

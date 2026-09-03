@@ -241,7 +241,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
     return _CATALOG_CACHE[key]
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """DEM endpoint / transport catalog for the bathymetry backend.
 
     Merges the bundled `catalog/` directory's per-family `*.yaml` files and

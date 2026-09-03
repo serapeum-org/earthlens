@@ -125,7 +125,7 @@ def _parse_sensor_community_catalog(files: list[Path]):
     return pollutants
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Pollutant]):
     """Pollutant catalog for the Sensor.Community backend.
 
     Reads the bundled `sensor_community_data_catalog.yaml` (shipped as

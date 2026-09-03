@@ -125,7 +125,7 @@ def _parse_eea_aq_catalog(files: list[Path]):
     return pollutants
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Pollutant]):
     """Pollutant catalog for the EEA (`eea_aq`) backend.
 
     Reads the bundled `eea_aq_data_catalog.yaml` (shipped as package data)

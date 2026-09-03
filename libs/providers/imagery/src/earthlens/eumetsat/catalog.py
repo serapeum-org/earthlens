@@ -333,7 +333,7 @@ class EumetsatDataset(BaseModel):
     temporal: TemporalCoverage = Field(default_factory=TemporalCoverage)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[EumetsatDataset]):
     """Dataset catalog for the EUMETSAT Data Store backend.
 
     Reads the bundled `catalog/` directory (shipped as package data) and

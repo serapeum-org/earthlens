@@ -200,7 +200,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[FlodisDataset]):
     """Catalog for the FLODIS backend.
 
     Reads the bundled `flodis_data_catalog.yaml` (shipped as package data) and

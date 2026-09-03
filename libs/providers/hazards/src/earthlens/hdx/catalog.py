@@ -289,7 +289,7 @@ class HdxDataset(BaseModel):
     output_kinds: list[OutputKindLiteral] = Field(default_factory=list)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[HdxDataset]):
     """Dataset catalog for the Humanitarian Data Exchange backend.
 
     Reads the bundled `catalog/` directory (shipped as package data)

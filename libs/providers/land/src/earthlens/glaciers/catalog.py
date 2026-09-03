@@ -304,7 +304,7 @@ class Region(BaseModel):
         return self
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Dataset + region catalog for the glaciers backend.
 
     Reads the bundled sharded `catalog/` directory (shipped as package data) and

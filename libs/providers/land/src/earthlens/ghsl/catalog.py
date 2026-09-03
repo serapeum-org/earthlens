@@ -400,7 +400,7 @@ class Product(BaseModel):
         return DataFrame(rows, columns=["band", "values", "color", "alpha"])
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Product]):
     """Product / availability catalog for the GHSL backend.
 
     Merges the bundled `catalog/` directory's per-family `*.yaml` files and

@@ -260,7 +260,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[FloodType]):
     """Catalog for the HANZE backend.
 
     Reads the bundled `hanze_data_catalog.yaml` (shipped as package data) and

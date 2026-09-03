@@ -10,7 +10,7 @@ from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, cast
 
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -2394,7 +2394,15 @@ class AbstractDataSource(ABC):
         return results
 
 
-class AbstractCatalog(BaseModel):
+#: The row type a concrete catalog holds. Providers parameterise
+#: :class:`AbstractCatalog` with their own pydantic row model
+#: (`AbstractCatalog[Dataset]`), so `datasets`, `get_catalog` and
+#: `get_dataset` keep that type instead of degrading to `Any`. Left
+#: unparameterised the catalog still works; it is simply untyped in the rows.
+RowT = TypeVar("RowT")
+
+
+class AbstractCatalog(BaseModel, Generic[RowT]):
     """Abstract base class for per-data-source variable catalogs.
 
     Subclasses load a backend-specific catalog (a YAML file, an
@@ -2443,7 +2451,7 @@ class AbstractCatalog(BaseModel):
     _entry_noun: str = "datasets"
 
     available_datasets: list[str] = Field(default_factory=list)
-    datasets: dict[str, Any] = Field(default_factory=dict)
+    datasets: dict[str, RowT] = Field(default_factory=dict)
     providers: dict[str, Any] = Field(default_factory=dict)
 
     @property
@@ -2518,7 +2526,7 @@ class AbstractCatalog(BaseModel):
                 if not getattr(self, field, None):
                     setattr(self, field, value)
 
-    def get_catalog(self) -> Any:
+    def get_catalog(self) -> dict[str, RowT]:
         """Return the catalog's rows.
 
         Defaults to :attr:`datasets`, which is where every backend keeps
@@ -2532,7 +2540,8 @@ class AbstractCatalog(BaseModel):
         overrides this.
 
         Returns:
-            Any: The `{key: row}` mapping backing this catalog.
+            dict[str, RowT]: The `{key: row}` mapping backing this catalog,
+            typed as the row model the subclass parameterised the base with.
 
         Examples:
             - Read the rows and inspect one:
@@ -2602,7 +2611,7 @@ class AbstractCatalog(BaseModel):
 
     # -- shared dict-like surface over `datasets` (M1 from catalog-cross-backend-comparison)
 
-    def get_dataset(self, name: str) -> Any:
+    def get_dataset(self, name: str) -> RowT:
         """Return the dataset record for `name`, with a did-you-mean hint on miss.
 
         Backend-generic: looks up `name` in :attr:`datasets` and raises
@@ -2630,7 +2639,7 @@ class AbstractCatalog(BaseModel):
                 f"Known {self._entry_noun}: {sorted(self.datasets)}.{hint}"
             ) from None
 
-    def __getitem__(self, name: str) -> Any:
+    def __getitem__(self, name: str) -> RowT:
         """`cat[name]` — dict-style lookup; raises `KeyError` on miss."""
         try:
             return self.get_dataset(name)
@@ -2741,7 +2750,9 @@ class AbstractCatalog(BaseModel):
         """
         import yaml
 
-        body = {}
+        # Annotated: the branches store a dumped dict and a raw row, so the
+        # inferred type would come from whichever ran first.
+        body: dict[str, Any] = {}
         for key, dataset in self.datasets.items():
             if isinstance(dataset, BaseModel):
                 body[key] = dataset.model_dump(exclude_none=True)

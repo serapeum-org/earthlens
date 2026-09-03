@@ -125,7 +125,7 @@ def _parse_datasets(files: list[Path]) -> dict[str, DEMDataset]:
     return datasets
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[DEMDataset]):
     """Dataset catalog for the DEM backend.
 
     Reads the bundled `dem_data_catalog.yaml` (shipped as package data)

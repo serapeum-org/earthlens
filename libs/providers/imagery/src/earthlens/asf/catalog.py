@@ -200,7 +200,7 @@ class Product(BaseModel):
         return self
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Product]):
     """Product catalog for the ASF InSAR backend.
 
     Reads the bundled `asf_data_catalog.yaml` (shipped as package

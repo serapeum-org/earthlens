@@ -190,7 +190,7 @@ def _parse_sensors(files: list[Path]) -> dict[str, Sensor]:
     return sensors
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Sensor]):
     """Sensor catalog for the NASA FIRMS backend.
 
     Reads the bundled `firms_data_catalog.yaml` (shipped as package

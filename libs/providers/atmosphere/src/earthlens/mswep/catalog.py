@@ -476,7 +476,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[MswepProduct]):
     """Product catalog for the MSWEP / MSWX backend.
 
     Reads the bundled `mswep_data_catalog.yaml` (shipped as package

@@ -154,7 +154,7 @@ class Index(BaseModel):
     citation: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Index]):
     """Index catalogue for the climate-indices backend.
 
     Reads the bundled `climate_indices_data_catalog.yaml` (shipped as

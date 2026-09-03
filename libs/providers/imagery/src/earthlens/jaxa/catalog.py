@@ -191,7 +191,7 @@ class Dataset(BaseModel):
         return self
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Reader for the bundled JAXA dataset catalog.
 
     Subclasses :class:`AbstractCatalog` so the dict-like surface

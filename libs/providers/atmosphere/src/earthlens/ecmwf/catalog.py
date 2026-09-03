@@ -901,7 +901,7 @@ class Dataset(BaseModel):
         return _validate_grid_resolution(value)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Variable catalog for the CDS-backed ECMWF data source.
 
     Reads the bundled CDS catalog (the `catalog/` directory, shipped as

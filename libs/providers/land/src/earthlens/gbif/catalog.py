@@ -154,7 +154,7 @@ class Taxon(BaseModel):
     rank: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Taxon]):
     """Taxon catalog for the GBIF occurrence backend.
 
     Reads the bundled `gbif_data_catalog.yaml` (shipped as package data)

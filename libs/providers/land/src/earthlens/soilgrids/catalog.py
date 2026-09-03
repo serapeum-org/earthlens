@@ -172,7 +172,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Property]]:
     return _CATALOG_CACHE[key]
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Property]):
     """Property / depth / quantile catalog for the SoilGrids backend.
 
     Merges the bundled `catalog/` directory's per-group `*.yaml` files and

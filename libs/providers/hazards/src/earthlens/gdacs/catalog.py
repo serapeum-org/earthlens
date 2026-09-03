@@ -111,7 +111,7 @@ def _parse_hazard_types(files: list[Path]) -> dict[str, HazardType]:
     return hazards
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[HazardType]):
     """Hazard-type catalog for the GDACS backend.
 
     Reads the bundled `gdacs_data_catalog.yaml` (shipped as package

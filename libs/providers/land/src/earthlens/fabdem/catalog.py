@@ -117,7 +117,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Product catalog for the FABDEM backend.
 
     Reads the bundled `fabdem_data_catalog.yaml` and exposes its single row

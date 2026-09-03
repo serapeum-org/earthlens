@@ -283,7 +283,7 @@ class Dataset(BaseModel):
         )
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Loader for the bundled EM-DAT dataset catalog.
 
     Reads `emdat_data_catalog.yaml` on construction (`Catalog()`) and exposes

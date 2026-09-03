@@ -116,7 +116,7 @@ class Country(BaseModel):
     region: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Country]):
     """Country catalog for the WDPA / Protected Planet backend.
 
     Reads the bundled `wdpa_data_catalog.yaml` (shipped as package data) and

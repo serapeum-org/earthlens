@@ -169,7 +169,7 @@ class Basin(BaseModel):
     fields: dict[str, TrackField] = Field(default_factory=dict)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Basin]):
     """Basin -> track-field catalog for the Tropycal backend.
 
     Reads the bundled `tropycal_data_catalog.yaml` (shipped as package

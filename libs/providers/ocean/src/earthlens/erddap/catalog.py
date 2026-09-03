@@ -212,7 +212,7 @@ class Dataset(BaseModel):
     license_note: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Server catalog for the generic ERDDAP backend.
 
     Reads the bundled `catalog/` directory (shipped as package data) and

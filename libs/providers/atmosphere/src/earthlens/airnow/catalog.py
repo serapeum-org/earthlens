@@ -119,7 +119,7 @@ def _parse_pollutants(files: list[Path]) -> dict[str, Pollutant]:
     return pollutants
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Pollutant]):
     """Pollutant catalog for the AirNow backend.
 
     Reads the bundled `airnow_data_catalog.yaml` (shipped as package

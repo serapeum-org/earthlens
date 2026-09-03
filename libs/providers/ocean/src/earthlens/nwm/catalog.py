@@ -231,7 +231,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     return {"datasets": products, "configurations": configurations}
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[NWMProduct]):
     """Product + configuration catalog for the NWM backend.
 
     Reads the bundled `nwm_data_catalog.yaml` (shipped as package data)

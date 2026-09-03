@@ -210,7 +210,7 @@ def _parse_osm_catalog(files: list[Path]):
     return (datasets, regions)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Named-query catalog for the OpenStreetMap backend.
 
     Reads the bundled `osm_data_catalog.yaml` (shipped as package data) and
