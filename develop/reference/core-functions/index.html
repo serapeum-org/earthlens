@@ -24051,15 +24051,7 @@ Defaults to <code>False</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/earthlens.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1820">1820</a></span>
-<span class="normal"><a href="#__codelineno-0-1821">1821</a></span>
-<span class="normal"><a href="#__codelineno-0-1822">1822</a></span>
-<span class="normal"><a href="#__codelineno-0-1823">1823</a></span>
-<span class="normal"><a href="#__codelineno-0-1824">1824</a></span>
-<span class="normal"><a href="#__codelineno-0-1825">1825</a></span>
-<span class="normal"><a href="#__codelineno-0-1826">1826</a></span>
-<span class="normal"><a href="#__codelineno-0-1827">1827</a></span>
-<span class="normal"><a href="#__codelineno-0-1828">1828</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1828">1828</a></span>
 <span class="normal"><a href="#__codelineno-0-1829">1829</a></span>
 <span class="normal"><a href="#__codelineno-0-1830">1830</a></span>
 <span class="normal"><a href="#__codelineno-0-1831">1831</a></span>
@@ -24151,107 +24143,115 @@ Defaults to <code>False</code>.</p>
 <span class="normal"><a href="#__codelineno-0-1917">1917</a></span>
 <span class="normal"><a href="#__codelineno-0-1918">1918</a></span>
 <span class="normal"><a href="#__codelineno-0-1919">1919</a></span>
-<span class="normal"><a href="#__codelineno-0-1920">1920</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1820" name="__codelineno-0-1820"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-1821" name="__codelineno-0-1821"></a>    <span class="n">data_source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;chc&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-1822" name="__codelineno-0-1822"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-1823" name="__codelineno-0-1823"></a>    <span class="n">variables</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1824" name="__codelineno-0-1824"></a>    <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1825" name="__codelineno-0-1825"></a>    <span class="n">start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1826" name="__codelineno-0-1826"></a>    <span class="n">end</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1827" name="__codelineno-0-1827"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1828" name="__codelineno-0-1828"></a>    <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1829" name="__codelineno-0-1829"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1830" name="__codelineno-0-1830"></a>    <span class="n">aoi</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1831" name="__codelineno-0-1831"></a>    <span class="n">buffer</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1832" name="__codelineno-0-1832"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;daily&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-1833" name="__codelineno-0-1833"></a>    <span class="n">cadence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1834" name="__codelineno-0-1834"></a>    <span class="n">time</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1835" name="__codelineno-0-1835"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-1836" name="__codelineno-0-1836"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-1837" name="__codelineno-0-1837"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1838" name="__codelineno-0-1838"></a>    <span class="n">load</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-1839" name="__codelineno-0-1839"></a>    <span class="o">**</span><span class="n">backend_kwargs</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
-<a id="__codelineno-0-1840" name="__codelineno-0-1840"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-1841" name="__codelineno-0-1841"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct an :class:`EarthLens` and download in one call.</span>
-<a id="__codelineno-0-1842" name="__codelineno-0-1842"></a>
-<a id="__codelineno-0-1843" name="__codelineno-0-1843"></a><span class="sd">    The one-shot convenience for the common case: it forwards every</span>
-<a id="__codelineno-0-1844" name="__codelineno-0-1844"></a><span class="sd">    request argument to :class:`EarthLens` and the run-time arguments to</span>
-<a id="__codelineno-0-1845" name="__codelineno-0-1845"></a><span class="sd">    :meth:`EarthLens.download`, so `earthlens.core.download(...)` replaces the</span>
-<a id="__codelineno-0-1846" name="__codelineno-0-1846"></a><span class="sd">    two-step construct-then-download.</span>
-<a id="__codelineno-0-1847" name="__codelineno-0-1847"></a>
-<a id="__codelineno-0-1848" name="__codelineno-0-1848"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-1849" name="__codelineno-0-1849"></a><span class="sd">        data_source: Backend key (see `sorted(EarthLens.DataSources)`).</span>
-<a id="__codelineno-0-1850" name="__codelineno-0-1850"></a><span class="sd">            Defaults to `&quot;chc&quot;`.</span>
-<a id="__codelineno-0-1851" name="__codelineno-0-1851"></a><span class="sd">        variables: Variable specification, as for :class:`EarthLens`.</span>
-<a id="__codelineno-0-1852" name="__codelineno-0-1852"></a><span class="sd">        dataset: Explicit dataset / collection key (see</span>
-<a id="__codelineno-0-1853" name="__codelineno-0-1853"></a><span class="sd">            :class:`EarthLens`).</span>
-<a id="__codelineno-0-1854" name="__codelineno-0-1854"></a><span class="sd">        start: Inclusive start date (string / `datetime` / `date`).</span>
-<a id="__codelineno-0-1855" name="__codelineno-0-1855"></a><span class="sd">        end: Inclusive end date.</span>
-<a id="__codelineno-0-1856" name="__codelineno-0-1856"></a><span class="sd">        time: A single time range (`&quot;a/b&quot;` string / `(a, b)` pair / `slice` /</span>
-<a id="__codelineno-0-1857" name="__codelineno-0-1857"></a><span class="sd">            single date) — the ergonomic alternative to `start` / `end`;</span>
-<a id="__codelineno-0-1858" name="__codelineno-0-1858"></a><span class="sd">            mutually exclusive with them.</span>
-<a id="__codelineno-0-1859" name="__codelineno-0-1859"></a><span class="sd">        path: Output directory; defaults to</span>
-<a id="__codelineno-0-1860" name="__codelineno-0-1860"></a><span class="sd">            `&lt;output_dir()&gt;/&lt;data_source&gt;/` when omitted — the directory</span>
-<a id="__codelineno-0-1861" name="__codelineno-0-1861"></a><span class="sd">            configured by `set_output_dir()` / `EARTHLENS_DATA_DIR`.</span>
-<a id="__codelineno-0-1862" name="__codelineno-0-1862"></a><span class="sd">        lat_lim: Legacy `[lat_min, lat_max]` pair — prefer `aoi=` (mutually</span>
-<a id="__codelineno-0-1863" name="__codelineno-0-1863"></a><span class="sd">            exclusive with it).</span>
-<a id="__codelineno-0-1864" name="__codelineno-0-1864"></a><span class="sd">        lon_lim: Legacy `[lon_min, lon_max]` pair — prefer `aoi=` (mutually</span>
-<a id="__codelineno-0-1865" name="__codelineno-0-1865"></a><span class="sd">            exclusive with it).</span>
-<a id="__codelineno-0-1866" name="__codelineno-0-1866"></a><span class="sd">        aoi: A single area-of-interest (bbox / point+`buffer` / geometry).</span>
-<a id="__codelineno-0-1867" name="__codelineno-0-1867"></a><span class="sd">        buffer: Half-width in degrees for a point `aoi`.</span>
-<a id="__codelineno-0-1868" name="__codelineno-0-1868"></a><span class="sd">        temporal_resolution: Backend cadence / label. Defaults to</span>
-<a id="__codelineno-0-1869" name="__codelineno-0-1869"></a><span class="sd">            `&quot;daily&quot;`.</span>
-<a id="__codelineno-0-1870" name="__codelineno-0-1870"></a><span class="sd">        cadence: Clearer alias for `temporal_resolution` (overrides it</span>
-<a id="__codelineno-0-1871" name="__codelineno-0-1871"></a><span class="sd">            when given). Defaults to `None`.</span>
-<a id="__codelineno-0-1872" name="__codelineno-0-1872"></a><span class="sd">        fmt: `strptime` format override for string dates.</span>
-<a id="__codelineno-0-1873" name="__codelineno-0-1873"></a><span class="sd">        progress_bar: Whether the backend prints a progress bar.</span>
-<a id="__codelineno-0-1874" name="__codelineno-0-1874"></a><span class="sd">        aggregate: Optional :class:`~earthlens.aggregate.AggregationConfig`.</span>
-<a id="__codelineno-0-1875" name="__codelineno-0-1875"></a><span class="sd">        load: When `True`, return the data in memory via</span>
-<a id="__codelineno-0-1876" name="__codelineno-0-1876"></a><span class="sd">            :meth:`EarthLens.load` (written rasters read into pyramids</span>
-<a id="__codelineno-0-1877" name="__codelineno-0-1877"></a><span class="sd">            `Dataset` / `NetCDF` objects) instead of the written paths.</span>
-<a id="__codelineno-0-1878" name="__codelineno-0-1878"></a><span class="sd">            Defaults to `False`.</span>
-<a id="__codelineno-0-1879" name="__codelineno-0-1879"></a><span class="sd">        **backend_kwargs: Extra backend-specific options (see</span>
-<a id="__codelineno-0-1880" name="__codelineno-0-1880"></a><span class="sd">            :meth:`EarthLens.options_for`).</span>
-<a id="__codelineno-0-1881" name="__codelineno-0-1881"></a>
-<a id="__codelineno-0-1882" name="__codelineno-0-1882"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-1883" name="__codelineno-0-1883"></a><span class="sd">        Whatever :meth:`EarthLens.download` returns for the backend, or —</span>
-<a id="__codelineno-0-1884" name="__codelineno-0-1884"></a><span class="sd">        when `load=True` — the in-memory objects from :meth:`EarthLens.load`.</span>
-<a id="__codelineno-0-1885" name="__codelineno-0-1885"></a>
-<a id="__codelineno-0-1886" name="__codelineno-0-1886"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-1887" name="__codelineno-0-1887"></a><span class="sd">        - One-shot CHIRPS download. Marked `# doctest: +SKIP` because it</span>
-<a id="__codelineno-0-1888" name="__codelineno-0-1888"></a><span class="sd">          makes a live FTP connection:</span>
-<a id="__codelineno-0-1889" name="__codelineno-0-1889"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-1890" name="__codelineno-0-1890"></a><span class="sd">            &gt;&gt;&gt; import earthlens.core</span>
-<a id="__codelineno-0-1891" name="__codelineno-0-1891"></a><span class="sd">            &gt;&gt;&gt; earthlens.core.download(  # doctest: +SKIP</span>
-<a id="__codelineno-0-1892" name="__codelineno-0-1892"></a><span class="sd">            ...     data_source=&quot;chc&quot;,</span>
-<a id="__codelineno-0-1893" name="__codelineno-0-1893"></a><span class="sd">            ...     variables=[&quot;precipitation&quot;],</span>
-<a id="__codelineno-0-1894" name="__codelineno-0-1894"></a><span class="sd">            ...     start=&quot;2009-01-01&quot;, end=&quot;2009-01-02&quot;,</span>
-<a id="__codelineno-0-1895" name="__codelineno-0-1895"></a><span class="sd">            ...     aoi=[-75.65, 4.19, -74.73, 4.64],</span>
-<a id="__codelineno-0-1896" name="__codelineno-0-1896"></a><span class="sd">            ...     path=&quot;examples/data/chirps&quot;,</span>
-<a id="__codelineno-0-1897" name="__codelineno-0-1897"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-1898" name="__codelineno-0-1898"></a>
-<a id="__codelineno-0-1899" name="__codelineno-0-1899"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-1900" name="__codelineno-0-1900"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1901" name="__codelineno-0-1901"></a>    <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-0-1902" name="__codelineno-0-1902"></a>        <span class="n">data_source</span><span class="o">=</span><span class="n">data_source</span><span class="p">,</span>
-<a id="__codelineno-0-1903" name="__codelineno-0-1903"></a>        <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span>
-<a id="__codelineno-0-1904" name="__codelineno-0-1904"></a>        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-<a id="__codelineno-0-1905" name="__codelineno-0-1905"></a>        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
-<a id="__codelineno-0-1906" name="__codelineno-0-1906"></a>        <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
-<a id="__codelineno-0-1907" name="__codelineno-0-1907"></a>        <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-<a id="__codelineno-0-1908" name="__codelineno-0-1908"></a>        <span class="n">lat_lim</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">,</span>
-<a id="__codelineno-0-1909" name="__codelineno-0-1909"></a>        <span class="n">lon_lim</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">,</span>
-<a id="__codelineno-0-1910" name="__codelineno-0-1910"></a>        <span class="n">aoi</span><span class="o">=</span><span class="n">aoi</span><span class="p">,</span>
-<a id="__codelineno-0-1911" name="__codelineno-0-1911"></a>        <span class="n">buffer</span><span class="o">=</span><span class="n">buffer</span><span class="p">,</span>
-<a id="__codelineno-0-1912" name="__codelineno-0-1912"></a>        <span class="n">temporal_resolution</span><span class="o">=</span><span class="n">temporal_resolution</span><span class="p">,</span>
-<a id="__codelineno-0-1913" name="__codelineno-0-1913"></a>        <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span>
-<a id="__codelineno-0-1914" name="__codelineno-0-1914"></a>        <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
-<a id="__codelineno-0-1915" name="__codelineno-0-1915"></a>        <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span>
-<a id="__codelineno-0-1916" name="__codelineno-0-1916"></a>        <span class="o">**</span><span class="n">backend_kwargs</span><span class="p">,</span>
-<a id="__codelineno-0-1917" name="__codelineno-0-1917"></a>    <span class="p">)</span>
-<a id="__codelineno-0-1918" name="__codelineno-0-1918"></a>    <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
-<a id="__codelineno-0-1919" name="__codelineno-0-1919"></a>        <span class="k">return</span> <span class="n">facade</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="n">aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-1920" name="__codelineno-0-1920"></a>    <span class="k">return</span> <span class="n">facade</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="n">aggregate</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-1920">1920</a></span>
+<span class="normal"><a href="#__codelineno-0-1921">1921</a></span>
+<span class="normal"><a href="#__codelineno-0-1922">1922</a></span>
+<span class="normal"><a href="#__codelineno-0-1923">1923</a></span>
+<span class="normal"><a href="#__codelineno-0-1924">1924</a></span>
+<span class="normal"><a href="#__codelineno-0-1925">1925</a></span>
+<span class="normal"><a href="#__codelineno-0-1926">1926</a></span>
+<span class="normal"><a href="#__codelineno-0-1927">1927</a></span>
+<span class="normal"><a href="#__codelineno-0-1928">1928</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1828" name="__codelineno-0-1828"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-1829" name="__codelineno-0-1829"></a>    <span class="n">data_source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;chc&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-1830" name="__codelineno-0-1830"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-1831" name="__codelineno-0-1831"></a>    <span class="n">variables</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1832" name="__codelineno-0-1832"></a>    <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1833" name="__codelineno-0-1833"></a>    <span class="n">start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1834" name="__codelineno-0-1834"></a>    <span class="n">end</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1835" name="__codelineno-0-1835"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1836" name="__codelineno-0-1836"></a>    <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1837" name="__codelineno-0-1837"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1838" name="__codelineno-0-1838"></a>    <span class="n">aoi</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1839" name="__codelineno-0-1839"></a>    <span class="n">buffer</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1840" name="__codelineno-0-1840"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;daily&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-1841" name="__codelineno-0-1841"></a>    <span class="n">cadence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1842" name="__codelineno-0-1842"></a>    <span class="n">time</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1843" name="__codelineno-0-1843"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-1844" name="__codelineno-0-1844"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-1845" name="__codelineno-0-1845"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1846" name="__codelineno-0-1846"></a>    <span class="n">load</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-1847" name="__codelineno-0-1847"></a>    <span class="o">**</span><span class="n">backend_kwargs</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+<a id="__codelineno-0-1848" name="__codelineno-0-1848"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-1849" name="__codelineno-0-1849"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct an :class:`EarthLens` and download in one call.</span>
+<a id="__codelineno-0-1850" name="__codelineno-0-1850"></a>
+<a id="__codelineno-0-1851" name="__codelineno-0-1851"></a><span class="sd">    The one-shot convenience for the common case: it forwards every</span>
+<a id="__codelineno-0-1852" name="__codelineno-0-1852"></a><span class="sd">    request argument to :class:`EarthLens` and the run-time arguments to</span>
+<a id="__codelineno-0-1853" name="__codelineno-0-1853"></a><span class="sd">    :meth:`EarthLens.download`, so `earthlens.core.download(...)` replaces the</span>
+<a id="__codelineno-0-1854" name="__codelineno-0-1854"></a><span class="sd">    two-step construct-then-download.</span>
+<a id="__codelineno-0-1855" name="__codelineno-0-1855"></a>
+<a id="__codelineno-0-1856" name="__codelineno-0-1856"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-1857" name="__codelineno-0-1857"></a><span class="sd">        data_source: Backend key (see `sorted(EarthLens.DataSources)`).</span>
+<a id="__codelineno-0-1858" name="__codelineno-0-1858"></a><span class="sd">            Defaults to `&quot;chc&quot;`.</span>
+<a id="__codelineno-0-1859" name="__codelineno-0-1859"></a><span class="sd">        variables: Variable specification, as for :class:`EarthLens`.</span>
+<a id="__codelineno-0-1860" name="__codelineno-0-1860"></a><span class="sd">        dataset: Explicit dataset / collection key (see</span>
+<a id="__codelineno-0-1861" name="__codelineno-0-1861"></a><span class="sd">            :class:`EarthLens`).</span>
+<a id="__codelineno-0-1862" name="__codelineno-0-1862"></a><span class="sd">        start: Inclusive start date (string / `datetime` / `date`).</span>
+<a id="__codelineno-0-1863" name="__codelineno-0-1863"></a><span class="sd">        end: Inclusive end date.</span>
+<a id="__codelineno-0-1864" name="__codelineno-0-1864"></a><span class="sd">        time: A single time range (`&quot;a/b&quot;` string / `(a, b)` pair / `slice` /</span>
+<a id="__codelineno-0-1865" name="__codelineno-0-1865"></a><span class="sd">            single date) — the ergonomic alternative to `start` / `end`;</span>
+<a id="__codelineno-0-1866" name="__codelineno-0-1866"></a><span class="sd">            mutually exclusive with them.</span>
+<a id="__codelineno-0-1867" name="__codelineno-0-1867"></a><span class="sd">        path: Output directory; defaults to</span>
+<a id="__codelineno-0-1868" name="__codelineno-0-1868"></a><span class="sd">            `&lt;output_dir()&gt;/&lt;data_source&gt;/` when omitted — the directory</span>
+<a id="__codelineno-0-1869" name="__codelineno-0-1869"></a><span class="sd">            configured by `set_output_dir()` / `EARTHLENS_DATA_DIR`.</span>
+<a id="__codelineno-0-1870" name="__codelineno-0-1870"></a><span class="sd">        lat_lim: Legacy `[lat_min, lat_max]` pair — prefer `aoi=` (mutually</span>
+<a id="__codelineno-0-1871" name="__codelineno-0-1871"></a><span class="sd">            exclusive with it).</span>
+<a id="__codelineno-0-1872" name="__codelineno-0-1872"></a><span class="sd">        lon_lim: Legacy `[lon_min, lon_max]` pair — prefer `aoi=` (mutually</span>
+<a id="__codelineno-0-1873" name="__codelineno-0-1873"></a><span class="sd">            exclusive with it).</span>
+<a id="__codelineno-0-1874" name="__codelineno-0-1874"></a><span class="sd">        aoi: A single area-of-interest (bbox / point+`buffer` / geometry).</span>
+<a id="__codelineno-0-1875" name="__codelineno-0-1875"></a><span class="sd">        buffer: Half-width in degrees for a point `aoi`.</span>
+<a id="__codelineno-0-1876" name="__codelineno-0-1876"></a><span class="sd">        temporal_resolution: Backend cadence / label. Defaults to</span>
+<a id="__codelineno-0-1877" name="__codelineno-0-1877"></a><span class="sd">            `&quot;daily&quot;`.</span>
+<a id="__codelineno-0-1878" name="__codelineno-0-1878"></a><span class="sd">        cadence: Clearer alias for `temporal_resolution` (overrides it</span>
+<a id="__codelineno-0-1879" name="__codelineno-0-1879"></a><span class="sd">            when given). Defaults to `None`.</span>
+<a id="__codelineno-0-1880" name="__codelineno-0-1880"></a><span class="sd">        fmt: `strptime` format override for string dates.</span>
+<a id="__codelineno-0-1881" name="__codelineno-0-1881"></a><span class="sd">        progress_bar: Whether the backend prints a progress bar.</span>
+<a id="__codelineno-0-1882" name="__codelineno-0-1882"></a><span class="sd">        aggregate: Optional :class:`~earthlens.aggregate.AggregationConfig`.</span>
+<a id="__codelineno-0-1883" name="__codelineno-0-1883"></a><span class="sd">        load: When `True`, return the data in memory via</span>
+<a id="__codelineno-0-1884" name="__codelineno-0-1884"></a><span class="sd">            :meth:`EarthLens.load` (written rasters read into pyramids</span>
+<a id="__codelineno-0-1885" name="__codelineno-0-1885"></a><span class="sd">            `Dataset` / `NetCDF` objects) instead of the written paths.</span>
+<a id="__codelineno-0-1886" name="__codelineno-0-1886"></a><span class="sd">            Defaults to `False`.</span>
+<a id="__codelineno-0-1887" name="__codelineno-0-1887"></a><span class="sd">        **backend_kwargs: Extra backend-specific options (see</span>
+<a id="__codelineno-0-1888" name="__codelineno-0-1888"></a><span class="sd">            :meth:`EarthLens.options_for`).</span>
+<a id="__codelineno-0-1889" name="__codelineno-0-1889"></a>
+<a id="__codelineno-0-1890" name="__codelineno-0-1890"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-1891" name="__codelineno-0-1891"></a><span class="sd">        Whatever :meth:`EarthLens.download` returns for the backend, or —</span>
+<a id="__codelineno-0-1892" name="__codelineno-0-1892"></a><span class="sd">        when `load=True` — the in-memory objects from :meth:`EarthLens.load`.</span>
+<a id="__codelineno-0-1893" name="__codelineno-0-1893"></a>
+<a id="__codelineno-0-1894" name="__codelineno-0-1894"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-1895" name="__codelineno-0-1895"></a><span class="sd">        - One-shot CHIRPS download. Marked `# doctest: +SKIP` because it</span>
+<a id="__codelineno-0-1896" name="__codelineno-0-1896"></a><span class="sd">          makes a live FTP connection:</span>
+<a id="__codelineno-0-1897" name="__codelineno-0-1897"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-1898" name="__codelineno-0-1898"></a><span class="sd">            &gt;&gt;&gt; import earthlens.core</span>
+<a id="__codelineno-0-1899" name="__codelineno-0-1899"></a><span class="sd">            &gt;&gt;&gt; earthlens.core.download(  # doctest: +SKIP</span>
+<a id="__codelineno-0-1900" name="__codelineno-0-1900"></a><span class="sd">            ...     data_source=&quot;chc&quot;,</span>
+<a id="__codelineno-0-1901" name="__codelineno-0-1901"></a><span class="sd">            ...     variables=[&quot;precipitation&quot;],</span>
+<a id="__codelineno-0-1902" name="__codelineno-0-1902"></a><span class="sd">            ...     start=&quot;2009-01-01&quot;, end=&quot;2009-01-02&quot;,</span>
+<a id="__codelineno-0-1903" name="__codelineno-0-1903"></a><span class="sd">            ...     aoi=[-75.65, 4.19, -74.73, 4.64],</span>
+<a id="__codelineno-0-1904" name="__codelineno-0-1904"></a><span class="sd">            ...     path=&quot;examples/data/chirps&quot;,</span>
+<a id="__codelineno-0-1905" name="__codelineno-0-1905"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-1906" name="__codelineno-0-1906"></a>
+<a id="__codelineno-0-1907" name="__codelineno-0-1907"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-1908" name="__codelineno-0-1908"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1909" name="__codelineno-0-1909"></a>    <span class="n">facade</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-1910" name="__codelineno-0-1910"></a>        <span class="n">data_source</span><span class="o">=</span><span class="n">data_source</span><span class="p">,</span>
+<a id="__codelineno-0-1911" name="__codelineno-0-1911"></a>        <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span>
+<a id="__codelineno-0-1912" name="__codelineno-0-1912"></a>        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+<a id="__codelineno-0-1913" name="__codelineno-0-1913"></a>        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+<a id="__codelineno-0-1914" name="__codelineno-0-1914"></a>        <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+<a id="__codelineno-0-1915" name="__codelineno-0-1915"></a>        <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+<a id="__codelineno-0-1916" name="__codelineno-0-1916"></a>        <span class="n">lat_lim</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">,</span>
+<a id="__codelineno-0-1917" name="__codelineno-0-1917"></a>        <span class="n">lon_lim</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">,</span>
+<a id="__codelineno-0-1918" name="__codelineno-0-1918"></a>        <span class="n">aoi</span><span class="o">=</span><span class="n">aoi</span><span class="p">,</span>
+<a id="__codelineno-0-1919" name="__codelineno-0-1919"></a>        <span class="n">buffer</span><span class="o">=</span><span class="n">buffer</span><span class="p">,</span>
+<a id="__codelineno-0-1920" name="__codelineno-0-1920"></a>        <span class="n">temporal_resolution</span><span class="o">=</span><span class="n">temporal_resolution</span><span class="p">,</span>
+<a id="__codelineno-0-1921" name="__codelineno-0-1921"></a>        <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span>
+<a id="__codelineno-0-1922" name="__codelineno-0-1922"></a>        <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
+<a id="__codelineno-0-1923" name="__codelineno-0-1923"></a>        <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span>
+<a id="__codelineno-0-1924" name="__codelineno-0-1924"></a>        <span class="o">**</span><span class="n">backend_kwargs</span><span class="p">,</span>
+<a id="__codelineno-0-1925" name="__codelineno-0-1925"></a>    <span class="p">)</span>
+<a id="__codelineno-0-1926" name="__codelineno-0-1926"></a>    <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
+<a id="__codelineno-0-1927" name="__codelineno-0-1927"></a>        <span class="k">return</span> <span class="n">facade</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="n">aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-1928" name="__codelineno-0-1928"></a>    <span class="k">return</span> <span class="n">facade</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="n">aggregate</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24321,15 +24321,7 @@ their canonical backend key here, so the list is one entry per backend.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/earthlens.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1923">1923</a></span>
-<span class="normal"><a href="#__codelineno-0-1924">1924</a></span>
-<span class="normal"><a href="#__codelineno-0-1925">1925</a></span>
-<span class="normal"><a href="#__codelineno-0-1926">1926</a></span>
-<span class="normal"><a href="#__codelineno-0-1927">1927</a></span>
-<span class="normal"><a href="#__codelineno-0-1928">1928</a></span>
-<span class="normal"><a href="#__codelineno-0-1929">1929</a></span>
-<span class="normal"><a href="#__codelineno-0-1930">1930</a></span>
-<span class="normal"><a href="#__codelineno-0-1931">1931</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1931">1931</a></span>
 <span class="normal"><a href="#__codelineno-0-1932">1932</a></span>
 <span class="normal"><a href="#__codelineno-0-1933">1933</a></span>
 <span class="normal"><a href="#__codelineno-0-1934">1934</a></span>
@@ -24358,44 +24350,52 @@ their canonical backend key here, so the list is one entry per backend.</p>
 <span class="normal"><a href="#__codelineno-0-1957">1957</a></span>
 <span class="normal"><a href="#__codelineno-0-1958">1958</a></span>
 <span class="normal"><a href="#__codelineno-0-1959">1959</a></span>
-<span class="normal"><a href="#__codelineno-0-1960">1960</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1923" name="__codelineno-0-1923"></a><span class="k">def</span><span class="w"> </span><span class="nf">sources</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-1924" name="__codelineno-0-1924"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sorted list of distinct backends, one canonical key each.</span>
-<a id="__codelineno-0-1925" name="__codelineno-0-1925"></a>
-<a id="__codelineno-0-1926" name="__codelineno-0-1926"></a><span class="sd">    The top-level discovery entry point — no class needed to see what</span>
-<a id="__codelineno-0-1927" name="__codelineno-0-1927"></a><span class="sd">    backends `earthlens.core.download(...)` / :class:`EarthLens` accept. Alias and</span>
-<a id="__codelineno-0-1928" name="__codelineno-0-1928"></a><span class="sd">    endpoint keys (`&quot;chirps&quot;` for `&quot;chc&quot;`, `&quot;google-earth-engine&quot;` for</span>
-<a id="__codelineno-0-1929" name="__codelineno-0-1929"></a><span class="sd">    `&quot;gee&quot;`, the STAC endpoint keys `&quot;planetary-computer&quot;` / `&quot;earth-search&quot;`</span>
-<a id="__codelineno-0-1930" name="__codelineno-0-1930"></a><span class="sd">    / `&quot;cdse&quot;`, …) still work as `data_source=` values but are collapsed to</span>
-<a id="__codelineno-0-1931" name="__codelineno-0-1931"></a><span class="sd">    their canonical backend key here, so the list is one entry per backend.</span>
-<a id="__codelineno-0-1932" name="__codelineno-0-1932"></a>
-<a id="__codelineno-0-1933" name="__codelineno-0-1933"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-1934" name="__codelineno-0-1934"></a><span class="sd">        The canonical `data_source` key of each registered backend, sorted.</span>
-<a id="__codelineno-0-1935" name="__codelineno-0-1935"></a>
-<a id="__codelineno-0-1936" name="__codelineno-0-1936"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-1937" name="__codelineno-0-1937"></a><span class="sd">        - The CHIRPS and GEE backends are listed by their canonical keys:</span>
-<a id="__codelineno-0-1938" name="__codelineno-0-1938"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-1939" name="__codelineno-0-1939"></a><span class="sd">            &gt;&gt;&gt; import earthlens.core</span>
-<a id="__codelineno-0-1940" name="__codelineno-0-1940"></a><span class="sd">            &gt;&gt;&gt; keys = earthlens.core.sources()</span>
-<a id="__codelineno-0-1941" name="__codelineno-0-1941"></a><span class="sd">            &gt;&gt;&gt; &quot;chc&quot; in keys and &quot;gee&quot; in keys</span>
-<a id="__codelineno-0-1942" name="__codelineno-0-1942"></a><span class="sd">            True</span>
+<span class="normal"><a href="#__codelineno-0-1960">1960</a></span>
+<span class="normal"><a href="#__codelineno-0-1961">1961</a></span>
+<span class="normal"><a href="#__codelineno-0-1962">1962</a></span>
+<span class="normal"><a href="#__codelineno-0-1963">1963</a></span>
+<span class="normal"><a href="#__codelineno-0-1964">1964</a></span>
+<span class="normal"><a href="#__codelineno-0-1965">1965</a></span>
+<span class="normal"><a href="#__codelineno-0-1966">1966</a></span>
+<span class="normal"><a href="#__codelineno-0-1967">1967</a></span>
+<span class="normal"><a href="#__codelineno-0-1968">1968</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1931" name="__codelineno-0-1931"></a><span class="k">def</span><span class="w"> </span><span class="nf">sources</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-1932" name="__codelineno-0-1932"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sorted list of distinct backends, one canonical key each.</span>
+<a id="__codelineno-0-1933" name="__codelineno-0-1933"></a>
+<a id="__codelineno-0-1934" name="__codelineno-0-1934"></a><span class="sd">    The top-level discovery entry point — no class needed to see what</span>
+<a id="__codelineno-0-1935" name="__codelineno-0-1935"></a><span class="sd">    backends `earthlens.core.download(...)` / :class:`EarthLens` accept. Alias and</span>
+<a id="__codelineno-0-1936" name="__codelineno-0-1936"></a><span class="sd">    endpoint keys (`&quot;chirps&quot;` for `&quot;chc&quot;`, `&quot;google-earth-engine&quot;` for</span>
+<a id="__codelineno-0-1937" name="__codelineno-0-1937"></a><span class="sd">    `&quot;gee&quot;`, the STAC endpoint keys `&quot;planetary-computer&quot;` / `&quot;earth-search&quot;`</span>
+<a id="__codelineno-0-1938" name="__codelineno-0-1938"></a><span class="sd">    / `&quot;cdse&quot;`, …) still work as `data_source=` values but are collapsed to</span>
+<a id="__codelineno-0-1939" name="__codelineno-0-1939"></a><span class="sd">    their canonical backend key here, so the list is one entry per backend.</span>
+<a id="__codelineno-0-1940" name="__codelineno-0-1940"></a>
+<a id="__codelineno-0-1941" name="__codelineno-0-1941"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-1942" name="__codelineno-0-1942"></a><span class="sd">        The canonical `data_source` key of each registered backend, sorted.</span>
 <a id="__codelineno-0-1943" name="__codelineno-0-1943"></a>
-<a id="__codelineno-0-1944" name="__codelineno-0-1944"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-1945" name="__codelineno-0-1945"></a><span class="sd">        - Aliases are collapsed, so each backend appears once:</span>
+<a id="__codelineno-0-1944" name="__codelineno-0-1944"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-1945" name="__codelineno-0-1945"></a><span class="sd">        - The CHIRPS and GEE backends are listed by their canonical keys:</span>
 <a id="__codelineno-0-1946" name="__codelineno-0-1946"></a><span class="sd">            ```python</span>
 <a id="__codelineno-0-1947" name="__codelineno-0-1947"></a><span class="sd">            &gt;&gt;&gt; import earthlens.core</span>
 <a id="__codelineno-0-1948" name="__codelineno-0-1948"></a><span class="sd">            &gt;&gt;&gt; keys = earthlens.core.sources()</span>
-<a id="__codelineno-0-1949" name="__codelineno-0-1949"></a><span class="sd">            &gt;&gt;&gt; &quot;chirps&quot; in keys or &quot;google-earth-engine&quot; in keys</span>
-<a id="__codelineno-0-1950" name="__codelineno-0-1950"></a><span class="sd">            False</span>
+<a id="__codelineno-0-1949" name="__codelineno-0-1949"></a><span class="sd">            &gt;&gt;&gt; &quot;chc&quot; in keys and &quot;gee&quot; in keys</span>
+<a id="__codelineno-0-1950" name="__codelineno-0-1950"></a><span class="sd">            True</span>
 <a id="__codelineno-0-1951" name="__codelineno-0-1951"></a>
 <a id="__codelineno-0-1952" name="__codelineno-0-1952"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-1953" name="__codelineno-0-1953"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1954" name="__codelineno-0-1954"></a>    <span class="n">seen_modules</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-<a id="__codelineno-0-1955" name="__codelineno-0-1955"></a>    <span class="n">canonical</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-1956" name="__codelineno-0-1956"></a>    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">_extras</span> <span class="ow">in</span> <span class="n">EarthLens</span><span class="o">.</span><span class="n">DataSources</span><span class="o">.</span><span class="n">entries</span><span class="p">():</span>
-<a id="__codelineno-0-1957" name="__codelineno-0-1957"></a>        <span class="k">if</span> <span class="n">module</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_modules</span><span class="p">:</span>
-<a id="__codelineno-0-1958" name="__codelineno-0-1958"></a>            <span class="n">seen_modules</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
-<a id="__codelineno-0-1959" name="__codelineno-0-1959"></a>            <span class="n">canonical</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-<a id="__codelineno-0-1960" name="__codelineno-0-1960"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">canonical</span><span class="p">)</span>
+<a id="__codelineno-0-1953" name="__codelineno-0-1953"></a><span class="sd">        - Aliases are collapsed, so each backend appears once:</span>
+<a id="__codelineno-0-1954" name="__codelineno-0-1954"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-1955" name="__codelineno-0-1955"></a><span class="sd">            &gt;&gt;&gt; import earthlens.core</span>
+<a id="__codelineno-0-1956" name="__codelineno-0-1956"></a><span class="sd">            &gt;&gt;&gt; keys = earthlens.core.sources()</span>
+<a id="__codelineno-0-1957" name="__codelineno-0-1957"></a><span class="sd">            &gt;&gt;&gt; &quot;chirps&quot; in keys or &quot;google-earth-engine&quot; in keys</span>
+<a id="__codelineno-0-1958" name="__codelineno-0-1958"></a><span class="sd">            False</span>
+<a id="__codelineno-0-1959" name="__codelineno-0-1959"></a>
+<a id="__codelineno-0-1960" name="__codelineno-0-1960"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-1961" name="__codelineno-0-1961"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1962" name="__codelineno-0-1962"></a>    <span class="n">seen_modules</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-0-1963" name="__codelineno-0-1963"></a>    <span class="n">canonical</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-1964" name="__codelineno-0-1964"></a>    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">_extras</span> <span class="ow">in</span> <span class="n">EarthLens</span><span class="o">.</span><span class="n">DataSources</span><span class="o">.</span><span class="n">entries</span><span class="p">():</span>
+<a id="__codelineno-0-1965" name="__codelineno-0-1965"></a>        <span class="k">if</span> <span class="n">module</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_modules</span><span class="p">:</span>
+<a id="__codelineno-0-1966" name="__codelineno-0-1966"></a>            <span class="n">seen_modules</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+<a id="__codelineno-0-1967" name="__codelineno-0-1967"></a>            <span class="n">canonical</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<a id="__codelineno-0-1968" name="__codelineno-0-1968"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">canonical</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24498,15 +24498,7 @@ failing the whole call — so the result covers the installed backends.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/earthlens.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2052">2052</a></span>
-<span class="normal"><a href="#__codelineno-0-2053">2053</a></span>
-<span class="normal"><a href="#__codelineno-0-2054">2054</a></span>
-<span class="normal"><a href="#__codelineno-0-2055">2055</a></span>
-<span class="normal"><a href="#__codelineno-0-2056">2056</a></span>
-<span class="normal"><a href="#__codelineno-0-2057">2057</a></span>
-<span class="normal"><a href="#__codelineno-0-2058">2058</a></span>
-<span class="normal"><a href="#__codelineno-0-2059">2059</a></span>
-<span class="normal"><a href="#__codelineno-0-2060">2060</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2060">2060</a></span>
 <span class="normal"><a href="#__codelineno-0-2061">2061</a></span>
 <span class="normal"><a href="#__codelineno-0-2062">2062</a></span>
 <span class="normal"><a href="#__codelineno-0-2063">2063</a></span>
@@ -24534,43 +24526,51 @@ failing the whole call — so the result covers the installed backends.</p>
 <span class="normal"><a href="#__codelineno-0-2085">2085</a></span>
 <span class="normal"><a href="#__codelineno-0-2086">2086</a></span>
 <span class="normal"><a href="#__codelineno-0-2087">2087</a></span>
-<span class="normal"><a href="#__codelineno-0-2088">2088</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2052" name="__codelineno-0-2052"></a><span class="k">def</span><span class="w"> </span><span class="nf">find</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-<a id="__codelineno-0-2053" name="__codelineno-0-2053"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find which sources expose a dataset matching `text`.</span>
-<a id="__codelineno-0-2054" name="__codelineno-0-2054"></a>
-<a id="__codelineno-0-2055" name="__codelineno-0-2055"></a><span class="sd">    A best-effort, cross-source discovery aid: it runs</span>
-<a id="__codelineno-0-2056" name="__codelineno-0-2056"></a><span class="sd">    :meth:`EarthLens.guess_dataset` (case-insensitive substring, then fuzzy)</span>
-<a id="__codelineno-0-2057" name="__codelineno-0-2057"></a><span class="sd">    against every registered source and collects the hits. A source whose SDK</span>
-<a id="__codelineno-0-2058" name="__codelineno-0-2058"></a><span class="sd">    is not installed, or that has no free-text catalog, is skipped rather than</span>
-<a id="__codelineno-0-2059" name="__codelineno-0-2059"></a><span class="sd">    failing the whole call — so the result covers the installed backends.</span>
-<a id="__codelineno-0-2060" name="__codelineno-0-2060"></a>
-<a id="__codelineno-0-2061" name="__codelineno-0-2061"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-2062" name="__codelineno-0-2062"></a><span class="sd">        text: Free-text dataset query, e.g. `&quot;precipitation&quot;` or `&quot;era5&quot;`.</span>
-<a id="__codelineno-0-2063" name="__codelineno-0-2063"></a>
-<a id="__codelineno-0-2064" name="__codelineno-0-2064"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-2065" name="__codelineno-0-2065"></a><span class="sd">        A mapping `{data_source: [matching dataset key, ...]}` for every</span>
-<a id="__codelineno-0-2066" name="__codelineno-0-2066"></a><span class="sd">        source with at least one match, in sorted-source order.</span>
-<a id="__codelineno-0-2067" name="__codelineno-0-2067"></a>
-<a id="__codelineno-0-2068" name="__codelineno-0-2068"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-2069" name="__codelineno-0-2069"></a><span class="sd">        - Find sources whose catalog mentions precipitation (live; skipped):</span>
-<a id="__codelineno-0-2070" name="__codelineno-0-2070"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-2071" name="__codelineno-0-2071"></a><span class="sd">            &gt;&gt;&gt; import earthlens.core</span>
-<a id="__codelineno-0-2072" name="__codelineno-0-2072"></a><span class="sd">            &gt;&gt;&gt; earthlens.core.find(&quot;precipitation&quot;)  # doctest: +SKIP</span>
-<a id="__codelineno-0-2073" name="__codelineno-0-2073"></a><span class="sd">            {&#39;chc&#39;: [&#39;global-daily&#39;, ...], ...}</span>
-<a id="__codelineno-0-2074" name="__codelineno-0-2074"></a>
-<a id="__codelineno-0-2075" name="__codelineno-0-2075"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-2076" name="__codelineno-0-2076"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2077" name="__codelineno-0-2077"></a>    <span class="n">matches</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-2078" name="__codelineno-0-2078"></a>    <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">():</span>
-<a id="__codelineno-0-2079" name="__codelineno-0-2079"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-2080" name="__codelineno-0-2080"></a>            <span class="n">hits</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="o">.</span><span class="n">guess_dataset</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
-<a id="__codelineno-0-2081" name="__codelineno-0-2081"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - skip uninstalled / catalog-less backends</span>
-<a id="__codelineno-0-2082" name="__codelineno-0-2082"></a>            <span class="c1"># Log (rather than silently drop) so a real `guess_dataset`</span>
-<a id="__codelineno-0-2083" name="__codelineno-0-2083"></a>            <span class="c1"># bug is traceable instead of just under-reporting.</span>
-<a id="__codelineno-0-2084" name="__codelineno-0-2084"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;find(): skipping </span><span class="si">{</span><span class="n">source</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-2085" name="__codelineno-0-2085"></a>            <span class="k">continue</span>
-<a id="__codelineno-0-2086" name="__codelineno-0-2086"></a>        <span class="k">if</span> <span class="n">hits</span><span class="p">:</span>
-<a id="__codelineno-0-2087" name="__codelineno-0-2087"></a>            <span class="n">matches</span><span class="p">[</span><span class="n">source</span><span class="p">]</span> <span class="o">=</span> <span class="n">hits</span>
-<a id="__codelineno-0-2088" name="__codelineno-0-2088"></a>    <span class="k">return</span> <span class="n">matches</span>
+<span class="normal"><a href="#__codelineno-0-2088">2088</a></span>
+<span class="normal"><a href="#__codelineno-0-2089">2089</a></span>
+<span class="normal"><a href="#__codelineno-0-2090">2090</a></span>
+<span class="normal"><a href="#__codelineno-0-2091">2091</a></span>
+<span class="normal"><a href="#__codelineno-0-2092">2092</a></span>
+<span class="normal"><a href="#__codelineno-0-2093">2093</a></span>
+<span class="normal"><a href="#__codelineno-0-2094">2094</a></span>
+<span class="normal"><a href="#__codelineno-0-2095">2095</a></span>
+<span class="normal"><a href="#__codelineno-0-2096">2096</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2060" name="__codelineno-0-2060"></a><span class="k">def</span><span class="w"> </span><span class="nf">find</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<a id="__codelineno-0-2061" name="__codelineno-0-2061"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find which sources expose a dataset matching `text`.</span>
+<a id="__codelineno-0-2062" name="__codelineno-0-2062"></a>
+<a id="__codelineno-0-2063" name="__codelineno-0-2063"></a><span class="sd">    A best-effort, cross-source discovery aid: it runs</span>
+<a id="__codelineno-0-2064" name="__codelineno-0-2064"></a><span class="sd">    :meth:`EarthLens.guess_dataset` (case-insensitive substring, then fuzzy)</span>
+<a id="__codelineno-0-2065" name="__codelineno-0-2065"></a><span class="sd">    against every registered source and collects the hits. A source whose SDK</span>
+<a id="__codelineno-0-2066" name="__codelineno-0-2066"></a><span class="sd">    is not installed, or that has no free-text catalog, is skipped rather than</span>
+<a id="__codelineno-0-2067" name="__codelineno-0-2067"></a><span class="sd">    failing the whole call — so the result covers the installed backends.</span>
+<a id="__codelineno-0-2068" name="__codelineno-0-2068"></a>
+<a id="__codelineno-0-2069" name="__codelineno-0-2069"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-2070" name="__codelineno-0-2070"></a><span class="sd">        text: Free-text dataset query, e.g. `&quot;precipitation&quot;` or `&quot;era5&quot;`.</span>
+<a id="__codelineno-0-2071" name="__codelineno-0-2071"></a>
+<a id="__codelineno-0-2072" name="__codelineno-0-2072"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-2073" name="__codelineno-0-2073"></a><span class="sd">        A mapping `{data_source: [matching dataset key, ...]}` for every</span>
+<a id="__codelineno-0-2074" name="__codelineno-0-2074"></a><span class="sd">        source with at least one match, in sorted-source order.</span>
+<a id="__codelineno-0-2075" name="__codelineno-0-2075"></a>
+<a id="__codelineno-0-2076" name="__codelineno-0-2076"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-2077" name="__codelineno-0-2077"></a><span class="sd">        - Find sources whose catalog mentions precipitation (live; skipped):</span>
+<a id="__codelineno-0-2078" name="__codelineno-0-2078"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-2079" name="__codelineno-0-2079"></a><span class="sd">            &gt;&gt;&gt; import earthlens.core</span>
+<a id="__codelineno-0-2080" name="__codelineno-0-2080"></a><span class="sd">            &gt;&gt;&gt; earthlens.core.find(&quot;precipitation&quot;)  # doctest: +SKIP</span>
+<a id="__codelineno-0-2081" name="__codelineno-0-2081"></a><span class="sd">            {&#39;chc&#39;: [&#39;global-daily&#39;, ...], ...}</span>
+<a id="__codelineno-0-2082" name="__codelineno-0-2082"></a>
+<a id="__codelineno-0-2083" name="__codelineno-0-2083"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-2084" name="__codelineno-0-2084"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2085" name="__codelineno-0-2085"></a>    <span class="n">matches</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-2086" name="__codelineno-0-2086"></a>    <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">():</span>
+<a id="__codelineno-0-2087" name="__codelineno-0-2087"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-2088" name="__codelineno-0-2088"></a>            <span class="n">hits</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="o">.</span><span class="n">guess_dataset</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+<a id="__codelineno-0-2089" name="__codelineno-0-2089"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - skip uninstalled / catalog-less backends</span>
+<a id="__codelineno-0-2090" name="__codelineno-0-2090"></a>            <span class="c1"># Log (rather than silently drop) so a real `guess_dataset`</span>
+<a id="__codelineno-0-2091" name="__codelineno-0-2091"></a>            <span class="c1"># bug is traceable instead of just under-reporting.</span>
+<a id="__codelineno-0-2092" name="__codelineno-0-2092"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;find(): skipping </span><span class="si">{</span><span class="n">source</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-2093" name="__codelineno-0-2093"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-2094" name="__codelineno-0-2094"></a>        <span class="k">if</span> <span class="n">hits</span><span class="p">:</span>
+<a id="__codelineno-0-2095" name="__codelineno-0-2095"></a>            <span class="n">matches</span><span class="p">[</span><span class="n">source</span><span class="p">]</span> <span class="o">=</span> <span class="n">hits</span>
+<a id="__codelineno-0-2096" name="__codelineno-0-2096"></a>    <span class="k">return</span> <span class="n">matches</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24922,15 +24922,7 @@ list (see :meth:<code>EarthLens.search</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/earthlens.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1963">1963</a></span>
-<span class="normal"><a href="#__codelineno-0-1964">1964</a></span>
-<span class="normal"><a href="#__codelineno-0-1965">1965</a></span>
-<span class="normal"><a href="#__codelineno-0-1966">1966</a></span>
-<span class="normal"><a href="#__codelineno-0-1967">1967</a></span>
-<span class="normal"><a href="#__codelineno-0-1968">1968</a></span>
-<span class="normal"><a href="#__codelineno-0-1969">1969</a></span>
-<span class="normal"><a href="#__codelineno-0-1970">1970</a></span>
-<span class="normal"><a href="#__codelineno-0-1971">1971</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1971">1971</a></span>
 <span class="normal"><a href="#__codelineno-0-1972">1972</a></span>
 <span class="normal"><a href="#__codelineno-0-1973">1973</a></span>
 <span class="normal"><a href="#__codelineno-0-1974">1974</a></span>
@@ -25008,93 +25000,101 @@ list (see :meth:<code>EarthLens.search</code>).</p>
 <span class="normal"><a href="#__codelineno-0-2046">2046</a></span>
 <span class="normal"><a href="#__codelineno-0-2047">2047</a></span>
 <span class="normal"><a href="#__codelineno-0-2048">2048</a></span>
-<span class="normal"><a href="#__codelineno-0-2049">2049</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1963" name="__codelineno-0-1963"></a><span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span>
-<a id="__codelineno-0-1964" name="__codelineno-0-1964"></a>    <span class="n">data_source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;chc&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-1965" name="__codelineno-0-1965"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-1966" name="__codelineno-0-1966"></a>    <span class="n">variables</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1967" name="__codelineno-0-1967"></a>    <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1968" name="__codelineno-0-1968"></a>    <span class="n">start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1969" name="__codelineno-0-1969"></a>    <span class="n">end</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1970" name="__codelineno-0-1970"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1971" name="__codelineno-0-1971"></a>    <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1972" name="__codelineno-0-1972"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1973" name="__codelineno-0-1973"></a>    <span class="n">aoi</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1974" name="__codelineno-0-1974"></a>    <span class="n">buffer</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1975" name="__codelineno-0-1975"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;daily&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-1976" name="__codelineno-0-1976"></a>    <span class="n">cadence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1977" name="__codelineno-0-1977"></a>    <span class="n">time</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1978" name="__codelineno-0-1978"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-1979" name="__codelineno-0-1979"></a>    <span class="o">**</span><span class="n">backend_kwargs</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
-<a id="__codelineno-0-1980" name="__codelineno-0-1980"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-1981" name="__codelineno-0-1981"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct an :class:`EarthLens` and run a dry-run `search` in one call.</span>
-<a id="__codelineno-0-1982" name="__codelineno-0-1982"></a>
-<a id="__codelineno-0-1983" name="__codelineno-0-1983"></a><span class="sd">    The one-shot counterpart to :func:`download` for the search→fetch split:</span>
-<a id="__codelineno-0-1984" name="__codelineno-0-1984"></a><span class="sd">    it forwards every request argument to :class:`EarthLens` and returns</span>
-<a id="__codelineno-0-1985" name="__codelineno-0-1985"></a><span class="sd">    :meth:`EarthLens.search` — the products a download *would* fetch — without</span>
-<a id="__codelineno-0-1986" name="__codelineno-0-1986"></a><span class="sd">    downloading anything.</span>
-<a id="__codelineno-0-1987" name="__codelineno-0-1987"></a>
-<a id="__codelineno-0-1988" name="__codelineno-0-1988"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-1989" name="__codelineno-0-1989"></a><span class="sd">        data_source: Backend key (see :func:`sources`). Defaults to `&quot;chc&quot;`.</span>
-<a id="__codelineno-0-1990" name="__codelineno-0-1990"></a><span class="sd">        variables: Variable specification, as for :class:`EarthLens`.</span>
-<a id="__codelineno-0-1991" name="__codelineno-0-1991"></a><span class="sd">        dataset: Explicit dataset / collection key.</span>
-<a id="__codelineno-0-1992" name="__codelineno-0-1992"></a><span class="sd">        start: Inclusive start date (string / `datetime` / `date`).</span>
-<a id="__codelineno-0-1993" name="__codelineno-0-1993"></a><span class="sd">        end: Inclusive end date.</span>
-<a id="__codelineno-0-1994" name="__codelineno-0-1994"></a><span class="sd">        time: A single time range (`&quot;a/b&quot;` string / `(a, b)` pair / `slice` /</span>
-<a id="__codelineno-0-1995" name="__codelineno-0-1995"></a><span class="sd">            single date) — the ergonomic alternative to `start` / `end`;</span>
-<a id="__codelineno-0-1996" name="__codelineno-0-1996"></a><span class="sd">            mutually exclusive with them.</span>
-<a id="__codelineno-0-1997" name="__codelineno-0-1997"></a><span class="sd">        path: Output directory (unused by a dry-run search, but accepted for</span>
-<a id="__codelineno-0-1998" name="__codelineno-0-1998"></a><span class="sd">            signature parity with :func:`download`).</span>
-<a id="__codelineno-0-1999" name="__codelineno-0-1999"></a><span class="sd">        lat_lim: Legacy `[lat_min, lat_max]` pair — prefer `aoi=` (mutually</span>
-<a id="__codelineno-0-2000" name="__codelineno-0-2000"></a><span class="sd">            exclusive with it).</span>
-<a id="__codelineno-0-2001" name="__codelineno-0-2001"></a><span class="sd">        lon_lim: Legacy `[lon_min, lon_max]` pair — prefer `aoi=` (mutually</span>
-<a id="__codelineno-0-2002" name="__codelineno-0-2002"></a><span class="sd">            exclusive with it).</span>
-<a id="__codelineno-0-2003" name="__codelineno-0-2003"></a><span class="sd">        aoi: A single area-of-interest (bbox / point+`buffer` / geometry).</span>
-<a id="__codelineno-0-2004" name="__codelineno-0-2004"></a><span class="sd">        buffer: Half-width in degrees for a point `aoi`.</span>
-<a id="__codelineno-0-2005" name="__codelineno-0-2005"></a><span class="sd">        temporal_resolution: Backend cadence / label. Defaults to `&quot;daily&quot;`.</span>
-<a id="__codelineno-0-2006" name="__codelineno-0-2006"></a><span class="sd">        cadence: Clearer alias for `temporal_resolution`.</span>
-<a id="__codelineno-0-2007" name="__codelineno-0-2007"></a><span class="sd">        fmt: `strptime` format override for string dates.</span>
-<a id="__codelineno-0-2008" name="__codelineno-0-2008"></a><span class="sd">        **backend_kwargs: Extra backend-specific options.</span>
-<a id="__codelineno-0-2009" name="__codelineno-0-2009"></a>
-<a id="__codelineno-0-2010" name="__codelineno-0-2010"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-2011" name="__codelineno-0-2011"></a><span class="sd">        One :class:`~earthlens.base.RemoteProduct` per matching item.</span>
-<a id="__codelineno-0-2012" name="__codelineno-0-2012"></a>
-<a id="__codelineno-0-2013" name="__codelineno-0-2013"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-2014" name="__codelineno-0-2014"></a><span class="sd">        NotImplementedError: If the backend exposes no searchable product</span>
-<a id="__codelineno-0-2015" name="__codelineno-0-2015"></a><span class="sd">            list (see :meth:`EarthLens.search`).</span>
-<a id="__codelineno-0-2016" name="__codelineno-0-2016"></a>
-<a id="__codelineno-0-2017" name="__codelineno-0-2017"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-2018" name="__codelineno-0-2018"></a><span class="sd">        - Dry-run a STAC search and inspect the first product id (live;</span>
-<a id="__codelineno-0-2019" name="__codelineno-0-2019"></a><span class="sd">          skipped here because it queries a remote catalog):</span>
-<a id="__codelineno-0-2020" name="__codelineno-0-2020"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-2021" name="__codelineno-0-2021"></a><span class="sd">            &gt;&gt;&gt; import earthlens.core</span>
-<a id="__codelineno-0-2022" name="__codelineno-0-2022"></a><span class="sd">            &gt;&gt;&gt; products = earthlens.core.search(  # doctest: +SKIP</span>
-<a id="__codelineno-0-2023" name="__codelineno-0-2023"></a><span class="sd">            ...     &quot;stac&quot;,</span>
-<a id="__codelineno-0-2024" name="__codelineno-0-2024"></a><span class="sd">            ...     dataset=&quot;sentinel-2-l2a&quot;,</span>
-<a id="__codelineno-0-2025" name="__codelineno-0-2025"></a><span class="sd">            ...     variables=[&quot;red&quot;],</span>
-<a id="__codelineno-0-2026" name="__codelineno-0-2026"></a><span class="sd">            ...     start=&quot;2020-06-01&quot;, end=&quot;2020-06-30&quot;,</span>
-<a id="__codelineno-0-2027" name="__codelineno-0-2027"></a><span class="sd">            ...     aoi=[-75, 4, -74, 5],</span>
-<a id="__codelineno-0-2028" name="__codelineno-0-2028"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-2029" name="__codelineno-0-2029"></a><span class="sd">            &gt;&gt;&gt; products[0].id  # doctest: +SKIP</span>
-<a id="__codelineno-0-2030" name="__codelineno-0-2030"></a>
-<a id="__codelineno-0-2031" name="__codelineno-0-2031"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-2032" name="__codelineno-0-2032"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2033" name="__codelineno-0-2033"></a>    <span class="k">return</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-0-2034" name="__codelineno-0-2034"></a>        <span class="n">data_source</span><span class="o">=</span><span class="n">data_source</span><span class="p">,</span>
-<a id="__codelineno-0-2035" name="__codelineno-0-2035"></a>        <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span>
-<a id="__codelineno-0-2036" name="__codelineno-0-2036"></a>        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-<a id="__codelineno-0-2037" name="__codelineno-0-2037"></a>        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
-<a id="__codelineno-0-2038" name="__codelineno-0-2038"></a>        <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
-<a id="__codelineno-0-2039" name="__codelineno-0-2039"></a>        <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-<a id="__codelineno-0-2040" name="__codelineno-0-2040"></a>        <span class="n">lat_lim</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">,</span>
-<a id="__codelineno-0-2041" name="__codelineno-0-2041"></a>        <span class="n">lon_lim</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">,</span>
-<a id="__codelineno-0-2042" name="__codelineno-0-2042"></a>        <span class="n">aoi</span><span class="o">=</span><span class="n">aoi</span><span class="p">,</span>
-<a id="__codelineno-0-2043" name="__codelineno-0-2043"></a>        <span class="n">buffer</span><span class="o">=</span><span class="n">buffer</span><span class="p">,</span>
-<a id="__codelineno-0-2044" name="__codelineno-0-2044"></a>        <span class="n">temporal_resolution</span><span class="o">=</span><span class="n">temporal_resolution</span><span class="p">,</span>
-<a id="__codelineno-0-2045" name="__codelineno-0-2045"></a>        <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span>
-<a id="__codelineno-0-2046" name="__codelineno-0-2046"></a>        <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
-<a id="__codelineno-0-2047" name="__codelineno-0-2047"></a>        <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span>
-<a id="__codelineno-0-2048" name="__codelineno-0-2048"></a>        <span class="o">**</span><span class="n">backend_kwargs</span><span class="p">,</span>
-<a id="__codelineno-0-2049" name="__codelineno-0-2049"></a>    <span class="p">)</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-2049">2049</a></span>
+<span class="normal"><a href="#__codelineno-0-2050">2050</a></span>
+<span class="normal"><a href="#__codelineno-0-2051">2051</a></span>
+<span class="normal"><a href="#__codelineno-0-2052">2052</a></span>
+<span class="normal"><a href="#__codelineno-0-2053">2053</a></span>
+<span class="normal"><a href="#__codelineno-0-2054">2054</a></span>
+<span class="normal"><a href="#__codelineno-0-2055">2055</a></span>
+<span class="normal"><a href="#__codelineno-0-2056">2056</a></span>
+<span class="normal"><a href="#__codelineno-0-2057">2057</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1971" name="__codelineno-0-1971"></a><span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span>
+<a id="__codelineno-0-1972" name="__codelineno-0-1972"></a>    <span class="n">data_source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;chc&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-1973" name="__codelineno-0-1973"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-1974" name="__codelineno-0-1974"></a>    <span class="n">variables</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1975" name="__codelineno-0-1975"></a>    <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1976" name="__codelineno-0-1976"></a>    <span class="n">start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1977" name="__codelineno-0-1977"></a>    <span class="n">end</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1978" name="__codelineno-0-1978"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1979" name="__codelineno-0-1979"></a>    <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1980" name="__codelineno-0-1980"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1981" name="__codelineno-0-1981"></a>    <span class="n">aoi</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1982" name="__codelineno-0-1982"></a>    <span class="n">buffer</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1983" name="__codelineno-0-1983"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;daily&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-1984" name="__codelineno-0-1984"></a>    <span class="n">cadence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1985" name="__codelineno-0-1985"></a>    <span class="n">time</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1986" name="__codelineno-0-1986"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-1987" name="__codelineno-0-1987"></a>    <span class="o">**</span><span class="n">backend_kwargs</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+<a id="__codelineno-0-1988" name="__codelineno-0-1988"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-1989" name="__codelineno-0-1989"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct an :class:`EarthLens` and run a dry-run `search` in one call.</span>
+<a id="__codelineno-0-1990" name="__codelineno-0-1990"></a>
+<a id="__codelineno-0-1991" name="__codelineno-0-1991"></a><span class="sd">    The one-shot counterpart to :func:`download` for the search→fetch split:</span>
+<a id="__codelineno-0-1992" name="__codelineno-0-1992"></a><span class="sd">    it forwards every request argument to :class:`EarthLens` and returns</span>
+<a id="__codelineno-0-1993" name="__codelineno-0-1993"></a><span class="sd">    :meth:`EarthLens.search` — the products a download *would* fetch — without</span>
+<a id="__codelineno-0-1994" name="__codelineno-0-1994"></a><span class="sd">    downloading anything.</span>
+<a id="__codelineno-0-1995" name="__codelineno-0-1995"></a>
+<a id="__codelineno-0-1996" name="__codelineno-0-1996"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-1997" name="__codelineno-0-1997"></a><span class="sd">        data_source: Backend key (see :func:`sources`). Defaults to `&quot;chc&quot;`.</span>
+<a id="__codelineno-0-1998" name="__codelineno-0-1998"></a><span class="sd">        variables: Variable specification, as for :class:`EarthLens`.</span>
+<a id="__codelineno-0-1999" name="__codelineno-0-1999"></a><span class="sd">        dataset: Explicit dataset / collection key.</span>
+<a id="__codelineno-0-2000" name="__codelineno-0-2000"></a><span class="sd">        start: Inclusive start date (string / `datetime` / `date`).</span>
+<a id="__codelineno-0-2001" name="__codelineno-0-2001"></a><span class="sd">        end: Inclusive end date.</span>
+<a id="__codelineno-0-2002" name="__codelineno-0-2002"></a><span class="sd">        time: A single time range (`&quot;a/b&quot;` string / `(a, b)` pair / `slice` /</span>
+<a id="__codelineno-0-2003" name="__codelineno-0-2003"></a><span class="sd">            single date) — the ergonomic alternative to `start` / `end`;</span>
+<a id="__codelineno-0-2004" name="__codelineno-0-2004"></a><span class="sd">            mutually exclusive with them.</span>
+<a id="__codelineno-0-2005" name="__codelineno-0-2005"></a><span class="sd">        path: Output directory (unused by a dry-run search, but accepted for</span>
+<a id="__codelineno-0-2006" name="__codelineno-0-2006"></a><span class="sd">            signature parity with :func:`download`).</span>
+<a id="__codelineno-0-2007" name="__codelineno-0-2007"></a><span class="sd">        lat_lim: Legacy `[lat_min, lat_max]` pair — prefer `aoi=` (mutually</span>
+<a id="__codelineno-0-2008" name="__codelineno-0-2008"></a><span class="sd">            exclusive with it).</span>
+<a id="__codelineno-0-2009" name="__codelineno-0-2009"></a><span class="sd">        lon_lim: Legacy `[lon_min, lon_max]` pair — prefer `aoi=` (mutually</span>
+<a id="__codelineno-0-2010" name="__codelineno-0-2010"></a><span class="sd">            exclusive with it).</span>
+<a id="__codelineno-0-2011" name="__codelineno-0-2011"></a><span class="sd">        aoi: A single area-of-interest (bbox / point+`buffer` / geometry).</span>
+<a id="__codelineno-0-2012" name="__codelineno-0-2012"></a><span class="sd">        buffer: Half-width in degrees for a point `aoi`.</span>
+<a id="__codelineno-0-2013" name="__codelineno-0-2013"></a><span class="sd">        temporal_resolution: Backend cadence / label. Defaults to `&quot;daily&quot;`.</span>
+<a id="__codelineno-0-2014" name="__codelineno-0-2014"></a><span class="sd">        cadence: Clearer alias for `temporal_resolution`.</span>
+<a id="__codelineno-0-2015" name="__codelineno-0-2015"></a><span class="sd">        fmt: `strptime` format override for string dates.</span>
+<a id="__codelineno-0-2016" name="__codelineno-0-2016"></a><span class="sd">        **backend_kwargs: Extra backend-specific options.</span>
+<a id="__codelineno-0-2017" name="__codelineno-0-2017"></a>
+<a id="__codelineno-0-2018" name="__codelineno-0-2018"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-2019" name="__codelineno-0-2019"></a><span class="sd">        One :class:`~earthlens.base.RemoteProduct` per matching item.</span>
+<a id="__codelineno-0-2020" name="__codelineno-0-2020"></a>
+<a id="__codelineno-0-2021" name="__codelineno-0-2021"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-2022" name="__codelineno-0-2022"></a><span class="sd">        NotImplementedError: If the backend exposes no searchable product</span>
+<a id="__codelineno-0-2023" name="__codelineno-0-2023"></a><span class="sd">            list (see :meth:`EarthLens.search`).</span>
+<a id="__codelineno-0-2024" name="__codelineno-0-2024"></a>
+<a id="__codelineno-0-2025" name="__codelineno-0-2025"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-2026" name="__codelineno-0-2026"></a><span class="sd">        - Dry-run a STAC search and inspect the first product id (live;</span>
+<a id="__codelineno-0-2027" name="__codelineno-0-2027"></a><span class="sd">          skipped here because it queries a remote catalog):</span>
+<a id="__codelineno-0-2028" name="__codelineno-0-2028"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-2029" name="__codelineno-0-2029"></a><span class="sd">            &gt;&gt;&gt; import earthlens.core</span>
+<a id="__codelineno-0-2030" name="__codelineno-0-2030"></a><span class="sd">            &gt;&gt;&gt; products = earthlens.core.search(  # doctest: +SKIP</span>
+<a id="__codelineno-0-2031" name="__codelineno-0-2031"></a><span class="sd">            ...     &quot;stac&quot;,</span>
+<a id="__codelineno-0-2032" name="__codelineno-0-2032"></a><span class="sd">            ...     dataset=&quot;sentinel-2-l2a&quot;,</span>
+<a id="__codelineno-0-2033" name="__codelineno-0-2033"></a><span class="sd">            ...     variables=[&quot;red&quot;],</span>
+<a id="__codelineno-0-2034" name="__codelineno-0-2034"></a><span class="sd">            ...     start=&quot;2020-06-01&quot;, end=&quot;2020-06-30&quot;,</span>
+<a id="__codelineno-0-2035" name="__codelineno-0-2035"></a><span class="sd">            ...     aoi=[-75, 4, -74, 5],</span>
+<a id="__codelineno-0-2036" name="__codelineno-0-2036"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-2037" name="__codelineno-0-2037"></a><span class="sd">            &gt;&gt;&gt; products[0].id  # doctest: +SKIP</span>
+<a id="__codelineno-0-2038" name="__codelineno-0-2038"></a>
+<a id="__codelineno-0-2039" name="__codelineno-0-2039"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-2040" name="__codelineno-0-2040"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2041" name="__codelineno-0-2041"></a>    <span class="k">return</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-2042" name="__codelineno-0-2042"></a>        <span class="n">data_source</span><span class="o">=</span><span class="n">data_source</span><span class="p">,</span>
+<a id="__codelineno-0-2043" name="__codelineno-0-2043"></a>        <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span>
+<a id="__codelineno-0-2044" name="__codelineno-0-2044"></a>        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+<a id="__codelineno-0-2045" name="__codelineno-0-2045"></a>        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+<a id="__codelineno-0-2046" name="__codelineno-0-2046"></a>        <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+<a id="__codelineno-0-2047" name="__codelineno-0-2047"></a>        <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+<a id="__codelineno-0-2048" name="__codelineno-0-2048"></a>        <span class="n">lat_lim</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">,</span>
+<a id="__codelineno-0-2049" name="__codelineno-0-2049"></a>        <span class="n">lon_lim</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">,</span>
+<a id="__codelineno-0-2050" name="__codelineno-0-2050"></a>        <span class="n">aoi</span><span class="o">=</span><span class="n">aoi</span><span class="p">,</span>
+<a id="__codelineno-0-2051" name="__codelineno-0-2051"></a>        <span class="n">buffer</span><span class="o">=</span><span class="n">buffer</span><span class="p">,</span>
+<a id="__codelineno-0-2052" name="__codelineno-0-2052"></a>        <span class="n">temporal_resolution</span><span class="o">=</span><span class="n">temporal_resolution</span><span class="p">,</span>
+<a id="__codelineno-0-2053" name="__codelineno-0-2053"></a>        <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span>
+<a id="__codelineno-0-2054" name="__codelineno-0-2054"></a>        <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
+<a id="__codelineno-0-2055" name="__codelineno-0-2055"></a>        <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span>
+<a id="__codelineno-0-2056" name="__codelineno-0-2056"></a>        <span class="o">**</span><span class="n">backend_kwargs</span><span class="p">,</span>
+<a id="__codelineno-0-2057" name="__codelineno-0-2057"></a>    <span class="p">)</span><span class="o">.</span><span class="n">search</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
