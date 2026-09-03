@@ -285,11 +285,6 @@ class STAC(LazyClientMixin, AbstractDataSource):
         for collection_key, requested in self.vars.items():
             collection = self._catalog.get_collection(collection_key)
             assets = list(requested) or list(collection.default_assets)
-            # The endpoint may publish a band under a different key than the
-            # catalog names it by (CDSE splits Sentinel-2 per resolution).
-            assets = self._catalog.resolve_assets(
-                self._endpoint, collection_key, assets
-            )
             resolved_id = self._catalog.resolve(self._endpoint, collection_key)
             for bbox in self._bboxes():
                 search = self.client.search(
@@ -357,8 +352,17 @@ class STAC(LazyClientMixin, AbstractDataSource):
                     # signer's sign_href (SAS graft / CDSE /vsis3 rewrite /
                     # no-op for requester-pays); _to_vsi then normalises a
                     # left-over s3:// to the GDAL /vsis3/ path.
+                    # Only the item lookup takes the endpoint's own key (CDSE
+                    # splits Sentinel-2 per resolution, so `B04` is `B04_10m`
+                    # there). `assets` itself stays in the catalog's naming, so
+                    # the nodata lookup and the written band names still match.
+                    item_key = self._catalog.resolve_assets(
+                        self._endpoint, collection_key, [band]
+                    )[0]
                     hrefs = [
-                        _to_vsi(resolved_href(p.metadata["item"], band, signer=signer))
+                        _to_vsi(
+                            resolved_href(p.metadata["item"], item_key, signer=signer)
+                        )
                         for p in group
                     ]
                     tmp = Path(self.root_dir) / f".{safe_key}_{band}_{date}_{idx}.tif"
