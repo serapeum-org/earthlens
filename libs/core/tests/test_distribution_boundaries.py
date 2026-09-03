@@ -1661,6 +1661,20 @@ class TestNoDirectGdal:
                 f"{name} is allowed to import GDAL but no function does; the "
                 "import must live in the function that needs it, not at module scope"
             )
+            # Everything `sites` found is inside a function; anything else in the
+            # file is at module (or class) scope, which is the arrangement the
+            # rule forbids and which the per-function loop below cannot see.
+            in_a_function = {id(node) for _, node in sites}
+            stray = sorted(
+                node.lineno
+                for node in ast.walk(tree)
+                if _is_banned_gis_import(node) and id(node) not in in_a_function
+            )
+            assert not stray, (
+                f"{name} imports GDAL at module scope (line {stray}); it belongs "
+                "inside the function that needs it, so the cost is paid only on "
+                "that path and pyramids is guaranteed to have run first"
+            )
             for func, node in sites:
                 first = [
                     other.lineno
