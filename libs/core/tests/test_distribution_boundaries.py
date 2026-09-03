@@ -148,10 +148,15 @@ def _is_banned_gis_import(node: ast.AST) -> bool:
 
 
 def _imports_pyramids(node: ast.AST) -> bool:
-    """Return whether `node` is `import pyramids` (the vendoring side effect)."""
-    return isinstance(node, ast.Import) and any(
-        alias.name.split(".", 1)[0] == "pyramids" for alias in node.names
-    )
+    """Return whether `node` imports pyramids in any form that vendors osgeo."""
+    if isinstance(node, ast.Import):
+        return any(alias.name.split(".", 1)[0] == "pyramids" for alias in node.names)
+    if isinstance(node, ast.ImportFrom):
+        # `from pyramids import dataset` imports the PACKAGE first and runs its
+        # __init__, so it puts the vendored osgeo on the path exactly as a plain
+        # `import pyramids` does. Rejecting this form would fail correct code.
+        return (node.module or "").split(".", 1)[0] == "pyramids"
+    return False
 
 
 _SOURCES = _provider_sources()
@@ -1750,13 +1755,15 @@ class TestGdalGuardDetection:
         assert not _is_banned_gis_import(innocent)
         assert not _is_banned_gis_import(call)
 
-    def test_imports_pyramids_matches_only_the_vendoring_import(self):
-        """The pyramids predicate is what makes the ordering assertion meaningful."""
-        plain = ast.parse("import pyramids").body[0]
-        submodule = ast.parse("import pyramids.dataset").body[0]
-        from_form = ast.parse("from pyramids import dataset").body[0]
-        assert _imports_pyramids(plain)
-        assert _imports_pyramids(submodule)
-        assert not _imports_pyramids(from_form), (
-            "a from-import does not run the package side effect that vendors osgeo"
-        )
+    def test_imports_pyramids_matches_every_vendoring_form(self):
+        """Any import that loads the pyramids package counts, from-imports included."""
+        vendoring = [
+            "import pyramids",
+            "import pyramids.dataset",
+            "from pyramids import dataset",
+            "from pyramids.dataset import Dataset",
+        ]
+        for source in vendoring:
+            node = ast.parse(source).body[0]
+            assert _imports_pyramids(node), f"{source!r} does vendor osgeo"
+        assert not _imports_pyramids(ast.parse("from json import loads").body[0])
