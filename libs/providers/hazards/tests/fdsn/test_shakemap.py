@@ -443,6 +443,9 @@ class TestFltToGeotiff:
         assert dataset.driver_type == "geotiff"
         assert dataset.columns == _COLS
         assert dataset.rows == _ROWS
+        # pyramids resolves this through AutoIdentifyEPSG rather than
+        # matching digits in the WKT, so a projection that merely mentions
+        # 4326 without carrying the authority does not satisfy it.
         assert dataset.epsg == 4326, (
             f"the CRS should resolve to EPSG:4326, got {dataset.epsg}"
         )
