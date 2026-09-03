@@ -8,7 +8,7 @@ the [`ecmwf`](../ecmwf/introduction.md) backend's per-store `endpoint`:
 
 | Facade key(s) | Product | `kind` | Output |
 |---|---|---|---|
-| `efhm` / `jrc-flood` / `jrc-flood-hazard` / `jrc:european-flood-hazard` | European Flood Hazard Map (river-flood depth per return period) | `flood_hazard_raster` | `list[Path]` GeoTIFF |
+| `jrc` / `efhm` / `jrc-flood` / `jrc-flood-hazard` / `jrc:european-flood-hazard` | European Flood Hazard Map (river-flood depth per return period) | `flood_hazard_raster` | `list[Path]` GeoTIFF |
 | `jrc:sea-level-forecast` / `jrc-sea-level` / `jrc:twl-forecast` | Probabilistic Total Water Level (TWL) forecasts (gridded) | `sea_level_gridded` | `list[Path]` GeoTIFF |
 | `jrc:coastal-forecast` | Subseasonal coastal per-country summary | `sea_level_coastal` | `pandas.DataFrame` |
 
