@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -17841,6 +17841,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05_dutch_rhine_flood_hazard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Showcase - rarity becomes area, or depth, depending where you look
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -24406,7 +24434,7 @@ EFHM is <strong>CC-BY-4.0</strong> (no licence warning).</p>
 
 <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"efhm-"</span><span class="p">))</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc-flood"</span><span class="p">,</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc"</span><span class="p">,</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.7</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.6</span><span class="p">,</span> <span class="mf">5.1</span><span class="p">],</span>
     <span class="n">return_periods</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span>
@@ -24433,7 +24461,7 @@ DEPTH_CMAP = DATA_STYLES["oslo"]["oslo"]["cmap"].reversed()
 
 out = Path(tempfile.mkdtemp(prefix="efhm-"))
 paths = EarthLens(
-    data_source="jrc-flood",
+    data_source="jrc",
     lat_lim=[51.7, 52.0],
     lon_lim=[4.6, 5.1],
     return_periods=[100],
@@ -24618,7 +24646,7 @@ downloads anything.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">plan</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc-flood"</span><span class="p">,</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc"</span><span class="p">,</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.7</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.6</span><span class="p">,</span> <span class="mf">5.1</span><span class="p">],</span>
     <span class="n">return_periods</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">500</span><span class="p">],</span>
@@ -24629,7 +24657,7 @@ downloads anything.</p>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"  "</span><span class="p">,</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"rp"</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">row</span><span class="p">})</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">plan = EarthLens(
-    data_source="jrc-flood",
+    data_source="jrc",
     lat_lim=[51.7, 52.0],
     lon_lim=[4.6, 5.1],
     return_periods=[10, 100, 500],
@@ -24677,7 +24705,7 @@ into a temporary directory and returns the object instead: a list of pyramids
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">grids</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc-flood"</span><span class="p">,</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc"</span><span class="p">,</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.8</span><span class="p">,</span> <span class="mf">51.9</span><span class="p">],</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.8</span><span class="p">,</span> <span class="mf">4.9</span><span class="p">],</span>
     <span class="n">return_periods</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span>
@@ -24687,7 +24715,7 @@ into a temporary directory and returns the object instead: a list of pyramids
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">grids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rows</span><span class="si">}</span><span class="s2"> x </span><span class="si">{</span><span class="n">grids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2"> cells, EPSG:</span><span class="si">{</span><span class="n">grids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">grids = EarthLens(
-    data_source="jrc-flood",
+    data_source="jrc",
     lat_lim=[51.8, 51.9],
     lon_lim=[4.8, 4.9],
     return_periods=[100],
@@ -24732,7 +24760,7 @@ point, which needs a <code>buffer</code> in degrees to become an area.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">point</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc-flood"</span><span class="p">,</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc"</span><span class="p">,</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">(</span><span class="mf">4.9</span><span class="p">,</span> <span class="mf">51.8</span><span class="p">),</span>
     <span class="n">buffer</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
     <span class="n">return_periods</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span>
@@ -24741,7 +24769,7 @@ point, which needs a <code>buffer</code> in degrees to become an area.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"a point plus a 0.1 deg buffer matches"</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="s2">"product(s)"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">point = EarthLens(
-    data_source="jrc-flood",
+    data_source="jrc",
     aoi=(4.9, 51.8),
     buffer=0.1,
     return_periods=[100],

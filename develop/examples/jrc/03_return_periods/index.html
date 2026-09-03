@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -17808,6 +17808,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05_dutch_rhine_flood_hazard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Showcase - rarity becomes area, or depth, depending where you look
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -24342,7 +24370,7 @@ per period.</p>
 <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span> <span class="o">=</span> <span class="p">[</span><span class="mf">51.7</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.6</span><span class="p">,</span> <span class="mf">5.1</span><span class="p">]</span>
 <span class="n">periods</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc-flood"</span><span class="p">,</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc"</span><span class="p">,</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">,</span>
     <span class="n">return_periods</span><span class="o">=</span><span class="n">periods</span><span class="p">,</span>
@@ -24371,7 +24399,7 @@ out = Path(tempfile.mkdtemp(prefix="efhm-rp-"))
 lat_lim, lon_lim = [51.7, 52.0], [4.6, 5.1]
 periods = [10, 100, 500]
 paths = EarthLens(
-    data_source="jrc-flood",
+    data_source="jrc",
     lat_lim=lat_lim,
     lon_lim=lon_lim,
     return_periods=periods,
@@ -24628,7 +24656,7 @@ file or a filename does not need converting first.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="p">([</span><span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="s2">"100"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"RP100"</span><span class="p">]):</span>
     <span class="n">picked</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc-flood"</span><span class="p">,</span>
+        <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc"</span><span class="p">,</span>
         <span class="n">lat_lim</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">,</span>
         <span class="n">lon_lim</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">,</span>
         <span class="n">return_periods</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span>
@@ -24638,7 +24666,7 @@ file or a filename does not need converting first.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">for spec in ([100], ["100"], ["RP100"]):
     picked = EarthLens(
-        data_source="jrc-flood",
+        data_source="jrc",
         lat_lim=lat_lim,
         lon_lim=lon_lim,
         return_periods=spec,
