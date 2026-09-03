@@ -1460,16 +1460,27 @@ class TestQualifiedKeyDefaultDir:
         assert _source_dirname("chc") == "chc"
 
     def test_no_registered_key_keeps_a_colon(self):
-        """No registered key may leave a colon in its directory name.
-
-        A colon is legal in a POSIX filename, so Linux CI would accept the
-        unflattened name; asserting on the derived string keeps this a real
-        gate on every platform rather than a Windows-only one.
-        """
+        """No registered key may leave a colon in its directory name."""
+        # A colon is legal in a POSIX filename, so Linux CI would happily accept
+        # the unflattened name. Asserting on the derived string keeps this a real
+        # gate on every platform rather than a Windows-only one.
         qualified = sorted(k for k in discover_backends() if ":" in k)
         assert qualified, "expected the registry to carry source:topic keys"
         offenders = [k for k in qualified if ":" in _source_dirname(k)]
         assert not offenders, f"colon survives into the directory name: {offenders}"
+
+    def test_registered_keys_map_to_distinct_directories(self):
+        """Flattening must not land two facade keys in one output directory."""
+        # `load()` cleans up the default directory it created, so two keys
+        # sharing one would let a download for either delete the other's output.
+        seen: dict[str, str] = {}
+        for key in sorted(discover_backends()):
+            name = _source_dirname(key)
+            clash = seen.get(name)
+            assert clash is None, (
+                f"{key!r} and {clash!r} both derive the directory {name!r}"
+            )
+            seen[name] = key
 
     @pytest.mark.jrc
     def test_facade_default_path_is_creatable(self, tmp_path):
