@@ -334,6 +334,8 @@ class STAC(LazyClientMixin, AbstractDataSource):
         # download(aggregate=) can group + window them without re-parsing names.
         self._written = []
         multi = len(self._aoi_bboxes) > 1
+        assert self._catalog is not None  # set in _initialize
+        assert self._endpoint is not None  # resolved in _initialize
         for (collection_key, date, bbox_key), group in _group_products(products):
             # Per-collection signer (e.g. requester-pays for usgs-landsat) — its
             # GDAL env must be active for the remote reads inside merge_rasters.
