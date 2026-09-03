@@ -108,7 +108,13 @@ def _gis_imports(path: Path) -> list[tuple[int, str]]:
                 if alias.name.split(".", 1)[0] in _BANNED_GIS_MODULES:
                     found.append((node.lineno, alias.name))
         elif isinstance(node, ast.ImportFrom):
-            if (node.module or "").split(".", 1)[0] in _BANNED_GIS_MODULES:
+            # `node.level` > 0 is a relative import, which resolves to a sibling
+            # module inside earthlens -- a local `osgeo.py` would be odd, but it
+            # is not GDAL, so flagging it would be a false positive.
+            if (
+                not node.level
+                and (node.module or "").split(".", 1)[0] in _BANNED_GIS_MODULES
+            ):
                 found.append((node.lineno, f"from {node.module}"))
         elif isinstance(node, ast.Call):
             # Match on the callee's NAME, not on the node shape: an attribute
@@ -143,7 +149,10 @@ def _is_banned_gis_import(node: ast.AST) -> bool:
             alias.name.split(".", 1)[0] in _BANNED_GIS_MODULES for alias in node.names
         )
     if isinstance(node, ast.ImportFrom):
-        return (node.module or "").split(".", 1)[0] in _BANNED_GIS_MODULES
+        return (
+            not node.level
+            and (node.module or "").split(".", 1)[0] in _BANNED_GIS_MODULES
+        )
     return False
 
 
@@ -1715,8 +1724,12 @@ _GDAL_SPELLINGS = [
     ("dynamic-dunder", '__import__("osgeo")' + chr(10)),
 ]
 
-#: Sources that must NOT trip the guard, so it stays usable.
+#: Sources that must NOT trip the guard, so it stays usable. The relative forms
+#: matter: `from .osgeo import gdal` names a sibling module inside earthlens, so
+#: it is not GDAL and flagging it would be a false positive.
 _INNOCENT_SOURCES = [
+    ("relative-module", "from .osgeo import gdal" + chr(10)),
+    ("relative-package", "from . import osgeo" + chr(10)),
     ("pyramids", "import pyramids" + chr(10)),
     ("pyramids-from", "from pyramids.dataset import Dataset" + chr(10)),
     (
