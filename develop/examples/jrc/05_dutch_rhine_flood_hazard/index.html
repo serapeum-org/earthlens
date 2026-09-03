@@ -27,7 +27,7 @@
     
     
       
-        <title>Showcase - rarity becomes area, or depth, depending where you look - earthlens</title>
+        <title>Showcase - how much worse is a rarer flood, and how your window changes the answer - earthlens</title>
       
     
     
@@ -87,20 +87,20 @@
     
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="earthlens">
-    <meta property="og:title" content="Showcase - rarity becomes area, or depth, depending where you look">
+    <meta property="og:title" content="Showcase - how much worse is a rarer flood, and how your window changes the answer">
     <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
     <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/examples/jrc/05_dutch_rhine_flood_hazard/">
     <meta property="og:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Showcase - rarity becomes area, or depth, depending where you look">
+    <meta name="twitter:title" content="Showcase - how much worse is a rarer flood, and how your window changes the answer">
     <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
     <meta name="twitter:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/announcement-card.png">
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -119,7 +119,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#showcase-rarity-becomes-area-or-depth-depending-where-you-look" class="md-skip">
+        <a href="#showcase-how-much-worse-is-a-rarer-flood-and-how-your-window-changes-the-answer" class="md-skip">
           Skip to content
         </a>
       
@@ -158,7 +158,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Showcase - rarity becomes area, or depth, depending where you look
+              Showcase - how much worse is a rarer flood, and how your window changes the answer
             
           </span>
         </div>
@@ -17740,7 +17740,7 @@
   <span class="md-ellipsis">
     
   
-    Showcase - rarity becomes area, or depth, depending where you look
+    Showcase - how much worse is a rarer flood, and how your window changes the answer
   
 
     
@@ -17758,7 +17758,7 @@
   <span class="md-ellipsis">
     
   
-    Showcase - rarity becomes area, or depth, depending where you look
+    Showcase - how much worse is a rarer flood, and how your window changes the answer
   
 
     
@@ -17839,10 +17839,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-inside-the-dikes" class="md-nav__link">
+  <a href="#5-a-closer-window-and-why-its-number-misleads" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5 - Inside the dikes
+        5 - A closer window, and why its number misleads
       
     </span>
   </a>
@@ -23619,10 +23619,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-inside-the-dikes" class="md-nav__link">
+  <a href="#5-a-closer-window-and-why-its-number-misleads" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5 - Inside the dikes
+        5 - A closer window, and why its number misleads
       
     </span>
   </a>
@@ -24411,15 +24411,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="showcase-rarity-becomes-area-or-depth-depending-where-you-look">Showcase - rarity becomes area, or depth, depending where you look<a class="anchor-link" href="#showcase-rarity-becomes-area-or-depth-depending-where-you-look">¶</a></h1><p>The JRC <strong>European Flood Hazard Map</strong> gives river-flood water depth for a chosen
+<h1 id="showcase-how-much-worse-is-a-rarer-flood-and-how-your-window-changes-the-answer">Showcase - how much worse is a rarer flood, and how your window changes the answer<a class="anchor-link" href="#showcase-how-much-worse-is-a-rarer-flood-and-how-your-window-changes-the-answer">¶</a></h1><p>The JRC <strong>European Flood Hazard Map</strong> gives river-flood water depth for a chosen
 return period: how deep the water gets in a 1-in-10, 1-in-100 or 1-in-500 year
 event. The obvious expectation is that a rarer flood covers more ground.</p>
 <p>Over the Dutch Rhine that holds - the flooded area grows by about a third from
-RP10 to RP500. Zoom into the Merwede / Biesbosch, one of the most heavily diked
-stretches in Europe, and the outline barely moves. There the extra water has
-nowhere to spread, so it goes into <strong>depth</strong> instead.</p>
-<p>This notebook reads both scales from the same three source rasters and puts them
-side by side.</p>
+RP10 to RP500, and the water standing on it gets deeper as well.</p>
+<p>The second half is a caution. Crop to a small box over the Merwede / Biesbosch
+and the flooded area barely grows at all - about seven per cent. That is not a
+fact about dikes. It is a fact about the box: it is already 89% under water at
+RP10, so its area cannot grow much whatever the water does. Widen the box and
+the growth returns to the whole-river figure.</p>
+<p>This notebook reads both scales from the same three source rasters, so the
+comparison is like for like, and measures the saturation that explains the gap.</p>
 </div>
 </div>
 </div>
@@ -24771,12 +24774,14 @@ for name, rows in measured.items():
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The contrast is the result. Across the whole Dutch Rhine the flooded area grows
-by about a third from RP10 to RP500. Inside the Merwede / Biesbosch it grows by
-about seven per cent, while the mean depth rises by roughly half.</p>
-<p>The embankments do not remove the water. They fix where it can go, so the
-severity of a rarer event shows up as depth inside a near-constant footprint
-rather than as spread.</p>
+<p>The two scales disagree, and the disagreement is the lesson. Across the whole
+Dutch Rhine the flooded area grows by about a third from RP10 to RP500. Inside
+the small Merwede / Biesbosch box it grows by about seven per cent, while the
+mean depth still rises by roughly half.</p>
+<p>It is tempting to read that second number as embankments holding the water in.
+The measurement does not support it. The box is already about 89% under water at
+RP10, so there is almost no dry ground left for a rarer flood to take - the
+ceiling is the crop, not the dikes.</p>
 </div>
 </div>
 </div>
@@ -24831,7 +24836,7 @@ pale blue reaching further from the channel.</p>
     <span class="s2">"JRC European Flood Hazard Map </span><span class="se">\u00b7</span><span class="s2"> Gorinchem to the North Sea"</span>
 <span class="p">)</span>
 <span class="n">ZOOM_TITLE</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">"Inside the dikes </span><span class="se">\u00b7</span><span class="s2"> the same flood deepens instead</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"A closer window </span><span class="se">\u00b7</span><span class="s2"> its area barely grows because the box is already full</span><span class="se">\n</span><span class="s2">"</span>
     <span class="s2">"the red box above, at the same colour scale"</span>
 <span class="p">)</span>
 
@@ -25031,7 +25036,7 @@ DOWN_TITLE = (
     "JRC European Flood Hazard Map \u00b7 Gorinchem to the North Sea"
 )
 ZOOM_TITLE = (
-    "Inside the dikes \u00b7 the same flood deepens instead\n"
+    "A closer window \u00b7 its area barely grows because the box is already full\n"
     "the red box above, at the same colour scale"
 )
 
@@ -25276,11 +25281,14 @@ plt.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="5-inside-the-dikes">5 - Inside the dikes<a class="anchor-link" href="#5-inside-the-dikes">¶</a></h2><p>The same three return periods over the boxed stretch, on the same colour scale.
-Here the outline barely moves - about seven per cent - while the whole scene
-darkens, the mean depth rising by roughly half. The embankments do not remove the
-water; they fix where it can go, so a rarer event shows up as depth inside a
-near-constant footprint.</p>
+<h2 id="5-a-closer-window-and-why-its-number-misleads">5 - A closer window, and why its number misleads<a class="anchor-link" href="#5-a-closer-window-and-why-its-number-misleads">¶</a></h2><p>The same three return periods over the boxed stretch, on the same colour scale.
+The flooded outline barely moves - about seven per cent - while the whole scene
+darkens.</p>
+<p>Before reading that as confinement, check how much of the box was dry to begin
+with. It is 88.9% flooded at RP10 and 95.2% at RP500, so the most its area could
+ever grow is around twelve per cent. Widen the box and the growth returns to
++27%, then +35%, and finally the +33% of the whole river. The depth increase is
+real; the flat area curve is an artifact of the window.</p>
 </div>
 </div>
 </div>
@@ -25589,9 +25597,11 @@ shade means the same depth in every one. The zoom never reaches the dark end -
 its deepest water is about 5.5 m against 9.2 m along the wider river - which
 leaves it looking pale. A per-figure scale would fix that and make them
 incomparable, which is the one thing this notebook exists to do.</li>
-<li><strong>The finding is scale-dependent, and that is the point.</strong> Measured on the
-zoom alone it would read as "a rarer flood does not spread" - which is false
-for the river as a whole. Both extents are shown so the claim stays honest.</li>
+<li><strong>A small window can manufacture a finding.</strong> Measured on the zoom alone this
+would read as "a rarer flood does not spread", which is false for the river as
+a whole. The box is 88.9% flooded at RP10, which caps its area growth at about
+twelve per cent; widening it restores +27%, +35%, +33%. Check how much of an
+area of interest is already covered before reading a small change as a result.</li>
 <li><strong>Licence.</strong> The EFHM is CC-BY-4.0. Cite Dottori, F., Alfieri, L., Bianchi, A.,
 Skoulikaris, C., Salamon, P. (2020), <em>River flood hazard maps for Europe and
 the Mediterranean Basin region</em>, JRC / Copernicus Emergency Management Service.</li>
