@@ -136,6 +136,24 @@ def _gis_imports(path: Path) -> list[tuple[int, str]]:
     return found
 
 
+def _is_banned_gis_import(node: ast.AST) -> bool:
+    """Return whether `node` is an import statement pulling in a banned GIS module."""
+    if isinstance(node, ast.Import):
+        return any(
+            alias.name.split(".", 1)[0] in _BANNED_GIS_MODULES for alias in node.names
+        )
+    if isinstance(node, ast.ImportFrom):
+        return (node.module or "").split(".", 1)[0] in _BANNED_GIS_MODULES
+    return False
+
+
+def _imports_pyramids(node: ast.AST) -> bool:
+    """Return whether `node` is `import pyramids` (the vendoring side effect)."""
+    return isinstance(node, ast.Import) and any(
+        alias.name.split(".", 1)[0] == "pyramids" for alias in node.names
+    )
+
+
 _SOURCES = _provider_sources()
 _IDS = [str(path.relative_to(_ROOT)).replace("\\", "/") for path in _SOURCES]
 
@@ -1617,11 +1635,37 @@ class TestNoDirectGdal:
         )
 
     def test_the_sanctioned_site_imports_pyramids_first(self):
-        """`osgeo` only resolves once pyramids has vendored it onto the path."""
-        for name in _GDAL_ALLOWED:
-            source = (_ROOT / name).read_text(encoding="utf-8")
-            gdal_at = source.index("from osgeo import")
-            assert "import pyramids" in source[:gdal_at], (
-                f"{name} imports osgeo without importing pyramids first, which "
-                "raises ModuleNotFoundError outside an already-loaded process"
+        """`osgeo` only resolves once pyramids has vendored it onto the path.
+
+        Asserted on the AST, and per enclosing function, because the rule is
+        that pyramids is imported inside the function that needs GDAL -- a
+        module-scope import would satisfy a "somewhere earlier in the file"
+        check while breaking the rule. Matching nodes rather than the literal
+        text also keeps the test reporting a failure, not a `ValueError`, if
+        the site ever switches to `import osgeo.gdal`.
+        """
+        for name in sorted(_GDAL_ALLOWED):
+            path = _ROOT / name
+            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            sites = [
+                (func, node)
+                for func in ast.walk(tree)
+                if isinstance(func, (ast.FunctionDef, ast.AsyncFunctionDef))
+                for node in ast.walk(func)
+                if _is_banned_gis_import(node)
+            ]
+            assert sites, (
+                f"{name} is allowed to import GDAL but no function does; the "
+                "import must live in the function that needs it, not at module scope"
             )
+            for func, node in sites:
+                first = [
+                    other.lineno
+                    for other in ast.walk(func)
+                    if _imports_pyramids(other) and other.lineno < node.lineno
+                ]
+                assert first, (
+                    f"{name}:{node.lineno} imports GDAL inside {func.name}() without "
+                    "importing pyramids first in that same function, which raises "
+                    "ModuleNotFoundError outside an already-loaded process"
+                )
