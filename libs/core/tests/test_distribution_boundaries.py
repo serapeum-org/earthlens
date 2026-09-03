@@ -1771,6 +1771,23 @@ class TestGdalGuardDetection:
         probe.write_text(source, encoding="utf-8")
         assert _gis_imports(probe) == [], f"guard false-positived on:\n{source}"
 
+    def test_the_guard_governs_tests_and_tools_too(self):
+        """The rule covers the test and tooling trees, not only shipped source."""
+        # Scope is a behavioural contract, not an implementation detail: this
+        # branch had to hand-convert osgeo out of two FDSN tests, so a glob
+        # narrowed back to src/ would let the next one in with every test green.
+        governed = _earthlens_sources()
+        trees = {path.relative_to(_ROOT).parts for path in governed}
+        assert any("src" in parts for parts in trees), "shipped source is ungoverned"
+        assert any("tests" in parts for parts in trees), "the test tree is ungoverned"
+        assert any(parts[0] == "tools" for parts in trees), "tools/ is ungoverned"
+        junk = [
+            path
+            for path in governed
+            if "__pycache__" in path.parts or "build" in path.parts
+        ]
+        assert junk == [], f"generated files are not source: {junk[:3]}"
+
     def test_reports_the_line_it_found(self, tmp_path):
         """The offender's line number is reported so the failure is actionable."""
         probe = tmp_path / "probe.py"
