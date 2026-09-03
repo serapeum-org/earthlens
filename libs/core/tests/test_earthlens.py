@@ -446,8 +446,7 @@ class TestTopLevelReExports:
     """Pin the `earthlens.core` public surface (L2)."""
 
     def test_earthlens_facade_importable_from_package_root(self):
-        """`from earthlens.base.abstractdatasource import native_parameters
-        from earthlens.core import EarthLens` resolves to the facade class."""
+        """`from earthlens.core import EarthLens` resolves to the facade class."""
         import earthlens.core
 
         assert earthlens.core.EarthLens is EarthLens, (
