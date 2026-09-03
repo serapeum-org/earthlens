@@ -172,7 +172,7 @@ def _causes(exc: BaseException):
                 queue.append(arg)
 
 
-def classify_transport_error(exc: BaseException) -> str | None:
+def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str | None:
     """Say whether a transport failure is retryable, and which budget it spends.
 
     Splits the failure the way urllib3's `Retry` does, because the two kinds
@@ -185,6 +185,13 @@ def classify_transport_error(exc: BaseException) -> str | None:
 
     Args:
         exc: The exception raised by the transport.
+        strict: Whether to veto failures this function considers
+            never-retryable. `True` while the client is using
+            :data:`DEFAULT_RETRY_EXCEPTIONS`. `False` when the caller passed
+            its own `retry_on_exceptions`, in which case naming a type *is*
+            the decision to retry it and this function only chooses the
+            budget — an unrecognised type then spends the read budget, the
+            method-gated one.
 
     Returns:
         str | None: `"connect"`, `"read"`, or `None` when the failure is
@@ -207,7 +214,8 @@ def classify_transport_error(exc: BaseException) -> str | None:
             'read'
 
             ```
-        - A certificate that does not validate is never retried:
+        - A certificate that does not validate is never retried under the
+          default set:
             ```python
             >>> import requests
             >>> from earthlens.base.http import classify_transport_error
@@ -215,8 +223,19 @@ def classify_transport_error(exc: BaseException) -> str | None:
             True
 
             ```
+        - A caller that named a type itself gets it retried, on the read
+          budget:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import classify_transport_error
+            >>> classify_transport_error(
+            ...     requests.exceptions.ContentDecodingError(), strict=False
+            ... )
+            'read'
+
+            ```
     """
-    if isinstance(exc, NON_RETRYABLE_EXCEPTIONS):
+    if strict and isinstance(exc, NON_RETRYABLE_EXCEPTIONS):
         return None
     if isinstance(exc, requests.exceptions.ConnectTimeout):
         return "connect"
@@ -245,7 +264,8 @@ def classify_transport_error(exc: BaseException) -> str | None:
         return "connect"
     if isinstance(exc, requests.exceptions.Timeout):
         return "read"
-    return None
+    # Anything else is retryable only because the caller asked for it by name.
+    return None if strict else "read"
 
 
 IDEMPOTENT_METHODS: frozenset[str] = frozenset(
@@ -714,7 +734,7 @@ class HttpClient:
         status_forcelist: tuple[int, ...] = DEFAULT_STATUS_FORCELIST,
         max_backoff: float | None = DEFAULT_MAX_BACKOFF,
         retry_on_exceptions: tuple[type[BaseException], ...] = DEFAULT_RETRY_EXCEPTIONS,
-        connect_retries: int = DEFAULT_CONNECT_RETRIES,
+        connect_retries: int | None = None,
         read_retries: int | None = DEFAULT_READ_RETRIES,
         retry_unsafe_methods: bool = False,
         retry_predicate: Callable[[requests.Response], bool] | None = None,
@@ -753,10 +773,13 @@ class HttpClient:
                 connection, a timeout, a body truncated mid-stream. Pass
                 `()` to retry on status only.
             connect_retries: Retries allowed for a failure in the connect
-                phase, counted separately from `read_retries`. Small by
-                default (:data:`DEFAULT_CONNECT_RETRIES`) because a host
-                that will not accept a connection rarely starts doing so
-                within a back-off window.
+                phase, counted separately from `read_retries`. `None` (the
+                default) resolves to :data:`DEFAULT_CONNECT_RETRIES` while
+                the client uses the default exception set — a host that will
+                not accept a connection rarely starts doing so within a
+                back-off window — and to `max_retries` when the caller
+                supplied its own `retry_on_exceptions`, since that caller
+                already chose how hard to try.
             read_retries: Retries allowed for a failure after the connection
                 was established — a reset mid-response, a read timeout, a
                 truncated body. `None` (the default) means `max_retries`.
@@ -794,7 +817,20 @@ class HttpClient:
         self.status_forcelist = tuple(status_forcelist)
         self.max_backoff = max_backoff
         self.retry_on_exceptions = tuple(retry_on_exceptions)
-        self.connect_retries = connect_retries
+        # A caller that passed its own set has already decided those types are
+        # worth retrying; the classifier then only picks the budget rather than
+        # second-guessing the choice.
+        self._default_retry_set = retry_on_exceptions is DEFAULT_RETRY_EXCEPTIONS
+        # The small connect budget is a property of the *default* policy. A
+        # caller that brought its own `retry_on_exceptions` already chose how
+        # hard to try, and silently capping its `max_retries` for one phase
+        # would change a number it set deliberately.
+        if connect_retries is not None:
+            self.connect_retries = connect_retries
+        elif self._default_retry_set:
+            self.connect_retries = DEFAULT_CONNECT_RETRIES
+        else:
+            self.connect_retries = max_retries
         self.read_retries = max_retries if read_retries is None else read_retries
         self.retry_unsafe_methods = retry_unsafe_methods
         self._retry_predicate = retry_predicate
@@ -1130,7 +1166,11 @@ class HttpClient:
                 # No idempotency gate here, unlike `_request_with_retry`: this
                 # loop only ever issues the GET above, so the verb is always
                 # replay-safe. Re-check that if it is ever parameterised.
-                if classify_transport_error(exc) is None or attempt >= self.max_retries:
+                if (
+                    classify_transport_error(exc, strict=self._default_retry_set)
+                    is None
+                    or attempt >= self.max_retries
+                ):
                     discard_partial()
                     raise
                 # Keep what already landed and ask for the rest, when the file
@@ -1264,7 +1304,7 @@ class HttpClient:
             try:
                 response = self._send(method, url, **kwargs)
             except self.retry_on_exceptions as exc:
-                kind = classify_transport_error(exc)
+                kind = classify_transport_error(exc, strict=self._default_retry_set)
                 if kind is None:
                     # Deterministic — the next attempt reproduces it exactly.
                     raise

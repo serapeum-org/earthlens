@@ -542,6 +542,38 @@ class TestRetryOnExceptions:
             f"got {session.calls} attempts"
         )
 
+    def test_an_explicit_retry_set_is_not_second_guessed(self):
+        """A type the caller named is retried even if the classifier would not.
+
+        The classifier decides which budget a failure spends; naming a type in
+        `retry_on_exceptions` is already the decision to retry it. Vetoing that
+        would silently disable a knob the caller set — as it did for the
+        `ContentDecodingError` that risk_indicators retries on purpose.
+        """
+        session = _FlakySession(
+            2, requests.exceptions.ContentDecodingError("gzip"), _Resp(body={"ok": 1})
+        )
+        client = HttpClient(
+            session=session,
+            sleep=lambda _: None,
+            retry_on_exceptions=(requests.exceptions.ContentDecodingError,),
+        )
+        assert client.get_json("http://x") == {"ok": 1}
+        assert session.calls == 3, f"expected 3 attempts, got {session.calls}"
+
+    def test_an_explicit_set_overrides_the_never_retry_list(self):
+        """`SSLError` is retried when the caller asks for it by name."""
+        session = _FlakySession(
+            1, requests.exceptions.SSLError("cert"), _Resp(body={"ok": 1})
+        )
+        client = HttpClient(
+            session=session,
+            sleep=lambda _: None,
+            retry_on_exceptions=(requests.exceptions.SSLError,),
+        )
+        assert client.get_json("http://x") == {"ok": 1}
+        assert session.calls == 2, f"expected 2 attempts, got {session.calls}"
+
     def test_default_retry_set_excludes_http_error(self):
         """`HTTPError` stays out, so 4xx responses are never replayed."""
         assert not any(
