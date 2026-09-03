@@ -877,7 +877,8 @@ class AbstractDataSource(ABC):
         orig = cls.__dict__.get("__init__")
         if orig is None or getattr(orig, "_ergonomic", False):
             return
-        params = inspect.signature(orig).parameters
+        native_signature = inspect.signature(orig)
+        params = native_signature.parameters
         native_aoi = "aoi" in params
         native_dataset = "dataset" in params
 
@@ -933,32 +934,23 @@ class AbstractDataSource(ABC):
         # at runtime. Re-advertise them as keyword-only, appended to whatever
         # the backend already declares, and drop any the backend names itself
         # so a native `aoi=` / `dataset=` is not listed twice.
-        try:
-            native = inspect.signature(orig)
-            existing = set(native.parameters)
-            extra = [
-                inspect.Parameter(name, inspect.Parameter.KEYWORD_ONLY, default=None)
-                for name in ("aoi", "buffer", "cadence", "dataset")
-                if name not in existing
-            ]
-            __init__._ergonomic_params = frozenset(  # type: ignore[attr-defined]
-                p.name for p in extra
+        existing = set(params)
+        extra = [
+            inspect.Parameter(name, inspect.Parameter.KEYWORD_ONLY, default=None)
+            for name in ("aoi", "buffer", "cadence", "dataset")
+            if name not in existing
+        ]
+        __init__._ergonomic_params = frozenset(  # type: ignore[attr-defined]
+            p.name for p in extra
+        )
+        if extra:
+            declared = list(params.values())
+            # Keyword-only parameters must precede any **kwargs.
+            var_kw = [p for p in declared if p.kind is inspect.Parameter.VAR_KEYWORD]
+            head = [p for p in declared if p.kind is not inspect.Parameter.VAR_KEYWORD]
+            __init__.__signature__ = native_signature.replace(  # type: ignore[attr-defined]
+                parameters=head + extra + var_kw
             )
-            if extra:
-                params = list(native.parameters.values())
-                # Keyword-only parameters must precede any **kwargs.
-                var_kw = [p for p in params if p.kind is inspect.Parameter.VAR_KEYWORD]
-                head = [
-                    p for p in params if p.kind is not inspect.Parameter.VAR_KEYWORD
-                ]
-                __init__.__signature__ = native.replace(  # type: ignore[attr-defined]
-                    parameters=head + extra + var_kw
-                )
-        except (TypeError, ValueError):
-            # A constructor whose signature cannot be read (a C-level or
-            # exotic callable) keeps the wrapped signature rather than losing
-            # the wrapper.
-            pass
         cls.__init__ = __init__  # type: ignore[method-assign]
 
     @classmethod
