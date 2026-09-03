@@ -62,13 +62,25 @@ class TestBackendDirectErgonomics:
         with pytest.raises(ValueError, match="buffer= only applies"):
             self._chc(tmp_path, buffer=0.5)
 
-    def test_signature_introspection_preserved(self):
-        """The wrapper keeps the backend's real signature for introspection."""
+    def test_signature_keeps_native_params_and_adds_the_ergonomic_ones(self):
+        """The wrapper preserves the backend's own parameters and appends its own.
+
+        It deliberately no longer reports the *unwrapped* signature: the four
+        kwargs the wrapper accepts were invisible to `help()` and to IDE
+        completion while it did.
+        """
         params = inspect.signature(CHIRPS.__init__).parameters
-        assert "variables" in params and "lat_lim" in params
-        assert not any(p.kind == p.VAR_KEYWORD for p in params.values()), (
-            "wrapped __init__ must still expose the real (no **kwargs) signature"
+        assert "variables" in params and "lat_lim" in params, (
+            f"native parameters must survive, got {list(params)}"
         )
+        assert not any(p.kind == p.VAR_KEYWORD for p in params.values()), (
+            "the wrapper must not degrade the signature to **kwargs"
+        )
+        for name in ("aoi", "buffer", "cadence", "dataset"):
+            assert name in params, f"{name} should be advertised, got {list(params)}"
+            assert params[name].kind is inspect.Parameter.KEYWORD_ONLY, (
+                f"{name} must be keyword-only"
+            )
 
 
 class TestBackendPolygonMask:

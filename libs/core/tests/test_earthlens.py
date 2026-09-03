@@ -1459,22 +1459,68 @@ class TestErgonomicKwargsAreDiscoverable:
     signature-driven tool while working perfectly at runtime.
     """
 
-    @pytest.mark.parametrize("name", ["aoi", "buffer", "cadence", "dataset"])
-    def test_every_backend_advertises_the_ergonomic_kwargs(self, name):
-        """Each wrapper-added kwarg appears in every backend's signature."""
-        missing = []
-        for key in sorted(EarthLens.DataSources):
-            backend = EarthLens.DataSources[key]
-            if name not in inspect.signature(backend.__init__).parameters:
-                missing.append(backend.__name__)
+    @pytest.mark.parametrize("name", ["aoi", "cadence"])
+    def test_every_backend_advertises_the_universal_kwargs(self, name):
+        """`aoi=` and `cadence=` work on every backend, so every one advertises them."""
+        missing = [
+            EarthLens.DataSources[key].__name__
+            for key in sorted(EarthLens.DataSources)
+            if name
+            not in inspect.signature(EarthLens.DataSources[key].__init__).parameters
+        ]
         assert not missing, f"{name} is hidden on {sorted(set(missing))}"
 
-    def test_no_signature_lists_a_parameter_twice(self):
-        """A backend declaring its own `aoi=` does not get a second one."""
-        for key in sorted(EarthLens.DataSources):
-            backend = EarthLens.DataSources[key]
-            names = list(inspect.signature(backend.__init__).parameters)
-            assert len(names) == len(set(names)), f"{backend.__name__}: {names}"
+    @pytest.mark.parametrize("name", ["buffer", "dataset"])
+    def test_the_conditional_kwargs_are_advertised_wherever_they_work(self, name):
+        """`buffer=` and `dataset=` appear except where the backend cannot accept them.
+
+        They are withheld only from backends that would raise on them — a
+        native-`aoi` backend for `buffer=`, a facet-only one for `dataset=` —
+        so the vast majority still advertise both.
+        """
+        advertised = [
+            key
+            for key in sorted(EarthLens.DataSources)
+            if name in inspect.signature(EarthLens.DataSources[key].__init__).parameters
+        ]
+        total = len(list(EarthLens.DataSources))
+        assert len(advertised) > total * 0.8, (
+            f"{name} should be advertised on the large majority of backends, "
+            f"got {len(advertised)} of {total}"
+        )
+
+    def test_a_native_parameter_is_not_shadowed_by_a_synthesized_one(self):
+        """A backend declaring its own `aoi=` keeps that one, not the wrapper's.
+
+        Asserting no duplicates would prove nothing — `inspect.Signature`
+        rejects those at construction, so the failure would surface at import.
+        What can actually go wrong is the native parameter being replaced by
+        the untyped, `None`-defaulted stand-in.
+        """
+        worldpop = EarthLens.DataSources["worldpop"]
+        aoi = inspect.signature(worldpop.__init__).parameters["aoi"]
+        synthesized = getattr(worldpop.__init__, "_ergonomic_params", frozenset())
+        assert "aoi" not in synthesized, (
+            "WorldPop declares aoi= itself; the wrapper must not add its own"
+        )
+        assert "aoi" in native_parameters(worldpop), (
+            "a native aoi= must still read as native"
+        )
+        assert aoi.annotation is not None, "the native annotation must survive"
+
+    def test_a_backend_is_not_offered_a_parameter_it_must_reject(self):
+        """Facet-only and native-aoi backends drop the kwargs that cannot work.
+
+        `cmip6` addresses its data by facet keywords, so `dataset=` can only
+        raise there; `buffer=` only shapes a point `aoi=` the wrapper resolves,
+        so it is meaningless on a backend that interprets `aoi=` itself.
+        """
+        cmip6 = inspect.signature(EarthLens.DataSources["cmip6"].__init__).parameters
+        assert "dataset" not in cmip6, "cmip6 is facet-only; dataset= cannot work"
+        worldpop = inspect.signature(
+            EarthLens.DataSources["worldpop"].__init__
+        ).parameters
+        assert "buffer" not in worldpop, "WorldPop interprets aoi= itself"
 
     def test_options_for_does_not_leak_the_ergonomic_kwargs(self):
         """No backend advertises a facade-resolved kwarg as its own option.

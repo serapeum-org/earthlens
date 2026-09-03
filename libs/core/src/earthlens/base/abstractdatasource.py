@@ -607,6 +607,18 @@ def _passed_aggregate(function: Any, args: tuple[Any, ...], kw: dict[str, Any]) 
     return bound.arguments.get("aggregate") is not None
 
 
+#: Annotations for the parameters `__init_subclass__` appends to a backend's
+#: signature. Declared once so `__signature__` and `__annotations__` cannot
+#: drift apart, and typed as loosely as the wrapper actually accepts: `aoi`
+#: takes a bbox, a point, a shapely geometry, GeoJSON, WKT or a GeoDataFrame.
+_ERGONOMIC_ANNOTATIONS: dict[str, Any] = {
+    "aoi": "Any",
+    "buffer": "float | None",
+    "cadence": "str | None",
+    "dataset": "str | None",
+}
+
+
 def native_parameters(backend_cls: type) -> frozenset[str]:
     """Parameter names a backend's own `__init__` declares.
 
@@ -637,6 +649,8 @@ def native_parameters(backend_cls: type) -> frozenset[str]:
             False
             >>> sorted(native_parameters(CHIRPS))[:3]
             ['end', 'fmt', 'lat_lim']
+            >>> "self" in native_parameters(CHIRPS)
+            False
 
             ```
         - WorldPop declares its own richer `aoi=`, so it reports as native
@@ -657,7 +671,11 @@ def native_parameters(backend_cls: type) -> frozenset[str]:
         declared = frozenset(inspect.signature(init).parameters)
     except (TypeError, ValueError):
         return frozenset()
-    return declared - synthetic
+    # `self` is not something a caller can pass. The `inspect.signature(cls)`
+    # call this function replaced dropped it implicitly; reading `__init__`
+    # directly does not, and the question here is "what does this backend
+    # accept?".
+    return declared - synthetic - {"self"}
 
 
 def _describe_remote_product(product: Any) -> str:
@@ -948,10 +966,29 @@ class AbstractDataSource(ABC):
         # the backend already declares, and drop any the backend names itself
         # so a native `aoi=` / `dataset=` is not listed twice.
         existing = set(params)
+        # A backend that declares neither `variables` nor `**kwargs` addresses
+        # its data by facet keywords (cmip6's `variable_id=` / `source_id=`), so
+        # `dataset=` can never reach anything there; and `buffer=` only shapes a
+        # point `aoi=` that the wrapper itself resolves, so it is meaningless on
+        # a backend that interprets `aoi=` natively. Advertising either would
+        # promise a parameter whose only possible outcome is an error.
+        facet_only = "variables" not in existing and not any(
+            p.kind is inspect.Parameter.VAR_KEYWORD for p in params.values()
+        )
+        unsupported = set()
+        if facet_only:
+            unsupported.add("dataset")
+        if native_aoi:
+            unsupported.add("buffer")
         extra = [
-            inspect.Parameter(name, inspect.Parameter.KEYWORD_ONLY, default=None)
+            inspect.Parameter(
+                name,
+                inspect.Parameter.KEYWORD_ONLY,
+                default=None,
+                annotation=_ERGONOMIC_ANNOTATIONS[name],
+            )
             for name in ("aoi", "buffer", "cadence", "dataset")
-            if name not in existing
+            if name not in existing and name not in unsupported
         ]
         __init__._ergonomic_params = frozenset(  # type: ignore[attr-defined]
             p.name for p in extra
@@ -964,6 +1001,14 @@ class AbstractDataSource(ABC):
             __init__.__signature__ = native_signature.replace(  # type: ignore[attr-defined]
                 parameters=head + extra + var_kw
             )
+            # `functools.wraps` copied the native `__annotations__`, so without
+            # this the signature and the annotations disagree and anything that
+            # pairs them (pydantic `validate_call`, signature-driven CLI
+            # builders) sees an untyped parameter.
+            __init__.__annotations__ = {
+                **__init__.__annotations__,
+                **{p.name: _ERGONOMIC_ANNOTATIONS[p.name] for p in extra},
+            }
         cls.__init__ = __init__  # type: ignore[method-assign]
 
     @classmethod
