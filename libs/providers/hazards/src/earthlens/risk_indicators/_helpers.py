@@ -63,9 +63,11 @@ INFORM_RESULTS_PAGE = f"{INFORM_SITE}/inform-index/INFORM-Risk/Results-and-data"
 #: the site now publishes (`INFORM_Risk_Mid_2026_v073.xlsx`); without it the
 #: 2026 release was invisible and the lookup raised "layout may have changed".
 #: The trend workbook on the same page has a different stem
-#: (`INFORM2026_TREND_...`) and still does not match.
+#: (`INFORM2026_TREND_...`) and still does not match. The qualifier class is
+#: `A-Z` alone because the pattern is compiled `IGNORECASE`, which already
+#: matches the lower-case half; spelling `A-Za-z` would be a redundant range.
 INFORM_RELEASE_LINK = re.compile(
-    r"""href=["']([^"']*?INFORM_Risk_(?:[A-Za-z]+_)?(\d{4})_v(\d+)\.xlsx[^"']*)["']""",
+    r"""href=["']([^"']*?INFORM_Risk_(?:[A-Z]+_)?(\d{4})_v(\d+)\.xlsx[^"']*)["']""",
     re.IGNORECASE,
 )
 
