@@ -652,7 +652,7 @@ def native_parameters(backend_cls: type) -> frozenset[str]:
     init = getattr(backend_cls, "__init__", None)
     if init is None:
         return frozenset()
-    synthetic = getattr(init, "_ergonomic_params", frozenset())
+    synthetic: frozenset[str] = getattr(init, "_ergonomic_params", frozenset())
     try:
         declared = frozenset(inspect.signature(init).parameters)
     except (TypeError, ValueError):
