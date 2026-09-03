@@ -53,6 +53,12 @@ _GLOBAL_GEO = (-180.0, 0.25, 0.0, 90.0, 0.0, -0.25)
 _COASTAL_CSV = "GID_0,NAME_0,summary_TWL_1_10\nABW,Aruba,2\nNLD,Netherlands,9\n"
 
 
+#: The label format `band_valid_times` must ask pyramids for. Asserted by the
+#: fakes below: without it a sub-daily axis collapses to date-only labels and
+#: every band in a cycle would share one name, which no assertion here catches.
+_LABEL_FORMAT = "%Y-%m-%dT%H:%M"
+
+
 class _FakeCube:
     """The slice of pyramids' `NetCDF` that `band_valid_times` touches.
 
@@ -64,6 +70,9 @@ class _FakeCube:
         self._labels = labels
 
     def get_time_variable(self, time_format=None):
+        assert time_format == _LABEL_FORMAT, (
+            f"band_valid_times must request {_LABEL_FORMAT!r}; got {time_format!r}"
+        )
         return self._labels
 
 
@@ -157,6 +166,9 @@ class _FakeContainer:
         return self._variable
 
     def get_time_variable(self, time_format=None):
+        assert time_format == _LABEL_FORMAT, (
+            f"band_valid_times must request {_LABEL_FORMAT!r}; got {time_format!r}"
+        )
         return self._time_labels
 
 
