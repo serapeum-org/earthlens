@@ -1318,3 +1318,110 @@ class TestRetryLoginForcingIpv4:
             retry_login_forcing_ipv4(login)
         assert calls["n"] == 2
         assert _restore_has_ipv6.HAS_IPV6 is False
+
+
+class _PartialBody:
+    """A streaming response that yields `stop_after` bytes then raises."""
+
+    def __init__(self, payload: bytes, stop_after: int | None, *, ranges: bool = True):
+        self.payload = payload
+        self.stop_after = stop_after
+        self.status_code = 200
+        self.headers = {"Content-Length": str(len(payload))}
+        if ranges:
+            self.headers["Accept-Ranges"] = "bytes"
+        self.closed = False
+
+    def iter_content(self, chunk_size: int = 1):
+        emitted = 0
+        for i in range(0, len(self.payload), chunk_size):
+            block = self.payload[i : i + chunk_size]
+            if self.stop_after is not None and emitted + len(block) > self.stop_after:
+                raise requests.ConnectionError(ConnectionResetError("reset"))
+            emitted += len(block)
+            yield block
+
+    def raise_for_status(self) -> None:
+        """No-op: these fixtures only model 2xx bodies."""
+
+    def close(self) -> None:
+        self.closed = True
+
+
+class _ResumingSession:
+    """Serves a payload, breaking the first attempt and honouring `Range` after."""
+
+    def __init__(self, payload: bytes, break_at: int, *, ranges: bool = True):
+        self.payload = payload
+        self.break_at = break_at
+        self.ranges = ranges
+        self.requests: list[str | None] = []
+
+    def get(self, url: str, **kwargs):
+        rng = kwargs.get("headers", {}).get("Range")
+        self.requests.append(rng)
+        if rng is None:
+            # Only the first attempt breaks, so a restart converges.
+            break_at = self.break_at if len(self.requests) == 1 else None
+            return _PartialBody(self.payload, break_at, ranges=self.ranges)
+        start = int(rng.removeprefix("bytes=").rstrip("-"))
+        rest = _PartialBody(self.payload[start:], None, ranges=self.ranges)
+        rest.status_code = 206 if self.ranges else 200
+        return rest
+
+
+@pytest.mark.unit
+class TestDownloadResume:
+    """A broken transfer continues from what already landed."""
+
+    def test_resumes_with_a_range_request(self, tmp_path):
+        """The retry asks for the remaining bytes, not the whole file again."""
+        payload = b"0123456789" * 50
+        session = _ResumingSession(payload, break_at=200)
+        client = HttpClient(session=session, sleep=lambda _: None)
+        dest = tmp_path / "granule.bin"
+        client.download("http://x/granule.bin", dest, progress=False, chunk=50)
+        assert dest.read_bytes() == payload, "the reassembled file must match exactly"
+        assert session.requests[0] is None, "the first attempt is a plain GET"
+        assert session.requests[1] is not None and session.requests[1].startswith(
+            "bytes="
+        ), f"the retry should carry a Range header, got {session.requests[1]!r}"
+
+    def test_restarts_when_the_server_does_not_support_ranges(self, tmp_path):
+        """Without `Accept-Ranges` the transfer starts over rather than appending."""
+        payload = b"abcdefghij" * 50
+        session = _ResumingSession(payload, break_at=200, ranges=False)
+        client = HttpClient(session=session, sleep=lambda _: None)
+        dest = tmp_path / "granule.bin"
+        client.download("http://x/granule.bin", dest, progress=False, chunk=50)
+        assert dest.read_bytes() == payload, "a restart must still produce the file"
+        assert session.requests[1] is None, (
+            "no Range may be sent to a server that did not advertise support"
+        )
+
+    def test_a_server_ignoring_the_range_does_not_corrupt_the_file(self, tmp_path):
+        """A `200` answer to a `Range` request restarts instead of appending.
+
+        Appending a full body onto a partial one would silently produce a file
+        longer than the source, which no checksum downstream would expect.
+        """
+        payload = b"wxyz" * 100
+        session = _ResumingSession(payload, break_at=120)
+        session.ranges = True
+
+        original = session.get
+
+        def _ignores_range(url, **kwargs):
+            response = original(url, **kwargs)
+            response.status_code = 200
+            if kwargs.get("headers", {}).get("Range"):
+                return _PartialBody(payload, None)
+            return response
+
+        session.get = _ignores_range
+        client = HttpClient(session=session, sleep=lambda _: None)
+        dest = tmp_path / "granule.bin"
+        client.download("http://x/granule.bin", dest, progress=False, chunk=50)
+        assert dest.read_bytes() == payload, (
+            f"expected {len(payload)} bytes, got {len(dest.read_bytes())}"
+        )

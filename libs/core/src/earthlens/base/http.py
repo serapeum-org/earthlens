@@ -935,6 +935,7 @@ class HttpClient:
         chunk: int,
         progress: bool,
         desc: str,
+        resume_from: int = 0,
     ) -> None:
         """Write a streaming response's body to `dest` with a `tqdm` bar.
 
@@ -946,8 +947,13 @@ class HttpClient:
             desc: The bar label (the final file name).
         """
         total = _progress_total(response.headers)
+        if total is not None and resume_from:
+            # A `206` reports only the bytes still to come, so the bar would
+            # otherwise show the remainder as if it were the whole file.
+            total += resume_from
         bar = tqdm(
             total=total,
+            initial=resume_from,
             unit="B",
             unit_scale=True,
             unit_divisor=1024,
@@ -955,7 +961,7 @@ class HttpClient:
             desc=desc,
         )
         try:
-            with open(dest, "wb") as handle:
+            with open(dest, "ab" if resume_from else "wb") as handle:
                 for block in response.iter_content(chunk_size=chunk):
                     if block:
                         handle.write(block)
@@ -1059,14 +1065,22 @@ class HttpClient:
         merged = self._merge_headers(headers)
         effective_timeout = self.timeout if timeout is None else timeout
         attempt = 0
+        # Bytes already on disk from a previous attempt. Non-zero only after a
+        # transport failure against a server that advertised `Accept-Ranges`,
+        # so the common path is unchanged.
+        resume_from = 0
+        accepts_ranges = False
         while True:
             self._throttle()
+            request_headers = dict(merged)
+            if resume_from:
+                request_headers["Range"] = f"bytes={resume_from}-"
             try:
                 response = self._send(
                     "GET",
                     url,
                     stream=True,
-                    headers=merged,
+                    headers=request_headers,
                     timeout=effective_timeout,
                     **kwargs,
                 )
@@ -1088,8 +1102,25 @@ class HttpClient:
                         attempt += 1
                         continue
                     response.raise_for_status()
+                    accepts_ranges = (
+                        "bytes" in response.headers.get("Accept-Ranges", "").lower()
+                    )
+                    if resume_from and response.status_code != 206:
+                        # The server ignored the `Range` and is sending the whole
+                        # body again. Appending it would corrupt the file, so
+                        # start the staged copy over.
+                        logger.debug(
+                            f"{redact_url(url)} ignored a Range request; "
+                            "restarting the download"
+                        )
+                        resume_from = 0
                     self._stream_to_file(
-                        response, tmp, chunk=chunk, progress=progress, desc=dest.name
+                        response,
+                        tmp,
+                        chunk=chunk,
+                        progress=progress,
+                        desc=dest.name,
+                        resume_from=resume_from,
                     )
                     if expect_magic is not None:
                         _check_magic(tmp, expect_magic, url)
@@ -1097,16 +1128,31 @@ class HttpClient:
                     response.close()
             except self.retry_on_exceptions as exc:
                 # No idempotency gate here, unlike `_request_with_retry`: this
-                # loop only ever issues the GET below, so the verb is always
+                # loop only ever issues the GET above, so the verb is always
                 # replay-safe. Re-check that if it is ever parameterised.
-                discard_partial()
-                if attempt >= self.max_retries:
+                if classify_transport_error(exc) is None or attempt >= self.max_retries:
+                    discard_partial()
                     raise
+                # Keep what already landed and ask for the rest, when the file
+                # is staged and the server said it supports ranges. Restarting
+                # a multi-gigabyte transfer from byte 0 on every reset can burn
+                # several times the bytes and may never converge on a link
+                # flaky enough to have caused the reset.
+                written = tmp.stat().st_size if staged and tmp.exists() else 0
+                if staged and accepts_ranges and written > 0:
+                    resume_from = written
+                    logger.warning(
+                        f"{type(exc).__name__} on {redact_url(url)}; resuming from "
+                        f"{written} bytes, retry {attempt + 1}/{self.max_retries}"
+                    )
+                else:
+                    discard_partial()
+                    resume_from = 0
+                    logger.warning(
+                        f"{type(exc).__name__} on {redact_url(url)}; restarting, "
+                        f"retry {attempt + 1}/{self.max_retries}"
+                    )
                 wait = self._backoff_wait(None, attempt)
-                logger.warning(
-                    f"{type(exc).__name__} on {redact_url(url)}; retry "
-                    f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
-                )
                 self._sleep(wait)
                 attempt += 1
                 continue
