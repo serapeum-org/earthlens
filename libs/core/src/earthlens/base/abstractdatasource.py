@@ -2407,11 +2407,17 @@ class AbstractCatalog(BaseModel):
 
     Subclasses pass through pydantic's normal `BaseModel.__init__`
     — declare any backend-specific construction parameters as
-    pydantic fields rather than `__init__` arguments. Override
-    :meth:`get_catalog` (and optionally :meth:`get_variable`); the
-    base implementations raise :class:`NotImplementedError` to flag
-    a missing override at first use rather than silently returning
-    an empty mapping.
+    pydantic fields rather than `__init__` arguments.
+
+    :meth:`get_catalog` defaults to returning :attr:`datasets`, which is
+    where every backend keeps its rows and what the dict surface below
+    already reads, so a subclass storing them there needs no override.
+    **A subclass whose rows live in another field must override it** —
+    otherwise `get_catalog()` and the :attr:`catalog` property report an
+    empty mapping rather than failing, and a catalog that silently has no
+    entries is harder to notice than one that raises. :meth:`get_variable`
+    still raises :class:`NotImplementedError`, since there is no sensible
+    default for a per-dataset variable level.
 
     Attributes:
         catalog: Read-only view of the mapping returned by

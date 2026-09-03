@@ -909,6 +909,15 @@ class HttpClient:
         `Retry-After`/back-off policy as the other verbs; the retry
         decision reads only the status line, never the body.
 
+        A body that breaks **after** this returns is therefore the
+        caller's to handle: the iteration happens outside the retry loop,
+        so a `ChunkedEncodingError` raised mid-stream escapes it. The
+        default transport retry covers the non-streaming verbs, whose
+        bodies `requests` materialises inside the loop, and
+        :meth:`download`, which owns its own. A caller streaming a large
+        body that needs the same protection should use :meth:`download`
+        or re-request on failure itself.
+
         Args:
             url: Absolute request URL.
             **kwargs: Keyword arguments forwarded to :meth:`get`.
@@ -1087,6 +1096,9 @@ class HttpClient:
                 finally:
                     response.close()
             except self.retry_on_exceptions as exc:
+                # No idempotency gate here, unlike `_request_with_retry`: this
+                # loop only ever issues the GET below, so the verb is always
+                # replay-safe. Re-check that if it is ever parameterised.
                 discard_partial()
                 if attempt >= self.max_retries:
                     raise

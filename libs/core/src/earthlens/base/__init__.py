@@ -27,6 +27,7 @@ from earthlens.base.abstractdatasource import (
     RemoteProduct,
     SpatialExtent,
     TemporalExtent,
+    native_parameters,
 )
 from earthlens.base.auth import (
     AbstractAuth,
@@ -128,6 +129,7 @@ __all__ = [
     "is_http_status",
     "is_network_unreachable",
     "load_catalog",
+    "native_parameters",
     "load_providers",
     "mask_to_geometry",
     "normalize_aoi",

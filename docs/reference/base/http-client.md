@@ -17,14 +17,44 @@ Construct one client per backend with the default headers it needs, then call th
 ```python
 from earthlens.base.http import HttpClient
 
-http = HttpClient(headers={"X-API-Key": api_key}, timeout=60.0)
+http = HttpClient(headers={"X-API-Key": api_key})
 
-# JSON GET with automatic 429/5xx retry + Retry-After honouring:
+# JSON GET with automatic status + transport retry and Retry-After honouring:
 payload = http.get_json("https://api.example.org/v1/things", params={"bbox": "1,2,3,4"})
 
 # Streamed download to disk with a tqdm bar (sized from Content-Length):
 http.download("https://example.org/big.tif", dest, progress=True)
 ```
+
+## Retry policy
+
+Two kinds of failure are retried, on separate budgets, because they warrant opposite policies.
+
+**Status retries** cover `429` / `500` / `502` / `503` / `504` and honour `Retry-After`. A `413` / `429` / `503`
+is the server asking for a later attempt, so it is replayed for any method. A `500` / `502` / `504` means the
+server already had the request and may have acted on it, so those are replayed only for idempotent methods.
+
+**Transport retries** cover the failures that never reach a status line — a refused or reset connection, a DNS
+blip, a read timeout, a body truncated mid-stream. These are on by default; they were opt-in before, which meant
+a TCP reset partway through a large granule threw away the whole transfer.
+
+The two phases have their own budgets:
+
+| Failure | Budget | Replayed for a `POST`? |
+|---|---|---|
+| **connect** — refused, unresolvable, connect timeout | `connect_retries` (1) | yes — the request never reached the server |
+| **read** — reset mid-response, read timeout, truncated body | `read_retries` (= `max_retries`) | no, unless `retry_unsafe_methods=True` |
+| `SSLError`, `ProxyError` | never retried | — |
+
+The connect budget is small on purpose: a host that refuses a connection rarely starts accepting one within a
+back-off window, so a generous budget only turns a clear failure into a slow one.
+
+If your endpoint is a `POST` that is safe to replay (a search API, an idempotent RPC), pass
+`retry_unsafe_methods=True`. Without it a read-phase failure on a `POST` is reported rather than replayed, and
+the suppression is logged at debug level.
+
+`timeout` is a `(connect, read)` pair by default — `(10.0, 60.0)` — so a dead host fails in ten seconds while a
+slow transfer keeps a full read budget. A bare float still works and applies to both phases.
 
 The default `User-Agent` is `earthlens/{version}` — deliberately **non-Mozilla**, because the DIGITAL.CSIC
 Anubis anti-bot wall (SPEIbase) blocks browser-like agents. Pass `user_agent=` for a descriptive contact string
