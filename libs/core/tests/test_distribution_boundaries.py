@@ -78,15 +78,23 @@ _GDAL_ALLOWED = frozenset({"libs/providers/hazards/src/earthlens/jrc/_helpers.py
 
 
 def _earthlens_sources() -> list[Path]:
-    """Return every shipped earthlens source file, core and providers alike."""
+    """Return every earthlens Python file the GDAL rule governs.
+
+    Covers the test and tooling trees as well as shipped source: this very
+    branch had to hand-convert `osgeo` out of two FDSN tests, and a rule that
+    only watches `src/` would let the next one back in unnoticed.
+    """
     return sorted(
         path
         for pattern in (
             "libs/core/src/earthlens/**/*.py",
             "libs/providers/*/src/earthlens/**/*.py",
+            "libs/core/tests/**/*.py",
+            "libs/providers/*/tests/**/*.py",
+            "tools/**/*.py",
         )
         for path in _ROOT.glob(pattern)
-        if "build" not in path.parts
+        if "build" not in path.parts and "__pycache__" not in path.parts
     )
 
 
