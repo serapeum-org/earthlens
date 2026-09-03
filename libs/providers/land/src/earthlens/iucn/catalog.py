@@ -186,14 +186,6 @@ class Catalog(AbstractCatalog):
         rows, available = _load_catalog_data(catalog_path)
         return cls(datasets=dict(rows), available_datasets=list(available))
 
-    def get_catalog(self) -> dict[str, Country]:
-        """Return the country map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Country]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def resolve_iso2(self, selector: str) -> str:
         """Resolve a country `variables` selector to an ISO2 country code.
 

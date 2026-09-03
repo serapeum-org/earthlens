@@ -131,10 +131,6 @@ class Catalog(AbstractCatalog):
         """
         return {"datasets": _load_stations(CATALOG_PATH)}
 
-    def get_catalog(self) -> dict[str, Station]:
-        """Return the structural per-site map (satisfies the base contract)."""
-        return self.datasets
-
     def get_station(self, site_id: str) -> Station:
         """Resolve a site id to its :class:`Station` (did-you-mean on miss).
 

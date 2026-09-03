@@ -332,14 +332,6 @@ class Catalog(AbstractCatalog):
                 ) from exc
         return out
 
-    def get_catalog(self) -> dict[str, Cmip6Variable]:
-        """Return the curated variable map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Cmip6Variable]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get_experiment(self, key: str) -> Experiment:
         """Return the :class:`Experiment` for `key`, with a did-you-mean hint.
 

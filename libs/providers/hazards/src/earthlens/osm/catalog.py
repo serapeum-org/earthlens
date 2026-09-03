@@ -295,14 +295,6 @@ class Catalog(AbstractCatalog):
         )
         return cls(datasets=dict(datasets), regions=dict(regions))
 
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the named-query map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Dataset]: Same object as `datasets`.
-        """
-        return self.datasets
-
     def get(self, query_id: str) -> Dataset:
         """Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.
 

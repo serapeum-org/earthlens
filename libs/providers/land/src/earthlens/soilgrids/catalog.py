@@ -235,10 +235,6 @@ class Catalog(AbstractCatalog):
             available_datasets=list(available),
         )
 
-    def get_catalog(self) -> dict[str, Property]:
-        """Return the property map (satisfies the abstract contract)."""
-        return self.datasets
-
     def get(self, property_id: str) -> Property:
         """Return the `Property` for a curated id, did-you-mean on miss.
 

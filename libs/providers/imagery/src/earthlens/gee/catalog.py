@@ -760,25 +760,6 @@ class Catalog(AbstractCatalog):
     # `get_provider(slug)` (with did-you-mean hint) lifted to
     # :class:`earthlens.base.AbstractCatalog`.
 
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the curated dataset map (asset id → :class:`Dataset`).
-
-        Returns:
-            The :attr:`datasets` mapping.
-
-        Examples:
-            - The map is keyed by Earth Engine asset id:
-                ```python
-                >>> cat = Catalog()
-                >>> "ESA/WorldCover/v200" in cat.get_catalog()
-                True
-                >>> cat.get_catalog()["ESA/WorldCover/v200"].title
-                'ESA WorldCover 10m v200 (2021)'
-
-                ```
-        """
-        return self.datasets
-
     def get_band(self, dataset_id: str, band_id: str) -> Band:
         """Return the :class:`Band` for `(dataset_id, band_id)`.
 

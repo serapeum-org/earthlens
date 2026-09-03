@@ -519,14 +519,6 @@ class Catalog(AbstractCatalog):
         path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(**_load_catalog_data(path))
 
-    def get_catalog(self) -> dict[str, Extension]:
-        """Return the extension map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Extension]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     @property
     def available_extensions(self) -> list[str]:
         """The sorted list of extension keys.

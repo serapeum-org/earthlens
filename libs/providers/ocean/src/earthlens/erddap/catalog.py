@@ -287,18 +287,6 @@ class Catalog(AbstractCatalog):
             datasets=dict(datasets),
         )
 
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the structural per-dataset map.
-
-        Satisfies the abstract base's contract; the actual parsing is
-        done in :func:`model_post_init`.
-
-        Returns:
-            dict[str, Dataset]: One entry per curated ERDDAP dataset.
-                Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get(self, dataset_id: str) -> Dataset:
         """Return the :class:`Dataset` row for `dataset_id`.
 

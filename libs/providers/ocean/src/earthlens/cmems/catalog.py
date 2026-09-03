@@ -449,18 +449,6 @@ class Catalog(AbstractCatalog):
             datasets=dict(datasets),
         )
 
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the structural per-dataset map.
-
-        Satisfies the abstract base's contract; the actual parsing
-        is done in :func:`model_post_init`.
-
-        Returns:
-            dict[str, Dataset]: One entry per curated CMEMS dataset.
-                Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get_variable(self, dataset_id: str, variable_name: str) -> Variable:
         """Return the :class:`Variable` for a `(dataset_id, name)` pair.
 

@@ -223,14 +223,6 @@ class Catalog(AbstractCatalog):
         )
         return cls(datasets=dict(cached))
 
-    def get_catalog(self) -> dict[str, Pollutant]:
-        """Return the pollutant map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Pollutant]: Same object as `datasets` / `pollutants`.
-        """
-        return self.datasets
-
     def get_pollutant(self, name: str) -> Pollutant:
         """Resolve a pollutant name to its `Pollutant` row.
 

@@ -2390,16 +2390,32 @@ class AbstractCatalog(BaseModel):
                     setattr(self, field, value)
 
     def get_catalog(self) -> Any:
-        """Read the catalog of the datasource from disk or retrieve it from server.
+        """Return the catalog's rows.
 
-        Abstract; concrete subclasses must override and return their
-        backend-specific catalog object (e.g. a pydantic `Catalog`
-        instance, a `dict`, or whatever shape the backend uses).
+        Defaults to :attr:`datasets`, which is where every backend keeps
+        them and what the inherited dict surface (`len`, `in`, `[]`,
+        iteration, :meth:`get_dataset`) already reads. Raising
+        `NotImplementedError` here instead made the method mandatory, and
+        all 61 provider catalogs answered it with the same
+        `return self.datasets`.
 
-        Raises:
-            NotImplementedError: Always, until overridden by a subclass.
+        A backend whose catalog is genuinely a different shape still
+        overrides this.
+
+        Returns:
+            Any: The `{key: row}` mapping backing this catalog.
+
+        Examples:
+            - The default is the `datasets` mapping itself:
+                ```python
+                >>> from earthlens.chc import Catalog
+                >>> catalog = Catalog()
+                >>> catalog.get_catalog() is catalog.datasets
+                True
+
+                ```
         """
-        raise NotImplementedError
+        return self.datasets
 
     def get_variable(self, dataset_key: str, variable_name: str) -> Any:
         """Return one leaf (variable / band / asset) of a dataset.

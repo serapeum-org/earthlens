@@ -232,14 +232,6 @@ class Catalog(AbstractCatalog):
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(**_load_catalog_data(catalog_path))
 
-    def get_catalog(self) -> dict[str, CatRaReDataset]:
-        """Return the threshold map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, CatRaReDataset]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get(self, threshold: str) -> CatRaReDataset:
         """Resolve a threshold key to its :class:`CatRaReDataset` row.
 

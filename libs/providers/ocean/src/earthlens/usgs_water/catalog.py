@@ -260,15 +260,6 @@ class Catalog(AbstractCatalog):
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(datasets=dict(_load_catalog_data(catalog_path)))
 
-    def get_catalog(self) -> dict[str, Parameter]:
-        """Return the parameter map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Parameter]: Same object as :attr:`datasets` /
-                :attr:`parameters`.
-        """
-        return self.datasets
-
     @property
     def available_parameters(self) -> list[str]:
         """The sorted list of curated friendly parameter names.

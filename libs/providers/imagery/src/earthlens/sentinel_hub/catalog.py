@@ -417,10 +417,6 @@ class Catalog(AbstractCatalog):
             available_collections=list(av_cols),
         )
 
-    def get_catalog(self) -> dict[str, Collection]:
-        """Return the curated collection map (logical key → :class:`Collection`)."""
-        return self.datasets
-
     def get_collection(self, collection_key: str) -> Collection:
         """Return the :class:`Collection` for `collection_key` (did-you-mean on miss).
 

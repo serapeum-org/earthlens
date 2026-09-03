@@ -358,10 +358,6 @@ class Catalog(AbstractCatalog):
         )
         return cls(datasets=dict(datasets), available_datasets=list(available))
 
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the dataset map (satisfies the abstract contract)."""
-        return self.datasets
-
     def resolve(self, dataset: str | dict[str, Any] | Dataset) -> Dataset:
         """Resolve a dataset selector to a validated `Dataset`.
 

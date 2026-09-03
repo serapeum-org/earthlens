@@ -251,14 +251,6 @@ class Catalog(AbstractCatalog):
         basins = _load_basins(catalog_path)
         return cls(datasets=dict(basins), available_datasets=sorted(basins))
 
-    def get_catalog(self) -> dict[str, Basin]:
-        """Return the basin map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Basin]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get_basin(self, code: str) -> Basin:
         """Return the :class:`Basin` for `code`, with a did-you-mean hint.
 

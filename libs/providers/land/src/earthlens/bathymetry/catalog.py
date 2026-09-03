@@ -300,10 +300,6 @@ class Catalog(AbstractCatalog):
             available_datasets=list(available),
         )
 
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the dataset map (satisfies the abstract contract)."""
-        return self.datasets
-
     def get(self, dataset_id: str) -> Dataset:
         """Return the `Dataset` for a curated id, did-you-mean on miss.
 

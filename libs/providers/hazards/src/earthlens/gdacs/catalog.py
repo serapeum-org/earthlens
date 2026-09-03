@@ -188,14 +188,6 @@ class Catalog(AbstractCatalog):
         )
         return cls(datasets=dict(hazards))
 
-    def get_catalog(self) -> dict[str, HazardType]:
-        """Return the hazard-type map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, HazardType]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get_hazard(self, code: str) -> HazardType:
         """Return the :class:`HazardType` for `code`, with a did-you-mean hint.
 

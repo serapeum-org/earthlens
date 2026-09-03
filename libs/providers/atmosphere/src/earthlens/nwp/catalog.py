@@ -296,10 +296,6 @@ class Catalog(AbstractCatalog):
         """
         return {"datasets": _load_catalog_data(CATALOG_PATH)}
 
-    def get_catalog(self) -> dict[str, NWPModel]:
-        """Return the structural per-model map (satisfies the base contract)."""
-        return self.datasets
-
     def get_model(self, model_key: str) -> NWPModel:
         """Resolve a model key to its :class:`NWPModel` row.
 

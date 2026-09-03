@@ -361,23 +361,6 @@ class Catalog(AbstractCatalog):
         )
         return cls(**parsed)
 
-    def get_catalog(self) -> dict[str, FloodType]:
-        """Return the flood-type map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, FloodType]: Same object as :attr:`datasets`.
-
-        Examples:
-            - The flood-type map is keyed by the `Type` string:
-                ```python
-                >>> from earthlens.hanze import Catalog
-                >>> sorted(Catalog().get_catalog())
-                ['Coastal', 'Flash', 'River', 'River/Coastal']
-
-                ```
-        """
-        return self.datasets
-
     def get_flood_type(self, flood_type: str) -> FloodType:
         """Return the :class:`FloodType` for `flood_type`, with a did-you-mean hint.
 

@@ -324,14 +324,6 @@ class Catalog(AbstractCatalog):
         payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="NWM")
         return cls(**payload)
 
-    def get_catalog(self) -> dict[str, NWMProduct]:
-        """Return the product map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, NWMProduct]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get_product(self, key: str) -> NWMProduct:
         """Return the :class:`NWMProduct` for `key`, with a did-you-mean hint.
 

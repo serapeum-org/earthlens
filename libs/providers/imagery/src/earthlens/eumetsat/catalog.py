@@ -401,18 +401,6 @@ class Catalog(AbstractCatalog):
             datasets=dict(datasets),
         )
 
-    def get_catalog(self) -> dict[str, EumetsatDataset]:
-        """Return the structural per-dataset map.
-
-        Satisfies the abstract base's contract; the actual parsing is
-        done in `model_post_init`.
-
-        Returns:
-            dict[str, EumetsatDataset]: One entry per curated dataset.
-                Same object as `datasets`.
-        """
-        return self.datasets
-
     def resolve(
         self, key: str, group: DataStoreGroup | str | None = None
     ) -> EumetsatDataset:

@@ -294,23 +294,6 @@ class Catalog(AbstractCatalog):
         )
         return cls(**parsed)
 
-    def get_catalog(self) -> dict[str, FlodisDataset]:
-        """Return the table map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, FlodisDataset]: Same object as :attr:`datasets`.
-
-        Examples:
-            - The table map is keyed by the `dataset` string:
-                ```python
-                >>> from earthlens.flodis import Catalog
-                >>> sorted(Catalog().get_catalog())
-                ['damages', 'displacement']
-
-                ```
-        """
-        return self.datasets
-
     def dataset(self, name: str) -> FlodisDataset:
         """Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.
 

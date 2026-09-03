@@ -224,14 +224,6 @@ class Catalog(AbstractCatalog):
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(datasets=dict(_load_catalog_data(catalog_path)))
 
-    def get_catalog(self) -> dict[str, Index]:
-        """Return the index map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Index]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get(self, index_id: str) -> Index:
         """Resolve an index id to its :class:`Index` row.
 

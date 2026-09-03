@@ -273,14 +273,6 @@ class Catalog(AbstractCatalog):
         )
         return cls(datasets=dict(sensors))
 
-    def get_catalog(self) -> dict[str, Sensor]:
-        """Return the sensor map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Sensor]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get_sensor(self, code: str) -> Sensor:
         """Return the :class:`Sensor` for `code`, with a did-you-mean hint.
 

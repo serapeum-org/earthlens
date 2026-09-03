@@ -1085,31 +1085,6 @@ class Catalog(AbstractCatalog):
             providers=dict(providers),
         )
 
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the structural per-dataset map.
-
-        Satisfies the abstract base's contract; the actual parsing
-        is done in :func:`model_post_init`.
-
-        Returns:
-            dict[str, Dataset]: One entry per CDS dataset. Same
-            object as :attr:`datasets`.
-
-        Examples:
-            - Inspect the dataset count and a sample:
-
-                ```python
-                >>> from earthlens.ecmwf import Catalog
-                >>> mapping = Catalog().get_catalog()
-                >>> "reanalysis-era5-single-levels" in mapping
-                True
-                >>> mapping["reanalysis-era5-single-levels"].monthly
-                'reanalysis-era5-single-levels-monthly-means'
-
-                ```
-        """
-        return self.datasets
-
     def get_variable(self, dataset_name: str, variable_name: str) -> Variable:
         """Return the :class:`Variable` for a `(dataset, code)` pair.
 

@@ -170,14 +170,6 @@ class Catalog(AbstractCatalog):
         )
         return cls(datasets=dict(cached))
 
-    def get_catalog(self) -> dict[str, Family]:
-        """Return the family map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Family]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get_family(self, name: str) -> Family:
         """Return the :class:`Family` for `name`, with a did-you-mean hint.
 

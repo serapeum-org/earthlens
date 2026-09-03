@@ -295,18 +295,6 @@ class Catalog(AbstractCatalog):
             datasets=dict(datasets),
         )
 
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the structural per-dataset map.
-
-        Satisfies the abstract base's contract; the actual parsing is done
-        in `model_post_init`.
-
-        Returns:
-            dict[str, Dataset]: One entry per curated dataset (same object
-                as `datasets`).
-        """
-        return self.datasets
-
     def get(self, dataset_id: str) -> Dataset:
         """Resolve a dataset id to its row, with a did-you-mean on miss.
 

@@ -10,8 +10,8 @@ import pytest
 import requests
 
 from earthlens.base.http import (
-    DEFAULT_STATUS_FORCELIST,
     DEFAULT_RETRY_EXCEPTIONS,
+    DEFAULT_STATUS_FORCELIST,
     DEFAULT_TIMEOUT,
     HttpClient,
     RequestsGet,

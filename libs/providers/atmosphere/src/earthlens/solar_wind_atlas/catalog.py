@@ -224,10 +224,6 @@ class Catalog(AbstractCatalog):
             available_datasets=list(available),
         )
 
-    def get_catalog(self) -> dict[str, Layer]:
-        """Return the layer map (satisfies the abstract contract)."""
-        return self.datasets
-
     def get(self, layer_id: str) -> Layer:
         """Return the `Layer` for a curated id, did-you-mean on miss.
 

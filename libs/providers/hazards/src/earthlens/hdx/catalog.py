@@ -377,18 +377,6 @@ class Catalog(AbstractCatalog):
         catalog._available_rows = rows
         return catalog
 
-    def get_catalog(self) -> dict[str, HdxDataset]:
-        """Return the structural per-dataset map.
-
-        Satisfies the abstract base's contract; the actual parsing is
-        done in :func:`model_post_init`.
-
-        Returns:
-            dict[str, HdxDataset]: One entry per curated dataset. Same
-                object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get_dataset(self, name: str) -> HdxDataset:
         """Resolve a key against the curated then the full HDX index.
 

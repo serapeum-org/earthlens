@@ -248,15 +248,6 @@ class Catalog(AbstractCatalog):
         )
         return cls(datasets=dict(parameters))
 
-    def get_catalog(self) -> dict[str, Parameter]:
-        """Return the parameter map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Parameter]: Same object as :attr:`datasets` /
-                :attr:`parameters`.
-        """
-        return self.datasets
-
     def get_parameter(self, name: str) -> Parameter:
         """Resolve a pollutant name to its :class:`Parameter` row.
 

@@ -193,14 +193,6 @@ class Catalog(AbstractCatalog):
         rows, available = _load_catalog_data(catalog_path)
         return cls(datasets=dict(rows), available_datasets=list(available))
 
-    def get_catalog(self) -> dict[str, Species]:
-        """Return the species map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Species]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def resolve_scientific_name(self, selector: str) -> str:
         """Resolve a `variables` selector to an OBIS `scientificname`.
 

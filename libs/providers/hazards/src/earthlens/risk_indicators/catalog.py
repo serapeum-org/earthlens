@@ -296,14 +296,6 @@ class Catalog(AbstractCatalog):
         datasets, admin_codes = _load_catalog_data(catalog_path)
         return cls(datasets=dict(datasets), admin_codes=dict(admin_codes))
 
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the dataset map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Dataset]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get(self, dataset_id: str) -> Dataset:
         """Resolve a dataset id to its :class:`Dataset` row.
 

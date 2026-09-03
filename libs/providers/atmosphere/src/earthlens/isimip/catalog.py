@@ -313,14 +313,6 @@ class Catalog(AbstractCatalog):
                 ) from exc
         return out
 
-    def get_catalog(self) -> dict[str, Variable]:
-        """Return the curated variable map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Variable]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
-
     def get_forcing(self, key: str) -> Forcing:
         """Return the :class:`Forcing` for `key`, with a did-you-mean hint.
 

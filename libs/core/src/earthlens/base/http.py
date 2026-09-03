@@ -1047,8 +1047,7 @@ class HttpClient:
                 # and act on the request, so a non-idempotent method is replayed
                 # only when the caller says it is safe.
                 if not (
-                    self.retry_unsafe_methods
-                    or method.upper() in IDEMPOTENT_METHODS
+                    self.retry_unsafe_methods or method.upper() in IDEMPOTENT_METHODS
                 ):
                     raise
                 wait = self._backoff_wait(None, attempt)
