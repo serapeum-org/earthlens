@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24426,7 +24426,8 @@ frames line up into an animation.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.patches</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circle</span><span class="p">,</span> <span class="n">FancyBboxPatch</span><span class="p">,</span> <span class="n">Wedge</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">osgeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdal</span>  <span class="c1"># after pyramids, which puts its vendored GDAL on the path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
@@ -24434,6 +24435,7 @@ frames line up into an animation.</p>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+<span class="n">gdal</span><span class="o">.</span><span class="n">UseExceptions</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">"figure.dpi"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">80</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import shutil
@@ -24450,7 +24452,8 @@ from cleopatra.styling.watermark import stamp_mark
 from IPython.display import Image, display
 from loguru import logger
 from matplotlib.patches import Circle, FancyBboxPatch, Wedge
-from pyramids.dataset import Dataset, GeoReference
+from osgeo import gdal  # after pyramids, which puts its vendored GDAL on the path
+from pyramids.dataset import Dataset
 from pyramids.dataset.collection import DatasetCollection
 from pyramids.netcdf import NetCDF
 
@@ -24458,6 +24461,7 @@ from earthlens.core import EarthLens
 
 warnings.filterwarnings("ignore")
 logger.remove()
+gdal.UseExceptions()
 plt.rcParams["figure.dpi"] = 80</div>
 </div>
 </div>
@@ -24850,10 +24854,11 @@ for d in (REGION_DIR, GLOBE_DIR):
     <span class="n">green</span> <span class="o">=</span> <span class="mf">0.45</span> <span class="o">*</span> <span class="n">red</span> <span class="o">+</span> <span class="mf">0.10</span> <span class="o">*</span> <span class="n">veg</span> <span class="o">+</span> <span class="mf">0.45</span> <span class="o">*</span> <span class="n">blue</span>  <span class="c1"># CIMSS synthetic green</span>
     <span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">([</span><span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">2.2</span><span class="p">)</span>  <span class="c1"># (3, H, W), gamma</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">rgb</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">255.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"uint8"</span><span class="p">)</span>
-    <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
+    <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
         <span class="n">arr</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span>
+        <span class="n">geo</span><span class="o">=</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">CELL</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">CELL</span><span class="p">),</span>
+        <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span>
         <span class="n">no_data_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">CELL</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">CELL</span><span class="p">),</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">),</span>
     <span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">def render_region(nc_path, dst):
@@ -24885,10 +24890,11 @@ for d in (REGION_DIR, GLOBE_DIR):
     green = 0.45 * red + 0.10 * veg + 0.45 * blue  # CIMSS synthetic green
     rgb = np.power(np.clip([red, green, blue], 0.0, 1.0), 1 / 2.2)  # (3, H, W), gamma
     arr = (np.clip(np.stack(rgb), 0.0, 1.0) * 255.0).astype("uint8")
-    Dataset.from_array(
+    Dataset.create_from_array(
         arr=arr,
+        geo=(W, CELL, 0.0, N, 0.0, -CELL),
+        epsg=4326,
         no_data_value=0,
-        geo_ref=GeoReference(geo=(W, CELL, 0.0, N, 0.0, -CELL), epsg=4326),
     ).to_file(str(dst))</div>
 </div>
 </div>
@@ -24945,10 +24951,8 @@ for d in (REGION_DIR, GLOBE_DIR):
     <span class="k">if</span> <span class="n">target</span> <span class="o">&gt;</span> <span class="n">width</span><span class="p">:</span>
         <span class="n">pad</span> <span class="o">=</span> <span class="p">(</span><span class="n">target</span> <span class="o">-</span> <span class="n">width</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
         <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="n">pad</span><span class="p">,</span> <span class="n">target</span> <span class="o">-</span> <span class="n">width</span> <span class="o">-</span> <span class="n">pad</span><span class="p">)))</span>
-    <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
-        <span class="n">arr</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span>
-        <span class="n">no_data_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">),</span>
+    <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
+        <span class="n">arr</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">no_data_value</span><span class="o">=</span><span class="mi">0</span>
     <span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span>
 
 
@@ -24956,9 +24960,9 @@ for d in (REGION_DIR, GLOBE_DIR):
 <span class="w">    </span><span class="sd">"""True when a cached globe frame already carries the widened canvas."""</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="k">return</span> <span class="kc">False</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">ratio</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">columns</span> <span class="o">/</span> <span class="n">ds</span><span class="o">.</span><span class="n">rows</span>
-    <span class="n">ds</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">RasterXSize</span> <span class="o">/</span> <span class="n">ds</span><span class="o">.</span><span class="n">RasterYSize</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ratio</span> <span class="o">-</span> <span class="n">GLOBE_ASPECT</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">def render_globe(nc_path, dst):
@@ -24992,10 +24996,8 @@ for d in (REGION_DIR, GLOBE_DIR):
     if target &gt; width:
         pad = (target - width) // 2
         arr = np.pad(arr, ((0, 0), (0, 0), (pad, target - width - pad)))
-    Dataset.from_array(
-        arr=arr,
-        no_data_value=0,
-        geo_ref=GeoReference(geo=(0.0, 1.0, 0.0, 0.0, 0.0, -1.0), epsg=4326),
+    Dataset.create_from_array(
+        arr=arr, geo=(0.0, 1.0, 0.0, 0.0, 0.0, -1.0), epsg=4326, no_data_value=0
     ).to_file(str(dst))
 
 
@@ -25003,9 +25005,9 @@ def wide_canvas(path):
     """True when a cached globe frame already carries the widened canvas."""
     if not path.exists():
         return False
-    ds = Dataset.read_file(path)
-    ratio = ds.columns / ds.rows
-    ds.close()
+    ds = gdal.Open(str(path))
+    ratio = ds.RasterXSize / ds.RasterYSize
+    ds = None
     return abs(ratio - GLOBE_ASPECT) &lt; 0.01</div>
 </div>
 </div>

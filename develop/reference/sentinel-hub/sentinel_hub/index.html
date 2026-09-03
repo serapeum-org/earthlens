@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -31030,7 +31030,7 @@ base URL. Defaults to CDSE-free.</p>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_url</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `(client_id, client_secret)` to use (env → kwargs).</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `(client_id, client_secret)` to use (kwargs → env).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        Explicit credentials on the object win over the environment.</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a>
@@ -31046,7 +31046,7 @@ base URL. Defaults to CDSE-free.</p>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `SHConfig` (base/token urls + credentials); idempotent.</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        Resolves credentials env → kwargs → profile. A second call after</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        Resolves credentials kwargs → env → profile. A second call after</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        :meth:`is_authenticated` returns `True` is a no-op.</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        Raises:</span>
@@ -31352,7 +31352,7 @@ fails at construction.</p>
     <div class="doc doc-contents ">
 
         <p>Build the <code>SHConfig</code> (base/token urls + credentials); idempotent.</p>
-<p>Resolves credentials env → kwargs → profile. A second call after
+<p>Resolves credentials kwargs → env → profile. A second call after
 :meth:<code>is_authenticated</code> returns <code>True</code> is a no-op.</p>
 
 
@@ -31429,7 +31429,7 @@ and no profile).</p>
 <span class="normal"><a href="#__codelineno-0-217">217</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the `SHConfig` (base/token urls + credentials); idempotent.</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    Resolves credentials env → kwargs → profile. A second call after</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    Resolves credentials kwargs → env → profile. A second call after</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">    :meth:`is_authenticated` returns `True` is a no-op.</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    Raises:</span>
@@ -38121,7 +38121,7 @@ base URL. Defaults to CDSE-free.</p>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_url</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `(client_id, client_secret)` to use (env → kwargs).</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `(client_id, client_secret)` to use (kwargs → env).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        Explicit credentials on the object win over the environment.</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a>
@@ -38137,7 +38137,7 @@ base URL. Defaults to CDSE-free.</p>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `SHConfig` (base/token urls + credentials); idempotent.</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        Resolves credentials env → kwargs → profile. A second call after</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        Resolves credentials kwargs → env → profile. A second call after</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        :meth:`is_authenticated` returns `True` is a no-op.</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        Raises:</span>
@@ -38443,7 +38443,7 @@ fails at construction.</p>
     <div class="doc doc-contents ">
 
         <p>Build the <code>SHConfig</code> (base/token urls + credentials); idempotent.</p>
-<p>Resolves credentials env → kwargs → profile. A second call after
+<p>Resolves credentials kwargs → env → profile. A second call after
 :meth:<code>is_authenticated</code> returns <code>True</code> is a no-op.</p>
 
 
@@ -38520,7 +38520,7 @@ and no profile).</p>
 <span class="normal"><a href="#__codelineno-0-217">217</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the `SHConfig` (base/token urls + credentials); idempotent.</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    Resolves credentials env → kwargs → profile. A second call after</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    Resolves credentials kwargs → env → profile. A second call after</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">    :meth:`is_authenticated` returns `True` is a no-op.</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    Raises:</span>
