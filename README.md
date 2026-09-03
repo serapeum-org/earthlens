@@ -157,6 +157,7 @@ for the full walkthrough of each one.
 | <img src="docs/_images/logos/wdpa.png" height="20"> | [Protected Planet (UNEP-WCMC)](https://www.protectedplanet.net/) | `wdpa` |
 
 **Climate reanalysis & projections**
+|   | [ISIMIP](https://www.isimip.org/) | `isimip` |
 
 | | Provider | `data_source` |
 |---|---|---|
@@ -165,6 +166,13 @@ for the full walkthrough of each one.
 | <img src="docs/_images/logos/cmip6.svg" height="20"> | [WCRP CMIP6](https://wcrp-cmip.org/) | `cmip6` |
 
 **Disasters & risk**
+|   | [WRI Aqueduct](https://www.wri.org/aqueduct) | `aqueduct` |
+|   | [EM-DAT (CRED, UCLouvain)](https://www.emdat.be/) | `emdat` |
+|   | [FLODIS observed flood impacts](https://doi.org/10.5281/zenodo.8123096) | `flodis` |
+|   | [FLOPROS flood-protection standards](https://nhess.copernicus.org/articles/16/1049/2016/) | `flopros` |
+|   | [HANZE historical European floods](https://naturalhazards.eu/) | `hanze` |
+|   | [European Commission Joint Research Centre (CEMS)](https://data.jrc.ec.europa.eu/) | `jrc-flood` |
+|   | [USACE National Structure Inventory](https://nsi.sec.usace.army.mil/) | `nsi` |
 
 | | Provider | `data_source` |
 |---|---|---|
@@ -174,6 +182,7 @@ for the full walkthrough of each one.
 | <img src="docs/_images/logos/risk_indicators.svg" height="20"> | [ThinkHazard! (GFDRR/World Bank)](https://thinkhazard.org) | `risk-indicators` |
 
 **Elevation & bathymetry**
+|   | [FABDEM (Fathom / University of Bristol)](https://www.fathom.global/) | `fabdem` |
 
 | | Provider | `data_source` |
 |---|---|---|
@@ -193,6 +202,7 @@ for the full walkthrough of each one.
 | <img src="docs/_images/logos/hdx.png" height="20"> | [Humanitarian Data Exchange (UN OCHA)](https://data.humdata.org) | `hdx` |
 
 **Hydrology**
+|   | [Caravan large-sample hydrology](https://github.com/kratzert/Caravan) | `caravan` |
 
 | | Provider | `data_source` |
 |---|---|---|
@@ -229,6 +239,7 @@ for the full walkthrough of each one.
 | <img src="docs/_images/logos/worldpop.png" height="20"> | [WorldPop](https://hub.worldpop.org) | `worldpop` |
 
 **Precipitation & drought**
+|   | [GloH2O (MSWEP / MSWX)](https://www.gloh2o.org/) | `mswep` |
 
 | | Provider | `data_source` |
 |---|---|---|
@@ -276,6 +287,8 @@ for the full walkthrough of each one.
 | <img src="docs/_images/logos/nwp.png" height="20"> | [Herbie (NWP archive access)](https://herbie.readthedocs.io) | `nwp` |
 
 **Weather radar**
+|   | [DWD CatRaRE](https://www.dwd.de/EN/ourservices/radarklimatologie/radarklimatologie.html) | `catrare` |
+|   | [DWD RADKLIM / RADOLAN](https://opendata.dwd.de) | `radklim` |
 
 | | Provider | `data_source` |
 |---|---|---|
