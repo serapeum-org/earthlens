@@ -137,6 +137,11 @@ class Collection(BaseModel):
             Defaults to the logical key when omitted.
         aliases: Per-endpoint overrides of the collection id, keyed by
             endpoint key (e.g. `{"earth-search": "sentinel-2-c1-l2a"}`).
+        asset_aliases: Per-endpoint overrides of the *asset* keys, keyed by
+            endpoint key then by the catalog's own asset key (e.g. CDSE serves
+            Sentinel-2 bands per resolution, so `B04` is `B04_10m` there). Only
+            the endpoints that rename need an entry; an asset with no override
+            is passed through unchanged.
         default_assets: Asset keys pulled when the request names no assets.
         cadence: Native revisit cadence label, or `None`.
         resolution: Native ground sample distance in metres, or `None`.
@@ -159,6 +164,7 @@ class Collection(BaseModel):
     endpoint: str
     collection_id: str | None = None
     aliases: dict[str, str] = Field(default_factory=dict)
+    asset_aliases: dict[str, dict[str, str]] = Field(default_factory=dict)
     default_assets: list[str] = Field(default_factory=list)
     cadence: str | None = None
     resolution: float | None = None
@@ -459,3 +465,47 @@ class Catalog(AbstractCatalog):
         if endpoint in collection.aliases:
             return collection.aliases[endpoint]
         return collection.collection_id or collection_key
+
+    def resolve_assets(
+        self, endpoint: str, collection_key: str, assets: list[str]
+    ) -> list[str]:
+        """Rename `assets` to the keys `endpoint` actually publishes.
+
+        The catalog names each asset once, but an endpoint may publish the same
+        band under a different key — CDSE splits Sentinel-2 per resolution, so
+        the catalog's `B04` is `B04_10m` there. An asset the endpoint does not
+        rename is returned unchanged, so only the renaming endpoints need an
+        `asset_aliases` entry.
+
+        Args:
+            endpoint: Endpoint key the request targets.
+            collection_key: Logical collection key.
+            assets: Asset keys in the catalog's own naming.
+
+        Returns:
+            The asset keys to request from `endpoint`, in the given order.
+
+        Raises:
+            ValueError: If `collection_key` is unknown.
+
+        Examples:
+            - CDSE publishes Sentinel-2 bands per resolution:
+                ```python
+                >>> from earthlens.stac import Catalog
+                >>> Catalog().resolve_assets("cdse", "sentinel-2-l2a", ["B04"])
+                ['B04_10m']
+
+                ```
+            - An endpoint that does not rename gets the keys unchanged:
+                ```python
+                >>> from earthlens.stac import Catalog
+                >>> Catalog().resolve_assets(
+                ...     "planetary-computer", "sentinel-2-l2a", ["B04"]
+                ... )
+                ['B04']
+
+                ```
+        """
+        collection = self.get_collection(collection_key)
+        renames = collection.asset_aliases.get(endpoint, {})
+        return [renames.get(asset, asset) for asset in assets]

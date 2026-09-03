@@ -285,6 +285,11 @@ class STAC(LazyClientMixin, AbstractDataSource):
         for collection_key, requested in self.vars.items():
             collection = self._catalog.get_collection(collection_key)
             assets = list(requested) or list(collection.default_assets)
+            # The endpoint may publish a band under a different key than the
+            # catalog names it by (CDSE splits Sentinel-2 per resolution).
+            assets = self._catalog.resolve_assets(
+                self._endpoint, collection_key, assets
+            )
             resolved_id = self._catalog.resolve(self._endpoint, collection_key)
             for bbox in self._bboxes():
                 search = self.client.search(

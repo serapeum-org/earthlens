@@ -387,6 +387,36 @@ class TestLoaderRules:
         )
         assert cat.resolve("e", "x") == "x"
 
+    def test_resolve_assets_renames_only_the_named_endpoint(self):
+        """An endpoint publishing a band under another key gets the renamed one."""
+        cat = Catalog(
+            endpoints={
+                "e": Endpoint(key="e", url="u"),
+                "f": Endpoint(key="f", url="u"),
+            },
+            datasets={
+                "x": Collection(endpoint="e", asset_aliases={"f": {"B04": "B04_10m"}})
+            },
+        )
+        assert cat.resolve_assets("f", "x", ["B04"]) == ["B04_10m"]
+        assert cat.resolve_assets("e", "x", ["B04"]) == ["B04"], (
+            "an endpoint with no asset_aliases entry must pass keys through"
+        )
+        assert cat.resolve_assets("f", "x", ["SCL"]) == ["SCL"], (
+            "an asset the endpoint does not rename passes through"
+        )
+
+    def test_cdse_sentinel2_assets_carry_the_resolution_suffix(self):
+        """CDSE splits Sentinel-2 per resolution, so B04 is B04_10m there."""
+        cat = Catalog()
+        assert cat.resolve_assets("cdse", "sentinel-2-l2a", ["B04"]) == ["B04_10m"]
+        assert cat.resolve_assets(
+            "cdse", "sentinel-2-l2a", ["B02", "B03", "B04", "B08"]
+        ) == ["B02_10m", "B03_10m", "B04_10m", "B08_10m"]
+        assert cat.resolve_assets("planetary-computer", "sentinel-2-l2a", ["B04"]) == [
+            "B04"
+        ], "the rename is CDSE-only"
+
     def test_collection_unknown_endpoint_raises(self, tmp_path):
         """A collection naming an undeclared endpoint is rejected."""
         _write(

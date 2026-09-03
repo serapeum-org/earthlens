@@ -1945,6 +1945,12 @@ collections:
     aliases:
       cdse: sentinel-2-l2a
       earth-search: sentinel-2-c1-l2a
+    asset_aliases:
+      cdse:
+        B02: B02_10m
+        B03: B03_10m
+        B04: B04_10m
+        B08: B08_10m
     assets:
       B02:
         common_name: blue
