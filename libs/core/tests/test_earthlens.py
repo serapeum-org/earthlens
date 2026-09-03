@@ -1477,6 +1477,30 @@ class TestErgonomicKwargsAreDiscoverable:
             names = list(inspect.signature(backend.__init__).parameters)
             assert len(names) == len(set(names)), f"{backend.__name__}: {names}"
 
+    def test_options_for_does_not_leak_the_ergonomic_kwargs(self):
+        """No backend advertises a facade-resolved kwarg as its own option.
+
+        `options_for` subtracts `_FACADE_PARAMS` from the introspected
+        signature, so advertising the wrapper's parameters would otherwise
+        report `cadence` as a backend-specific option on every key — and it
+        also renders the unknown-kwarg error text.
+        """
+        ergonomic = {"aoi", "buffer", "cadence", "dataset"}
+        leaking = {
+            key
+            for key in EarthLens.DataSources
+            if ergonomic & set(EarthLens.options_for(key))
+        }
+        assert not leaking, (
+            f"ergonomic kwargs leaked into options_for for {sorted(leaking)}"
+        )
+
+    def test_options_for_is_empty_for_a_backend_with_no_extra_options(self):
+        """CHIRPS declares nothing beyond the facade's own parameters."""
+        assert EarthLens.options_for("chc") == [], (
+            f"expected no backend options for chc, got {EarthLens.options_for('chc')}"
+        )
+
     def test_native_parameters_still_distinguishes_a_real_aoi(self):
         """The advertised kwargs must not make every backend look aoi-native.
 

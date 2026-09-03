@@ -1091,6 +1091,14 @@ class EarthLens:
             "fmt",
             "aoi",
             "buffer",
+            # `cadence` belongs here on the same footing as `aoi` / `buffer` /
+            # `dataset`: all four are resolved by the facade and by the
+            # `__init_subclass__` wrapper, so none can reach
+            # `**backend_kwargs`. It was omitted while `inspect.signature`
+            # still unwrapped past the wrapper and hid all four, which made the
+            # omission invisible; advertising the wrapper's signature exposed
+            # it as `cadence` leaking into every backend's option list.
+            "cadence",
         }
     )
 
