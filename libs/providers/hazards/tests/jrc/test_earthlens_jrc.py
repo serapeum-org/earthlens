@@ -11,7 +11,7 @@ from earthlens.earthlens import EarthLens
 
 pytestmark = pytest.mark.jrc
 
-KEYS = ["jrc-flood", "efhm", "jrc-flood-hazard", "jrc:european-flood-hazard"]
+KEYS = ["jrc", "jrc-flood", "efhm", "jrc-flood-hazard", "jrc:european-flood-hazard"]
 
 #: The EFHM src package files that must never import xarray (raster I/O is pyramids').
 _SRC_DIR = Path(earthlens.jrc.__file__).parent

@@ -156,6 +156,7 @@ class TestRegistry:
             "iucn",
             "jaxa",
             "jaxa-earth",
+            "jrc",
             "jrc-flood",
             "jrc-flood-hazard",
             "jrc-sea-level",
