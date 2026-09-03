@@ -103,10 +103,11 @@ def _gis_imports(path: Path) -> list[tuple[int, str]]:
 
     Walks the AST rather than grepping, so `from osgeo.gdal import Translate`,
     `import osgeo.gdal as g`, multi-line `from ... import (...)` continuations
-    and the dynamic forms are all caught. "Dynamic" covers both spellings that
-    reach the same place: `importlib.import_module("osgeo")` and a bare
-    `import_module("osgeo")` pulled in with `from importlib import
-    import_module`, plus `__import__("osgeo")`.
+    and the dynamic forms are all caught. "Dynamic" means a STRING LITERAL
+    argument: `importlib.import_module("osgeo")`, a bare `import_module("osgeo")`
+    pulled in with `from importlib import import_module`, and
+    `__import__("osgeo")`. A name computed at runtime is out of reach of a static
+    walk, and pretending otherwise would overstate what this guard proves.
     """
     found: list[tuple[int, str]] = []
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
@@ -1711,40 +1712,37 @@ class TestNoDirectGdal:
 #: probed, because the matcher keyed off the AST node shape instead of the
 #: callee's name.
 _GDAL_SPELLINGS = [
-    ("plain", "import osgeo" + chr(10)),
-    ("dotted", "import osgeo.gdal" + chr(10)),
-    ("aliased", "import osgeo.gdal as g" + chr(10)),
-    ("from", "from osgeo import gdal" + chr(10)),
-    ("from-dotted", "from osgeo.gdal import Translate" + chr(10)),
-    ("sibling-ogr", "from ogr import Open" + chr(10)),
-    ("sibling-osr", "import osr" + chr(10)),
+    ("plain", "import osgeo\n"),
+    ("dotted", "import osgeo.gdal\n"),
+    ("aliased", "import osgeo.gdal as g\n"),
+    ("from", "from osgeo import gdal\n"),
+    ("from-dotted", "from osgeo.gdal import Translate\n"),
+    ("sibling-ogr", "from ogr import Open\n"),
+    ("sibling-osr", "import osr\n"),
     (
         "dynamic-dotted",
-        "import importlib" + chr(10) + 'importlib.import_module("osgeo")' + chr(10),
+        'import importlib\nimportlib.import_module("osgeo")\n',
     ),
     (
         "dynamic-bare",
-        "from importlib import import_module"
-        + chr(10)
-        + 'import_module("osgeo")'
-        + chr(10),
+        'from importlib import import_module\nimport_module("osgeo")\n',
     ),
-    ("dynamic-dunder", '__import__("osgeo")' + chr(10)),
+    ("dynamic-dunder", '__import__("osgeo")\n'),
 ]
 
 #: Sources that must NOT trip the guard, so it stays usable. The relative forms
 #: matter: `from .osgeo import gdal` names a sibling module inside earthlens, so
 #: it is not GDAL and flagging it would be a false positive.
 _INNOCENT_SOURCES = [
-    ("relative-module", "from .osgeo import gdal" + chr(10)),
-    ("relative-package", "from . import osgeo" + chr(10)),
-    ("pyramids", "import pyramids" + chr(10)),
-    ("pyramids-from", "from pyramids.dataset import Dataset" + chr(10)),
+    ("relative-module", "from .osgeo import gdal\n"),
+    ("relative-package", "from . import osgeo\n"),
+    ("pyramids", "import pyramids\n"),
+    ("pyramids-from", "from pyramids.dataset import Dataset\n"),
     (
         "unrelated-dynamic",
-        "import importlib" + chr(10) + 'importlib.import_module("json")' + chr(10),
+        'import importlib\nimportlib.import_module("json")\n',
     ),
-    ("name-merely-contains-osgeo", "import osgeohelper" + chr(10)),
+    ("name-merely-contains-osgeo", "import osgeohelper\n"),
 ]
 
 
@@ -1760,7 +1758,7 @@ class TestGdalGuardDetection:
         """Each way of reaching GDAL is detected, static or dynamic."""
         probe = tmp_path / "probe.py"
         probe.write_text(source, encoding="utf-8")
-        assert _gis_imports(probe), f"guard missed this import:{chr(10)}{source}"
+        assert _gis_imports(probe), f"guard missed this import:\n{source}"
 
     @pytest.mark.parametrize(
         "source",
@@ -1771,14 +1769,12 @@ class TestGdalGuardDetection:
         """A guard that fires on ordinary imports would be turned off."""
         probe = tmp_path / "probe.py"
         probe.write_text(source, encoding="utf-8")
-        assert _gis_imports(probe) == [], f"guard false-positived on:{chr(10)}{source}"
+        assert _gis_imports(probe) == [], f"guard false-positived on:\n{source}"
 
     def test_reports_the_line_it_found(self, tmp_path):
         """The offender's line number is reported so the failure is actionable."""
         probe = tmp_path / "probe.py"
-        probe.write_text(
-            "x = 1" + chr(10) + "from osgeo import gdal" + chr(10), encoding="utf-8"
-        )
+        probe.write_text("x = 1\n" + "from osgeo import gdal\n", encoding="utf-8")
         assert _gis_imports(probe) == [(2, "from osgeo")]
 
     def test_is_banned_gis_import_matches_only_import_nodes(self):
