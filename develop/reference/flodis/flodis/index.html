@@ -4357,17 +4357,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.flodis.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.flodis.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4573,17 +4562,6 @@
     <span class="md-ellipsis">
       
         dataset
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.flodis.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -18126,34 +18104,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -23884,17 +23834,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.flodis.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.flodis.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24100,17 +24039,6 @@
     <span class="md-ellipsis">
       
         dataset
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.flodis.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -24579,24 +24507,7 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-361">361</a></span>
 <span class="normal"><a href="#__codelineno-0-362">362</a></span>
 <span class="normal"><a href="#__codelineno-0-363">363</a></span>
-<span class="normal"><a href="#__codelineno-0-364">364</a></span>
-<span class="normal"><a href="#__codelineno-0-365">365</a></span>
-<span class="normal"><a href="#__codelineno-0-366">366</a></span>
-<span class="normal"><a href="#__codelineno-0-367">367</a></span>
-<span class="normal"><a href="#__codelineno-0-368">368</a></span>
-<span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
-<span class="normal"><a href="#__codelineno-0-376">376</a></span>
-<span class="normal"><a href="#__codelineno-0-377">377</a></span>
-<span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Catalog for the FLODIS backend.</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">    Reads the bundled `flodis_data_catalog.yaml` (shipped as package data) and</span>
@@ -24690,91 +24601,74 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="p">)</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">parsed</span><span class="p">)</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FlodisDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the table map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlodisDataset</span><span class="p">:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            dict[str, FlodisDataset]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            - The table map is keyed by the `dataset` string:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">                &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                &gt;&gt;&gt; sorted(Catalog().get_catalog())</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                [&#39;damages&#39;, &#39;displacement&#39;]</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlodisDataset</span><span class="p">:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            name: A FLODIS table name (`&quot;damages&quot;` or `&quot;displacement&quot;`).</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            name: A FLODIS table name (`&quot;damages&quot;` or `&quot;displacement&quot;`).</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            FlodisDataset: The matching row.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            ValueError: If `name` is not a registered table.</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            - Resolve a table and read its file name:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                &gt;&gt;&gt; Catalog().dataset(&quot;damages&quot;).file</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">                &#39;FLODIS_mortality_damage.csv&#39;</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;FlodisDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            FlodisDataset: The matching row.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered table names, sorted.</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            ValueError: If `name` is not a registered table.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            list[str]: The table names (`[&quot;damages&quot;, &quot;displacement&quot;]`).</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            - Resolve a table and read its file name:</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            - The registered tables come back sorted:</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">                ```python</span>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">                &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">                &gt;&gt;&gt; Catalog().dataset(&quot;damages&quot;).file</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">                &#39;FLODIS_mortality_damage.csv&#39;</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">                &gt;&gt;&gt; Catalog().tables()</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">                [&#39;damages&#39;, &#39;displacement&#39;]</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;FlodisDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered table names, sorted.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">friendly</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the exact FLODIS CSV header for a friendly column name.</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            list[str]: The table names (`[&quot;damages&quot;, &quot;displacement&quot;]`).</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            - The registered tables come back sorted:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">                &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">                &gt;&gt;&gt; Catalog().tables()</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">                [&#39;damages&#39;, &#39;displacement&#39;]</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            friendly: A friendly key from the catalog&#39;s `columns:` map</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">                (`&quot;iso3&quot;`, `&quot;year&quot;`, `&quot;disasterno&quot;`, `&quot;gid_1&quot;`, ...).</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">            str: The exact CSV header (`&quot;ISO3&quot;`).</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            KeyError: If `friendly` is not a mapped column.</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">friendly</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the exact FLODIS CSV header for a friendly column name.</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            friendly: A friendly key from the catalog&#39;s `columns:` map</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                (`&quot;iso3&quot;`, `&quot;year&quot;`, `&quot;disasterno&quot;`, `&quot;gid_1&quot;`, ...).</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            str: The exact CSV header (`&quot;ISO3&quot;`).</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            KeyError: If `friendly` is not a mapped column.</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            - Map friendly keys to their exact FLODIS headers:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">                &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">                &gt;&gt;&gt; cat = Catalog()</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">                &gt;&gt;&gt; cat.column(&quot;iso3&quot;)</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">                &#39;ISO3&#39;</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">                &gt;&gt;&gt; cat.column(&quot;total_damages_000_usd&quot;)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">                &#39;total_damages_(000_USD)&#39;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">friendly</span><span class="p">]</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            - Map friendly keys to their exact FLODIS headers:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">                &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">                &gt;&gt;&gt; cat.column(&quot;iso3&quot;)</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">                &#39;ISO3&#39;</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">                &gt;&gt;&gt; cat.column(&quot;total_damages_000_usd&quot;)</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">                &#39;total_damages_(000_USD)&#39;</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">friendly</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24898,7 +24792,24 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/flodis/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-356">356</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span>
+<span class="normal"><a href="#__codelineno-0-342">342</a></span>
+<span class="normal"><a href="#__codelineno-0-343">343</a></span>
+<span class="normal"><a href="#__codelineno-0-344">344</a></span>
+<span class="normal"><a href="#__codelineno-0-345">345</a></span>
+<span class="normal"><a href="#__codelineno-0-346">346</a></span>
+<span class="normal"><a href="#__codelineno-0-347">347</a></span>
+<span class="normal"><a href="#__codelineno-0-348">348</a></span>
+<span class="normal"><a href="#__codelineno-0-349">349</a></span>
+<span class="normal"><a href="#__codelineno-0-350">350</a></span>
+<span class="normal"><a href="#__codelineno-0-351">351</a></span>
+<span class="normal"><a href="#__codelineno-0-352">352</a></span>
+<span class="normal"><a href="#__codelineno-0-353">353</a></span>
+<span class="normal"><a href="#__codelineno-0-354">354</a></span>
+<span class="normal"><a href="#__codelineno-0-355">355</a></span>
+<span class="normal"><a href="#__codelineno-0-356">356</a></span>
 <span class="normal"><a href="#__codelineno-0-357">357</a></span>
 <span class="normal"><a href="#__codelineno-0-358">358</a></span>
 <span class="normal"><a href="#__codelineno-0-359">359</a></span>
@@ -24906,49 +24817,32 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-361">361</a></span>
 <span class="normal"><a href="#__codelineno-0-362">362</a></span>
 <span class="normal"><a href="#__codelineno-0-363">363</a></span>
-<span class="normal"><a href="#__codelineno-0-364">364</a></span>
-<span class="normal"><a href="#__codelineno-0-365">365</a></span>
-<span class="normal"><a href="#__codelineno-0-366">366</a></span>
-<span class="normal"><a href="#__codelineno-0-367">367</a></span>
-<span class="normal"><a href="#__codelineno-0-368">368</a></span>
-<span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
-<span class="normal"><a href="#__codelineno-0-376">376</a></span>
-<span class="normal"><a href="#__codelineno-0-377">377</a></span>
-<span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="k">def</span><span class="w"> </span><span class="nf">column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">friendly</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the exact FLODIS CSV header for a friendly column name.</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        friendly: A friendly key from the catalog&#39;s `columns:` map</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            (`&quot;iso3&quot;`, `&quot;year&quot;`, `&quot;disasterno&quot;`, `&quot;gid_1&quot;`, ...).</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        str: The exact CSV header (`&quot;ISO3&quot;`).</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        KeyError: If `friendly` is not a mapped column.</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        - Map friendly keys to their exact FLODIS headers:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">            &gt;&gt;&gt; cat.column(&quot;iso3&quot;)</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            &#39;ISO3&#39;</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            &gt;&gt;&gt; cat.column(&quot;total_damages_000_usd&quot;)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            &#39;total_damages_(000_USD)&#39;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">friendly</span><span class="p">]</span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="k">def</span><span class="w"> </span><span class="nf">column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">friendly</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the exact FLODIS CSV header for a friendly column name.</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        friendly: A friendly key from the catalog&#39;s `columns:` map</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">            (`&quot;iso3&quot;`, `&quot;year&quot;`, `&quot;disasterno&quot;`, `&quot;gid_1&quot;`, ...).</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        str: The exact CSV header (`&quot;ISO3&quot;`).</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        KeyError: If `friendly` is not a mapped column.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        - Map friendly keys to their exact FLODIS headers:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            &gt;&gt;&gt; cat.column(&quot;iso3&quot;)</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            &#39;ISO3&#39;</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            &gt;&gt;&gt; cat.column(&quot;total_damages_000_usd&quot;)</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            &#39;total_damages_(000_USD)&#39;</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">friendly</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25059,108 +24953,6 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/flodis/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-314">314</a></span>
-<span class="normal"><a href="#__codelineno-0-315">315</a></span>
-<span class="normal"><a href="#__codelineno-0-316">316</a></span>
-<span class="normal"><a href="#__codelineno-0-317">317</a></span>
-<span class="normal"><a href="#__codelineno-0-318">318</a></span>
-<span class="normal"><a href="#__codelineno-0-319">319</a></span>
-<span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span>
-<span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlodisDataset</span><span class="p">:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        name: A FLODIS table name (`&quot;damages&quot;` or `&quot;displacement&quot;`).</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        FlodisDataset: The matching row.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        ValueError: If `name` is not a registered table.</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        - Resolve a table and read its file name:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">            &gt;&gt;&gt; Catalog().dataset(&quot;damages&quot;).file</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            &#39;FLODIS_mortality_damage.csv&#39;</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;FlodisDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.flodis.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.flodis.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.flodis.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the table map (satisfies the abstract contract).</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;FlodisDataset&lt;/code&gt; (&lt;code&gt;earthlens.flodis.catalog.FlodisDataset&lt;/code&gt;)" href="#earthlens.flodis.catalog.FlodisDataset">FlodisDataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, FlodisDataset]: Same object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Examples:</span></p>
-    <ul>
-<li>The table map is keyed by the <code>dataset</code> string:
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.flodis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_catalog</span><span class="p">())</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">[</span><span class="s1">&#39;damages&#39;</span><span class="p">,</span> <span class="s1">&#39;displacement&#39;</span><span class="p">]</span>
-</code></pre></div></li>
-</ul>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/flodis/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-297">297</a></span>
 <span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
@@ -25176,22 +24968,38 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-309">309</a></span>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
 <span class="normal"><a href="#__codelineno-0-311">311</a></span>
-<span class="normal"><a href="#__codelineno-0-312">312</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FlodisDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the table map (satisfies the abstract contract).</span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlodisDataset</span><span class="p">:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        dict[str, FlodisDataset]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        - The table map is keyed by the `dataset` string:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            &gt;&gt;&gt; sorted(Catalog().get_catalog())</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            [&#39;damages&#39;, &#39;displacement&#39;]</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        name: A FLODIS table name (`&quot;damages&quot;` or `&quot;displacement&quot;`).</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        FlodisDataset: The matching row.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        ValueError: If `name` is not a registered table.</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        - Resolve a table and read its file name:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            &gt;&gt;&gt; Catalog().dataset(&quot;damages&quot;).file</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            &#39;FLODIS_mortality_damage.csv&#39;</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;FlodisDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25428,37 +25236,37 @@ missing, or a row fails validation.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/flodis/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span>
-<span class="normal"><a href="#__codelineno-0-348">348</a></span>
-<span class="normal"><a href="#__codelineno-0-349">349</a></span>
-<span class="normal"><a href="#__codelineno-0-350">350</a></span>
-<span class="normal"><a href="#__codelineno-0-351">351</a></span>
-<span class="normal"><a href="#__codelineno-0-352">352</a></span>
-<span class="normal"><a href="#__codelineno-0-353">353</a></span>
-<span class="normal"><a href="#__codelineno-0-354">354</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="k">def</span><span class="w"> </span><span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered table names, sorted.</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        list[str]: The table names (`[&quot;damages&quot;, &quot;displacement&quot;]`).</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        - The registered tables come back sorted:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            &gt;&gt;&gt; Catalog().tables()</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            [&#39;damages&#39;, &#39;displacement&#39;]</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span>
+<span class="normal"><a href="#__codelineno-0-330">330</a></span>
+<span class="normal"><a href="#__codelineno-0-331">331</a></span>
+<span class="normal"><a href="#__codelineno-0-332">332</a></span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="k">def</span><span class="w"> </span><span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered table names, sorted.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        list[str]: The table names (`[&quot;damages&quot;, &quot;displacement&quot;]`).</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        - The registered tables come back sorted:</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">            &gt;&gt;&gt; Catalog().tables()</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            [&#39;damages&#39;, &#39;displacement&#39;]</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29479,24 +29287,7 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-361">361</a></span>
 <span class="normal"><a href="#__codelineno-0-362">362</a></span>
 <span class="normal"><a href="#__codelineno-0-363">363</a></span>
-<span class="normal"><a href="#__codelineno-0-364">364</a></span>
-<span class="normal"><a href="#__codelineno-0-365">365</a></span>
-<span class="normal"><a href="#__codelineno-0-366">366</a></span>
-<span class="normal"><a href="#__codelineno-0-367">367</a></span>
-<span class="normal"><a href="#__codelineno-0-368">368</a></span>
-<span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
-<span class="normal"><a href="#__codelineno-0-376">376</a></span>
-<span class="normal"><a href="#__codelineno-0-377">377</a></span>
-<span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Catalog for the FLODIS backend.</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">    Reads the bundled `flodis_data_catalog.yaml` (shipped as package data) and</span>
@@ -29590,91 +29381,74 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="p">)</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">parsed</span><span class="p">)</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FlodisDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the table map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlodisDataset</span><span class="p">:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            dict[str, FlodisDataset]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            - The table map is keyed by the `dataset` string:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">                &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                &gt;&gt;&gt; sorted(Catalog().get_catalog())</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                [&#39;damages&#39;, &#39;displacement&#39;]</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlodisDataset</span><span class="p">:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            name: A FLODIS table name (`&quot;damages&quot;` or `&quot;displacement&quot;`).</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            name: A FLODIS table name (`&quot;damages&quot;` or `&quot;displacement&quot;`).</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            FlodisDataset: The matching row.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            ValueError: If `name` is not a registered table.</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            - Resolve a table and read its file name:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                &gt;&gt;&gt; Catalog().dataset(&quot;damages&quot;).file</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">                &#39;FLODIS_mortality_damage.csv&#39;</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;FlodisDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            FlodisDataset: The matching row.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered table names, sorted.</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            ValueError: If `name` is not a registered table.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            list[str]: The table names (`[&quot;damages&quot;, &quot;displacement&quot;]`).</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            - Resolve a table and read its file name:</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            - The registered tables come back sorted:</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">                ```python</span>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">                &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">                &gt;&gt;&gt; Catalog().dataset(&quot;damages&quot;).file</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">                &#39;FLODIS_mortality_damage.csv&#39;</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">                &gt;&gt;&gt; Catalog().tables()</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">                [&#39;damages&#39;, &#39;displacement&#39;]</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;FlodisDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered table names, sorted.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">friendly</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the exact FLODIS CSV header for a friendly column name.</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            list[str]: The table names (`[&quot;damages&quot;, &quot;displacement&quot;]`).</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            - The registered tables come back sorted:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">                &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">                &gt;&gt;&gt; Catalog().tables()</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">                [&#39;damages&#39;, &#39;displacement&#39;]</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            friendly: A friendly key from the catalog&#39;s `columns:` map</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">                (`&quot;iso3&quot;`, `&quot;year&quot;`, `&quot;disasterno&quot;`, `&quot;gid_1&quot;`, ...).</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">            str: The exact CSV header (`&quot;ISO3&quot;`).</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            KeyError: If `friendly` is not a mapped column.</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">friendly</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the exact FLODIS CSV header for a friendly column name.</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            friendly: A friendly key from the catalog&#39;s `columns:` map</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                (`&quot;iso3&quot;`, `&quot;year&quot;`, `&quot;disasterno&quot;`, `&quot;gid_1&quot;`, ...).</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            str: The exact CSV header (`&quot;ISO3&quot;`).</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            KeyError: If `friendly` is not a mapped column.</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            - Map friendly keys to their exact FLODIS headers:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">                &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">                &gt;&gt;&gt; cat = Catalog()</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">                &gt;&gt;&gt; cat.column(&quot;iso3&quot;)</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">                &#39;ISO3&#39;</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">                &gt;&gt;&gt; cat.column(&quot;total_damages_000_usd&quot;)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">                &#39;total_damages_(000_USD)&#39;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">friendly</span><span class="p">]</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            - Map friendly keys to their exact FLODIS headers:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">                &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">                &gt;&gt;&gt; cat.column(&quot;iso3&quot;)</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">                &#39;ISO3&#39;</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">                &gt;&gt;&gt; cat.column(&quot;total_damages_000_usd&quot;)</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">                &#39;total_damages_(000_USD)&#39;</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">friendly</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29798,7 +29572,24 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/flodis/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-356">356</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span>
+<span class="normal"><a href="#__codelineno-0-342">342</a></span>
+<span class="normal"><a href="#__codelineno-0-343">343</a></span>
+<span class="normal"><a href="#__codelineno-0-344">344</a></span>
+<span class="normal"><a href="#__codelineno-0-345">345</a></span>
+<span class="normal"><a href="#__codelineno-0-346">346</a></span>
+<span class="normal"><a href="#__codelineno-0-347">347</a></span>
+<span class="normal"><a href="#__codelineno-0-348">348</a></span>
+<span class="normal"><a href="#__codelineno-0-349">349</a></span>
+<span class="normal"><a href="#__codelineno-0-350">350</a></span>
+<span class="normal"><a href="#__codelineno-0-351">351</a></span>
+<span class="normal"><a href="#__codelineno-0-352">352</a></span>
+<span class="normal"><a href="#__codelineno-0-353">353</a></span>
+<span class="normal"><a href="#__codelineno-0-354">354</a></span>
+<span class="normal"><a href="#__codelineno-0-355">355</a></span>
+<span class="normal"><a href="#__codelineno-0-356">356</a></span>
 <span class="normal"><a href="#__codelineno-0-357">357</a></span>
 <span class="normal"><a href="#__codelineno-0-358">358</a></span>
 <span class="normal"><a href="#__codelineno-0-359">359</a></span>
@@ -29806,49 +29597,32 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-361">361</a></span>
 <span class="normal"><a href="#__codelineno-0-362">362</a></span>
 <span class="normal"><a href="#__codelineno-0-363">363</a></span>
-<span class="normal"><a href="#__codelineno-0-364">364</a></span>
-<span class="normal"><a href="#__codelineno-0-365">365</a></span>
-<span class="normal"><a href="#__codelineno-0-366">366</a></span>
-<span class="normal"><a href="#__codelineno-0-367">367</a></span>
-<span class="normal"><a href="#__codelineno-0-368">368</a></span>
-<span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
-<span class="normal"><a href="#__codelineno-0-376">376</a></span>
-<span class="normal"><a href="#__codelineno-0-377">377</a></span>
-<span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="k">def</span><span class="w"> </span><span class="nf">column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">friendly</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the exact FLODIS CSV header for a friendly column name.</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        friendly: A friendly key from the catalog&#39;s `columns:` map</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            (`&quot;iso3&quot;`, `&quot;year&quot;`, `&quot;disasterno&quot;`, `&quot;gid_1&quot;`, ...).</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        str: The exact CSV header (`&quot;ISO3&quot;`).</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        KeyError: If `friendly` is not a mapped column.</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        - Map friendly keys to their exact FLODIS headers:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">            &gt;&gt;&gt; cat.column(&quot;iso3&quot;)</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            &#39;ISO3&#39;</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            &gt;&gt;&gt; cat.column(&quot;total_damages_000_usd&quot;)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            &#39;total_damages_(000_USD)&#39;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">friendly</span><span class="p">]</span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="k">def</span><span class="w"> </span><span class="nf">column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">friendly</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the exact FLODIS CSV header for a friendly column name.</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        friendly: A friendly key from the catalog&#39;s `columns:` map</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">            (`&quot;iso3&quot;`, `&quot;year&quot;`, `&quot;disasterno&quot;`, `&quot;gid_1&quot;`, ...).</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        str: The exact CSV header (`&quot;ISO3&quot;`).</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        KeyError: If `friendly` is not a mapped column.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        - Map friendly keys to their exact FLODIS headers:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            &gt;&gt;&gt; cat.column(&quot;iso3&quot;)</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            &#39;ISO3&#39;</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            &gt;&gt;&gt; cat.column(&quot;total_damages_000_usd&quot;)</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            &#39;total_damages_(000_USD)&#39;</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">friendly</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29959,108 +29733,6 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/flodis/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-314">314</a></span>
-<span class="normal"><a href="#__codelineno-0-315">315</a></span>
-<span class="normal"><a href="#__codelineno-0-316">316</a></span>
-<span class="normal"><a href="#__codelineno-0-317">317</a></span>
-<span class="normal"><a href="#__codelineno-0-318">318</a></span>
-<span class="normal"><a href="#__codelineno-0-319">319</a></span>
-<span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span>
-<span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlodisDataset</span><span class="p">:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        name: A FLODIS table name (`&quot;damages&quot;` or `&quot;displacement&quot;`).</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        FlodisDataset: The matching row.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        ValueError: If `name` is not a registered table.</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        - Resolve a table and read its file name:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">            &gt;&gt;&gt; Catalog().dataset(&quot;damages&quot;).file</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            &#39;FLODIS_mortality_damage.csv&#39;</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;FlodisDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.flodis.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.flodis.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.flodis.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the table map (satisfies the abstract contract).</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;FlodisDataset&lt;/code&gt; (&lt;code&gt;earthlens.flodis.catalog.FlodisDataset&lt;/code&gt;)" href="#earthlens.flodis.catalog.FlodisDataset">FlodisDataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, FlodisDataset]: Same object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Examples:</span></p>
-    <ul>
-<li>The table map is keyed by the <code>dataset</code> string:
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.flodis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_catalog</span><span class="p">())</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">[</span><span class="s1">&#39;damages&#39;</span><span class="p">,</span> <span class="s1">&#39;displacement&#39;</span><span class="p">]</span>
-</code></pre></div></li>
-</ul>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/flodis/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-297">297</a></span>
 <span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
@@ -30076,22 +29748,38 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-309">309</a></span>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
 <span class="normal"><a href="#__codelineno-0-311">311</a></span>
-<span class="normal"><a href="#__codelineno-0-312">312</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FlodisDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the table map (satisfies the abstract contract).</span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlodisDataset</span><span class="p">:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        dict[str, FlodisDataset]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        - The table map is keyed by the `dataset` string:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            &gt;&gt;&gt; sorted(Catalog().get_catalog())</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            [&#39;damages&#39;, &#39;displacement&#39;]</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        name: A FLODIS table name (`&quot;damages&quot;` or `&quot;displacement&quot;`).</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        FlodisDataset: The matching row.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        ValueError: If `name` is not a registered table.</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        - Resolve a table and read its file name:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            &gt;&gt;&gt; Catalog().dataset(&quot;damages&quot;).file</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            &#39;FLODIS_mortality_damage.csv&#39;</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;FlodisDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -30328,37 +30016,37 @@ missing, or a row fails validation.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/flodis/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span>
-<span class="normal"><a href="#__codelineno-0-348">348</a></span>
-<span class="normal"><a href="#__codelineno-0-349">349</a></span>
-<span class="normal"><a href="#__codelineno-0-350">350</a></span>
-<span class="normal"><a href="#__codelineno-0-351">351</a></span>
-<span class="normal"><a href="#__codelineno-0-352">352</a></span>
-<span class="normal"><a href="#__codelineno-0-353">353</a></span>
-<span class="normal"><a href="#__codelineno-0-354">354</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="k">def</span><span class="w"> </span><span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered table names, sorted.</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        list[str]: The table names (`[&quot;damages&quot;, &quot;displacement&quot;]`).</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        - The registered tables come back sorted:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            &gt;&gt;&gt; Catalog().tables()</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            [&#39;damages&#39;, &#39;displacement&#39;]</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span>
+<span class="normal"><a href="#__codelineno-0-330">330</a></span>
+<span class="normal"><a href="#__codelineno-0-331">331</a></span>
+<span class="normal"><a href="#__codelineno-0-332">332</a></span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="k">def</span><span class="w"> </span><span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered table names, sorted.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        list[str]: The table names (`[&quot;damages&quot;, &quot;displacement&quot;]`).</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        - The registered tables come back sorted:</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            &gt;&gt;&gt; from earthlens.flodis import Catalog</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">            &gt;&gt;&gt; Catalog().tables()</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            [&#39;damages&#39;, &#39;displacement&#39;]</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

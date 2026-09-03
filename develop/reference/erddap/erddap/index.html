@@ -4714,17 +4714,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.erddap.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.erddap.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4891,17 +4880,6 @@
     <span class="md-ellipsis">
       
         get
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.erddap.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -18037,34 +18015,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -23784,17 +23734,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.erddap.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.erddap.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23961,17 +23900,6 @@
     <span class="md-ellipsis">
       
         get
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.erddap.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -24314,19 +24242,7 @@ is a :class:<code>Dataset</code> row.</p>
 <span class="normal"><a href="#__codelineno-0-318">318</a></span>
 <span class="normal"><a href="#__codelineno-0-319">319</a></span>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span>
-<span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Server catalog for the generic ERDDAP backend.</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data) and</span>
@@ -24401,50 +24317,38 @@ is a :class:<code>Dataset</code> row.</p>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="p">)</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Dataset` row for `dataset_id`.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            dict[str, Dataset]: One entry per curated ERDDAP dataset.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">                Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Dataset` row for `dataset_id`.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Thin typed wrapper over the shared</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`, which raises</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            dataset_id: ERDDAP dataset id as it appears as a key in</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                :attr:`datasets` (e.g. `&quot;NOAA_DHW&quot;`).</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            Dataset: The curated row.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            ValueError: If `dataset_id` is not curated (message lists a</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                close match).</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            - Unknown id raises with a hint:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                &gt;&gt;&gt; from earthlens.erddap import Catalog</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                &gt;&gt;&gt; try:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                ...     Catalog().get(&quot;NOAA_DHX&quot;)</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                ... except ValueError as exc:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">                ...     print(&quot;ERDDAP catalog&quot; in str(exc) and &quot;NOAA_DHW&quot; in str(exc))</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">                True</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Thin typed wrapper over the shared</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`, which raises</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            dataset_id: ERDDAP dataset id as it appears as a key in</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                :attr:`datasets` (e.g. `&quot;NOAA_DHW&quot;`).</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            Dataset: The curated row.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            ValueError: If `dataset_id` is not curated (message lists a</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">                close match).</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            - Unknown id raises with a hint:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">                &gt;&gt;&gt; from earthlens.erddap import Catalog</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                &gt;&gt;&gt; try:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                ...     Catalog().get(&quot;NOAA_DHX&quot;)</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                ... except ValueError as exc:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">                ...     print(&quot;ERDDAP catalog&quot; in str(exc) and &quot;NOAA_DHW&quot; in str(exc))</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">                True</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24574,7 +24478,19 @@ close match).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-302">302</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-290">290</a></span>
+<span class="normal"><a href="#__codelineno-0-291">291</a></span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span>
+<span class="normal"><a href="#__codelineno-0-294">294</a></span>
+<span class="normal"><a href="#__codelineno-0-295">295</a></span>
+<span class="normal"><a href="#__codelineno-0-296">296</a></span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span>
 <span class="normal"><a href="#__codelineno-0-303">303</a></span>
 <span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
@@ -24593,119 +24509,38 @@ close match).</p>
 <span class="normal"><a href="#__codelineno-0-318">318</a></span>
 <span class="normal"><a href="#__codelineno-0-319">319</a></span>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span>
-<span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Dataset` row for `dataset_id`.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Thin typed wrapper over the shared</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`, which raises</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        dataset_id: ERDDAP dataset id as it appears as a key in</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            :attr:`datasets` (e.g. `&quot;NOAA_DHW&quot;`).</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        Dataset: The curated row.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        ValueError: If `dataset_id` is not curated (message lists a</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            close match).</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        - Unknown id raises with a hint:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            &gt;&gt;&gt; from earthlens.erddap import Catalog</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            &gt;&gt;&gt; try:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            ...     Catalog().get(&quot;NOAA_DHX&quot;)</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            ... except ValueError as exc:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            ...     print(&quot;ERDDAP catalog&quot; in str(exc) and &quot;NOAA_DHW&quot; in str(exc))</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            True</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.erddap.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.erddap.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.erddap.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the structural per-dataset map.</p>
-<p>Satisfies the abstract base's contract; the actual parsing is
-done in :func:<code>model_post_init</code>.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.erddap.catalog.Dataset&lt;/code&gt;)" href="#earthlens.erddap.catalog.Dataset">Dataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, Dataset]: One entry per curated ERDDAP dataset.
-Same object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-290">290</a></span>
-<span class="normal"><a href="#__codelineno-0-291">291</a></span>
-<span class="normal"><a href="#__codelineno-0-292">292</a></span>
-<span class="normal"><a href="#__codelineno-0-293">293</a></span>
-<span class="normal"><a href="#__codelineno-0-294">294</a></span>
-<span class="normal"><a href="#__codelineno-0-295">295</a></span>
-<span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span>
-<span class="normal"><a href="#__codelineno-0-298">298</a></span>
-<span class="normal"><a href="#__codelineno-0-299">299</a></span>
-<span class="normal"><a href="#__codelineno-0-300">300</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Dataset` row for `dataset_id`.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        dict[str, Dataset]: One entry per curated ERDDAP dataset.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Thin typed wrapper over the shared</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`, which raises</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        dataset_id: ERDDAP dataset id as it appears as a key in</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            :attr:`datasets` (e.g. `&quot;NOAA_DHW&quot;`).</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        Dataset: The curated row.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        ValueError: If `dataset_id` is not curated (message lists a</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            close match).</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        - Unknown id raises with a hint:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            &gt;&gt;&gt; from earthlens.erddap import Catalog</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            &gt;&gt;&gt; try:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            ...     Catalog().get(&quot;NOAA_DHX&quot;)</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            ... except ValueError as exc:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            ...     print(&quot;ERDDAP catalog&quot; in str(exc) and &quot;NOAA_DHW&quot; in str(exc))</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            True</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29029,19 +28864,7 @@ is a :class:<code>Dataset</code> row.</p>
 <span class="normal"><a href="#__codelineno-0-318">318</a></span>
 <span class="normal"><a href="#__codelineno-0-319">319</a></span>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span>
-<span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Server catalog for the generic ERDDAP backend.</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data) and</span>
@@ -29116,50 +28939,38 @@ is a :class:<code>Dataset</code> row.</p>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="p">)</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Dataset` row for `dataset_id`.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            dict[str, Dataset]: One entry per curated ERDDAP dataset.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">                Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Dataset` row for `dataset_id`.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Thin typed wrapper over the shared</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`, which raises</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            dataset_id: ERDDAP dataset id as it appears as a key in</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                :attr:`datasets` (e.g. `&quot;NOAA_DHW&quot;`).</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            Dataset: The curated row.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            ValueError: If `dataset_id` is not curated (message lists a</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                close match).</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            - Unknown id raises with a hint:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                &gt;&gt;&gt; from earthlens.erddap import Catalog</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                &gt;&gt;&gt; try:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                ...     Catalog().get(&quot;NOAA_DHX&quot;)</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                ... except ValueError as exc:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">                ...     print(&quot;ERDDAP catalog&quot; in str(exc) and &quot;NOAA_DHW&quot; in str(exc))</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">                True</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Thin typed wrapper over the shared</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`, which raises</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            dataset_id: ERDDAP dataset id as it appears as a key in</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                :attr:`datasets` (e.g. `&quot;NOAA_DHW&quot;`).</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            Dataset: The curated row.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            ValueError: If `dataset_id` is not curated (message lists a</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">                close match).</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            - Unknown id raises with a hint:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">                &gt;&gt;&gt; from earthlens.erddap import Catalog</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                &gt;&gt;&gt; try:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                ...     Catalog().get(&quot;NOAA_DHX&quot;)</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                ... except ValueError as exc:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">                ...     print(&quot;ERDDAP catalog&quot; in str(exc) and &quot;NOAA_DHW&quot; in str(exc))</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">                True</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29289,7 +29100,19 @@ close match).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-302">302</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-290">290</a></span>
+<span class="normal"><a href="#__codelineno-0-291">291</a></span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span>
+<span class="normal"><a href="#__codelineno-0-294">294</a></span>
+<span class="normal"><a href="#__codelineno-0-295">295</a></span>
+<span class="normal"><a href="#__codelineno-0-296">296</a></span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span>
 <span class="normal"><a href="#__codelineno-0-303">303</a></span>
 <span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
@@ -29308,119 +29131,38 @@ close match).</p>
 <span class="normal"><a href="#__codelineno-0-318">318</a></span>
 <span class="normal"><a href="#__codelineno-0-319">319</a></span>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span>
-<span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Dataset` row for `dataset_id`.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Thin typed wrapper over the shared</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`, which raises</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        dataset_id: ERDDAP dataset id as it appears as a key in</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            :attr:`datasets` (e.g. `&quot;NOAA_DHW&quot;`).</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        Dataset: The curated row.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        ValueError: If `dataset_id` is not curated (message lists a</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            close match).</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        - Unknown id raises with a hint:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            &gt;&gt;&gt; from earthlens.erddap import Catalog</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            &gt;&gt;&gt; try:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            ...     Catalog().get(&quot;NOAA_DHX&quot;)</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            ... except ValueError as exc:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            ...     print(&quot;ERDDAP catalog&quot; in str(exc) and &quot;NOAA_DHW&quot; in str(exc))</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            True</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.erddap.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.erddap.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.erddap.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the structural per-dataset map.</p>
-<p>Satisfies the abstract base's contract; the actual parsing is
-done in :func:<code>model_post_init</code>.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.erddap.catalog.Dataset&lt;/code&gt;)" href="#earthlens.erddap.catalog.Dataset">Dataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, Dataset]: One entry per curated ERDDAP dataset.
-Same object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/ocean/src/earthlens/erddap/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-290">290</a></span>
-<span class="normal"><a href="#__codelineno-0-291">291</a></span>
-<span class="normal"><a href="#__codelineno-0-292">292</a></span>
-<span class="normal"><a href="#__codelineno-0-293">293</a></span>
-<span class="normal"><a href="#__codelineno-0-294">294</a></span>
-<span class="normal"><a href="#__codelineno-0-295">295</a></span>
-<span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span>
-<span class="normal"><a href="#__codelineno-0-298">298</a></span>
-<span class="normal"><a href="#__codelineno-0-299">299</a></span>
-<span class="normal"><a href="#__codelineno-0-300">300</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Dataset` row for `dataset_id`.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        dict[str, Dataset]: One entry per curated ERDDAP dataset.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Thin typed wrapper over the shared</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`, which raises</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        dataset_id: ERDDAP dataset id as it appears as a key in</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            :attr:`datasets` (e.g. `&quot;NOAA_DHW&quot;`).</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        Dataset: The curated row.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        ValueError: If `dataset_id` is not curated (message lists a</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            close match).</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        - Unknown id raises with a hint:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            &gt;&gt;&gt; from earthlens.erddap import Catalog</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            &gt;&gt;&gt; try:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            ...     Catalog().get(&quot;NOAA_DHX&quot;)</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            ... except ValueError as exc:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            ...     print(&quot;ERDDAP catalog&quot; in str(exc) and &quot;NOAA_DHW&quot; in str(exc))</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            True</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

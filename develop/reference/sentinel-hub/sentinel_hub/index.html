@@ -8153,17 +8153,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#earthlens.sentinel_hub.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.sentinel_hub.Catalog.get_collection" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8562,17 +8551,6 @@
   
     <nav class="md-nav" aria-label="Catalog">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.sentinel_hub.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#earthlens.sentinel_hub.catalog.Catalog.get_collection" class="md-nav__link">
@@ -18641,34 +18619,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -24399,17 +24349,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#earthlens.sentinel_hub.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.sentinel_hub.Catalog.get_collection" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24808,17 +24747,6 @@
   
     <nav class="md-nav" aria-label="Catalog">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.sentinel_hub.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#earthlens.sentinel_hub.catalog.Catalog.get_collection" class="md-nav__link">
@@ -25848,11 +25776,7 @@ in :attr:<code>available_collections</code>.</p>
 <span class="normal"><a href="#__codelineno-0-524">524</a></span>
 <span class="normal"><a href="#__codelineno-0-525">525</a></span>
 <span class="normal"><a href="#__codelineno-0-526">526</a></span>
-<span class="normal"><a href="#__codelineno-0-527">527</a></span>
-<span class="normal"><a href="#__codelineno-0-528">528</a></span>
-<span class="normal"><a href="#__codelineno-0-529">529</a></span>
-<span class="normal"><a href="#__codelineno-0-530">530</a></span>
-<span class="normal"><a href="#__codelineno-0-531">531</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-527">527</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;YAML-backed catalog of Sentinel Hub collections and evalscript recipes.</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    Reads every `*.yaml` under :data:`CATALOG_PATH` on construction and merges</span>
@@ -25941,118 +25865,114 @@ in :attr:<code>available_collections</code>.</p>
 <a id="__codelineno-0-417" name="__codelineno-0-417"></a>            <span class="n">available_collections</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">av_cols</span><span class="p">),</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="p">)</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">]:</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated collection map (logical key → :class:`Collection`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        Alias of the inherited :meth:`get_dataset`, named for clarity.</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            collection_key: Logical collection key.</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            The matching :class:`Collection`.</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            ValueError: If the key is unknown (message suggests the closest key).</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipe_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvalscriptRecipe</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`EvalscriptRecipe` for `recipe_key` (did-you-mean on miss).</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">            recipe_key: Recipe key.</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">            The matching :class:`EvalscriptRecipe`.</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">            ValueError: If the key is unknown (message suggests the closest key).</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">recipe_key</span><span class="p">]</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">recipe_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recipe_key</span><span class="si">!r}</span><span class="s2"> is not a known recipe. &quot;</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>                <span class="sa">f</span><span class="s2">&quot;Known recipes: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether `key` names a curated evalscript recipe.</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">            key: A logical collection or recipe key.</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">            `True` when `key` is a recipe.</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedRequest</span><span class="p">:</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a collection-or-recipe key to a uniform :class:`ResolvedRequest`.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        Alias of the inherited :meth:`get_dataset`, named for clarity.</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">            collection_key: Logical collection key.</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            The matching :class:`Collection`.</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">            ValueError: If the key is unknown (message suggests the closest key).</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipe_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvalscriptRecipe</span><span class="p">:</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`EvalscriptRecipe` for `recipe_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            recipe_key: Recipe key.</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            The matching :class:`EvalscriptRecipe`.</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">            ValueError: If the key is unknown (message suggests the closest key).</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">recipe_key</span><span class="p">]</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">recipe_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recipe_key</span><span class="si">!r}</span><span class="s2"> is not a known recipe. &quot;</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>                <span class="sa">f</span><span class="s2">&quot;Known recipes: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether `key` names a curated evalscript recipe.</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">            key: A logical collection or recipe key.</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">            `True` when `key` is a recipe.</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedRequest</span><span class="p">:</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a collection-or-recipe key to a uniform :class:`ResolvedRequest`.</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        A recipe resolves to its bundled evalscript + bands + kind; a plain</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">        collection resolves with `evalscript=None` and its default bands (the</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">        backend then requires an explicit `evalscript=`).</span>
 <a id="__codelineno-0-477" name="__codelineno-0-477"></a>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        A recipe resolves to its bundled evalscript + bands + kind; a plain</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">        collection resolves with `evalscript=None` and its default bands (the</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        backend then requires an explicit `evalscript=`).</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">            key: A logical collection or recipe key.</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">            The normalised :class:`ResolvedRequest` the backend builds from.</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">            key: A logical collection or recipe key.</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">            The normalised :class:`ResolvedRequest` the backend builds from.</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">            ValueError: If `key` is neither a known recipe nor collection</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">                (message suggests the closest key across both layers).</span>
 <a id="__codelineno-0-487" name="__codelineno-0-487"></a>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">            ValueError: If `key` is neither a known recipe nor collection</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">                (message suggests the closest key across both layers).</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">            - A recipe carries its evalscript + kind:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">                &gt;&gt;&gt; from earthlens.sentinel_hub import Catalog</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">                &gt;&gt;&gt; r = Catalog().resolve(&quot;sentinel-2-l2a-ndvi-stats&quot;)</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">                &gt;&gt;&gt; r.kind, r.evalscript</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">                (&#39;stats&#39;, &#39;ndvi_stats.js&#39;)</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">:</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="n">recipe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>            <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>                <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>                <span class="n">sh_collection</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">base_collection</span><span class="p">,</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>                <span class="n">bands</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">recipe</span><span class="o">.</span><span class="n">bands</span><span class="p">),</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a>                <span class="n">evalscript</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">evalscript</span><span class="p">,</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>                <span class="n">output_bands</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">output_bands</span><span class="p">,</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>                <span class="n">is_recipe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>                <span class="n">kind</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>            <span class="p">)</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>            <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>                <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>                <span class="n">sh_collection</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">sh_collection</span><span class="p">,</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>                <span class="n">bands</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">effective_bands</span><span class="p">,</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>                <span class="n">evalscript</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>                <span class="n">is_recipe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>                <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;render&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>            <span class="p">)</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a>        <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">))</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a known Sentinel Hub collection or recipe. &quot;</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>            <span class="sa">f</span><span class="s2">&quot;Known keys: </span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="p">)</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">            - A recipe carries its evalscript + kind:</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">                &gt;&gt;&gt; from earthlens.sentinel_hub import Catalog</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">                &gt;&gt;&gt; r = Catalog().resolve(&quot;sentinel-2-l2a-ndvi-stats&quot;)</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">                &gt;&gt;&gt; r.kind, r.evalscript</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">                (&#39;stats&#39;, &#39;ndvi_stats.js&#39;)</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">:</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>            <span class="n">recipe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>            <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>                <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>                <span class="n">sh_collection</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">base_collection</span><span class="p">,</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>                <span class="n">bands</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">recipe</span><span class="o">.</span><span class="n">bands</span><span class="p">),</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>                <span class="n">evalscript</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">evalscript</span><span class="p">,</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>                <span class="n">output_bands</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">output_bands</span><span class="p">,</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>                <span class="n">is_recipe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>                <span class="n">kind</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>            <span class="p">)</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>            <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>                <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>                <span class="n">sh_collection</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">sh_collection</span><span class="p">,</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>                <span class="n">bands</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">effective_bands</span><span class="p">,</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>                <span class="n">evalscript</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>                <span class="n">is_recipe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>                <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;render&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>            <span class="p">)</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a>        <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">))</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a known Sentinel Hub collection or recipe. &quot;</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a>            <span class="sa">f</span><span class="s2">&quot;Known keys: </span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>        <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26068,33 +25988,6 @@ in :attr:<code>available_collections</code>.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.sentinel_hub.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.sentinel_hub.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.sentinel_hub.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the curated collection map (logical key → :class:<code>Collection</code>).</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/imagery/src/earthlens/sentinel_hub/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-420">420</a></span>
-<span class="normal"><a href="#__codelineno-0-421">421</a></span>
-<span class="normal"><a href="#__codelineno-0-422">422</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">]:</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated collection map (logical key → :class:`Collection`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -26190,7 +26083,11 @@ in :attr:<code>available_collections</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/sentinel_hub/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-424">424</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-420">420</a></span>
+<span class="normal"><a href="#__codelineno-0-421">421</a></span>
+<span class="normal"><a href="#__codelineno-0-422">422</a></span>
+<span class="normal"><a href="#__codelineno-0-423">423</a></span>
+<span class="normal"><a href="#__codelineno-0-424">424</a></span>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
 <span class="normal"><a href="#__codelineno-0-426">426</a></span>
 <span class="normal"><a href="#__codelineno-0-427">427</a></span>
@@ -26200,25 +26097,21 @@ in :attr:<code>available_collections</code>.</p>
 <span class="normal"><a href="#__codelineno-0-431">431</a></span>
 <span class="normal"><a href="#__codelineno-0-432">432</a></span>
 <span class="normal"><a href="#__codelineno-0-433">433</a></span>
-<span class="normal"><a href="#__codelineno-0-434">434</a></span>
-<span class="normal"><a href="#__codelineno-0-435">435</a></span>
-<span class="normal"><a href="#__codelineno-0-436">436</a></span>
-<span class="normal"><a href="#__codelineno-0-437">437</a></span>
-<span class="normal"><a href="#__codelineno-0-438">438</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">    Alias of the inherited :meth:`get_dataset`, named for clarity.</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        collection_key: Logical collection key.</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        The matching :class:`Collection`.</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        ValueError: If the key is unknown (message suggests the closest key).</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    Alias of the inherited :meth:`get_dataset`, named for clarity.</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        collection_key: Logical collection key.</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        The matching :class:`Collection`.</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        ValueError: If the key is unknown (message suggests the closest key).</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26318,7 +26211,11 @@ in :attr:<code>available_collections</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/sentinel_hub/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-440">440</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-436">436</a></span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span>
+<span class="normal"><a href="#__codelineno-0-439">439</a></span>
+<span class="normal"><a href="#__codelineno-0-440">440</a></span>
 <span class="normal"><a href="#__codelineno-0-441">441</a></span>
 <span class="normal"><a href="#__codelineno-0-442">442</a></span>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
@@ -26336,33 +26233,29 @@ in :attr:<code>available_collections</code>.</p>
 <span class="normal"><a href="#__codelineno-0-455">455</a></span>
 <span class="normal"><a href="#__codelineno-0-456">456</a></span>
 <span class="normal"><a href="#__codelineno-0-457">457</a></span>
-<span class="normal"><a href="#__codelineno-0-458">458</a></span>
-<span class="normal"><a href="#__codelineno-0-459">459</a></span>
-<span class="normal"><a href="#__codelineno-0-460">460</a></span>
-<span class="normal"><a href="#__codelineno-0-461">461</a></span>
-<span class="normal"><a href="#__codelineno-0-462">462</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipe_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvalscriptRecipe</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`EvalscriptRecipe` for `recipe_key` (did-you-mean on miss).</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        recipe_key: Recipe key.</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        The matching :class:`EvalscriptRecipe`.</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        ValueError: If the key is unknown (message suggests the closest key).</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">recipe_key</span><span class="p">]</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">recipe_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recipe_key</span><span class="si">!r}</span><span class="s2"> is not a known recipe. &quot;</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>            <span class="sa">f</span><span class="s2">&quot;Known recipes: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipe_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvalscriptRecipe</span><span class="p">:</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`EvalscriptRecipe` for `recipe_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        recipe_key: Recipe key.</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        The matching :class:`EvalscriptRecipe`.</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        ValueError: If the key is unknown (message suggests the closest key).</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">recipe_key</span><span class="p">]</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">recipe_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recipe_key</span><span class="si">!r}</span><span class="s2"> is not a known recipe. &quot;</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>            <span class="sa">f</span><span class="s2">&quot;Known recipes: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26439,25 +26332,25 @@ in :attr:<code>available_collections</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/sentinel_hub/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-464">464</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span>
+<span class="normal"><a href="#__codelineno-0-464">464</a></span>
 <span class="normal"><a href="#__codelineno-0-465">465</a></span>
 <span class="normal"><a href="#__codelineno-0-466">466</a></span>
 <span class="normal"><a href="#__codelineno-0-467">467</a></span>
 <span class="normal"><a href="#__codelineno-0-468">468</a></span>
-<span class="normal"><a href="#__codelineno-0-469">469</a></span>
-<span class="normal"><a href="#__codelineno-0-470">470</a></span>
-<span class="normal"><a href="#__codelineno-0-471">471</a></span>
-<span class="normal"><a href="#__codelineno-0-472">472</a></span>
-<span class="normal"><a href="#__codelineno-0-473">473</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="k">def</span><span class="w"> </span><span class="nf">is_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return whether `key` names a curated evalscript recipe.</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">        key: A logical collection or recipe key.</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        `True` when `key` is a recipe.</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>    <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span>
+<span class="normal"><a href="#__codelineno-0-469">469</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="k">def</span><span class="w"> </span><span class="nf">is_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return whether `key` names a curated evalscript recipe.</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">        key: A logical collection or recipe key.</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">        `True` when `key` is a recipe.</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>    <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26812,7 +26705,11 @@ backend then requires an explicit <code>evalscript=</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/sentinel_hub/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-475">475</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-471">471</a></span>
+<span class="normal"><a href="#__codelineno-0-472">472</a></span>
+<span class="normal"><a href="#__codelineno-0-473">473</a></span>
+<span class="normal"><a href="#__codelineno-0-474">474</a></span>
+<span class="normal"><a href="#__codelineno-0-475">475</a></span>
 <span class="normal"><a href="#__codelineno-0-476">476</a></span>
 <span class="normal"><a href="#__codelineno-0-477">477</a></span>
 <span class="normal"><a href="#__codelineno-0-478">478</a></span>
@@ -26864,67 +26761,63 @@ backend then requires an explicit <code>evalscript=</code>).</p>
 <span class="normal"><a href="#__codelineno-0-524">524</a></span>
 <span class="normal"><a href="#__codelineno-0-525">525</a></span>
 <span class="normal"><a href="#__codelineno-0-526">526</a></span>
-<span class="normal"><a href="#__codelineno-0-527">527</a></span>
-<span class="normal"><a href="#__codelineno-0-528">528</a></span>
-<span class="normal"><a href="#__codelineno-0-529">529</a></span>
-<span class="normal"><a href="#__codelineno-0-530">530</a></span>
-<span class="normal"><a href="#__codelineno-0-531">531</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedRequest</span><span class="p">:</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a collection-or-recipe key to a uniform :class:`ResolvedRequest`.</span>
+<span class="normal"><a href="#__codelineno-0-527">527</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedRequest</span><span class="p">:</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a collection-or-recipe key to a uniform :class:`ResolvedRequest`.</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">    A recipe resolves to its bundled evalscript + bands + kind; a plain</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">    collection resolves with `evalscript=None` and its default bands (the</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">    backend then requires an explicit `evalscript=`).</span>
 <a id="__codelineno-0-477" name="__codelineno-0-477"></a>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">    A recipe resolves to its bundled evalscript + bands + kind; a plain</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">    collection resolves with `evalscript=None` and its default bands (the</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">    backend then requires an explicit `evalscript=`).</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        key: A logical collection or recipe key.</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        The normalised :class:`ResolvedRequest` the backend builds from.</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">        key: A logical collection or recipe key.</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        The normalised :class:`ResolvedRequest` the backend builds from.</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        ValueError: If `key` is neither a known recipe nor collection</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">            (message suggests the closest key across both layers).</span>
 <a id="__codelineno-0-487" name="__codelineno-0-487"></a>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        ValueError: If `key` is neither a known recipe nor collection</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">            (message suggests the closest key across both layers).</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">        - A recipe carries its evalscript + kind:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">            &gt;&gt;&gt; from earthlens.sentinel_hub import Catalog</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">            &gt;&gt;&gt; r = Catalog().resolve(&quot;sentinel-2-l2a-ndvi-stats&quot;)</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">            &gt;&gt;&gt; r.kind, r.evalscript</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">            (&#39;stats&#39;, &#39;ndvi_stats.js&#39;)</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">:</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>        <span class="n">recipe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>        <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>            <span class="n">sh_collection</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">base_collection</span><span class="p">,</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>            <span class="n">bands</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">recipe</span><span class="o">.</span><span class="n">bands</span><span class="p">),</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a>            <span class="n">evalscript</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">evalscript</span><span class="p">,</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>            <span class="n">output_bands</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">output_bands</span><span class="p">,</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="n">is_recipe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>            <span class="n">kind</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>        <span class="p">)</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>            <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>            <span class="n">sh_collection</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">sh_collection</span><span class="p">,</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>            <span class="n">bands</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">effective_bands</span><span class="p">,</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>            <span class="n">evalscript</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>            <span class="n">is_recipe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;render&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>        <span class="p">)</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a>    <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">))</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a>    <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a known Sentinel Hub collection or recipe. &quot;</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>        <span class="sa">f</span><span class="s2">&quot;Known keys: </span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>    <span class="p">)</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        - A recipe carries its evalscript + kind:</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">            &gt;&gt;&gt; from earthlens.sentinel_hub import Catalog</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">            &gt;&gt;&gt; r = Catalog().resolve(&quot;sentinel-2-l2a-ndvi-stats&quot;)</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">            &gt;&gt;&gt; r.kind, r.evalscript</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">            (&#39;stats&#39;, &#39;ndvi_stats.js&#39;)</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">:</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">recipe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>            <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>            <span class="n">sh_collection</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">base_collection</span><span class="p">,</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="n">bands</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">recipe</span><span class="o">.</span><span class="n">bands</span><span class="p">),</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>            <span class="n">evalscript</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">evalscript</span><span class="p">,</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="n">output_bands</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">output_bands</span><span class="p">,</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>            <span class="n">is_recipe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>            <span class="n">kind</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>        <span class="p">)</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>            <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>            <span class="n">sh_collection</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">sh_collection</span><span class="p">,</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="n">bands</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">effective_bands</span><span class="p">,</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>            <span class="n">evalscript</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>            <span class="n">is_recipe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;render&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>        <span class="p">)</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a>    <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">))</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>    <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a known Sentinel Hub collection or recipe. &quot;</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a>        <span class="sa">f</span><span class="s2">&quot;Known keys: </span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -35730,11 +35623,7 @@ in :attr:<code>available_collections</code>.</p>
 <span class="normal"><a href="#__codelineno-0-524">524</a></span>
 <span class="normal"><a href="#__codelineno-0-525">525</a></span>
 <span class="normal"><a href="#__codelineno-0-526">526</a></span>
-<span class="normal"><a href="#__codelineno-0-527">527</a></span>
-<span class="normal"><a href="#__codelineno-0-528">528</a></span>
-<span class="normal"><a href="#__codelineno-0-529">529</a></span>
-<span class="normal"><a href="#__codelineno-0-530">530</a></span>
-<span class="normal"><a href="#__codelineno-0-531">531</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-527">527</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;YAML-backed catalog of Sentinel Hub collections and evalscript recipes.</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    Reads every `*.yaml` under :data:`CATALOG_PATH` on construction and merges</span>
@@ -35823,118 +35712,114 @@ in :attr:<code>available_collections</code>.</p>
 <a id="__codelineno-0-417" name="__codelineno-0-417"></a>            <span class="n">available_collections</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">av_cols</span><span class="p">),</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="p">)</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">]:</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated collection map (logical key → :class:`Collection`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        Alias of the inherited :meth:`get_dataset`, named for clarity.</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            collection_key: Logical collection key.</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            The matching :class:`Collection`.</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            ValueError: If the key is unknown (message suggests the closest key).</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipe_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvalscriptRecipe</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`EvalscriptRecipe` for `recipe_key` (did-you-mean on miss).</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">            recipe_key: Recipe key.</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">            The matching :class:`EvalscriptRecipe`.</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">            ValueError: If the key is unknown (message suggests the closest key).</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">recipe_key</span><span class="p">]</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">recipe_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recipe_key</span><span class="si">!r}</span><span class="s2"> is not a known recipe. &quot;</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>                <span class="sa">f</span><span class="s2">&quot;Known recipes: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether `key` names a curated evalscript recipe.</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">            key: A logical collection or recipe key.</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">            `True` when `key` is a recipe.</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedRequest</span><span class="p">:</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a collection-or-recipe key to a uniform :class:`ResolvedRequest`.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        Alias of the inherited :meth:`get_dataset`, named for clarity.</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">            collection_key: Logical collection key.</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            The matching :class:`Collection`.</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">            ValueError: If the key is unknown (message suggests the closest key).</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipe_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvalscriptRecipe</span><span class="p">:</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`EvalscriptRecipe` for `recipe_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            recipe_key: Recipe key.</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            The matching :class:`EvalscriptRecipe`.</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">            ValueError: If the key is unknown (message suggests the closest key).</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">recipe_key</span><span class="p">]</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">recipe_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recipe_key</span><span class="si">!r}</span><span class="s2"> is not a known recipe. &quot;</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>                <span class="sa">f</span><span class="s2">&quot;Known recipes: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether `key` names a curated evalscript recipe.</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">            key: A logical collection or recipe key.</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">            `True` when `key` is a recipe.</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedRequest</span><span class="p">:</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a collection-or-recipe key to a uniform :class:`ResolvedRequest`.</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        A recipe resolves to its bundled evalscript + bands + kind; a plain</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">        collection resolves with `evalscript=None` and its default bands (the</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">        backend then requires an explicit `evalscript=`).</span>
 <a id="__codelineno-0-477" name="__codelineno-0-477"></a>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        A recipe resolves to its bundled evalscript + bands + kind; a plain</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">        collection resolves with `evalscript=None` and its default bands (the</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        backend then requires an explicit `evalscript=`).</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">            key: A logical collection or recipe key.</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">            The normalised :class:`ResolvedRequest` the backend builds from.</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">            key: A logical collection or recipe key.</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">            The normalised :class:`ResolvedRequest` the backend builds from.</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">            ValueError: If `key` is neither a known recipe nor collection</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">                (message suggests the closest key across both layers).</span>
 <a id="__codelineno-0-487" name="__codelineno-0-487"></a>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">            ValueError: If `key` is neither a known recipe nor collection</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">                (message suggests the closest key across both layers).</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">            - A recipe carries its evalscript + kind:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">                &gt;&gt;&gt; from earthlens.sentinel_hub import Catalog</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">                &gt;&gt;&gt; r = Catalog().resolve(&quot;sentinel-2-l2a-ndvi-stats&quot;)</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">                &gt;&gt;&gt; r.kind, r.evalscript</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">                (&#39;stats&#39;, &#39;ndvi_stats.js&#39;)</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">:</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="n">recipe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>            <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>                <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>                <span class="n">sh_collection</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">base_collection</span><span class="p">,</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>                <span class="n">bands</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">recipe</span><span class="o">.</span><span class="n">bands</span><span class="p">),</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a>                <span class="n">evalscript</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">evalscript</span><span class="p">,</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>                <span class="n">output_bands</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">output_bands</span><span class="p">,</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>                <span class="n">is_recipe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>                <span class="n">kind</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>            <span class="p">)</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>            <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>                <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>                <span class="n">sh_collection</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">sh_collection</span><span class="p">,</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>                <span class="n">bands</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">effective_bands</span><span class="p">,</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>                <span class="n">evalscript</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>                <span class="n">is_recipe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>                <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;render&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>            <span class="p">)</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a>        <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">))</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a known Sentinel Hub collection or recipe. &quot;</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>            <span class="sa">f</span><span class="s2">&quot;Known keys: </span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="p">)</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">            - A recipe carries its evalscript + kind:</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">                &gt;&gt;&gt; from earthlens.sentinel_hub import Catalog</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">                &gt;&gt;&gt; r = Catalog().resolve(&quot;sentinel-2-l2a-ndvi-stats&quot;)</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">                &gt;&gt;&gt; r.kind, r.evalscript</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">                (&#39;stats&#39;, &#39;ndvi_stats.js&#39;)</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">:</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>            <span class="n">recipe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>            <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>                <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>                <span class="n">sh_collection</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">base_collection</span><span class="p">,</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>                <span class="n">bands</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">recipe</span><span class="o">.</span><span class="n">bands</span><span class="p">),</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>                <span class="n">evalscript</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">evalscript</span><span class="p">,</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>                <span class="n">output_bands</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">output_bands</span><span class="p">,</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>                <span class="n">is_recipe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>                <span class="n">kind</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>            <span class="p">)</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>            <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>                <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>                <span class="n">sh_collection</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">sh_collection</span><span class="p">,</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>                <span class="n">bands</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">effective_bands</span><span class="p">,</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>                <span class="n">evalscript</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>                <span class="n">is_recipe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>                <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;render&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>            <span class="p">)</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a>        <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">))</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a known Sentinel Hub collection or recipe. &quot;</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a>            <span class="sa">f</span><span class="s2">&quot;Known keys: </span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>        <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -35950,33 +35835,6 @@ in :attr:<code>available_collections</code>.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.sentinel_hub.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.sentinel_hub.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.sentinel_hub.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the curated collection map (logical key → :class:<code>Collection</code>).</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/imagery/src/earthlens/sentinel_hub/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-420">420</a></span>
-<span class="normal"><a href="#__codelineno-0-421">421</a></span>
-<span class="normal"><a href="#__codelineno-0-422">422</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">]:</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated collection map (logical key → :class:`Collection`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -36072,7 +35930,11 @@ in :attr:<code>available_collections</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/sentinel_hub/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-424">424</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-420">420</a></span>
+<span class="normal"><a href="#__codelineno-0-421">421</a></span>
+<span class="normal"><a href="#__codelineno-0-422">422</a></span>
+<span class="normal"><a href="#__codelineno-0-423">423</a></span>
+<span class="normal"><a href="#__codelineno-0-424">424</a></span>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
 <span class="normal"><a href="#__codelineno-0-426">426</a></span>
 <span class="normal"><a href="#__codelineno-0-427">427</a></span>
@@ -36082,25 +35944,21 @@ in :attr:<code>available_collections</code>.</p>
 <span class="normal"><a href="#__codelineno-0-431">431</a></span>
 <span class="normal"><a href="#__codelineno-0-432">432</a></span>
 <span class="normal"><a href="#__codelineno-0-433">433</a></span>
-<span class="normal"><a href="#__codelineno-0-434">434</a></span>
-<span class="normal"><a href="#__codelineno-0-435">435</a></span>
-<span class="normal"><a href="#__codelineno-0-436">436</a></span>
-<span class="normal"><a href="#__codelineno-0-437">437</a></span>
-<span class="normal"><a href="#__codelineno-0-438">438</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">    Alias of the inherited :meth:`get_dataset`, named for clarity.</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        collection_key: Logical collection key.</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        The matching :class:`Collection`.</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        ValueError: If the key is unknown (message suggests the closest key).</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    Alias of the inherited :meth:`get_dataset`, named for clarity.</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        collection_key: Logical collection key.</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        The matching :class:`Collection`.</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        ValueError: If the key is unknown (message suggests the closest key).</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -36200,7 +36058,11 @@ in :attr:<code>available_collections</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/sentinel_hub/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-440">440</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-436">436</a></span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span>
+<span class="normal"><a href="#__codelineno-0-439">439</a></span>
+<span class="normal"><a href="#__codelineno-0-440">440</a></span>
 <span class="normal"><a href="#__codelineno-0-441">441</a></span>
 <span class="normal"><a href="#__codelineno-0-442">442</a></span>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
@@ -36218,33 +36080,29 @@ in :attr:<code>available_collections</code>.</p>
 <span class="normal"><a href="#__codelineno-0-455">455</a></span>
 <span class="normal"><a href="#__codelineno-0-456">456</a></span>
 <span class="normal"><a href="#__codelineno-0-457">457</a></span>
-<span class="normal"><a href="#__codelineno-0-458">458</a></span>
-<span class="normal"><a href="#__codelineno-0-459">459</a></span>
-<span class="normal"><a href="#__codelineno-0-460">460</a></span>
-<span class="normal"><a href="#__codelineno-0-461">461</a></span>
-<span class="normal"><a href="#__codelineno-0-462">462</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipe_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvalscriptRecipe</span><span class="p">:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`EvalscriptRecipe` for `recipe_key` (did-you-mean on miss).</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        recipe_key: Recipe key.</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        The matching :class:`EvalscriptRecipe`.</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        ValueError: If the key is unknown (message suggests the closest key).</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">recipe_key</span><span class="p">]</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">recipe_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recipe_key</span><span class="si">!r}</span><span class="s2"> is not a known recipe. &quot;</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>            <span class="sa">f</span><span class="s2">&quot;Known recipes: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipe_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvalscriptRecipe</span><span class="p">:</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`EvalscriptRecipe` for `recipe_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        recipe_key: Recipe key.</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        The matching :class:`EvalscriptRecipe`.</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        ValueError: If the key is unknown (message suggests the closest key).</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">recipe_key</span><span class="p">]</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">recipe_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">recipe_key</span><span class="si">!r}</span><span class="s2"> is not a known recipe. &quot;</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>            <span class="sa">f</span><span class="s2">&quot;Known recipes: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -36321,25 +36179,25 @@ in :attr:<code>available_collections</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/sentinel_hub/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-464">464</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span>
+<span class="normal"><a href="#__codelineno-0-464">464</a></span>
 <span class="normal"><a href="#__codelineno-0-465">465</a></span>
 <span class="normal"><a href="#__codelineno-0-466">466</a></span>
 <span class="normal"><a href="#__codelineno-0-467">467</a></span>
 <span class="normal"><a href="#__codelineno-0-468">468</a></span>
-<span class="normal"><a href="#__codelineno-0-469">469</a></span>
-<span class="normal"><a href="#__codelineno-0-470">470</a></span>
-<span class="normal"><a href="#__codelineno-0-471">471</a></span>
-<span class="normal"><a href="#__codelineno-0-472">472</a></span>
-<span class="normal"><a href="#__codelineno-0-473">473</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="k">def</span><span class="w"> </span><span class="nf">is_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return whether `key` names a curated evalscript recipe.</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">        key: A logical collection or recipe key.</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        `True` when `key` is a recipe.</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>    <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span>
+<span class="normal"><a href="#__codelineno-0-469">469</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="k">def</span><span class="w"> </span><span class="nf">is_recipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return whether `key` names a curated evalscript recipe.</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">        key: A logical collection or recipe key.</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">        `True` when `key` is a recipe.</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>    <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -36694,7 +36552,11 @@ backend then requires an explicit <code>evalscript=</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/sentinel_hub/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-475">475</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-471">471</a></span>
+<span class="normal"><a href="#__codelineno-0-472">472</a></span>
+<span class="normal"><a href="#__codelineno-0-473">473</a></span>
+<span class="normal"><a href="#__codelineno-0-474">474</a></span>
+<span class="normal"><a href="#__codelineno-0-475">475</a></span>
 <span class="normal"><a href="#__codelineno-0-476">476</a></span>
 <span class="normal"><a href="#__codelineno-0-477">477</a></span>
 <span class="normal"><a href="#__codelineno-0-478">478</a></span>
@@ -36746,67 +36608,63 @@ backend then requires an explicit <code>evalscript=</code>).</p>
 <span class="normal"><a href="#__codelineno-0-524">524</a></span>
 <span class="normal"><a href="#__codelineno-0-525">525</a></span>
 <span class="normal"><a href="#__codelineno-0-526">526</a></span>
-<span class="normal"><a href="#__codelineno-0-527">527</a></span>
-<span class="normal"><a href="#__codelineno-0-528">528</a></span>
-<span class="normal"><a href="#__codelineno-0-529">529</a></span>
-<span class="normal"><a href="#__codelineno-0-530">530</a></span>
-<span class="normal"><a href="#__codelineno-0-531">531</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedRequest</span><span class="p">:</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a collection-or-recipe key to a uniform :class:`ResolvedRequest`.</span>
+<span class="normal"><a href="#__codelineno-0-527">527</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedRequest</span><span class="p">:</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a collection-or-recipe key to a uniform :class:`ResolvedRequest`.</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">    A recipe resolves to its bundled evalscript + bands + kind; a plain</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">    collection resolves with `evalscript=None` and its default bands (the</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">    backend then requires an explicit `evalscript=`).</span>
 <a id="__codelineno-0-477" name="__codelineno-0-477"></a>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">    A recipe resolves to its bundled evalscript + bands + kind; a plain</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">    collection resolves with `evalscript=None` and its default bands (the</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">    backend then requires an explicit `evalscript=`).</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        key: A logical collection or recipe key.</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        The normalised :class:`ResolvedRequest` the backend builds from.</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">        key: A logical collection or recipe key.</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        The normalised :class:`ResolvedRequest` the backend builds from.</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        ValueError: If `key` is neither a known recipe nor collection</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">            (message suggests the closest key across both layers).</span>
 <a id="__codelineno-0-487" name="__codelineno-0-487"></a>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        ValueError: If `key` is neither a known recipe nor collection</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">            (message suggests the closest key across both layers).</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">        - A recipe carries its evalscript + kind:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">            &gt;&gt;&gt; from earthlens.sentinel_hub import Catalog</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">            &gt;&gt;&gt; r = Catalog().resolve(&quot;sentinel-2-l2a-ndvi-stats&quot;)</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">            &gt;&gt;&gt; r.kind, r.evalscript</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">            (&#39;stats&#39;, &#39;ndvi_stats.js&#39;)</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">:</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>        <span class="n">recipe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>        <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>            <span class="n">sh_collection</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">base_collection</span><span class="p">,</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>            <span class="n">bands</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">recipe</span><span class="o">.</span><span class="n">bands</span><span class="p">),</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a>            <span class="n">evalscript</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">evalscript</span><span class="p">,</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>            <span class="n">output_bands</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">output_bands</span><span class="p">,</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="n">is_recipe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>            <span class="n">kind</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>        <span class="p">)</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>            <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>            <span class="n">sh_collection</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">sh_collection</span><span class="p">,</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>            <span class="n">bands</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">effective_bands</span><span class="p">,</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>            <span class="n">evalscript</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>            <span class="n">is_recipe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;render&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>        <span class="p">)</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a>    <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">))</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a>    <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a known Sentinel Hub collection or recipe. &quot;</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>        <span class="sa">f</span><span class="s2">&quot;Known keys: </span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>    <span class="p">)</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        - A recipe carries its evalscript + kind:</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">            &gt;&gt;&gt; from earthlens.sentinel_hub import Catalog</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">            &gt;&gt;&gt; r = Catalog().resolve(&quot;sentinel-2-l2a-ndvi-stats&quot;)</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">            &gt;&gt;&gt; r.kind, r.evalscript</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">            (&#39;stats&#39;, &#39;ndvi_stats.js&#39;)</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">:</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">recipe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>            <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>            <span class="n">sh_collection</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">base_collection</span><span class="p">,</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="n">bands</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">recipe</span><span class="o">.</span><span class="n">bands</span><span class="p">),</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>            <span class="n">evalscript</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">evalscript</span><span class="p">,</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="n">output_bands</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">output_bands</span><span class="p">,</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>            <span class="n">is_recipe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>            <span class="n">kind</span><span class="o">=</span><span class="n">recipe</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>        <span class="p">)</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="k">return</span> <span class="n">ResolvedRequest</span><span class="p">(</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>            <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>            <span class="n">sh_collection</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">sh_collection</span><span class="p">,</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="n">bands</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">effective_bands</span><span class="p">,</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>            <span class="n">evalscript</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>            <span class="n">is_recipe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;render&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>        <span class="p">)</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a>    <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recipes</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">))</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>    <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a known Sentinel Hub collection or recipe. &quot;</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a>        <span class="sa">f</span><span class="s2">&quot;Known keys: </span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

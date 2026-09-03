@@ -17864,34 +17864,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -24496,12 +24468,14 @@ eclipse so much more dramatically.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyramids</span>  <span class="c1"># noqa: F401  registers the vendored GDAL below</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">stamp_mark</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_dotenv</span><span class="p">,</span> <span class="n">load_dotenv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.patches</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circle</span><span class="p">,</span> <span class="n">FancyBboxPatch</span><span class="p">,</span> <span class="n">Wedge</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">osgeo</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdal</span>  <span class="c1"># needs the `import pyramids` above, which vendors it</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyproj</span><span class="w"> </span><span class="kn">import</span> <span class="n">CRS</span><span class="p">,</span> <span class="n">Transformer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
@@ -24526,6 +24500,7 @@ eclipse so much more dramatically.</p>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+<span class="n">gdal</span><span class="o">.</span><span class="n">UseExceptions</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">"figure.dpi"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">80</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import gc
@@ -24540,12 +24515,14 @@ import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import pyramids  # noqa: F401  registers the vendored GDAL below
 from cleopatra.glyphs.gridded.array_glyph import FrameLabel
 from cleopatra.styling.watermark import stamp_mark
 from dotenv import find_dotenv, load_dotenv
 from IPython.display import Image, display
 from loguru import logger
 from matplotlib.patches import Circle, FancyBboxPatch, Wedge
+from osgeo import gdal  # needs the `import pyramids` above, which vendors it
 from pyproj import CRS, Transformer
 from pyramids.dataset import Dataset
 from pyramids.dataset.collection import DatasetCollection
@@ -24570,6 +24547,7 @@ from earthlens.core import EarthLens, cache_dir
 
 warnings.filterwarnings("ignore")
 logger.remove()
+gdal.UseExceptions()
 plt.rcParams["figure.dpi"] = 80</div>
 </div>
 </div>
@@ -25298,14 +25276,15 @@ invents imagery — both only attenuate or tint pixels that already carry data.<
 
 <span class="k">def</span><span class="w"> </span><span class="nf">soften_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Read an RGBA GeoTIFF frame, clean its seam and boundary, write it back in place."""</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">bands</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()))</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">gdal</span><span class="o">.</span><span class="n">GA_Update</span><span class="p">)</span>
+    <span class="n">bands</span> <span class="o">=</span> <span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">ReadAsArray</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">RasterCount</span><span class="p">)]</span>
     <span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">(</span><span class="n">bands</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="n">bands</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="p">(</span><span class="n">rgb</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">soften</span><span class="p">(</span><span class="n">declip_cyan</span><span class="p">(</span><span class="n">rgb</span><span class="p">),</span> <span class="n">alpha</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-        <span class="n">ds</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">band</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
-    <span class="n">ds</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># flush the in-place writes before the next frame reads them</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">WriteArray</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">])</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">FlushCache</span><span class="p">()</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">path</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">def declip_cyan(rgb, tol=10.0, sigma=22.0, strength=0.9):
@@ -25392,14 +25371,15 @@ def soften(rgb, alpha, feather=14.0, glow=0.55, glow_rgb=(0.60, 0.78, 1.0), trim
 
 def soften_file(path, **kwargs):
     """Read an RGBA GeoTIFF frame, clean its seam and boundary, write it back in place."""
-    ds = Dataset.read_file(path, read_only=False)
-    bands = list(np.asarray(ds.read_array()))
+    ds = gdal.Open(str(path), gdal.GA_Update)
+    bands = [ds.GetRasterBand(i + 1).ReadAsArray() for i in range(ds.RasterCount)]
     rgb = np.dstack(bands[:3])
     alpha = bands[3] if len(bands) &gt; 3 else (rgb.max(axis=2) &gt; 0).astype(np.uint8) * 255
     out = soften(declip_cyan(rgb), alpha, **kwargs)
     for i in range(3):
-        ds.write_array(out[..., i], band=i)
-    ds.close()  # flush the in-place writes before the next frame reads them
+        ds.GetRasterBand(i + 1).WriteArray(out[..., i])
+    ds.FlushCache()
+    ds = None
     return path</div>
 </div>
 </div>
@@ -25643,9 +25623,9 @@ def soften_file(path, **kwargs):
                 <span class="c1"># umbra's deepest cycles. Passing None for R/G/B does not leave them</span>
                 <span class="c1"># nodata-free: pyramids-gis's SetNoDataValue(None) call fails on a</span>
                 <span class="c1"># Byte band and falls back to NaN, so they end up tagged</span>
-                <span class="c1"># a NaN nodata value instead. That is harmless here -- no Byte pixel is</span>
+                <span class="c1"># GDAL_NODATA=nan instead. That is harmless here -- no Byte pixel is</span>
                 <span class="c1"># ever exactly NaN, so it behaves like "no nodata" for every real</span>
-                <span class="c1"># value -- but it is real metadata a stricter reader would see,</span>
+                <span class="c1"># value -- but it is real metadata a stricter GDAL reader would see,</span>
                 <span class="c1"># not an omitted one. Alpha still carries the real coverage signal</span>
                 <span class="c1"># (0 off-disc, ~255 on) for anything that wants it.</span>
                 <span class="n">no_data_value</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
@@ -25876,9 +25856,9 @@ def render_cycle(slot):
                 # umbra's deepest cycles. Passing None for R/G/B does not leave them
                 # nodata-free: pyramids-gis's SetNoDataValue(None) call fails on a
                 # Byte band and falls back to NaN, so they end up tagged
-                # a NaN nodata value instead. That is harmless here -- no Byte pixel is
+                # GDAL_NODATA=nan instead. That is harmless here -- no Byte pixel is
                 # ever exactly NaN, so it behaves like "no nodata" for every real
-                # value -- but it is real metadata a stricter reader would see,
+                # value -- but it is real metadata a stricter GDAL reader would see,
                 # not an omitted one. Alpha still carries the real coverage signal
                 # (0 off-disc, ~255 on) for anything that wants it.
                 no_data_value=[None, None, None, 0],
