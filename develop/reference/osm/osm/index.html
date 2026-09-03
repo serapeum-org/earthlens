@@ -6868,17 +6868,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.osm.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.osm.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7316,17 +7305,6 @@
     <span class="md-ellipsis">
       
         get
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.osm.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -24310,17 +24288,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.osm.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.osm.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24758,17 +24725,6 @@
     <span class="md-ellipsis">
       
         get
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.osm.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -25248,7 +25204,7 @@ imported lazily, so the package imports without <code>earthlens[osm]</code> /
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.osm.catalog.Dataset&lt;/code&gt;)" href="#earthlens.osm.catalog.Dataset">Dataset</a>]</code></p>
 
 
 
@@ -25512,15 +25468,7 @@ Geofabrik path segment (<code>"europe/malta"</code>), read from the YAML's
 <span class="normal"><a href="#__codelineno-0-389">389</a></span>
 <span class="normal"><a href="#__codelineno-0-390">390</a></span>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
-<span class="normal"><a href="#__codelineno-0-392">392</a></span>
-<span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span>
-<span class="normal"><a href="#__codelineno-0-395">395</a></span>
-<span class="normal"><a href="#__codelineno-0-396">396</a></span>
-<span class="normal"><a href="#__codelineno-0-397">397</a></span>
-<span class="normal"><a href="#__codelineno-0-398">398</a></span>
-<span class="normal"><a href="#__codelineno-0-399">399</a></span>
-<span class="normal"><a href="#__codelineno-0-400">400</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]):</span>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Named-query catalog for the OpenStreetMap backend.</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    Reads the bundled `osm_data_catalog.yaml` (shipped as package data) and</span>
@@ -25605,109 +25553,101 @@ Geofabrik path segment (<code>"europe/malta"</code>), read from the YAML's
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="p">)</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span> <span class="n">regions</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the named-query map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            dict[str, Dataset]: Same object as `datasets`.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Thin alias over `AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            query_id: A named-query id (`&quot;overpass:hospitals&quot;`,</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                `&quot;ohsome:buildings&quot;`, …).</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Thin alias over `AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            query_id: A named-query id (`&quot;overpass:hospitals&quot;`,</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">                `&quot;ohsome:buildings&quot;`, …).</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            Dataset: The matching query row.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            ValueError: If `query_id` is not a registered named query.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">query_id</span><span class="p">))</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            Dataset: The matching query row.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">query_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered named-query ids, sorted.</span>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            ValueError: If `query_id` is not a registered named query.</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">query_id</span><span class="p">))</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">query_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered named-query ids, sorted.</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            list[str]: The query ids (`[&quot;ohsome:amenities&quot;, ...]`).</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            - List the curated named queries:</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">                &gt;&gt;&gt; from earthlens.osm import Catalog</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">                &gt;&gt;&gt; &quot;overpass:roads&quot; in Catalog().query_ids()</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">                True</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            list[str]: The query ids (`[&quot;ohsome:amenities&quot;, ...]`).</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            - List the curated named queries:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                &gt;&gt;&gt; from earthlens.osm import Catalog</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                &gt;&gt;&gt; &quot;overpass:roads&quot; in Catalog().query_ids()</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                True</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">region_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a `region=` value to its Geofabrik path segment (`G12`).</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        A `region` containing a `/` is taken as a raw Geofabrik path (the</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        power-user escape hatch, e.g. `&quot;europe/andorra&quot;`) and returned</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        unchanged; otherwise it is looked up in the `regions:` table, with a</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        did-you-mean hint on a miss.</span>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">region_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a `region=` value to its Geofabrik path segment (`G12`).</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        A `region` containing a `/` is taken as a raw Geofabrik path (the</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        power-user escape hatch, e.g. `&quot;europe/andorra&quot;`) and returned</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        unchanged; otherwise it is looked up in the `regions:` table, with a</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        did-you-mean hint on a miss.</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            region: A region key from the `regions:` table (`&quot;malta&quot;`, …), or</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">                a raw Geofabrik path (any string containing a `/`).</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            str: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            ValueError: If `region` is neither a raw path nor a known region</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">                key.</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            - A known key resolves; a raw path passes through:</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">                &gt;&gt;&gt; from earthlens.osm import Catalog</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">                &gt;&gt;&gt; cat = Catalog()</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">                &gt;&gt;&gt; cat.region_path(&quot;malta&quot;)</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">                &#39;europe/malta&#39;</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">                &gt;&gt;&gt; cat.region_path(&quot;europe/andorra&quot;)</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                &#39;europe/andorra&#39;</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">region</span><span class="p">:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="k">return</span> <span class="n">region</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="k">return</span> <span class="n">path</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="n">suggestion</span> <span class="o">=</span> <span class="n">get_close_matches</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">suggestion</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">suggestion</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">region</span><span class="si">!r}</span><span class="s2"> is not a known Geofabrik region. Known regions: &quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2"> You may also pass a raw Geofabrik path containing &quot;</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="s2">&quot;a &#39;/&#39;, e.g. &#39;europe/andorra&#39;.&quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="p">)</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered Geofabrik region keys, sorted.</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            list[str]: The region keys (`[&quot;andorra&quot;, &quot;belgium&quot;, ...]`).</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">            - The primary test extract is listed:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">                &gt;&gt;&gt; from earthlens.osm import Catalog</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">                &gt;&gt;&gt; &quot;malta&quot; in Catalog().region_ids()</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">                True</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            region: A region key from the `regions:` table (`&quot;malta&quot;`, …), or</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">                a raw Geofabrik path (any string containing a `/`).</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">            str: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">            ValueError: If `region` is neither a raw path nor a known region</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">                key.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">            - A known key resolves; a raw path passes through:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">                &gt;&gt;&gt; from earthlens.osm import Catalog</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">                &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                &gt;&gt;&gt; cat.region_path(&quot;malta&quot;)</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">                &#39;europe/malta&#39;</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">                &gt;&gt;&gt; cat.region_path(&quot;europe/andorra&quot;)</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">                &#39;europe/andorra&#39;</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">region</span><span class="p">:</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="k">return</span> <span class="n">region</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>            <span class="k">return</span> <span class="n">path</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">suggestion</span> <span class="o">=</span> <span class="n">get_close_matches</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">suggestion</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">suggestion</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">region</span><span class="si">!r}</span><span class="s2"> is not a known Geofabrik region. Known regions: &quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2"> You may also pass a raw Geofabrik path containing &quot;</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="s2">&quot;a &#39;/&#39;, e.g. &#39;europe/andorra&#39;.&quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="p">)</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered Geofabrik region keys, sorted.</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">            list[str]: The region keys (`[&quot;andorra&quot;, &quot;belgium&quot;, ...]`).</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            - The primary test extract is listed:</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">                &gt;&gt;&gt; from earthlens.osm import Catalog</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">                &gt;&gt;&gt; &quot;malta&quot; in Catalog().region_ids()</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                True</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25819,95 +25759,37 @@ Geofabrik path segment (<code>"europe/malta"</code>), read from the YAML's
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-306">306</a></span>
-<span class="normal"><a href="#__codelineno-0-307">307</a></span>
-<span class="normal"><a href="#__codelineno-0-308">308</a></span>
-<span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span>
-<span class="normal"><a href="#__codelineno-0-311">311</a></span>
-<span class="normal"><a href="#__codelineno-0-312">312</a></span>
-<span class="normal"><a href="#__codelineno-0-313">313</a></span>
-<span class="normal"><a href="#__codelineno-0-314">314</a></span>
-<span class="normal"><a href="#__codelineno-0-315">315</a></span>
-<span class="normal"><a href="#__codelineno-0-316">316</a></span>
-<span class="normal"><a href="#__codelineno-0-317">317</a></span>
-<span class="normal"><a href="#__codelineno-0-318">318</a></span>
-<span class="normal"><a href="#__codelineno-0-319">319</a></span>
-<span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Thin alias over `AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        query_id: A named-query id (`&quot;overpass:hospitals&quot;`,</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            `&quot;ohsome:buildings&quot;`, …).</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Dataset: The matching query row.</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        ValueError: If `query_id` is not a registered named query.</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">query_id</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.osm.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.osm.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.osm.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the named-query map (satisfies the abstract contract).</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.osm.catalog.Dataset&lt;/code&gt;)" href="#earthlens.osm.catalog.Dataset">Dataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, Dataset]: Same object as <code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
 <span class="normal"><a href="#__codelineno-0-300">300</a></span>
 <span class="normal"><a href="#__codelineno-0-301">301</a></span>
 <span class="normal"><a href="#__codelineno-0-302">302</a></span>
 <span class="normal"><a href="#__codelineno-0-303">303</a></span>
-<span class="normal"><a href="#__codelineno-0-304">304</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the named-query map (satisfies the abstract contract).</span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span>
+<span class="normal"><a href="#__codelineno-0-306">306</a></span>
+<span class="normal"><a href="#__codelineno-0-307">307</a></span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span>
+<span class="normal"><a href="#__codelineno-0-310">310</a></span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        dict[str, Dataset]: Same object as `datasets`.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Thin alias over `AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        query_id: A named-query id (`&quot;overpass:hospitals&quot;`,</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            `&quot;ohsome:buildings&quot;`, …).</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Dataset: The matching query row.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        ValueError: If `query_id` is not a registered named query.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">query_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26107,37 +25989,37 @@ module-level <code>CATALOG_PATH</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-323">323</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
 <span class="normal"><a href="#__codelineno-0-327">327</a></span>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="k">def</span><span class="w"> </span><span class="nf">query_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered named-query ids, sorted.</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        list[str]: The query ids (`[&quot;ohsome:amenities&quot;, ...]`).</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        - List the curated named queries:</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">            &gt;&gt;&gt; from earthlens.osm import Catalog</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            &gt;&gt;&gt; &quot;overpass:roads&quot; in Catalog().query_ids()</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">            True</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-330">330</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="k">def</span><span class="w"> </span><span class="nf">query_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered named-query ids, sorted.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        list[str]: The query ids (`[&quot;ohsome:amenities&quot;, ...]`).</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        - List the curated named queries:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            &gt;&gt;&gt; from earthlens.osm import Catalog</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            &gt;&gt;&gt; &quot;overpass:roads&quot; in Catalog().query_ids()</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            True</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26193,37 +26075,37 @@ module-level <code>CATALOG_PATH</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-385">385</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-377">377</a></span>
+<span class="normal"><a href="#__codelineno-0-378">378</a></span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span>
+<span class="normal"><a href="#__codelineno-0-380">380</a></span>
+<span class="normal"><a href="#__codelineno-0-381">381</a></span>
+<span class="normal"><a href="#__codelineno-0-382">382</a></span>
+<span class="normal"><a href="#__codelineno-0-383">383</a></span>
+<span class="normal"><a href="#__codelineno-0-384">384</a></span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
 <span class="normal"><a href="#__codelineno-0-386">386</a></span>
 <span class="normal"><a href="#__codelineno-0-387">387</a></span>
 <span class="normal"><a href="#__codelineno-0-388">388</a></span>
 <span class="normal"><a href="#__codelineno-0-389">389</a></span>
 <span class="normal"><a href="#__codelineno-0-390">390</a></span>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
-<span class="normal"><a href="#__codelineno-0-392">392</a></span>
-<span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span>
-<span class="normal"><a href="#__codelineno-0-395">395</a></span>
-<span class="normal"><a href="#__codelineno-0-396">396</a></span>
-<span class="normal"><a href="#__codelineno-0-397">397</a></span>
-<span class="normal"><a href="#__codelineno-0-398">398</a></span>
-<span class="normal"><a href="#__codelineno-0-399">399</a></span>
-<span class="normal"><a href="#__codelineno-0-400">400</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="k">def</span><span class="w"> </span><span class="nf">region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered Geofabrik region keys, sorted.</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        list[str]: The region keys (`[&quot;andorra&quot;, &quot;belgium&quot;, ...]`).</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        - The primary test extract is listed:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">            &gt;&gt;&gt; from earthlens.osm import Catalog</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">            &gt;&gt;&gt; &quot;malta&quot; in Catalog().region_ids()</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            True</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="k">def</span><span class="w"> </span><span class="nf">region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered Geofabrik region keys, sorted.</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        list[str]: The region keys (`[&quot;andorra&quot;, &quot;belgium&quot;, ...]`).</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        - The primary test extract is listed:</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            &gt;&gt;&gt; from earthlens.osm import Catalog</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            &gt;&gt;&gt; &quot;malta&quot; in Catalog().region_ids()</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            True</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26342,7 +26224,15 @@ key.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-340">340</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-332">332</a></span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
 <span class="normal"><a href="#__codelineno-0-341">341</a></span>
 <span class="normal"><a href="#__codelineno-0-342">342</a></span>
 <span class="normal"><a href="#__codelineno-0-343">343</a></span>
@@ -26377,58 +26267,50 @@ key.</p>
 <span class="normal"><a href="#__codelineno-0-372">372</a></span>
 <span class="normal"><a href="#__codelineno-0-373">373</a></span>
 <span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
-<span class="normal"><a href="#__codelineno-0-376">376</a></span>
-<span class="normal"><a href="#__codelineno-0-377">377</a></span>
-<span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span>
-<span class="normal"><a href="#__codelineno-0-383">383</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="k">def</span><span class="w"> </span><span class="nf">region_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a `region=` value to its Geofabrik path segment (`G12`).</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">    A `region` containing a `/` is taken as a raw Geofabrik path (the</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    power-user escape hatch, e.g. `&quot;europe/andorra&quot;`) and returned</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    unchanged; otherwise it is looked up in the `regions:` table, with a</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    did-you-mean hint on a miss.</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        region: A region key from the `regions:` table (`&quot;malta&quot;`, …), or</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            a raw Geofabrik path (any string containing a `/`).</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        str: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        ValueError: If `region` is neither a raw path nor a known region</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            key.</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        - A known key resolves; a raw path passes through:</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            &gt;&gt;&gt; from earthlens.osm import Catalog</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            &gt;&gt;&gt; cat.region_path(&quot;malta&quot;)</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            &#39;europe/malta&#39;</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            &gt;&gt;&gt; cat.region_path(&quot;europe/andorra&quot;)</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            &#39;europe/andorra&#39;</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">region</span><span class="p">:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="k">return</span> <span class="n">region</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>    <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>    <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="k">return</span> <span class="n">path</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>    <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>    <span class="n">suggestion</span> <span class="o">=</span> <span class="n">get_close_matches</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">suggestion</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">suggestion</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">region</span><span class="si">!r}</span><span class="s2"> is not a known Geofabrik region. Known regions: &quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2"> You may also pass a raw Geofabrik path containing &quot;</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="s2">&quot;a &#39;/&#39;, e.g. &#39;europe/andorra&#39;.&quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-375">375</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="k">def</span><span class="w"> </span><span class="nf">region_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a `region=` value to its Geofabrik path segment (`G12`).</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">    A `region` containing a `/` is taken as a raw Geofabrik path (the</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    power-user escape hatch, e.g. `&quot;europe/andorra&quot;`) and returned</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">    unchanged; otherwise it is looked up in the `regions:` table, with a</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    did-you-mean hint on a miss.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        region: A region key from the `regions:` table (`&quot;malta&quot;`, …), or</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">            a raw Geofabrik path (any string containing a `/`).</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        str: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        ValueError: If `region` is neither a raw path nor a known region</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            key.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        - A known key resolves; a raw path passes through:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            &gt;&gt;&gt; from earthlens.osm import Catalog</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            &gt;&gt;&gt; cat.region_path(&quot;malta&quot;)</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            &#39;europe/malta&#39;</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            &gt;&gt;&gt; cat.region_path(&quot;europe/andorra&quot;)</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            &#39;europe/andorra&#39;</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">region</span><span class="p">:</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="k">return</span> <span class="n">region</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="k">return</span> <span class="n">path</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>    <span class="n">suggestion</span> <span class="o">=</span> <span class="n">get_close_matches</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">suggestion</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">suggestion</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">region</span><span class="si">!r}</span><span class="s2"> is not a known Geofabrik region. Known regions: &quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2"> You may also pass a raw Geofabrik path containing &quot;</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="s2">&quot;a &#39;/&#39;, e.g. &#39;europe/andorra&#39;.&quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -35443,7 +35325,7 @@ path to the bundled YAML and is monkey-patchable in tests.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.osm.catalog.Dataset&lt;/code&gt;)" href="#earthlens.osm.catalog.Dataset">Dataset</a>]</code></p>
 
 
 
@@ -35707,15 +35589,7 @@ Geofabrik path segment (<code>"europe/malta"</code>), read from the YAML's
 <span class="normal"><a href="#__codelineno-0-389">389</a></span>
 <span class="normal"><a href="#__codelineno-0-390">390</a></span>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
-<span class="normal"><a href="#__codelineno-0-392">392</a></span>
-<span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span>
-<span class="normal"><a href="#__codelineno-0-395">395</a></span>
-<span class="normal"><a href="#__codelineno-0-396">396</a></span>
-<span class="normal"><a href="#__codelineno-0-397">397</a></span>
-<span class="normal"><a href="#__codelineno-0-398">398</a></span>
-<span class="normal"><a href="#__codelineno-0-399">399</a></span>
-<span class="normal"><a href="#__codelineno-0-400">400</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]):</span>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Named-query catalog for the OpenStreetMap backend.</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    Reads the bundled `osm_data_catalog.yaml` (shipped as package data) and</span>
@@ -35800,109 +35674,101 @@ Geofabrik path segment (<code>"europe/malta"</code>), read from the YAML's
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="p">)</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span> <span class="n">regions</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the named-query map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            dict[str, Dataset]: Same object as `datasets`.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Thin alias over `AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            query_id: A named-query id (`&quot;overpass:hospitals&quot;`,</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                `&quot;ohsome:buildings&quot;`, …).</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Thin alias over `AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            query_id: A named-query id (`&quot;overpass:hospitals&quot;`,</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">                `&quot;ohsome:buildings&quot;`, …).</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            Dataset: The matching query row.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            ValueError: If `query_id` is not a registered named query.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">query_id</span><span class="p">))</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            Dataset: The matching query row.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">query_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered named-query ids, sorted.</span>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            ValueError: If `query_id` is not a registered named query.</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">query_id</span><span class="p">))</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">query_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered named-query ids, sorted.</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            list[str]: The query ids (`[&quot;ohsome:amenities&quot;, ...]`).</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            - List the curated named queries:</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">                &gt;&gt;&gt; from earthlens.osm import Catalog</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">                &gt;&gt;&gt; &quot;overpass:roads&quot; in Catalog().query_ids()</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">                True</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            list[str]: The query ids (`[&quot;ohsome:amenities&quot;, ...]`).</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            - List the curated named queries:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                &gt;&gt;&gt; from earthlens.osm import Catalog</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                &gt;&gt;&gt; &quot;overpass:roads&quot; in Catalog().query_ids()</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                True</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">region_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a `region=` value to its Geofabrik path segment (`G12`).</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        A `region` containing a `/` is taken as a raw Geofabrik path (the</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        power-user escape hatch, e.g. `&quot;europe/andorra&quot;`) and returned</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        unchanged; otherwise it is looked up in the `regions:` table, with a</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        did-you-mean hint on a miss.</span>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">region_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a `region=` value to its Geofabrik path segment (`G12`).</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        A `region` containing a `/` is taken as a raw Geofabrik path (the</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        power-user escape hatch, e.g. `&quot;europe/andorra&quot;`) and returned</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        unchanged; otherwise it is looked up in the `regions:` table, with a</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        did-you-mean hint on a miss.</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            region: A region key from the `regions:` table (`&quot;malta&quot;`, …), or</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">                a raw Geofabrik path (any string containing a `/`).</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            str: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            ValueError: If `region` is neither a raw path nor a known region</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">                key.</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            - A known key resolves; a raw path passes through:</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">                &gt;&gt;&gt; from earthlens.osm import Catalog</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">                &gt;&gt;&gt; cat = Catalog()</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">                &gt;&gt;&gt; cat.region_path(&quot;malta&quot;)</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">                &#39;europe/malta&#39;</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">                &gt;&gt;&gt; cat.region_path(&quot;europe/andorra&quot;)</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                &#39;europe/andorra&#39;</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">region</span><span class="p">:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="k">return</span> <span class="n">region</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="k">return</span> <span class="n">path</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="n">suggestion</span> <span class="o">=</span> <span class="n">get_close_matches</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">suggestion</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">suggestion</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">region</span><span class="si">!r}</span><span class="s2"> is not a known Geofabrik region. Known regions: &quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2"> You may also pass a raw Geofabrik path containing &quot;</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="s2">&quot;a &#39;/&#39;, e.g. &#39;europe/andorra&#39;.&quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="p">)</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered Geofabrik region keys, sorted.</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            list[str]: The region keys (`[&quot;andorra&quot;, &quot;belgium&quot;, ...]`).</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">            - The primary test extract is listed:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">                &gt;&gt;&gt; from earthlens.osm import Catalog</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">                &gt;&gt;&gt; &quot;malta&quot; in Catalog().region_ids()</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">                True</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            region: A region key from the `regions:` table (`&quot;malta&quot;`, …), or</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">                a raw Geofabrik path (any string containing a `/`).</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">            str: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">            ValueError: If `region` is neither a raw path nor a known region</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">                key.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">            - A known key resolves; a raw path passes through:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">                &gt;&gt;&gt; from earthlens.osm import Catalog</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">                &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                &gt;&gt;&gt; cat.region_path(&quot;malta&quot;)</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">                &#39;europe/malta&#39;</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">                &gt;&gt;&gt; cat.region_path(&quot;europe/andorra&quot;)</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">                &#39;europe/andorra&#39;</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">region</span><span class="p">:</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="k">return</span> <span class="n">region</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>            <span class="k">return</span> <span class="n">path</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">suggestion</span> <span class="o">=</span> <span class="n">get_close_matches</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">suggestion</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">suggestion</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">region</span><span class="si">!r}</span><span class="s2"> is not a known Geofabrik region. Known regions: &quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2"> You may also pass a raw Geofabrik path containing &quot;</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="s2">&quot;a &#39;/&#39;, e.g. &#39;europe/andorra&#39;.&quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="p">)</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered Geofabrik region keys, sorted.</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">            list[str]: The region keys (`[&quot;andorra&quot;, &quot;belgium&quot;, ...]`).</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            - The primary test extract is listed:</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">                &gt;&gt;&gt; from earthlens.osm import Catalog</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">                &gt;&gt;&gt; &quot;malta&quot; in Catalog().region_ids()</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                True</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -36014,95 +35880,37 @@ Geofabrik path segment (<code>"europe/malta"</code>), read from the YAML's
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-306">306</a></span>
-<span class="normal"><a href="#__codelineno-0-307">307</a></span>
-<span class="normal"><a href="#__codelineno-0-308">308</a></span>
-<span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span>
-<span class="normal"><a href="#__codelineno-0-311">311</a></span>
-<span class="normal"><a href="#__codelineno-0-312">312</a></span>
-<span class="normal"><a href="#__codelineno-0-313">313</a></span>
-<span class="normal"><a href="#__codelineno-0-314">314</a></span>
-<span class="normal"><a href="#__codelineno-0-315">315</a></span>
-<span class="normal"><a href="#__codelineno-0-316">316</a></span>
-<span class="normal"><a href="#__codelineno-0-317">317</a></span>
-<span class="normal"><a href="#__codelineno-0-318">318</a></span>
-<span class="normal"><a href="#__codelineno-0-319">319</a></span>
-<span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Thin alias over `AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        query_id: A named-query id (`&quot;overpass:hospitals&quot;`,</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            `&quot;ohsome:buildings&quot;`, …).</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Dataset: The matching query row.</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        ValueError: If `query_id` is not a registered named query.</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">query_id</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.osm.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.osm.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.osm.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the named-query map (satisfies the abstract contract).</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.osm.catalog.Dataset&lt;/code&gt;)" href="#earthlens.osm.catalog.Dataset">Dataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, Dataset]: Same object as <code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/catalog.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
 <span class="normal"><a href="#__codelineno-0-300">300</a></span>
 <span class="normal"><a href="#__codelineno-0-301">301</a></span>
 <span class="normal"><a href="#__codelineno-0-302">302</a></span>
 <span class="normal"><a href="#__codelineno-0-303">303</a></span>
-<span class="normal"><a href="#__codelineno-0-304">304</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the named-query map (satisfies the abstract contract).</span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span>
+<span class="normal"><a href="#__codelineno-0-306">306</a></span>
+<span class="normal"><a href="#__codelineno-0-307">307</a></span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span>
+<span class="normal"><a href="#__codelineno-0-310">310</a></span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        dict[str, Dataset]: Same object as `datasets`.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Thin alias over `AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        query_id: A named-query id (`&quot;overpass:hospitals&quot;`,</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            `&quot;ohsome:buildings&quot;`, …).</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Dataset: The matching query row.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        ValueError: If `query_id` is not a registered named query.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">query_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -36302,37 +36110,37 @@ module-level <code>CATALOG_PATH</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-323">323</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
 <span class="normal"><a href="#__codelineno-0-327">327</a></span>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="k">def</span><span class="w"> </span><span class="nf">query_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered named-query ids, sorted.</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        list[str]: The query ids (`[&quot;ohsome:amenities&quot;, ...]`).</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        - List the curated named queries:</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">            &gt;&gt;&gt; from earthlens.osm import Catalog</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            &gt;&gt;&gt; &quot;overpass:roads&quot; in Catalog().query_ids()</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">            True</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-330">330</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="k">def</span><span class="w"> </span><span class="nf">query_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered named-query ids, sorted.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        list[str]: The query ids (`[&quot;ohsome:amenities&quot;, ...]`).</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        - List the curated named queries:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            &gt;&gt;&gt; from earthlens.osm import Catalog</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            &gt;&gt;&gt; &quot;overpass:roads&quot; in Catalog().query_ids()</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            True</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -36388,37 +36196,37 @@ module-level <code>CATALOG_PATH</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-385">385</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-377">377</a></span>
+<span class="normal"><a href="#__codelineno-0-378">378</a></span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span>
+<span class="normal"><a href="#__codelineno-0-380">380</a></span>
+<span class="normal"><a href="#__codelineno-0-381">381</a></span>
+<span class="normal"><a href="#__codelineno-0-382">382</a></span>
+<span class="normal"><a href="#__codelineno-0-383">383</a></span>
+<span class="normal"><a href="#__codelineno-0-384">384</a></span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
 <span class="normal"><a href="#__codelineno-0-386">386</a></span>
 <span class="normal"><a href="#__codelineno-0-387">387</a></span>
 <span class="normal"><a href="#__codelineno-0-388">388</a></span>
 <span class="normal"><a href="#__codelineno-0-389">389</a></span>
 <span class="normal"><a href="#__codelineno-0-390">390</a></span>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
-<span class="normal"><a href="#__codelineno-0-392">392</a></span>
-<span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span>
-<span class="normal"><a href="#__codelineno-0-395">395</a></span>
-<span class="normal"><a href="#__codelineno-0-396">396</a></span>
-<span class="normal"><a href="#__codelineno-0-397">397</a></span>
-<span class="normal"><a href="#__codelineno-0-398">398</a></span>
-<span class="normal"><a href="#__codelineno-0-399">399</a></span>
-<span class="normal"><a href="#__codelineno-0-400">400</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="k">def</span><span class="w"> </span><span class="nf">region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered Geofabrik region keys, sorted.</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        list[str]: The region keys (`[&quot;andorra&quot;, &quot;belgium&quot;, ...]`).</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        - The primary test extract is listed:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">            &gt;&gt;&gt; from earthlens.osm import Catalog</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">            &gt;&gt;&gt; &quot;malta&quot; in Catalog().region_ids()</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            True</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="k">def</span><span class="w"> </span><span class="nf">region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered Geofabrik region keys, sorted.</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        list[str]: The region keys (`[&quot;andorra&quot;, &quot;belgium&quot;, ...]`).</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        - The primary test extract is listed:</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            &gt;&gt;&gt; from earthlens.osm import Catalog</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            &gt;&gt;&gt; &quot;malta&quot; in Catalog().region_ids()</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            True</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -36537,7 +36345,15 @@ key.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-340">340</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-332">332</a></span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
 <span class="normal"><a href="#__codelineno-0-341">341</a></span>
 <span class="normal"><a href="#__codelineno-0-342">342</a></span>
 <span class="normal"><a href="#__codelineno-0-343">343</a></span>
@@ -36572,58 +36388,50 @@ key.</p>
 <span class="normal"><a href="#__codelineno-0-372">372</a></span>
 <span class="normal"><a href="#__codelineno-0-373">373</a></span>
 <span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
-<span class="normal"><a href="#__codelineno-0-376">376</a></span>
-<span class="normal"><a href="#__codelineno-0-377">377</a></span>
-<span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span>
-<span class="normal"><a href="#__codelineno-0-383">383</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="k">def</span><span class="w"> </span><span class="nf">region_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a `region=` value to its Geofabrik path segment (`G12`).</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">    A `region` containing a `/` is taken as a raw Geofabrik path (the</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    power-user escape hatch, e.g. `&quot;europe/andorra&quot;`) and returned</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    unchanged; otherwise it is looked up in the `regions:` table, with a</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    did-you-mean hint on a miss.</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        region: A region key from the `regions:` table (`&quot;malta&quot;`, …), or</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            a raw Geofabrik path (any string containing a `/`).</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        str: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        ValueError: If `region` is neither a raw path nor a known region</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            key.</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        - A known key resolves; a raw path passes through:</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            &gt;&gt;&gt; from earthlens.osm import Catalog</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            &gt;&gt;&gt; cat.region_path(&quot;malta&quot;)</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            &#39;europe/malta&#39;</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            &gt;&gt;&gt; cat.region_path(&quot;europe/andorra&quot;)</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            &#39;europe/andorra&#39;</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">region</span><span class="p">:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="k">return</span> <span class="n">region</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>    <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>    <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="k">return</span> <span class="n">path</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>    <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>    <span class="n">suggestion</span> <span class="o">=</span> <span class="n">get_close_matches</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">suggestion</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">suggestion</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">region</span><span class="si">!r}</span><span class="s2"> is not a known Geofabrik region. Known regions: &quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2"> You may also pass a raw Geofabrik path containing &quot;</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="s2">&quot;a &#39;/&#39;, e.g. &#39;europe/andorra&#39;.&quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-375">375</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="k">def</span><span class="w"> </span><span class="nf">region_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a `region=` value to its Geofabrik path segment (`G12`).</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">    A `region` containing a `/` is taken as a raw Geofabrik path (the</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    power-user escape hatch, e.g. `&quot;europe/andorra&quot;`) and returned</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">    unchanged; otherwise it is looked up in the `regions:` table, with a</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    did-you-mean hint on a miss.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        region: A region key from the `regions:` table (`&quot;malta&quot;`, …), or</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">            a raw Geofabrik path (any string containing a `/`).</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        str: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        ValueError: If `region` is neither a raw path nor a known region</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            key.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        - A known key resolves; a raw path passes through:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            &gt;&gt;&gt; from earthlens.osm import Catalog</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            &gt;&gt;&gt; cat.region_path(&quot;malta&quot;)</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            &#39;europe/malta&#39;</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            &gt;&gt;&gt; cat.region_path(&quot;europe/andorra&quot;)</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            &#39;europe/andorra&#39;</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">region</span><span class="p">:</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="k">return</span> <span class="n">region</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="k">return</span> <span class="n">path</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>    <span class="n">suggestion</span> <span class="o">=</span> <span class="n">get_close_matches</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">known</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">suggestion</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">suggestion</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">region</span><span class="si">!r}</span><span class="s2"> is not a known Geofabrik region. Known regions: &quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2"> You may also pass a raw Geofabrik path containing &quot;</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="s2">&quot;a &#39;/&#39;, e.g. &#39;europe/andorra&#39;.&quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
