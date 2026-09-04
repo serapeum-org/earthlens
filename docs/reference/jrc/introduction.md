@@ -12,6 +12,15 @@ the [`ecmwf`](../ecmwf/introduction.md) backend's per-store `endpoint`:
 | `jrc:sea-level-forecast` / `jrc-sea-level` / `jrc:twl-forecast` | Probabilistic Total Water Level (TWL) forecasts (gridded) | `sea_level_gridded` | `list[Path]` GeoTIFF |
 | `jrc:coastal-forecast` | Subseasonal coastal per-country summary | `sea_level_coastal` | `pandas.DataFrame` |
 
+!!! note "Why the bare `jrc` key means the flood hazard map"
+
+    The JRC publishes more than these datasets, and earthlens serves two of the others through their own
+    backends — `ghsl` (Global Human Settlement Layer) and `inform` (INFORM Risk). So `jrc` names the JRC
+    **hazards** backend, whose products are the European Flood Hazard Map and the sea-level forecasts, and
+    it resolves to the EFHM because that is the flood-hazard product its aliases already served. Reach the
+    others by their own keys; a qualified key such as `jrc:sea-level-forecast` picks a topic within this
+    backend.
+
 For the walkthrough see [Usage](usage.md), the datasets on the
 [Available datasets](datasets.md) page, and the rendered API on the
 [Reference](jrc.md) page.
