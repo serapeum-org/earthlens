@@ -2066,7 +2066,8 @@ class TestGdalGuardDetection:
         )
         problems = _pyramids_ordering_problems(probe)
         assert len(problems) == 1, problems
-        assert "inner()" in problems[0] and "outer()" not in problems[0]
+        assert "inner()" in problems[0], problems
+        assert "outer()" not in problems[0], problems
 
     def test_ordering_problems_are_sorted_by_line_number(self, tmp_path):
         """Complaints come back in source order, so line 2 precedes line 10."""
@@ -2086,7 +2087,8 @@ class TestGdalGuardDetection:
         probe.write_text("def read():\n    from osgeo import gdal\n", encoding="utf-8")
         problems = _pyramids_ordering_problems(probe)
         assert len(problems) == 1
-        assert "line 2" in problems[0] and "read()" in problems[0]
+        assert "line 2" in problems[0], problems
+        assert "read()" in problems[0], problems
 
     def test_a_notebook_code_cell_is_scanned(self, tmp_path):
         """A GDAL import inside a notebook code cell is found, JSON and all."""
@@ -2223,7 +2225,8 @@ class TestGdalGuardDetection:
         probe = tmp_path / "broken.py"
         probe.write_text("def oops(:\n", encoding="utf-8")
         found = _gis_imports(probe)
-        assert found and "unparseable" in found[0][1]
+        assert found, "a file the guard cannot parse produced no finding"
+        assert "unparseable" in found[0][1], found
 
     def test_generated_and_checkpoint_files_are_not_source(self, monkeypatch, tmp_path):
         """Build output, bytecode caches and Jupyter autosaves are not repo source."""
