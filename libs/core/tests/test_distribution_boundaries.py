@@ -18,7 +18,9 @@ import ast
 import functools
 import json
 import re
+import sys
 from pathlib import Path
+from types import MappingProxyType
 
 import pytest
 
@@ -89,6 +91,7 @@ def _banned_gis_target(name: str) -> str | None:
             return ".".join(parts[: index + 1])
     return None
 
+
 #: Files allowed to reach for GDAL directly. Empty, and meant to stay that way.
 #:
 #: It held one entry: `jrc/_helpers.py`, whose `gdal_module()` read a CF `time`
@@ -153,7 +156,10 @@ def _pyramids_ordering_problems(path: Path) -> list[str]:
         )
         if not satisfied:
             problems.append(
-                (node.lineno, f"GDAL imported in {func.name}() with no pyramids above it")
+                (
+                    node.lineno,
+                    f"GDAL imported in {func.name}() with no pyramids above it",
+                )
             )
     # Sort on the line number, not the rendered string: lexicographically
     # "line 10" precedes "line 2", which reports a file out of source order.
@@ -193,19 +199,22 @@ def _earthlens_sources() -> list[Path]:
 
 
 @functools.cache
-def _governed_findings() -> dict[str, list[tuple[int, str]]]:
+def _governed_findings() -> MappingProxyType[str, list[tuple[int, str]]]:
     """Return `{path: findings}` for every governed file that has any.
 
     Cached because two tests ask for it and a full scan parses over a thousand
-    files. Callers read it and build their own filtered views; nothing mutates
-    the shared result.
+    files. Read-only for the same reason: a cached mapping is shared, so a
+    caller that added or removed a key would be editing what every later test
+    sees. Callers build their own filtered views instead.
     """
-    return {
-        name: hits
-        for path in _earthlens_sources()
-        if (hits := _gis_imports(path))
-        and (name := str(path.relative_to(_ROOT)).replace("\\", "/"))
-    }
+    return MappingProxyType(
+        {
+            name: hits
+            for path in _earthlens_sources()
+            if (hits := _gis_imports(path))
+            and (name := str(path.relative_to(_ROOT)).replace("\\", "/"))
+        }
+    )
 
 
 #: IPython help on an object: `obj?` / `pd.DataFrame??`. Matched as a whole line
@@ -338,9 +347,7 @@ def _is_banned_gis_import(node: ast.AST) -> bool:
         if node.level:
             return False
         module = node.module or ""
-        return any(
-            _banned_gis_target(f"{module}.{alias.name}") for alias in node.names
-        )
+        return any(_banned_gis_target(f"{module}.{alias.name}") for alias in node.names)
     return False
 
 
@@ -2208,6 +2215,41 @@ class TestGdalGuardDetection:
         found = _gis_imports(probe)
         assert found and "unparseable" in found[0][1]
 
+    def test_generated_and_checkpoint_files_are_not_source(self, monkeypatch, tmp_path):
+        """Build output, bytecode caches and Jupyter autosaves are not repo source."""
+        # Driven off a tree of our own rather than the repo, since none of these
+        # exist here right now and committing one to prove the point would be
+        # absurd. `_governed_findings` is cached and reads `_ROOT` too, so this
+        # must not call it -- doing so would cache this tmp tree for every later
+        # test in the session.
+        (tmp_path / "libs/core/src/earthlens").mkdir(parents=True)
+        (tmp_path / "libs/core/src/earthlens/real.py").write_text(
+            "import pyramids\n", encoding="utf-8"
+        )
+        (tmp_path / "libs/core/src/earthlens/__pycache__").mkdir()
+        (tmp_path / "libs/core/src/earthlens/__pycache__/real.py").write_text(
+            "from osgeo import gdal\n", encoding="utf-8"
+        )
+        (tmp_path / "docs/examples/demo/.ipynb_checkpoints").mkdir(parents=True)
+        (tmp_path / "docs/examples/demo/kept.ipynb").write_text(
+            json.dumps({"cells": []}), encoding="utf-8"
+        )
+        (
+            tmp_path / "docs/examples/demo/.ipynb_checkpoints/kept-checkpoint.ipynb"
+        ).write_text(json.dumps({"cells": []}), encoding="utf-8")
+
+        monkeypatch.setattr(
+            sys.modules[_earthlens_sources.__module__], "_ROOT", tmp_path
+        )
+        governed = {
+            str(path.relative_to(tmp_path)).replace("\\", "/")
+            for path in _earthlens_sources()
+        }
+        assert governed == {
+            "libs/core/src/earthlens/real.py",
+            "docs/examples/demo/kept.ipynb",
+        }, f"unexpected file set: {sorted(governed)}"
+
     def test_the_guard_governs_tests_and_tools_too(self):
         """Every tree the rule claims to cover has governed files in it."""
         # Scope is a behavioural contract, not an implementation detail. An
@@ -2278,3 +2320,21 @@ class TestGdalGuardDetection:
             node = ast.parse(source).body[0]
             assert _imports_pyramids(node), f"{source!r} does vendor osgeo"
         assert not _imports_pyramids(ast.parse("from json import loads").body[0])
+
+    @pytest.mark.parametrize(
+        "source",
+        [
+            pytest.param("from .pyramids import helper", id="relative-module"),
+            pytest.param("from . import pyramids", id="relative-package"),
+            pytest.param(
+                "from pyramids._vendor.osgeo import gdal", id="vendored-osgeo"
+            ),
+        ],
+    )
+    def test_imports_pyramids_rejects_what_does_not_vendor_osgeo(self, source):
+        """Only the real pyramids package counts as having put osgeo on the path."""
+        # A relative `.pyramids` is a sibling module inside earthlens, not the
+        # package, so it runs no vendoring __init__. The vendored path is the
+        # banned import itself -- letting it count would have it satisfy the very
+        # rule that exists to precede it.
+        assert not _imports_pyramids(ast.parse(source).body[0])
