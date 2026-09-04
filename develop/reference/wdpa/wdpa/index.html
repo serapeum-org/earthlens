@@ -11286,6 +11286,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#earthlens.wdpa.Catalog.get_catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_catalog
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#earthlens.wdpa.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -18043,6 +18054,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Showcase - how much worse is a rarer flood, and how your window changes the answer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -23762,6 +23801,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#earthlens.wdpa.Catalog.get_catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_catalog
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#earthlens.wdpa.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24154,7 +24204,7 @@ backend's auth failure with one <code>except</code> clause.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Country&lt;/code&gt; (&lt;code&gt;earthlens.wdpa.catalog.Country&lt;/code&gt;)" href="#earthlens.wdpa.Country">Country</a>]</code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
 
 
 
@@ -24322,7 +24372,15 @@ loads and validates the YAML (cached) in one pass.</p>
 <span class="normal"><a href="#__codelineno-0-220">220</a></span>
 <span class="normal"><a href="#__codelineno-0-221">221</a></span>
 <span class="normal"><a href="#__codelineno-0-222">222</a></span>
-<span class="normal"><a href="#__codelineno-0-223">223</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Country</span><span class="p">]):</span>
+<span class="normal"><a href="#__codelineno-0-223">223</a></span>
+<span class="normal"><a href="#__codelineno-0-224">224</a></span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span>
+<span class="normal"><a href="#__codelineno-0-226">226</a></span>
+<span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Country catalog for the WDPA / Protected Planet backend.</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">    Reads the bundled `wdpa_data_catalog.yaml` (shipped as package data) and</span>
@@ -24393,40 +24451,48 @@ loads and validates the YAML (cached) in one pass.</p>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span> <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">))</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_iso3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a `variables` selector to an ISO3 country code.</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Country</span><span class="p">]:</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the country map (satisfies the abstract contract).</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        Accepts a `country:&lt;ISO3&gt;` selector, a bare alpha-3 code (passed</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        through uppercased, whether or not it is catalogued), or a friendly</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        country name (e.g. `&quot;kenya&quot;`).</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">            selector: One `variables` entry — `&quot;country:&lt;ISO3&gt;&quot;`, a bare</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">                alpha-3 code, or a country name.</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            dict[str, Country]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_iso3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a `variables` selector to an ISO3 country code.</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            The ISO3 country code.</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">            ValueError: If a non-code name is not a catalogued country</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">                (with a did-you-mean hint).</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>        <span class="n">text</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">COUNTRY_PREFIX</span><span class="p">):</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">COUNTRY_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">text</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">country</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>            <span class="k">if</span> <span class="n">country</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>                <span class="k">return</span> <span class="n">code</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>        <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">country</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">selector</span><span class="si">!r}</span><span class="s2"> is not a known WDPA country name or alpha-3 code.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>        <span class="p">)</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        Accepts a `country:&lt;ISO3&gt;` selector, a bare alpha-3 code (passed</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        through uppercased, whether or not it is catalogued), or a friendly</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">        country name (e.g. `&quot;kenya&quot;`).</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">            selector: One `variables` entry — `&quot;country:&lt;ISO3&gt;&quot;`, a bare</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">                alpha-3 code, or a country name.</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            The ISO3 country code.</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            ValueError: If a non-code name is not a catalogued country</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">                (with a did-you-mean hint).</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>        <span class="n">text</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">COUNTRY_PREFIX</span><span class="p">):</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">COUNTRY_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">text</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>            <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>        <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">country</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>            <span class="k">if</span> <span class="n">country</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>                <span class="k">return</span> <span class="n">code</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>        <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">country</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">selector</span><span class="si">!r}</span><span class="s2"> is not a known WDPA country name or alpha-3 code.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24442,6 +24508,64 @@ loads and validates the YAML (cached) in one pass.</p>
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="earthlens.wdpa.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.wdpa.Catalog.get_catalog" class="toclink">
+            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
+
+</a><a href="#earthlens.wdpa.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the country map (satisfies the abstract contract).</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Country&lt;/code&gt; (&lt;code&gt;earthlens.wdpa.catalog.Country&lt;/code&gt;)" href="#earthlens.wdpa.Country">Country</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>dict[str, Country]: Same object as :attr:<code>datasets</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>libs/providers/land/src/earthlens/wdpa/catalog.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-190">190</a></span>
+<span class="normal"><a href="#__codelineno-0-191">191</a></span>
+<span class="normal"><a href="#__codelineno-0-192">192</a></span>
+<span class="normal"><a href="#__codelineno-0-193">193</a></span>
+<span class="normal"><a href="#__codelineno-0-194">194</a></span>
+<span class="normal"><a href="#__codelineno-0-195">195</a></span>
+<span class="normal"><a href="#__codelineno-0-196">196</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Country</span><span class="p">]:</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the country map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        dict[str, Country]: Same object as :attr:`datasets`.</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
@@ -24681,15 +24805,7 @@ alpha-3 code, or a country name.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/land/src/earthlens/wdpa/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-190">190</a></span>
-<span class="normal"><a href="#__codelineno-0-191">191</a></span>
-<span class="normal"><a href="#__codelineno-0-192">192</a></span>
-<span class="normal"><a href="#__codelineno-0-193">193</a></span>
-<span class="normal"><a href="#__codelineno-0-194">194</a></span>
-<span class="normal"><a href="#__codelineno-0-195">195</a></span>
-<span class="normal"><a href="#__codelineno-0-196">196</a></span>
-<span class="normal"><a href="#__codelineno-0-197">197</a></span>
-<span class="normal"><a href="#__codelineno-0-198">198</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-198">198</a></span>
 <span class="normal"><a href="#__codelineno-0-199">199</a></span>
 <span class="normal"><a href="#__codelineno-0-200">200</a></span>
 <span class="normal"><a href="#__codelineno-0-201">201</a></span>
@@ -24714,40 +24830,48 @@ alpha-3 code, or a country name.</p>
 <span class="normal"><a href="#__codelineno-0-220">220</a></span>
 <span class="normal"><a href="#__codelineno-0-221">221</a></span>
 <span class="normal"><a href="#__codelineno-0-222">222</a></span>
-<span class="normal"><a href="#__codelineno-0-223">223</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_iso3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a `variables` selector to an ISO3 country code.</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">    Accepts a `country:&lt;ISO3&gt;` selector, a bare alpha-3 code (passed</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">    through uppercased, whether or not it is catalogued), or a friendly</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    country name (e.g. `&quot;kenya&quot;`).</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        selector: One `variables` entry — `&quot;country:&lt;ISO3&gt;&quot;`, a bare</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">            alpha-3 code, or a country name.</span>
+<span class="normal"><a href="#__codelineno-0-223">223</a></span>
+<span class="normal"><a href="#__codelineno-0-224">224</a></span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span>
+<span class="normal"><a href="#__codelineno-0-226">226</a></span>
+<span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_iso3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a `variables` selector to an ISO3 country code.</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        The ISO3 country code.</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        ValueError: If a non-code name is not a catalogued country</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">            (with a did-you-mean hint).</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">COUNTRY_PREFIX</span><span class="p">):</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">COUNTRY_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">text</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">country</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="k">if</span> <span class="n">country</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>            <span class="k">return</span> <span class="n">code</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">country</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">selector</span><span class="si">!r}</span><span class="s2"> is not a known WDPA country name or alpha-3 code.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="p">)</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">    Accepts a `country:&lt;ISO3&gt;` selector, a bare alpha-3 code (passed</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">    through uppercased, whether or not it is catalogued), or a friendly</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    country name (e.g. `&quot;kenya&quot;`).</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        selector: One `variables` entry — `&quot;country:&lt;ISO3&gt;&quot;`, a bare</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">            alpha-3 code, or a country name.</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        The ISO3 country code.</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        ValueError: If a non-code name is not a catalogued country</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            (with a did-you-mean hint).</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">COUNTRY_PREFIX</span><span class="p">):</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">COUNTRY_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">text</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">country</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="k">if</span> <span class="n">country</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>            <span class="k">return</span> <span class="n">code</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">country</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">selector</span><span class="si">!r}</span><span class="s2"> is not a known WDPA country name or alpha-3 code.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
