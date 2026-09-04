@@ -81,6 +81,40 @@ _BANNED_GIS_MODULES = frozenset({"osgeo", "gdal", "ogr", "osr"})
 _GDAL_ALLOWED: frozenset[str] = frozenset()
 
 
+def _pyramids_ordering_problems(path: Path) -> list[str]:
+    """Return one complaint per GDAL import pyramids does not correctly precede.
+
+    The rule is that `import pyramids` runs inside the same function, above the
+    GDAL import: pyramids vendors osgeo and only puts it on the path as a side
+    effect of being imported. A module-scope GDAL import breaks that too -- the
+    cost is paid on every import of the module, and nothing guarantees pyramids
+    ran first -- so both shapes are reported here, not just the ordering.
+    """
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    sites = [
+        (func, node)
+        for func in ast.walk(tree)
+        if isinstance(func, (ast.FunctionDef, ast.AsyncFunctionDef))
+        for node in ast.walk(func)
+        if _is_banned_gis_import(node)
+    ]
+    inside = {id(node) for _, node in sites}
+    problems = [
+        f"line {node.lineno}: GDAL imported at module scope"
+        for node in ast.walk(tree)
+        if _is_banned_gis_import(node) and id(node) not in inside
+    ]
+    problems += [
+        f"line {node.lineno}: GDAL imported in {func.name}() with no pyramids above it"
+        for func, node in sites
+        if not any(
+            _imports_pyramids(other) and other.lineno < node.lineno
+            for other in ast.walk(func)
+        )
+    ]
+    return sorted(problems)
+
+
 def _earthlens_sources() -> list[Path]:
     """Return every earthlens Python file the GDAL rule governs.
 
@@ -1636,7 +1670,7 @@ class TestSingleSecretAuthAdoption:
 
 
 class TestNoDirectGdal:
-    """GIS I/O goes through pyramids; `osgeo` has exactly one sanctioned site."""
+    """GIS I/O goes through pyramids; earthlens imports `osgeo` nowhere."""
 
     def test_no_unsanctioned_gdal_import(self):
         """Every earthlens source is free of GDAL beyond the declared allowance."""
@@ -1656,6 +1690,8 @@ class TestNoDirectGdal:
 
     def test_the_allowance_is_still_used(self):
         """A stale allowance is a lie about the codebase, so it must still bite."""
+        if not _GDAL_ALLOWED:
+            pytest.skip("the allowance is empty, so no entry in it can be stale")
         live = {
             str(path.relative_to(_ROOT)).replace("\\", "/")
             for path in _earthlens_sources()
@@ -1667,52 +1703,82 @@ class TestNoDirectGdal:
         )
 
     def test_the_sanctioned_site_imports_pyramids_first(self):
-        """`osgeo` only resolves once pyramids has vendored it onto the path."""
-        # Asserted per enclosing function, not per file: the rule is that
-        # pyramids is imported inside the function that reaches for GDAL, and a
-        # module-scope import would pass a "somewhere earlier in the file"
-        # check while breaking it. Matching AST nodes rather than literal text
-        # also keeps this reporting a failure, not a ValueError, if the site
-        # ever switches to `import osgeo.gdal`.
+        """A sanctioned site loads pyramids before osgeo, in that same function."""
+        # Skipping rather than passing: with no allowance there is no site to
+        # check, and a green tick would claim an assurance nothing produced. The
+        # rule itself stays covered -- TestGdalGuardDetection exercises
+        # `_pyramids_ordering_problems` directly on synthetic files.
+        if not _GDAL_ALLOWED:
+            pytest.skip(
+                "no sanctioned GDAL site; the rule is covered on synthetic files"
+            )
         for name in sorted(_GDAL_ALLOWED):
-            path = _ROOT / name
-            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-            sites = [
-                (func, node)
-                for func in ast.walk(tree)
-                if isinstance(func, (ast.FunctionDef, ast.AsyncFunctionDef))
-                for node in ast.walk(func)
-                if _is_banned_gis_import(node)
-            ]
-            assert sites, (
-                f"{name} is allowed to import GDAL but no function does; the "
-                "import must live in the function that needs it, not at module scope"
-            )
-            # Everything `sites` found is inside a function; anything else in the
-            # file is at module (or class) scope, which is the arrangement the
-            # rule forbids and which the per-function loop below cannot see.
-            in_a_function = {id(node) for _, node in sites}
-            stray = sorted(
-                node.lineno
-                for node in ast.walk(tree)
-                if _is_banned_gis_import(node) and id(node) not in in_a_function
-            )
-            assert not stray, (
-                f"{name} imports GDAL at module scope (line {stray}); it belongs "
-                "inside the function that needs it, so the cost is paid only on "
-                "that path and pyramids is guaranteed to have run first"
-            )
-            for func, node in sites:
-                first = [
-                    other.lineno
-                    for other in ast.walk(func)
-                    if _imports_pyramids(other) and other.lineno < node.lineno
-                ]
-                assert first, (
-                    f"{name}:{node.lineno} imports GDAL inside {func.name}() without "
-                    "importing pyramids first in that same function, which raises "
-                    "ModuleNotFoundError outside an already-loaded process"
-                )
+            problems = _pyramids_ordering_problems(_ROOT / name)
+            assert problems == [], f"{name}: {'; '.join(problems)}"
+
+
+#: `(id, source, has_problem)` for the pyramids-before-osgeo rule. These keep the
+#: rule covered while `_GDAL_ALLOWED` is empty and the repo test above skips.
+_ORDERING_PROBES = [
+    (
+        "pyramids-first",
+        """
+def read():
+    import pyramids
+    from osgeo import gdal
+""",
+        False,
+    ),
+    (
+        "pyramids-after",
+        """
+def read():
+    from osgeo import gdal
+    import pyramids
+""",
+        True,
+    ),
+    (
+        "no-pyramids",
+        """
+def read():
+    from osgeo import gdal
+""",
+        True,
+    ),
+    (
+        "module-scope",
+        """
+from osgeo import gdal
+
+
+def read():
+    return gdal
+""",
+        True,
+    ),
+    (
+        "pyramids-in-another-function",
+        """
+def warm():
+    import pyramids
+
+
+def read():
+    from osgeo import gdal
+""",
+        True,
+    ),
+    (
+        "from-import-vendors-too",
+        """
+def read():
+    from pyramids.dataset import Dataset
+    import osgeo.gdal
+""",
+        False,
+    ),
+]
 
 
 #: Every spelling that reaches GDAL, paired with the id it reports under. The
@@ -1779,6 +1845,27 @@ class TestGdalGuardDetection:
         probe = tmp_path / "probe.py"
         probe.write_text(source, encoding="utf-8")
         assert _gis_imports(probe) == [], f"guard false-positived on:\n{source}"
+
+    @pytest.mark.parametrize(
+        "source, has_problem",
+        [(src, bad) for _, src, bad in _ORDERING_PROBES],
+        ids=[name for name, _, _ in _ORDERING_PROBES],
+    )
+    def test_pyramids_ordering_is_judged_inside_the_function(
+        self, source, has_problem, tmp_path
+    ):
+        """The pyramids-before-osgeo rule is judged per function, not per file."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(source, encoding="utf-8")
+        assert bool(_pyramids_ordering_problems(probe)) is has_problem, source
+
+    def test_ordering_problems_name_the_line_and_the_function(self, tmp_path):
+        """A violation reports where it is, so the failure is actionable."""
+        probe = tmp_path / "probe.py"
+        probe.write_text("def read():\n    from osgeo import gdal\n", encoding="utf-8")
+        problems = _pyramids_ordering_problems(probe)
+        assert len(problems) == 1
+        assert "line 2" in problems[0] and "read()" in problems[0]
 
     def test_the_guard_governs_tests_and_tools_too(self):
         """The rule covers the test and tooling trees, not only shipped source."""
