@@ -111,18 +111,28 @@ _GDAL_ALLOWED: frozenset[str] = frozenset()
 def _enclosing_functions(tree: ast.AST) -> dict[int, ast.AST]:
     """Map each node to the innermost function containing it.
 
-    `ast.walk` is breadth-first, so an outer function is always visited before
-    a function nested inside it and the deeper assignment lands last. That is
-    what makes the innermost owner win, and why an import in a nested function
-    is attributed once rather than once per enclosing function.
+    Carries the current function down the tree rather than reading it back out
+    of a traversal order. `ast.walk` happens to be breadth-first today, which
+    would make the deepest assignment land last, but its own docstring promises
+    "no specified order" -- so depending on that would be building on something
+    CPython declines to guarantee.
+
+    A node inside a nested function maps to the inner function alone, which is
+    what keeps one GDAL import from being reported once per enclosing function.
     """
     owners: dict[int, ast.AST] = {}
-    for func in ast.walk(tree):
-        if not isinstance(func, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            continue
-        for node in ast.walk(func):
-            if node is not func:
-                owners[id(node)] = func
+    stack: list[tuple[ast.AST, ast.AST | None]] = [(tree, None)]
+    while stack:
+        node, current = stack.pop()
+        for child in ast.iter_child_nodes(node):
+            if current is not None:
+                owners[id(child)] = current
+            deeper = (
+                child
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+                else current
+            )
+            stack.append((child, deeper))
     return owners
 
 
