@@ -25551,7 +25551,8 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-710">710</a></span>
 <span class="normal"><a href="#__codelineno-0-711">711</a></span>
 <span class="normal"><a href="#__codelineno-0-712">712</a></span>
-<span class="normal"><a href="#__codelineno-0-713">713</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="k">class</span><span class="w"> </span><span class="nc">NWP</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-713">713</a></span>
+<span class="normal"><a href="#__codelineno-0-714">714</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="k">class</span><span class="w"> </span><span class="nc">NWP</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Open numerical-weather-prediction backend (forecast time axis).</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    Resolves each requested model key against the bundled catalog,</span>
@@ -26161,7 +26162,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-672" name="__codelineno-0-672"></a>                <span class="s2">&quot;supported. Request a griddable model (ICON-EU, or a &quot;</span>
 <a id="__codelineno-0-673" name="__codelineno-0-673"></a>                <span class="s2">&quot;regridded global feed) instead.&quot;</span>
 <a id="__codelineno-0-674" name="__codelineno-0-674"></a>            <span class="p">)</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span><span class="p">,</span> <span class="n">GeoReference</span>
 <a id="__codelineno-0-676" name="__codelineno-0-676"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.cog</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_cog</span>
 <a id="__codelineno-0-677" name="__codelineno-0-677"></a>
 <a id="__codelineno-0-678" name="__codelineno-0-678"></a>        <span class="n">op</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span> <span class="k">else</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span>
@@ -26196,10 +26197,11 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-707" name="__codelineno-0-707"></a>        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">reduced</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
 <a id="__codelineno-0-708" name="__codelineno-0-708"></a>            <span class="n">target</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">.tif&quot;</span>
 <a id="__codelineno-0-709" name="__codelineno-0-709"></a>            <span class="n">write_cog</span><span class="p">(</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a>                <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">array</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a>            <span class="p">)</span>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a>        <span class="k">return</span> <span class="n">written</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>                <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">array</span><span class="p">,</span> <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">)),</span>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>                <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">),</span>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="p">)</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a>        <span class="k">return</span> <span class="n">written</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -28467,7 +28469,8 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-710">710</a></span>
 <span class="normal"><a href="#__codelineno-0-711">711</a></span>
 <span class="normal"><a href="#__codelineno-0-712">712</a></span>
-<span class="normal"><a href="#__codelineno-0-713">713</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="k">class</span><span class="w"> </span><span class="nc">NWP</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-713">713</a></span>
+<span class="normal"><a href="#__codelineno-0-714">714</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="k">class</span><span class="w"> </span><span class="nc">NWP</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Open numerical-weather-prediction backend (forecast time axis).</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    Resolves each requested model key against the bundled catalog,</span>
@@ -29077,7 +29080,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-672" name="__codelineno-0-672"></a>                <span class="s2">&quot;supported. Request a griddable model (ICON-EU, or a &quot;</span>
 <a id="__codelineno-0-673" name="__codelineno-0-673"></a>                <span class="s2">&quot;regridded global feed) instead.&quot;</span>
 <a id="__codelineno-0-674" name="__codelineno-0-674"></a>            <span class="p">)</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span><span class="p">,</span> <span class="n">GeoReference</span>
 <a id="__codelineno-0-676" name="__codelineno-0-676"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.cog</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_cog</span>
 <a id="__codelineno-0-677" name="__codelineno-0-677"></a>
 <a id="__codelineno-0-678" name="__codelineno-0-678"></a>        <span class="n">op</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span> <span class="k">else</span> <span class="n">config</span><span class="o">.</span><span class="n">op</span>
@@ -29112,10 +29115,11 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-707" name="__codelineno-0-707"></a>        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">reduced</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
 <a id="__codelineno-0-708" name="__codelineno-0-708"></a>            <span class="n">target</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model_key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">.tif&quot;</span>
 <a id="__codelineno-0-709" name="__codelineno-0-709"></a>            <span class="n">write_cog</span><span class="p">(</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a>                <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">array</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a>            <span class="p">)</span>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a>        <span class="k">return</span> <span class="n">written</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>                <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">array</span><span class="p">,</span> <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">)),</span>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>                <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">),</span>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="p">)</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a>            <span class="n">written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a>        <span class="k">return</span> <span class="n">written</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
