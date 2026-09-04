@@ -145,6 +145,27 @@ class _FakeMdArray:
         return [_FakeAttribute("long_name", "Latitude")]
 
 
+class _ContainerThatCannotClose:
+    """A real pyramids container whose release fails.
+
+    Every read delegates to the genuine container, so the schema is really
+    parsed; only `close` fails. The real handle is released first so the
+    temporary file is not left locked on Windows.
+    """
+
+    def __init__(self, inner):
+        self._inner = inner
+
+    def __getattr__(self, name):
+        """Delegate every read to the real container."""
+        return getattr(self._inner, name)
+
+    def close(self):
+        """Release the real handle, then fail the way a broken one would."""
+        self._inner.close()
+        raise OSError("handle already torn down")
+
+
 def _raise_unreadable(_path):
     """Reject a container the way an unreadable file would."""
     raise RuntimeError("container cannot be opened")
@@ -814,6 +835,42 @@ class TestDeepProber:
         ).to_netcdf(path)
         meta = ecmwf_cli._read_netcdf_var_meta(str(path))
         assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
+
+    def test_a_failing_release_keeps_the_schema_it_read(self, monkeypatch, tmp_path):
+        """A handle that will not close must not discard a read that worked.
+
+        The release runs in a `finally` and the caller turns any exception out
+        of this function into an empty mapping, so an unguarded cleanup failure
+        silently throws away a schema that parsed fine.
+        """
+        import numpy as np
+        import xarray as xr
+        from pyramids.netcdf import NetCDF
+
+        path = tmp_path / "probe.nc"
+        xr.Dataset(
+            {
+                "t2m": (
+                    ("lat", "lon"),
+                    np.ones((2, 2), "f4"),
+                    {"units": "K", "long_name": "2 metre temperature"},
+                )
+            },
+            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
+        ).to_netcdf(path)
+        real_read = NetCDF.read_file
+        monkeypatch.setattr(
+            NetCDF,
+            "read_file",
+            lambda p, *a, **k: _ContainerThatCannotClose(real_read(p, *a, **k)),
+        )
+
+        meta = ecmwf_cli._read_netcdf_var_meta(str(path))
+
+        assert meta.get("t2m") == {
+            "long_name": "2 metre temperature",
+            "units": "K",
+        }, f"a failing release discarded the schema that was read; got {meta}"
 
     def test_a_probe_survives_a_scratch_it_cannot_remove(self, monkeypatch, tmp_path):
         """A removal that fails must not discard a retrieve and read that worked."""

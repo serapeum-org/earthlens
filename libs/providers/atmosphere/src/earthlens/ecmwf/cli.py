@@ -281,9 +281,18 @@ def _read_via_pyramids(path: str) -> dict[str, dict[str, Any]]:
         # directory fail — which surfaces as a PermissionError on the dataset,
         # indistinguishable from a licence refusal, after the data has already
         # been retrieved and read.
-        close = getattr(container, "close", None)
-        if callable(close):
-            close()
+        #
+        # The release itself must not raise. `schema` is already fully read by
+        # this point, and the caller turns any exception escaping here into an
+        # empty mapping -- so an unguarded cleanup failure would silently throw
+        # away a schema that was read successfully.
+        try:
+            container.close()
+        except Exception as exc:  # noqa: BLE001 - cleanup is best-effort
+            logger.debug(
+                f"ECMWF: releasing the NetCDF handle for {path} failed "
+                f"({type(exc).__name__}: {exc})."
+            )
     return schema
 
 
