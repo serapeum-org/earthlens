@@ -221,6 +221,22 @@ class TestNormalizeAoiErrors:
         with pytest.raises(TypeError, match="unsupported aoi type"):
             normalize_aoi(42)
 
+    def test_unsupported_type_message_names_every_accepted_form(self):
+        """The message is the only enumeration a caller sees, so it lists them all."""
+        with pytest.raises(TypeError) as excinfo:
+            normalize_aoi(42)
+        message = str(excinfo.value)
+        for form in (
+            "[W, S, E, N]",
+            "bbox mapping",
+            "(lon, lat) point with buffer=",
+            "shapely geometry",
+            "GeoJSON",
+            "WKT",
+            "GeoDataFrame",
+        ):
+            assert form in message
+
 
 class TestEstimatePixelDims:
     """The bbox-to-pixel-grid pre-flight estimate and its guards."""

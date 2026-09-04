@@ -839,6 +839,7 @@ nav:
     - Base contracts: reference/base/contracts.md
     - Bounded results (base): reference/base/bounded-results.md
     - Extents & warnings: reference/base/extents.md
+    - Area of interest: reference/base/area-of-interest.md
     - Authentication API: reference/base/auth-api.md
     - Catalog & utilities: reference/base/catalog-api.md
     - HTTP client (base): reference/base/http-client.md
