@@ -2200,3 +2200,33 @@ class TestDownloadErrorTypes:
 
         assert hasattr(base, name), f"{name} is not importable from earthlens.base"
         assert name in base.__all__, f"{name} is missing from __all__"
+
+
+@pytest.mark.unit
+class TestAcceptEncodingProvenance:
+    """Whether the caller chose `Accept-Encoding`, or it is the client's default."""
+
+    @pytest.mark.parametrize(
+        "headers, explicit",
+        [
+            (None, False),
+            ({"X-Api-Key": "k"}, False),
+            ({"Accept-Encoding": "gzip"}, True),
+            ({"accept-encoding": "gzip"}, True),
+            ({"ACCEPT-ENCODING": "br"}, True),
+        ],
+        ids=["none", "unrelated", "canonical", "lowercase", "uppercase"],
+    )
+    def test_the_flag_records_who_set_it(self, headers, explicit):
+        """`_default_headers` cannot answer this after the merge, so it is recorded."""
+        assert HttpClient(headers=headers)._accept_encoding_is_explicit is explicit
+
+    def test_the_clients_own_default_is_still_stamped(self):
+        """Recording provenance must not change what is actually sent."""
+        client = HttpClient()
+        assert client.default_headers["Accept-Encoding"] == "gzip, deflate"
+
+    def test_a_callers_choice_still_wins_the_header(self):
+        """The flag is additional information, not a replacement for the merge."""
+        client = HttpClient(headers={"Accept-Encoding": "identity"})
+        assert client.default_headers["Accept-Encoding"] == "identity"

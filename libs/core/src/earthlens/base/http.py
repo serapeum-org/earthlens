@@ -1163,6 +1163,14 @@ class HttpClient:
         }
         if headers:
             self._default_headers.update(headers)
+        # `_default_headers` stamps the client's own `gzip, deflate` above and
+        # then lets the caller's headers overwrite it, so afterwards the two are
+        # indistinguishable. `download()` places an `identity` default
+        # *underneath* a caller's choice and has to know which it is looking at,
+        # so the distinction is recorded here while it still exists.
+        self._accept_encoding_is_explicit: bool = any(
+            key.lower() == "accept-encoding" for key in (headers or {})
+        )
 
     @property
     def default_headers(self) -> dict[str, str]:
