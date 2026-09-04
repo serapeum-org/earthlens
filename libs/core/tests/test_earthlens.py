@@ -1463,7 +1463,10 @@ class TestQualifiedKeyDefaultDir:
         # the unflattened name. Asserting on the derived string keeps this a real
         # gate on every platform rather than a Windows-only one.
         qualified = sorted(k for k in discover_backends() if ":" in k)
-        assert qualified, "expected the registry to carry source:topic keys"
+        if not qualified:
+            # Core alone registers no backends, so there is no qualified key to
+            # judge. That is an absent fixture, not a broken rule.
+            pytest.skip("no provider distribution installed; no source:topic keys")
         offenders = [k for k in qualified if ":" in _source_dirname(k)]
         assert not offenders, f"colon survives into the directory name: {offenders}"
 
@@ -1481,15 +1484,16 @@ class TestQualifiedKeyDefaultDir:
             seen[name] = key
 
     @pytest.mark.jrc
-    def test_facade_default_path_is_creatable(self, tmp_path):
+    def test_facade_default_path_is_creatable(self, monkeypatch, tmp_path):
         """The facade's derived default directory can actually be created."""
-        from earthlens.config import set_output_dir
+        from earthlens import config
 
-        set_output_dir(tmp_path)
-        try:
-            target = pathlib.Path(EarthLens(data_source="jrc:coastal-forecast").path)
-            assert ":" not in target.name, f"unusable directory name: {target.name}"
-            target.mkdir(parents=True, exist_ok=True)
-            assert target.is_dir(), f"{target} was not created"
-        finally:
-            set_output_dir(None)
+        # Patched rather than set-then-cleared: `set_output_dir(None)` means "no
+        # override", not "whatever it was", so clearing in a finally would strip
+        # an outer fixture's or EARTHLENS_DATA_DIR's setting for every test that
+        # runs after this one.
+        monkeypatch.setattr(config, "_output_override", tmp_path)
+        target = pathlib.Path(EarthLens(data_source="jrc:coastal-forecast").path)
+        assert ":" not in target.name, f"unusable directory name: {target.name}"
+        target.mkdir(parents=True, exist_ok=True)
+        assert target.is_dir(), f"{target} was not created"
