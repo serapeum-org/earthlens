@@ -1921,3 +1921,81 @@ class TestRetryOptOutIsHonoured:
         assert session.calls == 1, (
             f"max_retries=0 must mean one attempt, got {session.calls}"
         )
+
+
+@pytest.mark.unit
+class TestRemainingRetryBranches:
+    """Branches the earlier suites reached only indirectly."""
+
+    def test_a_connect_timeout_classifies_as_connect(self):
+        """`ConnectTimeout` is the one unambiguous connect-phase exception."""
+        from earthlens.base.http import classify_transport_error
+
+        assert (
+            classify_transport_error(requests.exceptions.ConnectTimeout()) == "connect"
+        )
+
+    def test_a_read_timeout_classifies_as_read(self):
+        """`ReadTimeout` means the connection was made and the response stalled."""
+        from earthlens.base.http import classify_transport_error
+
+        assert classify_transport_error(requests.exceptions.ReadTimeout()) == "read"
+
+    def test_a_weak_etag_is_refused_as_a_range_validator(self):
+        """RFC 9110 requires a strong validator for `If-Range`."""
+        payload = b"abcdefghij" * 20
+        session = _ResumingSession(payload, break_at=100, etag='W/"weak"')
+        client = HttpClient(session=session, sleep=lambda _: None)
+        dest = tmp = None
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as td:
+            from pathlib import Path
+
+            dest = Path(td) / "g.bin"
+            client.download("http://x/g.bin", dest, progress=False, chunk=10)
+            assert dest.read_bytes() == payload, "the file must still be correct"
+        assert "If-Range" not in session.sent_headers[1], (
+            "a weak ETag must not be sent as If-Range"
+        )
+
+    def test_a_status_suppression_on_a_post_is_logged(self, caplog):
+        """The `5xx`-on-`POST` refusal is visible, matching the transport one."""
+        import logging
+
+        from loguru import logger as _loguru
+
+        class _Resp500:
+            def __init__(self):
+                self.status_code = 500
+                self.headers = {}
+
+            def close(self):
+                """No-op."""
+
+            def raise_for_status(self):
+                """No-op: the caller disabled raising."""
+
+        class _S:
+            def __init__(self):
+                self.calls = 0
+
+            def post(self, url, **kwargs):
+                self.calls += 1
+                return _Resp500()
+
+        handler = _loguru.add(
+            lambda m: logging.getLogger().debug(m.record["message"]), level="DEBUG"
+        )
+        try:
+            with caplog.at_level(logging.DEBUG):
+                session = _S()
+                HttpClient(
+                    session=session, sleep=lambda _: None, raise_for_status=False
+                ).post("http://x")
+        finally:
+            _loguru.remove(handler)
+        assert session.calls == 1, "a POST must not be replayed on a 500"
+        assert any("not retrying a POST" in r.message for r in caplog.records), (
+            f"the suppression must be logged; got {[r.message for r in caplog.records]}"
+        )
