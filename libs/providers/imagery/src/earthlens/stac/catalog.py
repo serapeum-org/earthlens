@@ -141,7 +141,10 @@ class Collection(BaseModel):
             endpoint key then by the catalog's own asset key (e.g. CDSE serves
             Sentinel-2 bands per resolution, so `B04` is `B04_10m` there). Only
             the endpoints that rename need an entry; an asset with no override
-            is passed through unchanged.
+            is passed through unchanged. Both keys are checked when the catalog
+            loads — an endpoint no `endpoints:` block declares, or an asset this
+            collection does not carry, is rejected rather than silently doing
+            nothing. Resolve with `Catalog.resolve_assets`.
         default_assets: Asset keys pulled when the request names no assets.
         cadence: Native revisit cadence label, or `None`.
         resolution: Native ground sample distance in metres, or `None`.
