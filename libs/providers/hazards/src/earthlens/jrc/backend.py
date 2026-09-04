@@ -314,8 +314,16 @@ class JRC(AbstractDataSource):
     def _resolve_dataset_id(self, dataset: str | None, product: str | None) -> str:
         """Resolve the request selectors to a single catalog dataset id.
 
+        `dataset` names a row of this backend's catalog, not a facade key: the
+        keys that route to this backend (`jrc`, `jrc-flood-hazard`,
+        `jrc:european-flood-hazard`, ...) are the facade's vocabulary and are
+        rejected here. A bare facade key arrives as `dataset=None`.
+
         Args:
-            dataset: A catalog id, the family selector `"sea_level"`, or `None`.
+            dataset: A catalog id, either EFHM alias (`"flood"` /
+                `"jrc-flood"`), the family selector `"sea_level"`, or `None`
+                for the EFHM. Compared after stripping surrounding whitespace
+                and lowercasing, so `"  Flood  "` resolves like `"flood"`.
             product: `"medium_term"` | `"subseasonal"` (sea-level family).
 
         Returns:
