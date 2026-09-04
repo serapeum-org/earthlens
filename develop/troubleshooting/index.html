@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -18106,34 +18106,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -24348,8 +24320,7 @@ and <code>nwp</code>. On one whose fetch is a single whole-batch request, such a
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>No `path` given; download() writes &#39;chc&#39; output under ~/.earthlens/data/chc/ (load() uses a temp dir).
 </code></pre></div>
 <p>An omitted <code>path=</code> resolves to the configured output directory — <code>set_output_dir()</code>, else <code>EARTHLENS_DATA_DIR</code>,
-else <code>~/.earthlens/data</code> — and the facade adds a per-source subdirectory, with a qualified <code>source:topic</code>
-key flattening its colon (<code>jrc:coastal-forecast</code> writes to <code>jrc_coastal-forecast/</code>). Pass <code>path=</code> to control it per call, or
+else <code>~/.earthlens/data</code> — and the facade adds a per-source subdirectory. Pass <code>path=</code> to control it per call, or
 see <a href="../reference/configuration/">Configuration</a> to set it once for the whole process.</p>
 <p>If you are upgrading and a script that globbed <code>./earthlens-data/**</code> now finds nothing, that is why: the default
 moved off the working directory. Pass <code>path=""</code> to write to the working directory as before. Nothing was moved for

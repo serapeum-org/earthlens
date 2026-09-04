@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -5575,17 +5575,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.solar_wind_atlas.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.solar_wind_atlas.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5851,17 +5840,6 @@
     <span class="md-ellipsis">
       
         get
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.solar_wind_atlas.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -18252,34 +18230,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -24010,17 +23960,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.solar_wind_atlas.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.solar_wind_atlas.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24293,17 +24232,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.solar_wind_atlas.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.solar_wind_atlas.catalog.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24549,7 +24477,7 @@ module — both atlases are public.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Layer&lt;/code&gt; (&lt;code&gt;earthlens.solar_wind_atlas.catalog.Layer&lt;/code&gt;)" href="#earthlens.solar_wind_atlas.catalog.Layer">Layer</a>]</code></p>
 
 
 
@@ -24698,11 +24626,7 @@ is the full shipped surface, so this equals the curated keys.</p>
 <span class="normal"><a href="#__codelineno-0-256">256</a></span>
 <span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
-<span class="normal"><a href="#__codelineno-0-259">259</a></span>
-<span class="normal"><a href="#__codelineno-0-260">260</a></span>
-<span class="normal"><a href="#__codelineno-0-261">261</a></span>
-<span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-259">259</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Layer</span><span class="p">]):</span>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Variable / transport catalog for the Solar &amp; Wind Atlas backend.</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    Merges the bundled `catalog/` directory&#39;s per-atlas `*.yaml` files and</span>
@@ -24761,43 +24685,39 @@ is the full shipped surface, so this equals the curated keys.</p>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="p">)</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the layer map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">            layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">            Layer: The matching row.</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            Layer: The matching row.</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">            ValueError: If `layer_id` is not a curated layer; the message</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            ValueError: If `layer_id` is not a curated layer; the message</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">            - A solar and a wind layer resolve to their atlas / transport:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">                &#39;gsa&#39;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">                &#39;vsicurl&#39;</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            - A solar and a wind layer resolve to their atlas / transport:</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">                &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">                &#39;gsa&#39;</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                &#39;vsicurl&#39;</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24853,19 +24773,19 @@ is the full shipped surface, so this equals the curated keys.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-257">257</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
-<span class="normal"><a href="#__codelineno-0-259">259</a></span>
-<span class="normal"><a href="#__codelineno-0-260">260</a></span>
-<span class="normal"><a href="#__codelineno-0-261">261</a></span>
-<span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-259">259</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24978,7 +24898,11 @@ lists the known ids with a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-231">231</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span>
 <span class="normal"><a href="#__codelineno-0-232">232</a></span>
 <span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
@@ -24998,62 +24922,31 @@ lists the known ids with a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-248">248</a></span>
 <span class="normal"><a href="#__codelineno-0-249">249</a></span>
 <span class="normal"><a href="#__codelineno-0-250">250</a></span>
-<span class="normal"><a href="#__codelineno-0-251">251</a></span>
-<span class="normal"><a href="#__codelineno-0-252">252</a></span>
-<span class="normal"><a href="#__codelineno-0-253">253</a></span>
-<span class="normal"><a href="#__codelineno-0-254">254</a></span>
-<span class="normal"><a href="#__codelineno-0-255">255</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        Layer: The matching row.</span>
+<span class="normal"><a href="#__codelineno-0-251">251</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        Layer: The matching row.</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        ValueError: If `layer_id` is not a curated layer; the message</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        ValueError: If `layer_id` is not a curated layer; the message</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        - A solar and a wind layer resolve to their atlas / transport:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            &#39;gsa&#39;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            &#39;vsicurl&#39;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.solar_wind_atlas.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.solar_wind_atlas.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.solar_wind_atlas.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the layer map (satisfies the abstract contract).</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-227">227</a></span>
-<span class="normal"><a href="#__codelineno-0-228">228</a></span>
-<span class="normal"><a href="#__codelineno-0-229">229</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the layer map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        - A solar and a wind layer resolve to their atlas / transport:</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">            &#39;gsa&#39;</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            &#39;vsicurl&#39;</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28972,7 +28865,7 @@ download <code>url</code>.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Layer&lt;/code&gt; (&lt;code&gt;earthlens.solar_wind_atlas.catalog.Layer&lt;/code&gt;)" href="#earthlens.solar_wind_atlas.catalog.Layer">Layer</a>]</code></p>
 
 
 
@@ -29121,11 +29014,7 @@ is the full shipped surface, so this equals the curated keys.</p>
 <span class="normal"><a href="#__codelineno-0-256">256</a></span>
 <span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
-<span class="normal"><a href="#__codelineno-0-259">259</a></span>
-<span class="normal"><a href="#__codelineno-0-260">260</a></span>
-<span class="normal"><a href="#__codelineno-0-261">261</a></span>
-<span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-259">259</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Layer</span><span class="p">]):</span>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Variable / transport catalog for the Solar &amp; Wind Atlas backend.</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    Merges the bundled `catalog/` directory&#39;s per-atlas `*.yaml` files and</span>
@@ -29184,43 +29073,39 @@ is the full shipped surface, so this equals the curated keys.</p>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="p">)</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the layer map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">            layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">            Layer: The matching row.</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            Layer: The matching row.</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">            ValueError: If `layer_id` is not a curated layer; the message</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            ValueError: If `layer_id` is not a curated layer; the message</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">            - A solar and a wind layer resolve to their atlas / transport:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">                &#39;gsa&#39;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">                &#39;vsicurl&#39;</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            - A solar and a wind layer resolve to their atlas / transport:</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">                &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">                &#39;gsa&#39;</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                &#39;vsicurl&#39;</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29276,19 +29161,19 @@ is the full shipped surface, so this equals the curated keys.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-257">257</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
-<span class="normal"><a href="#__codelineno-0-259">259</a></span>
-<span class="normal"><a href="#__codelineno-0-260">260</a></span>
-<span class="normal"><a href="#__codelineno-0-261">261</a></span>
-<span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-259">259</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29401,7 +29286,11 @@ lists the known ids with a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-231">231</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span>
 <span class="normal"><a href="#__codelineno-0-232">232</a></span>
 <span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
@@ -29421,62 +29310,31 @@ lists the known ids with a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-248">248</a></span>
 <span class="normal"><a href="#__codelineno-0-249">249</a></span>
 <span class="normal"><a href="#__codelineno-0-250">250</a></span>
-<span class="normal"><a href="#__codelineno-0-251">251</a></span>
-<span class="normal"><a href="#__codelineno-0-252">252</a></span>
-<span class="normal"><a href="#__codelineno-0-253">253</a></span>
-<span class="normal"><a href="#__codelineno-0-254">254</a></span>
-<span class="normal"><a href="#__codelineno-0-255">255</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        Layer: The matching row.</span>
+<span class="normal"><a href="#__codelineno-0-251">251</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        Layer: The matching row.</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        ValueError: If `layer_id` is not a curated layer; the message</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        ValueError: If `layer_id` is not a curated layer; the message</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        - A solar and a wind layer resolve to their atlas / transport:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            &#39;gsa&#39;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            &#39;vsicurl&#39;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.solar_wind_atlas.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.solar_wind_atlas.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.solar_wind_atlas.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the layer map (satisfies the abstract contract).</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-227">227</a></span>
-<span class="normal"><a href="#__codelineno-0-228">228</a></span>
-<span class="normal"><a href="#__codelineno-0-229">229</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the layer map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        - A solar and a wind layer resolve to their atlas / transport:</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">            &#39;gsa&#39;</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            &#39;vsicurl&#39;</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -831,34 +831,6 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#0210-0220" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        0.21.0 → 0.22.0
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="0.21.0 → 0.22.0">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#a-qualified-sourcetopic-key-writes-to-a-flattened-directory" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A qualified source:topic key writes to a flattened directory
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#0110-0120" class="md-nav__link">
@@ -17890,34 +17862,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -23602,34 +23546,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#0210-0220" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        0.21.0 → 0.22.0
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="0.21.0 → 0.22.0">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#a-qualified-sourcetopic-key-writes-to-a-flattened-directory" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A qualified source:topic key writes to a flattened directory
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#0110-0120" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23765,21 +23681,6 @@
 <h1 id="migration-guide"><a class="toclink" href="#migration-guide">Migration guide</a><a class="headerlink" href="#migration-guide" title="Permanent link">#</a></h1>
 <p>Breaking changes by release, with the concrete edit each one needs. Releases without breaking changes are
 omitted — see the <a href="../change-log/">change log</a> for the full history.</p>
-<h2 id="0210-0220"><a class="toclink" href="#0210-0220">0.21.0 → 0.22.0</a><a class="headerlink" href="#0210-0220" title="Permanent link">#</a></h2>
-<p>One breaking change, and it is the quiet kind: <strong>your code keeps running and writes somewhere else</strong>.</p>
-<h3 id="a-qualified-sourcetopic-key-writes-to-a-flattened-directory"><a class="toclink" href="#a-qualified-sourcetopic-key-writes-to-a-flattened-directory">A qualified <code>source:topic</code> key writes to a flattened directory</a><a class="headerlink" href="#a-qualified-sourcetopic-key-writes-to-a-flattened-directory" title="Permanent link">#</a></h3>
-<p><code>EarthLens(data_source="jrc:coastal-forecast").download()</code> used to derive its default output directory straight
-from the key, giving <code>&lt;output_dir()&gt;/jrc:coastal-forecast/</code>. A colon cannot appear in a Windows path component,
-so that call could not create its directory there at all. The separator is now flattened to <code>_</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># 0.21 — on POSIX; on Windows this failed to create the directory</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&lt;</span><span class="n">output_dir</span><span class="p">()</span><span class="o">&gt;/</span><span class="n">jrc</span><span class="p">:</span><span class="n">coastal</span><span class="o">-</span><span class="n">forecast</span><span class="o">/</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># 0.22</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="o">&lt;</span><span class="n">output_dir</span><span class="p">()</span><span class="o">&gt;/</span><span class="n">jrc_coastal</span><span class="o">-</span><span class="n">forecast</span><span class="o">/</span>
-</code></pre></div>
-<p>Only qualified keys are affected; a bare key such as <code>chc</code> is unchanged. Nothing is moved for you, so if you are
-on Linux or macOS and already have output under the old colon directory, either move it across or keep passing an
-explicit <code>path=</code>.</p>
 <h2 id="0110-0120"><a class="toclink" href="#0110-0120">0.11.0 → 0.12.0</a><a class="headerlink" href="#0110-0120" title="Permanent link">#</a></h2>
 <p>Five breaking changes. The <code>OpenAQ</code> one is the dangerous one: <strong>your code keeps running and quietly means
 something different</strong>. The rest fail loudly.</p>
@@ -23788,21 +23689,21 @@ something different</strong>. The rest fail loudly.</p>
 size moved to <code>page_size=</code>.</p>
 <p>Code that passed <code>limit=1000</code> to page through results still runs — but now it stops after 1000 rows in total
 instead of fetching 1000 rows per page. That is a silent change in the returned data, not an error.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 0.11 — 1000 rows per page, all pages fetched</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openaq&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># 0.12 — same behaviour</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openaq&quot;</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># 0.12 — a deliberate cap: stop after 1000 rows in total</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openaq&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># 0.11 — 1000 rows per page, all pages fetched</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openaq&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># 0.12 — same behaviour</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openaq&quot;</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># 0.12 — a deliberate cap: stop after 1000 rows in total</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openaq&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>Action:</strong> grep for <code>limit=</code> on any OpenAQ call. If it was there for paging, rename it to <code>page_size=</code>.</p>
 <h3 id="an-unsupported-temporal_resolution-now-raises"><a class="toclink" href="#an-unsupported-temporal_resolution-now-raises">An unsupported <code>temporal_resolution</code> now raises</a><a class="headerlink" href="#an-unsupported-temporal_resolution-now-raises" title="Permanent link">#</a></h3>
 <p>Passing a resolution a backend does not support used to fall through and silently download <strong>daily</strong> data. It now
 raises.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;chc&quot;</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;hourly&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>   <span class="c1"># 0.11: silently daily</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>                                                                  <span class="c1"># 0.12: raises</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;chc&quot;</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;hourly&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>   <span class="c1"># 0.11: silently daily</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>                                                                  <span class="c1"># 0.12: raises</span>
 </code></pre></div>
 <p><strong>Action:</strong> none if your resolutions were already valid. If a run suddenly fails, the old behaviour was giving you
 daily data under a label that claimed otherwise — check which resolution you actually wanted. Each backend's
@@ -23815,10 +23716,10 @@ re-generate any cached weekly outputs rather than mixing them with new ones.</p>
 <h3 id="catalogload-raises-valueerror-on-a-missing-path"><a class="toclink" href="#catalogload-raises-valueerror-on-a-missing-path"><code>Catalog.load()</code> raises <code>ValueError</code> on a missing path</a><a class="headerlink" href="#catalogload-raises-valueerror-on-a-missing-path" title="Permanent link">#</a></h3>
 <p>All 48 catalogs now report a missing file through the shared loader, which raises <code>ValueError</code> rather than
 <code>FileNotFoundError</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>        <span class="c1"># was: except FileNotFoundError</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>        <span class="c1"># was: except FileNotFoundError</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="o">...</span>
 </code></pre></div>
 <p>Pass a <code>pathlib.Path</code>, not a <code>str</code> — a bare string currently fails with <code>AttributeError</code> before the path check
 runs.</p>
@@ -23831,11 +23732,11 @@ Only affects code reaching into the private names.</p>
 <h3 id="from-earthlens-import-earthlens-no-longer-works"><a class="toclink" href="#from-earthlens-import-earthlens-no-longer-works"><code>from earthlens import EarthLens</code> no longer works</a><a class="headerlink" href="#from-earthlens-import-earthlens-no-longer-works" title="Permanent link">#</a></h3>
 <p><code>earthlens</code> became a <strong>PEP 420 namespace package</strong> split across seven distributions, so the top-level
 <code>__init__.py</code> — and the re-exports it carried — are gone. The public surface is <code>earthlens.core</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># before</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">download</span><span class="p">,</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># after</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">download</span><span class="p">,</span> <span class="n">AggregationConfig</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># before</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">download</span><span class="p">,</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># after</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">download</span><span class="p">,</span> <span class="n">AggregationConfig</span>
 </code></pre></div>
 <p>Everything that used to be importable from the top level now comes from <code>earthlens.core</code>: <code>EarthLens</code>,
 <code>download</code>, <code>find</code>, <code>search</code>, <code>sources</code>, <code>AggregationConfig</code>, <code>aggregate_netcdf</code>, <code>__version__</code>.</p>
