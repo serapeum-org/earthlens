@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import ast
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -65,6 +66,22 @@ def _core_imports(path: Path):
 #: path as a side effect of being imported -- so a bare import is both a layering
 #: break and a latent `ModuleNotFoundError`.
 _BANNED_GIS_MODULES = frozenset({"osgeo", "gdal", "ogr", "osr"})
+
+
+def _banned_gis_target(name: str) -> str | None:
+    """Return the banned GIS module a dotted import path reaches, else `None`.
+
+    Matching only the first segment would miss the one spelling most likely to
+    be reached for: pyramids vendors GDAL at `pyramids/_vendor/osgeo`, and
+    CLAUDE.md names that path, so `from pyramids._vendor.osgeo import gdal` is
+    documented, rooted at `pyramids`, and exactly what this rule forbids. Any
+    segment naming a banned module counts, wherever it sits in the path.
+    """
+    parts = name.split(".")
+    for index, part in enumerate(parts):
+        if part in _BANNED_GIS_MODULES:
+            return ".".join(parts[: index + 1])
+    return None
 
 #: Files allowed to reach for GDAL directly. Empty, and meant to stay that way.
 #:
@@ -142,14 +159,26 @@ def _earthlens_sources() -> list[Path]:
     )
 
 
+#: IPython help on an object: `obj?` / `pd.DataFrame??`. Matched as a whole line
+#: rather than by a trailing `?`, so a prose line inside a triple-quoted string
+#: ("is this a question?") is left alone -- blanking that would break the string
+#: and turn a clean file into an `unparseable` finding.
+_IPYTHON_HELP = re.compile(r"[A-Za-z_][\w.]*\?{1,2}")
+
+#: An IPython capture: `files = !ls`, `a, b = !cmd`. The shell escape is what
+#: makes the line non-Python; the assignment target itself is ordinary.
+_IPYTHON_CAPTURE = re.compile(r"[A-Za-z_][\w\s,.\[\]]*=\s*!.*")
+
+
 def _source_text(path: Path) -> str:
     """Return a file's Python source, unwrapping a notebook into one module.
 
     A `.ipynb` is JSON, so its code has to be lifted out before it can be
-    parsed. IPython line magics (`%timeit`), shell escapes (`!pip`) and help
-    (`obj?`) are not Python, so those lines are blanked rather than dropped --
-    keeping the line count means a reported line number still points at the
-    right place in the concatenated cells.
+    parsed. IPython syntax that is not Python -- line magics (`%timeit`), shell
+    escapes (`!pip`), captures (`files = !ls`), help (`obj?`) and the entire
+    body of a `%%bash`-style cell magic -- is blanked rather than dropped, so a
+    reported line number still points at the right place in the concatenated
+    cells. Blanking beats skipping the cell, which would stop scanning the rest.
     """
     if path.suffix != ".ipynb":
         return path.read_text(encoding="utf-8")
@@ -158,9 +187,27 @@ def _source_text(path: Path) -> str:
     for cell in notebook.get("cells", []):
         if cell.get("cell_type") != "code":
             continue
-        for line in cell.get("source", []):
+        # nbformat types `source` as multiline_string -- a list of lines OR one
+        # plain string, both valid. Iterating a string yields CHARACTERS, which
+        # would put one character on each line and hide every import in the
+        # cell, so normalise the shape before splitting.
+        source = cell.get("source") or []
+        if isinstance(source, str):
+            source = source.splitlines(keepends=True)
+        # A cell magic governs the whole cell: `%%bash` makes the body shell,
+        # not Python. Only its header line starts with `%`, so blanking per line
+        # would hand the shell body to `ast.parse`.
+        cell_magic = bool(source) and source[0].lstrip().startswith("%%")
+        for line in source:
             body = line.rstrip("\n")
-            lines.append("\n" if body.lstrip()[:1] in {"%", "!", "?"} else body + "\n")
+            stripped = body.strip()
+            not_python = (
+                cell_magic
+                or stripped[:1] in {"%", "!", "?"}
+                or _IPYTHON_HELP.fullmatch(stripped) is not None
+                or _IPYTHON_CAPTURE.fullmatch(stripped) is not None
+            )
+            lines.append("\n" if not_python else body + "\n")
         lines.append("\n")
     return "".join(lines)
 
@@ -187,17 +234,22 @@ def _gis_imports(path: Path) -> list[tuple[int, str]]:
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for alias in node.names:
-                if alias.name.split(".", 1)[0] in _BANNED_GIS_MODULES:
+                if _banned_gis_target(alias.name):
                     found.append((node.lineno, alias.name))
         elif isinstance(node, ast.ImportFrom):
             # `node.level` > 0 is a relative import, which resolves to a sibling
             # module inside earthlens -- a local `osgeo.py` would be odd, but it
             # is not GDAL, so flagging it would be a false positive.
-            if (
-                not node.level
-                and (node.module or "").split(".", 1)[0] in _BANNED_GIS_MODULES
-            ):
-                found.append((node.lineno, f"from {node.module}"))
+            if not node.level:
+                # Check each imported name too: `from pyramids._vendor
+                # import osgeo` puts the banned module in the alias, not
+                # in `node.module`.
+                module = node.module or ""
+                for alias in node.names:
+                    reached = _banned_gis_target(f"{module}.{alias.name}")
+                    if reached:
+                        found.append((node.lineno, f"from {reached}"))
+                        break
         elif isinstance(node, ast.Call):
             # Match on the callee's NAME, not on the node shape: an attribute
             # call (`importlib.import_module`) and a plain name call (a bare
@@ -219,7 +271,7 @@ def _gis_imports(path: Path) -> list[tuple[int, str]]:
                 and isinstance(node.args[0].value, str)
             ):
                 target = node.args[0].value
-            if target and target.split(".", 1)[0] in _BANNED_GIS_MODULES:
+            if target and _banned_gis_target(target):
                 found.append((node.lineno, f"dynamic:{target}"))
     return found
 
@@ -232,26 +284,33 @@ def _is_banned_gis_import(node: ast.AST) -> bool:
     correct code.
     """
     if isinstance(node, ast.Import):
-        return any(
-            alias.name.split(".", 1)[0] in _BANNED_GIS_MODULES for alias in node.names
-        )
+        return any(_banned_gis_target(alias.name) for alias in node.names)
     if isinstance(node, ast.ImportFrom):
-        return (
-            not node.level
-            and (node.module or "").split(".", 1)[0] in _BANNED_GIS_MODULES
+        if node.level:
+            return False
+        module = node.module or ""
+        return any(
+            _banned_gis_target(f"{module}.{alias.name}") for alias in node.names
         )
     return False
 
 
 def _imports_pyramids(node: ast.AST) -> bool:
-    """Return whether `node` imports pyramids in any form that vendors osgeo."""
+    """Return whether `node` imports pyramids in a form that vendors osgeo.
+
+    A reach into `pyramids._vendor.osgeo` does not count. It is rooted at
+    `pyramids`, so a first-segment test would let the banned import satisfy the
+    very rule that exists to precede it.
+    """
+    if _is_banned_gis_import(node):
+        return False
     if isinstance(node, ast.Import):
         return any(alias.name.split(".", 1)[0] == "pyramids" for alias in node.names)
     if isinstance(node, ast.ImportFrom):
         # `from pyramids import dataset` imports the PACKAGE first and runs its
         # __init__, so it puts the vendored osgeo on the path exactly as a plain
         # `import pyramids` does. Rejecting this form would fail correct code.
-        return (node.module or "").split(".", 1)[0] == "pyramids"
+        return not node.level and (node.module or "").split(".", 1)[0] == "pyramids"
     return False
 
 
@@ -1838,6 +1897,16 @@ _GDAL_SPELLINGS = [
         'from importlib import import_module\nimport_module("osgeo")\n',
     ),
     ("dynamic-dunder", '__import__("osgeo")\n'),
+    # pyramids vendors GDAL at `pyramids/_vendor/osgeo` and CLAUDE.md names that
+    # path, so this is the documented spelling -- rooted at `pyramids`, which a
+    # first-segment test reads as an ordinary pyramids import.
+    ("vendored-from", "from pyramids._vendor.osgeo import gdal\n"),
+    ("vendored-import", "import pyramids._vendor.osgeo.gdal as gdal\n"),
+    ("vendored-fromlist", "from pyramids._vendor import osgeo\n"),
+    (
+        "vendored-dynamic",
+        'import importlib\nimportlib.import_module("pyramids._vendor.osgeo")\n',
+    ),
 ]
 
 #: Sources that must NOT trip the guard, so it stays usable. The relative forms
@@ -1845,6 +1914,10 @@ _GDAL_SPELLINGS = [
 #: it is not GDAL and flagging it would be a false positive.
 _INNOCENT_SOURCES = [
     ("relative-module", "from .osgeo import gdal\n"),
+    # The IPython-help rule matches a whole line, so prose that merely ends in a
+    # question mark keeps its line -- blanking it would break the string it sits
+    # in and report the file as unparseable.
+    ("prose-question", 'MSG = """\nis this a question?\n"""\n'),
     ("relative-package", "from . import osgeo\n"),
     ("pyramids", "import pyramids\n"),
     ("pyramids-from", "from pyramids.dataset import Dataset\n"),
@@ -1961,6 +2034,76 @@ class TestGdalGuardDetection:
             encoding="utf-8",
         )
         assert _gis_imports(probe) == [(3, "from osgeo")]
+
+    def test_a_string_valued_source_is_scanned(self, tmp_path):
+        """nbformat allows `source` to be one string, and it is still scanned."""
+        # Iterating a string yields characters, which would put one character on
+        # each line and hide every import in the cell.
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps(
+                {"cells": [{"cell_type": "code", "source": "from osgeo import gdal\n"}]}
+            ),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe) == [(1, "from osgeo")]
+
+    def test_a_string_valued_source_does_not_manufacture_a_finding(self, tmp_path):
+        """A clean cell given as one string parses, rather than reporting garbage."""
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps(
+                {"cells": [{"cell_type": "code", "source": "import pyramids\nx = 1\n"}]}
+            ),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe) == []
+
+    @pytest.mark.parametrize(
+        "source",
+        [
+            pytest.param(["import os\n", "pd.DataFrame?\n"], id="trailing-help"),
+            pytest.param(["files = !ls\n"], id="capture"),
+            pytest.param(
+                ["if True:\n", "    %matplotlib inline\n", "    x = 1\n"],
+                id="indented-magic",
+            ),
+            pytest.param(["%%bash\n", "echo hello && ls -la\n"], id="cell-magic"),
+        ],
+    )
+    def test_ipython_syntax_is_not_reported_as_a_violation(self, source, tmp_path):
+        """Ordinary IPython cell syntax is not Python, and not a GDAL finding."""
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps({"cells": [{"cell_type": "code", "source": source}]}),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe) == []
+
+    def test_a_cell_magic_does_not_hide_a_later_cell(self, tmp_path):
+        """Blanking a `%%bash` body stops at that cell, so the rest stays scanned."""
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps(
+                {
+                    "cells": [
+                        {"cell_type": "code", "source": ["%%bash\n", "echo hi\n"]},
+                        {"cell_type": "code", "source": ["from osgeo import gdal\n"]},
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe) == [(4, "from osgeo")]
+
+    def test_the_vendored_path_does_not_satisfy_the_ordering_rule(self, tmp_path):
+        """Reaching into pyramids' vendored osgeo is the violation, not the remedy."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(
+            "def read():\n    from pyramids._vendor.osgeo import gdal\n",
+            encoding="utf-8",
+        )
+        assert _pyramids_ordering_problems(probe) != []
 
     def test_an_unparseable_file_is_reported_not_raised(self, tmp_path):
         """A file the guard cannot parse becomes a finding naming the file."""
