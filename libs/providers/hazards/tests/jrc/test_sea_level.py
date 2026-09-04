@@ -605,6 +605,32 @@ class TestBandValidTimes:
         assert cube.closed, "the handle must be released on the failure path too"
 
     @pytest.mark.real_band_names
+    def test_a_failing_release_still_yields_the_fallback(self, monkeypatch):
+        """A cube whose close() raises must not turn naming into a failure.
+
+        Closing a handle whose read just died mid-flight is exactly where an
+        error surfaces, and the release runs in a `finally` -- so an unguarded
+        close() would replace the documented step_N fallback with an exception.
+        """
+        cube = _FakeCube(None)
+
+        def _boom_read(time_format=None):
+            raise RuntimeError("mid-read /vsicurl hiccup")
+
+        def _boom_close():
+            raise OSError("handle already torn down")
+
+        cube.get_time_variable = _boom_read
+        cube.close = _boom_close
+        monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", lambda *a, **k: cube)
+
+        assert _helpers.band_valid_times("irrelevant", 3) == [
+            "step_1",
+            "step_2",
+            "step_3",
+        ], "a failing release must not escape; naming is documented never to fail"
+
+    @pytest.mark.real_band_names
     def test_an_undecodable_axis_keeps_positional_names(self, monkeypatch):
         """pyramids returning no labels degrades to step_N, never raises."""
         monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", _fake_cube_reader(None))

@@ -450,9 +450,18 @@ def band_valid_times(url: str, steps: int) -> list[str]:
     finally:
         # Release the remote handle this opens: naming runs once per fetch, and
         # leaving it to the GC holds a /vsicurl connection open until then.
-        close = getattr(cube, "close", None)
-        if callable(close):
-            close()
+        # The release itself must never raise: this function promises a step_N
+        # fallback rather than a failure, and closing a handle whose read just
+        # died mid-flight is precisely where an error would surface -- letting
+        # it out of `finally` would replace the fallback with an exception.
+        if cube is not None:
+            try:
+                cube.close()
+            except Exception as exc:  # noqa: BLE001 - cleanup is best-effort
+                logger.debug(
+                    f"JRC: releasing the cube handle failed "
+                    f"({type(exc).__name__}: {exc})."
+                )
     return [f"step_{index + 1}" for index in range(steps)]
 
 
