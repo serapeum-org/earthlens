@@ -8465,17 +8465,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.firms.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.firms.Catalog.get_column" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8808,17 +8797,6 @@
     <span class="md-ellipsis">
       
         codes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.firms.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -24066,17 +24044,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.firms.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.firms.Catalog.get_column" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24409,17 +24376,6 @@
     <span class="md-ellipsis">
       
         codes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.firms.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -24784,7 +24740,7 @@ can catch every backend's auth failure with one <code>except</code> clause.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Sensor&lt;/code&gt; (&lt;code&gt;earthlens.firms.catalog.Sensor&lt;/code&gt;)" href="#earthlens.firms.catalog.Sensor">Sensor</a>]</code></p>
 
 
 
@@ -25008,15 +24964,7 @@ row.</p>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
 <span class="normal"><a href="#__codelineno-0-339">339</a></span>
 <span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span>
-<span class="normal"><a href="#__codelineno-0-348">348</a></span>
-<span class="normal"><a href="#__codelineno-0-349">349</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Sensor</span><span class="p">]):</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sensor catalog for the NASA FIRMS backend.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Reads the bundled `firms_data_catalog.yaml` (shipped as package</span>
@@ -25099,80 +25047,72 @@ row.</p>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a>        <span class="p">)</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">sensors</span><span class="p">))</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sensor</span><span class="p">]:</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sensor map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sensor</span><span class="p">:</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Sensor` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            dict[str, Sensor]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sensor</span><span class="p">:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Sensor` for `code`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            code: A FIRMS source code (`&quot;VIIRS_SNPP_NRT&quot;`, `&quot;MODIS_NRT&quot;`,</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                …).</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Thin alias over</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">            code: A FIRMS source code (`&quot;VIIRS_SNPP_NRT&quot;`, `&quot;MODIS_NRT&quot;`,</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">                …).</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            Sensor: The matching sensor row.</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            ValueError: If `code` is not a registered FIRMS sensor.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Sensor&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">code</span><span class="p">))</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            Sensor: The matching sensor row.</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one column&#39;s metadata for a `(sensor, column)` pair.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            ValueError: If `code` is not a registered FIRMS sensor.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Sensor&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">code</span><span class="p">))</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one column&#39;s metadata for a `(sensor, column)` pair.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            code: A FIRMS source code as it appears in :attr:`datasets`.</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            column: A CSV column name declared under that sensor.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            SensorColumn: The matching column metadata.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            ValueError: If `code` is not a registered sensor.</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            KeyError: If `column` is not declared under that sensor.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            - Read a column&#39;s units:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                &gt;&gt;&gt; from earthlens.firms import Catalog</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_column(&quot;MODIS_NRT&quot;, &quot;confidence&quot;).units</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                &#39;%&#39;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sensor</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            code: A FIRMS source code as it appears in :attr:`datasets`.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            column: A CSV column name declared under that sensor.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            SensorColumn: The matching column metadata.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            ValueError: If `code` is not a registered sensor.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            KeyError: If `column` is not declared under that sensor.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            - Read a column&#39;s units:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                &gt;&gt;&gt; from earthlens.firms import Catalog</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_column(&quot;MODIS_NRT&quot;, &quot;confidence&quot;).units</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                &#39;%&#39;</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sensor</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Alias of :meth:`get_column` so the FIRMS leaf is reachable under</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        the same `get_variable(dataset_key, variable_name)` verb the</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        other two-level catalogs use.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            code: A FIRMS source code.</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            column: A CSV column name declared under that sensor.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Alias of :meth:`get_column` so the FIRMS leaf is reachable under</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        the same `get_variable(dataset_key, variable_name)` verb the</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        other two-level catalogs use.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">            code: A FIRMS source code.</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">            column: A CSV column name declared under that sensor.</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            SensorColumn: The matching column metadata.</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">codes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered FIRMS sensor codes, sorted.</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            SensorColumn: The matching column metadata.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            list[str]: The sensor codes (`[&quot;MODIS_NRT&quot;, &quot;MODIS_SP&quot;, ...]`).</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">codes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered FIRMS sensor codes, sorted.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">            list[str]: The sensor codes (`[&quot;MODIS_NRT&quot;, &quot;MODIS_SP&quot;, ...]`).</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25228,77 +25168,19 @@ row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span>
-<span class="normal"><a href="#__codelineno-0-348">348</a></span>
-<span class="normal"><a href="#__codelineno-0-349">349</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="k">def</span><span class="w"> </span><span class="nf">codes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered FIRMS sensor codes, sorted.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        list[str]: The sensor codes (`[&quot;MODIS_NRT&quot;, &quot;MODIS_SP&quot;, ...]`).</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.firms.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.firms.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.firms.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the sensor map (satisfies the abstract contract).</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Sensor&lt;/code&gt; (&lt;code&gt;earthlens.firms.catalog.Sensor&lt;/code&gt;)" href="#earthlens.firms.catalog.Sensor">Sensor</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, Sensor]: Same object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
-<span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span>
-<span class="normal"><a href="#__codelineno-0-280">280</a></span>
-<span class="normal"><a href="#__codelineno-0-281">281</a></span>
-<span class="normal"><a href="#__codelineno-0-282">282</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sensor</span><span class="p">]:</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sensor map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        dict[str, Sensor]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="k">def</span><span class="w"> </span><span class="nf">codes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered FIRMS sensor codes, sorted.</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        list[str]: The sensor codes (`[&quot;MODIS_NRT&quot;, &quot;MODIS_SP&quot;, ...]`).</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25434,7 +25316,15 @@ row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-302">302</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-294">294</a></span>
+<span class="normal"><a href="#__codelineno-0-295">295</a></span>
+<span class="normal"><a href="#__codelineno-0-296">296</a></span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span>
 <span class="normal"><a href="#__codelineno-0-303">303</a></span>
 <span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
@@ -25449,38 +25339,30 @@ row.</p>
 <span class="normal"><a href="#__codelineno-0-314">314</a></span>
 <span class="normal"><a href="#__codelineno-0-315">315</a></span>
 <span class="normal"><a href="#__codelineno-0-316">316</a></span>
-<span class="normal"><a href="#__codelineno-0-317">317</a></span>
-<span class="normal"><a href="#__codelineno-0-318">318</a></span>
-<span class="normal"><a href="#__codelineno-0-319">319</a></span>
-<span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return one column&#39;s metadata for a `(sensor, column)` pair.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        code: A FIRMS source code as it appears in :attr:`datasets`.</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        column: A CSV column name declared under that sensor.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        SensorColumn: The matching column metadata.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        ValueError: If `code` is not a registered sensor.</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        KeyError: If `column` is not declared under that sensor.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        - Read a column&#39;s units:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            &gt;&gt;&gt; from earthlens.firms import Catalog</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_column(&quot;MODIS_NRT&quot;, &quot;confidence&quot;).units</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            &#39;%&#39;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sensor</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return one column&#39;s metadata for a `(sensor, column)` pair.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        code: A FIRMS source code as it appears in :attr:`datasets`.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        column: A CSV column name declared under that sensor.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        SensorColumn: The matching column metadata.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        ValueError: If `code` is not a registered sensor.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        KeyError: If `column` is not declared under that sensor.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        - Read a column&#39;s units:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            &gt;&gt;&gt; from earthlens.firms import Catalog</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_column(&quot;MODIS_NRT&quot;, &quot;confidence&quot;).units</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            &#39;%&#39;</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sensor</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25583,7 +25465,15 @@ row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-284">284</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-276">276</a></span>
+<span class="normal"><a href="#__codelineno-0-277">277</a></span>
+<span class="normal"><a href="#__codelineno-0-278">278</a></span>
+<span class="normal"><a href="#__codelineno-0-279">279</a></span>
+<span class="normal"><a href="#__codelineno-0-280">280</a></span>
+<span class="normal"><a href="#__codelineno-0-281">281</a></span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span>
+<span class="normal"><a href="#__codelineno-0-283">283</a></span>
+<span class="normal"><a href="#__codelineno-0-284">284</a></span>
 <span class="normal"><a href="#__codelineno-0-285">285</a></span>
 <span class="normal"><a href="#__codelineno-0-286">286</a></span>
 <span class="normal"><a href="#__codelineno-0-287">287</a></span>
@@ -25591,31 +25481,23 @@ row.</p>
 <span class="normal"><a href="#__codelineno-0-289">289</a></span>
 <span class="normal"><a href="#__codelineno-0-290">290</a></span>
 <span class="normal"><a href="#__codelineno-0-291">291</a></span>
-<span class="normal"><a href="#__codelineno-0-292">292</a></span>
-<span class="normal"><a href="#__codelineno-0-293">293</a></span>
-<span class="normal"><a href="#__codelineno-0-294">294</a></span>
-<span class="normal"><a href="#__codelineno-0-295">295</a></span>
-<span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span>
-<span class="normal"><a href="#__codelineno-0-298">298</a></span>
-<span class="normal"><a href="#__codelineno-0-299">299</a></span>
-<span class="normal"><a href="#__codelineno-0-300">300</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sensor</span><span class="p">:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Sensor` for `code`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        code: A FIRMS source code (`&quot;VIIRS_SNPP_NRT&quot;`, `&quot;MODIS_NRT&quot;`,</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            …).</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        Sensor: The matching sensor row.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ValueError: If `code` is not a registered FIRMS sensor.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Sensor&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">code</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sensor</span><span class="p">:</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Sensor` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    Thin alias over</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        code: A FIRMS source code (`&quot;VIIRS_SNPP_NRT&quot;`, `&quot;MODIS_NRT&quot;`,</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            …).</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Sensor: The matching sensor row.</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        ValueError: If `code` is not a registered FIRMS sensor.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Sensor&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">code</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25711,35 +25593,35 @@ other two-level catalogs use.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-327">327</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Alias of :meth:`get_column` so the FIRMS leaf is reachable under</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    the same `get_variable(dataset_key, variable_name)` verb the</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    other two-level catalogs use.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        code: A FIRMS source code.</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        column: A CSV column name declared under that sensor.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    Alias of :meth:`get_column` so the FIRMS leaf is reachable under</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">    the same `get_variable(dataset_key, variable_name)` verb the</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    other two-level catalogs use.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        code: A FIRMS source code.</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        column: A CSV column name declared under that sensor.</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        SensorColumn: The matching column metadata.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        SensorColumn: The matching column metadata.</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -32266,7 +32148,7 @@ is monkey-patchable in tests.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Sensor&lt;/code&gt; (&lt;code&gt;earthlens.firms.catalog.Sensor&lt;/code&gt;)" href="#earthlens.firms.catalog.Sensor">Sensor</a>]</code></p>
 
 
 
@@ -32490,15 +32372,7 @@ row.</p>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
 <span class="normal"><a href="#__codelineno-0-339">339</a></span>
 <span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span>
-<span class="normal"><a href="#__codelineno-0-348">348</a></span>
-<span class="normal"><a href="#__codelineno-0-349">349</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Sensor</span><span class="p">]):</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sensor catalog for the NASA FIRMS backend.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Reads the bundled `firms_data_catalog.yaml` (shipped as package</span>
@@ -32581,80 +32455,72 @@ row.</p>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a>        <span class="p">)</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">sensors</span><span class="p">))</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sensor</span><span class="p">]:</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sensor map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sensor</span><span class="p">:</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Sensor` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            dict[str, Sensor]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sensor</span><span class="p">:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Sensor` for `code`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            code: A FIRMS source code (`&quot;VIIRS_SNPP_NRT&quot;`, `&quot;MODIS_NRT&quot;`,</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                …).</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Thin alias over</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">            code: A FIRMS source code (`&quot;VIIRS_SNPP_NRT&quot;`, `&quot;MODIS_NRT&quot;`,</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">                …).</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            Sensor: The matching sensor row.</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            ValueError: If `code` is not a registered FIRMS sensor.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Sensor&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">code</span><span class="p">))</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            Sensor: The matching sensor row.</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one column&#39;s metadata for a `(sensor, column)` pair.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            ValueError: If `code` is not a registered FIRMS sensor.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Sensor&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">code</span><span class="p">))</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one column&#39;s metadata for a `(sensor, column)` pair.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            code: A FIRMS source code as it appears in :attr:`datasets`.</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            column: A CSV column name declared under that sensor.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            SensorColumn: The matching column metadata.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            ValueError: If `code` is not a registered sensor.</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            KeyError: If `column` is not declared under that sensor.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            - Read a column&#39;s units:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                &gt;&gt;&gt; from earthlens.firms import Catalog</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_column(&quot;MODIS_NRT&quot;, &quot;confidence&quot;).units</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                &#39;%&#39;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sensor</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            code: A FIRMS source code as it appears in :attr:`datasets`.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            column: A CSV column name declared under that sensor.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            SensorColumn: The matching column metadata.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            ValueError: If `code` is not a registered sensor.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            KeyError: If `column` is not declared under that sensor.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            - Read a column&#39;s units:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                &gt;&gt;&gt; from earthlens.firms import Catalog</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_column(&quot;MODIS_NRT&quot;, &quot;confidence&quot;).units</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                &#39;%&#39;</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sensor</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Alias of :meth:`get_column` so the FIRMS leaf is reachable under</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        the same `get_variable(dataset_key, variable_name)` verb the</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        other two-level catalogs use.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            code: A FIRMS source code.</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            column: A CSV column name declared under that sensor.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Alias of :meth:`get_column` so the FIRMS leaf is reachable under</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        the same `get_variable(dataset_key, variable_name)` verb the</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        other two-level catalogs use.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">            code: A FIRMS source code.</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">            column: A CSV column name declared under that sensor.</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            SensorColumn: The matching column metadata.</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">codes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered FIRMS sensor codes, sorted.</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            SensorColumn: The matching column metadata.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            list[str]: The sensor codes (`[&quot;MODIS_NRT&quot;, &quot;MODIS_SP&quot;, ...]`).</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">codes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered FIRMS sensor codes, sorted.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">            list[str]: The sensor codes (`[&quot;MODIS_NRT&quot;, &quot;MODIS_SP&quot;, ...]`).</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -32710,77 +32576,19 @@ row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span>
-<span class="normal"><a href="#__codelineno-0-348">348</a></span>
-<span class="normal"><a href="#__codelineno-0-349">349</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="k">def</span><span class="w"> </span><span class="nf">codes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered FIRMS sensor codes, sorted.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        list[str]: The sensor codes (`[&quot;MODIS_NRT&quot;, &quot;MODIS_SP&quot;, ...]`).</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.firms.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.firms.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.firms.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the sensor map (satisfies the abstract contract).</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Sensor&lt;/code&gt; (&lt;code&gt;earthlens.firms.catalog.Sensor&lt;/code&gt;)" href="#earthlens.firms.catalog.Sensor">Sensor</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, Sensor]: Same object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
-<span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span>
-<span class="normal"><a href="#__codelineno-0-280">280</a></span>
-<span class="normal"><a href="#__codelineno-0-281">281</a></span>
-<span class="normal"><a href="#__codelineno-0-282">282</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sensor</span><span class="p">]:</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sensor map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        dict[str, Sensor]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="k">def</span><span class="w"> </span><span class="nf">codes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered FIRMS sensor codes, sorted.</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        list[str]: The sensor codes (`[&quot;MODIS_NRT&quot;, &quot;MODIS_SP&quot;, ...]`).</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -32916,7 +32724,15 @@ row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-302">302</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-294">294</a></span>
+<span class="normal"><a href="#__codelineno-0-295">295</a></span>
+<span class="normal"><a href="#__codelineno-0-296">296</a></span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span>
 <span class="normal"><a href="#__codelineno-0-303">303</a></span>
 <span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
@@ -32931,38 +32747,30 @@ row.</p>
 <span class="normal"><a href="#__codelineno-0-314">314</a></span>
 <span class="normal"><a href="#__codelineno-0-315">315</a></span>
 <span class="normal"><a href="#__codelineno-0-316">316</a></span>
-<span class="normal"><a href="#__codelineno-0-317">317</a></span>
-<span class="normal"><a href="#__codelineno-0-318">318</a></span>
-<span class="normal"><a href="#__codelineno-0-319">319</a></span>
-<span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span>
-<span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span>
-<span class="normal"><a href="#__codelineno-0-325">325</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return one column&#39;s metadata for a `(sensor, column)` pair.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        code: A FIRMS source code as it appears in :attr:`datasets`.</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        column: A CSV column name declared under that sensor.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        SensorColumn: The matching column metadata.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        ValueError: If `code` is not a registered sensor.</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        KeyError: If `column` is not declared under that sensor.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        - Read a column&#39;s units:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            &gt;&gt;&gt; from earthlens.firms import Catalog</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_column(&quot;MODIS_NRT&quot;, &quot;confidence&quot;).units</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            &#39;%&#39;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sensor</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return one column&#39;s metadata for a `(sensor, column)` pair.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        code: A FIRMS source code as it appears in :attr:`datasets`.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        column: A CSV column name declared under that sensor.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        SensorColumn: The matching column metadata.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        ValueError: If `code` is not a registered sensor.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        KeyError: If `column` is not declared under that sensor.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        - Read a column&#39;s units:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            &gt;&gt;&gt; from earthlens.firms import Catalog</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_column(&quot;MODIS_NRT&quot;, &quot;confidence&quot;).units</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            &#39;%&#39;</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sensor</span><span class="p">(</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -33065,7 +32873,15 @@ row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-284">284</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-276">276</a></span>
+<span class="normal"><a href="#__codelineno-0-277">277</a></span>
+<span class="normal"><a href="#__codelineno-0-278">278</a></span>
+<span class="normal"><a href="#__codelineno-0-279">279</a></span>
+<span class="normal"><a href="#__codelineno-0-280">280</a></span>
+<span class="normal"><a href="#__codelineno-0-281">281</a></span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span>
+<span class="normal"><a href="#__codelineno-0-283">283</a></span>
+<span class="normal"><a href="#__codelineno-0-284">284</a></span>
 <span class="normal"><a href="#__codelineno-0-285">285</a></span>
 <span class="normal"><a href="#__codelineno-0-286">286</a></span>
 <span class="normal"><a href="#__codelineno-0-287">287</a></span>
@@ -33073,31 +32889,23 @@ row.</p>
 <span class="normal"><a href="#__codelineno-0-289">289</a></span>
 <span class="normal"><a href="#__codelineno-0-290">290</a></span>
 <span class="normal"><a href="#__codelineno-0-291">291</a></span>
-<span class="normal"><a href="#__codelineno-0-292">292</a></span>
-<span class="normal"><a href="#__codelineno-0-293">293</a></span>
-<span class="normal"><a href="#__codelineno-0-294">294</a></span>
-<span class="normal"><a href="#__codelineno-0-295">295</a></span>
-<span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span>
-<span class="normal"><a href="#__codelineno-0-298">298</a></span>
-<span class="normal"><a href="#__codelineno-0-299">299</a></span>
-<span class="normal"><a href="#__codelineno-0-300">300</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sensor</span><span class="p">:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Sensor` for `code`, with a did-you-mean hint.</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        code: A FIRMS source code (`&quot;VIIRS_SNPP_NRT&quot;`, `&quot;MODIS_NRT&quot;`,</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            …).</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        Sensor: The matching sensor row.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ValueError: If `code` is not a registered FIRMS sensor.</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Sensor&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">code</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sensor</span><span class="p">:</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Sensor` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    Thin alias over</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        code: A FIRMS source code (`&quot;VIIRS_SNPP_NRT&quot;`, `&quot;MODIS_NRT&quot;`,</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            …).</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Sensor: The matching sensor row.</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        ValueError: If `code` is not a registered FIRMS sensor.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Sensor&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">code</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -33193,35 +33001,35 @@ other two-level catalogs use.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/firms/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-327">327</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Alias of :meth:`get_column` so the FIRMS leaf is reachable under</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    the same `get_variable(dataset_key, variable_name)` verb the</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    other two-level catalogs use.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        code: A FIRMS source code.</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        column: A CSV column name declared under that sensor.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    Alias of :meth:`get_column` so the FIRMS leaf is reachable under</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">    the same `get_variable(dataset_key, variable_name)` verb the</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    other two-level catalogs use.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        code: A FIRMS source code.</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        column: A CSV column name declared under that sensor.</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        SensorColumn: The matching column metadata.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        SensorColumn: The matching column metadata.</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

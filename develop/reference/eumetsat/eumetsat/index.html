@@ -2956,17 +2956,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#earthlens.eumetsat.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.eumetsat.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3349,17 +3338,6 @@
   
     <nav class="md-nav" aria-label="Catalog">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.eumetsat.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#earthlens.eumetsat.catalog.Catalog.load" class="md-nav__link">
@@ -24122,17 +24100,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#earthlens.eumetsat.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.eumetsat.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24517,17 +24484,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#earthlens.eumetsat.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.eumetsat.catalog.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24909,7 +24865,7 @@ clause.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;EumetsatDataset&lt;/code&gt; (&lt;code&gt;earthlens.eumetsat.catalog.EumetsatDataset&lt;/code&gt;)" href="#earthlens.eumetsat.catalog.EumetsatDataset">EumetsatDataset</a>]</code></p>
 
 
 
@@ -25089,19 +25045,7 @@ value is an <code>EumetsatDataset</code>.</p>
 <span class="normal"><a href="#__codelineno-0-442">442</a></span>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
 <span class="normal"><a href="#__codelineno-0-444">444</a></span>
-<span class="normal"><a href="#__codelineno-0-445">445</a></span>
-<span class="normal"><a href="#__codelineno-0-446">446</a></span>
-<span class="normal"><a href="#__codelineno-0-447">447</a></span>
-<span class="normal"><a href="#__codelineno-0-448">448</a></span>
-<span class="normal"><a href="#__codelineno-0-449">449</a></span>
-<span class="normal"><a href="#__codelineno-0-450">450</a></span>
-<span class="normal"><a href="#__codelineno-0-451">451</a></span>
-<span class="normal"><a href="#__codelineno-0-452">452</a></span>
-<span class="normal"><a href="#__codelineno-0-453">453</a></span>
-<span class="normal"><a href="#__codelineno-0-454">454</a></span>
-<span class="normal"><a href="#__codelineno-0-455">455</a></span>
-<span class="normal"><a href="#__codelineno-0-456">456</a></span>
-<span class="normal"><a href="#__codelineno-0-457">457</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">EumetsatDataset</span><span class="p">]):</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset catalog for the EUMETSAT Data Store backend.</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data) and</span>
@@ -25169,60 +25113,48 @@ value is an <code>EumetsatDataset</code>.</p>
 <a id="__codelineno-0-401" name="__codelineno-0-401"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
 <a id="__codelineno-0-402" name="__codelineno-0-402"></a>        <span class="p">)</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EumetsatDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        done in `model_post_init`.</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            dict[str, EumetsatDataset]: One entry per curated dataset.</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">                Same object as `datasets`.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">DataStoreGroup</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EumetsatDataset</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key, optionally disambiguated by group.</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        Most keys map one-to-one to a curated row; the inherited</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">        :meth:`get_dataset` (with its did-you-mean) handles those. The</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        `group=` filter additionally asserts which Data Store group the</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        resolved dataset belongs to (`G2`) — the EUMETSAT analog of the</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        Earthdata backend&#39;s `daac=` filter.</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">DataStoreGroup</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EumetsatDataset</span><span class="p">:</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key, optionally disambiguated by group.</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        Most keys map one-to-one to a curated row; the inherited</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        :meth:`get_dataset` (with its did-you-mean) handles those. The</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        `group=` filter additionally asserts which Data Store group the</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        resolved dataset belongs to (`G2`) — the EUMETSAT analog of the</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        Earthdata backend&#39;s `daac=` filter.</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            key: Curated dataset key (a member of `datasets`).</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            group: Optional `DataStoreGroup` (or its string value) the</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">                resolved row&#39;s `group` must match.</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            EumetsatDataset: The resolved row.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean hint),</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">                or `group=` is given but does not match the row&#39;s group.</span>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            key: Curated dataset key (a member of `datasets`).</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            group: Optional `DataStoreGroup` (or its string value) the</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">                resolved row&#39;s `group` must match.</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            EumetsatDataset: The resolved row.</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean hint),</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">                or `group=` is given but does not match the row&#39;s group.</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            - Resolve a key and read its group:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">                &gt;&gt;&gt; from earthlens.eumetsat import Catalog</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;msg-hrseviri&quot;).group.value</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">                &#39;MSG&#39;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;EumetsatDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>        <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a>            <span class="n">wanted</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">DataStoreGroup</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>            <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="n">wanted</span><span class="p">:</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>                    <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is in group &quot;</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">, not the requested &quot;</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>                    <span class="sa">f</span><span class="s2">&quot;group=</span><span class="si">{</span><span class="n">wanted</span><span class="si">!r}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>                <span class="p">)</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>        <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            - Resolve a key and read its group:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">                &gt;&gt;&gt; from earthlens.eumetsat import Catalog</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;msg-hrseviri&quot;).group.value</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">                &#39;MSG&#39;</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;EumetsatDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>            <span class="n">wanted</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">DataStoreGroup</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>            <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="n">wanted</span><span class="p">:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>                    <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is in group &quot;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">, not the requested &quot;</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>                    <span class="sa">f</span><span class="s2">&quot;group=</span><span class="si">{</span><span class="n">wanted</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>                <span class="p">)</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="k">return</span> <span class="n">dataset</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25238,75 +25170,6 @@ value is an <code>EumetsatDataset</code>.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.eumetsat.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.eumetsat.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.eumetsat.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the structural per-dataset map.</p>
-<p>Satisfies the abstract base's contract; the actual parsing is
-done in <code>model_post_init</code>.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;EumetsatDataset&lt;/code&gt; (&lt;code&gt;earthlens.eumetsat.catalog.EumetsatDataset&lt;/code&gt;)" href="#earthlens.eumetsat.catalog.EumetsatDataset">EumetsatDataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, EumetsatDataset]: One entry per curated dataset.
-Same object as <code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/imagery/src/earthlens/eumetsat/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-404">404</a></span>
-<span class="normal"><a href="#__codelineno-0-405">405</a></span>
-<span class="normal"><a href="#__codelineno-0-406">406</a></span>
-<span class="normal"><a href="#__codelineno-0-407">407</a></span>
-<span class="normal"><a href="#__codelineno-0-408">408</a></span>
-<span class="normal"><a href="#__codelineno-0-409">409</a></span>
-<span class="normal"><a href="#__codelineno-0-410">410</a></span>
-<span class="normal"><a href="#__codelineno-0-411">411</a></span>
-<span class="normal"><a href="#__codelineno-0-412">412</a></span>
-<span class="normal"><a href="#__codelineno-0-413">413</a></span>
-<span class="normal"><a href="#__codelineno-0-414">414</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EumetsatDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    done in `model_post_init`.</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        dict[str, EumetsatDataset]: One entry per curated dataset.</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            Same object as `datasets`.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -25577,7 +25440,19 @@ or <code>group=</code> is given but does not match the row's group.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/eumetsat/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-416">416</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-404">404</a></span>
+<span class="normal"><a href="#__codelineno-0-405">405</a></span>
+<span class="normal"><a href="#__codelineno-0-406">406</a></span>
+<span class="normal"><a href="#__codelineno-0-407">407</a></span>
+<span class="normal"><a href="#__codelineno-0-408">408</a></span>
+<span class="normal"><a href="#__codelineno-0-409">409</a></span>
+<span class="normal"><a href="#__codelineno-0-410">410</a></span>
+<span class="normal"><a href="#__codelineno-0-411">411</a></span>
+<span class="normal"><a href="#__codelineno-0-412">412</a></span>
+<span class="normal"><a href="#__codelineno-0-413">413</a></span>
+<span class="normal"><a href="#__codelineno-0-414">414</a></span>
+<span class="normal"><a href="#__codelineno-0-415">415</a></span>
+<span class="normal"><a href="#__codelineno-0-416">416</a></span>
 <span class="normal"><a href="#__codelineno-0-417">417</a></span>
 <span class="normal"><a href="#__codelineno-0-418">418</a></span>
 <span class="normal"><a href="#__codelineno-0-419">419</a></span>
@@ -25606,60 +25481,48 @@ or <code>group=</code> is given but does not match the row's group.</p>
 <span class="normal"><a href="#__codelineno-0-442">442</a></span>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
 <span class="normal"><a href="#__codelineno-0-444">444</a></span>
-<span class="normal"><a href="#__codelineno-0-445">445</a></span>
-<span class="normal"><a href="#__codelineno-0-446">446</a></span>
-<span class="normal"><a href="#__codelineno-0-447">447</a></span>
-<span class="normal"><a href="#__codelineno-0-448">448</a></span>
-<span class="normal"><a href="#__codelineno-0-449">449</a></span>
-<span class="normal"><a href="#__codelineno-0-450">450</a></span>
-<span class="normal"><a href="#__codelineno-0-451">451</a></span>
-<span class="normal"><a href="#__codelineno-0-452">452</a></span>
-<span class="normal"><a href="#__codelineno-0-453">453</a></span>
-<span class="normal"><a href="#__codelineno-0-454">454</a></span>
-<span class="normal"><a href="#__codelineno-0-455">455</a></span>
-<span class="normal"><a href="#__codelineno-0-456">456</a></span>
-<span class="normal"><a href="#__codelineno-0-457">457</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">DataStoreGroup</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EumetsatDataset</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key, optionally disambiguated by group.</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">    Most keys map one-to-one to a curated row; the inherited</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">    :meth:`get_dataset` (with its did-you-mean) handles those. The</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    `group=` filter additionally asserts which Data Store group the</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">    resolved dataset belongs to (`G2`) — the EUMETSAT analog of the</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    Earthdata backend&#39;s `daac=` filter.</span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">DataStoreGroup</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EumetsatDataset</span><span class="p">:</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key, optionally disambiguated by group.</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">    Most keys map one-to-one to a curated row; the inherited</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    :meth:`get_dataset` (with its did-you-mean) handles those. The</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">    `group=` filter additionally asserts which Data Store group the</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">    resolved dataset belongs to (`G2`) — the EUMETSAT analog of the</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">    Earthdata backend&#39;s `daac=` filter.</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        key: Curated dataset key (a member of `datasets`).</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        group: Optional `DataStoreGroup` (or its string value) the</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            resolved row&#39;s `group` must match.</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        EumetsatDataset: The resolved row.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean hint),</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">            or `group=` is given but does not match the row&#39;s group.</span>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        key: Curated dataset key (a member of `datasets`).</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        group: Optional `DataStoreGroup` (or its string value) the</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            resolved row&#39;s `group` must match.</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        EumetsatDataset: The resolved row.</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean hint),</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">            or `group=` is given but does not match the row&#39;s group.</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        - Resolve a key and read its group:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            &gt;&gt;&gt; from earthlens.eumetsat import Catalog</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;msg-hrseviri&quot;).group.value</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">            &#39;MSG&#39;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="n">dataset</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;EumetsatDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>    <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="n">wanted</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">DataStoreGroup</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="n">wanted</span><span class="p">:</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>                <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is in group &quot;</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">, not the requested &quot;</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>                <span class="sa">f</span><span class="s2">&quot;group=</span><span class="si">{</span><span class="n">wanted</span><span class="si">!r}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>            <span class="p">)</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>    <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        - Resolve a key and read its group:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            &gt;&gt;&gt; from earthlens.eumetsat import Catalog</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;msg-hrseviri&quot;).group.value</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">            &#39;MSG&#39;</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="n">dataset</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;EumetsatDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="n">wanted</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">DataStoreGroup</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="n">wanted</span><span class="p">:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>                <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is in group &quot;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">, not the requested &quot;</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>                <span class="sa">f</span><span class="s2">&quot;group=</span><span class="si">{</span><span class="n">wanted</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="p">)</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>    <span class="k">return</span> <span class="n">dataset</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -34652,7 +34515,7 @@ directory or a single YAML file.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;EumetsatDataset&lt;/code&gt; (&lt;code&gt;earthlens.eumetsat.catalog.EumetsatDataset&lt;/code&gt;)" href="#earthlens.eumetsat.catalog.EumetsatDataset">EumetsatDataset</a>]</code></p>
 
 
 
@@ -34832,19 +34695,7 @@ value is an <code>EumetsatDataset</code>.</p>
 <span class="normal"><a href="#__codelineno-0-442">442</a></span>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
 <span class="normal"><a href="#__codelineno-0-444">444</a></span>
-<span class="normal"><a href="#__codelineno-0-445">445</a></span>
-<span class="normal"><a href="#__codelineno-0-446">446</a></span>
-<span class="normal"><a href="#__codelineno-0-447">447</a></span>
-<span class="normal"><a href="#__codelineno-0-448">448</a></span>
-<span class="normal"><a href="#__codelineno-0-449">449</a></span>
-<span class="normal"><a href="#__codelineno-0-450">450</a></span>
-<span class="normal"><a href="#__codelineno-0-451">451</a></span>
-<span class="normal"><a href="#__codelineno-0-452">452</a></span>
-<span class="normal"><a href="#__codelineno-0-453">453</a></span>
-<span class="normal"><a href="#__codelineno-0-454">454</a></span>
-<span class="normal"><a href="#__codelineno-0-455">455</a></span>
-<span class="normal"><a href="#__codelineno-0-456">456</a></span>
-<span class="normal"><a href="#__codelineno-0-457">457</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">EumetsatDataset</span><span class="p">]):</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset catalog for the EUMETSAT Data Store backend.</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data) and</span>
@@ -34912,60 +34763,48 @@ value is an <code>EumetsatDataset</code>.</p>
 <a id="__codelineno-0-401" name="__codelineno-0-401"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
 <a id="__codelineno-0-402" name="__codelineno-0-402"></a>        <span class="p">)</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EumetsatDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        done in `model_post_init`.</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            dict[str, EumetsatDataset]: One entry per curated dataset.</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">                Same object as `datasets`.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">DataStoreGroup</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EumetsatDataset</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key, optionally disambiguated by group.</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        Most keys map one-to-one to a curated row; the inherited</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">        :meth:`get_dataset` (with its did-you-mean) handles those. The</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        `group=` filter additionally asserts which Data Store group the</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        resolved dataset belongs to (`G2`) — the EUMETSAT analog of the</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        Earthdata backend&#39;s `daac=` filter.</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">DataStoreGroup</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EumetsatDataset</span><span class="p">:</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key, optionally disambiguated by group.</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        Most keys map one-to-one to a curated row; the inherited</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        :meth:`get_dataset` (with its did-you-mean) handles those. The</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        `group=` filter additionally asserts which Data Store group the</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        resolved dataset belongs to (`G2`) — the EUMETSAT analog of the</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        Earthdata backend&#39;s `daac=` filter.</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            key: Curated dataset key (a member of `datasets`).</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            group: Optional `DataStoreGroup` (or its string value) the</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">                resolved row&#39;s `group` must match.</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            EumetsatDataset: The resolved row.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean hint),</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">                or `group=` is given but does not match the row&#39;s group.</span>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            key: Curated dataset key (a member of `datasets`).</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            group: Optional `DataStoreGroup` (or its string value) the</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">                resolved row&#39;s `group` must match.</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            EumetsatDataset: The resolved row.</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean hint),</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">                or `group=` is given but does not match the row&#39;s group.</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            - Resolve a key and read its group:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">                &gt;&gt;&gt; from earthlens.eumetsat import Catalog</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;msg-hrseviri&quot;).group.value</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">                &#39;MSG&#39;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;EumetsatDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>        <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a>            <span class="n">wanted</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">DataStoreGroup</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>            <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="n">wanted</span><span class="p">:</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>                    <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is in group &quot;</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">, not the requested &quot;</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>                    <span class="sa">f</span><span class="s2">&quot;group=</span><span class="si">{</span><span class="n">wanted</span><span class="si">!r}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>                <span class="p">)</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>        <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            - Resolve a key and read its group:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">                &gt;&gt;&gt; from earthlens.eumetsat import Catalog</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;msg-hrseviri&quot;).group.value</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">                &#39;MSG&#39;</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;EumetsatDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>            <span class="n">wanted</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">DataStoreGroup</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>            <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="n">wanted</span><span class="p">:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>                    <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is in group &quot;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">, not the requested &quot;</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>                    <span class="sa">f</span><span class="s2">&quot;group=</span><span class="si">{</span><span class="n">wanted</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>                <span class="p">)</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="k">return</span> <span class="n">dataset</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -34981,75 +34820,6 @@ value is an <code>EumetsatDataset</code>.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.eumetsat.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.eumetsat.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.eumetsat.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the structural per-dataset map.</p>
-<p>Satisfies the abstract base's contract; the actual parsing is
-done in <code>model_post_init</code>.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;EumetsatDataset&lt;/code&gt; (&lt;code&gt;earthlens.eumetsat.catalog.EumetsatDataset&lt;/code&gt;)" href="#earthlens.eumetsat.catalog.EumetsatDataset">EumetsatDataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, EumetsatDataset]: One entry per curated dataset.
-Same object as <code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/imagery/src/earthlens/eumetsat/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-404">404</a></span>
-<span class="normal"><a href="#__codelineno-0-405">405</a></span>
-<span class="normal"><a href="#__codelineno-0-406">406</a></span>
-<span class="normal"><a href="#__codelineno-0-407">407</a></span>
-<span class="normal"><a href="#__codelineno-0-408">408</a></span>
-<span class="normal"><a href="#__codelineno-0-409">409</a></span>
-<span class="normal"><a href="#__codelineno-0-410">410</a></span>
-<span class="normal"><a href="#__codelineno-0-411">411</a></span>
-<span class="normal"><a href="#__codelineno-0-412">412</a></span>
-<span class="normal"><a href="#__codelineno-0-413">413</a></span>
-<span class="normal"><a href="#__codelineno-0-414">414</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EumetsatDataset</span><span class="p">]:</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing is</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    done in `model_post_init`.</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        dict[str, EumetsatDataset]: One entry per curated dataset.</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            Same object as `datasets`.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -35320,7 +35090,19 @@ or <code>group=</code> is given but does not match the row's group.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/eumetsat/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-416">416</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-404">404</a></span>
+<span class="normal"><a href="#__codelineno-0-405">405</a></span>
+<span class="normal"><a href="#__codelineno-0-406">406</a></span>
+<span class="normal"><a href="#__codelineno-0-407">407</a></span>
+<span class="normal"><a href="#__codelineno-0-408">408</a></span>
+<span class="normal"><a href="#__codelineno-0-409">409</a></span>
+<span class="normal"><a href="#__codelineno-0-410">410</a></span>
+<span class="normal"><a href="#__codelineno-0-411">411</a></span>
+<span class="normal"><a href="#__codelineno-0-412">412</a></span>
+<span class="normal"><a href="#__codelineno-0-413">413</a></span>
+<span class="normal"><a href="#__codelineno-0-414">414</a></span>
+<span class="normal"><a href="#__codelineno-0-415">415</a></span>
+<span class="normal"><a href="#__codelineno-0-416">416</a></span>
 <span class="normal"><a href="#__codelineno-0-417">417</a></span>
 <span class="normal"><a href="#__codelineno-0-418">418</a></span>
 <span class="normal"><a href="#__codelineno-0-419">419</a></span>
@@ -35349,60 +35131,48 @@ or <code>group=</code> is given but does not match the row's group.</p>
 <span class="normal"><a href="#__codelineno-0-442">442</a></span>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
 <span class="normal"><a href="#__codelineno-0-444">444</a></span>
-<span class="normal"><a href="#__codelineno-0-445">445</a></span>
-<span class="normal"><a href="#__codelineno-0-446">446</a></span>
-<span class="normal"><a href="#__codelineno-0-447">447</a></span>
-<span class="normal"><a href="#__codelineno-0-448">448</a></span>
-<span class="normal"><a href="#__codelineno-0-449">449</a></span>
-<span class="normal"><a href="#__codelineno-0-450">450</a></span>
-<span class="normal"><a href="#__codelineno-0-451">451</a></span>
-<span class="normal"><a href="#__codelineno-0-452">452</a></span>
-<span class="normal"><a href="#__codelineno-0-453">453</a></span>
-<span class="normal"><a href="#__codelineno-0-454">454</a></span>
-<span class="normal"><a href="#__codelineno-0-455">455</a></span>
-<span class="normal"><a href="#__codelineno-0-456">456</a></span>
-<span class="normal"><a href="#__codelineno-0-457">457</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">DataStoreGroup</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EumetsatDataset</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key, optionally disambiguated by group.</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">    Most keys map one-to-one to a curated row; the inherited</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">    :meth:`get_dataset` (with its did-you-mean) handles those. The</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    `group=` filter additionally asserts which Data Store group the</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">    resolved dataset belongs to (`G2`) — the EUMETSAT analog of the</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    Earthdata backend&#39;s `daac=` filter.</span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">DataStoreGroup</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EumetsatDataset</span><span class="p">:</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key, optionally disambiguated by group.</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">    Most keys map one-to-one to a curated row; the inherited</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    :meth:`get_dataset` (with its did-you-mean) handles those. The</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">    `group=` filter additionally asserts which Data Store group the</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">    resolved dataset belongs to (`G2`) — the EUMETSAT analog of the</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">    Earthdata backend&#39;s `daac=` filter.</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        key: Curated dataset key (a member of `datasets`).</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        group: Optional `DataStoreGroup` (or its string value) the</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            resolved row&#39;s `group` must match.</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        EumetsatDataset: The resolved row.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean hint),</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">            or `group=` is given but does not match the row&#39;s group.</span>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        key: Curated dataset key (a member of `datasets`).</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        group: Optional `DataStoreGroup` (or its string value) the</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            resolved row&#39;s `group` must match.</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        EumetsatDataset: The resolved row.</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean hint),</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">            or `group=` is given but does not match the row&#39;s group.</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        - Resolve a key and read its group:</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            &gt;&gt;&gt; from earthlens.eumetsat import Catalog</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;msg-hrseviri&quot;).group.value</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">            &#39;MSG&#39;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="n">dataset</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;EumetsatDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>    <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="n">wanted</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">DataStoreGroup</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="n">wanted</span><span class="p">:</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>                <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is in group &quot;</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">, not the requested &quot;</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>                <span class="sa">f</span><span class="s2">&quot;group=</span><span class="si">{</span><span class="n">wanted</span><span class="si">!r}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>            <span class="p">)</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>    <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        - Resolve a key and read its group:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            &gt;&gt;&gt; from earthlens.eumetsat import Catalog</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;msg-hrseviri&quot;).group.value</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">            &#39;MSG&#39;</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="n">dataset</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;EumetsatDataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="n">wanted</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">DataStoreGroup</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="n">wanted</span><span class="p">:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>                <span class="sa">f</span><span class="s2">&quot;dataset </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is in group &quot;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span><span class="si">!r}</span><span class="s2">, not the requested &quot;</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>                <span class="sa">f</span><span class="s2">&quot;group=</span><span class="si">{</span><span class="n">wanted</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="p">)</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>    <span class="k">return</span> <span class="n">dataset</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

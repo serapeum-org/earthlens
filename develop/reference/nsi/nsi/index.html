@@ -6397,17 +6397,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.nsi.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.nsi.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6629,17 +6618,6 @@
     <span class="md-ellipsis">
       
         get
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.nsi.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -23894,17 +23872,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.nsi.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.nsi.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24133,17 +24100,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.nsi.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.nsi.catalog.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24353,7 +24309,7 @@ query/geometry helpers.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Source&lt;/code&gt; (&lt;code&gt;earthlens.nsi.catalog.Source&lt;/code&gt;)" href="#earthlens.nsi.catalog.Source">Source</a>]</code></p>
 
 
 
@@ -24498,15 +24454,7 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 <span class="normal"><a href="#__codelineno-0-269">269</a></span>
 <span class="normal"><a href="#__codelineno-0-270">270</a></span>
 <span class="normal"><a href="#__codelineno-0-271">271</a></span>
-<span class="normal"><a href="#__codelineno-0-272">272</a></span>
-<span class="normal"><a href="#__codelineno-0-273">273</a></span>
-<span class="normal"><a href="#__codelineno-0-274">274</a></span>
-<span class="normal"><a href="#__codelineno-0-275">275</a></span>
-<span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
-<span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span>
-<span class="normal"><a href="#__codelineno-0-280">280</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Source</span><span class="p">]):</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Source catalog for the NSI backend.</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    Reads the bundled `nsi_data_catalog.yaml` (shipped as package data) and</span>
@@ -24566,41 +24514,33 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Source</span><span class="p">]:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the source map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its :class:`Source` row.</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            dict[str, Source]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its :class:`Source` row.</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            source_id: A shipped source name (`&quot;structures&quot;`, `&quot;nfhl&quot;`,</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">                `&quot;nfip&quot;`).</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">            Source: The matching catalog row.</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            ValueError: If `source_id` is not a known source; the message names</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">                the catalog kind and, when a close match exists, adds a</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">                did-you-mean hint.</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key.</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            source_id: A shipped source name (`&quot;structures&quot;`, `&quot;nfhl&quot;`,</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">                `&quot;nfip&quot;`).</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            Source: The matching catalog row.</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            ValueError: If `source_id` is not a known source; the message names</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">                the catalog kind and, when a close match exists, adds a</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">                did-you-mean hint.</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Source&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">source_id</span><span class="p">))</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped source names.</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            list[str]: Every catalog key, sorted.</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Source&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">source_id</span><span class="p">))</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped source names.</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">            list[str]: Every catalog key, sorted.</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24656,19 +24596,19 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/nsi/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-274">274</a></span>
-<span class="normal"><a href="#__codelineno-0-275">275</a></span>
-<span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
-<span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span>
-<span class="normal"><a href="#__codelineno-0-280">280</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped source names.</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        list[str]: Every catalog key, sorted.</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-266">266</a></span>
+<span class="normal"><a href="#__codelineno-0-267">267</a></span>
+<span class="normal"><a href="#__codelineno-0-268">268</a></span>
+<span class="normal"><a href="#__codelineno-0-269">269</a></span>
+<span class="normal"><a href="#__codelineno-0-270">270</a></span>
+<span class="normal"><a href="#__codelineno-0-271">271</a></span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped source names.</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        list[str]: Every catalog key, sorted.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24773,7 +24713,15 @@ did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/nsi/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-254">254</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span>
+<span class="normal"><a href="#__codelineno-0-250">250</a></span>
+<span class="normal"><a href="#__codelineno-0-251">251</a></span>
+<span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span>
 <span class="normal"><a href="#__codelineno-0-256">256</a></span>
 <span class="normal"><a href="#__codelineno-0-257">257</a></span>
@@ -24783,91 +24731,25 @@ did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-261">261</a></span>
 <span class="normal"><a href="#__codelineno-0-262">262</a></span>
 <span class="normal"><a href="#__codelineno-0-263">263</a></span>
-<span class="normal"><a href="#__codelineno-0-264">264</a></span>
-<span class="normal"><a href="#__codelineno-0-265">265</a></span>
-<span class="normal"><a href="#__codelineno-0-266">266</a></span>
-<span class="normal"><a href="#__codelineno-0-267">267</a></span>
-<span class="normal"><a href="#__codelineno-0-268">268</a></span>
-<span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span>
-<span class="normal"><a href="#__codelineno-0-271">271</a></span>
-<span class="normal"><a href="#__codelineno-0-272">272</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its :class:`Source` row.</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        source_id: A shipped source name (`&quot;structures&quot;`, `&quot;nfhl&quot;`,</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            `&quot;nfip&quot;`).</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        Source: The matching catalog row.</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        ValueError: If `source_id` is not a known source; the message names</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            the catalog kind and, when a close match exists, adds a</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            did-you-mean hint.</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Source&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">source_id</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.nsi.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.nsi.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.nsi.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the source map (satisfies the abstract contract).</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Source&lt;/code&gt; (&lt;code&gt;earthlens.nsi.catalog.Source&lt;/code&gt;)" href="#earthlens.nsi.catalog.Source">Source</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, Source]: Same object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/nsi/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span>
-<span class="normal"><a href="#__codelineno-0-248">248</a></span>
-<span class="normal"><a href="#__codelineno-0-249">249</a></span>
-<span class="normal"><a href="#__codelineno-0-250">250</a></span>
-<span class="normal"><a href="#__codelineno-0-251">251</a></span>
-<span class="normal"><a href="#__codelineno-0-252">252</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Source</span><span class="p">]:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the source map (satisfies the abstract contract).</span>
+<span class="normal"><a href="#__codelineno-0-264">264</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its :class:`Source` row.</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        dict[str, Source]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key.</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        source_id: A shipped source name (`&quot;structures&quot;`, `&quot;nfhl&quot;`,</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            `&quot;nfip&quot;`).</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        Source: The matching catalog row.</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        ValueError: If `source_id` is not a known source; the message names</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            the catalog kind and, when a close match exists, adds a</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            did-you-mean hint.</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Source&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">source_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29425,7 +29307,7 @@ hint on an unknown key); list the shipped keys with :meth:<code>Catalog.availabl
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Source&lt;/code&gt; (&lt;code&gt;earthlens.nsi.catalog.Source&lt;/code&gt;)" href="#earthlens.nsi.catalog.Source">Source</a>]</code></p>
 
 
 
@@ -29570,15 +29452,7 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 <span class="normal"><a href="#__codelineno-0-269">269</a></span>
 <span class="normal"><a href="#__codelineno-0-270">270</a></span>
 <span class="normal"><a href="#__codelineno-0-271">271</a></span>
-<span class="normal"><a href="#__codelineno-0-272">272</a></span>
-<span class="normal"><a href="#__codelineno-0-273">273</a></span>
-<span class="normal"><a href="#__codelineno-0-274">274</a></span>
-<span class="normal"><a href="#__codelineno-0-275">275</a></span>
-<span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
-<span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span>
-<span class="normal"><a href="#__codelineno-0-280">280</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Source</span><span class="p">]):</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Source catalog for the NSI backend.</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    Reads the bundled `nsi_data_catalog.yaml` (shipped as package data) and</span>
@@ -29638,41 +29512,33 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Source</span><span class="p">]:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the source map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its :class:`Source` row.</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            dict[str, Source]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its :class:`Source` row.</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            source_id: A shipped source name (`&quot;structures&quot;`, `&quot;nfhl&quot;`,</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">                `&quot;nfip&quot;`).</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">            Source: The matching catalog row.</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            ValueError: If `source_id` is not a known source; the message names</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">                the catalog kind and, when a close match exists, adds a</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">                did-you-mean hint.</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key.</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            source_id: A shipped source name (`&quot;structures&quot;`, `&quot;nfhl&quot;`,</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">                `&quot;nfip&quot;`).</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            Source: The matching catalog row.</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            ValueError: If `source_id` is not a known source; the message names</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">                the catalog kind and, when a close match exists, adds a</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">                did-you-mean hint.</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Source&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">source_id</span><span class="p">))</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped source names.</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            list[str]: Every catalog key, sorted.</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Source&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">source_id</span><span class="p">))</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped source names.</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">            list[str]: Every catalog key, sorted.</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29728,19 +29594,19 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/nsi/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-274">274</a></span>
-<span class="normal"><a href="#__codelineno-0-275">275</a></span>
-<span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
-<span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span>
-<span class="normal"><a href="#__codelineno-0-280">280</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped source names.</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        list[str]: Every catalog key, sorted.</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-266">266</a></span>
+<span class="normal"><a href="#__codelineno-0-267">267</a></span>
+<span class="normal"><a href="#__codelineno-0-268">268</a></span>
+<span class="normal"><a href="#__codelineno-0-269">269</a></span>
+<span class="normal"><a href="#__codelineno-0-270">270</a></span>
+<span class="normal"><a href="#__codelineno-0-271">271</a></span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped source names.</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        list[str]: Every catalog key, sorted.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29845,7 +29711,15 @@ did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/nsi/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-254">254</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span>
+<span class="normal"><a href="#__codelineno-0-250">250</a></span>
+<span class="normal"><a href="#__codelineno-0-251">251</a></span>
+<span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span>
 <span class="normal"><a href="#__codelineno-0-256">256</a></span>
 <span class="normal"><a href="#__codelineno-0-257">257</a></span>
@@ -29855,91 +29729,25 @@ did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-261">261</a></span>
 <span class="normal"><a href="#__codelineno-0-262">262</a></span>
 <span class="normal"><a href="#__codelineno-0-263">263</a></span>
-<span class="normal"><a href="#__codelineno-0-264">264</a></span>
-<span class="normal"><a href="#__codelineno-0-265">265</a></span>
-<span class="normal"><a href="#__codelineno-0-266">266</a></span>
-<span class="normal"><a href="#__codelineno-0-267">267</a></span>
-<span class="normal"><a href="#__codelineno-0-268">268</a></span>
-<span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span>
-<span class="normal"><a href="#__codelineno-0-271">271</a></span>
-<span class="normal"><a href="#__codelineno-0-272">272</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its :class:`Source` row.</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        source_id: A shipped source name (`&quot;structures&quot;`, `&quot;nfhl&quot;`,</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            `&quot;nfip&quot;`).</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        Source: The matching catalog row.</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        ValueError: If `source_id` is not a known source; the message names</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            the catalog kind and, when a close match exists, adds a</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            did-you-mean hint.</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Source&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">source_id</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.nsi.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.nsi.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.nsi.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the source map (satisfies the abstract contract).</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Source&lt;/code&gt; (&lt;code&gt;earthlens.nsi.catalog.Source&lt;/code&gt;)" href="#earthlens.nsi.catalog.Source">Source</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, Source]: Same object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/nsi/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span>
-<span class="normal"><a href="#__codelineno-0-248">248</a></span>
-<span class="normal"><a href="#__codelineno-0-249">249</a></span>
-<span class="normal"><a href="#__codelineno-0-250">250</a></span>
-<span class="normal"><a href="#__codelineno-0-251">251</a></span>
-<span class="normal"><a href="#__codelineno-0-252">252</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Source</span><span class="p">]:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the source map (satisfies the abstract contract).</span>
+<span class="normal"><a href="#__codelineno-0-264">264</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its :class:`Source` row.</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        dict[str, Source]: Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key.</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        source_id: A shipped source name (`&quot;structures&quot;`, `&quot;nfhl&quot;`,</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            `&quot;nfip&quot;`).</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        Source: The matching catalog row.</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        ValueError: If `source_id` is not a known source; the message names</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            the catalog kind and, when a close match exists, adds a</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            did-you-mean hint.</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Source&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">source_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

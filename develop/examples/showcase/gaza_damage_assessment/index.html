@@ -24663,11 +24663,7 @@ lists).</li>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># pyramids' own IO + plotting</span>
-    <span class="n">Dataset</span><span class="p">,</span>
-    <span class="n">DatasetCollection</span><span class="p">,</span>
-    <span class="n">GeoReference</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetCollection</span>  <span class="c1"># pyramids' own IO + plotting</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthEngineAuth</span>  <span class="c1"># service-account -&gt; ee.Initialize</span>
 
@@ -24687,11 +24683,7 @@ import numpy as np
 import pandas as pd
 from IPython.display import Image, display
 from loguru import logger
-from pyramids.dataset import (  # pyramids' own IO + plotting
-    Dataset,
-    DatasetCollection,
-    GeoReference,
-)
+from pyramids.dataset import Dataset, DatasetCollection  # pyramids' own IO + plotting
 
 from earthlens.gee.auth import EarthEngineAuth  # service-account -&gt; ee.Initialize
 
@@ -24994,8 +24986,8 @@ the true-colour composite into <code>rgb_dir</code>, derive the NDVI raster, and
     <span class="n">tag</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"-"</span><span class="p">,</span> <span class="s2">"."</span><span class="p">)</span>
     <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rgb_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"rgb_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">.tif"</span><span class="p">))</span>
     <span class="n">ndvi</span><span class="p">,</span> <span class="n">src</span> <span class="o">=</span> <span class="n">ndvi_from_nir</span><span class="p">(</span><span class="n">nir</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
-        <span class="n">arr</span><span class="o">=</span><span class="n">ndvi</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
+        <span class="n">arr</span><span class="o">=</span><span class="n">ndvi</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">geo</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">epsg</span>
     <span class="p">)</span>
     <span class="n">out</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ndvi_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"ndvi_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">.tif"</span><span class="p">))</span>  <span class="c1"># persist derived NDVI</span>
     <span class="n">dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
@@ -25009,8 +25001,8 @@ for label, start, end in WINDOWS:
     tag = label.replace("-", ".")
     shutil.copy(rgb, os.path.join(rgb_dir, f"rgb_{tag}.tif"))
     ndvi, src = ndvi_from_nir(nir)
-    out = Dataset.from_array(
-        arr=ndvi[None, :, :], geo_ref=GeoReference(geo=src.geotransform, epsg=src.epsg)
+    out = Dataset.create_from_array(
+        arr=ndvi[None, :, :], geo=src.geotransform, epsg=src.epsg
     )
     out.to_file(os.path.join(ndvi_dir, f"ndvi_{tag}.tif"))  # persist derived NDVI
     dates.append(label)
@@ -25335,11 +25327,10 @@ else:
     <span class="n">dc_ndvi</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="n">i_a</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
         <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"RdYlGn"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"NDVI - May 2024"</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">0.6</span>
     <span class="p">)</span>
-    <span class="n">diff</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
         <span class="n">arr</span><span class="o">=</span><span class="p">(</span><span class="n">nd_a</span> <span class="o">-</span> <span class="n">nd_b</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span>
-        <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span>
-            <span class="n">geo</span><span class="o">=</span><span class="n">dc_ndvi</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">dc_ndvi</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">epsg</span>
-        <span class="p">),</span>
+        <span class="n">geo</span><span class="o">=</span><span class="n">dc_ndvi</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span>
+        <span class="n">epsg</span><span class="o">=</span><span class="n">dc_ndvi</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">epsg</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">diff</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
         <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -25360,11 +25351,10 @@ else:
     dc_ndvi.iloc(i_a).plot(
         band=0, ax=ax[1], cmap="RdYlGn", title="NDVI - May 2024", vmin=-0.2, vmax=0.6
     )
-    diff = Dataset.from_array(
+    diff = Dataset.create_from_array(
         arr=(nd_a - nd_b)[None, :, :],
-        geo_ref=GeoReference(
-            geo=dc_ndvi.iloc(0).geotransform, epsg=dc_ndvi.iloc(0).epsg
-        ),
+        geo=dc_ndvi.iloc(0).geotransform,
+        epsg=dc_ndvi.iloc(0).epsg,
     )
     diff.plot(
         band=0,
