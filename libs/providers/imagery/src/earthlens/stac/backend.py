@@ -349,18 +349,19 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 # Endpoint-namespaced keys contain "/"; flatten for filenames so
                 # they don't create phantom subdirectories.
                 safe_key = safe_filename(collection_key)
-                for band in assets:
+                # Only the item lookup takes the endpoint's own key (CDSE splits
+                # Sentinel-2 per resolution, so `B04` is `B04_10m` there).
+                # `assets` itself stays in the catalog's naming, so the nodata
+                # lookup and the written band names still match. Resolved once
+                # for the whole list, which is the shape resolve_assets takes.
+                item_keys = self._catalog.resolve_assets(
+                    self._endpoint, collection_key, assets
+                )
+                for band, item_key in zip(assets, item_keys, strict=True):
                     # resolved_href resolves the asset href and applies the
                     # signer's sign_href (SAS graft / CDSE /vsis3 rewrite /
                     # no-op for requester-pays); _to_vsi then normalises a
                     # left-over s3:// to the GDAL /vsis3/ path.
-                    # Only the item lookup takes the endpoint's own key (CDSE
-                    # splits Sentinel-2 per resolution, so `B04` is `B04_10m`
-                    # there). `assets` itself stays in the catalog's naming, so
-                    # the nodata lookup and the written band names still match.
-                    item_key = self._catalog.resolve_assets(
-                        self._endpoint, collection_key, [band]
-                    )[0]
                     hrefs = [
                         _to_vsi(
                             resolved_href(p.metadata["item"], item_key, signer=signer)
