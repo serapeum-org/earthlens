@@ -563,6 +563,7 @@ def _resume_is_safe(
     resume_from: int,
     expected_total: int | None,
     validator: str | None = None,
+    validator_header: str = "ETag",
 ) -> bool:
     """Whether a resumed response may be appended to what is already staged.
 
@@ -581,6 +582,10 @@ def _resume_is_safe(
         validator: The `ETag` / `Last-Modified` sent as `If-Range`. A
             conforming server answers `200` when the representation changed,
             but one that answers `206` anyway is caught by comparing it back.
+        validator_header: Which header `validator` came from, so it is compared
+            against the same one. Comparing a `Last-Modified` value against the
+            response's `ETag` never matches, which would reject every resume
+            from a server that publishes no `ETag`.
 
     Returns:
         bool: True when the body may be appended.
@@ -622,6 +627,15 @@ def _resume_is_safe(
     """
     if response.status_code != 206:
         return False
+    if response.headers.get("Content-Encoding", "identity").lower() not in {
+        "identity",
+        "",
+    }:
+        # The staged bytes were decoded; an encoded fragment appended to them
+        # is not the resource, and `requests` would decode this one separately.
+        # `Accept-Encoding: identity` asks the server not to do this, but a
+        # server is free to ignore it.
+        return False
     content_type = response.headers.get("Content-Type", "")
     if "multipart/byteranges" in content_type.lower():
         # A multipart reply carries MIME framing the plain append would write
@@ -633,7 +647,7 @@ def _resume_is_safe(
         return False
     if int(match.group(1)) != resume_from:
         return False
-    returned = response.headers.get("ETag")
+    returned = response.headers.get(validator_header)
     if validator and returned and returned != validator:
         # The server ignored `If-Range` and is serving a different
         # representation; splicing the two would produce a file that never
@@ -1338,6 +1352,7 @@ class HttpClient:
         # The validator that pins the resumed bytes to the same representation
         # the first attempt read — an `ETag`, else `Last-Modified`.
         range_validator: str | None = None
+        range_validator_header = "ETag"
         expected_total: int | None = None
         while True:
             self._throttle()
@@ -1420,7 +1435,11 @@ class HttpClient:
                         return dest
                     response.raise_for_status()
                     if resume_from and not _resume_is_safe(
-                        response, resume_from, expected_total, range_validator
+                        response,
+                        resume_from,
+                        expected_total,
+                        range_validator,
+                        range_validator_header,
                     ):
                         # Either the server ignored the `Range` (a `200`), or the
                         # `206` does not start where we asked, or it describes a
@@ -1447,9 +1466,11 @@ class HttpClient:
                         resumable = "bytes" in response.headers.get(
                             "Accept-Ranges", ""
                         ).lower() and not response.headers.get("Content-Encoding")
-                        range_validator = response.headers.get(
-                            "ETag"
-                        ) or response.headers.get("Last-Modified")
+                        range_validator = response.headers.get("ETag")
+                        range_validator_header = "ETag"
+                        if not range_validator:
+                            range_validator = response.headers.get("Last-Modified")
+                            range_validator_header = "Last-Modified"
                         expected_total = _progress_total(response.headers)
                     self._stream_to_file(
                         response,

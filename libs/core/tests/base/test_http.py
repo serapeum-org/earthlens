@@ -1806,3 +1806,50 @@ class TestResumeCorruptionGuards:
             f"a shorter 416 total must not publish a truncated file; "
             f"got {len(dest.read_bytes())} bytes for a {len(payload)}-byte object"
         )
+
+
+@pytest.mark.unit
+class TestResumeValidatorGuards:
+    """The resume compares like for like, and refuses an encoded fragment."""
+
+    def test_an_encoded_206_is_not_appended(self):
+        """Decoded staged bytes cannot be extended with an encoded fragment."""
+        from earthlens.base.http import _resume_is_safe
+
+        response = requests.Response()
+        response.status_code = 206
+        response.headers["Content-Range"] = "bytes 5-9/10"
+        response.headers["Content-Encoding"] = "gzip"
+        assert _resume_is_safe(response, 5, 10) is False
+
+    def test_a_last_modified_validator_is_compared_against_last_modified(self):
+        """A validator taken from `Last-Modified` is not compared to `ETag`.
+
+        Comparing across headers never matches, which would reject every resume
+        from a server that publishes no `ETag`.
+        """
+        from earthlens.base.http import _resume_is_safe
+
+        response = requests.Response()
+        response.status_code = 206
+        response.headers["Content-Range"] = "bytes 5-9/10"
+        response.headers["Last-Modified"] = "Wed, 04 Sep 2026 00:00:00 GMT"
+        assert _resume_is_safe(
+            response,
+            5,
+            10,
+            "Wed, 04 Sep 2026 00:00:00 GMT",
+            "Last-Modified",
+        ), "a matching Last-Modified must permit the resume"
+
+    def test_a_changed_last_modified_refuses_the_resume(self):
+        """A different `Last-Modified` means a different representation."""
+        from earthlens.base.http import _resume_is_safe
+
+        response = requests.Response()
+        response.status_code = 206
+        response.headers["Content-Range"] = "bytes 5-9/10"
+        response.headers["Last-Modified"] = "Thu, 05 Sep 2026 00:00:00 GMT"
+        assert not _resume_is_safe(
+            response, 5, 10, "Wed, 04 Sep 2026 00:00:00 GMT", "Last-Modified"
+        )
