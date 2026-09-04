@@ -517,174 +517,6 @@ def _check_magic(path: Path, magic: bytes | tuple[bytes, ...], url: str) -> None
     )
 
 
-def _range_is_complete(
-    response: requests.Response, staged: Path, expected_total: int | None = None
-) -> bool:
-    """Whether a `416` means the staged file already holds the whole object.
-
-    A `416` carries `Content-Range: bytes */<total>`. When that total matches
-    what is on disk, the transfer finished and only the stream framing broke.
-
-    Args:
-        response: The `416` response.
-        staged: The partially-written file.
-        expected_total: The size the *first* attempt reported, when known. The
-            `416`'s own total is cross-checked against it, so a server that
-            re-serves a shorter object cannot make a truncated file look
-            finished.
-
-    Returns:
-        bool: True when the staged size equals the reported total, and that
-        total agrees with what the first attempt described.
-
-    Examples:
-        - The unsatisfied-range form a `416` uses, matching what is on disk:
-            ```python
-            >>> import requests
-            >>> from pathlib import Path
-            >>> from earthlens.base.http import _range_is_complete
-            >>> staged = Path("complete.part")
-            >>> _ = staged.write_bytes(b"0123456789")
-            >>> response = requests.Response()
-            >>> response.headers["Content-Range"] = "bytes */10"
-            >>> _range_is_complete(response, staged)
-            True
-            >>> staged.unlink()
-
-            ```
-        - A `206`-style range is not a completeness claim, so it does not count:
-            ```python
-            >>> import requests
-            >>> from pathlib import Path
-            >>> from earthlens.base.http import _range_is_complete
-            >>> staged = Path("partial.part")
-            >>> _ = staged.write_bytes(b"0123456789")
-            >>> response = requests.Response()
-            >>> response.headers["Content-Range"] = "bytes 0-9/10"
-            >>> _range_is_complete(response, staged)
-            False
-            >>> staged.unlink()
-
-            ```
-    """
-    # A 416 reports `bytes */<total>` — the unsatisfied-range form, which
-    # `_CONTENT_RANGE_TOTAL` (built for the `bytes N-M/total` of a 206) does
-    # not match.
-    match = re.search(r"bytes\s+\*/(\d+)", response.headers.get("Content-Range", ""))
-    if match is None:
-        return False
-    total = int(match.group(1))
-    if expected_total is not None and total != expected_total:
-        # The 416 describes a different object than the one being downloaded;
-        # trusting it would publish a truncated file as a complete one.
-        return False
-    try:
-        return staged.stat().st_size == total
-    except OSError:
-        return False
-
-
-def _resume_is_safe(
-    response: requests.Response,
-    resume_from: int,
-    expected_total: int | None,
-    validator: str | None = None,
-    validator_header: str = "ETag",
-) -> bool:
-    """Whether a resumed response may be appended to what is already staged.
-
-    Three things have to hold, and a `206` alone guarantees none of them: the
-    status must actually be `206` (a `200` means the server ignored the range
-    and is re-sending everything), the returned range must begin exactly where
-    the staged file ends, and it must describe the same object the first attempt
-    read. Appending a response that fails any of these produces a file that is
-    not the resource, with no error anywhere.
-
-    Args:
-        response: The response to the resumed request.
-        resume_from: Bytes already staged, i.e. the requested first-byte
-            position.
-        expected_total: The full size the first attempt reported, when known.
-        validator: The `ETag` / `Last-Modified` sent as `If-Range`. A
-            conforming server answers `200` when the representation changed,
-            but one that answers `206` anyway is caught by comparing it back.
-        validator_header: Which header `validator` came from, so it is compared
-            against the same one. Comparing a `Last-Modified` value against the
-            response's `ETag` never matches, which would reject every resume
-            from a server that publishes no `ETag`.
-
-    Returns:
-        bool: True when the body may be appended.
-
-    Examples:
-        - A `200` is never appendable, whatever it contains:
-            ```python
-            >>> import requests
-            >>> from earthlens.base.http import _resume_is_safe
-            >>> resp = requests.Response()
-            >>> resp.status_code = 200
-            >>> _resume_is_safe(resp, 5, 10)
-            False
-
-            ```
-        - A `206` that starts where the staged file ends is appendable:
-            ```python
-            >>> import requests
-            >>> from earthlens.base.http import _resume_is_safe
-            >>> resp = requests.Response()
-            >>> resp.status_code = 206
-            >>> resp.headers["Content-Range"] = "bytes 5-9/10"
-            >>> _resume_is_safe(resp, 5, 10)
-            True
-
-            ```
-        - A `206` that restarts the object is refused, since appending it would
-          duplicate the bytes already written:
-            ```python
-            >>> import requests
-            >>> from earthlens.base.http import _resume_is_safe
-            >>> resp = requests.Response()
-            >>> resp.status_code = 206
-            >>> resp.headers["Content-Range"] = "bytes 0-9/10"
-            >>> _resume_is_safe(resp, 5, 10)
-            False
-
-            ```
-    """
-    if response.status_code != 206:
-        return False
-    if response.headers.get("Content-Encoding", "identity").lower() not in {
-        "identity",
-        "",
-    }:
-        # The staged bytes were decoded; an encoded fragment appended to them
-        # is not the resource, and `requests` would decode this one separately.
-        # `Accept-Encoding: identity` asks the server not to do this, but a
-        # server is free to ignore it.
-        return False
-    content_type = response.headers.get("Content-Type", "")
-    if "multipart/byteranges" in content_type.lower():
-        # A multipart reply carries MIME framing the plain append would write
-        # into the file as if it were data.
-        return False
-    header = response.headers.get("Content-Range", "")
-    match = re.search(r"bytes\s+(\d+)-(\d+)/(\d+|\*)", header)
-    if match is None:
-        return False
-    if int(match.group(1)) != resume_from:
-        return False
-    returned = response.headers.get(validator_header)
-    if validator and returned and returned != validator:
-        # The server ignored `If-Range` and is serving a different
-        # representation; splicing the two would produce a file that never
-        # existed upstream.
-        return False
-    total = match.group(3)
-    return not (
-        expected_total is not None and total != "*" and int(total) != expected_total
-    )
-
-
 def _progress_total(headers: Any) -> int | None:
     """Return the download progress-bar total from response headers.
 
@@ -1204,7 +1036,17 @@ class HttpClient:
         Args:
             method: HTTP verb (`"GET"`, `"POST"`, ...).
             url: Absolute request URL.
-            headers: Per-request headers merged over the client defaults.
+            headers: Per-request headers merged over the client defaults, and
+                passed through verbatim. `download` adds only one header of its
+                own, `Accept-Encoding: identity`, and only when neither this
+                argument nor the constructor's `headers=` named it in any
+                casing — the length check compares against bytes as delivered,
+                which a transparently-encoded body would not match. Pass
+                `{"Accept-Encoding": "gzip"}` to override that.
+
+                A `Range` here is honoured as written: the response is accepted
+                at its own `Content-Length`, and `download` does **not** check
+                that the server returned the range you asked for.
             timeout: Per-request timeout override (seconds), as a single
                 float or a `(connect, read)` pair. Defaults to the client's
                 `timeout`.
@@ -1296,7 +1138,6 @@ class HttpClient:
         chunk: int,
         progress: bool,
         desc: str,
-        resume_from: int = 0,
     ) -> None:
         """Write a streaming response's body to `dest` with a `tqdm` bar.
 
@@ -1308,13 +1149,8 @@ class HttpClient:
             desc: The bar label (the final file name).
         """
         total = _progress_total(response.headers)
-        if total is not None and resume_from:
-            # A `206` reports only the bytes still to come, so the bar would
-            # otherwise show the remainder as if it were the whole file.
-            total += resume_from
         bar = tqdm(
             total=total,
-            initial=resume_from,
             unit="B",
             unit_scale=True,
             unit_divisor=1024,
@@ -1322,7 +1158,7 @@ class HttpClient:
             desc=desc,
         )
         try:
-            with open(dest, "ab" if resume_from else "wb") as handle:
+            with open(dest, "wb") as handle:
                 for block in response.iter_content(chunk_size=chunk):
                     if block:
                         handle.write(block)
@@ -1355,15 +1191,13 @@ class HttpClient:
         or an exception in `retry_on_exceptions` retries the attempt (after
         cleaning the temp), honouring the `Retry-After`/back-off policy.
 
-        A retry **resumes** rather than restarting when the staged file has
-        bytes, the first response advertised `Accept-Ranges: bytes` and carried
-        no `Content-Encoding`: the retry sends `Range`, `Accept-Encoding:
-        identity` and an `If-Range` validator, and appends only if the returned
-        `206` starts exactly where the staged file ends and describes the same
-        representation. Anything else — a `200`, a mismatched `Content-Range`, a
-        changed `ETag`, a `multipart/byteranges` body — discards the partial and
-        re-requests the whole object, because appending it would silently
-        produce a file that never existed upstream.
+        Every attempt reads the object **once, whole**. `download` generates no
+        `Range` header of its own: a resumed transfer has to prove that the
+        bytes it appends belong to the same representation as the bytes already
+        on disk, and the guarantees a server actually offers are not strong
+        enough to prove it. Instead the body is verified after the fact — a
+        response that advertised a `Content-Length` must deliver exactly that
+        many bytes — and a short read is retried from the start.
 
         Args:
             url: Absolute request URL.
@@ -1380,7 +1214,14 @@ class HttpClient:
                 leaves `dest` short, and any previous contents are gone. The
                 failure path does not additionally delete it, but that is damage
                 limitation, not a guarantee — `atomic=False` is only appropriate
-                when `dest` is known to be disposable.
+                when `dest` is known to be disposable. The length check below
+                runs in both modes; under `atomic=False` a failed check leaves
+                the caller-owned `dest` short, because there is no staging file
+                to discard.
+
+                Two calls downloading the same `dest` concurrently share one
+                `<dest>.part` and will interleave into it. Serialising that is
+                the caller's job.
             expect_magic: One or more byte prefixes the body must start with
                 (e.g. `b"CDF"` / `b"\\x89HDF"` for NetCDF). A body that starts
                 with none of them raises `ValueError` and the partial write is
@@ -1399,6 +1240,14 @@ class HttpClient:
         Raises:
             ValueError: When `expect_magic` is given and the body does not
                 start with any of the supplied prefixes.
+            UnsolicitedPartialContentError: When a `206` answers a request that
+                carried no `Range` — the body is a fragment of the object, and
+                repeating the request returns the same fragment, so this is
+                raised rather than retried whatever the client's retry policy.
+            IncompleteDownloadError: When the bytes written do not equal the
+                `Content-Length` the response advertised. A short body is
+                retried from the start; a long one, a repeat of the same count,
+                or a client that opted out of transport retry raises at once.
             requests.HTTPError: On an error status — `download` always
                 calls `raise_for_status` (the client's `raise_for_status`
                 flag governs the verb methods, not `download`; a file
@@ -1410,6 +1259,8 @@ class HttpClient:
                 before raising it, mirroring their old download loops.
                 Also the last transport exception after the retry budget
                 is exhausted.
+            OSError: From `mkdir`, the streaming write, `stat` or `replace`,
+                unchanged. `RangeReadError` is never raised here.
         """
         dest = Path(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
@@ -1434,43 +1285,62 @@ class HttpClient:
                 tmp.unlink(missing_ok=True)
 
         merged = self._merge_headers(headers)
+        # Header names are case-insensitive, and `_merge_headers` returns a
+        # plain dict, so every test on them is folded explicitly.
+        per_call = {key.lower() for key in (headers or {})}
+        caller_sent_range = "range" in {key.lower() for key in merged}
+        if "accept-encoding" not in per_call and not self._accept_encoding_is_explicit:
+            # The length check below compares against the bytes as delivered, so
+            # a transparently-encoded body would fail it. This sits *underneath*
+            # the caller: a backend that asked for `gzip`, or for `identity` to
+            # protect its own magic check, keeps what it asked for.
+            merged["Accept-Encoding"] = "identity"
         effective_timeout = self.timeout if timeout is None else timeout
         attempt = 0
-        # Bytes already on disk from a previous attempt. Non-zero only after a
-        # transport failure against a server that advertised `Accept-Ranges`
-        # and served an unencoded body, so the common path is unchanged.
-        resume_from = 0
-        resumable = False
-        # Same per-kind accounting as `_request_with_retry`: a dead host should
+        # Per-kind accounting, as in `_request_with_retry`: a dead host should
         # not cost a large download six full connect attempts.
-        spent = {"connect": 0, "read": 0, "unknown": 0}
-        # The validator that pins the resumed bytes to the same representation
-        # the first attempt read — an `ETag`, else `Last-Modified`.
-        range_validator: str | None = None
-        range_validator_header = "ETag"
-        expected_total: int | None = None
+        spent = {"connect": 0, "read": 0}
+        # The byte count the previous attempt reached. A second attempt landing
+        # on the identical number is deterministic, not a transport blip.
+        last_written: int | None = None
+        best_written = 0
+        if staged and tmp.exists():
+            logger.debug(
+                f"{redact_url(url)}: discarding a pre-existing "
+                f"{tmp.stat().st_size:,}-byte {tmp.name}"
+            )
+
+        def salvaged(expected: int | None) -> bool:
+            """Whether the bytes on disk already are the whole object.
+
+            A transfer can break after the last byte but before the stream
+            frames its end. The equality is the entire proof, so this asks no
+            question of the server and consults no retry policy.
+
+            Args:
+                expected: The length the response advertised, if any.
+
+            Returns:
+                bool: True when the staged file is exactly that long.
+            """
+            if expected is None or not tmp.exists():
+                return False
+            return tmp.stat().st_size == expected
+
         while True:
             self._throttle()
-            request_headers = dict(merged)
-            if resume_from:
-                request_headers["Range"] = f"bytes={resume_from}-"
-                # `Range` addresses the *encoded* representation while the bytes
-                # already staged were *decoded* by `requests`, so a compressed
-                # transfer would resume at an offset that means nothing. The
-                # same guard `HttpRangeFile` applies to every range read.
-                request_headers["Accept-Encoding"] = "identity"
-                if range_validator:
-                    # Without `If-Range` a server may legitimately answer a
-                    # `206` from a *newer* representation, splicing two
-                    # different files together (RFC 9110 §13.1.5). With it, a
-                    # changed resource answers `200` and the loop restarts.
-                    request_headers["If-Range"] = range_validator
+            response: requests.Response | None = None
+            expected_total: int | None = None
+            status_wait: float | None = None
             try:
+                # Inside the retrying `try`: a failure here is a connect-phase
+                # failure and must be retried like any other, which is why the
+                # send and the body processing share one handler.
                 response = self._send(
                     "GET",
                     url,
                     stream=True,
-                    headers=request_headers,
+                    headers=merged,
                     timeout=effective_timeout,
                     **kwargs,
                 )
@@ -1480,201 +1350,132 @@ class HttpClient:
                         and self._retry_predicate(response)
                     )
                     if retryable and attempt < self.max_retries:
-                        retry_after = _parse_retry_after(
-                            response.headers.get("Retry-After")
+                        # Recorded, not slept on: the sleep happens after the
+                        # `finally` below has released the streamed connection,
+                        # rather than holding a socket open across the back-off.
+                        status_wait = self._backoff_wait(
+                            _parse_retry_after(response.headers.get("Retry-After")),
+                            attempt,
                         )
-                        wait = self._backoff_wait(retry_after, attempt)
                         logger.warning(
-                            f"HTTP {response.status_code} on {redact_url(url)}; retry "
-                            f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
+                            f"HTTP {response.status_code} on {redact_url(url)}; "
+                            f"retry {attempt + 1}/{self.max_retries} after "
+                            f"{status_wait:.1f}s"
                         )
-                        self._sleep(wait)
-                        attempt += 1
-                        continue
-                    if resume_from and response.status_code == 416:
-                        # "Range Not Satisfiable" against a staged file means the
-                        # bytes already on disk cover the whole object — the
-                        # transfer broke after the last byte but before the
-                        # stream ended. Treat the staged file as complete rather
-                        # than raising and discarding a finished download.
-                        if _range_is_complete(response, tmp, expected_total):
-                            logger.debug(
-                                f"{redact_url(url)} reports the staged file is "
-                                "already complete"
-                            )
-                            # Skip the body — there is none to fetch — but take
-                            # the normal completion path so the magic check and
-                            # the atomic rename still run.
-                            already_complete = True
-                            continue_from_scratch = False
-                        else:
-                            already_complete = False
-                            resume_from = 0
-                            continue_from_scratch = True
                     else:
-                        already_complete = False
-                        continue_from_scratch = False
-                    if continue_from_scratch:
-                        discard_partial()
-                        continue
-                    if already_complete:
+                        if response.status_code == 206 and not caller_sent_range:
+                            raise UnsolicitedPartialContentError(
+                                f"{redact_url(url)} answered 206 to a request "
+                                "carrying no Range; the body is a fragment",
+                                response=response,
+                            )
+                        response.raise_for_status()
+                        expected_total = _progress_total(response.headers)
+                        self._stream_to_file(
+                            response,
+                            tmp,
+                            chunk=chunk,
+                            progress=progress,
+                            desc=dest.name,
+                        )
+                        written = tmp.stat().st_size
+                        best_written = max(best_written, written)
+                        if expected_total is not None and written != expected_total:
+                            raise IncompleteDownloadError(
+                                f"{redact_url(url)} delivered {written:,} of "
+                                f"{expected_total:,} advertised bytes",
+                                written=written,
+                                expected=expected_total,
+                            )
                         if expect_magic is not None:
                             _check_magic(tmp, expect_magic, url)
-                        response.close()
-                        if staged:
-                            try:
-                                tmp.replace(dest)
-                            except BaseException:
-                                discard_partial()
-                                raise
-                        return dest
-                    response.raise_for_status()
-                    if resume_from and not _resume_is_safe(
-                        response,
-                        resume_from,
-                        expected_total,
-                        range_validator,
-                        range_validator_header,
-                    ):
-                        # Either the server ignored the `Range` (a `200`), or the
-                        # `206` does not start where we asked, or it describes a
-                        # different object. Appending any of those silently
-                        # produces a file that is not the resource — and neither
-                        # can this response's body be written as-is, since it may
-                        # be a fragment. Discard and re-request the whole object.
-                        logger.debug(
-                            f"{redact_url(url)} did not honour the Range request; "
-                            "restarting the download"
-                        )
-                        discard_partial()
-                        resume_from = 0
-                        if attempt >= self.max_retries:
-                            raise RangeReadError(
-                                f"{redact_url(url)} kept answering Range requests "
-                                "with a body that could not be resumed"
-                            )
-                        # Back off like every other retry path: a server
-                        # mishandling ranges is often the same one under load,
-                        # and re-requesting a whole object immediately is the
-                        # most expensive way to ask again.
-                        self._sleep(self._backoff_wait(None, attempt))
-                        attempt += 1
-                        continue
-                    if not resume_from:
-                        # Only a full response describes the whole resource, so
-                        # the resume state is captured from attempt one.
-                        # Three preconditions, not one. Ranges must be
-                        # supported; the body must be unencoded, since the
-                        # staged count is of decoded bytes; and the total must
-                        # be known, because it is the only thing that can
-                        # confirm the reassembled file afterwards. A validator
-                        # is required too (checked below) — without one a
-                        # server may legally answer from a newer
-                        # representation. Resuming without any of these trades
-                        # a re-download for a file nobody can verify.
-                        expected_total = _progress_total(response.headers)
-                        etag = response.headers.get("ETag", "")
-                        # RFC 9110 §13.1.5: `If-Range` takes a *strong*
-                        # validator. A weak one (`W/"..."`) only promises
-                        # semantic equivalence, which is not enough to splice
-                        # byte ranges from two responses together.
-                        range_validator = (
-                            None if etag.startswith("W/") else (etag or None)
-                        )
-                        range_validator_header = "ETag"
-                        if not range_validator:
-                            range_validator = response.headers.get("Last-Modified")
-                            range_validator_header = "Last-Modified"
-                        # Three preconditions, not one. Ranges must be
-                        # supported; the body must be unencoded, since the
-                        # staged count is of decoded bytes; the total must be
-                        # known, because it is the only thing that can confirm
-                        # the reassembled file; and there must be a validator,
-                        # or a server may legally answer from a newer
-                        # representation. Failing any of them, a restart costs
-                        # bandwidth while resuming would cost correctness.
-                        resumable = (
-                            "bytes" in response.headers.get("Accept-Ranges", "").lower()
-                            and not response.headers.get("Content-Encoding")
-                            and expected_total is not None
-                            and bool(range_validator)
-                        )
-                    self._stream_to_file(
-                        response,
-                        tmp,
-                        chunk=chunk,
-                        progress=progress,
-                        desc=dest.name,
-                        resume_from=resume_from,
-                    )
-                    if expected_total is not None and staged:
-                        # The post-condition the resume path turns on: whatever
-                        # legs it took, the assembled file must be the size the
-                        # first response described. A server may answer a range
-                        # request with a legal but *short* sub-range, or with an
-                        # end position past the object, and both produce a file
-                        # that streams cleanly and is the wrong length.
-                        # `expect_magic` cannot catch either, since the head
-                        # bytes came from the first attempt.
-                        written = tmp.stat().st_size
-                        if written != expected_total:
-                            raise RangeReadError(
-                                f"{redact_url(url)} assembled to {written} bytes, "
-                                f"expected {expected_total}"
-                            )
-                    if expect_magic is not None:
-                        _check_magic(tmp, expect_magic, url)
                 finally:
-                    response.close()
-            except RangeReadError:
-                # A size mismatch is a server-behaviour problem, not a transport
-                # blip; repeating the same request reproduces it.
+                    if response is not None:
+                        response.close()
+            except UnsolicitedPartialContentError:
+                # Deterministic: a server that volunteers partial content to a
+                # Range-less request returns the same fragment next time.
                 discard_partial()
                 raise
-            except self.retry_on_exceptions as exc:
-                # No idempotency gate here, unlike `_request_with_retry`: this
-                # loop only ever issues the GET above, so the verb is always
-                # replay-safe. Re-check that if it is ever parameterised.
-                kind = classify_transport_error(exc, strict=self._default_retry_set)
-                if kind is None:
-                    # Deterministic — the next attempt reproduces it exactly.
-                    discard_partial()
-                    raise
-                budget = (
-                    self.connect_retries
-                    if kind in {"connect", "unknown"}
-                    else self.read_retries
+            except IncompleteDownloadError as exc:
+                over_delivered = (
+                    exc.written is not None
+                    and exc.expected is not None
+                    and exc.written > exc.expected
                 )
-                if spent[kind] >= budget or attempt >= self.max_retries:
+                if (
+                    over_delivered
+                    or not self.retry_on_exceptions
+                    or exc.written == last_written
+                    or spent["read"] >= self.read_retries
+                    or attempt >= self.max_retries
+                ):
                     discard_partial()
                     raise
-                spent[kind] += 1
-                # Keep what already landed and ask for the rest, when the file
-                # is staged and the server said it supports ranges. Restarting
-                # a multi-gigabyte transfer from byte 0 on every reset can burn
-                # several times the bytes and may never converge on a link
-                # flaky enough to have caused the reset.
-                written = tmp.stat().st_size if staged and tmp.exists() else 0
-                if staged and resumable and written > 0:
-                    resume_from = written
-                    logger.warning(
-                        f"{type(exc).__name__} on {redact_url(url)}; resuming from "
-                        f"{written} bytes, retry {attempt + 1}/{self.max_retries}"
-                    )
-                else:
-                    discard_partial()
-                    resume_from = 0
-                    logger.warning(
-                        f"{type(exc).__name__} on {redact_url(url)}; restarting, "
-                        f"retry {attempt + 1}/{self.max_retries}"
-                    )
-                wait = self._backoff_wait(None, attempt)
-                self._sleep(wait)
+                spent["read"] += 1
+                last_written = exc.written
+                logger.warning(
+                    f"{redact_url(url)} delivered {exc.written:,} of "
+                    f"{exc.expected:,} bytes; discarding and restarting, retry "
+                    f"{attempt + 1}/{self.max_retries}"
+                )
+                discard_partial()
+                self._sleep(self._backoff_wait(None, attempt))
                 attempt += 1
                 continue
+            except self.retry_on_exceptions as exc:
+                if salvaged(expected_total):
+                    logger.debug(
+                        f"{redact_url(url)} broke after the last byte; the "
+                        f"{expected_total:,}-byte body is already complete"
+                    )
+                else:
+                    kind = classify_transport_error(exc, strict=self._default_retry_set)
+                    if kind is None:
+                        # Deterministic - the next attempt reproduces it.
+                        discard_partial()
+                        raise
+                    # `response is None` is exactly "the failure happened before
+                    # a response object existed", which is the connect phase.
+                    if kind == "connect" or (kind == "unknown" and response is None):
+                        key, budget = "connect", self.connect_retries
+                    else:
+                        key, budget = "read", self.read_retries
+                    if spent[key] >= budget or attempt >= self.max_retries:
+                        discard_partial()
+                        raise type(exc)(
+                            f"{redact_url(url)} failed after {attempt + 1} "
+                            f"attempts; best read {best_written:,} bytes"
+                        ) from exc
+                    spent[key] += 1
+                    logger.warning(
+                        f"{type(exc).__name__} ({kind}) on {redact_url(url)} after "
+                        f"{best_written:,} bytes; discarding and restarting, retry "
+                        f"{attempt + 1}/{self.max_retries}"
+                    )
+                    discard_partial()
+                    self._sleep(self._backoff_wait(None, attempt))
+                    attempt += 1
+                    continue
+            except requests.RequestException:
+                # Wider than the client's retry set on purpose: the salvage
+                # issues no request and reads no header, so the caller's retry
+                # policy is not the right gate - the size equality is the proof.
+                if not salvaged(expected_total):
+                    discard_partial()
+                    raise
+                logger.debug(
+                    f"{redact_url(url)} broke after the last byte; the "
+                    f"{expected_total:,}-byte body is already complete"
+                )
             except BaseException:
                 discard_partial()
                 raise
+            if status_wait is not None:
+                # The response is closed by now, so nothing is held open.
+                self._sleep(status_wait)
+                attempt += 1
+                continue
             if staged:
                 # Guard the rename too, so the "removes the temp on any
                 # failure" promise holds if the final replace fails.
