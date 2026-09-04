@@ -491,7 +491,9 @@ def _check_magic(path: Path, magic: bytes | tuple[bytes, ...], url: str) -> None
     )
 
 
-def _range_is_complete(response: requests.Response, staged: Path) -> bool:
+def _range_is_complete(
+    response: requests.Response, staged: Path, expected_total: int | None = None
+) -> bool:
     """Whether a `416` means the staged file already holds the whole object.
 
     A `416` carries `Content-Range: bytes */<total>`. When that total matches
@@ -500,9 +502,14 @@ def _range_is_complete(response: requests.Response, staged: Path) -> bool:
     Args:
         response: The `416` response.
         staged: The partially-written file.
+        expected_total: The size the *first* attempt reported, when known. The
+            `416`'s own total is cross-checked against it, so a server that
+            re-serves a shorter object cannot make a truncated file look
+            finished.
 
     Returns:
-        bool: True when the staged size equals the reported total.
+        bool: True when the staged size equals the reported total, and that
+        total agrees with what the first attempt described.
 
     Examples:
         - The unsatisfied-range form a `416` uses, matching what is on disk:
@@ -540,8 +547,13 @@ def _range_is_complete(response: requests.Response, staged: Path) -> bool:
     match = re.search(r"bytes\s+\*/(\d+)", response.headers.get("Content-Range", ""))
     if match is None:
         return False
+    total = int(match.group(1))
+    if expected_total is not None and total != expected_total:
+        # The 416 describes a different object than the one being downloaded;
+        # trusting it would publish a truncated file as a complete one.
+        return False
     try:
-        return staged.stat().st_size == int(match.group(1))
+        return staged.stat().st_size == total
     except OSError:
         return False
 
@@ -1375,7 +1387,7 @@ class HttpClient:
                         # transfer broke after the last byte but before the
                         # stream ended. Treat the staged file as complete rather
                         # than raising and discarding a finished download.
-                        if _range_is_complete(response, tmp):
+                        if _range_is_complete(response, tmp, expected_total):
                             logger.debug(
                                 f"{redact_url(url)} reports the staged file is "
                                 "already complete"

@@ -1764,3 +1764,45 @@ class TestTransportClassificationEdges:
     def test_an_explicit_connect_retries_overrides_both_defaults(self):
         """The argument wins over the default-set and caller-set resolutions."""
         assert HttpClient(max_retries=5, connect_retries=3).connect_retries == 3
+
+
+@pytest.mark.unit
+class TestResumeCorruptionGuards:
+    """A resume must never publish a file that is not the resource."""
+
+    def test_a_416_describing_a_shorter_object_does_not_publish_a_truncated_file(
+        self, tmp_path
+    ):
+        """The 416's total is cross-checked against what attempt one reported.
+
+        A server re-serving a shorter object would otherwise make the staged
+        bytes look complete, and the truncated file would be renamed over the
+        destination as a success.
+        """
+        payload = b"0123456789" * 10
+
+        class _Session:
+            """Breaks mid-body, then answers the resume with a shorter total."""
+
+            def __init__(self):
+                self.calls = 0
+
+            def get(self, url, **kwargs):
+                self.calls += 1
+                if kwargs.get("headers", {}).get("Range"):
+                    resp = _PartialBody(b"", None)
+                    resp.status_code = 416
+                    resp.headers["Content-Range"] = "bytes */40"
+                    return resp
+                body = _PartialBody(payload, 40 if self.calls == 1 else None)
+                body.headers["ETag"] = '"v1"'
+                return body
+
+        session = _Session()
+        client = HttpClient(session=session, sleep=lambda _: None)
+        dest = tmp_path / "g.bin"
+        client.download("http://x/g.bin", dest, progress=False, chunk=10)
+        assert dest.read_bytes() == payload, (
+            f"a shorter 416 total must not publish a truncated file; "
+            f"got {len(dest.read_bytes())} bytes for a {len(payload)}-byte object"
+        )
