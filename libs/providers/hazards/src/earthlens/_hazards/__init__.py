@@ -49,7 +49,7 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'hdx': ('earthlens.hdx', 'HDX', 'hdx', {}),
     'overture': ('earthlens.overture', 'Overture', 'overture', {}),
     'firms': ('earthlens.firms', 'FIRMS', '', {}),
-    # The bare source key, like every other backend answers to its own name.
+    # The bare source key, as every other backend answers to its own name.
     # JRC is a source, not a reserved topic, so it needs no qualifier; it
     # resolves to the EFHM, the flood-hazard product the aliases below serve.
     'jrc': (_JRC, 'JRC', '', {}),
