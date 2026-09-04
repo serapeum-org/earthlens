@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from earthlens.chc import CHIRPS
+from earthlens.chc import CHIRPS, backend
 
 pytestmark = [pytest.mark.chc]
 
@@ -23,6 +23,51 @@ def _build_chirps(tmp_path: Path) -> CHIRPS:
         lon_lim=[0.0, 1.0],
         path=tmp_path,
     )
+
+
+class _FakeFtp:
+    """Stand-in for an `ftplib.FTP` session; records that it was closed."""
+
+    def __init__(self):
+        self.closed = False
+
+    def quit(self) -> None:
+        """Match the session API `_close_ftp_quietly` calls."""
+        self.closed = True
+
+    def close(self) -> None:
+        """Match the session API `_close_ftp_quietly` falls back to."""
+        self.closed = True
+
+
+@pytest.fixture
+def offline_ftp(monkeypatch):
+    """Replace the module's FTP session helpers so no connection is opened.
+
+    `_fetch_dates_sequential` opens a session itself, so patching `_api` alone
+    left these tests dialling the live CHC server — they passed or failed on
+    whether anonymous FTP happened to be accepted, which is not what they are
+    about.
+
+    Returns:
+        list[_FakeFtp]: Every session handed out, newest last, so a test can
+        assert the loop reopened after a failure.
+    """
+    handed_out: list[_FakeFtp] = []
+
+    def _open() -> _FakeFtp:
+        session = _FakeFtp()
+        handed_out.append(session)
+        return session
+
+    def _reopen(session: _FakeFtp) -> _FakeFtp:
+        session.close()
+        return _open()
+
+    monkeypatch.setattr(backend, "_open_ftp", _open)
+    monkeypatch.setattr(backend, "_reopen_ftp", _reopen)
+    monkeypatch.setattr(backend, "_close_ftp_quietly", lambda session: session.close())
+    return handed_out
 
 
 class _CountingApiSpy:
@@ -44,7 +89,7 @@ class TestPerDateResilience:
     """`_download_dataset` keeps going past a per-date exception (M1)."""
 
     def test_sequential_path_continues_past_failed_date(
-        self, tmp_path: Path, monkeypatch
+        self, tmp_path: Path, monkeypatch, offline_ftp
     ):
         """A 5-day batch where the 3rd date raises still attempts dates 4 and 5."""
         chirps = _build_chirps(tmp_path)
@@ -61,9 +106,16 @@ class TestPerDateResilience:
             "the per-date loop must visit ALL 5 dates after M1, "
             f"got {len(spy.dates_seen)}: {[d.date() for d in spy.dates_seen]}"
         )
+        assert len(offline_ftp) == 2, (
+            "a failed date must reopen the session before continuing, "
+            f"got {len(offline_ftp)} session(s)"
+        )
+        assert all(session.closed for session in offline_ftp), (
+            "every session handed out must be closed"
+        )
 
     def test_sequential_path_logs_failed_date_summary(
-        self, tmp_path: Path, monkeypatch, caplog
+        self, tmp_path: Path, monkeypatch, caplog, offline_ftp
     ):
         """After M1, the failure summary log names the date count and a sample."""
         import logging
