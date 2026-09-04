@@ -1636,6 +1636,39 @@ class TestDownloadResume:
         )
         assert session.calls == 2, f"expected one resume attempt, got {session.calls}"
 
+    def test_a_416_over_an_incomplete_file_restarts_the_download(self, tmp_path):
+        """A `416` whose total exceeds the staged bytes means the resume is wrong.
+
+        The staged file is not the whole object, so it is discarded and the
+        transfer starts over rather than being published short.
+        """
+        payload = b"abcdefghij" * 20
+
+        class _Session:
+            """Breaks once, answers the resume with a 416 for a larger object."""
+
+            def __init__(self):
+                self.calls = 0
+
+            def get(self, url, **kwargs):
+                self.calls += 1
+                if kwargs.get("headers", {}).get("Range"):
+                    resp = _PartialBody(b"", None)
+                    resp.status_code = 416
+                    resp.headers["Content-Range"] = f"bytes */{len(payload) + 500}"
+                    return resp
+                body = _PartialBody(payload, 100 if self.calls == 1 else None)
+                body.headers["ETag"] = '"v1"'
+                return body
+
+        session = _Session()
+        client = HttpClient(session=session, sleep=lambda _: None)
+        dest = tmp_path / "g.bin"
+        client.download("http://x/g.bin", dest, progress=False, chunk=10)
+        assert dest.read_bytes() == payload, (
+            f"a restart must produce the whole payload, got {len(dest.read_bytes())} bytes"
+        )
+
     def test_restarts_when_the_server_does_not_support_ranges(self, tmp_path):
         """Without `Accept-Ranges` the transfer starts over rather than appending."""
         payload = b"abcdefghij" * 50
@@ -1647,3 +1680,85 @@ class TestDownloadResume:
         assert session.requests[1] is None, (
             "no Range may be sent to a server that did not advertise support"
         )
+
+
+@pytest.mark.unit
+class TestTransportClassificationEdges:
+    """Edge cases of the connect/read classifier and the resume guards."""
+
+    def test_an_unrecognised_connection_error_spends_the_connect_budget(self):
+        """An unknown cause fails fast rather than burning the read budget."""
+        from earthlens.base.http import classify_transport_error
+
+        assert (
+            classify_transport_error(requests.ConnectionError("mystery")) == "connect"
+        )
+
+    def test_a_bare_timeout_is_a_read_failure(self):
+        """A `Timeout` that is not a `ConnectTimeout` happened after connecting."""
+        from earthlens.base.http import classify_transport_error
+
+        assert classify_transport_error(requests.exceptions.Timeout()) == "read"
+
+    def test_a_cycle_in_the_cause_chain_terminates(self):
+        """`_causes` must not loop on an exception that references itself."""
+        from earthlens.base.http import _causes
+
+        first = requests.ConnectionError("a")
+        second = requests.ConnectionError("b")
+        first.__cause__ = second
+        second.__cause__ = first
+        assert len(list(_causes(first))) >= 2, "the walk must yield both and stop"
+
+    @pytest.mark.parametrize(
+        "headers, expected",
+        [
+            ({}, False),
+            ({"Content-Range": "bytes 5-9/10"}, True),
+            ({"Content-Range": "bytes 0-9/10"}, False),
+            ({"Content-Range": "bytes 5-9/99"}, False),
+        ],
+        ids=["no-header", "matching", "restarts-object", "wrong-total"],
+    )
+    def test_resume_is_safe_requires_a_matching_content_range(self, headers, expected):
+        """Only a `206` starting at the staged end, of the same size, is appendable."""
+        from earthlens.base.http import _resume_is_safe
+
+        response = requests.Response()
+        response.status_code = 206
+        response.headers.update(headers)
+        assert _resume_is_safe(response, 5, 10) is expected
+
+    def test_a_multipart_byteranges_reply_is_never_appended(self):
+        """Multipart framing would be written into the file as if it were data."""
+        from earthlens.base.http import _resume_is_safe
+
+        response = requests.Response()
+        response.status_code = 206
+        response.headers["Content-Type"] = "multipart/byteranges; boundary=x"
+        response.headers["Content-Range"] = "bytes 5-9/10"
+        assert _resume_is_safe(response, 5, 10) is False
+
+    def test_range_is_complete_needs_the_unsatisfied_range_form(self, tmp_path):
+        """A `416` reports `bytes */total`; anything else is not a completeness claim."""
+        from earthlens.base.http import _range_is_complete
+
+        staged = tmp_path / "p"
+        staged.write_bytes(b"0123456789")
+        response = requests.Response()
+        response.headers["Content-Range"] = "bytes 0-9/10"
+        assert _range_is_complete(response, staged) is False
+        response.headers["Content-Range"] = "bytes */10"
+        assert _range_is_complete(response, staged) is True
+
+    def test_range_is_complete_is_false_for_a_missing_staged_file(self, tmp_path):
+        """A vanished `.part` cannot be complete."""
+        from earthlens.base.http import _range_is_complete
+
+        response = requests.Response()
+        response.headers["Content-Range"] = "bytes */10"
+        assert _range_is_complete(response, tmp_path / "gone") is False
+
+    def test_an_explicit_connect_retries_overrides_both_defaults(self):
+        """The argument wins over the default-set and caller-set resolutions."""
+        assert HttpClient(max_retries=5, connect_retries=3).connect_retries == 3
