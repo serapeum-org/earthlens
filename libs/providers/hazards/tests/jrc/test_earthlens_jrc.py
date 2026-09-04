@@ -56,6 +56,17 @@ class TestDatasetResolution:
         with pytest.raises(ValueError):
             backend._resolve_dataset_id(alias, None)
 
+    @pytest.mark.parametrize("dataset", ["flood", "jrc-flood", "FLOOD", "  flood  "])
+    def test_accepted_flood_selectors_reach_the_efhm(self, dataset, tmp_path):
+        """The selectors the resolver accepts for the EFHM keep resolving to it."""
+        # This round removed `"jrc"` from that tuple; nothing covered the members
+        # left in it, so dropping another would have been silent. Case and
+        # surrounding space are included because the resolver normalises both.
+        backend = EarthLens(
+            data_source="jrc", return_periods=[10], path=tmp_path
+        ).datasource
+        assert backend._resolve_dataset_id(dataset, None) == "efhm"
+
 
 @pytest.mark.unit
 class TestFacadeConstruction:

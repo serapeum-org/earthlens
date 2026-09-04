@@ -12,6 +12,7 @@ import pytest
 
 from earthlens._backends import (
     ENTRY_POINT_GROUP,
+    KEY_TOPIC_SEPARATOR,
     RESERVED_TOPICS,
     discover_backends,
     topic_claimants,
@@ -283,6 +284,27 @@ class TestReservedTopics:
     def test_topic_claimants_empty_when_unclaimed(self) -> None:
         """A topic no key qualifies yields an empty list."""
         assert topic_claimants(["chc", "cmems"], "precipitation") == []
+
+    def test_topic_claimants_matches_the_whole_topic_not_a_suffix(self) -> None:
+        """A hyphenated topic is one word, so its tail is not a topic of its own."""
+        # The docstring's own example: `foo:sea-surface-temperature` serves
+        # `sea-surface-temperature` and never `temperature`. An `endswith` here
+        # would pass both existing cases, so it takes a key whose topic ends in
+        # the searched word to hold the exact-match rule in place.
+        keys = ["foo:sea-surface-temperature", "bar:temperature"]
+        assert topic_claimants(keys, "temperature") == ["bar:temperature"]
+
+    def test_topic_claimants_splits_on_the_first_separator_only(self) -> None:
+        """A key's topic is everything after the first separator, colons and all."""
+        # `split(sep)[1]` reads the same as `split(sep, 1)[1]` for every key in
+        # the registry today, so nothing else would notice maxsplit going missing.
+        keys = ["a:sea:surface", "b:sea"]
+        assert topic_claimants(keys, "sea:surface") == ["a:sea:surface"]
+        assert topic_claimants(keys, "sea") == ["b:sea"]
+
+    def test_key_topic_separator_is_the_grammar_colon(self) -> None:
+        """The exported separator is the colon the facade-key grammar is written in."""
+        assert KEY_TOPIC_SEPARATOR == ":"
 
     def test_reserved_topics_covers_the_migrated_words(self) -> None:
         """Every generic word migrated to `source:topic` is a reserved topic."""
