@@ -13,7 +13,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from earthlens._backends import AmbiguousDataSourceError, discover_backends
+from earthlens._backends import (
+    KEY_TOPIC_SEPARATOR,
+    AmbiguousDataSourceError,
+    discover_backends,
+)
 from earthlens.aggregate import AggregationConfig
 from earthlens.chc import CHIRPS
 from earthlens.earthlens import EarthLens, _LazyRegistry, _source_dirname
@@ -1446,6 +1450,19 @@ class TestFacadeAoi:
             )
 
 
+def _require_qualified_keys() -> list[str]:
+    """Return the registered `source:topic` keys, skipping when there are none.
+
+    Core on its own registers no backends, so a qualified key is an absent
+    fixture rather than a broken rule -- and a test that quietly passes on an
+    empty registry claims an assurance nothing produced.
+    """
+    qualified = sorted(key for key in discover_backends() if KEY_TOPIC_SEPARATOR in key)
+    if not qualified:
+        pytest.skip("no provider distribution installed; no source:topic keys")
+    return qualified
+
+
 class TestQualifiedKeyDefaultDir:
     """The default output directory derived from a `source:topic` facade key."""
 
@@ -1457,23 +1474,31 @@ class TestQualifiedKeyDefaultDir:
         """A bare source key already names a directory, so it passes through."""
         assert _source_dirname("chc") == "chc"
 
+    def test_keys_that_differ_only_by_the_separator_collide(self):
+        """Flattening maps `a:b` and `a_b` onto one name, which is the risk."""
+        # Pins the rule the registry test below polices, without depending on
+        # what happens to be installed: nothing stops a future bare key called
+        # `jrc_sea-level-forecast` from colliding with `jrc:sea-level-forecast`.
+        assert _source_dirname("a:b") == _source_dirname("a_b") == "a_b"
+
     def test_no_registered_key_keeps_a_colon(self):
         """No registered key may leave a colon in its directory name."""
         # A colon is legal in a POSIX filename, so Linux CI would happily accept
         # the unflattened name. Asserting on the derived string keeps this a real
         # gate on every platform rather than a Windows-only one.
-        qualified = sorted(k for k in discover_backends() if ":" in k)
-        if not qualified:
-            # Core alone registers no backends, so there is no qualified key to
-            # judge. That is an absent fixture, not a broken rule.
-            pytest.skip("no provider distribution installed; no source:topic keys")
-        offenders = [k for k in qualified if ":" in _source_dirname(k)]
+        qualified = _require_qualified_keys()
+        offenders = [
+            key for key in qualified if KEY_TOPIC_SEPARATOR in _source_dirname(key)
+        ]
         assert not offenders, f"colon survives into the directory name: {offenders}"
 
     def test_registered_keys_map_to_distinct_directories(self):
         """Flattening must not land two facade keys in one output directory."""
-        # `load()` cleans up the default directory it created, so two keys
-        # sharing one would let a download for either delete the other's output.
+        # Two keys sharing a directory would have them read and clean up each
+        # other's default output. `_redirect_output_to_tempdir` only removes the
+        # directory when it is empty, so nothing is deleted outright -- but the
+        # keys stop being independent, which is what one-directory-per-key means.
+        _require_qualified_keys()
         seen: dict[str, str] = {}
         for key in sorted(discover_backends()):
             name = _source_dirname(key)
@@ -1483,7 +1508,6 @@ class TestQualifiedKeyDefaultDir:
             )
             seen[name] = key
 
-    @pytest.mark.jrc
     def test_facade_default_path_is_creatable(self, monkeypatch, tmp_path):
         """The facade's derived default directory can actually be created."""
         from earthlens import config
@@ -1493,7 +1517,17 @@ class TestQualifiedKeyDefaultDir:
         # an outer fixture's or EARTHLENS_DATA_DIR's setting for every test that
         # runs after this one.
         monkeypatch.setattr(config, "_output_override", tmp_path)
-        target = pathlib.Path(EarthLens(data_source="jrc:coastal-forecast").path)
-        assert ":" not in target.name, f"unusable directory name: {target.name}"
+        # A named key rather than any qualified one: backends differ in what
+        # their constructor demands (most want `variables=`), and this test is
+        # about the directory, not about satisfying a backend. Skipped rather
+        # than marked `jrc` -- it covers core's derivation, so `-m "not jrc"`
+        # should not drop it and `-m jrc` should not select it.
+        key = "jrc:coastal-forecast"
+        if key not in discover_backends():
+            pytest.skip(f"{key!r} is not registered; earthlens-hazards not installed")
+        target = pathlib.Path(EarthLens(data_source=key).path)
+        assert KEY_TOPIC_SEPARATOR not in target.name, (
+            f"unusable directory name for {key!r}: {target.name}"
+        )
         target.mkdir(parents=True, exist_ok=True)
         assert target.is_dir(), f"{target} was not created"
