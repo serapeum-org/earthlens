@@ -1381,30 +1381,70 @@ class _PartialBody:
 
 
 class _ResumingSession:
-    """Serves a payload, breaking the first attempt and honouring `Range` after."""
+    """Serves a payload, breaking the first attempt and honouring `Range` after.
 
-    def __init__(self, payload: bytes, break_at: int, *, ranges: bool = True):
+    Models a conforming origin: the first response advertises `Accept-Ranges`
+    and an `ETag`, and a resumed request is answered `206` with a matching
+    `Content-Range`.
+    """
+
+    def __init__(
+        self,
+        payload: bytes,
+        break_at: int,
+        *,
+        ranges: bool = True,
+        etag: str = '"v1"',
+        second_etag: str | None = None,
+        bad_range: bool = False,
+        encoding: str | None = None,
+    ):
         self.payload = payload
         self.break_at = break_at
         self.ranges = ranges
+        self.etag = etag
+        self.second_etag = second_etag
+        self.bad_range = bad_range
+        self.encoding = encoding
         self.requests: list[str | None] = []
+        self.sent_headers: list[dict[str, str]] = []
 
     def get(self, url: str, **kwargs):
-        rng = kwargs.get("headers", {}).get("Range")
+        headers = kwargs.get("headers", {})
+        rng = headers.get("Range")
         self.requests.append(rng)
+        self.sent_headers.append(dict(headers))
         if rng is None:
-            # Only the first attempt breaks, so a restart converges.
             break_at = self.break_at if len(self.requests) == 1 else None
-            return _PartialBody(self.payload, break_at, ranges=self.ranges)
+            body = _PartialBody(self.payload, break_at, ranges=self.ranges)
+            body.headers["ETag"] = self.etag
+            if self.encoding:
+                body.headers["Content-Encoding"] = self.encoding
+            return body
         start = int(rng.removeprefix("bytes=").rstrip("-"))
+        if self.second_etag is not None:
+            # A changed representation: without `If-Range` the server would be
+            # free to serve this as a 206 and splice two files together.
+            payload = b"z" * len(self.payload)
+            rest = _PartialBody(payload[start:], None, ranges=self.ranges)
+            rest.status_code = 206
+            rest.headers["ETag"] = self.second_etag
+            rest.headers["Content-Range"] = (
+                f"bytes {start}-{len(payload) - 1}/{len(payload)}"
+            )
+            return rest
         rest = _PartialBody(self.payload[start:], None, ranges=self.ranges)
         rest.status_code = 206 if self.ranges else 200
+        first = 0 if self.bad_range else start
+        rest.headers["Content-Range"] = (
+            f"bytes {first}-{len(self.payload) - 1}/{len(self.payload)}"
+        )
         return rest
 
 
 @pytest.mark.unit
 class TestDownloadResume:
-    """A broken transfer continues from what already landed."""
+    """A broken transfer continues from what already landed, or restarts safely."""
 
     def test_resumes_with_a_range_request(self, tmp_path):
         """The retry asks for the remaining bytes, not the whole file again."""
@@ -1419,6 +1459,123 @@ class TestDownloadResume:
             "bytes="
         ), f"the retry should carry a Range header, got {session.requests[1]!r}"
 
+    def test_the_resumed_request_disables_content_encoding(self, tmp_path):
+        """`Range` addresses encoded bytes, so the resume must ask for identity.
+
+        The staged byte count is of *decoded* bytes; resuming under
+        `gzip, deflate` would request an offset into a different byte stream.
+        """
+        payload = b"abcdefghij" * 50
+        session = _ResumingSession(payload, break_at=200)
+        client = HttpClient(session=session, sleep=lambda _: None)
+        client.download("http://x/g.bin", tmp_path / "g.bin", progress=False, chunk=50)
+        resumed = session.sent_headers[1]
+        assert resumed.get("Accept-Encoding") == "identity", (
+            f"resumed request must disable encoding, sent {resumed.get('Accept-Encoding')!r}"
+        )
+
+    def test_the_resumed_request_pins_the_representation(self, tmp_path):
+        """`If-Range` carries the first response's validator."""
+        payload = b"abcdefghij" * 50
+        session = _ResumingSession(payload, break_at=200, etag='"abc"')
+        client = HttpClient(session=session, sleep=lambda _: None)
+        client.download("http://x/g.bin", tmp_path / "g.bin", progress=False, chunk=50)
+        assert session.sent_headers[1].get("If-Range") == '"abc"', (
+            f"expected the ETag as If-Range, got {session.sent_headers[1].get('If-Range')!r}"
+        )
+
+    def test_a_compressed_first_response_is_not_resumed(self, tmp_path):
+        """A body the server encoded cannot be resumed by decoded byte count."""
+        payload = b"abcdefghij" * 50
+        session = _ResumingSession(payload, break_at=200, encoding="gzip")
+        client = HttpClient(session=session, sleep=lambda _: None)
+        dest = tmp_path / "g.bin"
+        client.download("http://x/g.bin", dest, progress=False, chunk=50)
+        assert dest.read_bytes() == payload, "a restart must still produce the file"
+        assert session.requests[1] is None, (
+            "a gzipped representation must restart, not resume"
+        )
+
+    def test_a_206_that_restarts_the_object_is_refused(self, tmp_path):
+        """A `Content-Range` beginning at 0 would duplicate the staged bytes."""
+        payload = b"abcdefghij" * 50
+        session = _ResumingSession(payload, break_at=200, bad_range=True)
+        client = HttpClient(session=session, sleep=lambda _: None)
+        dest = tmp_path / "g.bin"
+        client.download("http://x/g.bin", dest, progress=False, chunk=50)
+        assert dest.read_bytes() == payload, (
+            f"expected {len(payload)} bytes, got {len(dest.read_bytes())}"
+        )
+
+    def test_a_changed_representation_does_not_splice_two_files(self, tmp_path):
+        """A `206` from a newer object restarts instead of appending to the old."""
+        payload = b"abcdefghij" * 50
+        session = _ResumingSession(payload, break_at=200, second_etag='"v2"')
+        client = HttpClient(session=session, sleep=lambda _: None)
+        dest = tmp_path / "g.bin"
+        client.download("http://x/g.bin", dest, progress=False, chunk=50)
+        written = dest.read_bytes()
+        assert b"z" not in written, (
+            "bytes from the second representation must not reach the file"
+        )
+        assert written == payload, (
+            f"expected the original payload, got {written[:20]!r}"
+        )
+
+    def test_a_416_on_a_complete_staged_file_finishes_the_download(self, tmp_path):
+        """A transfer that broke after the last byte is completed, not discarded.
+
+        The server answers `416` because nothing lies past the staged end;
+        raising there would throw away a file that is already whole.
+        """
+        payload = b"abcdefghij" * 20
+
+        class _AllThenBreak:
+            """Yields the whole body, then breaks before the stream ends."""
+
+            def __init__(self):
+                self.status_code = 200
+                self.headers = {
+                    "Content-Length": str(len(payload)),
+                    "Accept-Ranges": "bytes",
+                    "ETag": '"v1"',
+                }
+
+            def iter_content(self, chunk_size: int = 1):
+                for i in range(0, len(payload), chunk_size):
+                    yield payload[i : i + chunk_size]
+                raise requests.ConnectionError(ConnectionResetError("reset"))
+
+            def raise_for_status(self) -> None:
+                """No-op: the fixture models a 200."""
+
+            def close(self) -> None:
+                """No-op."""
+
+        class _Session:
+            """Serves the breaking body first, then a 416 for the resume."""
+
+            def __init__(self):
+                self.calls = 0
+
+            def get(self, url, **kwargs):
+                self.calls += 1
+                if self.calls == 1:
+                    return _AllThenBreak()
+                resp = _PartialBody(b"", None)
+                resp.status_code = 416
+                resp.headers["Content-Range"] = f"bytes */{len(payload)}"
+                return resp
+
+        session = _Session()
+        client = HttpClient(session=session, sleep=lambda _: None)
+        dest = tmp_path / "g.bin"
+        client.download("http://x/g.bin", dest, progress=False, chunk=10)
+        assert dest.read_bytes() == payload, (
+            f"expected the complete payload, got {len(dest.read_bytes())} bytes"
+        )
+        assert session.calls == 2, f"expected one resume attempt, got {session.calls}"
+
     def test_restarts_when_the_server_does_not_support_ranges(self, tmp_path):
         """Without `Accept-Ranges` the transfer starts over rather than appending."""
         payload = b"abcdefghij" * 50
@@ -1429,31 +1586,4 @@ class TestDownloadResume:
         assert dest.read_bytes() == payload, "a restart must still produce the file"
         assert session.requests[1] is None, (
             "no Range may be sent to a server that did not advertise support"
-        )
-
-    def test_a_server_ignoring_the_range_does_not_corrupt_the_file(self, tmp_path):
-        """A `200` answer to a `Range` request restarts instead of appending.
-
-        Appending a full body onto a partial one would silently produce a file
-        longer than the source, which no checksum downstream would expect.
-        """
-        payload = b"wxyz" * 100
-        session = _ResumingSession(payload, break_at=120)
-        session.ranges = True
-
-        original = session.get
-
-        def _ignores_range(url, **kwargs):
-            response = original(url, **kwargs)
-            response.status_code = 200
-            if kwargs.get("headers", {}).get("Range"):
-                return _PartialBody(payload, None)
-            return response
-
-        session.get = _ignores_range
-        client = HttpClient(session=session, sleep=lambda _: None)
-        dest = tmp_path / "granule.bin"
-        client.download("http://x/granule.bin", dest, progress=False, chunk=50)
-        assert dest.read_bytes() == payload, (
-            f"expected {len(payload)} bytes, got {len(dest.read_bytes())}"
         )
