@@ -9,7 +9,7 @@ from typing import Any
 import pytest
 import requests
 
-from earthlens.base.http import HttpClient, HttpRangeFile
+from earthlens.base.http import HttpClient, HttpRangeFile, RangeReadError
 
 
 class _RangeResp:
@@ -388,3 +388,56 @@ class _ClosableSession:
 
     def close(self) -> None:
         self._log.append(True)
+
+
+class _FailingRangeSession(_RangeSession):
+    """Answers the size probe, then fails every ranged read."""
+
+    def __init__(self, blob: bytes, exc: BaseException) -> None:
+        super().__init__(blob)
+        self._exc = exc
+
+    def get(self, url: str, **kwargs: Any) -> _RangeResp:
+        """Record the attempt and raise the injected transport error."""
+        self.get_calls.append((url, kwargs))
+        raise self._exc
+
+
+class TestRangeReadErrors:
+    """A live HTTP failure must reach the caller, not look like a bad archive."""
+
+    def test_a_transport_failure_raises_range_read_error(self):
+        """The `requests` error is translated at the boundary, not leaked."""
+        session = _FailingRangeSession(b"x" * 64, requests.ConnectionError("boom"))
+        reader = _range_file(session)
+        with pytest.raises(RangeReadError) as excinfo:
+            reader.read(8)
+        assert "example.org" in str(excinfo.value)
+        assert isinstance(excinfo.value.__cause__, requests.ConnectionError)
+
+    def test_it_is_not_an_oserror(self):
+        """Container readers probe with `except OSError`, which must not match."""
+        assert not issubclass(RangeReadError, OSError)
+
+    def test_a_zipfile_probe_cannot_swallow_a_live_failure(self):
+        """The whole point: a 503 must not be reported as a malformed ZIP."""
+        session = _FailingRangeSession(
+            _zip_blob(), requests.HTTPError("503 Service Unavailable")
+        )
+        reader = _range_file(session)
+        with pytest.raises(RangeReadError):
+            zipfile.ZipFile(reader.buffered())
+
+    def test_an_http_error_status_still_reaches_the_caller(self):
+        """`raise_for_status` inside the client is a `RequestException` too."""
+        session = _FailingRangeSession(b"x" * 64, requests.HTTPError("404"))
+        reader = _range_file(session)
+        with pytest.raises(RangeReadError, match="404"):
+            reader.read(8)
+
+    def test_a_server_ignoring_the_range_is_a_value_error_not_a_short_read(self):
+        """A `200` carries the whole object, so every later offset would be wrong."""
+        session = _RangeSession(b"y" * 64, ignore_range=True)
+        reader = _range_file(session)
+        with pytest.raises(ValueError, match="ignored the Range header"):
+            reader.read(8)
