@@ -46,12 +46,17 @@ The two phases have their own budgets:
 | **read** — reset mid-response, read timeout, truncated body | `read_retries` (= `max_retries`) | no, unless `retry_unsafe_methods=True` |
 | `SSLError`, `ProxyError` | never retried | — |
 
+A backend that already wraps its calls in its own retry or resilience loop now has two layers: the client retries
+the transport, and the backend retries the call. The budgets multiply rather than add, so an outer loop of 3 over a
+client of 5 is up to 18 attempts. If that is not what you want, pass `retry_on_exceptions=()` to opt the client's
+transport retry out and keep the outer loop as the single authority.
+
+If your endpoint is a `POST` that is safe to replay — a search or query API, an idempotent RPC — pass
+`retry_unsafe_methods=True`. Without it neither a transport failure nor a `5xx` is replayed for that verb, and
+the suppression is logged at debug level rather than being silent.
+
 The connect budget is small on purpose: a host that refuses a connection rarely starts accepting one within a
 back-off window, so a generous budget only turns a clear failure into a slow one.
-
-If your endpoint is a `POST` that is safe to replay (a search API, an idempotent RPC), pass
-`retry_unsafe_methods=True`. Without it a read-phase failure on a `POST` is reported rather than replayed, and
-the suppression is logged at debug level.
 
 `timeout` is a `(connect, read)` pair by default — `(10.0, 60.0)` — so a dead host fails in ten seconds while a
 slow transfer keeps a full read budget. A bare float still works and applies to both phases.

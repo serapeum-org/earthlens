@@ -1523,7 +1523,11 @@ class HttpClient:
                 budget = (
                     self.connect_retries if kind == "connect" else self.read_retries
                 )
-                if spent[kind] >= budget:
+                # Two guards, not one: the per-kind budget shapes *which* failure
+                # is worth repeating, and `max_retries` still caps the total, so
+                # a request alternating between the two phases cannot make
+                # `connect_retries + read_retries` attempts.
+                if spent[kind] >= budget or attempt >= self.max_retries:
                     raise
                 # A *read* failure means the request was delivered and the
                 # server may already have acted, so a non-idempotent verb is
@@ -1547,11 +1551,12 @@ class HttpClient:
                 spent[kind] += 1
                 attempt += 1
                 continue
-            retryable = response.status_code in self.status_forcelist or (
-                self._retry_predicate is not None and self._retry_predicate(response)
+            by_status = response.status_code in self.status_forcelist
+            by_predicate = self._retry_predicate is not None and self._retry_predicate(
+                response
             )
             if (
-                retryable
+                by_status
                 and response.status_code not in RETRY_AFTER_STATUS_CODES
                 and not (
                     self.retry_unsafe_methods or method.upper() in IDEMPOTENT_METHODS
@@ -1562,7 +1567,12 @@ class HttpClient:
                 # double submission the read-phase gate prevents. A `429` /
                 # `503` / `413` is the server asking for a later attempt, which
                 # is safe for any method.
-                retryable = False
+                by_status = False
+            # A `retry_predicate` is the caller inspecting the response and
+            # saying "this one is not really a success" — often on a `200` whose
+            # body carries a rate-limit. That is their judgement about their own
+            # endpoint, so the verb gate does not overrule it.
+            retryable = by_status or by_predicate
             if retryable and attempt < self.max_retries:
                 retry_after = _parse_retry_after(response.headers.get("Retry-After"))
                 wait = self._backoff_wait(retry_after, attempt)
