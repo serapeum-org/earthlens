@@ -1497,8 +1497,9 @@ class HttpClient:
                 last_written = exc.written
                 logger.warning(
                     f"{redact_url(url)} delivered {exc.written:,} of "
-                    f"{exc.expected:,} bytes; discarding and restarting, retry "
-                    f"{attempt + 1}/{self.max_retries}"
+                    f"{exc.expected:,} bytes; discarding and restarting, read "
+                    f"retry {spent['read']}/{self.read_retries} "
+                    f"(attempt {attempt + 1}/{self.max_retries})"
                 )
                 discard_partial()
                 self._sleep(self._backoff_wait(None, attempt))
@@ -1531,8 +1532,9 @@ class HttpClient:
                     spent[key] += 1
                     logger.warning(
                         f"{type(exc).__name__} ({kind}) on {redact_url(url)} after "
-                        f"{best_written:,} bytes; discarding and restarting, retry "
-                        f"{attempt + 1}/{self.max_retries}"
+                        f"{best_written:,} bytes; discarding and restarting, "
+                        f"{key} retry {spent[key]}/{budget} "
+                        f"(attempt {attempt + 1}/{self.max_retries})"
                     )
                     discard_partial()
                     self._sleep(self._backoff_wait(None, attempt))
@@ -1656,7 +1658,10 @@ class HttpClient:
             self.raise_for_status if raise_for_status is None else raise_for_status
         )
         attempt = 0
-        spent = {"connect": 0, "read": 0, "unknown": 0}
+        # Keyed by *budget*, not by classification: `connect` and `unknown`
+        # draw on the same allowance, so counting them apart would let a request
+        # alternating between the two spend it twice.
+        spent = {"connect": 0, "read": 0}
         while True:
             self._throttle()
             try:
@@ -1669,12 +1674,13 @@ class HttpClient:
                 # An unidentified failure spends the cheap budget but is
                 # replayed as cautiously as a read one.
                 cheap = kind in {"connect", "unknown"}
+                key = "connect" if cheap else "read"
                 budget = self.connect_retries if cheap else self.read_retries
                 # Two guards, not one: the per-kind budget shapes *which* failure
                 # is worth repeating, and `max_retries` still caps the total, so
                 # a request alternating between the two phases cannot make
                 # `connect_retries + read_retries` attempts.
-                if spent[kind] >= budget or attempt >= self.max_retries:
+                if spent[key] >= budget or attempt >= self.max_retries:
                     raise
                 # A *read* failure means the request was delivered and the
                 # server may already have acted, so a non-idempotent verb is
@@ -1693,10 +1699,10 @@ class HttpClient:
                 wait = self._backoff_wait(None, attempt)
                 logger.warning(
                     f"{type(exc).__name__} ({kind}) on {redact_url(url)}; retry "
-                    f"{spent[kind] + 1}/{budget} after {wait:.1f}s"
+                    f"{spent[key] + 1}/{budget} after {wait:.1f}s"
                 )
                 self._sleep(wait)
-                spent[kind] += 1
+                spent[key] += 1
                 attempt += 1
                 continue
             by_status = response.status_code in self.status_forcelist
