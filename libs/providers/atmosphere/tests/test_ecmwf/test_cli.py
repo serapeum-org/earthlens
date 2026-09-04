@@ -900,12 +900,27 @@ class TestDeepProber:
     def test_read_netcdf_var_meta_swallows_a_pyramids_error(
         self, monkeypatch, tmp_path
     ):
-        """A raising read degrades to an empty schema, never propagates."""
+        """A raising read degrades to an empty schema and says why.
+
+        The empty mapping alone is indistinguishable from "this container
+        genuinely declares no metadata", so a hydration sweep could read
+        nothing and still look like it worked. The warning is the only thing
+        that separates the two, which makes it part of the contract.
+        """
         path = tmp_path / "probe.nc"
         path.write_bytes(b"not really a netcdf")
         monkeypatch.setattr(ecmwf_cli, "_read_via_pyramids", _raise_unreadable)
+        warnings: list[str] = []
+        sink = logger.add(warnings.append, level="WARNING")
 
-        assert ecmwf_cli._read_netcdf_var_meta(str(path)) == {}
+        try:
+            assert ecmwf_cli._read_netcdf_var_meta(str(path)) == {}
+        finally:
+            logger.remove(sink)
+
+        assert any(str(path) in message for message in warnings), (
+            "an unreadable container must be named, not silently reported empty"
+        )
 
     def test_variable_meta_reads_a_gridded_variable(self):
         """A gridded variable arrives as a pyramids Variable."""
