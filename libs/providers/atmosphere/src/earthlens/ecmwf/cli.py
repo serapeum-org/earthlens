@@ -304,7 +304,14 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     """
     try:
         return _read_via_pyramids(path)
-    except Exception:  # noqa: BLE001 — an unreadable container has nothing to add
+    except Exception as exc:  # noqa: BLE001 — an unreadable container has nothing to add
+        # Say so. A hydration sweep calls this per granule, and a silent {} is
+        # indistinguishable from "this file genuinely declares no metadata" —
+        # the whole sweep can read nothing and still look like it worked.
+        logger.warning(
+            f"ECMWF: could not read variable metadata from {path} "
+            f"({type(exc).__name__}: {exc}); the row gains nothing from it."
+        )
         return {}
 
 
