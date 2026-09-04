@@ -335,7 +335,7 @@ class JRC(AbstractDataSource):
                     f"{', '.join(ignored)} ignored."
                 )
             return key
-        if key in ("", "jrc", "flood", "jrc-flood"):
+        if key in ("", "flood", "jrc-flood"):
             return "efhm"
         if key == "sea_level":
             return self._resolve_sea_level_id(product)

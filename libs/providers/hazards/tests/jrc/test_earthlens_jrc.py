@@ -33,6 +33,31 @@ class TestRegistry:
 
 
 @pytest.mark.unit
+class TestDatasetResolution:
+    """Tests for how `dataset=` and the bare facade key reach a catalog row."""
+
+    def test_bare_facade_key_reaches_the_efhm(self, tmp_path):
+        """`data_source="jrc"` resolves to the EFHM without naming a dataset."""
+        # The facade key arrives as dataset=None, so the empty-string branch is
+        # what carries it -- not any alias spelled into the dataset vocabulary.
+        backend = EarthLens(
+            data_source="jrc", return_periods=[10], path=tmp_path
+        ).datasource
+        assert backend._resolve_dataset_id(None, None) == "efhm"
+
+    @pytest.mark.parametrize(
+        "alias", ["jrc", "jrc-flood-hazard", "jrc:european-flood-hazard"]
+    )
+    def test_facade_aliases_are_not_dataset_names(self, alias, tmp_path):
+        """`dataset=` names catalog rows and family selectors, never facade keys."""
+        backend = EarthLens(
+            data_source="jrc", return_periods=[10], path=tmp_path
+        ).datasource
+        with pytest.raises(ValueError):
+            backend._resolve_dataset_id(alias, None)
+
+
+@pytest.mark.unit
 class TestFacadeConstruction:
     """Tests for `EarthLens(data_source="jrc-flood", ...)`."""
 
