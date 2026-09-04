@@ -93,10 +93,11 @@ Prefer regenerating via the refresh/probe tools over hand-editing the YAML.
 
 ### `asset_aliases` is the one hand-curated block
 
-`asset_aliases` is the exception to the rule above: it is written by hand and
-**must survive regeneration**. It exists because an endpoint may publish the
-same band under a different key than the catalog names it by — CDSE splits
-Sentinel-2 per resolution, so the catalog's `B04` is `B04_10m` there:
+`asset_aliases` is the exception to the rule above: **nothing derives it**, so
+it is written by hand and must be preserved if the rows around it are ever
+regenerated. It exists because an endpoint may publish the same band under a
+different key than the catalog names it by — CDSE splits Sentinel-2 per
+resolution, so the catalog's `B04` is `B04_10m` there:
 
 ```yaml
 sentinel-2-l2a:

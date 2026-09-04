@@ -1945,10 +1945,13 @@ collections:
     aliases:
       cdse: sentinel-2-l2a
       earth-search: sentinel-2-c1-l2a
-    # HAND-CURATED — must survive `refresh stac` / `probe stac`, which
-    # regenerate the rest of this file. CDSE publishes Sentinel-2 per
-    # resolution, so the catalog's B04 is B04_10m there. See
-    # docs/reference/stac/introduction.md.
+    # HAND-CURATED, like the `aliases` block above: no tool derives it.
+    # CDSE publishes Sentinel-2 per resolution, so the catalog's B04 is
+    # B04_10m there, and nothing in the upstream STAC metadata says so.
+    # `refresh stac --write` only rewrites the available_* index in
+    # _index.yaml, and `curate` has no stac emitter, so this file is
+    # maintained by hand -- keep the two blocks in step when either
+    # changes. See docs/reference/stac/introduction.md.
     asset_aliases:
       cdse:
         B02: B02_10m
