@@ -663,6 +663,10 @@ def native_parameters(backend_cls: type) -> frozenset[str]:
 
             ```
     """
+    # `object.__init__` means every real class answers this, so the `None`
+    # branch guards only a class that shadows `__init__` with a non-callable —
+    # which the tests construct deliberately. It is kept because this is a
+    # public helper answering a question about arbitrary input.
     init = getattr(backend_cls, "__init__", None)
     if init is None:
         return frozenset()

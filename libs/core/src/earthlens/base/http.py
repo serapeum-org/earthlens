@@ -39,7 +39,7 @@ import io
 import re
 import threading
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any, TypeVar, cast
@@ -133,9 +133,12 @@ DEFAULT_READ_RETRIES: int | None = None
 RETRY_AFTER_STATUS_CODES: frozenset[int] = frozenset({413, 429, 503})
 
 #: Substrings of the wrapped exception's class name identifying a failure raised
-#: while *establishing* the connection. Matched by name rather than by importing
-#: `urllib3`: it is `requests`' dependency, not a declared one of this package,
-#: and the wrapped cause is an implementation detail of theirs.
+#: while *establishing* the connection. Matched by name rather than against
+#: imported `urllib3` classes: the wrapped cause is an implementation detail of
+#: how `requests` happens to reach the network today, so a name match keeps
+#: working if that changes, and this module stays free of a second dependency on
+#: `urllib3`'s exception taxonomy. (`prefer_ipv4` does import `urllib3`, for a
+#: module global it can only reach that way.)
 _CONNECT_CAUSE_NAMES = ("NewConnection", "NameResolution", "ConnectTimeout", "MaxRetry")
 
 #: The same, for a failure raised once the connection was established and the
@@ -143,7 +146,7 @@ _CONNECT_CAUSE_NAMES = ("NewConnection", "NameResolution", "ConnectTimeout", "Ma
 _READ_CAUSE_NAMES = ("Protocol", "ReadTimeout", "IncompleteRead", "Decode")
 
 
-def _causes(exc: BaseException):
+def _causes(exc: BaseException) -> Iterator[BaseException]:
     """Yield a transport exception and every cause wrapped inside it.
 
     `requests` puts the underlying urllib3 error in `args[0]` rather than in
@@ -1170,6 +1173,16 @@ class HttpClient:
         or an exception in `retry_on_exceptions` retries the attempt (after
         cleaning the temp), honouring the `Retry-After`/back-off policy.
 
+        A retry **resumes** rather than restarting when the staged file has
+        bytes, the first response advertised `Accept-Ranges: bytes` and carried
+        no `Content-Encoding`: the retry sends `Range`, `Accept-Encoding:
+        identity` and an `If-Range` validator, and appends only if the returned
+        `206` starts exactly where the staged file ends and describes the same
+        representation. Anything else — a `200`, a mismatched `Content-Range`, a
+        changed `ETag`, a `multipart/byteranges` body — discards the partial and
+        re-requests the whole object, because appending it would silently
+        produce a file that never existed upstream.
+
         Args:
             url: Absolute request URL.
             dest: Output file path. Parent directories are created.
@@ -1246,6 +1259,9 @@ class HttpClient:
         # and served an unencoded body, so the common path is unchanged.
         resume_from = 0
         resumable = False
+        # Same per-kind accounting as `_request_with_retry`: a dead host should
+        # not cost a large download six full connect attempts.
+        spent = {"connect": 0, "read": 0}
         # The validator that pins the resumed bytes to the same representation
         # the first attempt read — an `ETag`, else `Last-Modified`.
         range_validator: str | None = None
@@ -1378,13 +1394,14 @@ class HttpClient:
                 # No idempotency gate here, unlike `_request_with_retry`: this
                 # loop only ever issues the GET above, so the verb is always
                 # replay-safe. Re-check that if it is ever parameterised.
-                if (
-                    classify_transport_error(exc, strict=self._default_retry_set)
-                    is None
-                    or attempt >= self.max_retries
-                ):
+                kind = classify_transport_error(exc, strict=self._default_retry_set)
+                budget = (
+                    self.connect_retries if kind == "connect" else self.read_retries
+                )
+                if kind is None or spent[kind] >= budget or attempt >= self.max_retries:
                     discard_partial()
                     raise
+                spent[kind] += 1
                 # Keep what already landed and ask for the rest, when the file
                 # is staged and the server said it supports ranges. Restarting
                 # a multi-gigabyte transfer from byte 0 on every reset can burn

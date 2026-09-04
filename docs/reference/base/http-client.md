@@ -44,7 +44,7 @@ The two phases have their own budgets:
 |---|---|---|
 | **connect** — refused, unresolvable, connect timeout | `connect_retries` (1) | yes — the request never reached the server |
 | **read** — reset mid-response, read timeout, truncated body | `read_retries` (= `max_retries`) | no, unless `retry_unsafe_methods=True` |
-| `SSLError`, `ProxyError` | never retried | — |
+| `SSLError`, `ProxyError` | never retried *under the default set* | — |
 
 A backend that already wraps its calls in its own retry or resilience loop now has two layers: the client retries
 the transport, and the backend retries the call. The budgets multiply rather than add, so an outer loop of 3 over a

@@ -1472,21 +1472,34 @@ class TestErgonomicKwargsAreDiscoverable:
 
     @pytest.mark.parametrize("name", ["buffer", "dataset"])
     def test_the_conditional_kwargs_are_advertised_wherever_they_work(self, name):
-        """`buffer=` and `dataset=` appear except where the backend cannot accept them.
+        """`buffer=` and `dataset=` appear on exactly the backends that accept them.
 
-        They are withheld only from backends that would raise on them — a
-        native-`aoi` backend for `buffer=`, a facet-only one for `dataset=` —
-        so the vast majority still advertise both.
+        They are withheld only where they could not work — `buffer=` from a
+        backend that interprets `aoi=` itself, `dataset=` from one addressing
+        its data by facet keywords. The expected set is derived from those two
+        rules rather than approximated, so a backend silently losing a kwarg
+        fails here.
         """
-        advertised = [
-            key
-            for key in sorted(EarthLens.DataSources)
-            if name in inspect.signature(EarthLens.DataSources[key].__init__).parameters
-        ]
-        total = len(list(EarthLens.DataSources))
-        assert len(advertised) > total * 0.8, (
-            f"{name} should be advertised on the large majority of backends, "
-            f"got {len(advertised)} of {total}"
+        expected, advertised = set(), set()
+        for key in sorted(EarthLens.DataSources):
+            backend = EarthLens.DataSources[key]
+            params = inspect.signature(backend.__init__).parameters
+            native = native_parameters(backend)
+            if name in native:
+                continue
+            if name == "buffer":
+                works = "aoi" not in native
+            else:
+                works = "variables" in native or any(
+                    p.kind is inspect.Parameter.VAR_KEYWORD for p in params.values()
+                )
+            if works:
+                expected.add(backend.__name__)
+            if name in params:
+                advertised.add(backend.__name__)
+        assert advertised == expected, (
+            f"{name} advertised on {sorted(advertised - expected)} that reject it, "
+            f"missing from {sorted(expected - advertised)} that accept it"
         )
 
     def test_a_native_parameter_is_not_shadowed_by_a_synthesized_one(self):
