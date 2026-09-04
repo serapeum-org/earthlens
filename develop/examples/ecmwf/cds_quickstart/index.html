@@ -24596,7 +24596,6 @@ reading and plotting the files that land on disk.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
@@ -24606,7 +24605,6 @@ reading and plotting the files that land on disk.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
 from pyramids.dataset import Dataset
 from pyramids.netcdf import NetCDF
@@ -25123,24 +25121,18 @@ array.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tifs</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 <span class="n">img</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"coolwarm"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Daily-mean 2m temperature — </span><span class="si">{</span><span class="n">tifs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon (pixels)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat (pixels)"</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"K (</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">units</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># plot() draws the Dataset itself: georeferenced axes, and</span>
+<span class="c1"># the band's declared no-data honoured without masking.</span>
+<span class="n">glyph</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">"coolwarm"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Daily-mean 2m temperature — </span><span class="si">{</span><span class="n">tifs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="sa">f</span><span class="s2">"K (</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">units</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-12">ds = Dataset.read_file(str(tifs[0]))
 img = ds.read_array()
 
-fig, ax = plt.subplots(figsize=(7, 5))
-im = ax.imshow(img, cmap="coolwarm")
-ax.set_title(f"Daily-mean 2m temperature — {tifs[0].stem}")
-ax.set_xlabel("lon (pixels)")
-ax.set_ylabel("lat (pixels)")
-fig.colorbar(im, ax=ax, label=f"K ({spec.units})")
-plt.show()</div>
+# plot() draws the Dataset itself: georeferenced axes, and
+# the band's declared no-data honoured without masking.
+glyph = ds.plot(cmap="coolwarm", title=f"Daily-mean 2m temperature — {tifs[0].stem}")
+glyph.cbar.set_label(f"K ({spec.units})")</div>
 </div>
 </div>
 </div>

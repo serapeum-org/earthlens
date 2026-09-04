@@ -24464,13 +24464,10 @@ fabdem_paths</div>
 <span class="k">if</span> <span class="n">nodata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">bare</span><span class="p">[</span><span class="n">bare</span> <span class="o">==</span> <span class="n">nodata</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">bare</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"terrain"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"FABDEM V1-2 bare-earth elevation (m)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"elevation (m)"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># plot() draws the Dataset itself: georeferenced axes, and</span>
+<span class="c1"># the band's declared no-data honoured without masking.</span>
+<span class="n">glyph</span> <span class="o">=</span> <span class="n">fabdem</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">"terrain"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"FABDEM V1-2 bare-earth elevation (m)"</span><span class="p">)</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">"elevation (m)"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"elevation range: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">bare</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> .. </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">bare</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">fabdem = Dataset.read_file(str(fabdem_paths[0]))
@@ -24480,13 +24477,10 @@ bare = fabdem.read_array().astype("float64")
 if nodata is not None:
     bare[bare == nodata] = np.nan
 
-fig, ax = plt.subplots(figsize=(6, 5))
-im = ax.imshow(bare, cmap="terrain")
-ax.set_title("FABDEM V1-2 bare-earth elevation (m)")
-ax.set_xticks([])
-ax.set_yticks([])
-fig.colorbar(im, ax=ax, shrink=0.8, label="elevation (m)")
-plt.show()
+# plot() draws the Dataset itself: georeferenced axes, and
+# the band's declared no-data honoured without masking.
+glyph = fabdem.plot(cmap="terrain", title="FABDEM V1-2 bare-earth elevation (m)")
+glyph.cbar.set_label("elevation (m)")
 print(f"elevation range: {np.nanmin(bare):.1f} .. {np.nanmax(bare):.1f} m")</div>
 </div>
 </div>
