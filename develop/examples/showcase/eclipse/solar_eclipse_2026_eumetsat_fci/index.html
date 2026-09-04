@@ -25272,6 +25272,10 @@ invents imagery — both only attenuate or tint pixels that already carry data.<
 <span class="w">    </span><span class="sd">"""Read an RGBA GeoTIFF frame, clean its seam and boundary, write it back in place."""</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">bands</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
+    <span class="c1"># read_array returns (bands, rows, cols), so `bands[:3]` slices the band</span>
+    <span class="c1"># axis; a single-band read comes back 2-D and would slice rows instead.</span>
+    <span class="k">if</span> <span class="n">bands</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"expected an RGBA frame, got shape </span><span class="si">{</span><span class="n">bands</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">(</span><span class="n">bands</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">bands</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">band_count</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="p">(</span><span class="n">rgb</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span>
@@ -25368,6 +25372,10 @@ def soften_file(path, **kwargs):
     """Read an RGBA GeoTIFF frame, clean its seam and boundary, write it back in place."""
     ds = Dataset.read_file(path, read_only=False)
     bands = ds.read_array()
+    # read_array returns (bands, rows, cols), so `bands[:3]` slices the band
+    # axis; a single-band read comes back 2-D and would slice rows instead.
+    if bands.ndim != 3:
+        raise ValueError(f"expected an RGBA frame, got shape {bands.shape}")
     rgb = np.dstack(bands[:3])
     alpha = (
         bands[3] if ds.band_count &gt; 3 else (rgb.max(axis=2) &gt; 0).astype(np.uint8) * 255
@@ -25612,7 +25620,9 @@ def soften_file(path, **kwargs):
                 <span class="p">)</span>
             <span class="p">)</span>
             <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
-                <span class="n">eight_bit</span><span class="p">,</span>  <span class="c1"># A scalar 0 across all four RGBA bands would flag any genuinely</span>
+                <span class="n">eight_bit</span><span class="p">,</span>
+                <span class="c1"># A scalar 0 across all four RGBA bands would flag any</span>
+                <span class="c1"># genuinely</span>
                 <span class="c1"># covered, genuinely dark pixel as missing -- measured on this</span>
                 <span class="c1"># pipeline's own frames: 5% of on-disc pixels have R == 0 during the</span>
                 <span class="c1"># umbra's deepest cycles. Passing None for R/G/B does not leave them</span>
@@ -25845,7 +25855,9 @@ def render_cycle(slot):
                 )
             )
             Dataset.from_array(
-                eight_bit,  # A scalar 0 across all four RGBA bands would flag any genuinely
+                eight_bit,
+                # A scalar 0 across all four RGBA bands would flag any
+                # genuinely
                 # covered, genuinely dark pixel as missing -- measured on this
                 # pipeline's own frames: 5% of on-disc pixels have R == 0 during the
                 # umbra's deepest cycles. Passing None for R/G/B does not leave them
