@@ -1502,6 +1502,29 @@ class TestErgonomicKwargsAreDiscoverable:
             f"missing from {sorted(expected - advertised)} that accept it"
         )
 
+    def test_the_synthesized_annotations_resolve(self):
+        """`get_type_hints` must work on every backend the wrapper touches.
+
+        `functools.wraps` copies `__module__` onto the wrapper, so a
+        *stringified* annotation is resolved in the backend's namespace — where
+        `Any` is usually not imported — and every signature-driven tool
+        (`typing.get_type_hints`, `pydantic.validate_call`) raises `NameError`.
+        That is the tooling the annotations exist to serve.
+        """
+        import typing
+
+        broken = []
+        for key in sorted(EarthLens.DataSources):
+            backend = EarthLens.DataSources[key]
+            try:
+                typing.get_type_hints(backend.__init__)
+            except NameError as exc:
+                if any(n in str(exc) for n in ("Any", "float", "str")):
+                    broken.append((backend.__name__, str(exc)))
+            except Exception:  # noqa: BLE001 - other failures are pre-existing
+                continue
+        assert not broken, f"synthesized annotations fail to resolve on {broken}"
+
     def test_a_native_parameter_is_not_shadowed_by_a_synthesized_one(self):
         """A backend declaring its own `aoi=` keeps that one, not the wrapper's.
 

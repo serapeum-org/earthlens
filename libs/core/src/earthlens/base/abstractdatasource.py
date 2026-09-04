@@ -611,11 +611,17 @@ def _passed_aggregate(function: Any, args: tuple[Any, ...], kw: dict[str, Any]) 
 #: signature. Declared once so `__signature__` and `__annotations__` cannot
 #: drift apart, and typed as loosely as the wrapper actually accepts: `aoi`
 #: takes a bbox, a point, a shapely geometry, GeoJSON, WKT or a GeoDataFrame.
+#:
+#: Real objects, not strings. `functools.wraps` copies `__module__` onto the
+#: wrapper, so a stringified annotation would be resolved in the *backend's*
+#: namespace — where `Any` is usually not imported — and
+#: `typing.get_type_hints` / `pydantic.validate_call` would raise `NameError`.
+#: That is the exact tooling this table exists to keep working.
 _ERGONOMIC_ANNOTATIONS: dict[str, Any] = {
-    "aoi": "Any",
-    "buffer": "float | None",
-    "cadence": "str | None",
-    "dataset": "str | None",
+    "aoi": Any,
+    "buffer": float | None,
+    "cadence": str | None,
+    "dataset": str | None,
 }
 
 
