@@ -15,7 +15,6 @@ from typing import Any, cast
 
 from loguru import logger
 from pyramids.base.remote import CloudConfig
-from pyramids.dataset import GeoReference
 from pyramids.feature import bbox as _pyramids_bbox
 
 #: `/vsicurl` HTTP tuning for a remote-raster read: suppress per-open sidecar
@@ -585,7 +584,7 @@ def windowed_bbox_crop(dataset: Any, bbox: Sequence[float], *, epsg: Any = 4326)
         # `touch=False` returns a lazy warp VRT that reads through to the source;
         # materialise it now so those reads happen before the caller closes the
         # source handle (and inside any active tuning context).
-        from pyramids.dataset import Dataset
+        from pyramids.dataset import Dataset, GeoReference
 
         no_data = fallback.no_data_value
         return Dataset.from_array(
