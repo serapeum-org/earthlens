@@ -2146,3 +2146,57 @@ class TestProgressTotalRejectsUntrustworthyLengths:
             )
             is None
         )
+
+
+@pytest.mark.unit
+class TestDownloadErrorTypes:
+    """The two download verdicts land in the right exception families."""
+
+    def test_incomplete_download_is_a_transport_error(self):
+        """Providers' error handlers catch `requests` transport errors, so it must be one."""
+        from earthlens.base.http import IncompleteDownloadError
+
+        err = IncompleteDownloadError("short body", written=8, expected=22)
+        assert isinstance(err, requests.ConnectionError)
+        assert isinstance(err, requests.RequestException)
+        assert isinstance(err, OSError)
+
+    def test_incomplete_download_carries_both_sizes(self):
+        """A caller deciding what to do needs the mismatch, not just the fact of it."""
+        from earthlens.base.http import IncompleteDownloadError
+
+        err = IncompleteDownloadError("short body", written=8, expected=22)
+        assert (err.written, err.expected) == (8, 22)
+
+    def test_incomplete_download_defaults_its_sizes(self):
+        """It stays constructible without them, like any `requests` error."""
+        from earthlens.base.http import IncompleteDownloadError
+
+        err = IncompleteDownloadError("boom")
+        assert err.written is None and err.expected is None
+
+    def test_an_unsolicited_206_is_a_status_error_not_a_transport_one(self):
+        """It must not be swept up by the transport retry set.
+
+        A server that volunteers partial content to a Range-less request does
+        not stop doing so, so replaying reproduces the same fragment.
+        """
+        from earthlens.base.http import (
+            DEFAULT_RETRY_EXCEPTIONS,
+            UnsolicitedPartialContentError,
+        )
+
+        assert issubclass(UnsolicitedPartialContentError, requests.HTTPError)
+        assert not issubclass(UnsolicitedPartialContentError, requests.ConnectionError)
+        assert not issubclass(UnsolicitedPartialContentError, DEFAULT_RETRY_EXCEPTIONS)
+
+    @pytest.mark.parametrize(
+        "name",
+        ["IncompleteDownloadError", "UnsolicitedPartialContentError", "RangeReadError"],
+    )
+    def test_the_error_types_are_exported(self, name):
+        """Both new names, and the existing one, reach callers from `earthlens.base`."""
+        import earthlens.base as base
+
+        assert hasattr(base, name), f"{name} is not importable from earthlens.base"
+        assert name in base.__all__, f"{name} is missing from __all__"

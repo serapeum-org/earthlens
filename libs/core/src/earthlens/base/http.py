@@ -1882,6 +1882,93 @@ class HttpClient:
         return self._session.request(method, url, **kwargs)
 
 
+class IncompleteDownloadError(requests.ConnectionError):
+    """A download finished with a body that did not match its advertised length.
+
+    Raised when the bytes written do not equal the `Content-Length` the
+    accepted response declared — in either direction. A short body is the
+    common case (a connection that ended cleanly at the wrong place, or a
+    server that under-sent its own claim); a long one means the stream and the
+    header disagree about what the object is, which is no safer to publish.
+
+    Derives from `requests.ConnectionError`, and so from `RequestException`
+    and `OSError`, for two reasons: the failure *is* a transport outcome, and
+    the providers' error-normalisation handlers already catch that family, so
+    a truncated download reaches them as the network error it is rather than
+    as an unfamiliar type that escapes their `except` clauses.
+
+    Attributes:
+        written: Bytes actually on disk when the mismatch was detected.
+        expected: The length the response advertised.
+
+    Examples:
+        - The two sizes travel with the error, so a caller can decide:
+            ```python
+            >>> from earthlens.base.http import IncompleteDownloadError
+            >>> err = IncompleteDownloadError("short body", written=8, expected=22)
+            >>> err.written, err.expected
+            (8, 22)
+
+            ```
+        - It is a `requests` transport error, so existing handlers catch it:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import IncompleteDownloadError
+            >>> issubclass(IncompleteDownloadError, requests.RequestException)
+            True
+            >>> issubclass(IncompleteDownloadError, OSError)
+            True
+
+            ```
+    """
+
+    def __init__(
+        self,
+        *args: Any,
+        written: int | None = None,
+        expected: int | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """Record the two sizes alongside the usual `requests` error fields.
+
+        Args:
+            *args: Positional arguments forwarded to `requests.ConnectionError`.
+            written: Bytes on disk when the mismatch was detected.
+            expected: The length the response advertised.
+            **kwargs: Keyword arguments forwarded to `requests.ConnectionError`.
+        """
+        super().__init__(*args, **kwargs)
+        self.written = written
+        self.expected = expected
+
+
+class UnsolicitedPartialContentError(requests.HTTPError):
+    """A `206` answered a request that carried no `Range` header.
+
+    The body is a fragment of the object, not the object, so writing it would
+    publish a partial file as a complete one. Repeating the request reproduces
+    the same answer — a server that volunteers partial content does not stop
+    doing so — which is why this is raised rather than retried, and why it is
+    caught ahead of the retry policy rather than by it.
+
+    Derives from `requests.HTTPError` because it is a verdict on the status
+    line. Note that `HTTPError` is *not* a `ConnectionError`, so the transport
+    retry set does not match it.
+
+    Examples:
+        - It is an HTTP-status error, not a transport one:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import UnsolicitedPartialContentError
+            >>> issubclass(UnsolicitedPartialContentError, requests.HTTPError)
+            True
+            >>> issubclass(UnsolicitedPartialContentError, requests.ConnectionError)
+            False
+
+            ```
+    """
+
+
 class RangeReadError(Exception):
     """A ranged read failed at the transport level.
 
