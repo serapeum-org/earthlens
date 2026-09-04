@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -833,15 +833,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#0210-0220" class="md-nav__link">
+  <a href="#unreleased" class="md-nav__link">
     <span class="md-ellipsis">
       
-        0.21.0 → 0.22.0
+        Unreleased
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="0.21.0 → 0.22.0">
+    <nav class="md-nav" aria-label="Unreleased">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -23602,15 +23602,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#0210-0220" class="md-nav__link">
+  <a href="#unreleased" class="md-nav__link">
     <span class="md-ellipsis">
       
-        0.21.0 → 0.22.0
+        Unreleased
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="0.21.0 → 0.22.0">
+    <nav class="md-nav" aria-label="Unreleased">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -23765,16 +23765,17 @@
 <h1 id="migration-guide"><a class="toclink" href="#migration-guide">Migration guide</a><a class="headerlink" href="#migration-guide" title="Permanent link">#</a></h1>
 <p>Breaking changes by release, with the concrete edit each one needs. Releases without breaking changes are
 omitted — see the <a href="../change-log/">change log</a> for the full history.</p>
-<h2 id="0210-0220"><a class="toclink" href="#0210-0220">0.21.0 → 0.22.0</a><a class="headerlink" href="#0210-0220" title="Permanent link">#</a></h2>
-<p>One breaking change, and it is the quiet kind: <strong>your code keeps running and writes somewhere else</strong>.</p>
+<h2 id="unreleased"><a class="toclink" href="#unreleased">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">#</a></h2>
+<p>One breaking change, and it is the quiet kind: <strong>your code keeps running and writes somewhere else</strong>. The
+heading gets its version boundary at release time, once the bump is known.</p>
 <h3 id="a-qualified-sourcetopic-key-writes-to-a-flattened-directory"><a class="toclink" href="#a-qualified-sourcetopic-key-writes-to-a-flattened-directory">A qualified <code>source:topic</code> key writes to a flattened directory</a><a class="headerlink" href="#a-qualified-sourcetopic-key-writes-to-a-flattened-directory" title="Permanent link">#</a></h3>
 <p><code>EarthLens(data_source="jrc:coastal-forecast").download()</code> used to derive its default output directory straight
 from the key, giving <code>&lt;output_dir()&gt;/jrc:coastal-forecast/</code>. A colon cannot appear in a Windows path component,
 so that call could not create its directory there at all. The separator is now flattened to <code>_</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a># 0.21 — on POSIX; on Windows this failed to create the directory
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a># before — on POSIX; on Windows this failed to create the directory
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>&lt;output_dir()&gt;/jrc:coastal-forecast/
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a># 0.22
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a># after
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>&lt;output_dir()&gt;/jrc_coastal-forecast/
 </code></pre></div>
 <p>Only qualified keys are affected; a bare key such as <code>chc</code> is unchanged. Nothing is moved for you, so if you are
