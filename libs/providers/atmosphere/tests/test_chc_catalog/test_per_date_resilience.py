@@ -54,9 +54,11 @@ class _FakeFtp:
 def offline_ftp(monkeypatch):
     """Replace the module's FTP session helpers so no connection is opened.
 
-    Patching `_open_ftp` alone would suffice to stay offline — `_reopen_ftp`
-    calls it — but replacing all three lets the fixture hand out sessions it
-    can track, which is what makes the reopen assertion possible.
+    Only `_open_ftp` is replaced. `_reopen_ftp` and `_close_ftp_quietly` are
+    left as the production functions, so the reopen assertion exercises the
+    real code path rather than the fixture's imitation of it — `_reopen_ftp`
+    closes the old session and calls the patched opener, and
+    `_close_ftp_quietly` calls `quit()` on the fake.
 
     Returns:
         list[_FakeFtp]: Every session handed out, newest last, so a test can
@@ -69,15 +71,7 @@ def offline_ftp(monkeypatch):
         handed_out.append(session)
         return session
 
-    def _reopen(session: _FakeFtp) -> _FakeFtp:
-        session.close()
-        return _open()
-
     monkeypatch.setattr(chc_backend, "_open_ftp", _open)
-    monkeypatch.setattr(chc_backend, "_reopen_ftp", _reopen)
-    monkeypatch.setattr(
-        chc_backend, "_close_ftp_quietly", lambda session: session.close()
-    )
     return handed_out
 
 
