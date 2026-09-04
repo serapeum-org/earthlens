@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -9349,17 +9349,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#earthlens.nwp.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.nwp.Catalog.get_model" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -9531,17 +9520,6 @@
   
     <nav class="md-nav" aria-label="Catalog">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.nwp.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#earthlens.nwp.catalog.Catalog.get_model" class="md-nav__link">
@@ -18200,34 +18178,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -23936,17 +23886,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#earthlens.nwp.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.nwp.Catalog.get_model" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24118,17 +24057,6 @@
   
     <nav class="md-nav" aria-label="Catalog">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.nwp.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#earthlens.nwp.catalog.Catalog.get_model" class="md-nav__link">
@@ -24458,7 +24386,7 @@ lazily, so this package imports without the extra installed.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;NWPModel&lt;/code&gt; (&lt;code&gt;earthlens.nwp.catalog.NWPModel&lt;/code&gt;)" href="#earthlens.nwp.catalog.NWPModel">NWPModel</a>]</code></p>
 
 
 
@@ -24601,11 +24529,7 @@ an :class:<code>NWPModel</code>.</p>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">NWPModel</span><span class="p">]):</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Model catalog for the NWP backend.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    Reads the bundled `nwp_data_catalog.yaml` (shipped as package data)</span>
@@ -24650,47 +24574,43 @@ an :class:<code>NWPModel</code>.</p>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">)}</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NWPModel</span><span class="p">]:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-model map (satisfies the base contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its :class:`NWPModel` row.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its :class:`NWPModel` row.</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            model_key: A curated model key (e.g. `&quot;gfs&quot;`,</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">                `&quot;icon-global&quot;`).</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            model_key: A curated model key (e.g. `&quot;gfs&quot;`,</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                `&quot;icon-global&quot;`).</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            NWPModel: The resolved row.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            NWPModel: The resolved row.</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            ValueError: When `model_key` is unknown (with a</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                did-you-mean hint from the base class).</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            ValueError: When `model_key` is unknown (with a</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                did-you-mean hint from the base class).</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            - Resolve a known model:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_model(&quot;gfs&quot;).horizon_h</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                384</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            - A typo raises with a did-you-mean hint:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_model(&quot;gffs&quot;)  # doctest: +ELLIPSIS</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">                Traceback (most recent call last):</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">                    ...</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">                ValueError: &#39;gffs&#39; is not in the NWP catalog. Known datasets: [...]. Did you mean &#39;gfs&#39;?</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            - Resolve a known model:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">                &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_model(&quot;gfs&quot;).horizon_h</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                384</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            - A typo raises with a did-you-mean hint:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_model(&quot;gffs&quot;)  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                Traceback (most recent call last):</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                    ...</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                ValueError: &#39;gffs&#39; is not in the NWP catalog. Known datasets: [...]. Did you mean &#39;gfs&#39;?</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWPModel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">model_key</span><span class="p">))</span>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWPModel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">model_key</span><span class="p">))</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Alias for :meth:`get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Alias for :meth:`get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24706,33 +24626,6 @@ an :class:<code>NWPModel</code>.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.nwp.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.nwp.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.nwp.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the structural per-model map (satisfies the base contract).</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/nwp/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-299">299</a></span>
-<span class="normal"><a href="#__codelineno-0-300">300</a></span>
-<span class="normal"><a href="#__codelineno-0-301">301</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NWPModel</span><span class="p">]:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-model map (satisfies the base contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -24846,7 +24739,11 @@ did-you-mean hint from the base class).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/nwp/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-303">303</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span>
+<span class="normal"><a href="#__codelineno-0-303">303</a></span>
 <span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
@@ -24874,43 +24771,39 @@ did-you-mean hint from the base class).</p>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its :class:`NWPModel` row.</span>
+<span class="normal"><a href="#__codelineno-0-331">331</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its :class:`NWPModel` row.</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        model_key: A curated model key (e.g. `&quot;gfs&quot;`,</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            `&quot;icon-global&quot;`).</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        model_key: A curated model key (e.g. `&quot;gfs&quot;`,</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            `&quot;icon-global&quot;`).</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        NWPModel: The resolved row.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        NWPModel: The resolved row.</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        ValueError: When `model_key` is unknown (with a</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            did-you-mean hint from the base class).</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        ValueError: When `model_key` is unknown (with a</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            did-you-mean hint from the base class).</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        - Resolve a known model:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_model(&quot;gfs&quot;).horizon_h</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            384</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        - A typo raises with a did-you-mean hint:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_model(&quot;gffs&quot;)  # doctest: +ELLIPSIS</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            ValueError: &#39;gffs&#39; is not in the NWP catalog. Known datasets: [...]. Did you mean &#39;gfs&#39;?</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWPModel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">model_key</span><span class="p">))</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        - Resolve a known model:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_model(&quot;gfs&quot;).horizon_h</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            384</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        - A typo raises with a did-you-mean hint:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_model(&quot;gffs&quot;)  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            ValueError: &#39;gffs&#39; is not in the NWP catalog. Known datasets: [...]. Did you mean &#39;gfs&#39;?</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWPModel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">model_key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24933,11 +24826,11 @@ did-you-mean hint from the base class).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/nwp/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias for :meth:`get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-333">333</a></span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias for :meth:`get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -30087,7 +29980,7 @@ attribute to redirect the loader at a temporary file.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;NWPModel&lt;/code&gt; (&lt;code&gt;earthlens.nwp.catalog.NWPModel&lt;/code&gt;)" href="#earthlens.nwp.catalog.NWPModel">NWPModel</a>]</code></p>
 
 
 
@@ -30230,11 +30123,7 @@ an :class:<code>NWPModel</code>.</p>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">NWPModel</span><span class="p">]):</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Model catalog for the NWP backend.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    Reads the bundled `nwp_data_catalog.yaml` (shipped as package data)</span>
@@ -30279,47 +30168,43 @@ an :class:<code>NWPModel</code>.</p>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">)}</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NWPModel</span><span class="p">]:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-model map (satisfies the base contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its :class:`NWPModel` row.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its :class:`NWPModel` row.</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            model_key: A curated model key (e.g. `&quot;gfs&quot;`,</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">                `&quot;icon-global&quot;`).</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            model_key: A curated model key (e.g. `&quot;gfs&quot;`,</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                `&quot;icon-global&quot;`).</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            NWPModel: The resolved row.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            NWPModel: The resolved row.</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            ValueError: When `model_key` is unknown (with a</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                did-you-mean hint from the base class).</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            ValueError: When `model_key` is unknown (with a</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                did-you-mean hint from the base class).</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            - Resolve a known model:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_model(&quot;gfs&quot;).horizon_h</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                384</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            - A typo raises with a did-you-mean hint:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_model(&quot;gffs&quot;)  # doctest: +ELLIPSIS</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">                Traceback (most recent call last):</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">                    ...</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">                ValueError: &#39;gffs&#39; is not in the NWP catalog. Known datasets: [...]. Did you mean &#39;gfs&#39;?</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            - Resolve a known model:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">                &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_model(&quot;gfs&quot;).horizon_h</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                384</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            - A typo raises with a did-you-mean hint:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_model(&quot;gffs&quot;)  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                Traceback (most recent call last):</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                    ...</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                ValueError: &#39;gffs&#39; is not in the NWP catalog. Known datasets: [...]. Did you mean &#39;gfs&#39;?</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWPModel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">model_key</span><span class="p">))</span>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWPModel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">model_key</span><span class="p">))</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Alias for :meth:`get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Alias for :meth:`get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -30335,33 +30220,6 @@ an :class:<code>NWPModel</code>.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.nwp.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.nwp.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.nwp.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the structural per-model map (satisfies the base contract).</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/nwp/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-299">299</a></span>
-<span class="normal"><a href="#__codelineno-0-300">300</a></span>
-<span class="normal"><a href="#__codelineno-0-301">301</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NWPModel</span><span class="p">]:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-model map (satisfies the base contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -30475,7 +30333,11 @@ did-you-mean hint from the base class).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/nwp/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-303">303</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span>
+<span class="normal"><a href="#__codelineno-0-303">303</a></span>
 <span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
@@ -30503,43 +30365,39 @@ did-you-mean hint from the base class).</p>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its :class:`NWPModel` row.</span>
+<span class="normal"><a href="#__codelineno-0-331">331</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its :class:`NWPModel` row.</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        model_key: A curated model key (e.g. `&quot;gfs&quot;`,</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            `&quot;icon-global&quot;`).</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        model_key: A curated model key (e.g. `&quot;gfs&quot;`,</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            `&quot;icon-global&quot;`).</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        NWPModel: The resolved row.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        NWPModel: The resolved row.</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        ValueError: When `model_key` is unknown (with a</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            did-you-mean hint from the base class).</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        ValueError: When `model_key` is unknown (with a</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            did-you-mean hint from the base class).</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        - Resolve a known model:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_model(&quot;gfs&quot;).horizon_h</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            384</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        - A typo raises with a did-you-mean hint:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_model(&quot;gffs&quot;)  # doctest: +ELLIPSIS</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            ValueError: &#39;gffs&#39; is not in the NWP catalog. Known datasets: [...]. Did you mean &#39;gfs&#39;?</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWPModel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">model_key</span><span class="p">))</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        - Resolve a known model:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_model(&quot;gfs&quot;).horizon_h</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            384</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        - A typo raises with a did-you-mean hint:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            &gt;&gt;&gt; from earthlens.nwp import Catalog</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_model(&quot;gffs&quot;)  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            ValueError: &#39;gffs&#39; is not in the NWP catalog. Known datasets: [...]. Did you mean &#39;gfs&#39;?</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWPModel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">model_key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -30562,11 +30420,11 @@ did-you-mean hint from the base class).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/nwp/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias for :meth:`get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-333">333</a></span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias for :meth:`get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
