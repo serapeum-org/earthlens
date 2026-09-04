@@ -5,11 +5,17 @@ independently, so a provider that imports an underscore-private core symbol has 
 undeclared contract: any core release free to rename its internals breaks the
 installed provider at runtime, in one code path, without failing core's own tests.
 These tests keep that boundary explicit.
+
+The file has since grown the repo's other layering guards, which share the same
+shape -- walk the source, assert a rule no single review would catch. The
+largest is the GDAL rule: GIS I/O belongs to pyramids, so `osgeo` must not be
+imported anywhere in earthlens, including its tests, tooling and notebooks.
 """
 
 from __future__ import annotations
 
 import ast
+import functools
 import json
 import re
 from pathlib import Path
@@ -154,6 +160,12 @@ def _pyramids_ordering_problems(path: Path) -> list[str]:
     return [f"line {line}: {text}" for line, text in sorted(problems)]
 
 
+#: Directory names that are never repo source. `.ipynb_checkpoints` is Jupyter's
+#: autosave and is gitignored, so scanning it would fail the guard on a file the
+#: author cannot fix by editing the tracked notebook.
+_EXCLUDED_DIRS = frozenset({"build", "__pycache__", ".ipynb_checkpoints"})
+
+
 def _earthlens_sources() -> list[Path]:
     """Return every earthlens Python file the GDAL rule governs.
 
@@ -176,8 +188,24 @@ def _earthlens_sources() -> list[Path]:
             "examples/**/*.ipynb",
         )
         for path in _ROOT.glob(pattern)
-        if "build" not in path.parts and "__pycache__" not in path.parts
+        if not _EXCLUDED_DIRS.intersection(path.parts)
     )
+
+
+@functools.cache
+def _governed_findings() -> dict[str, list[tuple[int, str]]]:
+    """Return `{path: findings}` for every governed file that has any.
+
+    Cached because two tests ask for it and a full scan parses over a thousand
+    files. Callers read it and build their own filtered views; nothing mutates
+    the shared result.
+    """
+    return {
+        name: hits
+        for path in _earthlens_sources()
+        if (hits := _gis_imports(path))
+        and (name := str(path.relative_to(_ROOT)).replace("\\", "/"))
+    }
 
 
 #: IPython help on an object: `obj?` / `pd.DataFrame??`. Matched as a whole line
@@ -1787,16 +1815,30 @@ class TestSingleSecretAuthAdoption:
 class TestNoDirectGdal:
     """GIS I/O goes through pyramids; earthlens imports `osgeo` nowhere."""
 
+    def test_every_governed_file_parses(self):
+        """A file the guard cannot parse is a blind spot, and says so itself."""
+        # Kept apart from the GDAL assertion below: a syntax error is not a
+        # layering break, and telling its author to use `Dataset` / `NetCDF` or
+        # to add the file to `_GDAL_ALLOWED` would send them somewhere useless.
+        broken = {
+            name: hits
+            for name, hits in _governed_findings().items()
+            if any(what.startswith("unparseable") for _, what in hits)
+        }
+        assert broken == {}, (
+            "the guard could not parse these, so it cannot vouch for them. Fix the "
+            "syntax, or -- for a notebook -- teach `_source_text` the cell form it "
+            f"chokes on: {broken}"
+        )
+
     def test_no_unsanctioned_gdal_import(self):
         """Every earthlens source is free of GDAL beyond the declared allowance."""
-        offenders = {
-            str(path.relative_to(_ROOT)).replace("\\", "/"): _gis_imports(path)
-            for path in _earthlens_sources()
-        }
-        offenders = {name: hits for name, hits in offenders.items() if hits}
         unsanctioned = {
-            name: hits for name, hits in offenders.items() if name not in _GDAL_ALLOWED
+            name: [(line, what) for line, what in hits if "unparseable" not in what]
+            for name, hits in _governed_findings().items()
+            if name not in _GDAL_ALLOWED
         }
+        unsanctioned = {name: hits for name, hits in unsanctioned.items() if hits}
         assert unsanctioned == {}, (
             "GIS I/O belongs to pyramids -- use Dataset / NetCDF / FeatureCollection. "
             "If pyramids genuinely cannot do it, file an issue there and add the site "
