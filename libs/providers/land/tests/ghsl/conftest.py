@@ -9,7 +9,7 @@ from typing import Any, Callable
 import numpy as np
 import pytest
 import requests
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 
 #: Mollweide (ESRI:54009) geotransform inside the verified R6_C18 tile extent
 #: ([-1041000, 3000000, -41000, 4000000]); 5x5 cells of 100 km.
@@ -32,8 +32,10 @@ def make_tiny_tif(
     rows = 5 if epsg == 54009 else 4
     if values is None:
         values = np.arange(rows * rows, dtype="float32").reshape(rows, rows)
-    dataset = Dataset.create_from_array(
-        values, geo=geo, epsg=epsg, no_data_value=no_data, driver_type="MEM"
+    dataset = Dataset.from_array(
+        values,
+        no_data_value=no_data,
+        geo_ref=GeoReference(geo=geo, epsg=epsg),
     )
     dataset.to_file(str(path))
     return path

@@ -21,7 +21,7 @@ API is the [Reference](jaxa.md) page.
 `OUTPUT_KIND="raster"`. `download()` returns the list of written paths:
 
 * **`protocol: jaxa-earth`** — one GeoTIFF per band per requested
-  dataset, written via `pyramids.dataset.Dataset.create_from_array(...)`
+  dataset, written via `pyramids.dataset.Dataset.from_array(...)`
   → `.to_file(...)`. Filenames are `<dataset key>_<band>.tif`. EPSG:4326,
   north-up.
 * **`protocol: gportal`** — the raw G-Portal product(s) that match the

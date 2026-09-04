@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 
 from earthlens.base.spatial import (
     ensure_no_data,
@@ -15,12 +15,10 @@ from earthlens.base.spatial import (
 def _dataset(no_data_value):
     """Return a small in-memory 4326 Dataset with the given no-data value."""
     arr = np.arange(9, dtype="float32").reshape(3, 3)
-    return Dataset.create_from_array(
+    return Dataset.from_array(
         arr,
-        top_left_corner=(0, 0),
-        cell_size=1.0,
-        epsg=4326,
         no_data_value=no_data_value,
+        geo_ref=GeoReference(top_left_corner=(0, 0), cell_size=1.0, epsg=4326),
     )
 
 
@@ -113,8 +111,10 @@ class TestWindowedBboxCrop:
             if all_nodata
             else np.arange(100, dtype="float32").reshape(10, 10)
         )
-        return Dataset.create_from_array(
-            arr, top_left_corner=(0, 0), cell_size=1.0, epsg=4326, no_data_value=-9999.0
+        return Dataset.from_array(
+            arr,
+            no_data_value=-9999.0,
+            geo_ref=GeoReference(top_left_corner=(0, 0), cell_size=1.0, epsg=4326),
         )
 
     def test_data_present_window_is_cropped(self):

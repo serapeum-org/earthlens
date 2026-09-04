@@ -121,23 +121,29 @@ class _FakeCustomisation:
 
     def __init__(
         self,
-        statuses: list[str] | None = None,
+        statuses: list[Any] | None = None,
         outputs: list[str] | None = None,
         logfile: str = "server log tail",
         payload: bytes = b"TAILORED",
+        name: str = "fake-customisation",
     ) -> None:
         self._statuses = list(statuses or ["DONE"])
         self.outputs = list(outputs if outputs is not None else ["customised.tif"])
         self._logfile = logfile
         self._payload = payload
+        self.name = name
         self.deleted = 0
         self.delete_error: BaseException | None = None
+        #: Optional shared ordering log, set by `_FakeDataTailor` on hand-out.
+        self.events: list[tuple[str, str]] | None = None
 
     @property
-    def status(self) -> str:
-        if len(self._statuses) > 1:
-            return self._statuses.pop(0)
-        return self._statuses[0]
+    def status(self) -> Any:
+        value = self._statuses.pop(0) if len(self._statuses) > 1 else self._statuses[0]
+        # A scripted exception simulates a stalled / dropped poll HTTP call.
+        if isinstance(value, BaseException):
+            raise value
+        return value
 
     @property
     def logfile(self) -> str:
@@ -149,27 +155,33 @@ class _FakeCustomisation:
 
     def delete(self) -> None:
         self.deleted += 1
+        if self.events is not None:
+            self.events.append(("delete", self.name))
         if self.delete_error is not None:
             raise self.delete_error
         return None
 
     def __str__(self) -> str:
-        return "fake-customisation"
+        return self.name
 
 
 class _FakeDataTailor:
     """Stand-in for `eumdac.DataTailor` — records submits, returns a scripted job.
 
-    A test sets `.customisation` to the `_FakeCustomisation` to return and,
-    optionally, seeds `.submit_errors` with exceptions (or `None`) consumed
-    one per `new_customisation` call to exercise the transient-retry path.
+    A test sets `.customisation` to the `_FakeCustomisation` to return (or
+    seeds `.customisations` with a per-submit sequence, e.g. a FAILED job
+    then a DONE one) and, optionally, `.submit_errors` with exceptions (or
+    `None`) consumed one per `new_customisation` call to exercise the
+    transient-submit-retry path. `.events` records the submit/delete order.
     """
 
     def __init__(self, token: Any) -> None:
         self.token = token
         self.submitted: list[tuple[Any, Any]] = []
         self.customisation: _FakeCustomisation | None = None
+        self.customisations: list[_FakeCustomisation] = []
         self.submit_errors: list[BaseException | None] = []
+        self.events: list[tuple[str, str]] = []
 
     def new_customisation(self, product: Any, chain: Any):
         self.submitted.append((product, chain))
@@ -177,7 +189,11 @@ class _FakeDataTailor:
             error = self.submit_errors.pop(0)
             if error is not None:
                 raise error
-        return self.customisation
+        cust = self.customisations.pop(0) if self.customisations else self.customisation
+        if cust is not None:
+            cust.events = self.events
+            self.events.append(("submit", cust.name))
+        return cust
 
 
 class _FakeEumdac(types.ModuleType):

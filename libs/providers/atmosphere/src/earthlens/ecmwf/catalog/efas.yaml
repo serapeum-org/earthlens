@@ -54,7 +54,11 @@ datasets:
         cds_variable: river_discharge_in_the_last_24_hours
         nc_variable: dis24
         units: m3 s-1
-
+        extras:
+          system_version:
+          - version_2_0
+          time:
+          - 06:00
   efas-reforecast:
     endpoint: ewds
     grid_resolution: 0.05

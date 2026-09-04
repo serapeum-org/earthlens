@@ -8,6 +8,7 @@ malformed YAML, and the no-MARS-keys invariant on the schema.
 
 from __future__ import annotations
 
+import pydantic
 import pytest
 
 from earthlens.ecmwf import Catalog, Variable
@@ -1154,3 +1155,134 @@ class TestDenotesTemporalAggregate:
         assert all(t == t.lower() for t in _TEMPORAL_AGGREGATE_TOKENS), (
             "every token is lowercase so matching against lowercased text works"
         )
+
+
+class TestUnhydratableField:
+    """The catalog can say a row is terminal rather than merely unfilled."""
+
+    def test_it_defaults_to_none(self):
+        """Every existing row keeps meaning 'pending' without being touched."""
+        from earthlens.ecmwf.catalog import Variable
+
+        row = Variable(
+            cds_dataset="d",
+            cds_variable="v",
+            nc_variable="n",
+            units="K",
+            product_type=["reanalysis"],
+        )
+        assert row.unhydratable is None
+
+    def test_every_unfilled_pseudo_slug_row_is_marked(self):
+        """Both spellings count; a filled one needs no mark, having resolved."""
+        from earthlens.ecmwf import Catalog
+
+        unmarked = [
+            f"{name}/{slug}"
+            for name, dataset in Catalog().datasets.items()
+            for slug, row in dataset.variables.items()
+            if slug in {"all", "all-variables"}
+            and row.units == "unknown"
+            and not row.unhydratable
+        ]
+        assert not unmarked, f"pseudo-slug rows left indistinguishable: {unmarked}"
+
+    @pytest.mark.parametrize("typo", ["pseudo_slug", "pseudoslug", "Pseudo-Slug"])
+    def test_a_misspelt_reason_is_refused(self, typo):
+        """A truthy typo would skip the row for good and read as deliberate."""
+        from earthlens.ecmwf.catalog import Variable
+
+        with pytest.raises(pydantic.ValidationError):
+            Variable.model_validate(
+                {
+                    "cds_dataset": "a-dataset",
+                    "cds_variable": "a-variable",
+                    "nc_variable": "v",
+                    "units": "unknown",
+                    "unhydratable": typo,
+                }
+            )
+
+    def test_a_resolved_pseudo_slug_row_is_left_alone(self):
+        """A dataset serving one variable resolves `all`, so the mark would lie."""
+        from earthlens.ecmwf import Catalog
+
+        catalog = Catalog()
+        for name in ("satellite-precipitation", "satellite-sea-surface-temperature"):
+            row = catalog.datasets[name].variables["all"]
+            assert row.units != "unknown", f"{name}/all is expected to be hydrated"
+            assert row.unhydratable is None, (
+                f"{name}/all resolved to {row.nc_variable!r}, so it is not terminal"
+            )
+
+
+class TestShippedCatalogInvariants:
+    """Properties every shipped row must hold, not only rows a sweep just wrote.
+
+    The serveability guard runs at write time, so it protects the catalog only
+    for as long as nobody edits it by hand or with a pre-guard tool. These check
+    what is actually on disk.
+    """
+
+    def test_a_placeholder_row_names_no_variable(self):
+        """`units: unknown` has one meaning: nothing has been curated here yet.
+
+        A row keeping a probed `nc_variable` while losing its `units` reads as
+        uncurated to the sweep but still feeds `aggregate=`, and un-reserves the
+        name in the leftover rule so a later sweep can hand it to another slug.
+        """
+        from earthlens.ecmwf import Catalog
+
+        divergent = [
+            f"{name}/{slug} -> {row.nc_variable}"
+            for name, dataset in Catalog().datasets.items()
+            for slug, row in dataset.variables.items()
+            if row.units == "unknown" and str(row.nc_variable) != str(row.cds_variable)
+        ]
+
+        assert not divergent, (
+            "placeholder rows carrying a probed nc_variable: " + "; ".join(divergent)
+        )
+
+    def test_a_row_naming_a_statistic_in_its_variable_records_it(self):
+        """A name ending `_Max_24h` must say which statistic produced it.
+
+        `2m-relative-humidity-derived` was hydrated to the 24-hour maximum
+        without recording `statistic`, so the request it sends is not the one
+        the name came from.
+        """
+        from earthlens.ecmwf import Catalog
+
+        suffixes = {"_Max_24h": "24_hour_maximum", "_Min_24h": "24_hour_minimum"}
+        silent = []
+        for name, dataset in Catalog().datasets.items():
+            for slug, row in dataset.variables.items():
+                if row.units == "unknown":
+                    continue
+                nc = str(row.nc_variable)
+                wanted = next(
+                    (stat for suffix, stat in suffixes.items() if nc.endswith(suffix)),
+                    None,
+                )
+                if wanted is None:
+                    continue
+                asked = (row.extras or {}).get("statistic")
+                if not asked or wanted not in [str(v) for v in asked]:
+                    silent.append(f"{name}/{slug} -> {nc} asks {asked}")
+
+        assert not silent, "rows whose name names a statistic they never request: " + (
+            "; ".join(silent)
+        )
+
+    def test_a_curated_row_names_a_variable_and_a_unit(self):
+        """The converse: a row that has lost the sentinel has both halves filled."""
+        from earthlens.ecmwf import Catalog
+
+        incomplete = [
+            f"{name}/{slug}"
+            for name, dataset in Catalog().datasets.items()
+            for slug, row in dataset.variables.items()
+            if row.units != "unknown" and not str(row.nc_variable).strip()
+        ]
+
+        assert not incomplete, f"curated rows with no nc_variable: {incomplete}"

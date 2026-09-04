@@ -428,7 +428,10 @@ def audit_table(outcomes) -> Table:
             `status`, `live_count`, `curated_count`, `broken`, `detail`).
 
     Returns:
-        A :class:`rich.table.Table`; counts show `-` for non-`ok` rows.
+        A :class:`rich.table.Table`; counts show `-` for non-`ok` rows. Variable
+        drift is not a column (it would overflow an 80-column terminal); it is
+        surfaced by the `datasets audit` command's per-provider drift lines, the
+        `--json` output, and the `--strict` exit code.
     """
     table = Table(header_style="bold", show_lines=False)
     table.add_column("PROVIDER", overflow="fold")

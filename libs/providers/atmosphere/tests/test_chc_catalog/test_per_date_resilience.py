@@ -8,6 +8,7 @@ import pandas as pd
 import pytest
 
 from earthlens.chc import CHIRPS
+from earthlens.chc import backend as chc_backend
 
 pytestmark = [pytest.mark.chc]
 
@@ -23,6 +24,22 @@ def _build_chirps(tmp_path: Path) -> CHIRPS:
         lon_lim=[0.0, 1.0],
         path=tmp_path,
     )
+
+
+class _FakeFtp:
+    """Stand-in for the batch's shared FTP session.
+
+    `_fetch_dates_sequential` opens one session up front and hands it to every
+    `_api` call, so stubbing `_api` alone still leaves a real anonymous login
+    against `data.chc.ucsb.edu` in the path -- which turns these unit tests into
+    live-network tests. Both cleanup helpers are no-ops here.
+    """
+
+    def quit(self) -> None:
+        """Close the session."""
+
+    def close(self) -> None:
+        """Drop the session."""
 
 
 class _CountingApiSpy:
@@ -50,6 +67,7 @@ class TestPerDateResilience:
         chirps = _build_chirps(tmp_path)
         spy = _CountingApiSpy()
         monkeypatch.setattr(chirps, "_api", spy)
+        monkeypatch.setattr(chc_backend, "_open_ftp", _FakeFtp)
         # Run the per-dataset loop directly so the test doesn't depend on
         # `download()`'s outer try/except.
         ds = chirps.catalog.datasets["global-daily"]
@@ -71,6 +89,7 @@ class TestPerDateResilience:
         chirps = _build_chirps(tmp_path)
         spy = _CountingApiSpy()
         monkeypatch.setattr(chirps, "_api", spy)
+        monkeypatch.setattr(chc_backend, "_open_ftp", _FakeFtp)
         ds = chirps.catalog.datasets["global-daily"]
         var = ds.variables["precipitation"]
         # Bridge loguru to the std `logging` records caplog watches.

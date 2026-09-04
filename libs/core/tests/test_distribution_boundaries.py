@@ -65,16 +65,20 @@ def _core_imports(path: Path):
 #: break and a latent `ModuleNotFoundError`.
 _BANNED_GIS_MODULES = frozenset({"osgeo", "gdal", "ogr", "osr"})
 
-#: The one place allowed to reach for GDAL, and why. `gdal_module()` reads a CF
-#: `time` coordinate's `units` through the multidim API, because under the HDF5
-#: driver (which GDAL picks for any NetCDF-4 over `/vsicurl` on Windows) that
-#: attribute never reaches `meta_data.get_dimension().attrs`, and
-#: `MDArray.GetUnit()` is the only route to the epoch.
+#: Files allowed to reach for GDAL directly. Empty, and meant to stay that way.
 #:
-#: Blocked on serapeum-org/pyramids#1078. When that lands, delete the import in
-#: `_helpers.py` *and* this entry -- the assertion below is a subset check, so
-#: an empty allowance keeps passing.
-_GDAL_ALLOWED = frozenset({"libs/providers/hazards/src/earthlens/jrc/_helpers.py"})
+#: It held one entry: `jrc/_helpers.py`, whose `gdal_module()` read a CF `time`
+#: coordinate's `units` through the multidim API because under the HDF5 driver
+#: (which GDAL picks for any NetCDF-4 over `/vsicurl` on Windows) that attribute
+#: never reached `meta_data.get_dimension().attrs`. serapeum-org/pyramids#1078
+#: fixed that, pyramids 0.59 shipped it, and the accessor is gone -- so the
+#: allowance retired itself: `test_the_allowance_is_still_used` failed on the
+#: merge that removed the import, which is exactly what it is for.
+#:
+#: Adding an entry means a pyramids gap you have filed an issue for. Name the
+#: issue here, and note that `test_the_sanctioned_site_imports_pyramids_first`
+#: only has something to check while this set is non-empty.
+_GDAL_ALLOWED: frozenset[str] = frozenset()
 
 
 def _earthlens_sources() -> list[Path]:

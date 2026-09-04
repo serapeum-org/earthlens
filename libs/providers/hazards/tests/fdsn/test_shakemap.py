@@ -440,15 +440,16 @@ class TestFltToGeotiff:
 
         assert dest.is_file()
         dataset = Dataset.read_file(dest)
-        assert dataset.driver_type == "geotiff"
-        assert dataset.columns == _COLS
-        assert dataset.rows == _ROWS
-        # pyramids resolves this through AutoIdentifyEPSG rather than
-        # matching digits in the WKT, so a projection that merely mentions
-        # 4326 without carrying the authority does not satisfy it.
-        assert dataset.epsg == 4326, (
-            f"the CRS should resolve to EPSG:4326, got {dataset.epsg}"
-        )
+        try:
+            assert dataset.driver_type == "geotiff"
+            assert dataset.columns == _COLS
+            assert dataset.rows == _ROWS
+            assert dataset.epsg == 4326, (
+                "the CRS should carry an EPSG authority code, not merely the "
+                "digits 4326 somewhere in its WKT"
+            )
+        finally:
+            dataset.close()
 
 
 class TestFltToGeotiffFailures:

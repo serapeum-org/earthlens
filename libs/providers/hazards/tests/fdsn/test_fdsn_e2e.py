@@ -122,15 +122,15 @@ class TestShakemapLiveSideOutput:
         assert rasters, "expected a ShakeMap GeoTIFF per event"
 
         dataset = Dataset.read_file(rasters[0])
-        assert dataset.driver_type == "geotiff"
-        # pyramids resolves this through AutoIdentifyEPSG rather than
-        # matching digits in the WKT, so a projection that merely mentions
-        # 4326 without carrying the authority does not satisfy it.
-        assert dataset.epsg == 4326, (
-            f"the CRS should resolve to EPSG:4326, got {dataset.epsg}"
-        )
-        assert dataset.columns > 1, "the grid should have real width"
-        assert dataset.rows > 1, "the grid should have real height"
+        try:
+            assert dataset.driver_type == "geotiff"
+            # pyramids resolves the authority code itself, so a CRS that merely
+            # carries the digits 4326 somewhere in its WKT does not pass.
+            assert dataset.epsg == 4326, "the CRS should carry an EPSG authority code"
+            assert dataset.columns > 1, "the grid should have real width"
+            assert dataset.rows > 1, "the grid should have real height"
+        finally:
+            dataset.close()
 
         # Exact contents, not an allowlist of forbidden suffixes: GDAL drops a
         # `.prj` beside the grid when its CRS is assigned, which a suffix filter

@@ -10,12 +10,16 @@ name: Catalog drift (scheduled)
 # actually runs it. It names the dead dataset in one line, without downloading
 # a byte - unlike an e2e fetch failure, which reads like ordinary flakiness.
 #
-# SCOPE, so this is not mistaken for more than it is: the audit compares
-# dataset *ids* only. Of the two halves of #1129 it would have caught the
-# retired `nceiPH53sstd1day` and NOT the `wtmp` -> `WTMP` re-casing, because
-# nothing here compares a row's variables against the ones served live. A
-# variable-level audit is tracked in #1148; until it exists, variable drift
-# is still found the hard way, by an e2e fetch failing.
+# SCOPE: the audit compares curated dataset *ids* for every wired provider, and
+# for providers whose listing endpoint enumerates a dataset's variables
+# (currently `erddap`, via each dataset's `.dds`) it also compares the curated
+# *variables* against those served live. This closes both halves of the #1129
+# *class* of drift: a curated id the provider stops serving (id drift) and a
+# curated variable it re-cases or drops - e.g. `cwwcNDBCMet`'s `wtmp` -> `WTMP`,
+# which the variable dimension added in #1148 catches today. (#1129's retired id
+# `nceiPH53sstd1day` was never curated here, so it is the *kind* of id drift the
+# gate catches, not a row it flags today.) A provider that cannot enumerate
+# variables reports `unsupported` for that dimension rather than a false `ok`.
 #
 # Deliberately SCHEDULED, not per-PR: it needs the network and provider
 # credentials, so it would be slow and flaky as a required check, and a

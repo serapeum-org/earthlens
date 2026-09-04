@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 
 from earthlens.jrc import backend as backend_module
 from earthlens.jrc.backend import JRC
@@ -247,12 +247,10 @@ def _write_efhm_geotiff(
         arr = np.arange(200 * 200, dtype="float32").reshape(200, 200)
     else:
         arr = np.full((200, 200), fill, dtype="float32")
-    Dataset.create_from_array(
+    Dataset.from_array(
         arr,
-        top_left_corner=(4.0, 53.0),
-        cell_size=0.01,
-        epsg=4326,
         no_data_value=no_data_value,
+        geo_ref=GeoReference(top_left_corner=(4.0, 53.0), cell_size=0.01, epsg=4326),
     ).to_file(str(path))
 
 

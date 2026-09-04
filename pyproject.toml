@@ -1,6 +1,6 @@
 [project]
 name = "earthlens"
-version = "0.20.0"
+version = "0.21.0"
 description = "remote sensing package"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -30,12 +30,12 @@ requires-python = ">=3.11,<4"
 # five is conflict-free — the irreconcilable pins only meet if a user asks for
 # two conflicting extras at once, exactly as before the split.
 dependencies = [
-    "earthlens-core ==0.20.0",
-    "earthlens-atmosphere ==0.20.0",
-    "earthlens-ocean ==0.20.0",
-    "earthlens-imagery ==0.20.0",
-    "earthlens-land ==0.20.0",
-    "earthlens-hazards ==0.20.0",
+    "earthlens-core ==0.21.0",
+    "earthlens-atmosphere ==0.21.0",
+    "earthlens-ocean ==0.21.0",
+    "earthlens-imagery ==0.21.0",
+    "earthlens-land ==0.21.0",
+    "earthlens-hazards ==0.21.0",
 ]
 
 
@@ -134,7 +134,7 @@ dev = [
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
     # runtime dep of earthlens itself.
-    "pyramids-gis[viz] >=0.58.1",
+    "pyramids-gis[viz] >=0.59.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -178,7 +178,7 @@ dev = [
     # pulled in here instead -- otherwise the tests that pin its
     # `from_earthengine` signature would skip everywhere and a 0.x contract
     # change would only surface on a live run.
-    "pyramids-eo >=0.7.0,<0.8",
+    "pyramids-eo >=0.8.0,<0.9",
 ]
 # The eclipse showcase notebooks need the geostationary-imagery pieces of
 # pyramids-eo (read_fci_l1c, the composites, the viewing geometry) plus a few small
@@ -189,12 +189,14 @@ notebooks = [
     # pyramids-eo: reads raw MTG FCI granules (read_fci_l1c) and builds the day/night
     # composites -- true colour, the sun-zenith pair, Rayleigh correction and the
     # viewing geometry it needs. This replaces the satpy / pyresample / pyspectral
-    # stack the eclipse notebook used to carry. 0.7 is the floor for `rayleigh_correct`,
-    # `solar_zenith_azimuth`, `satellite_zenith_azimuth` and `relative_azimuth`, none of
-    # which exist before it (pyramids-eo#91-93); `sunz_correct` / `sunz_reduce`, also
-    # used here, shipped earlier in 0.6.0 (pyramids-eo#86) but the other four still set
-    # the floor. Also declared, at the same version, in `dev` -- see the comment there.
-    "pyramids-eo >=0.7.0,<0.8",
+    # stack the eclipse notebook used to carry. 0.7 first carried `rayleigh_correct`,
+    # `solar_zenith_azimuth`, `satellite_zenith_azimuth` and `relative_azimuth`
+    # (pyramids-eo#91-93), but 0.8 now sets the floor: it is the first release built
+    # against pyramids 0.59's `from_array` / `GeoReference` constructors, and 0.7's
+    # reader still calls the removed `create_from_array`, so the EEDAI path raises
+    # AttributeError against the pyramids floor this project now requires.
+    # Also declared, at the same version, in `dev` -- see the comment there.
+    "pyramids-eo >=0.8.0,<0.9",
     # scipy: feathers the disc edge and softens the limb (ndimage.binary_erosion /
     # gaussian_filter).
     "scipy >=1.11",
@@ -221,7 +223,7 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.58.1",
+    "pyramids-gis[viz] >=0.59.0",
     # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-gis[viz], but an imported package

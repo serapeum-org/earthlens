@@ -26,6 +26,7 @@ from typing import Any
 
 import typer
 import yaml
+from loguru import logger
 
 #: Seconds to wait for one dataset's live retrieve before abandoning it. A
 #: single request stuck in the CDS queue would otherwise wedge the whole pass,
@@ -80,6 +81,19 @@ _AUXILIARY_SUFFIXES = (
     "_status",
     "_flag",
     "_flags",
+    # A CDR spells its quality band `FAPAR_QFLAG`, which does not end in
+    # `_flag` - the tail is `qflag` - so the entry above does not reach it.
+    "_qflag",
+    "_qflags",
+    # An uncertainty or spread band describes a measurement rather than being
+    # one. Its long_name names the quantity it belongs to, which is enough for
+    # the leftover rule to pair it with that quantity's slug.
+    "_err",
+    "_error",
+    "_unc",
+    "_uncertainty",
+    "_stddev",
+    "_sigma",
     "_zenith_angle",
     "_azimuth_angle",
     "_covered_hours",
@@ -92,6 +106,15 @@ _VARIABLE_BLOCK = re.compile(
 )
 #: The placeholder sentinel a seed writes for an un-hydrated variable.
 _UNKNOWN_UNITS = re.compile(r"(?m)^ {8}units:[ \t]*unknown[ \t]*$")
+
+#: A row whose `unhydratable:` names why no retrieve can ever fill it. The
+#: null spellings are excluded on purpose: the field is `str | None`, so
+#: pydantic loads `unhydratable: null` as `None` - "pending, try it" - and a
+#: regex that matched it would have the sweep skip a row the catalog holds
+#: unmarked. Only a value that survives as a string means the row is terminal.
+_UNHYDRATABLE = re.compile(
+    r"(?m)^ {8}unhydratable:[ \t]*(?!(?:~|null|Null|NULL)[ \t]*(?:#[^\n]*)?$)\S"
+)
 #: The 8-space `nc_variable:` / `units:` keys rewritten inside a var sub-block
 #: (the value after the key is replaced, a single space re-inserted).
 _NC_VARIABLE_LINE = re.compile(r"(?m)^( {8}nc_variable:)[^\n]*$")
@@ -153,7 +176,19 @@ def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
     return _ecmwf_deep_sample(dataset_id)
 
 
-def _probe_into(dataset_id: str, cds_variable: str, box: dict[str, Any]) -> None:
+# `cli.py` and this module import each other's privates, and the cycle is
+# only survivable because every one of those imports sits inside a
+# function: this module reaches into `cli` for `_ecmwf_constraints` and
+# `_ecmwf_deep_sample*`, and `cli` reaches back for `_asked_values`.
+# Promoting any of them to a module-level import breaks
+# `import earthlens.ecmwf`. Keep them function-local until the shared
+# selector vocabulary moves to a third module.
+def _probe_into(
+    dataset_id: str,
+    cds_variable: str,
+    box: dict[str, Any],
+    prefer: dict[str, Any] | None = None,
+) -> None:
     """Thread body: probe one variable, storing its result or error in `box`.
 
     Catches `BaseException`, not `Exception`: anything raised in here has to
@@ -164,9 +199,12 @@ def _probe_into(dataset_id: str, cds_variable: str, box: dict[str, Any]) -> None
         dataset_id: The Copernicus dataset id to sample.
         cds_variable: The `cds_variable` to request.
         box: Mutable result cell shared with the caller thread.
+        prefer: Selectors the row already carries, so the probe reads its name
+            and unit from a block the row's own request can reach rather than
+            from whichever block the store happens to list first.
     """
     try:
-        box["result"] = _retrieve_variable_meta(dataset_id, cds_variable)
+        box["result"] = _retrieve_variable_meta(dataset_id, cds_variable, prefer)
     except Exception as exc:  # noqa: BLE001 — surfaced to the caller thread
         box["error"] = exc
     except BaseException as exc:
@@ -178,7 +216,10 @@ def _probe_into(dataset_id: str, cds_variable: str, box: dict[str, Any]) -> None
 
 
 def _probe_with_timeout(
-    dataset_id: str, cds_variable: str, timeout: float | None
+    dataset_id: str,
+    cds_variable: str,
+    timeout: float | None,
+    prefer: dict[str, Any] | None = None,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     """Probe one variable under a deadline, so a stuck request cannot wedge the pass.
 
@@ -198,12 +239,17 @@ def _probe_with_timeout(
         deadline; the retrieve it holds is abandoned, not cancelled. At most one
         such thread is left per dataset, because the session stops probing after
         its first timeout.
+        prefer: Selectors the row already carries, so the probe reads its name
+            and unit from a block the row's own request can reach rather than
+            from whichever block the store happens to list first.
     """
     if not timeout:
-        return _retrieve_variable_meta(dataset_id, cds_variable)
+        return _retrieve_variable_meta(dataset_id, cds_variable, prefer)
     box: dict[str, Any] = {}
     thread = threading.Thread(
-        target=_probe_into, args=(dataset_id, cds_variable, box), daemon=True
+        target=_probe_into,
+        args=(dataset_id, cds_variable, box, prefer),
+        daemon=True,
     )
     thread.start()
     thread.join(timeout)
@@ -233,9 +279,14 @@ class _ProbeSession:
         timed_out: Whether that failure was the deadline rather than the store.
         offered: Every data variable any probe in this session returned, so a
             dataset that hydrated nothing can report what it was actually given.
-        answered: How many probes came back describing something. Zero means no
-            constraints block names these rows at all, which is a different
-            problem from a probe that answered with nothing usable.
+        filtered: Every variable a probe returned that `_data_variables` then
+            removed as a coordinate, bound, or auxiliary. A file offering only
+            `FAPAR_ERR` and `FAPAR_QFLAG` would otherwise report the same
+            "nothing offered" as a store that answered with an empty file, and
+            those call for opposite actions — widen the row, or chase the store.
+        issued: How many probes were actually sent. Zero means the stanza named
+            no `cds_variable` to probe, so nothing can be said about what the
+            store would have returned.
     """
 
     def __init__(self, dataset_id: str, timeout: float | None) -> None:
@@ -244,20 +295,39 @@ class _ProbeSession:
         self.error: BaseException | None = None
         self.timed_out = False
         self.offered: set[str] = set()
-        self.answered = 0
+        self.filtered: set[str] = set()
+        self.issued = 0
 
     def __call__(
-        self, cds_variable: str
+        self, cds_variable: str, prefer: dict[str, Any] | None = None
     ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
-        """Probe `cds_variable`, or return empty once the session has failed."""
+        """Probe `cds_variable`, or return empty once the session has failed.
+
+        A failure is recorded rather than raised, so the caller keeps the rows
+        already filled in this pass and every later variable of the same dataset
+        short-circuits instead of repeating a refusal that will not change.
+
+        Args:
+            cds_variable: The CDS variable name to retrieve a slice of.
+            prefer: The selectors the catalog row will send, so the probe reads
+                the product that row asks for rather than the first listed.
+
+        Returns:
+            The `(metadata, selectors)` pair the probe returned — metadata maps
+            NetCDF short name to `{long_name, units}`, selectors are what the
+            variable is only ever served under. Both empty when this probe
+            failed, or when an earlier one already abandoned the session.
+        """
         if self.error is not None:
             return {}, {}
+        self.issued += 1
         try:
             meta, selectors = _probe_with_timeout(
-                self.dataset_id, cds_variable, self.timeout
+                self.dataset_id, cds_variable, self.timeout, prefer
             )
-            self.offered.update(_data_variables(meta))
-            self.answered += bool(meta)
+            data = _data_variables(meta)
+            self.offered.update(data)
+            self.filtered.update(set(meta) - set(data))
             return meta, selectors
         except TimeoutError as exc:
             self.timed_out = True
@@ -327,12 +397,83 @@ def _tokens(text: str) -> set[str]:
     return {token for token in re.split(r"[^a-z0-9]+", text.lower()) if token}
 
 
+#: A scalar that reads as a number to some YAML reader. PyYAML's 1.1
+#: resolver calls none of these numbers - it wants a decimal point for a
+#: float, and `08` is not valid octal - so `safe_dump` leaves them bare and
+#: they load back as strings here by luck of the resolver. A YAML 1.2
+#: core-schema loader resolves `1e-3` to a float, and `units: str` would
+#: then coerce it to `'0.001'`. Quote them, so the type is the file's
+#: rather than the parser's.
+_NUMBER_SHAPED = re.compile(
+    r"[+-]?(?:0[0-9]+|[0-9]+(?:\.[0-9]*)?|\.[0-9]+)"
+    r"(?:[eE][+-]?[0-9]+)?"
+)
+
+
+def _quote_if_number_shaped(dumped: str, value: str) -> str:
+    """Quote a scalar the emitter left bare that another reader would type.
+
+    Args:
+        dumped: What the YAML emitter produced for `value`.
+        value: The original string.
+
+    Returns:
+        `dumped`, quoted when it is bare and number-shaped.
+    """
+    if dumped == value and _NUMBER_SHAPED.fullmatch(value):
+        return f"'{value}'"
+    return dumped
+
+
 def _yaml_value(value: str) -> str:
-    """Render a string as the scalar YAML would emit after `key: ` (quoting as needed)."""
+    """Render a string as the scalar YAML would emit after `key: `.
+
+    Dumped by the emitter rather than interpolated, so a value that needs
+    quoting gets it and reads back as the same string. A number-shaped scalar
+    the emitter leaves bare is quoted on top of that, because PyYAML's own
+    resolver is not the only one that will ever read the file.
+
+    Args:
+        value: The string to write as a scalar.
+
+    Returns:
+        The scalar text to place after `key: `, quoted where a reader would
+        otherwise give it a type.
+
+    Examples:
+        - An ordinary unit is written as itself:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _yaml_value
+            >>> _yaml_value("W m-2")
+            'W m-2'
+
+            ```
+        - A value YAML would re-read as another type is quoted:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _yaml_value
+            >>> _yaml_value("yes")
+            "'yes'"
+
+            ```
+        - So is one only PyYAML happens to leave alone:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _yaml_value
+            >>> _yaml_value("1e-3")
+            "'1e-3'"
+
+            ```
+    """
+    # `width` is unbounded because the result is spliced into one `key: value`
+    # line: at the default 80 columns the emitter folds a long scalar onto a
+    # continuation line, and the embedded newline would break both that line
+    # and any inline list built from it.
     dumped: str = yaml.safe_dump(
-        {"x": value}, allow_unicode=True, default_flow_style=False
+        {"x": value}, allow_unicode=True, default_flow_style=False, width=10**6
     )
-    return dumped[len("x: ") :].rstrip("\n")
+    return _quote_if_number_shaped(dumped[len("x: ") :].rstrip("\n"), value)
 
 
 def _is_auxiliary(name: str) -> bool:
@@ -342,8 +483,20 @@ def _is_auxiliary(name: str) -> bool:
     slug (a wrong `nc_variable` silently mis-extracts at `aggregate=` time).
     Covers the explicit :data:`_COORD_NAMES` and :data:`_AUXILIARY_NAMES`, the
     observation-count prefix `nobs` / `n_obs`, and every :data:`_AUXILIARY_SUFFIXES`
-    tail — cell bounds (`lat_bnds`), counts (`pixel_count`), status/quality flags,
-    and solar/sensor viewing angles (`SZA`, `sensor_zenith_angle`).
+    tail — cell bounds (`lat_bnds`), counts (`pixel_count`), status and quality
+    flags in both spellings (`quality_flag`, `FAPAR_QFLAG`), uncertainty and
+    spread bands (`FAPAR_ERR`, `swe_unc`, `ice_conc_stddev`), and solar/sensor
+    viewing angles (`SZA`, `sensor_zenith_angle`).
+
+    The suffixes are tails, not names: a variable actually called `flag` or
+    `err` is a measurement and stays one. Matching folds case, since a producer
+    spells `FAPAR_ERR` where another spells `fapar_err`.
+
+    Args:
+        name: A NetCDF short name from the retrieved file.
+
+    Returns:
+        True when the name describes a measurement rather than being one.
     """
     lower = name.lower()
     return (
@@ -643,6 +796,52 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
     return len(tokens) >= 2 and _is_initialism(name, tokens)
 
 
+#: Temporal restatements of a variable the same file also carries in its own
+#: right. The CAMS emission inventories offer `emiss_bio` beside
+#: `emiss_bio_monthly`, both labelled with the species, which leaves the
+#: matcher two candidates for one row and no way to choose.
+_RESTATEMENT_SUFFIXES = ("_monthly",)
+
+
+def _drop_restatements(
+    candidates: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Drop `X_monthly` when the file also offers `X`.
+
+    A monthly restatement is the same quantity on another cadence, so a file
+    carrying both hands the matcher two candidates that are not really a choice
+    — and it declines rather than guess, leaving the row a placeholder. The
+    base is the one a catalog row names.
+
+    Only a restatement whose base is present is dropped: a file offering
+    `emiss_bio_monthly` alone still has one candidate, and it is that one.
+
+    `_monthly` is the only suffix ruled on, because it is the only one observed
+    to pair this way. `X` beside `X_climatology` or `X_daily` is not the same
+    quantity restated — an instantaneous field beside a long-term mean, or a
+    field beside a daily statistic of it — and CDS ships each as its own
+    product, so dropping either would discard a variable a row could name.
+
+    Matching folds case on both sides, since a producer spells `EMISS_BIO`
+    beside `emiss_bio_monthly` and the base is the same variable either way.
+
+    Args:
+        candidates: The data variables the matcher would weigh.
+
+    Returns:
+        The same mapping without restatements of a base it already holds.
+    """
+    folded = {name.lower() for name in candidates}
+    return {
+        name: meta
+        for name, meta in candidates.items()
+        if not any(
+            name.lower().endswith(suffix) and name.lower()[: -len(suffix)] in folded
+            for suffix in _RESTATEMENT_SUFFIXES
+        )
+    }
+
+
 def _data_variables(
     nc_meta: dict[str, dict[str, Any]],
 ) -> dict[str, dict[str, Any]]:
@@ -655,9 +854,12 @@ def _data_variables(
         nc_meta: The retrieved `{nc_name: {long_name, units}}` mapping.
 
     Returns:
-        The subset that is not a coordinate, bound, or auxiliary variable.
+        The subset that is not a coordinate, bound, or auxiliary variable, and
+        not a temporal restatement of a base the file also carries.
     """
-    return {name: meta for name, meta in nc_meta.items() if not _is_auxiliary(name)}
+    return _drop_restatements(
+        {name: meta for name, meta in nc_meta.items() if not _is_auxiliary(name)}
+    )
 
 
 def _inline_mapping(line: str) -> dict[str, Any]:
@@ -702,6 +904,69 @@ def _extras_span(lines: list[str]) -> tuple[int, int] | None:
     ):
         stop += 1
     return found, stop
+
+
+def _row_field(block: str, slug: str, field: str) -> Any:
+    """Return one typed field a row carries in the stanza text.
+
+    `product_type` and `cds_pressure_level` reach the request without passing
+    through `extras`, so a guard reading only `extras` judges a different
+    request from the one that will be sent.
+
+    Args:
+        block: The stanza's `variables:` text.
+        slug: The row to read.
+        field: The model field name to read.
+
+    Returns:
+        The field's value, or `None` when the row does not carry it.
+    """
+    for match in _VARIABLE_BLOCK.finditer(block):
+        if match.group("slug") != slug:
+            continue
+        body = match.group("body")
+        dedented = "".join(
+            line[8:] if line.startswith(" " * 8) else line
+            for line in body.splitlines(keepends=True)
+        )
+        try:
+            parsed = yaml.safe_load(dedented) or {}
+        except yaml.YAMLError:
+            return None
+        return parsed.get(field) if isinstance(parsed, dict) else None
+    return None
+
+
+def _row_extras(block: str, slug: str) -> dict[str, Any]:
+    """Return the `extras:` one row already carries in the stanza text.
+
+    The write-time guard has the stanza as text rather than as the parsed lines
+    `_existing_override` wants, and it needs the same mapping the audit reads:
+    a row with hand-set extras that conflict with the block would otherwise pass
+    the guard and then be reported by the audit.
+
+    Args:
+        block: The stanza's `variables:` text.
+        slug: The row to read.
+
+    Returns:
+        The row's own extras, empty when it has none or cannot be parsed.
+    """
+    for match in _VARIABLE_BLOCK.finditer(block):
+        if match.group("slug") != slug:
+            continue
+        body = match.group("body")
+        dedented = "".join(
+            line[8:] if line.startswith(" " * 8) else line
+            for line in body.splitlines(keepends=True)
+        )
+        try:
+            parsed = yaml.safe_load(dedented) or {}
+        except yaml.YAMLError:
+            return {}
+        extras = parsed.get("extras") if isinstance(parsed, dict) else None
+        return extras if isinstance(extras, dict) else {}
+    return {}
 
 
 def _existing_override(
@@ -781,10 +1046,102 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
     return block
 
 
+def _hydrate_one_row(
+    block: str,
+    slug: str,
+    cds_names: dict[str, str],
+    dataset_extras: dict[str, Any],
+    probe: Callable[
+        [str, dict[str, Any]], tuple[dict[str, dict[str, Any]], dict[str, Any]]
+    ],
+    serving: Callable[[str], list[dict[str, Any]]] | None,
+) -> tuple[str, str, dict[str, Any]] | None:
+    """Probe one placeholder row and decide what to write into it.
+
+    Declines rather than guesses in three cases: the row names no
+    `cds_variable`, the probe returns nothing this row can claim, or the
+    request that would be written matches no block the store serves. A
+    placeholder says less than a wrong row, but says it truthfully.
+
+    Args:
+        block: The stanza text as rewritten so far, so names bound by rows
+            filled earlier in this pass are visible.
+        slug: The row to hydrate.
+        cds_names: Slug to `cds_variable` for the whole stanza.
+        dataset_extras: The stanza's `extras:` mapping.
+        probe: Callable taking a `cds_variable` and the selectors the row will
+            send, returning the `(metadata, selectors)` pair.
+        serving: Callable returning the blocks serving a `cds_variable`, or
+            `None` for a dataset publishing no constraints.
+
+    Returns:
+        A `(name, units, override)` triple to write, or `None` to decline.
+    """
+    cds_variable = cds_names.get(slug)
+    if cds_variable is None:
+        return None
+    meta, selectors = probe(
+        cds_variable, {**dataset_extras, **_row_extras(block, slug)}
+    )
+    chosen = _choose_for_slug(slug, meta, _claimed_nc_names(block))
+    if chosen is None:
+        return None
+    name, units = chosen
+    blocks = serving(cds_variable) if serving is not None else []
+    offering = {
+        key: {
+            str(value)
+            for serving_block in blocks
+            for value in (serving_block.get(key) or [])
+        }
+        for serving_block in blocks
+        for key in serving_block
+    }
+    override = _selector_override(selectors, dataset_extras, offering)
+    if blocks and not _selectors_are_serveable(
+        _written_selectors(block, slug, dataset_extras, override), blocks
+    ):
+        # The name was read under a product this row will not ask for, so
+        # writing it would ship a request the store cannot answer.
+        return None
+    return name, units, override
+
+
+def _written_selectors(
+    block: str, slug: str, dataset_extras: dict[str, Any], override: dict[str, Any]
+) -> dict[str, Any]:
+    """Return the request the row would send once this pass's override lands.
+
+    The same merge the audit performs: stanza, then whatever `extras:` the row
+    already carries on disk, then this pass's override - and finally the typed
+    fields the request also carries, which live on the model rather than in
+    `extras`. Judging any narrower slice let a row pass the writer and be
+    reported by the audit afterwards, two definitions of serveable for one row.
+
+    Args:
+        block: The stanza text to read the row's on-disk values from.
+        slug: The row being written.
+        dataset_extras: The stanza's `extras:` mapping.
+        override: The per-row selector override this pass would write.
+
+    Returns:
+        The merged selectors, as the store will see them.
+    """
+    written = {**dataset_extras, **_row_extras(block, slug), **override}
+    for field, request_key in _ROW_FIELD_SELECTORS.items():
+        carried = _row_field(block, slug, field)
+        if carried:
+            written.setdefault(request_key, carried)
+    return written
+
+
 def _hydrate_stanza_per_variable(
     text: str,
     dataset_id: str,
-    probe: Callable[[str], tuple[dict[str, dict[str, Any]], dict[str, Any]]],
+    probe: Callable[
+        [str, dict[str, Any]], tuple[dict[str, dict[str, Any]], dict[str, Any]]
+    ],
+    serving: Callable[[str], list[dict[str, Any]]] | None = None,
 ) -> tuple[str, list[str], list[str]]:
     """Fill every placeholder of one stanza, probing each variable on its own.
 
@@ -804,8 +1161,12 @@ def _hydrate_stanza_per_variable(
     Args:
         text: The full per-family catalog shard text.
         dataset_id: The dataset id whose stanza to hydrate.
-        probe: Callable taking a `cds_variable` and returning the
-            `(metadata, selectors)` pair :func:`_retrieve_variable_meta` returns.
+        probe: Callable taking a `cds_variable` and the selectors the row will
+            send, returning the `(metadata, selectors)` pair
+            :func:`_retrieve_variable_meta` returns.
+        serving: Callable taking a `cds_variable` and returning the constraints
+            blocks that serve it. `None` skips the serveability check, which is what a
+            dataset publishing no constraints gets.
 
     Returns:
         A `(text, filled, declined)` triple — the rewritten shard text, the
@@ -824,20 +1185,15 @@ def _hydrate_stanza_per_variable(
     filled: list[str] = []
     declined: list[str] = []
     for slug in placeholders:
-        cds_variable = cds_names.get(slug)
-        if cds_variable is None:
-            declined.append(slug)
-            continue
-        meta, selectors = probe(cds_variable)
-        chosen = _choose_for_slug(slug, meta, _claimed_nc_names(new_block))
-        if chosen is None:
-            declined.append(slug)
-            continue
-        name, units = chosen
-        new_block = _fill_variable(new_block, slug, name, units)
-        new_block = _fill_variable_extras(
-            new_block, slug, _selector_override(selectors, dataset_extras)
+        hydrated = _hydrate_one_row(
+            new_block, slug, cds_names, dataset_extras, probe, serving
         )
+        if hydrated is None:
+            declined.append(slug)
+            continue
+        name, units, override = hydrated
+        new_block = _fill_variable(new_block, slug, name, units)
+        new_block = _fill_variable_extras(new_block, slug, override)
         filled.append(slug)
     if new_block == block:
         return text, filled, declined
@@ -880,7 +1236,7 @@ def _choose_for_slug(
 
 
 def _retrieve_variable_meta(
-    dataset_id: str, cds_variable: str
+    dataset_id: str, cds_variable: str, prefer: dict[str, Any] | None = None
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     """Probe one variable of a dataset; the second credentialed seam.
 
@@ -891,6 +1247,9 @@ def _retrieve_variable_meta(
     Args:
         dataset_id: The Copernicus dataset id to sample.
         cds_variable: The `cds_variable` to request.
+        prefer: The selectors the catalog row will send, so the probe samples
+            the product the row asks for rather than whichever the constraints
+            happen to list first.
 
     Returns:
         A `(metadata, selectors)` pair as :func:`_ecmwf_deep_sample_variable`
@@ -898,7 +1257,7 @@ def _retrieve_variable_meta(
     """
     from earthlens.ecmwf.cli import _ecmwf_deep_sample_variable
 
-    return _ecmwf_deep_sample_variable(dataset_id, cds_variable)
+    return _ecmwf_deep_sample_variable(dataset_id, cds_variable, prefer)
 
 
 def _slug_cds_variables(block: str) -> dict[str, str]:
@@ -994,8 +1353,227 @@ def _dataset_extras(block: str) -> dict[str, str]:
     return {}
 
 
+#: Block keys a catalog row is not expected to carry, so omitting one does
+#: not make a request under-specified. `variable` is what selects the block
+#: in the first place, and the rest the backend fills in at request time:
+#: the date keys and `time` come from the caller's range, `area` from the
+#: bounding box, `data_format` is fixed at netcdf. Verified against the
+#: request assembly in `backend.py`.
+_BLOCK_KEYS_NOT_REQUESTED = frozenset(
+    {
+        "variable",
+        "year",
+        "month",
+        "day",
+        "time",
+        "date",
+        "area",
+        # Only for the *required*-key half of the guard: a row that nulls
+        # `data_format` sends none and the store defaults it. When the row does
+        # send one - which is every row that does not null it, since
+        # `effective_selectors` seeds the backend's netCDF - the offer loop
+        # checks it like any other selector.
+        "data_format",
+        # The hindcast forms key on `hmonth` / `hday`, which the backend copies
+        # from the caller's dates. A row pinning them would fix itself to one
+        # date.
+        "hmonth",
+        "hday",
+    }
+)
+
+#: Request kinds where the backend also renames the caller's `year` to `hyear`,
+#: so a row of that kind is not expected to carry it. `s2s_reforecast` is not
+#: one of them: it sends both the forecast and the reforecast date, and its
+#: `hyear` really does come from `extras`. Read from `_remap_date_keys` in
+#: `backend.py`, whose pairs differ per kind.
+_HINDCAST_YEAR_KINDS = frozenset({"glofas_hindcast", "seasonal_hindcast"})
+
+
+def _keys_the_backend_supplies(row: Any) -> frozenset[str]:
+    """Block keys this row is not expected to carry.
+
+    Args:
+        row: The catalog row whose request is being judged.
+
+    Returns:
+        `_BLOCK_KEYS_NOT_REQUESTED`, plus `hyear` for the request kinds whose
+        backend hook renames the caller's `year` into it.
+    """
+    if getattr(row, "request_kind", None) in _HINDCAST_YEAR_KINDS:
+        return _BLOCK_KEYS_NOT_REQUESTED | {"hyear"}
+    return _BLOCK_KEYS_NOT_REQUESTED
+
+
+#: Selector values a row carries as typed fields rather than in `extras`,
+#: mapped to the request key the backend sends them under. A check reading
+#: only `extras` would think every ERA5 row omits `product_type`.
+_ROW_FIELD_SELECTORS = {
+    "product_type": "product_type",
+    "cds_pressure_level": "pressure_level",
+}
+
+
+#: The format `ECMWF._build_request` writes into every request, unconditionally.
+#: Read from `backend.py`; a row opts out by setting `data_format: null` in its
+#: extras, which drops the key rather than changing it.
+_BACKEND_DATA_FORMAT = "netcdf"
+
+
+def effective_selectors(stanza: dict[str, Any], row: Any) -> dict[str, Any]:
+    """Return every selector a retrieve built from `row` will actually send.
+
+    Stanza `extras` first, the row's own `extras` over them (the row wins,
+    since `request.update(extras)` is the last write before the retrieve),
+    and the row's typed fields folded in under the key the backend sends
+    them as.
+
+    Args:
+        stanza: The dataset-level `extras:` mapping.
+        row: The catalog row whose request is being assembled.
+
+    Returns:
+        The merged selectors, as the store will see them.
+    """
+    effective = dict(stanza)
+    effective.update(getattr(row, "extras", None) or {})
+    for field, key in _ROW_FIELD_SELECTORS.items():
+        value = getattr(row, field, None)
+        if value:
+            effective.setdefault(key, value)
+    # The backend writes `data_format` itself and always asks for netCDF, so a
+    # row that says nothing about it still sends it and a store offering only
+    # GRIB for that variable answers nothing. Seeding the default here is what
+    # makes the ordinary offer loop judge it. A row whose extras set the key to
+    # `None` really does omit it - `_apply_extras_and_strips` pops it - so that
+    # spelling is left alone.
+    if "data_format" not in effective:
+        effective["data_format"] = _BACKEND_DATA_FORMAT
+    return effective
+
+
+def _asked_values(want: Any) -> set[str] | None:
+    """Return the values a selector asks for, or None when it asks for nothing.
+
+    A selector reaches here as a list (`["forecast"]`), as a bare scalar
+    (`level_type: single_levels`, which the catalog also spells), or as `None`
+    for a key the stanza strips. Only the last carries no request, and treating
+    a scalar as unjudgeable would leave most of a row unchecked — scalars are
+    roughly half the selector values in the shipped catalog.
+
+    Args:
+        want: One selector value from a row's effective request.
+
+    Returns:
+        The requested values as strings, or `None` when nothing is asked.
+    """
+    if want is None:
+        return None
+    if isinstance(want, list):
+        return {str(value) for value in want} or None
+    return {str(want)}
+
+
+def _block_satisfies(
+    effective: dict[str, Any],
+    block: dict[str, Any],
+    *,
+    not_required: frozenset[str] = _BLOCK_KEYS_NOT_REQUESTED,
+) -> bool:
+    """Whether one constraints block can answer the whole request a row sends.
+
+    Two ways a block fails. It may **offer** a key the row asks for but share no
+    value with it. Or it may **require** a key the row never sends: a CARRA
+    `forecast` block enumerates `leadtime_hour` on every combination, so a row
+    naming only `product_type` cannot be answered by it however well the rest
+    matches. Checking only the keys the row sends misses the second kind
+    entirely, which is how a row can pass this and still retrieve nothing.
+
+    Args:
+        effective: The row's selectors, stanza extras merged with its own.
+        block: One constraints block serving the row's variable.
+        not_required: Block keys this row is not expected to carry, since the
+            backend fills them in. Varies by request kind - see
+            :func:`_keys_the_backend_supplies`.
+
+    Returns:
+        True when this single block can serve the request.
+    """
+    for key, want in effective.items():
+        asked = _asked_values(want)
+        if asked is None:
+            continue
+        offered = {str(value) for value in (block.get(key) or [])}
+        if not offered:
+            # A key this block does not list is unconstrained for it, which is
+            # how CDS constraints read: `reanalysis-era5-land-monthly-means`
+            # serves nine time-invariant fields from a block naming only
+            # `data_format`, and a row sending `product_type` alongside is not
+            # thereby broken. Treating absence as a conflict reported exactly
+            # those rows, and other known-good ones with them.
+            continue
+        if not asked <= offered:
+            # Subset, not intersection: the store builds the cross product of
+            # everything requested, so a selector naming one value it serves and
+            # one it does not is rejected whole. Intersection would pass it.
+            return False
+    for key in block:
+        if key in not_required:
+            continue
+        if _asked_values(effective.get(key)) is None:
+            # The block partitions on this key, so a request omitting it is
+            # under-specified for this combination even though nothing it does
+            # send conflicts.
+            return False
+    return True
+
+
+def _selectors_are_serveable(
+    effective: dict[str, Any],
+    serving: list[dict[str, Any]],
+    *,
+    not_required: frozenset[str] = _BLOCK_KEYS_NOT_REQUESTED,
+) -> bool:
+    """Whether one serving block can satisfy every selector the row will send.
+
+    Judged per block rather than per key. Unioning each key's values across all
+    serving blocks passes a row whose key A comes from one block and key B from
+    another, when no single block offers both — and a retrieve is one block, so
+    that row returns nothing. A request is serveable only if some one block
+    answers all of it.
+
+    Args:
+        effective: The row's selectors, stanza extras merged with its own.
+        serving: The constraints blocks that serve the row's variable.
+
+    Returns:
+        True when at least one serving block satisfies the whole request, and
+        when there is nothing to judge against.
+    """
+    if not serving:
+        return True
+    return any(
+        _block_satisfies(effective, block, not_required=not_required)
+        for block in serving
+    )
+
+
+#: Selectors the backend builds from the caller's start/end dates. An
+#: override on one of these does not add information, it overrules the
+#: request, because `_apply_extras_and_strips` merges extras last.
+#:
+#: `time` is deliberately absent. The backend sets it as a *default*
+#: (`request["time"] = ["00:00"]`) which extras then merge over, so a row
+#: whose product is only served at another hour — `efas-historical` at
+#: 06:00 — has to be able to record it. Listing it here made the writer
+#: refuse the only requirement such a row has.
+_CALLER_DERIVED_KEYS = frozenset({"year", "month", "day"})
+
+
 def _selector_override(
-    selectors: dict[str, Any], dataset_extras: dict[str, str]
+    selectors: dict[str, Any],
+    dataset_extras: dict[str, str],
+    offered: dict[str, set[str]] | None = None,
 ) -> dict[str, Any]:
     """Return the selectors a variable needs that the stanza does not already set.
 
@@ -1009,6 +1587,10 @@ def _selector_override(
         selectors: The serving constraints block's selectors for this variable.
         dataset_extras: The stanza's dataset-level `extras:` mapping, as parsed
             values so that re-spelling a list does not read as a disagreement.
+        offered: What the serving blocks offer per key, when known. An override
+            naming a key's entire offering records no requirement — it only
+            says the selector exists — so it is refused, the same reasoning the
+            caller-derived keys get.
 
     Returns:
         The subset of `selectors` that differs from `dataset_extras`, keyed the
@@ -1037,6 +1619,25 @@ def _selector_override(
             {}
 
             ```
+        - A caller-derived key is never overridden with more than one value,
+          since the backend builds it from the requested dates:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _selector_override
+            >>> _selector_override(
+            ...     {"month": ["01", "02", "03"]}, {"month": ["01"]}
+            ... )
+            {}
+
+            ```
+        - A single value is a real requirement and is still recorded:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _selector_override
+            >>> _selector_override({"day": ["01"]}, {"day": ["15"]})
+            {'day': ['01']}
+
+            ```
         - And one the stanza never declares is not this row's business:
 
             ```python
@@ -1049,6 +1650,25 @@ def _selector_override(
     override: dict[str, Any] = {}
     for key, value in selectors.items():
         if key not in dataset_extras:
+            continue
+        if (
+            offered
+            and isinstance(value, list)
+            and len(value) > 1
+            and {str(item) for item in value} == offered.get(key, set())
+        ):
+            # The whole offering is not a requirement. It has already shipped
+            # `version: [v3.0, v3.1]` on five CAMS rows, which asks the store
+            # for two inventory versions at once.
+            continue
+        if key in _CALLER_DERIVED_KEYS and isinstance(value, list) and len(value) > 1:
+            # The backend builds year/month/day from the caller's date range and
+            # then merges extras over them, so a multi-valued override here
+            # silently replaces the dates that were asked for. With one serving
+            # block every value the store offers looks required, and recording
+            # all twelve months says nothing except "this selector exists". A
+            # single value is different: that is a real pin, like the `day: 01`
+            # a monthly product genuinely requires.
             continue
         if dataset_extras[key] != value:
             override[key] = value
@@ -1086,6 +1706,15 @@ def _yaml_inline_list(value: Any) -> str:
 
             ```
     """
+    if isinstance(value, list):
+        # Rendered item by item so the number-shaped guard reaches each one:
+        # a month list mixing '01' with a bare 08 is one loader change from
+        # meaning two different types in one sequence.
+        rendered = [
+            _yaml_value(item) if isinstance(item, str) else _yaml_inline_list(item)
+            for item in value
+        ]
+        return "[" + ", ".join(rendered) + "]"
     dumped = str(
         yaml.safe_dump(value, default_flow_style=True, allow_unicode=True, width=10**6)
     ).strip()
@@ -1224,11 +1853,25 @@ def _match_variables(
 
 
 def _placeholder_slugs(block: str) -> list[str]:
-    """Return the slugs of variable sub-blocks still carrying `units: unknown`."""
+    """Return the slugs still carrying `units: unknown` that a probe could fill.
+
+    A row marked `unhydratable:` is left out. It is still a placeholder, but no
+    retrieve can answer it — the marked rows are keyed `all` or `all-variables`,
+    naming every variable their dataset serves rather than one of them, with
+    more than one candidate to land on — and probing it again spends a request
+    and a queue slot to learn what the row already says.
+
+    Args:
+        block: The stanza text for one dataset, as it stands in the shard.
+
+    Returns:
+        The slugs a probe could still fill, in the order the stanza lists them.
+    """
     return [
         match.group("slug")
         for match in _VARIABLE_BLOCK.finditer(block)
         if _UNKNOWN_UNITS.search(match.group("body"))
+        and not _UNHYDRATABLE.search(match.group("body"))
     ]
 
 
@@ -1421,7 +2064,10 @@ def _hydrate_stanza_whole(
     except Exception as exc:  # noqa: BLE001 — a licence-gated dataset is skipped
         session.error = exc
         return text, [], []
-    session.offered.update(_data_variables(nc_meta))
+    data = _data_variables(nc_meta)
+    session.issued += 1
+    session.offered.update(data)
+    session.filtered.update(set(nc_meta) - set(data))
     match = _stanza_match(text, dataset_id)
     placeholders = _placeholder_slugs(match.group(1)) if match else []
     new_text = _rewrite_stanza(text, dataset_id, nc_meta)
@@ -1444,7 +2090,18 @@ def _declined_detail(session: _ProbeSession, declined: list[str]) -> str:
         A phrase naming either the missing data variables or the declined rows.
     """
     if not session.offered:
-        return "no data variables, only coordinates and auxiliaries"
+        if session.issued == 0:
+            # Nothing was asked, so nothing can be said about what came back:
+            # a stanza whose placeholders name no `cds_variable` is skipped
+            # before any probe is issued.
+            return "no probe was issued - no row named a cds_variable"
+        if not session.filtered:
+            return "the store answered with no variables at all"
+        held = sorted(session.filtered)
+        shown = ", ".join(held[:_ECHO_MAX_NAMES])
+        extra = len(held) - _ECHO_MAX_NAMES
+        listed = f"{shown}, +{extra} more" if extra > 0 else shown
+        return f"only coordinates and auxiliaries ({listed})"
     offered = sorted(session.offered)
     shown = ", ".join(offered[:_ECHO_MAX_NAMES])
     extra = len(offered) - _ECHO_MAX_NAMES
@@ -1534,6 +2191,128 @@ def _written_rows_survive(text: str, dataset_id: str, filled: list[str]) -> bool
     return True
 
 
+#: Longest line `_error_summary` will return, composed name and message
+#: together. One dataset is one line of sweep output; a store that answers with
+#: a paragraph of HTML must not be able to push the next dataset off the screen.
+_SUMMARY_LIMIT = 160
+
+#: What a redacted credential is replaced with, so the line still reads as
+#: having carried one rather than silently losing a span of text.
+_REDACTED = "[redacted]"
+
+#: Credential shapes to strike from an error before it is echoed. The store
+#: raises through `cdsapi`, whose text this repo does not control, and a
+#: sweep's output is routinely pasted into issues and CI logs.
+_CREDENTIAL_PATTERNS = (
+    re.compile(
+        r"(?i)((?:authorization|x-api-key|private-token)\s*[:=]\s*)"
+        r"(?:(?:bearer|basic|token)\s+)?\S+"
+    ),
+    re.compile(r"(?i)([?&](?:api_?key|key|token|access_token)=)[^&\s]+"),
+    re.compile(r"(?i)((?:set-)?cookie\s*[:=]\s*)[^\s;]+"),
+    # Basic auth inside a URL, which requests and urllib3 do echo in some
+    # error text: keep the scheme and the host, drop what is between them.
+    re.compile(r"(?i)(https?://)[^/\s:@]+:[^/\s@]+@"),
+)
+
+#: Shortest configured key worth striking by exact match. A key set to
+#: something like `test` would otherwise blank every occurrence of that
+#: substring in an unrelated message, costing the diagnosis to protect nothing.
+_MIN_STRIKEABLE_KEY = 8
+
+
+def _redact_credentials(message: str) -> str:
+    """Strike anything credential-shaped, and the configured key, from `message`.
+
+    The configured key is matched exactly rather than by pattern: it is the
+    one secret whose value is knowable here, so an exact strike is a
+    guarantee where a pattern is only a guess. The patterns cover the rest.
+
+    The exact strike applies only to a key of at least `_MIN_STRIKEABLE_KEY`
+    characters, because a short one would blank unrelated text that happens to
+    contain it.
+
+    Args:
+        message: The upstream error text about to be echoed.
+
+    Returns:
+        The same text with any credential replaced by `_REDACTED`.
+    """
+    for pattern in _CREDENTIAL_PATTERNS:
+        message = pattern.sub(r"\1" + _REDACTED, message)
+    for key in _configured_keys():
+        if len(key) >= _MIN_STRIKEABLE_KEY:
+            message = message.replace(key, _REDACTED)
+    return message
+
+
+def _configured_keys() -> list[str]:
+    """Return the CADS keys this machine is configured with, longest first.
+
+    Best-effort and never raising: a redaction pass must not be the thing
+    that turns a reportable failure into an unreportable one. Longest first
+    so a key that contains another is struck whole.
+
+    Returns:
+        The distinct non-empty key values, or an empty list.
+    """
+    try:
+        from earthlens.ecmwf.endpoints import ENDPOINTS, _resolve_key
+    except Exception as exc:  # noqa: BLE001 - redaction is never the failure
+        # Inside the guard because the import is itself a way this can fail:
+        # `endpoints` reaches for the CADS SDK, and an environment without it
+        # would otherwise turn every error summary into an ImportError.
+        logger.debug(f"endpoint table unavailable, so no key is redacted: {exc}")
+        return []
+
+    found: set[str] = set()
+    for entry in ENDPOINTS.values():
+        # Indexed rather than unpacked: widening the endpoint tuple must not
+        # break the helper that keeps a failure reportable.
+        key_env = entry[2]
+        try:
+            key = _resolve_key(key_env)
+        except Exception as exc:  # noqa: BLE001 - redaction is never the failure
+            # Not silent: an unreadable key is one this pass cannot strike,
+            # so an operator who later finds a secret in a pasted log has
+            # something saying which source went unread. The value is never
+            # logged, only the name of the variable that would hold it.
+            logger.debug(f"{key_env} unreadable, so it is not redacted: {exc}")
+            key = None
+        if key:
+            found.add(key)
+    return sorted(found, key=len, reverse=True)
+
+
+def _error_summary(error: BaseException) -> str:
+    """Name an error by its type and what it actually said.
+
+    The type alone is not enough to act on. `PermissionError` is raised both by
+    a store refusing an unaccepted licence and by Windows refusing a file
+    another process holds — the same word for an operator action and a local
+    race — and an operator reading only the type cannot tell which, so they
+    accept licences that were never the problem.
+
+    The message is redacted first: it comes from `cdsapi`, whose text this
+    repo does not control, and a sweep's output is routinely pasted into issues
+    and CI logs.
+
+    Args:
+        error: The error a dataset stopped on.
+
+    Returns:
+        The type name, plus the message when there is one, capped at
+        `_SUMMARY_LIMIT` characters in total so one dataset stays one line.
+    """
+    message = _redact_credentials(" ".join(str(error).split()))
+    if not message:
+        return type(error).__name__
+    summary = f"{type(error).__name__}: {message}"
+    if len(summary) > _SUMMARY_LIMIT:
+        summary = summary[: _SUMMARY_LIMIT - 3] + "..."
+    return summary
+
+
 def _hydrated_detail(session: _ProbeSession, declined: list[str]) -> str:
     """Describe what a hydrated dataset left behind, and why it stopped.
 
@@ -1554,6 +2333,286 @@ def _hydrated_detail(session: _ProbeSession, declined: list[str]) -> str:
     if session.error is not None:
         return f"{left} ({type(session.error).__name__}; re-run to continue)"
     return left
+
+
+class _ServingBlocks:
+    """Lookup from a `cds_variable` to the constraints blocks serving it.
+
+    A class rather than a closure or a bound `partial` because the audit needs
+    two things from one object: the blocks for a variable, and every key the
+    *whole* dataset partitions on. The second is what separates "this dataset
+    does not partition by variable at all" from "the store does not offer this
+    variable", which are otherwise the same empty block list.
+
+    It does *not* decide serveability. A key the serving blocks omit is
+    unconstrained for those blocks, whether or not some other block enumerates
+    it - see `_block_satisfies`.
+
+    The constraints are fetched on first use rather than at construction: the
+    caller builds one of these per dataset before knowing whether the stanza has
+    any placeholder to check, and a stanza with nothing to hydrate should not
+    cost a round trip.
+
+    Args:
+        dataset_id: The Copernicus dataset id whose constraints to consult.
+
+    Attributes:
+        unreachable: Whether the fetch failed, as opposed to the store
+            publishing no constraints. Both leave no blocks to judge against,
+            but only the first means the check did not happen.
+    """
+
+    def __init__(self, dataset_id: str) -> None:
+        self._dataset_id = dataset_id
+        self._rows: list[dict[str, Any]] | None = None
+        self.unreachable = False
+
+    def _load(self) -> list[dict[str, Any]]:
+        """Fetch the dataset's constraints once, tolerating an unreachable store.
+
+        Returns:
+            The dataset's constraints blocks, empty when the store publishes
+            none or could not be reached. Fetched on first call and reused.
+        """
+        if self._rows is None:
+            from earthlens.ecmwf.cli import _ecmwf_constraints
+
+            try:
+                self._rows = _ecmwf_constraints(self._dataset_id, strict=True) or []
+            except Exception as exc:  # noqa: BLE001 - uncheckable is not fatal
+                logger.debug(f"no constraints for {self._dataset_id}: {exc}")
+                self._rows = []
+                self.unreachable = True
+        return self._rows
+
+    @property
+    def enumerated(self) -> set[str]:
+        """Every key any block of the dataset constrains.
+
+        Read by the audit to tell "this dataset does not partition by variable"
+        from "the store does not offer this variable". The serveability guard
+        no longer takes it: a key a block omits is unconstrained for that block,
+        so knowing what other blocks enumerate does not change the answer.
+
+        Returns:
+            The union of keys across the dataset's blocks.
+        """
+        return {key for block in self._load() for key in block}
+
+    def __call__(self, cds_variable: str) -> list[dict[str, Any]]:
+        """Return the constraints blocks that serve one variable.
+
+        Args:
+            cds_variable: The CDS variable name a catalog row requests.
+
+        Returns:
+            The blocks listing that variable, empty when none does or when the
+            dataset publishes no constraints.
+        """
+        return [
+            row for row in self._load() if cds_variable in (row.get("variable") or [])
+        ]
+
+
+def _promises_data(row: Any) -> bool:
+    """Whether a catalog row claims to describe a retrievable variable.
+
+    Args:
+        row: A `Variable` from the curated catalog.
+
+    Returns:
+        True unless the row is a placeholder, which promises nothing and so
+        cannot be failing to deliver it.
+    """
+    return row.units != "unknown" and not row.unhydratable
+
+
+def _unserveable_selectors(
+    stanza: dict[str, Any], row: Any, lookup: _ServingBlocks
+) -> dict[str, Any] | None:
+    """Return a row's effective selectors when no serving block can answer them.
+
+    Args:
+        stanza: The dataset-level `extras:` mapping.
+        row: The catalog row to judge.
+        lookup: The dataset's serving-block lookup.
+
+    Returns:
+        The merged selectors when the row is unserveable, else `None`. A
+        variable the dataset partitions on but no block offers is reported as
+        `{"variable": [name]}`, since the store not having it is a different
+        and worse problem than a selector pointing at the wrong combination.
+    """
+    serving = lookup(row.cds_variable)
+    if not serving:
+        # No block names this variable. Where the dataset partitions on
+        # `variable` at all, that means the store does not offer it — a
+        # stronger defect than a mis-set selector, and one the row's own
+        # request cannot describe. Where it does not partition on `variable`,
+        # there is genuinely nothing to judge.
+        if "variable" in lookup.enumerated:
+            return {"variable": [row.cds_variable]}
+        return None
+    effective = effective_selectors(stanza, row)
+    if _selectors_are_serveable(
+        effective, serving, not_required=_keys_the_backend_supplies(row)
+    ):
+        return None
+    return effective
+
+
+class ConstraintsUnavailable(RuntimeError):
+    """Raised when an audit could not read a dataset's constraints.
+
+    Distinct from finding nothing wrong: a run that could not fetch has checked
+    nothing, and reporting that as clean is how a hand edit slips through.
+    """
+
+
+def audit_serveability(
+    blocks_for: Callable[[str], _ServingBlocks] | None = None,
+    strict: bool = True,
+) -> list[tuple[str, str, dict[str, Any]]]:
+    """Find every curated row whose request no single serving block can answer.
+
+    The invariant behind #1147, as code rather than as a claim. A row can name a
+    real NetCDF variable with a correct unit and still be unfetchable, because
+    the selectors it sends — stanza `extras` merged with its own — match no
+    combination the store offers for that variable. Such a row looks curated and
+    returns nothing.
+
+    Placeholder rows are skipped: they promise nothing yet. So is a row whose
+    dataset publishes no constraints, since there is nothing to judge against.
+
+    Args:
+        blocks_for: Factory returning the serving-block lookup for a dataset id,
+            defaulting to the live one. Injected so the audit can run against a
+            fixture without reaching the network.
+        strict: Raise `ConstraintsUnavailable` when nothing at all could be
+            read, rather than returning a clean result from a run that checked
+            nothing. Pass `False` to audit whatever is reachable and stay
+            silent about the rest.
+
+    Returns:
+        One `(dataset_id, slug, effective_selectors)` per unserveable row, in
+        catalog order. Empty is the invariant holding.
+
+    Raises:
+        ConstraintsUnavailable: Under `strict`, when *no* dataset's constraints
+            could be read, so the audit has no opinion and an empty list would
+            read as a clean bill of health. A store failing on some datasets
+            reports those as findings instead, since one dataset answering 500
+            must not abort the audit of the rest.
+
+    Examples:
+        - A store that constrains nothing serves every row, so nothing is
+          reported. The lookup is injected, so this reaches no network:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import audit_serveability
+            >>> class ServesAnything:
+            ...     enumerated = set()
+            ...     def __call__(self, cds_variable):
+            ...         return [{"variable": [cds_variable]}]
+            >>> audit_serveability(lambda dataset_id: ServesAnything())
+            []
+
+            ```
+        - A store offering one `product_type` nothing is curated under reports
+          each row it cannot serve, as a triple naming where the row lives:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import audit_serveability
+            >>> class ServesOnlyOneProduct:
+            ...     enumerated = {"variable", "product_type"}
+            ...     def __call__(self, cds_variable):
+            ...         return [
+            ...             {"variable": [cds_variable], "product_type": ["nothing"]}
+            ...         ]
+            >>> findings = audit_serveability(lambda dataset_id: ServesOnlyOneProduct())
+            >>> len(findings) > 0
+            True
+            >>> {len(finding) for finding in findings} == {3}
+            True
+            >>> all(isinstance(slug, str) for _, slug, _ in findings)
+            True
+            >>> any(
+            ...     selectors.get("product_type") == ["nothing"]
+            ...     for _, _, selectors in findings
+            ... )
+            False
+
+            ```
+        - A dataset the store knows nothing about is not judged, since there
+          is nothing to check the request against:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import audit_serveability
+            >>> class KnowsNothing:
+            ...     enumerated = set()
+            ...     def __call__(self, cds_variable):
+            ...         return []
+            >>> audit_serveability(lambda dataset_id: KnowsNothing())
+            []
+
+            ```
+    """
+    from earthlens.ecmwf import Catalog
+
+    lookup_for = blocks_for or _serving_blocks_for
+    findings: list[tuple[str, str, dict[str, Any]]] = []
+    unreachable: list[str] = []
+    readable = 0
+    for name, dataset in Catalog().datasets.items():
+        rows = [
+            (slug, row)
+            for slug, row in dataset.variables.items()
+            if _promises_data(row)
+        ]
+        if not rows:
+            continue
+        stanza = dict(getattr(dataset, "extras", {}) or {})
+        lookup = lookup_for(name)
+        for slug, row in rows:
+            effective = _unserveable_selectors(stanza, row, lookup)
+            if effective is not None:
+                findings.append((name, slug, effective))
+        if getattr(lookup, "unreachable", False):
+            unreachable.append(name)
+        else:
+            readable += 1
+    if strict and unreachable and not readable:
+        # Nothing was readable at all, so this run has no opinion to offer and
+        # returning an empty list would read as a clean bill of health.
+        raise ConstraintsUnavailable(
+            f"constraints unreadable for all {len(unreachable)} dataset(s), so "
+            f"this audit checked nothing: {', '.join(sorted(unreachable)[:5])}"
+        )
+    # A store that errors on one dataset — CEMS answers 500 for
+    # `cems-glofas-historical-intermediate` — must not abort an audit of the
+    # other 173, nor vanish from it. Each is reported so the result is never
+    # silently clean, and a caller can tell "unreadable" from "unserveable".
+    findings.extend(
+        (name, "<constraints unreadable>", {}) for name in sorted(unreachable)
+    )
+    return findings
+
+
+def _serving_blocks_for(dataset_id: str) -> _ServingBlocks:
+    """Return a lazy lookup from `cds_variable` to the blocks serving it.
+
+    Lazy because the caller builds one per dataset, before knowing whether the
+    stanza has any placeholder to check. A stanza with nothing to hydrate would
+    otherwise cost a constraints round trip it never uses, on a path that is
+    otherwise careful about spending network.
+
+    Args:
+        dataset_id: The Copernicus dataset id being hydrated.
+
+    Returns:
+        A callable taking a `cds_variable` and returning its serving blocks.
+    """
+    return _ServingBlocks(dataset_id)
 
 
 def _hydrate_one(
@@ -1600,7 +2659,7 @@ def _hydrate_one(
         return blocked
     session = _ProbeSession(dataset_id, timeout)
     new_text, filled, declined = _hydrate_stanza_per_variable(
-        file_text[path], dataset_id, session
+        file_text[path], dataset_id, session, _serving_blocks_for(dataset_id)
     )
     if declined and session.error is None:
         # A row no constraints block names is declined outright by the
@@ -1621,7 +2680,7 @@ def _hydrate_one(
         return "timed_out"
     if new_text == file_text[path]:
         if session.error is not None:
-            typer.echo(f"{prefix}: skipped ({type(session.error).__name__})")
+            typer.echo(f"{prefix}: skipped ({_error_summary(session.error)})")
             return "skipped"
         typer.echo(f"{prefix}: retrieved, {_declined_detail(session, declined)}")
         return "unmatched"
@@ -1700,20 +2759,29 @@ def bulk_hydrate_empty(
 
     Returns:
         A summary
-        `{candidates, hydrated, skipped, timed_out, unmatched, partial, filled}`
+        `{candidates, hydrated, skipped, timed_out, unmatched, partial,
+        filled, unremoved_scratch}`
         mapping. `unmatched` counts the retrieves that succeeded and still
         hydrated nothing; those are also counted in `skipped`, which stays the
         total of everything not hydrated. `partial` counts the datasets that
         hydrated some rows and then stopped on a deadline or a refusal — they
         are counted in `hydrated` too, and they are the ones a re-run continues.
     """
-    from earthlens.ecmwf import Catalog
+    from earthlens.ecmwf import Catalog, cli
     from earthlens.ecmwf.catalog import CATALOG_PATH, clear_catalog_cache
 
+    scratch_watermark = len(cli.UNREMOVED_SCRATCH)
     catalog_dir = Path(CATALOG_PATH)
     catalog = Catalog()
+    # A row marked `unhydratable` is a placeholder no retrieve can fill, so it
+    # is not outstanding work: counting it would select a dataset with nothing
+    # to do, spend the `--limit` row budget on it, and report it as `skipped` —
+    # the same word a licence refusal gets.
     rows = {
-        key: sum(var.units == "unknown" for var in ds.variables.values())
+        key: sum(
+            var.units == "unknown" and not var.unhydratable
+            for var in ds.variables.values()
+        )
         for key, ds in catalog.datasets.items()
     }
     empty = sorted(key for key, count in rows.items() if count)
@@ -1726,7 +2794,7 @@ def bulk_hydrate_empty(
     skipped = 0
     timed_out = 0
     unmatched = 0
-    partial = 0
+    partial_fills = 0
     filled: list[str] = []
     for index, dataset_id in enumerate(empty, start=1):
         prefix = f"[{index}/{total}] {dataset_id}"
@@ -1735,7 +2803,7 @@ def bulk_hydrate_empty(
             hydrated += 1
             filled.append(dataset_id)
             if outcome == "partial":
-                partial += 1
+                partial_fills += 1
         elif outcome == "unmatched":
             unmatched += 1
             skipped += 1
@@ -1746,12 +2814,27 @@ def bulk_hydrate_empty(
             skipped += 1
 
     clear_catalog_cache()
+    # Sliced from the watermark taken before the first probe, so a second sweep
+    # in one process reports its own survivors rather than inheriting the
+    # first's - the list is a module global and nothing clears it.
+    # A probe whose granule could not be removed leaves a directory under the
+    # cache root. One is a Windows race; hundreds across a sweep is a release
+    # regression worth tens of GB, so the count travels with the summary rather
+    # than only reaching a log line the operator has already scrolled past.
+    unremoved = cli.UNREMOVED_SCRATCH[scratch_watermark:]
+    if unremoved:
+        typer.echo(
+            f"{len(unremoved)} probe scratch director"
+            f"{'y' if len(unremoved) == 1 else 'ies'} could not be removed; "
+            f"first: {unremoved[0]}"
+        )
     return {
         "candidates": total,
         "hydrated": hydrated,
         "skipped": skipped,
         "timed_out": timed_out,
         "unmatched": unmatched,
-        "partial": partial,
+        "partial": partial_fills,
         "filled": filled,
+        "unremoved_scratch": unremoved,
     }

@@ -215,17 +215,28 @@ earthlens datasets refresh ghsl --tiles          # regenerate the tile grid
 ### `audit <providers>` — curated-vs-live drift (and coverage)
 
 Like `refresh`, but focused on the **curated** rows: flags `broken` curated ids the provider no longer
-serves (the drift a CI gate fails on) and, informationally, live ids missing from the index.
+serves (the drift a CI gate fails on) and, informationally, live ids missing from the index. For providers
+whose listing endpoint enumerates a dataset's variables (currently `erddap`, via each dataset's `.dds`), it
+also flags a curated **variable** the provider stopped serving or re-cased (e.g. `wtmp` → `WTMP`); providers
+that cannot enumerate variables report `unsupported` for that dimension, never a false `ok`.
 
 | Option | Meaning |
 |--------|---------|
-| `--strict` | exit non-zero if any curated dataset is no longer served live |
+| `--strict` | exit non-zero if any curated dataset id — or a curated variable a provider stopped serving — is no longer served live |
 | `--coverage` | switch to a **curation-coverage** report — classify the available universe into DONE / addressable / thin / table / missing, and list the highest-value ids to curate next (`gee`, `erddap`) |
+| `--serveable` | switch to a **serveability** report — list the curated rows whose own selectors match no combination the store offers, so a download returns nothing (providers publishing the `serveability_auditor` role; `ecmwf` today) |
 | `-j, --json` | JSON output |
 
+`--serveable` answers a narrower question than drift. Drift asks whether the dataset still exists;
+`--serveable` asks whether each row's request is answerable — a row can name a real variable with the
+right unit and still fetch nothing, because the selectors it sends (its stanza's `extras` merged with
+its own) match no single constraints block. It is unauthenticated and issues no retrieve.
+
 ```bash
-earthlens datasets audit stac --strict           # CI drift gate
-earthlens datasets audit gee --coverage          # what's worth curating next
+earthlens datasets audit stac --strict            # CI drift gate
+earthlens datasets audit gee --coverage           # what's worth curating next
+earthlens datasets audit ecmwf --serveable        # rows whose request answers nothing
+earthlens datasets audit ecmwf --serveable --strict --json   # as a CI gate, piped
 ```
 
 ### `validate <providers>` — per-entry checks (offline lint, optional live)
@@ -329,6 +340,7 @@ earthlens providers list --check          # which optional SDKs are installed
 | see one dataset's full record | `datasets show <provider> <id>` |
 | check what the provider serves now vs the bundled index | `datasets refresh <p>` |
 | gate CI on curated-vs-live drift | `datasets audit <p> --strict` |
+| find curated rows the store cannot answer | `datasets audit <p> --serveable` |
 | see what's worth curating next | `datasets audit gee --coverage` |
 | lint / reachability-check curated entries | `datasets validate <p> [--live] [--strict]` |
 | inspect a dataset's real schema | `datasets probe <p> <id> [--deep]` |

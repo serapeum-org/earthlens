@@ -18,70 +18,112 @@ datasets:
         nc_variable: ccl
         types: state
         units: '%'
+        extras:
+          product_type:
+          - forecast
       geometric-vertical-velocity-carra:
         cds_variable: geometric_vertical_velocity
         nc_variable: wz
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - forecast
       geopotential-carra:
         cds_variable: geopotential
         nc_variable: z
         units: m**2 s**-2
+        extras:
+          product_type:
+          - forecast
       graupel-carra:
         cds_variable: graupel
         nc_variable: grle
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       potential-vorticity-carra:
         cds_variable: potential_vorticity
         nc_variable: pv
         types: state
         units: K m**2 kg**-1 s**-1
+        extras:
+          product_type:
+          - forecast
       pseudo-adiabatic-potential-temperature-carra:
         cds_variable: pseudo_adiabatic_potential_temperature
         nc_variable: papt
         types: state
         units: K
+        extras:
+          product_type:
+          - forecast
       relative-humidity-carra:
         cds_variable: relative_humidity
         nc_variable: r
         types: state
         units: '%'
+        extras:
+          product_type:
+          - forecast
       specific-cloud-ice-water-content-carra:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       specific-cloud-liquid-water-content-carra:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       specific-cloud-rain-water-content-carra:
         cds_variable: specific_cloud_rain_water_content
         nc_variable: crwc
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       specific-cloud-snow-water-content-carra:
         cds_variable: specific_cloud_snow_water_content
         nc_variable: cswc
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       temperature-carra:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
+        extras:
+          product_type:
+          - forecast
       u-component-of-wind-carra:
         cds_variable: u_component_of_wind
         nc_variable: u
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - forecast
       v-component-of-wind-carra:
         cds_variable: v_component_of_wind
         nc_variable: v
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - forecast
   reanalysis-carra-height-levels:
     product_type:
     - reanalysis
@@ -99,36 +141,57 @@ datasets:
         nc_variable: pres
         types: state
         units: Pa
+        extras:
+          product_type:
+          - forecast
       relative-humidity-carra-h:
         cds_variable: relative_humidity
         nc_variable: r
         types: state
         units: '%'
+        extras:
+          product_type:
+          - forecast
       specific-cloud-ice-water-content-carra-h:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       specific-cloud-liquid-water-content-carra-h:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       temperature-carra-h:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
+        extras:
+          product_type:
+          - forecast
       wind-direction-carra-h:
         cds_variable: wind_direction
         nc_variable: wdir
         types: state
         units: Degree true
+        extras:
+          product_type:
+          - forecast
       wind-speed-carra-h:
         cds_variable: wind_speed
         nc_variable: si100
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - forecast
   reanalysis-carra-model-levels:
     product_type:
     - reanalysis
@@ -146,56 +209,89 @@ datasets:
         nc_variable: ccl
         types: state
         units: '%'
+        extras:
+          product_type:
+          - forecast
       graupel-carra-m:
         cds_variable: graupel
         nc_variable: grle
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       specific-cloud-ice-water-content-carra-m:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       specific-cloud-liquid-water-content-carra-m:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       specific-cloud-rain-water-content-carra-m:
         cds_variable: specific_cloud_rain_water_content
         nc_variable: crwc
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       specific-cloud-snow-water-content-carra-m:
         cds_variable: specific_cloud_snow_water_content
         nc_variable: cswc
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       specific-humidity-carra-m:
         cds_variable: specific_humidity
         nc_variable: q
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       temperature-carra-m:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
+        extras:
+          product_type:
+          - forecast
       turbulent-kinetic-energy-carra-m:
         cds_variable: turbulent_kinetic_energy
         nc_variable: tke
         types: state
         units: J kg**-1
+        extras:
+          product_type:
+          - forecast
       u-component-of-wind-carra-m:
         cds_variable: u_component_of_wind
         nc_variable: u
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - forecast
       v-component-of-wind-carra-m:
         cds_variable: v_component_of_wind
         nc_variable: v
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - forecast
   reanalysis-carra-single-levels:
     product_type:
     - reanalysis
@@ -212,333 +308,536 @@ datasets:
         nc_variable: u10
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - forecast
       10m-v-component-of-wind-carra:
         cds_variable: 10m_v_component_of_wind
         nc_variable: v10
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - forecast
       10m-wind-direction-carra:
         cds_variable: 10m_wind_direction
         nc_variable: wdir10
         types: state
         units: Degree true
+        extras:
+          product_type:
+          - forecast
       10m-wind-speed-carra:
         cds_variable: 10m_wind_speed
         nc_variable: si10
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - forecast
       2m-relative-humidity-carra:
         cds_variable: 2m_relative_humidity
         nc_variable: r2
         types: state
         units: '%'
+        extras:
+          product_type:
+          - forecast
       2m-temperature-carra:
         cds_variable: 2m_temperature
         nc_variable: t2m
         types: state
         units: K
+        extras:
+          product_type:
+          - forecast
       albedo-carra:
         cds_variable: albedo
         nc_variable: al
         types: state
         units: '%'
+        extras:
+          product_type:
+          - forecast
       cloud-base-carra:
         cds_variable: cloud_base
         nc_variable: cdcb
         types: state
         units: m
+        extras:
+          product_type:
+          - forecast
       cloud-top-carra:
         cds_variable: cloud_top
         nc_variable: cdct
         types: state
         units: m
+        extras:
+          product_type:
+          - forecast
       high-cloud-cover-carra:
         cds_variable: high_cloud_cover
         nc_variable: hcc
         types: state
         units: '%'
+        extras:
+          product_type:
+          - forecast
       land-sea-mask-carra:
         cds_variable: land_sea_mask
         nc_variable: lsm
         units: (0 - 1)
+        extras:
+          leadtime_hour: null
       low-cloud-cover-carra:
         cds_variable: low_cloud_cover
         nc_variable: lcc
         types: state
         units: '%'
+        extras:
+          product_type:
+          - forecast
       medium-cloud-cover-carra:
         cds_variable: medium_cloud_cover
         nc_variable: mcc
         types: state
         units: '%'
+        extras:
+          product_type:
+          - forecast
       orography-carra:
         cds_variable: orography
         nc_variable: orog
         units: m
+        extras:
+          leadtime_hour: null
       percolation-carra:
         cds_variable: percolation
         nc_variable: perc
         types: flux
         units: kg m**-2
+        extras:
+          product_type:
+          - forecast
       sea-ice-area-fraction-carra:
         cds_variable: sea_ice_area_fraction
         nc_variable: siconc
         types: state
         units: (0 - 1)
+        extras:
+          product_type:
+          - forecast
       sea-surface-temperature-carra:
         cds_variable: sea_surface_temperature
         nc_variable: sst
         types: state
         units: K
+        extras:
+          product_type:
+          - forecast
       skin-temperature-carra:
         cds_variable: skin_temperature
         nc_variable: skt
         types: state
         units: K
+        extras:
+          product_type:
+          - forecast
       snow-density-carra:
         cds_variable: snow_density
         nc_variable: rsn
         types: state
         units: kg m**-3
+        extras:
+          product_type:
+          - forecast
       snow-depth-water-equivalent-carra:
         cds_variable: snow_depth_water_equivalent
         nc_variable: sd
         types: state
         units: kg m**-2
+        extras:
+          product_type:
+          - forecast
       surface-pressure-carra:
         cds_variable: surface_pressure
         nc_variable: sp
         types: state
         units: Pa
+        extras:
+          product_type:
+          - forecast
       surface-roughness-carra:
         cds_variable: surface_roughness
         nc_variable: sr
         units: m
+        extras:
+          leadtime_hour: null
       surface-runoff-carra:
         cds_variable: surface_runoff
         nc_variable: sro
         types: flux
         units: kg m**-2
+        extras:
+          product_type:
+          - forecast
       total-cloud-cover-carra:
         cds_variable: total_cloud_cover
         nc_variable: tcc
         types: state
         units: '%'
+        extras:
+          product_type:
+          - forecast
       total-column-integrated-water-vapour-carra:
         cds_variable: total_column_integrated_water_vapour
         nc_variable: tciwv
         types: state
         units: kg m**-2
+        extras:
+          product_type:
+          - forecast
       visibility-carra:
         cds_variable: visibility
         nc_variable: vis
         types: state
         units: m
+        extras:
+          product_type:
+          - forecast
       2m-specific-humidity-carra:
         cds_variable: 2m_specific_humidity
         nc_variable: sh2
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - forecast
       snow-albedo-carra:
         cds_variable: snow_albedo
         nc_variable: asn
         types: state
         units: '%'
+        extras:
+          leadtime_hour: null
       mean-sea-level-pressure-carra:
         cds_variable: mean_sea_level_pressure
         nc_variable: msl
         types: state
         units: Pa
+        extras:
+          product_type:
+          - forecast
       surface-sensible-heat-flux-carra:
         cds_variable: surface_sensible_heat_flux
         nc_variable: sshf
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       10m-eastward-wind-gust-since-previous-post-processing-carra:
         cds_variable: 10m_eastward_wind_gust_since_previous_post_processing
         nc_variable: efg10
         types: flux
         units: m s**-1
+        extras:
+          product_type:
+          - forecast
       10m-northward-wind-gust-since-previous-post-processing-carra:
         cds_variable: 10m_northward_wind_gust_since_previous_post_processing
         nc_variable: nfg10
         types: flux
         units: m s**-1
+        extras:
+          product_type:
+          - forecast
       10m-wind-gust-since-previous-post-processing-carra:
         cds_variable: 10m_wind_gust_since_previous_post_processing
         nc_variable: fg10
         types: flux
         units: m s**-1
+        extras:
+          product_type:
+          - forecast
       direct-solar-radiation-carra:
         cds_variable: direct_solar_radiation
         nc_variable: dirsrf
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       evaporation-carra:
         cds_variable: evaporation
         nc_variable: eva
         types: flux
         units: kg m**-2
+        extras:
+          product_type:
+          - forecast
       fog-carra:
         cds_variable: fog
         nc_variable: fog
         types: state
         units: '%'
+        extras:
+          product_type:
+          - forecast
       fraction-of-snow-cover-carra:
         cds_variable: fraction_of_snow_cover
         nc_variable: fscov
         types: state
         units: Proportion
+        extras:
+          leadtime_hour: null
       maximum-2m-temperature-since-previous-post-processing-carra:
         cds_variable: maximum_2m_temperature_since_previous_post_processing
         nc_variable: mx2t
         types: state
         units: K
+        extras:
+          product_type:
+          - forecast
       minimum-2m-temperature-since-previous-post-processing-carra:
         cds_variable: minimum_2m_temperature_since_previous_post_processing
         nc_variable: mn2t
         types: state
         units: K
+        extras:
+          product_type:
+          - forecast
       precipitation-type-carra:
         cds_variable: precipitation_type
         nc_variable: ptype
         types: state
         units: (0 - 8)
+        extras:
+          product_type:
+          - forecast
       sea-ice-surface-temperature-carra:
         cds_variable: sea_ice_surface_temperature
         nc_variable: ist
         types: state
         units: K
+        extras:
+          product_type:
+          - forecast
       sea-ice-thickness-carra:
         cds_variable: sea_ice_thickness
         nc_variable: siti
         types: state
         units: m
+        extras:
+          product_type:
+          - forecast
       snow-on-ice-total-depth-carra:
         cds_variable: snow_on_ice_total_depth
         nc_variable: soit
         types: state
         units: m
+        extras:
+          product_type:
+          - forecast
       surface-latent-heat-flux-carra:
         cds_variable: surface_latent_heat_flux
         nc_variable: slhf
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       surface-net-solar-radiation-carra:
         cds_variable: surface_net_solar_radiation
         nc_variable: ssr
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       surface-net-solar-radiation-clear-sky-carra:
         cds_variable: surface_net_solar_radiation,_clear_sky
         nc_variable: ssrc
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       surface-net-thermal-radiation-carra:
         cds_variable: surface_net_thermal_radiation
         nc_variable: str
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       surface-net-thermal-radiation-clear-sky-carra:
         cds_variable: surface_net_thermal_radiation,_clear_sky
         nc_variable: strc
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       surface-roughness-length-for-heat-carra:
         cds_variable: surface_roughness_length_for_heat
         nc_variable: flsr
         types: state
         units: m
+        extras:
+          leadtime_hour: null
       surface-solar-radiation-downwards-carra:
         cds_variable: surface_solar_radiation_downwards
         nc_variable: ssrd
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       thermal-surface-radiation-downwards-carra:
         cds_variable: thermal_surface_radiation_downwards
         nc_variable: strd
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       time-integral-of-rain-flux-carra:
         cds_variable: time_integral_of_rain_flux
         nc_variable: tirf
         types: flux
         units: kg m**-2
+        extras:
+          product_type:
+          - forecast
       time-integral-of-snow-evaporation-flux-carra:
         cds_variable: time_integral_of_snow_evaporation_flux
         nc_variable: tisef
         types: flux
         units: kg m**-2
+        extras:
+          product_type:
+          - forecast
       time-integral-of-surface-eastward-momentum-flux-carra:
         cds_variable: time_integral_of_surface_eastward_momentum_flux
         nc_variable: tisemf
         types: flux
         units: N m**-2 s
+        extras:
+          product_type:
+          - forecast
       time-integral-of-surface-latent-heat-evaporation-flux-carra:
         cds_variable: time_integral_of_surface_latent_heat_evaporation_flux
         nc_variable: tislhef
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       time-integral-of-surface-latent-heat-sublimation-flux-carra:
         cds_variable: time_integral_of_surface_latent_heat_sublimation_flux
         nc_variable: tislhsf
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       time-integral-of-surface-northward-momentum-flux-carra:
         cds_variable: time_integral_of_surface_northward_momentum_flux
         nc_variable: tisnmf
         types: flux
         units: N m**-2 s
+        extras:
+          product_type:
+          - forecast
       time-integral-of-total-solid-precipitation-flux-carra:
         cds_variable: time_integral_of_total_solid_precipitation_flux
         nc_variable: titspf
         types: flux
         units: kg m**-2
+        extras:
+          product_type:
+          - forecast
       time-integrated-surface-direct-short-wave-radiation-flux-carra:
         cds_variable: time_integrated_surface_direct_short_wave_radiation_flux
         nc_variable: tidirswrf
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       top-net-solar-radiation-carra:
         cds_variable: top_net_solar_radiation
         nc_variable: tsr
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       top-net-thermal-radiation-carra:
         cds_variable: top_net_thermal_radiation
         nc_variable: ttr
         types: flux
         units: J m**-2
+        extras:
+          product_type:
+          - forecast
       total-column-cloud-ice-water-carra:
         cds_variable: total_column_cloud_ice_water
         nc_variable: tciw
         types: state
         units: kg m**-2
+        extras:
+          product_type:
+          - forecast
       total-column-cloud-liquid-water-carra:
         cds_variable: total_column_cloud_liquid_water
         nc_variable: tclw
         types: state
         units: kg m**-2
+        extras:
+          product_type:
+          - forecast
       total-column-graupel-carra:
         cds_variable: total_column_graupel
         nc_variable: tcgr
         types: state
         units: kg m**-2
+        extras:
+          product_type:
+          - forecast
       total-precipitation-carra:
         cds_variable: total_precipitation
         nc_variable: tp
         types: flux
         units: kg m**-2
+        extras:
+          product_type:
+          - forecast
       volumetric-soil-ice-carra:
         cds_variable: volumetric_soil_ice
         nc_variable: vsi
         types: state
         units: m**3 m**-3
+        extras:
+          level_type:
+          - soil_level
+          product_type:
+          - forecast
+          soil_level:
+          - root_depth
       volumetric-soil-moisture-carra:
         cds_variable: volumetric_soil_moisture
         nc_variable: vsw
         types: state
         units: m**3 m**-3
+        extras:
+          level_type:
+          - soil_level
+          product_type:
+          - forecast
+          soil_level:
+          - root_depth
   reanalysis-carra-means:
     product_type:
     - reanalysis
@@ -690,6 +989,10 @@ datasets:
         types: state
         units: '%'
         extras:
+          level_location:
+          - '65'
+          level_type:
+          - model_levels
           product_type:
           - analysis_based
       pressure-carra-means-h-analysisbased:
@@ -698,352 +1001,416 @@ datasets:
         types: state
         units: Pa
         extras:
+          height_level:
+          - 100_m
+          level_location:
+          - '500'
           level_type: height_levels
           product_type:
           - analysis_based
-          height_level:
-          - 100_m
       relative-humidity-carra-means-h-analysisbased:
         cds_variable: relative_humidity
         nc_variable: r
         types: state
         units: '%'
         extras:
+          height_level:
+          - 100_m
+          level_location:
+          - '500'
           level_type: height_levels
           product_type:
           - analysis_based
-          height_level:
-          - 100_m
       specific-cloud-ice-water-content-carra-means-h-analysisbased:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
         units: kg kg**-1
         extras:
+          height_level:
+          - 100_m
+          level_location:
+          - '500'
           level_type: height_levels
           product_type:
           - analysis_based
-          height_level:
-          - 100_m
       specific-cloud-liquid-water-content-carra-means-h-analysisbased:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
         units: kg kg**-1
         extras:
+          height_level:
+          - 100_m
+          level_location:
+          - '500'
           level_type: height_levels
           product_type:
           - analysis_based
-          height_level:
-          - 100_m
       temperature-carra-means-h-analysisbased:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
         extras:
+          height_level:
+          - 100_m
+          level_location:
+          - '500'
           level_type: height_levels
           product_type:
           - analysis_based
-          height_level:
-          - 100_m
       wind-direction-carra-means-h-analysisbased:
         cds_variable: wind_direction
         nc_variable: wdir
         types: state
         units: Degree true
         extras:
+          height_level:
+          - 100_m
+          level_location:
+          - '500'
           level_type: height_levels
           product_type:
           - analysis_based
-          height_level:
-          - 100_m
       wind-speed-carra-means-h-analysisbased:
         cds_variable: wind_speed
         nc_variable: si100
         types: state
         units: m s**-1
         extras:
+          height_level:
+          - 100_m
+          level_location:
+          - '500'
           level_type: height_levels
           product_type:
           - analysis_based
-          height_level:
-          - 100_m
       cloud-cover-carra-means-m-analysisbased:
         cds_variable: cloud_cover
         nc_variable: ccl
         types: state
         units: '%'
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
-          product_type:
-          - analysis_based
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       graupel-carra-means-m-analysisbased:
         cds_variable: graupel
         nc_variable: grle
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
-          product_type:
-          - analysis_based
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       specific-cloud-ice-water-content-carra-means-m-analysisbased:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
-          product_type:
-          - analysis_based
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       specific-cloud-liquid-water-content-carra-means-m-analysisbased:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
-          product_type:
-          - analysis_based
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       specific-cloud-rain-water-content-carra-means-m-analysisbased:
         cds_variable: specific_cloud_rain_water_content
         nc_variable: crwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
-          product_type:
-          - analysis_based
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       specific-cloud-snow-water-content-carra-means-m-analysisbased:
         cds_variable: specific_cloud_snow_water_content
         nc_variable: cswc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
-          product_type:
-          - analysis_based
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       specific-humidity-carra-means-m-analysisbased:
         cds_variable: specific_humidity
         nc_variable: q
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
-          product_type:
-          - analysis_based
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       temperature-carra-means-m-analysisbased:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
-          product_type:
-          - analysis_based
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       turbulent-kinetic-energy-carra-means-m-analysisbased:
         cds_variable: turbulent_kinetic_energy
         nc_variable: tke
         types: state
         units: J kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
-          product_type:
-          - analysis_based
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       u-component-of-wind-carra-means-m-analysisbased:
         cds_variable: u_component_of_wind
         nc_variable: u
         types: state
         units: m s**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
-          product_type:
-          - analysis_based
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       v-component-of-wind-carra-means-m-analysisbased:
         cds_variable: v_component_of_wind
         nc_variable: v
         types: state
         units: m s**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
-          product_type:
-          - analysis_based
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       cloud-cover-carra-means-p-analysisbased:
         cds_variable: cloud_cover
         nc_variable: ccl
         types: state
         units: '%'
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       geometric-vertical-velocity-carra-means-p-analysisbased:
         cds_variable: geometric_vertical_velocity
         nc_variable: wz
         types: state
         units: m s**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       geopotential-carra-means-p-analysisbased:
         cds_variable: geopotential
         nc_variable: z
         types: state
         units: m**2 s**-2
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       graupel-carra-means-p-analysisbased:
         cds_variable: graupel
         nc_variable: grle
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       potential-vorticity-carra-means-p-analysisbased:
         cds_variable: potential_vorticity
         nc_variable: pv
         types: state
         units: K m**2 kg**-1 s**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       pseudo-adiabatic-potential-temperature-carra-means-p-analysisbased:
         cds_variable: pseudo_adiabatic_potential_temperature
         nc_variable: papt
         types: state
         units: K
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       relative-humidity-carra-means-p-analysisbased:
         cds_variable: relative_humidity
         nc_variable: r
         types: state
         units: '%'
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       specific-cloud-ice-water-content-carra-means-p-analysisbased:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       specific-cloud-liquid-water-content-carra-means-p-analysisbased:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       specific-cloud-rain-water-content-carra-means-p-analysisbased:
         cds_variable: specific_cloud_rain_water_content
         nc_variable: crwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       specific-cloud-snow-water-content-carra-means-p-analysisbased:
         cds_variable: specific_cloud_snow_water_content
         nc_variable: cswc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       temperature-carra-means-p-analysisbased:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       u-component-of-wind-carra-means-p-analysisbased:
         cds_variable: u_component_of_wind
         nc_variable: u
         types: state
         units: m s**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       v-component-of-wind-carra-means-p-analysisbased:
         cds_variable: v_component_of_wind
         nc_variable: v
         types: state
         units: m s**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
-          product_type:
-          - analysis_based
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       10m-u-component-of-wind-carra-means-analysisbased:
         cds_variable: 10m_u_component_of_wind
         nc_variable: u10
@@ -1572,6 +1939,8 @@ datasets:
         types: state
         units: m**3 m**-3
         extras:
+          level_location:
+          - '1'
           level_type: soil_levels
           product_type:
           - analysis_based
@@ -1581,6 +1950,8 @@ datasets:
         types: state
         units: m**3 m**-3
         extras:
+          level_location:
+          - '1'
           level_type: soil_levels
           product_type:
           - analysis_based
@@ -1597,324 +1968,473 @@ datasets:
         nc_variable: si10
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - analysis
       10m-u-component-of-wind-pancarra:
         cds_variable: 10m_u_component_of_wind
         nc_variable: u10
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - analysis
       10m-v-component-of-wind-pancarra:
         cds_variable: 10m_v_component_of_wind
         nc_variable: v10
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - analysis
       10m-wind-direction-pancarra:
         cds_variable: 10m_wind_direction
         nc_variable: wdir10
         types: state
         units: Degree true
+        extras:
+          product_type:
+          - analysis
       2m-relative-humidity-pancarra:
         cds_variable: 2m_relative_humidity
         nc_variable: r2
         types: state
         units: '%'
+        extras:
+          product_type:
+          - analysis
       2m-specific-humidity-pancarra:
         cds_variable: 2m_specific_humidity
         nc_variable: sh2
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - analysis
       pressure-pancarra-h:
         cds_variable: pressure
         nc_variable: pres
         types: state
         units: Pa
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '3000'
+          level_type: height_levels
+          product_type:
+          - analysis
       cloud-cover-pancarra-p:
         cds_variable: cloud_cover
         nc_variable: ccl
         types: state
         units: '%'
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       sea-surface-temperature-pancarra:
         cds_variable: sea_surface_temperature
         nc_variable: sst
         types: state
         units: K
+        extras:
+          product_type:
+          - analysis
       relative-humidity-pancarra-h:
         cds_variable: relative_humidity
         nc_variable: r
         types: state
         units: '%'
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '3000'
+          level_type: height_levels
+          product_type:
+          - analysis
       specific-cloud-ice-water-content-pancarra-h:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
         units: kg kg**-1
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '3000'
+          level_type: height_levels
+          product_type:
+          - analysis
       specific-cloud-liquid-water-content-pancarra-h:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
         units: kg kg**-1
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '3000'
+          level_type: height_levels
+          product_type:
+          - analysis
       temperature-pancarra-h:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '3000'
+          level_type: height_levels
+          product_type:
+          - analysis
       wind-direction-pancarra-h:
         cds_variable: wind_direction
         nc_variable: wdir
         types: state
         units: Degree true
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '3000'
+          level_type: height_levels
+          product_type:
+          - analysis
       wind-speed-pancarra-h:
         cds_variable: wind_speed
         nc_variable: si100
         types: state
         units: m s**-1
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '3000'
+          level_type: height_levels
+          product_type:
+          - analysis
       cloud-cover-pancarra-m:
         cds_variable: cloud_cover
         nc_variable: ccl
         types: state
         units: '%'
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis
       graupel-pancarra-m:
         cds_variable: graupel
         nc_variable: grle
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis
       specific-cloud-ice-water-content-pancarra-m:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis
       specific-cloud-liquid-water-content-pancarra-m:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis
       specific-cloud-rain-water-content-pancarra-m:
         cds_variable: specific_cloud_rain_water_content
         nc_variable: crwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis
       specific-cloud-snow-water-content-pancarra-m:
         cds_variable: specific_cloud_snow_water_content
         nc_variable: cswc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis
       specific-humidity-pancarra-m:
         cds_variable: specific_humidity
         nc_variable: q
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis
       temperature-pancarra-m:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis
       turbulent-kinetic-energy-pancarra-m:
         cds_variable: turbulent_kinetic_energy
         nc_variable: tke
         types: state
         units: J kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis
       wind-direction-pancarra-m:
         cds_variable: wind_direction
         nc_variable: wdir
         types: state
         units: Degree true
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis
       wind-speed-pancarra-m:
         cds_variable: wind_speed
         nc_variable: si100
         types: state
         units: m s**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis
       geometric-vertical-velocity-pancarra-p:
         cds_variable: geometric_vertical_velocity
         nc_variable: wz
         types: state
         units: m s**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       geopotential-pancarra-p:
         cds_variable: geopotential
         nc_variable: z
         types: state
         units: m**2 s**-2
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       graupel-pancarra-p:
         cds_variable: graupel
         nc_variable: grle
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       potential-vorticity-pancarra-p:
         cds_variable: potential_vorticity
         nc_variable: pv
         types: state
         units: K m**2 kg**-1 s**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       pseudo-adiabatic-potential-temperature-pancarra-p:
         cds_variable: pseudo_adiabatic_potential_temperature
         nc_variable: papt
         types: state
         units: K
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       relative-humidity-pancarra-p:
         cds_variable: relative_humidity
         nc_variable: r
         types: state
         units: '%'
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       specific-cloud-ice-water-content-pancarra-p:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       specific-cloud-liquid-water-content-pancarra-p:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       specific-cloud-rain-water-content-pancarra-p:
         cds_variable: specific_cloud_rain_water_content
         nc_variable: crwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       specific-cloud-snow-water-content-pancarra-p:
         cds_variable: specific_cloud_snow_water_content
         nc_variable: cswc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       temperature-pancarra-p:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       wind-direction-pancarra-p:
         cds_variable: wind_direction
         nc_variable: wdir
         types: state
         units: Degree true
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       wind-speed-pancarra-p:
         cds_variable: wind_speed
         nc_variable: si100
         types: state
         units: m s**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis
       2m-temperature-pancarra:
         cds_variable: 2m_temperature
         nc_variable: t2m
@@ -1922,6 +2442,8 @@ datasets:
         units: K
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       cloud-base-pancarra:
         cds_variable: cloud_base
         nc_variable: cdcb
@@ -1929,6 +2451,8 @@ datasets:
         units: m
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       cloud-top-pancarra:
         cds_variable: cloud_top
         nc_variable: cdct
@@ -1936,27 +2460,41 @@ datasets:
         units: m
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       direct-solar-radiation-pancarra:
         cds_variable: direct_solar_radiation
         nc_variable: dirsrf
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       evaporation-pancarra:
         cds_variable: evaporation
         nc_variable: erate
         types: flux
         units: m of water equivalent s**-1
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       fog-pancarra:
         cds_variable: fog
         nc_variable: fog
         types: state
         units: '%'
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       high-cloud-cover-pancarra:
         cds_variable: high_cloud_cover
         nc_variable: hcc
@@ -1964,13 +2502,19 @@ datasets:
         units: '%'
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       instantaneous-10m-wind-gust-pancarra:
         cds_variable: instantaneous_10m_wind_gust
         nc_variable: i10fg
         types: state
         units: m s**-1
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       land-sea-mask-pancarra:
         cds_variable: land_sea_mask
         nc_variable: lsm
@@ -1978,6 +2522,8 @@ datasets:
         units: (0 - 1)
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       low-cloud-cover-pancarra:
         cds_variable: low_cloud_cover
         nc_variable: lcc
@@ -1985,13 +2531,19 @@ datasets:
         units: '%'
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       maximum-2m-temperature-since-previous-post-processing-pancarra:
         cds_variable: maximum_2m_temperature_since_previous_post_processing
         nc_variable: mx2t
         types: state
         units: K
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       mean-sea-level-pressure-pancarra:
         cds_variable: mean_sea_level_pressure
         nc_variable: msl
@@ -1999,6 +2551,8 @@ datasets:
         units: Pa
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       medium-cloud-cover-pancarra:
         cds_variable: medium_cloud_cover
         nc_variable: mcc
@@ -2006,13 +2560,19 @@ datasets:
         units: '%'
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       minimum-2m-temperature-since-previous-post-processing-pancarra:
         cds_variable: minimum_2m_temperature_since_previous_post_processing
         nc_variable: mn2t
         types: state
         units: K
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       orography-pancarra:
         cds_variable: orography
         nc_variable: orog
@@ -2020,13 +2580,19 @@ datasets:
         units: m
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       percolation-pancarra:
         cds_variable: percolation
         nc_variable: perc
         types: flux
         units: kg m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       sea-ice-area-fraction-pancarra:
         cds_variable: sea_ice_area_fraction
         nc_variable: siconc
@@ -2034,6 +2600,8 @@ datasets:
         units: (0 - 1)
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       sea-ice-surface-temperature-pancarra:
         cds_variable: sea_ice_surface_temperature
         nc_variable: ist
@@ -2041,6 +2609,8 @@ datasets:
         units: K
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       sea-ice-thickness-pancarra:
         cds_variable: sea_ice_thickness
         nc_variable: siti
@@ -2048,6 +2618,8 @@ datasets:
         units: m
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       skin-temperature-pancarra:
         cds_variable: skin_temperature
         nc_variable: skt
@@ -2055,6 +2627,8 @@ datasets:
         units: K
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       snow-cover-pancarra:
         cds_variable: snow_cover
         nc_variable: snowc
@@ -2062,6 +2636,8 @@ datasets:
         units: '%'
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       snow-depth-pancarra:
         cds_variable: snow_depth
         nc_variable: sd
@@ -2069,6 +2645,8 @@ datasets:
         units: m of water equivalent
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       snow-depth-water-equivalent-pancarra:
         cds_variable: snow_depth_water_equivalent
         nc_variable: sd
@@ -2076,6 +2654,8 @@ datasets:
         units: kg m**-2
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       snow-on-ice-total-depth-pancarra:
         cds_variable: snow_on_ice_total_depth
         nc_variable: soit
@@ -2083,34 +2663,52 @@ datasets:
         units: m
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       surface-net-solar-radiation-pancarra:
         cds_variable: surface_net_solar_radiation
         nc_variable: ssr
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       surface-net-solar-radiation-clear-sky-pancarra:
         cds_variable: surface_net_solar_radiation,_clear_sky
         nc_variable: ssrc
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       surface-net-thermal-radiation-pancarra:
         cds_variable: surface_net_thermal_radiation
         nc_variable: str
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       surface-net-thermal-radiation-clear-sky-pancarra:
         cds_variable: surface_net_thermal_radiation,_clear_sky
         nc_variable: strc
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       surface-pressure-pancarra:
         cds_variable: surface_pressure
         nc_variable: sp
@@ -2118,6 +2716,8 @@ datasets:
         units: Pa
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       surface-roughness-pancarra:
         cds_variable: surface_roughness
         nc_variable: sr
@@ -2125,6 +2725,8 @@ datasets:
         units: m
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       surface-roughness-length-for-heat-pancarra:
         cds_variable: surface_roughness_length_for_heat
         nc_variable: flsr
@@ -2132,104 +2734,162 @@ datasets:
         units: m
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       surface-runoff-pancarra:
         cds_variable: surface_runoff
         nc_variable: sro
         types: flux
         units: kg m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       surface-sensible-heat-flux-pancarra:
         cds_variable: surface_sensible_heat_flux
         nc_variable: msshfl
         types: flux
         units: W m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       surface-solar-radiation-downwards-pancarra:
         cds_variable: surface_solar_radiation_downwards
         nc_variable: msdsrf
         types: flux
         units: W m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       thermal-surface-radiation-downwards-pancarra:
         cds_variable: thermal_surface_radiation_downwards
         nc_variable: strd
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       time-integral-of-rain-flux-pancarra:
         cds_variable: time_integral_of_rain_flux
         nc_variable: tirf
         types: flux
         units: kg m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       time-integral-of-snow-evaporation-flux-pancarra:
         cds_variable: time_integral_of_snow_evaporation_flux
         nc_variable: tisef
         types: flux
         units: kg m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       time-integral-of-surface-eastward-momentum-flux-pancarra:
         cds_variable: time_integral_of_surface_eastward_momentum_flux
         nc_variable: tisemf
         types: flux
         units: N m**-2 s
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       time-integral-of-surface-latent-heat-evaporation-flux-pancarra:
         cds_variable: time_integral_of_surface_latent_heat_evaporation_flux
         nc_variable: tislhef
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       time-integral-of-surface-latent-heat-sublimation-flux-pancarra:
         cds_variable: time_integral_of_surface_latent_heat_sublimation_flux
         nc_variable: tislhsf
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       time-integral-of-surface-northward-momentum-flux-pancarra:
         cds_variable: time_integral_of_surface_northward_momentum_flux
         nc_variable: tisnmf
         types: flux
         units: N m**-2 s
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       time-integral-of-total-solid-precipitation-flux-pancarra:
         cds_variable: time_integral_of_total_solid_precipitation_flux
         nc_variable: titspf
         types: flux
         units: kg m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       time-integrated-surface-direct-short-wave-radiation-flux-pancarra:
         cds_variable: time_integrated_surface_direct_short_wave_radiation_flux
         nc_variable: tidirswrf
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       top-net-solar-radiation-pancarra:
         cds_variable: top_net_solar_radiation
         nc_variable: tsr
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       top-net-thermal-radiation-pancarra:
         cds_variable: top_net_thermal_radiation
         nc_variable: ttr
         types: flux
         units: J m**-2
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
       total-cloud-cover-pancarra:
         cds_variable: total_cloud_cover
         nc_variable: tcc
@@ -2237,6 +2897,8 @@ datasets:
         units: (0 - 1)
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       total-column-cloud-ice-water-pancarra:
         cds_variable: total_column_cloud_ice_water
         nc_variable: tciw
@@ -2244,6 +2906,8 @@ datasets:
         units: kg m**-2
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       total-column-cloud-liquid-water-pancarra:
         cds_variable: total_column_cloud_liquid_water
         nc_variable: tclw
@@ -2251,6 +2915,8 @@ datasets:
         units: kg m**-2
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       total-column-graupel-pancarra:
         cds_variable: total_column_graupel
         nc_variable: tcgr
@@ -2258,6 +2924,8 @@ datasets:
         units: kg m**-2
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       total-column-integrated-water-vapour-pancarra:
         cds_variable: total_column_integrated_water_vapour
         nc_variable: tcwv
@@ -2265,13 +2933,19 @@ datasets:
         units: kg m**-2
         extras:
           level_type: single_levels
+          product_type:
+          - analysis
       total-precipitation-pancarra:
         cds_variable: total_precipitation
         nc_variable: tprate
         types: flux
         units: m s**-1
         extras:
+          leadtime_hour:
+          - '3'
           level_type: single_levels
+          product_type:
+          - forecast
   reanalysis-pan-carra-means:
     product_type:
     - reanalysis
@@ -2291,51 +2965,81 @@ datasets:
         nc_variable: si10
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - analysis_based
       2m-temperature-pancarra-means:
         cds_variable: 2m_temperature
         nc_variable: t2m
         types: state
         units: K
+        extras:
+          product_type:
+          - analysis_based
       10m-wind-direction-pancarra-means:
         cds_variable: 10m_wind_direction
         nc_variable: wdir10
         types: state
         units: Degree true
+        extras:
+          product_type:
+          - analysis_based
       2m-specific-humidity-pancarra-means:
         cds_variable: 2m_specific_humidity
         nc_variable: sh2
         types: state
         units: kg kg**-1
+        extras:
+          product_type:
+          - analysis_based
       surface-pressure-pancarra-means:
         cds_variable: surface_pressure
         nc_variable: sp
         types: state
         units: Pa
+        extras:
+          product_type:
+          - analysis_based
       skin-temperature-pancarra-means:
         cds_variable: skin_temperature
         nc_variable: skt
         types: state
         units: K
+        extras:
+          product_type:
+          - analysis_based
       2m-relative-humidity-pancarra-means:
         cds_variable: 2m_relative_humidity
         nc_variable: r2
         types: state
         units: '%'
+        extras:
+          product_type:
+          - analysis_based
       sea-ice-area-fraction-pancarra-means:
         cds_variable: sea_ice_area_fraction
         nc_variable: siconc
         types: state
         units: (0 - 1)
+        extras:
+          product_type:
+          - analysis_based
       10m-u-component-of-wind-pancarra-means:
         cds_variable: 10m_u_component_of_wind
         nc_variable: u10
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - analysis_based
       10m-v-component-of-wind-pancarra-means:
         cds_variable: 10m_v_component_of_wind
         nc_variable: v10
         types: state
         units: m s**-1
+        extras:
+          product_type:
+          - analysis_based
       total-precipitation-pancarra-means:
         cds_variable: total_precipitation
         nc_variable: tp
@@ -2346,299 +3050,437 @@ datasets:
         nc_variable: sde
         types: state
         units: m
+        extras:
+          product_type:
+          - analysis_based
       cloud-cover-pancarra-means:
         cds_variable: cloud_cover
         nc_variable: ccl
         types: state
         units: '%'
+        extras:
+          level_location:
+          - '1000'
+          level_type:
+          - pressure_levels
+          product_type:
+          - analysis_based
       pressure-pancarra-means-h:
         cds_variable: pressure
         nc_variable: pres
         types: state
         units: Pa
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '500'
+          level_type: height_levels
+          product_type:
+          - analysis_based
       relative-humidity-pancarra-means-h:
         cds_variable: relative_humidity
         nc_variable: r
         types: state
         units: '%'
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '500'
+          level_type: height_levels
+          product_type:
+          - analysis_based
       specific-cloud-ice-water-content-pancarra-means-h:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
         units: kg kg**-1
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '500'
+          level_type: height_levels
+          product_type:
+          - analysis_based
       specific-cloud-liquid-water-content-pancarra-means-h:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
         units: kg kg**-1
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '500'
+          level_type: height_levels
+          product_type:
+          - analysis_based
       temperature-pancarra-means-h:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '500'
+          level_type: height_levels
+          product_type:
+          - analysis_based
       wind-direction-pancarra-means-h:
         cds_variable: wind_direction
         nc_variable: wdir
         types: state
         units: Degree true
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '500'
+          level_type: height_levels
+          product_type:
+          - analysis_based
       wind-speed-pancarra-means-h:
         cds_variable: wind_speed
         nc_variable: si100
         types: state
         units: m s**-1
         extras:
-          level_type: height_levels
           height_level:
           - 100_m
+          level_location:
+          - '500'
+          level_type: height_levels
+          product_type:
+          - analysis_based
       cloud-cover-pancarra-means-m:
         cds_variable: cloud_cover
         nc_variable: ccl
         types: state
         units: '%'
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       graupel-pancarra-means-m:
         cds_variable: graupel
         nc_variable: grle
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       specific-cloud-ice-water-content-pancarra-means-m:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       specific-cloud-liquid-water-content-pancarra-means-m:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       specific-cloud-rain-water-content-pancarra-means-m:
         cds_variable: specific_cloud_rain_water_content
         nc_variable: crwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       specific-cloud-snow-water-content-pancarra-means-m:
         cds_variable: specific_cloud_snow_water_content
         nc_variable: cswc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       specific-humidity-pancarra-means-m:
         cds_variable: specific_humidity
         nc_variable: q
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       temperature-pancarra-means-m:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       turbulent-kinetic-energy-pancarra-means-m:
         cds_variable: turbulent_kinetic_energy
         nc_variable: tke
         types: state
         units: J kg**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       wind-direction-pancarra-means-m:
         cds_variable: wind_direction
         nc_variable: wdir
         types: state
         units: Degree true
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       wind-speed-pancarra-means-m:
         cds_variable: wind_speed
         nc_variable: si100
         types: state
         units: m s**-1
         extras:
+          level_location:
+          - '65'
           level_type: model_levels
           model_level:
           - '1'
+          product_type:
+          - analysis_based
       cloud-cover-pancarra-means-p:
         cds_variable: cloud_cover
         nc_variable: ccl
         types: state
         units: '%'
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       geometric-vertical-velocity-pancarra-means-p:
         cds_variable: geometric_vertical_velocity
         nc_variable: wz
         types: state
         units: m s**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       geopotential-pancarra-means-p:
         cds_variable: geopotential
         nc_variable: z
         types: state
         units: m**2 s**-2
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       graupel-pancarra-means-p:
         cds_variable: graupel
         nc_variable: grle
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       potential-vorticity-pancarra-means-p:
         cds_variable: potential_vorticity
         nc_variable: pv
         types: state
         units: K m**2 kg**-1 s**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       pseudo-adiabatic-potential-temperature-pancarra-means-p:
         cds_variable: pseudo_adiabatic_potential_temperature
         nc_variable: papt
         types: state
         units: K
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       relative-humidity-pancarra-means-p:
         cds_variable: relative_humidity
         nc_variable: r
         types: state
         units: '%'
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       specific-cloud-ice-water-content-pancarra-means-p:
         cds_variable: specific_cloud_ice_water_content
         nc_variable: ciwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       specific-cloud-liquid-water-content-pancarra-means-p:
         cds_variable: specific_cloud_liquid_water_content
         nc_variable: clwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       specific-cloud-rain-water-content-pancarra-means-p:
         cds_variable: specific_cloud_rain_water_content
         nc_variable: crwc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       specific-cloud-snow-water-content-pancarra-means-p:
         cds_variable: specific_cloud_snow_water_content
         nc_variable: cswc
         types: state
         units: kg kg**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       temperature-pancarra-means-p:
         cds_variable: temperature
         nc_variable: t
         types: state
         units: K
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       wind-direction-pancarra-means-p:
         cds_variable: wind_direction
         nc_variable: wdir
         types: state
         units: Degree true
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       wind-speed-pancarra-means-p:
         cds_variable: wind_speed
         nc_variable: si100
         types: state
         units: m s**-1
         extras:
+          level_location:
+          - '1000'
           level_type: pressure_levels
           pressure_level:
           - '1000'
+          product_type:
+          - analysis_based
       cloud-base-pancarra-means:
         cds_variable: cloud_base
         nc_variable: cdcb
@@ -2646,6 +3488,8 @@ datasets:
         units: m
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       cloud-top-pancarra-means:
         cds_variable: cloud_top
         nc_variable: cdct
@@ -2653,6 +3497,8 @@ datasets:
         units: m
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       direct-solar-radiation-pancarra-means:
         cds_variable: direct_solar_radiation
         nc_variable: dirsrf
@@ -2674,6 +3520,8 @@ datasets:
         units: '%'
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       low-cloud-cover-pancarra-means:
         cds_variable: low_cloud_cover
         nc_variable: lcc
@@ -2681,6 +3529,8 @@ datasets:
         units: '%'
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       maximum-2m-temperature-since-previous-post-processing-pancarra-means:
         cds_variable: maximum_2m_temperature_since_previous_post_processing
         nc_variable: mx2t
@@ -2695,6 +3545,8 @@ datasets:
         units: Pa
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       medium-cloud-cover-pancarra-means:
         cds_variable: medium_cloud_cover
         nc_variable: mcc
@@ -2702,6 +3554,8 @@ datasets:
         units: '%'
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       minimum-2m-temperature-since-previous-post-processing-pancarra-means:
         cds_variable: minimum_2m_temperature_since_previous_post_processing
         nc_variable: mn2t
@@ -2723,6 +3577,8 @@ datasets:
         units: m
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       sea-surface-temperature-pancarra-means:
         cds_variable: sea_surface_temperature
         nc_variable: sst
@@ -2730,6 +3586,8 @@ datasets:
         units: K
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       snow-cover-pancarra-means:
         cds_variable: snow_cover
         nc_variable: snowc
@@ -2737,6 +3595,8 @@ datasets:
         units: '%'
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       snow-depth-water-equivalent-pancarra-means:
         cds_variable: snow_depth_water_equivalent
         nc_variable: sd
@@ -2744,6 +3604,8 @@ datasets:
         units: kg m**-2
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       snow-on-ice-total-depth-pancarra-means:
         cds_variable: snow_on_ice_total_depth
         nc_variable: soit
@@ -2751,6 +3613,8 @@ datasets:
         units: m
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       surface-net-solar-radiation-pancarra-means:
         cds_variable: surface_net_solar_radiation
         nc_variable: ssr
@@ -2891,6 +3755,8 @@ datasets:
         units: (0 - 1)
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       total-column-cloud-ice-water-pancarra-means:
         cds_variable: total_column_cloud_ice_water
         nc_variable: tciw
@@ -2898,6 +3764,8 @@ datasets:
         units: kg m**-2
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       total-column-cloud-liquid-water-pancarra-means:
         cds_variable: total_column_cloud_liquid_water
         nc_variable: tclw
@@ -2905,6 +3773,8 @@ datasets:
         units: kg m**-2
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       total-column-graupel-pancarra-means:
         cds_variable: total_column_graupel
         nc_variable: tcgr
@@ -2912,6 +3782,8 @@ datasets:
         units: kg m**-2
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based
       total-column-integrated-water-vapour-pancarra-means:
         cds_variable: total_column_integrated_water_vapour
         nc_variable: tcwv
@@ -2919,3 +3791,5 @@ datasets:
         units: kg m**-2
         extras:
           level_type: single_levels
+          product_type:
+          - analysis_based

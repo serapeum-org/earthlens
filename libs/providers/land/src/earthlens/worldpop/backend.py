@@ -707,7 +707,7 @@ class WorldPop(AbstractDataSource):
         Returns:
             list[Path]: One reduced GeoTIFF per `(product, cohort, window)`.
         """
-        from pyramids.dataset import Dataset, DatasetCollection
+        from pyramids.dataset import Dataset, DatasetCollection, GeoReference
 
         op = "mean" if cfg.op == "auto" else cfg.op
         by_series: dict[tuple[str, tuple[str, int] | None], dict[int, Path]] = {}
@@ -732,9 +732,9 @@ class WorldPop(AbstractDataSource):
             tag = f"_{cohort[0]}_{cohort[1]}" if cohort else ""
             for label, array in reduced.items():
                 target = Path(self.path) / f"{product}{tag}_{cfg.freq}_{label}_{op}.tif"
-                Dataset.create_from_array(arr=array, geo=geo, epsg=epsg).to_file(
-                    str(target)
-                )
+                Dataset.from_array(
+                    arr=array, geo_ref=GeoReference(geo=geo, epsg=epsg)
+                ).to_file(str(target))
                 out.append(target)
         return out
 

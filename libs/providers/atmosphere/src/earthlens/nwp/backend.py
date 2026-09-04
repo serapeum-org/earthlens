@@ -672,7 +672,7 @@ class NWP(AbstractDataSource):
                 "supported. Request a griddable model (ICON-EU, or a "
                 "regridded global feed) instead."
             )
-        from pyramids.dataset import Dataset, DatasetCollection
+        from pyramids.dataset import Dataset, DatasetCollection, GeoReference
         from pyramids.dataset.cog import write_cog
 
         op = "mean" if config.op == "auto" else config.op
@@ -707,7 +707,8 @@ class NWP(AbstractDataSource):
         for label, array in reduced.items():
             target = out_dir / f"{model_key}_{op}_{config.freq}_{label}.tif"
             write_cog(
-                Dataset.create_from_array(arr=array, geo=geo, epsg=epsg), str(target)
+                Dataset.from_array(arr=array, geo_ref=GeoReference(geo=geo, epsg=epsg)),
+                str(target),
             )
             written.append(target)
         return written

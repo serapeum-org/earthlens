@@ -891,7 +891,7 @@ def iter_aggregate_netcdf(
         - :func:`aggregate_netcdf`: the eager `list` form of this function.
         - :class:`AggregationConfig`: the frozen request payload.
     """
-    from pyramids.dataset import Dataset
+    from pyramids.dataset import Dataset, GeoReference
     from pyramids.netcdf import NetCDF
 
     out_dir: Path | None = config.out_dir
@@ -941,9 +941,9 @@ def iter_aggregate_netcdf(
             target: Path | None = None
             if out_dir is not None:
                 target = out_dir / (f"{stem}_{config.freq}_{window_label:%Y%m%d}.tif")
-                Dataset.create_from_array(arr=reduced, geo=geo, epsg=4326).to_file(
-                    str(target)
-                )
+                Dataset.from_array(
+                    arr=reduced, geo_ref=GeoReference(geo=geo, epsg=4326)
+                ).to_file(str(target))
 
             keep = config.keep_arrays or target is None
             yield AggregatedWindow(

@@ -33,6 +33,7 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "coverage": "earthlens.erddap.cli:coverage",
         "validator": "earthlens.erddap.cli:validator",
         "emitter": "earthlens.erddap.cli:emitter",
+        "variable_lister": "earthlens.erddap.cli:variables_for",
     },
     "obis": {
         "refresher": "earthlens.obis.cli:refresher",
