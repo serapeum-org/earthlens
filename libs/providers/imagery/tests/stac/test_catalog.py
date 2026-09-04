@@ -417,6 +417,24 @@ class TestLoaderRules:
             "B04"
         ], "the rename is CDSE-only"
 
+    def test_asset_aliases_unknown_endpoint_raises(self, tmp_path):
+        """A rename keyed by an endpoint nobody declared is a typo, not a no-op."""
+        _write(
+            tmp_path / "a.yaml",
+            'endpoints:\n  e:\n    url: u\ncollections:\n  c:\n    endpoint: e\n    assets:\n      B04: {}\n    asset_aliases:\n      nope:\n        B04: B04_10m\n',
+        )
+        with pytest.raises(ValueError, match="asset_aliases for endpoint"):
+            _load_catalog_data(tmp_path)
+
+    def test_asset_aliases_unknown_asset_raises(self, tmp_path):
+        """Renaming an asset the collection never declares would silently do nothing."""
+        _write(
+            tmp_path / "a.yaml",
+            'endpoints:\n  e:\n    url: u\ncollections:\n  c:\n    endpoint: e\n    assets:\n      B04: {}\n    asset_aliases:\n      e:\n        B99: B99_10m\n',
+        )
+        with pytest.raises(ValueError, match="renaming"):
+            _load_catalog_data(tmp_path)
+
     def test_collection_unknown_endpoint_raises(self, tmp_path):
         """A collection naming an undeclared endpoint is rejected."""
         _write(

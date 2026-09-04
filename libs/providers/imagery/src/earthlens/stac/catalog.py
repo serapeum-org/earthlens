@@ -268,6 +268,24 @@ def _load_catalog_data(
                 f"{collections[col_key].endpoint!r} which is not declared in "
                 f"any 'endpoints:' block ({origin[col_key]})."
             )
+        # An asset_aliases typo is otherwise invisible: an unknown endpoint key
+        # never matches, and an unknown asset key passes straight through, so
+        # the rename silently does nothing and the request fails much later as
+        # a StacAssetError naming a key the catalog never advertised.
+        for ep_key, renames in collections[col_key].asset_aliases.items():
+            if endpoints and ep_key not in endpoints:
+                raise ValueError(
+                    f"collection {col_key!r} declares asset_aliases for endpoint "
+                    f"{ep_key!r} which is not declared in any 'endpoints:' block "
+                    f"({origin[col_key]})."
+                )
+            unknown = sorted(set(renames) - set(assets))
+            if assets and unknown:
+                raise ValueError(
+                    f"collection {col_key!r} declares asset_aliases for "
+                    f"{ep_key!r} renaming {unknown} which are not among its "
+                    f"assets ({sorted(assets)}) ({origin[col_key]})."
+                )
 
     _CATALOG_CACHE[key] = (endpoints, available, collections)
     return _CATALOG_CACHE[key]
