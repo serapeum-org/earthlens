@@ -1945,6 +1945,10 @@ collections:
     aliases:
       cdse: sentinel-2-l2a
       earth-search: sentinel-2-c1-l2a
+    # HAND-CURATED — must survive `refresh stac` / `probe stac`, which
+    # regenerate the rest of this file. CDSE publishes Sentinel-2 per
+    # resolution, so the catalog's B04 is B04_10m there. See
+    # docs/reference/stac/introduction.md.
     asset_aliases:
       cdse:
         B02: B02_10m

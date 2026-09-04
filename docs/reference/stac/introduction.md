@@ -91,6 +91,36 @@ data, not from earthlens:
 
 Prefer regenerating via the refresh/probe tools over hand-editing the YAML.
 
+### `asset_aliases` is the one hand-curated block
+
+`asset_aliases` is the exception to the rule above: it is written by hand and
+**must survive regeneration**. It exists because an endpoint may publish the
+same band under a different key than the catalog names it by — CDSE splits
+Sentinel-2 per resolution, so the catalog's `B04` is `B04_10m` there:
+
+```yaml
+sentinel-2-l2a:
+  aliases:
+    cdse: sentinel-2-l2a          # per-endpoint collection id
+  asset_aliases:
+    cdse:                          # per-endpoint asset keys
+      B02: B02_10m
+      B04: B04_10m
+```
+
+`aliases` overrides the *collection id*; `asset_aliases` overrides the *asset
+keys*, one level down. Only the endpoints that rename need an entry, and an
+asset an endpoint does not rename passes through unchanged.
+
+The rename is applied at exactly one place — the STAC item lookup. The request's
+asset list keeps the catalog's own naming everywhere else, so the `nodata`
+lookup and the written band names still match the catalog. Both keys are
+validated at load: an endpoint that no `endpoints:` block declares, or an asset
+the collection does not carry, is rejected rather than silently ignored.
+
+Resolve them with `Catalog.resolve_assets(endpoint, collection_key, assets)`,
+which returns the keys to request from that endpoint, in the given order.
+
 ## Output kind & aggregation
 
 `OUTPUT_KIND = "raster"`, so the `EarthLens` facade **forwards**
