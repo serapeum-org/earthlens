@@ -13,7 +13,7 @@ One breaking change, and it is the quiet kind: **your code keeps running and wri
 from the key, giving `<output_dir()>/jrc:coastal-forecast/`. A colon cannot appear in a Windows path component,
 so that call could not create its directory there at all. The separator is now flattened to `_`:
 
-```python
+```text
 # 0.21 — on POSIX; on Windows this failed to create the directory
 <output_dir()>/jrc:coastal-forecast/
 
