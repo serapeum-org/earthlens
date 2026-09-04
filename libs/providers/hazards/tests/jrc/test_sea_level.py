@@ -68,6 +68,11 @@ class _FakeCube:
 
     def __init__(self, labels):
         self._labels = labels
+        self.closed = False
+
+    def close(self):
+        """Record the release the caller owes for the remote handle."""
+        self.closed = True
 
     def get_time_variable(self, time_format=None):
         assert time_format == _LABEL_FORMAT, (
@@ -571,6 +576,33 @@ class TestBandValidTimes:
             _fake_cube_reader([f"2026-08-{26 + n:02d}T00:00" for n in range(16)]),
         )
         assert _helpers.band_valid_times("irrelevant", 1) == ["step_1"]
+
+    @pytest.mark.real_band_names
+    def test_the_cube_handle_is_released(self, monkeypatch):
+        """The /vsicurl handle is closed even though the labels are returned."""
+        cube = _FakeCube(["2026-08-26T00:00"])
+        monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", lambda *a, **k: cube)
+
+        _helpers.band_valid_times("irrelevant", 1)
+
+        assert cube.closed, (
+            "band_valid_times must close the cube it opens; leaving it to the "
+            "GC holds a /vsicurl connection open per fetch"
+        )
+
+    @pytest.mark.real_band_names
+    def test_the_cube_handle_is_released_on_failure(self, monkeypatch):
+        """A cube that cannot be decoded is still released."""
+        cube = _FakeCube(None)
+
+        def _boom(time_format=None):
+            raise RuntimeError("undecodable axis")
+
+        cube.get_time_variable = _boom
+        monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", lambda *a, **k: cube)
+
+        assert _helpers.band_valid_times("irrelevant", 2) == ["step_1", "step_2"]
+        assert cube.closed, "the handle must be released on the failure path too"
 
     @pytest.mark.real_band_names
     def test_an_undecodable_axis_keeps_positional_names(self, monkeypatch):
