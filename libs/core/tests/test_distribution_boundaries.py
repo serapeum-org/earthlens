@@ -10,6 +10,7 @@ These tests keep that boundary explicit.
 from __future__ import annotations
 
 import ast
+import json
 from pathlib import Path
 
 import pytest
@@ -90,7 +91,7 @@ def _pyramids_ordering_problems(path: Path) -> list[str]:
     cost is paid on every import of the module, and nothing guarantees pyramids
     ran first -- so both shapes are reported here, not just the ordering.
     """
-    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    tree = ast.parse(_source_text(path), filename=str(path))
     sites = [
         (func, node)
         for func in ast.walk(tree)
@@ -118,9 +119,9 @@ def _pyramids_ordering_problems(path: Path) -> list[str]:
 def _earthlens_sources() -> list[Path]:
     """Return every earthlens Python file the GDAL rule governs.
 
-    Covers the test and tooling trees as well as shipped source: this very
-    branch had to hand-convert `osgeo` out of two FDSN tests, and a rule that
-    only watches `src/` would let the next one back in unnoticed.
+    Covers the test and tooling trees and the example notebooks, not just
+    shipped source. Both have carried direct GDAL in this repo's history, so a
+    rule that watched `src/` alone would be looking in the wrong place.
     """
     return sorted(
         path
@@ -130,10 +131,38 @@ def _earthlens_sources() -> list[Path]:
             "libs/core/tests/**/*.py",
             "libs/providers/*/tests/**/*.py",
             "tools/**/*.py",
+            # Notebooks are where this repo's raw-GDAL escape hatches have
+            # actually lived, so a rule that skipped them would watch the wrong
+            # tree. `_source_text` lifts their code cells out for parsing.
+            "docs/examples/**/*.ipynb",
+            "examples/**/*.ipynb",
         )
         for path in _ROOT.glob(pattern)
         if "build" not in path.parts and "__pycache__" not in path.parts
     )
+
+
+def _source_text(path: Path) -> str:
+    """Return a file's Python source, unwrapping a notebook into one module.
+
+    A `.ipynb` is JSON, so its code has to be lifted out before it can be
+    parsed. IPython line magics (`%timeit`), shell escapes (`!pip`) and help
+    (`obj?`) are not Python, so those lines are blanked rather than dropped --
+    keeping the line count means a reported line number still points at the
+    right place in the concatenated cells.
+    """
+    if path.suffix != ".ipynb":
+        return path.read_text(encoding="utf-8")
+    notebook = json.loads(path.read_text(encoding="utf-8"))
+    lines: list[str] = []
+    for cell in notebook.get("cells", []):
+        if cell.get("cell_type") != "code":
+            continue
+        for line in cell.get("source", []):
+            body = line.rstrip("\n")
+            lines.append("\n" if body.lstrip()[:1] in {"%", "!", "?"} else body + "\n")
+        lines.append("\n")
+    return "".join(lines)
 
 
 def _gis_imports(path: Path) -> list[tuple[int, str]]:
@@ -148,7 +177,13 @@ def _gis_imports(path: Path) -> list[tuple[int, str]]:
     walk, and pretending otherwise would overstate what this guard proves.
     """
     found: list[tuple[int, str]] = []
-    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    try:
+        tree = ast.parse(_source_text(path), filename=str(path))
+    except (SyntaxError, ValueError) as error:
+        # A file the guard cannot read is a hole in the guard. Report it as a
+        # finding so the failure names the file, rather than letting the whole
+        # test error out with a traceback that buries which one was at fault.
+        return [(getattr(error, "lineno", 0) or 0, f"unparseable: {error}")]
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for alias in node.names:
@@ -1867,6 +1902,73 @@ class TestGdalGuardDetection:
         assert len(problems) == 1
         assert "line 2" in problems[0] and "read()" in problems[0]
 
+    def test_a_notebook_code_cell_is_scanned(self, tmp_path):
+        """A GDAL import inside a notebook code cell is found, JSON and all."""
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps(
+                {
+                    "cells": [
+                        {
+                            "cell_type": "markdown",
+                            "source": ["from osgeo import gdal\n"],
+                        },
+                        {"cell_type": "code", "source": ["import pyramids\n"]},
+                        {"cell_type": "code", "source": ["from osgeo import gdal\n"]},
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe), "a code cell's GDAL import was missed"
+
+    def test_a_notebook_markdown_cell_is_not_scanned(self, tmp_path):
+        """Prose that mentions the import is not a violation."""
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps(
+                {
+                    "cells": [
+                        {
+                            "cell_type": "markdown",
+                            "source": ["Do not write `from osgeo import gdal`.\n"],
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe) == []
+
+    def test_ipython_magics_do_not_break_parsing(self, tmp_path):
+        """A cell using `%` / `!` still parses, so the rest of it is scanned."""
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps(
+                {
+                    "cells": [
+                        {
+                            "cell_type": "code",
+                            "source": [
+                                "%matplotlib inline\n",
+                                "!echo hello\n",
+                                "from osgeo import gdal\n",
+                            ],
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe) == [(3, "from osgeo")]
+
+    def test_an_unparseable_file_is_reported_not_raised(self, tmp_path):
+        """A file the guard cannot parse becomes a finding naming the file."""
+        probe = tmp_path / "broken.py"
+        probe.write_text("def oops(:\n", encoding="utf-8")
+        found = _gis_imports(probe)
+        assert found and "unparseable" in found[0][1]
+
     def test_the_guard_governs_tests_and_tools_too(self):
         """The rule covers the test and tooling trees, not only shipped source."""
         # Scope is a behavioural contract, not an implementation detail: this
@@ -1877,6 +1979,10 @@ class TestGdalGuardDetection:
         assert any("src" in parts for parts in trees), "shipped source is ungoverned"
         assert any("tests" in parts for parts in trees), "the test tree is ungoverned"
         assert any(parts[0] == "tools" for parts in trees), "tools/ is ungoverned"
+        assert any(parts[-1].endswith(".ipynb") for parts in trees), (
+            "the example notebooks are ungoverned, and they are where this repo's "
+            "raw-GDAL workarounds have historically lived"
+        )
         junk = [
             path
             for path in governed
