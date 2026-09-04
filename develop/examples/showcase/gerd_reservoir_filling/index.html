@@ -24355,7 +24355,7 @@ series over this rainy reach produces.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATA_STYLES</span><span class="p">,</span> <span class="n">resolve_colormap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -24375,7 +24375,7 @@ from cleopatra.glyphs.gridded.array_glyph import FrameLabel
 from cleopatra.styling.colors import DATA_STYLES, resolve_colormap
 from IPython.display import Image, display
 from loguru import logger
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 from pyramids.dataset.collection import DatasetCollection
 
 from earthlens.core import EarthLens
@@ -24531,12 +24531,12 @@ is derived for the water index.</p>
     <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.0000275</span> <span class="o">-</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span>
     <span class="p">)</span>
-    <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">a</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">geo</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rgb_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"gerd_</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">.tif"</span><span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
+        <span class="n">arr</span><span class="o">=</span><span class="n">a</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rgb_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"gerd_</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">.tif"</span><span class="p">))</span>
     <span class="n">ndwi</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)</span>  <span class="c1"># (Green - NIR)/(Green + NIR)</span>
-    <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span>
-        <span class="n">arr</span><span class="o">=</span><span class="n">ndwi</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">geo</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">epsg</span>
+    <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
+        <span class="n">arr</span><span class="o">=</span><span class="n">ndwi</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
     <span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ndwi_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"gerd_</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">.tif"</span><span class="p">))</span>
     <span class="n">frames_written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 
@@ -24574,12 +24574,12 @@ for y in range(2013, 2026):  # 2013 dry season ... 2025/26 dry season (all in th
     a = np.clip(
         np.asarray(src.read_array(), dtype="float32") * 0.0000275 - 0.2, 0.0, None
     )
-    Dataset.create_from_array(arr=a[:3], geo=src.geotransform, epsg=src.epsg).to_file(
-        os.path.join(rgb_dir, f"gerd_{y}.tif")
-    )
+    Dataset.from_array(
+        arr=a[:3], geo_ref=GeoReference(geo=src.geotransform, epsg=src.epsg)
+    ).to_file(os.path.join(rgb_dir, f"gerd_{y}.tif"))
     ndwi = (a[1] - a[3]) / (a[1] + a[3] + 1e-6)  # (Green - NIR)/(Green + NIR)
-    Dataset.create_from_array(
-        arr=ndwi[None, :, :], geo=src.geotransform, epsg=src.epsg
+    Dataset.from_array(
+        arr=ndwi[None, :, :], geo_ref=GeoReference(geo=src.geotransform, epsg=src.epsg)
     ).to_file(os.path.join(ndwi_dir, f"gerd_{y}.tif"))
     frames_written.append(y)
 
