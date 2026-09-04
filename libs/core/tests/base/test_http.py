@@ -2087,3 +2087,62 @@ class TestResumePostCondition:
         assert session.ranged[1] is None, (
             "an unpinnable representation must restart, not resume"
         )
+
+
+@pytest.mark.unit
+class TestProgressTotalRejectsUntrustworthyLengths:
+    """`_progress_total` is the single source of "how big is this body"."""
+
+    @pytest.mark.parametrize(
+        "headers, expected",
+        [
+            ({"Content-Length": "22"}, 22),
+            ({"Content-Length": " 22 "}, 22),
+            ({"Content-Length": "22, 22"}, 22),
+            ({"Content-Length": "22, 40"}, None),
+            ({"Content-Length": "22", "Transfer-Encoding": "chunked"}, None),
+            ({"Content-Length": "22", "Transfer-Encoding": "identity"}, 22),
+            ({"Content-Length": "22", "Content-Encoding": "gzip"}, None),
+            ({"Content-Length": "22", "Content-Encoding": "identity"}, 22),
+            ({"Content-Length": "\u00b2\u00b2"}, None),
+            ({"Content-Length": ""}, None),
+            ({"Content-Length": "22,"}, None),
+            ({}, None),
+        ],
+        ids=[
+            "plain",
+            "padded",
+            "duplicate-agreeing",
+            "duplicate-conflicting",
+            "chunked-wins",
+            "identity-coding-ok",
+            "gzip-encoded",
+            "identity-encoding-ok",
+            "unicode-digits",
+            "empty",
+            "trailing-comma",
+            "absent",
+        ],
+    )
+    def test_only_a_length_describing_the_delivered_bytes_is_used(
+        self, headers, expected
+    ):
+        """A length that will not match the stream is reported as unknown."""
+        from earthlens.base.http import _progress_total
+
+        assert _progress_total(headers) == expected
+
+    def test_a_chunked_body_is_unknown_even_with_a_wellformed_length(self):
+        """RFC 9110 6.3: a transfer coding makes `Content-Length` non-describing.
+
+        urllib3 frames the body by the chunked encoding, so a length check
+        against the header would report a complete body as truncated.
+        """
+        from earthlens.base.http import _progress_total
+
+        assert (
+            _progress_total(
+                {"Content-Length": "1048576", "Transfer-Encoding": "chunked"}
+            )
+            is None
+        )

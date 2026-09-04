@@ -688,25 +688,86 @@ def _resume_is_safe(
 def _progress_total(headers: Any) -> int | None:
     """Return the download progress-bar total from response headers.
 
-    Uses `Content-Length` only for an untransformed body: it reports the
-    *compressed* size, but `iter_content` yields *decompressed* bytes, so
-    a `Content-Encoding` (e.g. gzip) response would overshoot the bar. In
-    that case (or when the length is absent / non-numeric) the total is
-    `None` and the bar runs unbounded.
+    Uses `Content-Length` only when it actually describes the bytes the
+    caller will receive. Four things disqualify it:
+
+    * a `Content-Encoding` other than `identity` — the header reports the
+      *compressed* size while `iter_content` yields *decompressed* bytes;
+    * a `Transfer-Encoding` — RFC 9110 §6.3 requires a recipient to ignore
+      `Content-Length` when one is present, and urllib3 does, so the header
+      describes nothing the stream will match;
+    * a duplicated header whose comma-joined values disagree;
+    * a value that is absent, empty, or not ASCII digits.
+
+    In any of those cases the total is `None`: the progress bar runs
+    unbounded and callers that verify a length know not to.
+
+    This is the single source of "how big is this body", so a wrong answer
+    here becomes a wrong length check rather than only a wrong bar.
 
     Args:
         headers: The response headers mapping.
 
     Returns:
-        The byte total, or `None` when it cannot be trusted.
+        int | None: The byte total the body will deliver, or `None` when the
+        headers do not determine one.
+
+    Examples:
+        - A plain unencoded body reports its length:
+            ```python
+            >>> from earthlens.base.http import _progress_total
+            >>> _progress_total({"Content-Length": "22"})
+            22
+
+            ```
+        - A chunked body has no usable length, even when the header is
+          present and well-formed:
+            ```python
+            >>> from earthlens.base.http import _progress_total
+            >>> _progress_total(
+            ...     {"Content-Length": "22", "Transfer-Encoding": "chunked"}
+            ... ) is None
+            True
+
+            ```
+        - A duplicated header agreeing with itself is honoured; one that
+          contradicts itself is not:
+            ```python
+            >>> from earthlens.base.http import _progress_total
+            >>> _progress_total({"Content-Length": "22, 22"})
+            22
+            >>> _progress_total({"Content-Length": "22, 40"}) is None
+            True
+
+            ```
     """
     encoding = (headers.get("Content-Encoding") or "").strip().lower()
     if encoding and encoding != "identity":
         return None
+    # RFC 9110 §6.3: a recipient MUST ignore `Content-Length` when a transfer
+    # coding is present, and urllib3 does — the body is framed by the chunked
+    # encoding, not by the header. Reading it anyway yields a number the stream
+    # will not match, which a length check would then report as a truncation.
+    coding = (headers.get("Transfer-Encoding") or "").strip().lower()
+    if coding and coding != "identity":
+        return None
     raw_length = headers.get("Content-Length")
-    if raw_length is not None and raw_length.isdigit():
-        return int(raw_length)
-    return None
+    if raw_length is None:
+        return None
+    # A duplicated header arrives comma-joined. Identical values are the same
+    # claim stated twice and are honoured; differing ones are a contradiction
+    # no reader can resolve, so the total is unknown.
+    parts = [part.strip() for part in str(raw_length).split(",")]
+    if not parts or not all(parts):
+        return None
+    # `str.isdigit` accepts superscripts and other Unicode digit forms that
+    # `int()` then rejects or reads differently; a header is ASCII.
+    if not all(part.isascii() and part.isdigit() for part in parts):
+        return None
+    values = {int(part) for part in parts}
+    if len(values) != 1:
+        return None
+    return values.pop()
 
 
 def _default_user_agent() -> str:
