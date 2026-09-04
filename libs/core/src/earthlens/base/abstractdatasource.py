@@ -1019,10 +1019,16 @@ class AbstractDataSource(ABC):
             __init__.__signature__ = native_signature.replace(  # type: ignore[attr-defined]
                 parameters=head + extra + var_kw
             )
-            # `functools.wraps` copied the native `__annotations__`, so without
-            # this the signature and the annotations disagree and anything that
-            # pairs them (pydantic `validate_call`, signature-driven CLI
-            # builders) sees an untyped parameter.
+            # `functools.wraps` gave the wrapper the native's annotations —
+            # under PEP 649 (3.14) by copying `__annotate__`, so the two share
+            # one source rather than a dict. Without this assignment the
+            # signature and the annotations disagree and anything that pairs
+            # them (pydantic `validate_call`, signature-driven CLI builders)
+            # sees an untyped parameter. Rebinding rather than mutating is what
+            # makes it safe: reading `__annotations__` materialises a dict from
+            # the shared `__annotate__`, and assigning a new one detaches the
+            # wrapper (3.14 sets its `__annotate__` to `None`), so the native
+            # function keeps the annotations it declared.
             __init__.__annotations__ = {
                 **__init__.__annotations__,
                 **{p.name: _ERGONOMIC_ANNOTATIONS[p.name] for p in extra},
