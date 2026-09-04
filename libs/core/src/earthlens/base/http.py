@@ -1461,12 +1461,17 @@ class HttpClient:
                         )
                         discard_partial()
                         resume_from = 0
-                        attempt += 1
-                        if attempt > self.max_retries:
+                        if attempt >= self.max_retries:
                             raise RangeReadError(
                                 f"{redact_url(url)} kept answering Range requests "
                                 "with a body that could not be resumed"
                             )
+                        # Back off like every other retry path: a server
+                        # mishandling ranges is often the same one under load,
+                        # and re-requesting a whole object immediately is the
+                        # most expensive way to ask again.
+                        self._sleep(self._backoff_wait(None, attempt))
+                        attempt += 1
                         continue
                     if not resume_from:
                         # Only a full response describes the whole resource, so
@@ -1474,7 +1479,14 @@ class HttpClient:
                         resumable = "bytes" in response.headers.get(
                             "Accept-Ranges", ""
                         ).lower() and not response.headers.get("Content-Encoding")
-                        range_validator = response.headers.get("ETag")
+                        etag = response.headers.get("ETag", "")
+                        # RFC 9110 §13.1.5: `If-Range` takes a *strong*
+                        # validator. A weak one (`W/"..."`) only promises
+                        # semantic equivalence, which is not enough to splice
+                        # byte ranges from two responses together.
+                        range_validator = (
+                            None if etag.startswith("W/") else (etag or None)
+                        )
                         range_validator_header = "ETag"
                         if not range_validator:
                             range_validator = response.headers.get("Last-Modified")
@@ -1497,12 +1509,16 @@ class HttpClient:
                 # loop only ever issues the GET above, so the verb is always
                 # replay-safe. Re-check that if it is ever parameterised.
                 kind = classify_transport_error(exc, strict=self._default_retry_set)
+                if kind is None:
+                    # Deterministic — the next attempt reproduces it exactly.
+                    discard_partial()
+                    raise
                 budget = (
                     self.connect_retries
                     if kind in {"connect", "unknown"}
                     else self.read_retries
                 )
-                if kind is None or spent[kind] >= budget or attempt >= self.max_retries:
+                if spent[kind] >= budget or attempt >= self.max_retries:
                     discard_partial()
                     raise
                 spent[kind] += 1
@@ -1690,6 +1706,12 @@ class HttpClient:
                 # double submission the read-phase gate prevents. A `429` /
                 # `503` / `413` is the server asking for a later attempt, which
                 # is safe for any method.
+                logger.debug(
+                    f"HTTP {response.status_code} on {redact_url(url)}; not "
+                    f"retrying a {method.upper()}: the server already had the "
+                    f"request (pass retry_unsafe_methods=True if it is "
+                    f"replay-safe)"
+                )
                 by_status = False
             # A `retry_predicate` is the caller inspecting the response and
             # saying "this one is not really a success" — often on a `200` whose

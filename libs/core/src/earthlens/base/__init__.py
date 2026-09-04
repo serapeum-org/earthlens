@@ -47,6 +47,10 @@ from earthlens.base.catalog_source import (
     yaml_files_for,
 )
 from earthlens.base.http import (
+    DEFAULT_CONNECT_RETRIES,
+    DEFAULT_RETRY_EXCEPTIONS,
+    IDEMPOTENT_METHODS,
+    NON_RETRYABLE_EXCEPTIONS,
     HttpClient,
     HttpRangeFile,
     RangeReadError,
@@ -95,7 +99,11 @@ __all__ = [
     "AuthenticationError",
     "CADENCE_ALIASES",
     "FluxableLeaf",
+    "DEFAULT_CONNECT_RETRIES",
+    "DEFAULT_RETRY_EXCEPTIONS",
     "HttpClient",
+    "IDEMPOTENT_METHODS",
+    "NON_RETRYABLE_EXCEPTIONS",
     "HttpRangeFile",
     "LazyClientMixin",
     "METRES_PER_DEGREE",
