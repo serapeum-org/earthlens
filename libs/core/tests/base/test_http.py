@@ -1900,3 +1900,24 @@ class TestUnidentifiedTransportFailures:
         assert session.calls == DEFAULT_CONNECT_RETRIES + 1, (
             f"expected the cheap budget, got {session.calls} attempts"
         )
+
+
+@pytest.mark.unit
+class TestRetryOptOutIsHonoured:
+    """`max_retries=0` still disables retry after the transport default was armed."""
+
+    def test_zero_max_retries_makes_exactly_one_attempt(self):
+        """Nine backends pass `max_retries=0` to opt out; arming a default must not undo that.
+
+        The per-kind connect budget defaults to 1, which would otherwise
+        re-enable a retry for a client that asked for none.
+        """
+        session = _FlakySession(
+            9, requests.ConnectionError(ConnectionResetError("r")), _Resp(body={})
+        )
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=0)
+        with pytest.raises(requests.ConnectionError):
+            client.get("http://x")
+        assert session.calls == 1, (
+            f"max_retries=0 must mean one attempt, got {session.calls}"
+        )
