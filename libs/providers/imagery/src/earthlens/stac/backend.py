@@ -334,6 +334,8 @@ class STAC(LazyClientMixin, AbstractDataSource):
         # download(aggregate=) can group + window them without re-parsing names.
         self._written = []
         multi = len(self._aoi_bboxes) > 1
+        assert self._catalog is not None  # set in _initialize
+        assert self._endpoint is not None  # resolved in _initialize
         for (collection_key, date, bbox_key), group in _group_products(products):
             # Per-collection signer (e.g. requester-pays for usgs-landsat) — its
             # GDAL env must be active for the remote reads inside merge_rasters.
@@ -347,13 +349,23 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 # Endpoint-namespaced keys contain "/"; flatten for filenames so
                 # they don't create phantom subdirectories.
                 safe_key = safe_filename(collection_key)
-                for band in assets:
+                # Only the item lookup takes the endpoint's own key (CDSE splits
+                # Sentinel-2 per resolution, so `B04` is `B04_10m` there).
+                # `assets` itself stays in the catalog's naming, so the nodata
+                # lookup and the written band names still match. Resolved once
+                # for the whole list, which is the shape resolve_assets takes.
+                item_keys = self._catalog.resolve_assets(
+                    self._endpoint, collection_key, assets
+                )
+                for band, item_key in zip(assets, item_keys, strict=True):
                     # resolved_href resolves the asset href and applies the
                     # signer's sign_href (SAS graft / CDSE /vsis3 rewrite /
                     # no-op for requester-pays); _to_vsi then normalises a
                     # left-over s3:// to the GDAL /vsis3/ path.
                     hrefs = [
-                        _to_vsi(resolved_href(p.metadata["item"], band, signer=signer))
+                        _to_vsi(
+                            resolved_href(p.metadata["item"], item_key, signer=signer)
+                        )
                         for p in group
                     ]
                     tmp = Path(self.root_dir) / f".{safe_key}_{band}_{date}_{idx}.tif"
@@ -492,7 +504,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         requested band's grid. `no_data_value` is threaded through so the grid
         template adopts a dtype-safe fill — pyramids' earlier `from_band_files`
         default of -9999 overflowed unsigned dtypes such as `uint16`; that is
-        fixed upstream, so the previous `Dataset.align` + `create_from_array`
+        fixed upstream, so the previous `Dataset.align` + `from_array`
         workaround is no longer needed.
 
         Args:
@@ -555,7 +567,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         Returns:
             The per-window COG paths.
         """
-        from pyramids.dataset import Dataset, DatasetCollection
+        from pyramids.dataset import Dataset, DatasetCollection, GeoReference
         from pyramids.dataset.cog import write_cog
 
         op = "mean" if config.op == "auto" else config.op
@@ -585,7 +597,9 @@ class STAC(LazyClientMixin, AbstractDataSource):
             for label, array in reduced.items():
                 target = out_dir / f"{safe_key}_{op}_{config.freq}_{label}{part}.tif"
                 write_cog(
-                    Dataset.create_from_array(arr=array, geo=geo, epsg=epsg),
+                    Dataset.from_array(
+                        arr=array, geo_ref=GeoReference(geo=geo, epsg=epsg)
+                    ),
                     str(target),
                 )
                 written.append(target)

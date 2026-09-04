@@ -7,7 +7,7 @@ complementary SDKs, selected per-dataset by a `protocol` discriminator:
   `jaxa.earth` API (AW3D30 elevation, GSMaP precipitation, AMSR2 L3
   re-hosts, JASMES MODIS re-hosts, …). The API returns in-memory numpy
   arrays which the backend writes to north-up GeoTIFFs via
-  `pyramids.dataset.Dataset.create_from_array`.
+  `pyramids.dataset.Dataset.from_array`.
 * `protocol: gportal` — credentialed SFTP access through the community
   `gportal` SDK (raw L1/L2 swaths of GCOM-W AMSR2 / GCOM-C SGLI /
   ALOS-2 PALSAR-2 / EarthCARE / GPM / …). Requires a free G-Portal

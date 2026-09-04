@@ -19,8 +19,9 @@ def _forbid_network(request, monkeypatch):
 
     def _blocked(*args, **kwargs):
         raise AssertionError(
-            "a non-e2e JRC test attempted a real HTTP request; inject the "
-            "`http_text` / `http_bytes` seam instead."
+            "a non-e2e JRC test attempted to reach the network; inject the "
+            "`http_text` / `http_bytes` seam, or stub "
+            "`pyramids.netcdf.NetCDF.read_file` for a cube read."
         )
 
     import requests
@@ -28,9 +29,8 @@ def _forbid_network(request, monkeypatch):
     monkeypatch.setattr(requests.Session, "request", _blocked)
     monkeypatch.setattr(requests, "get", _blocked)
 
-    # The backend's raster I/O goes through GDAL, not requests, so block that
-    # route too: otherwise a test can still reach the live cube over /vsicurl.
+    # The backend's raster I/O goes through pyramids, not requests, so block
+    # that route too: otherwise a test can still reach the live cube over
+    # /vsicurl.
     if not request.node.get_closest_marker("real_band_names"):
-        from earthlens.jrc import _helpers
-
-        monkeypatch.setattr(_helpers, "gdal_module", _blocked)
+        monkeypatch.setattr("pyramids.netcdf.NetCDF.read_file", _blocked)

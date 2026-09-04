@@ -59,9 +59,18 @@ INFORM_RESULTS_PAGE = f"{INFORM_SITE}/inform-index/INFORM-Risk/Results-and-data"
 
 #: Matches a release workbook link, capturing its year and version so the newest
 #: can be picked when the page lists more than one (`INFORM_Risk_2026_v072.xlsx`).
-#: The trend workbook on the same page has a different stem and does not match.
+#: An optional word between the stem and the year absorbs the mid-year releases
+#: the site now publishes (`INFORM_Risk_Mid_2026_v073.xlsx`); without it the
+#: 2026 release was invisible and the lookup raised "layout may have changed".
+#: The trend workbook on the same page has a different stem
+#: (`INFORM2026_TREND_...`) and still does not match. The qualifier is spelled
+#: out rather than left as a wildcard word: a wildcard would also admit a
+#: future regional or subnational workbook, and because the newest
+#: `(year, version)` wins, a higher-versioned one would silently be served as
+#: the global release. An unrecognised qualifier instead raises "layout may
+#: have changed", which is the loud failure this function already has.
 INFORM_RELEASE_LINK = re.compile(
-    r"""href=["']([^"']*?INFORM_Risk_(\d{4})_v(\d+)\.xlsx[^"']*)["']""",
+    r"""href=["']([^"']*?INFORM_Risk_(?:Mid_)?(\d{4})_v(\d+)\.xlsx[^"']*)["']""",
     re.IGNORECASE,
 )
 

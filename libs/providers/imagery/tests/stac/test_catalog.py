@@ -387,6 +387,54 @@ class TestLoaderRules:
         )
         assert cat.resolve("e", "x") == "x"
 
+    def test_resolve_assets_renames_only_the_named_endpoint(self):
+        """An endpoint publishing a band under another key gets the renamed one."""
+        cat = Catalog(
+            endpoints={
+                "e": Endpoint(key="e", url="u"),
+                "f": Endpoint(key="f", url="u"),
+            },
+            datasets={
+                "x": Collection(endpoint="e", asset_aliases={"f": {"B04": "B04_10m"}})
+            },
+        )
+        assert cat.resolve_assets("f", "x", ["B04"]) == ["B04_10m"]
+        assert cat.resolve_assets("e", "x", ["B04"]) == ["B04"], (
+            "an endpoint with no asset_aliases entry must pass keys through"
+        )
+        assert cat.resolve_assets("f", "x", ["SCL"]) == ["SCL"], (
+            "an asset the endpoint does not rename passes through"
+        )
+
+    def test_cdse_sentinel2_assets_carry_the_resolution_suffix(self):
+        """CDSE splits Sentinel-2 per resolution, so B04 is B04_10m there."""
+        cat = Catalog()
+        assert cat.resolve_assets("cdse", "sentinel-2-l2a", ["B04"]) == ["B04_10m"]
+        assert cat.resolve_assets(
+            "cdse", "sentinel-2-l2a", ["B02", "B03", "B04", "B08"]
+        ) == ["B02_10m", "B03_10m", "B04_10m", "B08_10m"]
+        assert cat.resolve_assets("planetary-computer", "sentinel-2-l2a", ["B04"]) == [
+            "B04"
+        ], "the rename is CDSE-only"
+
+    def test_asset_aliases_unknown_endpoint_raises(self, tmp_path):
+        """A rename keyed by an endpoint nobody declared is a typo, not a no-op."""
+        _write(
+            tmp_path / "a.yaml",
+            'endpoints:\n  e:\n    url: u\ncollections:\n  c:\n    endpoint: e\n    assets:\n      B04: {}\n    asset_aliases:\n      nope:\n        B04: B04_10m\n',
+        )
+        with pytest.raises(ValueError, match="asset_aliases for endpoint"):
+            _load_catalog_data(tmp_path)
+
+    def test_asset_aliases_unknown_asset_raises(self, tmp_path):
+        """Renaming an asset the collection never declares would silently do nothing."""
+        _write(
+            tmp_path / "a.yaml",
+            'endpoints:\n  e:\n    url: u\ncollections:\n  c:\n    endpoint: e\n    assets:\n      B04: {}\n    asset_aliases:\n      e:\n        B99: B99_10m\n',
+        )
+        with pytest.raises(ValueError, match="renaming"):
+            _load_catalog_data(tmp_path)
+
     def test_collection_unknown_endpoint_raises(self, tmp_path):
         """A collection naming an undeclared endpoint is rejected."""
         _write(

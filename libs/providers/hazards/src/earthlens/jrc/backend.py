@@ -666,6 +666,7 @@ class JRC(AbstractDataSource):
         """
         import numpy as np
         from pyramids.dataset import Dataset as PyramidsDataset
+        from pyramids.dataset import GeoReference
         from pyramids.netcdf import NetCDF
 
         from earthlens.base import close_quietly
@@ -752,8 +753,10 @@ class JRC(AbstractDataSource):
                 close_quietly(variable)
                 close_quietly(container)
 
-        window_ds = PyramidsDataset.create_from_array(
-            array, geo=window_geo, epsg=4326, no_data_value=float("nan")
+        window_ds = PyramidsDataset.from_array(
+            array,
+            no_data_value=float("nan"),
+            geo_ref=GeoReference(geo=window_geo, epsg=4326),
         )
         try:
             cropped = crop_to_aoi(

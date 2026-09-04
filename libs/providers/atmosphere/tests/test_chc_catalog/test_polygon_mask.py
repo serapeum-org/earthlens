@@ -16,10 +16,12 @@ _GEO: list[float] = [0.0, 1.0, 0.0, 10.0, 0.0, -1.0]
 
 def _write_ones_tif(path, dataset):
     """Write a 10x10 all-ones GeoTIFF over [0,10]x[0,10] to `path`."""
+    from pyramids.dataset import GeoReference
+
     arr = np.ones((10, 10), dtype="float32")
-    dataset.create_from_array(arr, geo=_GEO, epsg=4326, no_data_value=-9999.0).to_file(
-        str(path)
-    )
+    dataset.from_array(
+        arr, no_data_value=-9999.0, geo_ref=GeoReference(geo=_GEO, epsg=4326)
+    ).to_file(str(path))
 
 
 def _polygon_chirps(tmp_path, geometry):

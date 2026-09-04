@@ -402,7 +402,7 @@ class GHSL(AbstractDataSource):
         from collections import defaultdict
 
         import numpy as np
-        from pyramids.dataset import Dataset
+        from pyramids.dataset import Dataset, GeoReference
 
         from earthlens.aggregate import reduce_time_axis, window_groups
 
@@ -450,11 +450,10 @@ class GHSL(AbstractDataSource):
                     skipna=config.skipna,
                     min_count=config.min_count,
                 )
-                result = Dataset.create_from_array(
+                result = Dataset.from_array(
                     reduced,
-                    geo=geo,
-                    epsg=self._output_epsg,
                     no_data_value=fill if fill is not None else -9999,
+                    geo_ref=GeoReference(geo=geo, epsg=self._output_epsg),
                 )
                 target = out_dir / (
                     f"{code}_{op}_{label.strftime('%Y')}_{resolution}"

@@ -584,14 +584,13 @@ def windowed_bbox_crop(dataset: Any, bbox: Sequence[float], *, epsg: Any = 4326)
         # `touch=False` returns a lazy warp VRT that reads through to the source;
         # materialise it now so those reads happen before the caller closes the
         # source handle (and inside any active tuning context).
-        from pyramids.dataset import Dataset
+        from pyramids.dataset import Dataset, GeoReference
 
         no_data = fallback.no_data_value
-        return Dataset.create_from_array(
+        return Dataset.from_array(
             arr=fallback.read_array(),
-            geo=fallback.geotransform,
-            epsg=fallback.epsg,
             no_data_value=no_data[0] if isinstance(no_data, (list, tuple)) else no_data,
+            geo_ref=GeoReference(geo=fallback.geotransform, epsg=fallback.epsg),
         )
 
 

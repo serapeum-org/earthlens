@@ -145,6 +145,27 @@ class _FakeMdArray:
         return [_FakeAttribute("long_name", "Latitude")]
 
 
+class _ContainerThatCannotClose:
+    """A real pyramids container whose release fails.
+
+    Every read delegates to the genuine container, so the schema is really
+    parsed; only `close` fails. The real handle is released first so the
+    temporary file is not left locked on Windows.
+    """
+
+    def __init__(self, inner):
+        self._inner = inner
+
+    def __getattr__(self, name):
+        """Delegate every read to the real container."""
+        return getattr(self._inner, name)
+
+    def close(self):
+        """Release the real handle, then fail the way a broken one would."""
+        self._inner.close()
+        raise OSError("handle already torn down")
+
+
 def _raise_unreadable(_path):
     """Reject a container the way an unreadable file would."""
     raise RuntimeError("container cannot be opened")
@@ -577,13 +598,20 @@ class TestDeepSampleVariable:
         assert ecmwf_cli._ecmwf_deep_sample_variable("a-dataset", "t2m") == ({}, {})
 
 
-class TestReadNetcdfVarMetaSubdatasets:
-    """A container whose variables live in subdatasets rather than at the root."""
+class TestReadNetcdfVarMeta:
+    """Reading goes through pyramids; an unreadable container has nothing to add."""
 
-    def test_every_named_subdataset_is_read_and_merged(self, monkeypatch, tmp_path):
-        """Some CDS NetCDFs describe their variables one subdataset down."""
-        from osgeo import gdal
+    def test_the_pyramids_schema_is_returned_verbatim(self, monkeypatch, tmp_path):
+        """Whatever pyramids describes is what the caller gets."""
+        target = tmp_path / "granule.nc"
+        target.write_bytes(b"not really netcdf")
+        schema = {"t2m": {"long_name": "2 metre temperature", "units": "K"}}
+        monkeypatch.setattr(ecmwf_cli, "_read_via_pyramids", lambda path: schema)
 
+        assert ecmwf_cli._read_netcdf_var_meta(str(target)) == schema
+
+    def test_a_raising_read_degrades_to_an_empty_schema(self, monkeypatch, tmp_path):
+        """A caller hydrating a row gets "nothing to add", never an exception."""
         target = tmp_path / "granule.nc"
         target.write_bytes(b"not really netcdf")
         monkeypatch.setattr(
@@ -591,33 +619,8 @@ class TestReadNetcdfVarMetaSubdatasets:
             "_read_via_pyramids",
             lambda path: (_ for _ in ()).throw(OSError("unreadable")),
         )
-        monkeypatch.setattr(gdal, "Info", _info_with_two_subdatasets)
-        monkeypatch.setattr(ecmwf_cli, "_from_info", _info_to_meta)
 
-        meta = ecmwf_cli._read_netcdf_var_meta(str(target))
-
-        assert sorted(meta) == ["sst", "t2m"], f"subdatasets not merged: {sorted(meta)}"
-        assert meta["t2m"]["units"] == "K"
-
-    def test_a_root_exposing_variables_is_read_without_subdatasets(
-        self, monkeypatch, tmp_path
-    ):
-        """The ordinary container needs no second pass."""
-        from osgeo import gdal
-
-        target = tmp_path / "granule.nc"
-        target.write_bytes(b"not really netcdf")
-        monkeypatch.setattr(
-            ecmwf_cli,
-            "_read_via_pyramids",
-            lambda path: (_ for _ in ()).throw(OSError("unreadable")),
-        )
-        monkeypatch.setattr(gdal, "Info", lambda path, format=None: {"path": "t2m"})
-        monkeypatch.setattr(ecmwf_cli, "_from_info", _info_to_meta)
-
-        assert ecmwf_cli._read_netcdf_var_meta(str(target)) == {
-            "t2m": {"long_name": "2 metre temperature", "units": "K"}
-        }
+        assert ecmwf_cli._read_netcdf_var_meta(str(target)) == {}
 
 
 class TestDiscardScratch:
@@ -671,32 +674,6 @@ def _write_zip_holding_no_netcdf(client, dataset, request, target, endpoint):
 
     with zipfile.ZipFile(target, "w") as archive:
         archive.writestr("readme.txt", b"no granule here")
-
-
-def _info_with_two_subdatasets(path, format=None):
-    """Stand in for gdal.Info over a container holding two subdatasets."""
-    if path.endswith(".nc"):
-        return {
-            "metadata": {
-                "SUBDATASETS": {
-                    "SUBDATASET_1_NAME": "NETCDF:granule.nc:t2m",
-                    "SUBDATASET_1_DESC": "the temperature field",
-                    "SUBDATASET_2_NAME": "NETCDF:granule.nc:sst",
-                    "SUBDATASET_2_DESC": "the sea surface field",
-                }
-            }
-        }
-    return {"path": path}
-
-
-def _info_to_meta(info):
-    """Turn a stubbed gdal.Info payload into the meta mapping the reader returns."""
-    path = str(info.get("path", ""))
-    if path.endswith("t2m"):
-        return {"t2m": {"long_name": "2 metre temperature", "units": "K"}}
-    if path.endswith("sst"):
-        return {"sst": {"long_name": "sea surface temperature", "units": "K"}}
-    return {}
 
 
 def _recording_reader(seen):
@@ -804,8 +781,44 @@ class TestDeepProber:
         assert captured["variable"] == ["all"]
         assert captured["lake"] == ["achit"]
 
-    def test_read_netcdf_var_meta_via_gdal(self, tmp_path):
-        """_read_netcdf_var_meta reads long_name/units from a NetCDF via GDAL."""
+    def test_reads_every_variable_of_a_multi_variable_container(self, tmp_path):
+        """A container GDAL would expose as several subdatasets is read whole.
+
+        Replaces the coverage deleted with the GDAL subdataset walk: for GDAL a
+        multi-subdataset CDS container is simply a NetCDF with more than one
+        gridded variable, and the property that mattered was that every one is
+        merged into the schema rather than only the first.
+        """
+        xr = pytest.importorskip("xarray", reason="needs xarray to author a NetCDF")
+        import numpy as np
+
+        path = tmp_path / "two_vars.nc"
+        xr.Dataset(
+            {
+                "t2m": (
+                    ("lat", "lon"),
+                    np.ones((2, 2), "f4"),
+                    {"units": "K", "long_name": "2 metre temperature"},
+                ),
+                "sst": (
+                    ("lat", "lon"),
+                    np.ones((2, 2), "f4"),
+                    {"units": "K", "long_name": "sea surface temperature"},
+                ),
+            },
+            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
+        ).to_netcdf(path)
+
+        meta = ecmwf_cli._read_netcdf_var_meta(str(path))
+
+        assert sorted(k for k in meta if k in {"t2m", "sst"}) == ["sst", "t2m"], (
+            f"both variables should be merged into the schema; got {sorted(meta)}"
+        )
+        assert meta["t2m"]["units"] == "K"
+        assert meta["sst"]["long_name"] == "sea surface temperature"
+
+    def test_read_netcdf_var_meta_reads_a_netcdf(self, tmp_path):
+        """_read_netcdf_var_meta reads long_name/units from a NetCDF."""
         import numpy as np
         import xarray as xr
 
@@ -822,6 +835,42 @@ class TestDeepProber:
         ).to_netcdf(path)
         meta = ecmwf_cli._read_netcdf_var_meta(str(path))
         assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
+
+    def test_a_failing_release_keeps_the_schema_it_read(self, monkeypatch, tmp_path):
+        """A handle that will not close must not discard a read that worked.
+
+        The release runs in a `finally` and the caller turns any exception out
+        of this function into an empty mapping, so an unguarded cleanup failure
+        silently throws away a schema that parsed fine.
+        """
+        import numpy as np
+        import xarray as xr
+        from pyramids.netcdf import NetCDF
+
+        path = tmp_path / "probe.nc"
+        xr.Dataset(
+            {
+                "t2m": (
+                    ("lat", "lon"),
+                    np.ones((2, 2), "f4"),
+                    {"units": "K", "long_name": "2 metre temperature"},
+                )
+            },
+            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
+        ).to_netcdf(path)
+        real_read = NetCDF.read_file
+        monkeypatch.setattr(
+            NetCDF,
+            "read_file",
+            lambda p, *a, **k: _ContainerThatCannotClose(real_read(p, *a, **k)),
+        )
+
+        meta = ecmwf_cli._read_netcdf_var_meta(str(path))
+
+        assert meta.get("t2m") == {
+            "long_name": "2 metre temperature",
+            "units": "K",
+        }, f"a failing release discarded the schema that was read; got {meta}"
 
     def test_a_probe_survives_a_scratch_it_cannot_remove(self, monkeypatch, tmp_path):
         """A removal that fails must not discard a retrieve and read that worked."""
@@ -895,42 +944,40 @@ class TestDeepProber:
         )
         assert ecmwf_cli._read_netcdf_var_meta(str(path)) == {"tp": {"units": "m"}}
 
-    def test_read_netcdf_var_meta_falls_back_when_pyramids_is_empty(
+    def test_read_netcdf_var_meta_returns_empty_when_pyramids_finds_nothing(
         self, monkeypatch, tmp_path
     ):
-        """Every hydrated row was read by the classic walk; it must keep working."""
-        import numpy as np
-        import xarray as xr
-
+        """A container pyramids cannot describe adds nothing, rather than raising."""
         path = tmp_path / "probe.nc"
-        xr.Dataset(
-            {
-                "t2m": (
-                    ("lat", "lon"),
-                    np.ones((2, 2), "f4"),
-                    {"units": "K", "long_name": "2 metre temperature"},
-                )
-            },
-            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
-        ).to_netcdf(path)
+        path.write_bytes(b"not really a netcdf")
         monkeypatch.setattr(ecmwf_cli, "_read_via_pyramids", lambda p: {})
-        meta = ecmwf_cli._read_netcdf_var_meta(str(path))
-        assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
 
-    def test_read_netcdf_var_meta_falls_back_when_pyramids_raises(
+        assert ecmwf_cli._read_netcdf_var_meta(str(path)) == {}
+
+    def test_read_netcdf_var_meta_swallows_a_pyramids_error(
         self, monkeypatch, tmp_path
     ):
-        """An unreadable container must not lose a file the classic walk can read."""
-        import numpy as np
-        import xarray as xr
+        """A raising read degrades to an empty schema and says why.
 
+        The empty mapping alone is indistinguishable from "this container
+        genuinely declares no metadata", so a hydration sweep could read
+        nothing and still look like it worked. The warning is the only thing
+        that separates the two, which makes it part of the contract.
+        """
         path = tmp_path / "probe.nc"
-        xr.Dataset(
-            {"tp": (("lat", "lon"), np.ones((2, 2), "f4"), {"units": "m"})},
-            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
-        ).to_netcdf(path)
+        path.write_bytes(b"not really a netcdf")
         monkeypatch.setattr(ecmwf_cli, "_read_via_pyramids", _raise_unreadable)
-        assert ecmwf_cli._read_netcdf_var_meta(str(path))["tp"]["units"] == "m"
+        warnings: list[str] = []
+        sink = logger.add(warnings.append, level="WARNING")
+
+        try:
+            assert ecmwf_cli._read_netcdf_var_meta(str(path)) == {}
+        finally:
+            logger.remove(sink)
+
+        assert any(str(path) in message for message in warnings), (
+            "an unreadable container must be named, not silently reported empty"
+        )
 
     def test_variable_meta_reads_a_gridded_variable(self):
         """A gridded variable arrives as a pyramids Variable."""

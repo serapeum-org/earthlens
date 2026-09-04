@@ -7,7 +7,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from earthlens.chc import CHIRPS, backend
+from earthlens.chc import CHIRPS
+from earthlens.chc import backend as chc_backend
 
 pytestmark = [pytest.mark.chc]
 
@@ -26,17 +27,26 @@ def _build_chirps(tmp_path: Path) -> CHIRPS:
 
 
 class _FakeFtp:
-    """Stand-in for an `ftplib.FTP` session; records that it was closed."""
+    """Stand-in for the batch's shared FTP session.
+
+    `_fetch_dates_sequential` opens one session up front and hands it to every
+    `_api` call, so stubbing `_api` alone still leaves a real anonymous login
+    against `data.chc.ucsb.edu` in the path — which turns these unit tests into
+    live-network tests.
+
+    Records whether it was closed, so a test can assert the loop's session
+    handling rather than only that it did not dial out.
+    """
 
     def __init__(self):
         self.closed = False
 
     def quit(self) -> None:
-        """Match the session API `_close_ftp_quietly` calls."""
+        """Close the session, as `_close_ftp_quietly` prefers."""
         self.closed = True
 
     def close(self) -> None:
-        """Match the session API `_close_ftp_quietly` falls back to."""
+        """Drop the session, the fallback `_close_ftp_quietly` uses."""
         self.closed = True
 
 
@@ -44,14 +54,13 @@ class _FakeFtp:
 def offline_ftp(monkeypatch):
     """Replace the module's FTP session helpers so no connection is opened.
 
-    `_fetch_dates_sequential` opens a session itself, so patching `_api` alone
-    left these tests dialling the live CHC server — they passed or failed on
-    whether anonymous FTP happened to be accepted, which is not what they are
-    about.
+    Patching `_open_ftp` alone would suffice to stay offline — `_reopen_ftp`
+    calls it — but replacing all three lets the fixture hand out sessions it
+    can track, which is what makes the reopen assertion possible.
 
     Returns:
         list[_FakeFtp]: Every session handed out, newest last, so a test can
-        assert the loop reopened after a failure.
+        assert the loop reopened after a failure and closed what it opened.
     """
     handed_out: list[_FakeFtp] = []
 
@@ -64,9 +73,11 @@ def offline_ftp(monkeypatch):
         session.close()
         return _open()
 
-    monkeypatch.setattr(backend, "_open_ftp", _open)
-    monkeypatch.setattr(backend, "_reopen_ftp", _reopen)
-    monkeypatch.setattr(backend, "_close_ftp_quietly", lambda session: session.close())
+    monkeypatch.setattr(chc_backend, "_open_ftp", _open)
+    monkeypatch.setattr(chc_backend, "_reopen_ftp", _reopen)
+    monkeypatch.setattr(
+        chc_backend, "_close_ftp_quietly", lambda session: session.close()
+    )
     return handed_out
 
 
