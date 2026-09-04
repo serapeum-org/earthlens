@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24527,21 +24527,31 @@ so the plot can pull them by year.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
-    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
+    <span class="c1"># Hand back the Dataset as well: the panels are drawn from it, while the</span>
+    <span class="c1"># totals below keep using the very same array as before.</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">a</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ds</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
 
 
-<span class="n">by_epoch</span> <span class="o">=</span> <span class="p">{(</span><span class="s1">'2025'</span> <span class="k">if</span> <span class="s1">'_E2025'</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="s1">'2100'</span><span class="p">):</span> <span class="n">_load</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">}</span>
+<span class="n">loaded</span> <span class="o">=</span> <span class="p">{(</span><span class="s1">'2025'</span> <span class="k">if</span> <span class="s1">'_E2025'</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="s1">'2100'</span><span class="p">):</span> <span class="n">_load</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">}</span>
+<span class="n">rasters</span> <span class="o">=</span> <span class="p">{</span><span class="n">year</span><span class="p">:</span> <span class="n">ds</span> <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">loaded</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="n">by_epoch</span> <span class="o">=</span> <span class="p">{</span><span class="n">year</span><span class="p">:</span> <span class="n">a</span> <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="ow">in</span> <span class="n">loaded</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># NBVAL_SKIP
 def _load(p):
-    a = np.asarray(Dataset.read_file(str(p)).read_array(), dtype='float32')
+    # Hand back the Dataset as well: the panels are drawn from it, while the
+    # totals below keep using the very same array as before.
+    ds = Dataset.read_file(p)
+    a = np.asarray(ds.read_array(), dtype='float32')
     a = a[0] if a.ndim == 3 else a
-    return np.where(a &lt; 0, np.nan, a)
+    return ds, np.where(a &lt; 0, np.nan, a)
 
 
-by_epoch = {('2025' if '_E2025' in p.name else '2100'): _load(p) for p in paths}</div>
+loaded = {('2025' if '_E2025' in p.name else '2100'): _load(p) for p in paths}
+rasters = {year: ds for year, (ds, _) in loaded.items()}
+by_epoch = {year: a for year, (_, a) in loaded.items()}</div>
 </div>
 </div>
 </div>
@@ -24579,24 +24589,24 @@ century is directly comparable.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
+<span class="c1"># matplotlib builds the grid; pyramids draws each georeferenced panel into it.</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="p">[</span><span class="s1">'2025'</span><span class="p">,</span> <span class="s1">'2100'</span><span class="p">]):</span>
-    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">by_epoch</span><span class="p">[</span><span class="n">year</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'magma'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'GHS-WUP-POP </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s1"> (1 km)'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'people / cell'</span><span class="p">)</span>
+    <span class="n">glyph</span> <span class="o">=</span> <span class="n">rasters</span><span class="p">[</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'magma'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">'GHS-WUP-POP </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s1"> (1 km)'</span>
+    <span class="p">)</span>
+    <span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">'people / cell'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5"># NBVAL_SKIP
+# matplotlib builds the grid; pyramids draws each georeferenced panel into it.
 fig, axes = plt.subplots(1, 2, figsize=(11, 5))
 for ax, year in zip(axes, ['2025', '2100']):
-    im = ax.imshow(by_epoch[year], cmap='magma')
-    ax.set_title(f'GHS-WUP-POP {year} (1 km)')
-    ax.axis('off')
-    fig.colorbar(im, ax=ax, shrink=0.7, label='people / cell')
-plt.tight_layout()
-plt.show()</div>
+    glyph = rasters[year].plot(
+        fig=fig, ax=ax, cmap='magma', title=f'GHS-WUP-POP {year} (1 km)'
+    )
+    glyph.cbar.set_label('people / cell')
+plt.tight_layout()</div>
 </div>
 </div>
 </div>
