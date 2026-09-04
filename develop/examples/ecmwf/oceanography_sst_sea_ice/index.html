@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24488,7 +24488,7 @@ inspection.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
@@ -24498,7 +24498,7 @@ inspection.</p>
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 
 from earthlens.core import AggregationConfig, EarthLens
 from earthlens.ecmwf import Catalog</div>
@@ -24909,27 +24909,33 @@ spatial patterns side-by-side.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># stack() keeps only the arrays, so re-read one granule as the grid template</span>
+<span class="c1"># the wrapped panels are placed on.</span>
+<span class="n">template</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span>
+    <span class="nb">sorted</span><span class="p">(</span><span class="n">agg_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"sea_surface_temperature_1MS_*.tif"</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">geo_ref</span> <span class="o">=</span> <span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">template</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">template</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
+
+<span class="c1"># matplotlib lays the pair out; pyramids draws each georeferenced panel.</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="p">(</span><span class="s2">"February"</span><span class="p">,</span> <span class="s2">"August"</span><span class="p">)):</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">sst</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="mf">273.15</span>
-    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"RdBu_r"</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> 2022 SST [°C]"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"lon (pixels)"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat (pixels)"</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.046</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.04</span><span class="p">)</span>
+    <span class="n">panel</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">sst</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="mf">273.15</span><span class="p">,</span> <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">geo_ref</span><span class="o">=</span><span class="n">geo_ref</span><span class="p">)</span>
+    <span class="n">panel</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"RdBu_r"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> 2022 SST [°C]"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-9">fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+<div class="clipboard-copy-txt" id="cell-9"># stack() keeps only the arrays, so re-read one granule as the grid template
+# the wrapped panels are placed on.
+template = Dataset.read_file(
+    sorted(agg_dir.glob("sea_surface_temperature_1MS_*.tif"))[0]
+)
+geo_ref = GeoReference(geo=template.geotransform, epsg=template.epsg)
+
+# matplotlib lays the pair out; pyramids draws each georeferenced panel.
+fig, axes = plt.subplots(1, 2, figsize=(11, 4))
 for ax, idx, label in zip(axes, (1, 7), ("February", "August")):
-    img = sst[idx] - 273.15
-    im = ax.imshow(img, cmap="RdBu_r", origin="upper")
-    ax.set_title(f"{label} 2022 SST [°C]")
-    ax.set_xlabel("lon (pixels)")
-    ax.set_ylabel("lat (pixels)")
-    fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
-plt.tight_layout()
-plt.show()</div>
+    panel = Dataset.from_array(sst[idx] - 273.15, no_data_value=np.nan, geo_ref=geo_ref)
+    panel.plot(fig=fig, ax=ax, cmap="RdBu_r", title=f"{label} 2022 SST [°C]")
+plt.tight_layout()</div>
 </div>
 </div>
 </div>

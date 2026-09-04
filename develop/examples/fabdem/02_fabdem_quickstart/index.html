@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24333,7 +24333,7 @@ minutes; keep the bounding box small.</p>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.biodiversity</span><span class="w"> </span><span class="kn">import</span> <span class="n">LicenseWarning</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -24350,7 +24350,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 
 from earthlens.biodiversity import LicenseWarning
 from earthlens.core import EarthLens
@@ -24571,27 +24571,27 @@ copdem_paths</div>
     <span class="n">dst_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">resampling</span><span class="o">=</span><span class="s2">"bilinear"</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">cop</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">aligned</span><span class="p">))</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">fabdem</span><span class="p">)</span>
+<span class="n">cop</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">aligned</span><span class="p">)</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">fabdem</span><span class="p">)</span>
 <span class="n">surface</span> <span class="o">=</span> <span class="n">cop</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float64"</span><span class="p">)</span>
 <span class="n">surface</span><span class="p">[</span><span class="n">surface</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1000</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
 <span class="n">diff</span> <span class="o">=</span> <span class="n">surface</span> <span class="o">-</span> <span class="n">bare</span>  <span class="c1"># removed above-ground height (canopy + buildings)</span>
 
+<span class="c1"># All three panels are blanked grids, so each is wrapped back onto the shared</span>
+<span class="c1"># FABDEM grid: the same arrays as before, drawn on real coordinates.</span>
+<span class="n">geo_ref</span> <span class="o">=</span> <span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">fabdem</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">fabdem</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
+<span class="n">bare_grid</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">bare</span><span class="p">,</span> <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">geo_ref</span><span class="o">=</span><span class="n">geo_ref</span><span class="p">)</span>
+<span class="n">surface_grid</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">geo_ref</span><span class="o">=</span><span class="n">geo_ref</span><span class="p">)</span>
+<span class="n">diff_grid</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">geo_ref</span><span class="o">=</span><span class="n">geo_ref</span><span class="p">)</span>
+
+<span class="c1"># matplotlib lays the row out; pyramids draws each georeferenced panel into it.</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">))</span>
-<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">cmap</span> <span class="ow">in</span> <span class="p">[</span>
-    <span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bare</span><span class="p">,</span> <span class="s2">"FABDEM (bare-earth)"</span><span class="p">,</span> <span class="s2">"terrain"</span><span class="p">),</span>
-    <span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">surface</span><span class="p">,</span> <span class="s2">"Copernicus GLO-30 (surface)"</span><span class="p">,</span> <span class="s2">"terrain"</span><span class="p">),</span>
-    <span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">diff</span><span class="p">,</span> <span class="s2">"surface - bare  (canopy + buildings)"</span><span class="p">,</span> <span class="s2">"viridis"</span><span class="p">),</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">cmap</span> <span class="ow">in</span> <span class="p">[</span>
+    <span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bare_grid</span><span class="p">,</span> <span class="s2">"FABDEM (bare-earth)"</span><span class="p">,</span> <span class="s2">"terrain"</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">surface_grid</span><span class="p">,</span> <span class="s2">"Copernicus GLO-30 (surface)"</span><span class="p">,</span> <span class="s2">"terrain"</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">diff_grid</span><span class="p">,</span> <span class="s2">"surface - bare  (canopy + buildings)"</span><span class="p">,</span> <span class="s2">"viridis"</span><span class="p">),</span>
 <span class="p">]:</span>
-    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s2">"median removed height: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> m; 95th pct: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span><span class="w"> </span><span class="mi">95</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> m"</span>
-<span class="p">)</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">from pyramids.dataset.merge import merge_rasters
 
@@ -24603,27 +24603,27 @@ merge_rasters(
     dst_crs=None,
     resampling="bilinear",
 )
-cop = Dataset.read_file(str(aligned)).align(fabdem)
+cop = Dataset.read_file(aligned).align(fabdem)
 surface = cop.read_array().astype("float64")
 surface[surface &lt; -1000] = np.nan
 
 diff = surface - bare  # removed above-ground height (canopy + buildings)
 
+# All three panels are blanked grids, so each is wrapped back onto the shared
+# FABDEM grid: the same arrays as before, drawn on real coordinates.
+geo_ref = GeoReference(geo=fabdem.geotransform, epsg=fabdem.epsg)
+bare_grid = Dataset.from_array(bare, no_data_value=np.nan, geo_ref=geo_ref)
+surface_grid = Dataset.from_array(surface, no_data_value=np.nan, geo_ref=geo_ref)
+diff_grid = Dataset.from_array(diff, no_data_value=np.nan, geo_ref=geo_ref)
+
+# matplotlib lays the row out; pyramids draws each georeferenced panel into it.
 fig, axes = plt.subplots(1, 3, figsize=(15, 4.5))
-for ax, data, title, cmap in [
-    (axes[0], bare, "FABDEM (bare-earth)", "terrain"),
-    (axes[1], surface, "Copernicus GLO-30 (surface)", "terrain"),
-    (axes[2], diff, "surface - bare  (canopy + buildings)", "viridis"),
+for ax, grid, title, cmap in [
+    (axes[0], bare_grid, "FABDEM (bare-earth)", "terrain"),
+    (axes[1], surface_grid, "Copernicus GLO-30 (surface)", "terrain"),
+    (axes[2], diff_grid, "surface - bare  (canopy + buildings)", "viridis"),
 ]:
-    im = ax.imshow(data, cmap=cmap)
-    ax.set_title(title)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    fig.colorbar(im, ax=ax, shrink=0.75)
-plt.show()
-print(
-    f"median removed height: {np.nanmedian(diff):.2f} m; 95th pct: {np.nanpercentile(diff, 95):.2f} m"
-)</div>
+    grid.plot(fig=fig, ax=ax, cmap=cmap, title=title)</div>
 </div>
 </div>
 </div>
