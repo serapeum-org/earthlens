@@ -472,6 +472,36 @@ def _range_is_complete(response: requests.Response, staged: Path) -> bool:
 
     Returns:
         bool: True when the staged size equals the reported total.
+
+    Examples:
+        - The unsatisfied-range form a `416` uses, matching what is on disk:
+            ```python
+            >>> import requests
+            >>> from pathlib import Path
+            >>> from earthlens.base.http import _range_is_complete
+            >>> staged = Path("complete.part")
+            >>> _ = staged.write_bytes(b"0123456789")
+            >>> response = requests.Response()
+            >>> response.headers["Content-Range"] = "bytes */10"
+            >>> _range_is_complete(response, staged)
+            True
+            >>> staged.unlink()
+
+            ```
+        - A `206`-style range is not a completeness claim, so it does not count:
+            ```python
+            >>> import requests
+            >>> from pathlib import Path
+            >>> from earthlens.base.http import _range_is_complete
+            >>> staged = Path("partial.part")
+            >>> _ = staged.write_bytes(b"0123456789")
+            >>> response = requests.Response()
+            >>> response.headers["Content-Range"] = "bytes 0-9/10"
+            >>> _range_is_complete(response, staged)
+            False
+            >>> staged.unlink()
+
+            ```
     """
     # A 416 reports `bytes */<total>` — the unsatisfied-range form, which
     # `_CONTENT_RANGE_TOTAL` (built for the `bytes N-M/total` of a 206) does
