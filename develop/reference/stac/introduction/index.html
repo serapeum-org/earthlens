@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -3404,23 +3404,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="The catalog is generated, not hand-written">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#asset_aliases-is-the-one-hand-curated-block" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        asset_aliases is the one hand-curated block
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -23606,23 +23589,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The catalog is generated, not hand-written">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#asset_aliases-is-the-one-hand-curated-block" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        asset_aliases is the one hand-curated block
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -23786,30 +23752,6 @@ data, not from earthlens:</p>
   informational and not required by the download path.</li>
 </ul>
 <p>Prefer regenerating via the refresh/probe tools over hand-editing the YAML.</p>
-<h3 id="asset_aliases-is-the-one-hand-curated-block"><a class="toclink" href="#asset_aliases-is-the-one-hand-curated-block"><code>asset_aliases</code> is the one hand-curated block</a><a class="headerlink" href="#asset_aliases-is-the-one-hand-curated-block" title="Permanent link">#</a></h3>
-<p><code>asset_aliases</code> is the exception to the rule above: <strong>nothing derives it</strong>, so
-it is written by hand and must be preserved if the rows around it are ever
-regenerated. It exists because an endpoint may publish the same band under a
-different key than the catalog names it by — CDSE splits Sentinel-2 per
-resolution, so the catalog's <code>B04</code> is <code>B04_10m</code> there:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">sentinel-2-l2a</span><span class="p">:</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">aliases</span><span class="p">:</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">cdse</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sentinel-2-l2a</span><span class="w">          </span><span class="c1"># per-endpoint collection id</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">asset_aliases</span><span class="p">:</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="nt">cdse</span><span class="p">:</span><span class="w">                          </span><span class="c1"># per-endpoint asset keys</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">      </span><span class="nt">B02</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">B02_10m</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">      </span><span class="nt">B04</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">B04_10m</span>
-</code></pre></div>
-<p><code>aliases</code> overrides the <em>collection id</em>; <code>asset_aliases</code> overrides the <em>asset
-keys</em>, one level down. Only the endpoints that rename need an entry, and an
-asset an endpoint does not rename passes through unchanged.</p>
-<p>The rename is applied at exactly one place — the STAC item lookup. The request's
-asset list keeps the catalog's own naming everywhere else, so the <code>nodata</code>
-lookup and the written band names still match the catalog. Both keys are
-validated at load: an endpoint that no <code>endpoints:</code> block declares, or an asset
-the collection does not carry, is rejected rather than silently ignored.</p>
-<p>Resolve them with <code>Catalog.resolve_assets(endpoint, collection_key, assets)</code>,
-which returns the keys to request from that endpoint, in the given order.</p>
 <h2 id="output-kind-aggregation"><a class="toclink" href="#output-kind-aggregation">Output kind &amp; aggregation</a><a class="headerlink" href="#output-kind-aggregation" title="Permanent link">#</a></h2>
 <p><code>OUTPUT_KIND = "raster"</code>, so the <code>EarthLens</code> facade <strong>forwards</strong>
 <code>aggregate=AggregationConfig(...)</code> to the backend (it is not rejected as it is

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -10277,17 +10277,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.usgs_water.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.usgs_water.Catalog.get_parameter" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -10548,17 +10537,6 @@
     <span class="md-ellipsis">
       
         parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.usgs_water.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -23972,17 +23950,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.usgs_water.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.usgs_water.Catalog.get_parameter" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24250,17 +24217,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.usgs_water.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.usgs_water.catalog.Catalog.get_parameter" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24519,7 +24475,7 @@ Authentication is an optional Personal Access Token.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Parameter&lt;/code&gt; (&lt;code&gt;earthlens.usgs_water.catalog.Parameter&lt;/code&gt;)" href="#earthlens.usgs_water.catalog.Parameter">Parameter</a>]</code></p>
 
 
 
@@ -24779,16 +24735,7 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
 <span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Parameter</span><span class="p">]):</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter-code catalog for the USGS Water backend.</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">    Reads the bundled `usgs_water_data_catalog.yaml` (shipped as</span>
@@ -24905,89 +24852,80 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the parameter map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            dict[str, Parameter]: Same object as :attr:`datasets` /</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">                :attr:`parameters`.</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The sorted list of curated friendly parameter names.</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            list[str]: Every curated catalog key, sorted.</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            - List the curated names and check membership:</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">                &gt;&gt;&gt; from earthlens.usgs_water import Catalog</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">                &gt;&gt;&gt; names = Catalog().available_parameters</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">                &gt;&gt;&gt; &quot;discharge&quot; in names</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">                True</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">                &gt;&gt;&gt; names == sorted(names)</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">                True</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The sorted list of curated friendly parameter names.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            list[str]: Every curated catalog key, sorted.</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            - List the curated names and check membership:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">                &gt;&gt;&gt; from earthlens.usgs_water import Catalog</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">                &gt;&gt;&gt; names = Catalog().available_parameters</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">                &gt;&gt;&gt; &quot;discharge&quot; in names</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">                True</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">                &gt;&gt;&gt; names == sorted(names)</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">                True</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its :class:`Parameter` row.</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            name: A friendly parameter name (`&quot;discharge&quot;`).</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its :class:`Parameter` row.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            Parameter: The matching catalog row.</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown name.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">            name: A friendly parameter name (`&quot;discharge&quot;`).</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            Parameter: The matching catalog row.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            ValueError: If `name` is not a known parameter; the message</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                adds a did-you-mean hint.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            - Resolve a row and read its fields:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                &gt;&gt;&gt; from earthlens.usgs_water import Catalog</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                &gt;&gt;&gt; p = Catalog().get_parameter(&quot;gage_height&quot;)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                &gt;&gt;&gt; p.code</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">                &#39;00065&#39;</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">                &gt;&gt;&gt; p.units</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                &#39;ft&#39;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code_or_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name or a raw 5-digit code to a code.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            ValueError: If `name` is not a known parameter; the message</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                adds a did-you-mean hint.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            - Resolve a row and read its fields:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">                &gt;&gt;&gt; from earthlens.usgs_water import Catalog</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">                &gt;&gt;&gt; p = Catalog().get_parameter(&quot;gage_height&quot;)</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">                &gt;&gt;&gt; p.code</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                &#39;00065&#39;</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                &gt;&gt;&gt; p.units</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">                &#39;ft&#39;</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code_or_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name or a raw 5-digit code to a code.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        A raw 5-digit code (`&quot;00060&quot;`) passes through unmapped — the</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        full USGS code table is far larger than the curated catalog, so</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        any valid code is accepted directly. A non-code string is</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        looked up as a friendly name via :meth:`get_parameter`.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            code_or_name: A friendly name (`&quot;discharge&quot;`) or a raw</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                5-digit NWIS code (`&quot;00060&quot;`).</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        A raw 5-digit code (`&quot;00060&quot;`) passes through unmapped — the</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        full USGS code table is far larger than the curated catalog, so</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        any valid code is accepted directly. A non-code string is</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        looked up as a friendly name via :meth:`get_parameter`.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            code_or_name: A friendly name (`&quot;discharge&quot;`) or a raw</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">                5-digit NWIS code (`&quot;00060&quot;`).</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">            str: The 5-digit parameter code.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">            ValueError: If `code_or_name` is neither a 5-digit code nor</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">                a known friendly name (with a did-you-mean hint).</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="k">if</span> <span class="n">_CODE_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">):</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>            <span class="k">return</span> <span class="n">code_or_name</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            str: The 5-digit parameter code.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            ValueError: If `code_or_name` is neither a 5-digit code nor</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">                a known friendly name (with a did-you-mean hint).</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="k">if</span> <span class="n">_CODE_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">):</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="k">return</span> <span class="n">code_or_name</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25124,67 +25062,6 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <div class="doc doc-object doc-function">
 
 
-<h4 id="earthlens.usgs_water.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.usgs_water.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.usgs_water.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the parameter map (satisfies the abstract contract).</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Parameter&lt;/code&gt; (&lt;code&gt;earthlens.usgs_water.catalog.Parameter&lt;/code&gt;)" href="#earthlens.usgs_water.catalog.Parameter">Parameter</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, Parameter]: Same object as :attr:<code>datasets</code> /
-:attr:<code>parameters</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/ocean/src/earthlens/usgs_water/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-263">263</a></span>
-<span class="normal"><a href="#__codelineno-0-264">264</a></span>
-<span class="normal"><a href="#__codelineno-0-265">265</a></span>
-<span class="normal"><a href="#__codelineno-0-266">266</a></span>
-<span class="normal"><a href="#__codelineno-0-267">267</a></span>
-<span class="normal"><a href="#__codelineno-0-268">268</a></span>
-<span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the parameter map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        dict[str, Parameter]: Same object as :attr:`datasets` /</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            :attr:`parameters`.</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h4 id="earthlens.usgs_water.Catalog.get_parameter" class="doc doc-heading"><a href="#earthlens.usgs_water.Catalog.get_parameter" class="toclink">
             <code class="highlight language-python"><span class="n">get_parameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
 
@@ -25292,7 +25169,16 @@ adds a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/usgs_water/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-293">293</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-284">284</a></span>
+<span class="normal"><a href="#__codelineno-0-285">285</a></span>
+<span class="normal"><a href="#__codelineno-0-286">286</a></span>
+<span class="normal"><a href="#__codelineno-0-287">287</a></span>
+<span class="normal"><a href="#__codelineno-0-288">288</a></span>
+<span class="normal"><a href="#__codelineno-0-289">289</a></span>
+<span class="normal"><a href="#__codelineno-0-290">290</a></span>
+<span class="normal"><a href="#__codelineno-0-291">291</a></span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span>
 <span class="normal"><a href="#__codelineno-0-294">294</a></span>
 <span class="normal"><a href="#__codelineno-0-295">295</a></span>
 <span class="normal"><a href="#__codelineno-0-296">296</a></span>
@@ -25312,45 +25198,36 @@ adds a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
 <span class="normal"><a href="#__codelineno-0-311">311</a></span>
 <span class="normal"><a href="#__codelineno-0-312">312</a></span>
-<span class="normal"><a href="#__codelineno-0-313">313</a></span>
-<span class="normal"><a href="#__codelineno-0-314">314</a></span>
-<span class="normal"><a href="#__codelineno-0-315">315</a></span>
-<span class="normal"><a href="#__codelineno-0-316">316</a></span>
-<span class="normal"><a href="#__codelineno-0-317">317</a></span>
-<span class="normal"><a href="#__codelineno-0-318">318</a></span>
-<span class="normal"><a href="#__codelineno-0-319">319</a></span>
-<span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its :class:`Parameter` row.</span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its :class:`Parameter` row.</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        name: A friendly parameter name (`&quot;discharge&quot;`).</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Parameter: The matching catalog row.</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown name.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        name: A friendly parameter name (`&quot;discharge&quot;`).</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        Parameter: The matching catalog row.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        ValueError: If `name` is not a known parameter; the message</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            adds a did-you-mean hint.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        - Resolve a row and read its fields:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            &gt;&gt;&gt; from earthlens.usgs_water import Catalog</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            &gt;&gt;&gt; p = Catalog().get_parameter(&quot;gage_height&quot;)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            &gt;&gt;&gt; p.code</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            &#39;00065&#39;</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            &gt;&gt;&gt; p.units</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            &#39;ft&#39;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        ValueError: If `name` is not a known parameter; the message</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            adds a did-you-mean hint.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        - Resolve a row and read its fields:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            &gt;&gt;&gt; from earthlens.usgs_water import Catalog</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            &gt;&gt;&gt; p = Catalog().get_parameter(&quot;gage_height&quot;)</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            &gt;&gt;&gt; p.code</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            &#39;00065&#39;</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            &gt;&gt;&gt; p.units</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            &#39;ft&#39;</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25594,7 +25471,16 @@ a known friendly name (with a did-you-mean hint).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/usgs_water/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-324">324</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
 <span class="normal"><a href="#__codelineno-0-327">327</a></span>
@@ -25606,37 +25492,28 @@ a known friendly name (with a did-you-mean hint).</p>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
 <span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code_or_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name or a raw 5-digit code to a code.</span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code_or_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name or a raw 5-digit code to a code.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    A raw 5-digit code (`&quot;00060&quot;`) passes through unmapped — the</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    full USGS code table is far larger than the curated catalog, so</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    any valid code is accepted directly. A non-code string is</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    looked up as a friendly name via :meth:`get_parameter`.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        code_or_name: A friendly name (`&quot;discharge&quot;`) or a raw</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            5-digit NWIS code (`&quot;00060&quot;`).</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    A raw 5-digit code (`&quot;00060&quot;`) passes through unmapped — the</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    full USGS code table is far larger than the curated catalog, so</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    any valid code is accepted directly. A non-code string is</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    looked up as a friendly name via :meth:`get_parameter`.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        code_or_name: A friendly name (`&quot;discharge&quot;`) or a raw</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">            5-digit NWIS code (`&quot;00060&quot;`).</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        str: The 5-digit parameter code.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        ValueError: If `code_or_name` is neither a 5-digit code nor</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            a known friendly name (with a did-you-mean hint).</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">if</span> <span class="n">_CODE_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">):</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="k">return</span> <span class="n">code_or_name</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        str: The 5-digit parameter code.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        ValueError: If `code_or_name` is neither a 5-digit code nor</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">            a known friendly name (with a did-you-mean hint).</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="k">if</span> <span class="n">_CODE_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">):</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">return</span> <span class="n">code_or_name</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -30491,7 +30368,7 @@ cover the common codes, and the refresh tool builds an informational
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Parameter&lt;/code&gt; (&lt;code&gt;earthlens.usgs_water.catalog.Parameter&lt;/code&gt;)" href="#earthlens.usgs_water.catalog.Parameter">Parameter</a>]</code></p>
 
 
 
@@ -30751,16 +30628,7 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
 <span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Parameter</span><span class="p">]):</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter-code catalog for the USGS Water backend.</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">    Reads the bundled `usgs_water_data_catalog.yaml` (shipped as</span>
@@ -30877,89 +30745,80 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the parameter map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            dict[str, Parameter]: Same object as :attr:`datasets` /</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">                :attr:`parameters`.</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The sorted list of curated friendly parameter names.</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            list[str]: Every curated catalog key, sorted.</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            - List the curated names and check membership:</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">                &gt;&gt;&gt; from earthlens.usgs_water import Catalog</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">                &gt;&gt;&gt; names = Catalog().available_parameters</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">                &gt;&gt;&gt; &quot;discharge&quot; in names</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">                True</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">                &gt;&gt;&gt; names == sorted(names)</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">                True</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The sorted list of curated friendly parameter names.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            list[str]: Every curated catalog key, sorted.</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            - List the curated names and check membership:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">                &gt;&gt;&gt; from earthlens.usgs_water import Catalog</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">                &gt;&gt;&gt; names = Catalog().available_parameters</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">                &gt;&gt;&gt; &quot;discharge&quot; in names</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">                True</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">                &gt;&gt;&gt; names == sorted(names)</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">                True</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its :class:`Parameter` row.</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            name: A friendly parameter name (`&quot;discharge&quot;`).</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its :class:`Parameter` row.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            Parameter: The matching catalog row.</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown name.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">            name: A friendly parameter name (`&quot;discharge&quot;`).</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            Parameter: The matching catalog row.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            ValueError: If `name` is not a known parameter; the message</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                adds a did-you-mean hint.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            - Resolve a row and read its fields:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                &gt;&gt;&gt; from earthlens.usgs_water import Catalog</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                &gt;&gt;&gt; p = Catalog().get_parameter(&quot;gage_height&quot;)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                &gt;&gt;&gt; p.code</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">                &#39;00065&#39;</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">                &gt;&gt;&gt; p.units</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                &#39;ft&#39;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code_or_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name or a raw 5-digit code to a code.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            ValueError: If `name` is not a known parameter; the message</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                adds a did-you-mean hint.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            - Resolve a row and read its fields:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">                &gt;&gt;&gt; from earthlens.usgs_water import Catalog</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">                &gt;&gt;&gt; p = Catalog().get_parameter(&quot;gage_height&quot;)</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">                &gt;&gt;&gt; p.code</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                &#39;00065&#39;</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                &gt;&gt;&gt; p.units</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">                &#39;ft&#39;</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code_or_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name or a raw 5-digit code to a code.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        A raw 5-digit code (`&quot;00060&quot;`) passes through unmapped — the</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        full USGS code table is far larger than the curated catalog, so</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        any valid code is accepted directly. A non-code string is</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        looked up as a friendly name via :meth:`get_parameter`.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            code_or_name: A friendly name (`&quot;discharge&quot;`) or a raw</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                5-digit NWIS code (`&quot;00060&quot;`).</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        A raw 5-digit code (`&quot;00060&quot;`) passes through unmapped — the</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        full USGS code table is far larger than the curated catalog, so</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        any valid code is accepted directly. A non-code string is</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        looked up as a friendly name via :meth:`get_parameter`.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            code_or_name: A friendly name (`&quot;discharge&quot;`) or a raw</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">                5-digit NWIS code (`&quot;00060&quot;`).</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">            str: The 5-digit parameter code.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">            ValueError: If `code_or_name` is neither a 5-digit code nor</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">                a known friendly name (with a did-you-mean hint).</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="k">if</span> <span class="n">_CODE_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">):</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>            <span class="k">return</span> <span class="n">code_or_name</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            str: The 5-digit parameter code.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            ValueError: If `code_or_name` is neither a 5-digit code nor</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">                a known friendly name (with a did-you-mean hint).</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="k">if</span> <span class="n">_CODE_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">):</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="k">return</span> <span class="n">code_or_name</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -31096,67 +30955,6 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <div class="doc doc-object doc-function">
 
 
-<h4 id="earthlens.usgs_water.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.usgs_water.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.usgs_water.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the parameter map (satisfies the abstract contract).</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Parameter&lt;/code&gt; (&lt;code&gt;earthlens.usgs_water.catalog.Parameter&lt;/code&gt;)" href="#earthlens.usgs_water.catalog.Parameter">Parameter</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, Parameter]: Same object as :attr:<code>datasets</code> /
-:attr:<code>parameters</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/ocean/src/earthlens/usgs_water/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-263">263</a></span>
-<span class="normal"><a href="#__codelineno-0-264">264</a></span>
-<span class="normal"><a href="#__codelineno-0-265">265</a></span>
-<span class="normal"><a href="#__codelineno-0-266">266</a></span>
-<span class="normal"><a href="#__codelineno-0-267">267</a></span>
-<span class="normal"><a href="#__codelineno-0-268">268</a></span>
-<span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the parameter map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        dict[str, Parameter]: Same object as :attr:`datasets` /</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            :attr:`parameters`.</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h4 id="earthlens.usgs_water.catalog.Catalog.get_parameter" class="doc doc-heading"><a href="#earthlens.usgs_water.catalog.Catalog.get_parameter" class="toclink">
             <code class="highlight language-python"><span class="n">get_parameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
 
@@ -31264,7 +31062,16 @@ adds a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/usgs_water/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-293">293</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-284">284</a></span>
+<span class="normal"><a href="#__codelineno-0-285">285</a></span>
+<span class="normal"><a href="#__codelineno-0-286">286</a></span>
+<span class="normal"><a href="#__codelineno-0-287">287</a></span>
+<span class="normal"><a href="#__codelineno-0-288">288</a></span>
+<span class="normal"><a href="#__codelineno-0-289">289</a></span>
+<span class="normal"><a href="#__codelineno-0-290">290</a></span>
+<span class="normal"><a href="#__codelineno-0-291">291</a></span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span>
 <span class="normal"><a href="#__codelineno-0-294">294</a></span>
 <span class="normal"><a href="#__codelineno-0-295">295</a></span>
 <span class="normal"><a href="#__codelineno-0-296">296</a></span>
@@ -31284,45 +31091,36 @@ adds a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
 <span class="normal"><a href="#__codelineno-0-311">311</a></span>
 <span class="normal"><a href="#__codelineno-0-312">312</a></span>
-<span class="normal"><a href="#__codelineno-0-313">313</a></span>
-<span class="normal"><a href="#__codelineno-0-314">314</a></span>
-<span class="normal"><a href="#__codelineno-0-315">315</a></span>
-<span class="normal"><a href="#__codelineno-0-316">316</a></span>
-<span class="normal"><a href="#__codelineno-0-317">317</a></span>
-<span class="normal"><a href="#__codelineno-0-318">318</a></span>
-<span class="normal"><a href="#__codelineno-0-319">319</a></span>
-<span class="normal"><a href="#__codelineno-0-320">320</a></span>
-<span class="normal"><a href="#__codelineno-0-321">321</a></span>
-<span class="normal"><a href="#__codelineno-0-322">322</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its :class:`Parameter` row.</span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its :class:`Parameter` row.</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        name: A friendly parameter name (`&quot;discharge&quot;`).</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Parameter: The matching catalog row.</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown name.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        name: A friendly parameter name (`&quot;discharge&quot;`).</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        Parameter: The matching catalog row.</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        ValueError: If `name` is not a known parameter; the message</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            adds a did-you-mean hint.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        - Resolve a row and read its fields:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            &gt;&gt;&gt; from earthlens.usgs_water import Catalog</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            &gt;&gt;&gt; p = Catalog().get_parameter(&quot;gage_height&quot;)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            &gt;&gt;&gt; p.code</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            &#39;00065&#39;</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            &gt;&gt;&gt; p.units</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            &#39;ft&#39;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        ValueError: If `name` is not a known parameter; the message</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            adds a did-you-mean hint.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        - Resolve a row and read its fields:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            &gt;&gt;&gt; from earthlens.usgs_water import Catalog</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            &gt;&gt;&gt; p = Catalog().get_parameter(&quot;gage_height&quot;)</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            &gt;&gt;&gt; p.code</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            &#39;00065&#39;</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            &gt;&gt;&gt; p.units</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            &#39;ft&#39;</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -31566,7 +31364,16 @@ a known friendly name (with a did-you-mean hint).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/usgs_water/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-324">324</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
 <span class="normal"><a href="#__codelineno-0-327">327</a></span>
@@ -31578,37 +31385,28 @@ a known friendly name (with a did-you-mean hint).</p>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
 <span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code_or_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name or a raw 5-digit code to a code.</span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code_or_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name or a raw 5-digit code to a code.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    A raw 5-digit code (`&quot;00060&quot;`) passes through unmapped — the</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    full USGS code table is far larger than the curated catalog, so</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    any valid code is accepted directly. A non-code string is</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    looked up as a friendly name via :meth:`get_parameter`.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        code_or_name: A friendly name (`&quot;discharge&quot;`) or a raw</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            5-digit NWIS code (`&quot;00060&quot;`).</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    A raw 5-digit code (`&quot;00060&quot;`) passes through unmapped — the</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    full USGS code table is far larger than the curated catalog, so</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    any valid code is accepted directly. A non-code string is</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    looked up as a friendly name via :meth:`get_parameter`.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        code_or_name: A friendly name (`&quot;discharge&quot;`) or a raw</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">            5-digit NWIS code (`&quot;00060&quot;`).</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        str: The 5-digit parameter code.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        ValueError: If `code_or_name` is neither a 5-digit code nor</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            a known friendly name (with a did-you-mean hint).</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">if</span> <span class="n">_CODE_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">):</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="k">return</span> <span class="n">code_or_name</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        str: The 5-digit parameter code.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        ValueError: If `code_or_name` is neither a 5-digit code nor</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">            a known friendly name (with a did-you-mean hint).</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="k">if</span> <span class="n">_CODE_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">):</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">return</span> <span class="n">code_or_name</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter</span><span class="p">(</span><span class="n">code_or_name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
