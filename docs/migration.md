@@ -3,6 +3,28 @@
 Breaking changes by release, with the concrete edit each one needs. Releases without breaking changes are
 omitted — see the [change log](change-log.md) for the full history.
 
+## 0.21.0 → 0.22.0
+
+One breaking change, and it is the quiet kind: **your code keeps running and writes somewhere else**.
+
+### A qualified `source:topic` key writes to a flattened directory
+
+`EarthLens(data_source="jrc:coastal-forecast").download()` used to derive its default output directory straight
+from the key, giving `<output_dir()>/jrc:coastal-forecast/`. A colon cannot appear in a Windows path component,
+so that call could not create its directory there at all. The separator is now flattened to `_`:
+
+```python
+# 0.21 — on POSIX; on Windows this failed to create the directory
+<output_dir()>/jrc:coastal-forecast/
+
+# 0.22
+<output_dir()>/jrc_coastal-forecast/
+```
+
+Only qualified keys are affected; a bare key such as `chc` is unchanged. Nothing is moved for you, so if you are
+on Linux or macOS and already have output under the old colon directory, either move it across or keep passing an
+explicit `path=`.
+
 ## 0.11.0 → 0.12.0
 
 Five breaking changes. The `OpenAQ` one is the dangerous one: **your code keeps running and quietly means
