@@ -760,6 +760,42 @@ class TestDeepProber:
         assert captured["variable"] == ["all"]
         assert captured["lake"] == ["achit"]
 
+    def test_reads_every_variable_of_a_multi_variable_container(self, tmp_path):
+        """A container GDAL would expose as several subdatasets is read whole.
+
+        Replaces the coverage deleted with the GDAL subdataset walk: for GDAL a
+        multi-subdataset CDS container is simply a NetCDF with more than one
+        gridded variable, and the property that mattered was that every one is
+        merged into the schema rather than only the first.
+        """
+        xr = pytest.importorskip("xarray", reason="needs xarray to author a NetCDF")
+        import numpy as np
+
+        path = tmp_path / "two_vars.nc"
+        xr.Dataset(
+            {
+                "t2m": (
+                    ("lat", "lon"),
+                    np.ones((2, 2), "f4"),
+                    {"units": "K", "long_name": "2 metre temperature"},
+                ),
+                "sst": (
+                    ("lat", "lon"),
+                    np.ones((2, 2), "f4"),
+                    {"units": "K", "long_name": "sea surface temperature"},
+                ),
+            },
+            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
+        ).to_netcdf(path)
+
+        meta = ecmwf_cli._read_netcdf_var_meta(str(path))
+
+        assert sorted(k for k in meta if k in {"t2m", "sst"}) == ["sst", "t2m"], (
+            f"both variables should be merged into the schema; got {sorted(meta)}"
+        )
+        assert meta["t2m"]["units"] == "K"
+        assert meta["sst"]["long_name"] == "sea surface temperature"
+
     def test_read_netcdf_var_meta_reads_a_netcdf(self, tmp_path):
         """_read_netcdf_var_meta reads long_name/units from a NetCDF."""
         import numpy as np
