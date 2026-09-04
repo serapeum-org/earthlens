@@ -1971,9 +1971,10 @@ class TestGdalGuardDetection:
 
     def test_the_guard_governs_tests_and_tools_too(self):
         """The rule covers the test and tooling trees, not only shipped source."""
-        # Scope is a behavioural contract, not an implementation detail: this
-        # branch had to hand-convert osgeo out of two FDSN tests, so a glob
-        # narrowed back to src/ would let the next one in with every test green.
+        # Scope is a behavioural contract, not an implementation detail. An
+        # `osgeo` import in a test or a notebook is the same layering break as
+        # one in src/, so a glob narrowed back to src/ would un-govern most of
+        # the repo while every test stayed green.
         governed = _earthlens_sources()
         trees = {path.relative_to(_ROOT).parts for path in governed}
         assert any("src" in parts for parts in trees), "shipped source is ungoverned"
