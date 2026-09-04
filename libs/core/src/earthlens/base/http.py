@@ -863,7 +863,7 @@ class HttpClient:
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
         status_forcelist: tuple[int, ...] = DEFAULT_STATUS_FORCELIST,
         max_backoff: float | None = DEFAULT_MAX_BACKOFF,
-        retry_on_exceptions: tuple[type[BaseException], ...] = DEFAULT_RETRY_EXCEPTIONS,
+        retry_on_exceptions: tuple[type[BaseException], ...] | None = None,
         connect_retries: int | None = None,
         read_retries: int | None = DEFAULT_READ_RETRIES,
         retry_unsafe_methods: bool = False,
@@ -898,10 +898,14 @@ class HttpClient:
                 large `Retry-After` cannot pin the thread indefinitely.
                 `None` disables the cap.
             retry_on_exceptions: Exception types that also trigger a retry
-                when raised by the transport. Defaults to
+                when raised by the transport. `None` (the default) uses
                 :data:`DEFAULT_RETRY_EXCEPTIONS` — a refused or reset
-                connection, a timeout, a body truncated mid-stream. Pass
-                `()` to retry on status only.
+                connection, a timeout, a body truncated mid-stream — and is
+                what selects the strict policy: the never-retry list applies
+                and `connect_retries` takes its small default. Passing any
+                tuple, including an equal-valued one, means the caller owns
+                the policy: nothing is vetoed and `connect_retries` follows
+                `max_retries`. Pass `()` to retry on status only.
             connect_retries: Retries allowed for a failure in the connect
                 phase, counted separately from `read_retries`. `None` (the
                 default) resolves to :data:`DEFAULT_CONNECT_RETRIES` while
@@ -946,11 +950,17 @@ class HttpClient:
         self.backoff_factor = backoff_factor
         self.status_forcelist = tuple(status_forcelist)
         self.max_backoff = max_backoff
-        self.retry_on_exceptions = tuple(retry_on_exceptions)
-        # A caller that passed its own set has already decided those types are
-        # worth retrying; the classifier then only picks the budget rather than
-        # second-guessing the choice.
-        self._default_retry_set = retry_on_exceptions is DEFAULT_RETRY_EXCEPTIONS
+        # `None` means "use the default set" — an explicit sentinel rather than
+        # an identity test against the constant, so a caller who re-spells the
+        # same tuple, or writes `DEFAULT_RETRY_EXCEPTIONS + (Extra,)`, gets the
+        # behaviour the value implies instead of one that depends on which
+        # object it is.
+        self._default_retry_set = retry_on_exceptions is None
+        self.retry_on_exceptions = tuple(
+            DEFAULT_RETRY_EXCEPTIONS
+            if retry_on_exceptions is None
+            else retry_on_exceptions
+        )
         # The small connect budget is a property of the *default* policy. A
         # caller that brought its own `retry_on_exceptions` already chose how
         # hard to try, and silently capping its `max_retries` for one phase

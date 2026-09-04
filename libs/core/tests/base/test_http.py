@@ -610,6 +610,30 @@ class TestRetryOnExceptions:
             f"got {classify_transport_error(wrapped)}"
         )
 
+    def test_policy_selection_does_not_depend_on_object_identity(self):
+        """An equal-valued retry tuple behaves the same however it is spelled.
+
+        Deriving the strict policy from `is DEFAULT_RETRY_EXCEPTIONS` made two
+        equal tuples behave oppositely, and made `DEFAULT_RETRY_EXCEPTIONS +
+        (Extra,)` silently drop the never-retry veto.
+        """
+        respelled = (
+            requests.ConnectionError,
+            requests.exceptions.Timeout,
+            requests.exceptions.ChunkedEncodingError,
+        )
+        as_constant = HttpClient(
+            max_retries=5, retry_on_exceptions=DEFAULT_RETRY_EXCEPTIONS
+        )
+        as_literal = HttpClient(max_retries=5, retry_on_exceptions=respelled)
+        assert as_constant.connect_retries == as_literal.connect_retries, (
+            "equal retry sets must yield the same connect budget"
+        )
+        default = HttpClient(max_retries=5)
+        assert default.connect_retries == DEFAULT_CONNECT_RETRIES, (
+            "the untouched default keeps the small connect budget"
+        )
+
     def test_default_retry_set_excludes_http_error(self):
         """`HTTPError` stays out, so 4xx responses are never replayed."""
         assert not any(
