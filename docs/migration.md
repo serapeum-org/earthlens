@@ -3,9 +3,10 @@
 Breaking changes by release, with the concrete edit each one needs. Releases without breaking changes are
 omitted — see the [change log](change-log.md) for the full history.
 
-## 0.21.0 → 0.22.0
+## Unreleased
 
-One breaking change, and it is the quiet kind: **your code keeps running and writes somewhere else**.
+One breaking change, and it is the quiet kind: **your code keeps running and writes somewhere else**. The
+heading gets its version boundary at release time, once the bump is known.
 
 ### A qualified `source:topic` key writes to a flattened directory
 
@@ -14,10 +15,10 @@ from the key, giving `<output_dir()>/jrc:coastal-forecast/`. A colon cannot appe
 so that call could not create its directory there at all. The separator is now flattened to `_`:
 
 ```text
-# 0.21 — on POSIX; on Windows this failed to create the directory
+# before — on POSIX; on Windows this failed to create the directory
 <output_dir()>/jrc:coastal-forecast/
 
-# 0.22
+# after
 <output_dir()>/jrc_coastal-forecast/
 ```
 
