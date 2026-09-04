@@ -24334,6 +24334,8 @@ point, and <code>AggregationConfig</code> to describe the across-epoch reduction
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
@@ -24341,6 +24343,8 @@ point, and <code>AggregationConfig</code> to describe the across-epoch reduction
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 
+import matplotlib.pyplot as plt
+import numpy as np
 from pyramids.dataset import Dataset
 
 from earthlens.aggregate import AggregationConfig
@@ -24486,17 +24490,27 @@ and render the maximum built-up surface for the Lisbon AOI.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">raster</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">rasters</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="c1"># plot() places the raster on georeferenced axes and honours the band's</span>
-<span class="c1"># declared no-data, so nothing is read or masked for the picture.</span>
-<span class="n">glyph</span> <span class="o">=</span> <span class="n">raster</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s1">'inferno'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'GHS-BUILT-S 2000-2020 max — Lisbon'</span><span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">'max built m2'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">rasters</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">arr</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">arr</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'inferno'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'max built m2'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'GHS-BUILT-S 2000-2020 max — Lisbon'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">raster = Dataset.read_file(rasters[0])
-# plot() places the raster on georeferenced axes and honours the band's
-# declared no-data, so nothing is read or masked for the picture.
-glyph = raster.plot(cmap='inferno', title='GHS-BUILT-S 2000-2020 max — Lisbon')
-glyph.cbar.set_label('max built m2')</div>
+<div class="clipboard-copy-txt" id="cell-4">arr = np.asarray(Dataset.read_file(str(rasters[0])).read_array(), dtype='float32')
+arr = arr[0] if arr.ndim == 3 else arr
+arr = np.where(arr &lt; 0, np.nan, arr)
+
+plt.figure(figsize=(6, 5))
+plt.imshow(arr, cmap='inferno')
+plt.colorbar(label='max built m2')
+plt.title('GHS-BUILT-S 2000-2020 max — Lisbon')
+plt.axis('off')
+plt.show()</div>
 </div>
 </div>
 </div>

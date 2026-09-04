@@ -24336,9 +24336,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListedColormap</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundaryNorm</span><span class="p">,</span> <span class="n">ListedColormap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColorScaling</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ghsl</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
@@ -24347,9 +24348,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 import json
 import tempfile
 
-from matplotlib.colors import ListedColormap
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.colors import BoundaryNorm, ListedColormap
 from pyramids.dataset import Dataset
-from pyramids.plot import ColorScaling
 
 from earthlens.core import EarthLens
 from earthlens.ghsl import Catalog</div>
@@ -24530,11 +24532,13 @@ legend</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
 <span class="n">prod</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'GHS_SMOD'</span><span class="p">)</span>
-<span class="n">raster</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">arr</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5"># NBVAL_SKIP
 prod = Catalog().get('GHS_SMOD')
-raster = Dataset.read_file(paths[0])</div>
+arr = np.asarray(Dataset.read_file(str(paths[0])).read_array(), dtype='float32')
+arr = arr[0] if arr.ndim == 3 else arr</div>
 </div>
 </div>
 </div>
@@ -24547,7 +24551,7 @@ raster = Dataset.read_file(paths[0])</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Build a discrete colormap and a boundary colour scale from the catalog's class codes so each settlement class maps to its own GHSL legend colour, then render the map with a labelled colour bar.</p>
+<p>Build a discrete colormap and a <code>BoundaryNorm</code> from the catalog's class codes so each settlement class maps to its own GHSL legend colour, then render the map with a labelled colour bar.</p>
 </div>
 </div>
 </div>
@@ -24573,32 +24577,28 @@ raster = Dataset.read_file(paths[0])</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
 <span class="n">codes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">prod</span><span class="o">.</span><span class="n">legend</span><span class="p">)</span>
 <span class="n">cmap</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">([</span><span class="n">prod</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">])</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">BoundaryNorm</span><span class="p">([</span><span class="n">c</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">codes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">cmap</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
 
-<span class="c1"># The class codes are the colour boundaries, so the discrete scale is declared</span>
-<span class="c1"># rather than hand-built, and the raster lands on georeferenced axes instead of</span>
-<span class="c1"># the bare pixel grid the old call had to hide.</span>
-<span class="n">glyph</span> <span class="o">=</span> <span class="n">raster</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
-    <span class="n">color</span><span class="o">=</span><span class="n">ColorScaling</span><span class="o">.</span><span class="n">boundary</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="n">codes</span><span class="p">),</span>
-    <span class="n">title</span><span class="o">=</span><span class="s1">'GHS-SMOD 2020 (1 km) — Portugal'</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">(</span><span class="n">codes</span><span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="n">prod</span><span class="o">.</span><span class="n">legend</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">)</span>
+<span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="n">codes</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="n">prod</span><span class="o">.</span><span class="n">legend</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'GHS-SMOD 2020 (1 km) — Portugal'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6"># NBVAL_SKIP
 codes = sorted(prod.legend)
 cmap = ListedColormap([prod.colors[c] for c in codes])
+norm = BoundaryNorm([c - 0.5 for c in codes] + [codes[-1] + 0.5], cmap.N)
 
-# The class codes are the colour boundaries, so the discrete scale is declared
-# rather than hand-built, and the raster lands on georeferenced axes instead of
-# the bare pixel grid the old call had to hide.
-glyph = raster.plot(
-    cmap=cmap,
-    color=ColorScaling.boundary(bounds=codes),
-    title='GHS-SMOD 2020 (1 km) — Portugal',
-)
-glyph.cbar.set_ticks(codes)
-glyph.cbar.ax.set_yticklabels([prod.legend[c] for c in codes])</div>
+plt.figure(figsize=(6, 6))
+im = plt.imshow(arr, cmap=cmap, norm=norm)
+cbar = plt.colorbar(im, ticks=codes, shrink=0.8)
+cbar.ax.set_yticklabels([prod.legend[c] for c in codes])
+plt.title('GHS-SMOD 2020 (1 km) — Portugal')
+plt.axis('off')
+plt.show()</div>
 </div>
 </div>
 </div>

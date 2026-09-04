@@ -24257,17 +24257,19 @@ pop — exactly how a marine geologist would eyeball seafloor structure.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataStyle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LightSource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 
+import matplotlib.pyplot as plt
 import numpy as np
-from pyramids.dataset import Dataset, GeoReference
-from pyramids.plot import DataStyle
+from matplotlib.colors import LightSource
+from pyramids.dataset import Dataset
 
 from earthlens.core import EarthLens</div>
 </div>
@@ -24302,8 +24304,7 @@ from earthlens.core import EarthLens</div>
     <span class="n">path</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="n">source</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">arr</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">arr</span> <span class="o">==</span> <span class="mi">32767</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
 <span class="c1"># LightSource needs finite values; fill the (rare) gaps with the deepest value.</span>
@@ -24326,8 +24327,7 @@ paths = EarthLens(
     path=out,
 ).download(progress_bar=False)
 
-source = Dataset.read_file(paths[0])
-arr = np.asarray(source.read_array(), dtype='float32')
+arr = np.asarray(Dataset.read_file(str(paths[0])).read_array(), dtype='float32')
 arr = arr[0] if arr.ndim == 3 else arr
 arr = np.where(arr == 32767, np.nan, arr)
 # LightSource needs finite values; fill the (rare) gaps with the deepest value.
@@ -24378,51 +24378,25 @@ scaled rather than wildly exaggerated.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># pyramids shades the relief itself: the same lighting as the old LightSource</span>
-<span class="c1"># call (azdeg -&gt; azimuth, altdeg -&gt; altitude), but drawn on real coordinates</span>
-<span class="c1"># rather than the pixel grid the axes had to be switched off to hide.</span>
-<span class="n">relief</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
-    <span class="n">filled</span><span class="p">,</span>
-    <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-    <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ls</span> <span class="o">=</span> <span class="n">LightSource</span><span class="p">(</span><span class="n">azdeg</span><span class="o">=</span><span class="mi">315</span><span class="p">,</span> <span class="n">altdeg</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">rgb</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">shade</span><span class="p">(</span>
+    <span class="n">filled</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">gist_earth</span><span class="p">,</span> <span class="n">vert_exag</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">460</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">460</span><span class="p">,</span> <span class="n">blend_mode</span><span class="o">=</span><span class="s1">'soft'</span>
 <span class="p">)</span>
-<span class="n">relief</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">'gist_earth'</span><span class="p">,</span>
-    <span class="n">data_style</span><span class="o">=</span><span class="n">DataStyle</span><span class="p">(</span>
-        <span class="n">hillshade</span><span class="o">=</span><span class="p">{</span>
-            <span class="s1">'azimuth'</span><span class="p">:</span> <span class="mi">315</span><span class="p">,</span>
-            <span class="s1">'altitude'</span><span class="p">:</span> <span class="mi">45</span><span class="p">,</span>
-            <span class="s1">'vert_exag'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-            <span class="s1">'dx'</span><span class="p">:</span> <span class="mi">460</span><span class="p">,</span>
-            <span class="s1">'dy'</span><span class="p">:</span> <span class="mi">460</span><span class="p">,</span>
-            <span class="s1">'blend_mode'</span><span class="p">:</span> <span class="s1">'soft'</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">),</span>
-    <span class="n">title</span><span class="o">=</span><span class="s1">'GEBCO 2020 shaded relief — Mid-Atlantic Ridge (Azores)'</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rgb</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'GEBCO 2020 shaded relief — Mid-Atlantic Ridge (Azores)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3"># pyramids shades the relief itself: the same lighting as the old LightSource
-# call (azdeg -&gt; azimuth, altdeg -&gt; altitude), but drawn on real coordinates
-# rather than the pixel grid the axes had to be switched off to hide.
-relief = Dataset.from_array(
-    filled,
-    no_data_value=np.nan,
-    geo_ref=GeoReference(geo=source.geotransform, epsg=source.epsg),
+<div class="clipboard-copy-txt" id="cell-3">ls = LightSource(azdeg=315, altdeg=45)
+rgb = ls.shade(
+    filled, cmap=plt.cm.gist_earth, vert_exag=1.0, dx=460, dy=460, blend_mode='soft'
 )
-relief.plot(
-    cmap='gist_earth',
-    data_style=DataStyle(
-        hillshade={
-            'azimuth': 315,
-            'altitude': 45,
-            'vert_exag': 1.0,
-            'dx': 460,
-            'dy': 460,
-            'blend_mode': 'soft',
-        }
-    ),
-    title='GEBCO 2020 shaded relief — Mid-Atlantic Ridge (Azores)',
-)</div>
+plt.figure(figsize=(6, 6))
+plt.imshow(rgb)
+plt.title('GEBCO 2020 shaded relief — Mid-Atlantic Ridge (Azores)')
+plt.axis('off')
+plt.show()</div>
 </div>
 </div>
 </div>

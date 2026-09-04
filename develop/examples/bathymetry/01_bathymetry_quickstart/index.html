@@ -24380,16 +24380,18 @@ written GeoTIFF; downloads go to a temporary directory.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.bathymetry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 
+import matplotlib.pyplot as plt
 import numpy as np
-from pyramids.dataset import Dataset, GeoReference
+from pyramids.dataset import Dataset
 
 from earthlens.bathymetry import Catalog
 from earthlens.core import EarthLens</div>
@@ -24582,15 +24584,19 @@ print(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># plot() draws the Dataset itself: georeferenced axes, and</span>
-<span class="c1"># the band's declared no-data honoured without masking.</span>
-<span class="n">glyph</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues_r'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'GEBCO 2020 (15″) — NW African shelf'</span><span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">'elevation (m, negative = below sea level)'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues_r'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'elevation (m, negative = below sea level)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'GEBCO 2020 (15″) — NW African shelf'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5"># plot() draws the Dataset itself: georeferenced axes, and
-# the band's declared no-data honoured without masking.
-glyph = ds.plot(cmap='Blues_r', title='GEBCO 2020 (15″) — NW African shelf')
-glyph.cbar.set_label('elevation (m, negative = below sea level)')</div>
+<div class="clipboard-copy-txt" id="cell-5">plt.figure(figsize=(6, 5))
+plt.imshow(arr, cmap='Blues_r')
+plt.colorbar(label='elevation (m, negative = below sea level)')
+plt.title('GEBCO 2020 (15″) — NW African shelf')
+plt.axis('off')
+plt.show()</div>
 </div>
 </div>
 </div>
@@ -24636,22 +24642,13 @@ ice thickness. We download both and subtract.</p>
         <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">150.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">78.0</span><span class="p">,</span> <span class="mf">170.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">74.0</span><span class="p">],</span>
         <span class="n">path</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">source</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">written</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
-    <span class="c1"># Hand back the Dataset too: the difference below needs its grid.</span>
-    <span class="k">return</span> <span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">grid</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">grid</span><span class="p">)</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">written</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">grid</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">grid</span>
 
 
-<span class="n">ice_source</span><span class="p">,</span> <span class="n">ice</span> <span class="o">=</span> <span class="n">fetch_etopo</span><span class="p">(</span><span class="s1">'etopo1_ice'</span><span class="p">)</span>
-<span class="n">_</span><span class="p">,</span> <span class="n">bedrock</span> <span class="o">=</span> <span class="n">fetch_etopo</span><span class="p">(</span><span class="s1">'etopo1_bedrock'</span><span class="p">)</span>
+<span class="n">ice</span> <span class="o">=</span> <span class="n">fetch_etopo</span><span class="p">(</span><span class="s1">'etopo1_ice'</span><span class="p">)</span>
+<span class="n">bedrock</span> <span class="o">=</span> <span class="n">fetch_etopo</span><span class="p">(</span><span class="s1">'etopo1_bedrock'</span><span class="p">)</span>
 <span class="n">thickness</span> <span class="o">=</span> <span class="n">ice</span> <span class="o">-</span> <span class="n">bedrock</span>
-
-<span class="c1"># The difference is derived, so it is wrapped back onto the source grid.</span>
-<span class="n">thickness_grid</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
-    <span class="n">thickness</span><span class="p">,</span>
-    <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-    <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">ice_source</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">ice_source</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
-<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'max ice thickness'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">thickness</span><span class="p">))),</span> <span class="s1">'m'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">def fetch_etopo(dataset_id):
@@ -24662,22 +24659,13 @@ ice thickness. We download both and subtract.</p>
         aoi=[150.0, -78.0, 170.0, -74.0],
         path=out_dir,
     ).download(progress_bar=False)
-    source = Dataset.read_file(written[0])
-    grid = np.asarray(source.read_array(), dtype='float32')
-    # Hand back the Dataset too: the difference below needs its grid.
-    return source, (grid[0] if grid.ndim == 3 else grid)
+    grid = np.asarray(Dataset.read_file(str(written[0])).read_array(), dtype='float32')
+    return grid[0] if grid.ndim == 3 else grid
 
 
-ice_source, ice = fetch_etopo('etopo1_ice')
-_, bedrock = fetch_etopo('etopo1_bedrock')
+ice = fetch_etopo('etopo1_ice')
+bedrock = fetch_etopo('etopo1_bedrock')
 thickness = ice - bedrock
-
-# The difference is derived, so it is wrapped back onto the source grid.
-thickness_grid = Dataset.from_array(
-    thickness,
-    no_data_value=np.nan,
-    geo_ref=GeoReference(geo=ice_source.geotransform, epsg=ice_source.epsg),
-)
 print('max ice thickness', round(float(np.nanmax(thickness))), 'm')</div>
 </div>
 </div>
@@ -24703,15 +24691,19 @@ print('max ice thickness', round(float(np.nanmax(thickness))), 'm')</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">glyph</span> <span class="o">=</span> <span class="n">thickness_grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">'viridis'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'ETOPO1 ice surface − bedrock — East Antarctica'</span>
-<span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">'ice thickness (m)'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">thickness</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'viridis'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'ice thickness (m)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'ETOPO1 ice surface − bedrock — East Antarctica'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">glyph = thickness_grid.plot(
-    cmap='viridis', title='ETOPO1 ice surface − bedrock — East Antarctica'
-)
-glyph.cbar.set_label('ice thickness (m)')</div>
+<div class="clipboard-copy-txt" id="cell-7">plt.figure(figsize=(6, 5))
+plt.imshow(thickness, cmap='viridis')
+plt.colorbar(label='ice thickness (m)')
+plt.title('ETOPO1 ice surface − bedrock — East Antarctica')
+plt.axis('off')
+plt.show()</div>
 </div>
 </div>
 </div>

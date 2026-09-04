@@ -24420,9 +24420,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.radklim</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
@@ -24432,9 +24433,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from pyramids.dataset import Dataset, GeoReference
+from pyramids.dataset import Dataset
 
 from earthlens.core import EarthLens
 from earthlens.radklim import Catalog
@@ -24744,37 +24746,25 @@ print('crs  :', ds.crs.split('PROJECTION')[-1][:40], '...')</div>
 <span class="n">band</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="s1">'ndim'</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">arr</span>
 <span class="n">precip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">band</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">band</span><span class="p">)</span>
 
-<span class="c1"># The masked grid is derived, so it is wrapped back into a Dataset carrying the</span>
-<span class="c1"># source's geotransform and EPSG: same numbers, but drawn on real coordinates.</span>
-<span class="n">rain</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
-    <span class="n">precip</span><span class="p">,</span>
-    <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-    <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
-<span class="p">)</span>
-<span class="n">glyph</span> <span class="o">=</span> <span class="n">rain</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues'</span><span class="p">,</span>
-    <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">precip</span><span class="p">,</span> <span class="mi">99</span><span class="p">),</span>
-    <span class="n">title</span><span class="o">=</span><span class="s1">'RADOLAN-RW operational granule — (c) Deutscher Wetterdienst (DWD)'</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">'hourly precipitation (raw units)'</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">precip</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues'</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">precip</span><span class="p">,</span> <span class="mi">99</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'hourly precipitation (raw units)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'RADOLAN-RW operational granule — (c) Deutscher Wetterdienst (DWD)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7">arr = ds.read_array()
 band = arr[0] if getattr(arr, 'ndim', 2) == 3 else arr
 precip = np.where(band &lt; 0, np.nan, band)
 
-# The masked grid is derived, so it is wrapped back into a Dataset carrying the
-# source's geotransform and EPSG: same numbers, but drawn on real coordinates.
-rain = Dataset.from_array(
-    precip,
-    no_data_value=np.nan,
-    geo_ref=GeoReference(geo=ds.geotransform, epsg=ds.epsg),
-)
-glyph = rain.plot(
-    cmap='Blues',
-    vmax=np.nanpercentile(precip, 99),
-    title='RADOLAN-RW operational granule — (c) Deutscher Wetterdienst (DWD)',
-)
-glyph.cbar.set_label('hourly precipitation (raw units)')</div>
+fig, ax = plt.subplots(figsize=(6, 6))
+im = ax.imshow(precip, cmap='Blues', vmax=np.nanpercentile(precip, 99))
+fig.colorbar(im, ax=ax, shrink=0.8, label='hourly precipitation (raw units)')
+ax.set_title('RADOLAN-RW operational granule — (c) Deutscher Wetterdienst (DWD)')
+ax.axis('off')
+plt.tight_layout()
+plt.show()</div>
 </div>
 </div>
 </div>

@@ -24392,7 +24392,7 @@ of the two composites — to beat the cloud.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
@@ -24415,7 +24415,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from loguru import logger
-from pyramids.dataset import Dataset, GeoReference
+from pyramids.dataset import Dataset
 
 from earthlens.core import EarthLens
 
@@ -24618,7 +24618,6 @@ gives one cloud-reduced true-colour composite per year.</p>
 
 
 <span class="n">merged</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">sources</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># one Dataset per year, for the panels' georeferencing</span>
 <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">YEARS</span><span class="p">:</span>
     <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
@@ -24629,8 +24628,6 @@ gives one cloud-reduced true-colour composite per year.</p>
         <span class="k">if</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">paths</span>
     <span class="p">]</span>
     <span class="n">merged</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">comps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">merge_clearer</span><span class="p">(</span><span class="n">comps</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">comps</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">first</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'LC08'</span><span class="p">,</span> <span class="s1">'LC09'</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">)</span>
-    <span class="n">sources</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[(</span><span class="n">tag</span><span class="p">,</span> <span class="n">first</span><span class="p">)])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'</span><span class="se">\\</span><span class="s1">'</span><span class="p">,</span> <span class="s1">'/'</span><span class="p">))</span>
 <span class="p">{</span><span class="n">tag</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">merged</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">def merge_clearer(a, b):
@@ -24643,7 +24640,6 @@ gives one cloud-reduced true-colour composite per year.</p>
 
 
 merged = {}
-sources = {}  # one Dataset per year, for the panels' georeferencing
 for tag in YEARS:
     comps = [
         np.asarray(
@@ -24654,8 +24650,6 @@ for tag in YEARS:
         if (tag, s) in paths
     ]
     merged[tag] = comps[0] if len(comps) == 1 else merge_clearer(comps[0], comps[1])
-    first = next(s for s in ('LC08', 'LC09') if (tag, s) in paths)
-    sources[tag] = Dataset.read_file(str(paths[(tag, first)]).replace('\\', '/'))
 {tag: m.shape for tag, m in merged.items()}</div>
 </div>
 </div>
@@ -24693,59 +24687,37 @@ summer against the 2026 drought summer over the same reach.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># matplotlib lays the pair out; pyramids draws each georeferenced panel.</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">tag</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">YEARS</span><span class="p">):</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
     <span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">a</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="mi">98</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
     <span class="p">)</span>
-    <span class="c1"># Already stretched to 0..1, so the composite is wrapped as three bands and</span>
-    <span class="c1"># drawn unchanged. merge_clearer crops from the top-left, so the source</span>
-    <span class="c1"># geotransform still describes the cropped grid.</span>
-    <span class="n">source</span> <span class="o">=</span> <span class="n">sources</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
-    <span class="n">truecolour</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-        <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-        <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
-    <span class="p">)</span>
-    <span class="n">truecolour</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-        <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
-        <span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]},</span>
-        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Danube at Budapest - </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rgb</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Danube at Budapest - </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
     <span class="s2">"Landsat true colour (LC08+LC09 merged) - wet year vs drought year"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.02</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5"># matplotlib lays the pair out; pyramids draws each georeferenced panel.
-fig, axes = plt.subplots(1, 2, figsize=(12, 5.5))
+<div class="clipboard-copy-txt" id="cell-5">fig, axes = plt.subplots(1, 2, figsize=(12, 5.5))
 for ax, tag in zip(axes, YEARS):
     a = merged[tag]
     rgb = np.clip(
         np.stack([a[0], a[1], a[2]], axis=-1) / np.nanpercentile(a[:3], 98), 0, 1
     )
-    # Already stretched to 0..1, so the composite is wrapped as three bands and
-    # drawn unchanged. merge_clearer crops from the top-left, so the source
-    # geotransform still describes the cropped grid.
-    source = sources[tag]
-    truecolour = Dataset.from_array(
-        np.moveaxis(rgb, -1, 0),
-        no_data_value=np.nan,
-        geo_ref=GeoReference(geo=source.geotransform, epsg=source.epsg),
-    )
-    truecolour.plot(
-        fig=fig,
-        ax=ax,
-        rgb_options={"rgb": [0, 1, 2]},
-        title=f"Danube at Budapest - {tag}",
-    )
+    ax.imshow(rgb)
+    ax.set_title(f"Danube at Budapest - {tag}")
+    ax.set_xticks([])
+    ax.set_yticks([])
 fig.suptitle(
     "Landsat true colour (LC08+LC09 merged) - wet year vs drought year", y=1.02
 )
-plt.tight_layout()</div>
+plt.tight_layout()
+plt.show()</div>
 </div>
 </div>
 </div>

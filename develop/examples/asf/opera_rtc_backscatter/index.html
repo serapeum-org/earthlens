@@ -24398,8 +24398,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
@@ -24408,8 +24409,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
-from pyramids.dataset import Dataset, GeoReference
+from pyramids.dataset import Dataset
 
 from earthlens.core import EarthLens
 
@@ -24631,38 +24633,24 @@ print(
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">arr</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>  <span class="c1"># mask non-positive samples</span>
 <span class="n">db</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
 
-<span class="c1"># The dB grid is derived, so it is wrapped back into a Dataset carrying the</span>
-<span class="c1"># source's geotransform and EPSG: same numbers, but drawn on real coordinates.</span>
-<span class="n">backscatter</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
-    <span class="n">db</span><span class="p">,</span>
-    <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-    <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
-<span class="p">)</span>
-<span class="n">glyph</span> <span class="o">=</span> <span class="n">backscatter</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span>
-    <span class="n">vmin</span><span class="o">=-</span><span class="mi">25</span><span class="p">,</span>
-    <span class="n">vmax</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">'OPERA RTC-S1 VH backscatter</span><span class="se">\n</span><span class="si">{</span><span class="n">vh_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">'VH backscatter (dB)'</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">25</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'VH backscatter (dB)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'OPERA RTC-S1 VH backscatter</span><span class="se">\n</span><span class="si">{</span><span class="n">vh_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">arr = np.where(arr &gt; 0, arr, np.nan)  # mask non-positive samples
 db = 10 * np.log10(arr)
 
-# The dB grid is derived, so it is wrapped back into a Dataset carrying the
-# source's geotransform and EPSG: same numbers, but drawn on real coordinates.
-backscatter = Dataset.from_array(
-    db,
-    no_data_value=np.nan,
-    geo_ref=GeoReference(geo=ds.geotransform, epsg=ds.epsg),
-)
-glyph = backscatter.plot(
-    cmap='gray',
-    vmin=-25,
-    vmax=0,
-    title=f'OPERA RTC-S1 VH backscatter\n{vh_path.name}',
-)
-glyph.cbar.set_label('VH backscatter (dB)')</div>
+fig, ax = plt.subplots(figsize=(8, 7))
+im = ax.imshow(db, cmap='gray', vmin=-25, vmax=0)
+fig.colorbar(im, ax=ax, label='VH backscatter (dB)')
+ax.set_title(f'OPERA RTC-S1 VH backscatter\n{vh_path.name}', fontsize=10)
+ax.set_axis_off()
+plt.tight_layout()
+plt.show()</div>
 </div>
 </div>
 </div>

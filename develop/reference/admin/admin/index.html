@@ -7077,17 +7077,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.admin.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.admin.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7204,17 +7193,6 @@
     <span class="md-ellipsis">
       
         get
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.admin.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -23878,17 +23856,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.admin.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.admin.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24005,17 +23972,6 @@
     <span class="md-ellipsis">
       
         get
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.admin.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -25769,7 +25725,7 @@ cap is never fetched. <code>None</code> (the default) reads everything.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.admin.catalog.Dataset&lt;/code&gt;)" href="#earthlens.admin.catalog.Dataset">Dataset</a>]</code></p>
 
 
 
@@ -25912,11 +25868,7 @@ keys.</p>
 <span class="normal"><a href="#__codelineno-0-274">274</a></span>
 <span class="normal"><a href="#__codelineno-0-275">275</a></span>
 <span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
-<span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span>
-<span class="normal"><a href="#__codelineno-0-280">280</a></span>
-<span class="normal"><a href="#__codelineno-0-281">281</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-277">277</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]):</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Administrative-boundary source catalog for the admin backend.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Merges the bundled `catalog/` directory&#39;s per-provider `*.yaml` files and</span>
@@ -25975,36 +25927,32 @@ keys.</p>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="p">)</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dataset map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            dataset_id: A curated dataset id (`&quot;geoboundaries:adm1&quot;`,</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">                `&quot;tiger:county&quot;`, `&quot;natural_earth:countries&quot;`).</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            dataset_id: A curated dataset id (`&quot;geoboundaries:adm1&quot;`,</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">                `&quot;tiger:county&quot;`, `&quot;natural_earth:countries&quot;`).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            Dataset: The matching row.</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            Dataset: The matching row.</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            ValueError: If `dataset_id` is not a curated dataset; the message</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            ValueError: If `dataset_id` is not a curated dataset; the message</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            - A known id resolves to its row:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">                &gt;&gt;&gt; from earthlens.admin import Catalog</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;geoboundaries:adm1&quot;).provider</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">                &#39;geoboundaries&#39;</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;tiger:tract&quot;).per_state</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">                True</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            - A known id resolves to its row:</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">                &gt;&gt;&gt; from earthlens.admin import Catalog</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;geoboundaries:adm1&quot;).provider</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">                &#39;geoboundaries&#39;</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;tiger:tract&quot;).per_state</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">                True</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26128,7 +26076,11 @@ lists the known ids with a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-256">256</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
 <span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
 <span class="normal"><a href="#__codelineno-0-259">259</a></span>
@@ -26149,63 +26101,32 @@ lists the known ids with a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-274">274</a></span>
 <span class="normal"><a href="#__codelineno-0-275">275</a></span>
 <span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
-<span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span>
-<span class="normal"><a href="#__codelineno-0-280">280</a></span>
-<span class="normal"><a href="#__codelineno-0-281">281</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
+<span class="normal"><a href="#__codelineno-0-277">277</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        dataset_id: A curated dataset id (`&quot;geoboundaries:adm1&quot;`,</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            `&quot;tiger:county&quot;`, `&quot;natural_earth:countries&quot;`).</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        dataset_id: A curated dataset id (`&quot;geoboundaries:adm1&quot;`,</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            `&quot;tiger:county&quot;`, `&quot;natural_earth:countries&quot;`).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        Dataset: The matching row.</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Dataset: The matching row.</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        ValueError: If `dataset_id` is not a curated dataset; the message</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        ValueError: If `dataset_id` is not a curated dataset; the message</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        - A known id resolves to its row:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            &gt;&gt;&gt; from earthlens.admin import Catalog</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;geoboundaries:adm1&quot;).provider</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            &#39;geoboundaries&#39;</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;tiger:tract&quot;).per_state</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            True</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.admin.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.admin.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.admin.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the dataset map (satisfies the abstract contract).</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-252">252</a></span>
-<span class="normal"><a href="#__codelineno-0-253">253</a></span>
-<span class="normal"><a href="#__codelineno-0-254">254</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the dataset map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        - A known id resolves to its row:</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            &gt;&gt;&gt; from earthlens.admin import Catalog</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;geoboundaries:adm1&quot;).provider</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            &#39;geoboundaries&#39;</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;tiger:tract&quot;).per_state</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            True</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28337,7 +28258,7 @@ incompatible).</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.admin.catalog.Dataset&lt;/code&gt;)" href="#earthlens.admin.catalog.Dataset">Dataset</a>]</code></p>
 
 
 
@@ -28480,11 +28401,7 @@ keys.</p>
 <span class="normal"><a href="#__codelineno-0-274">274</a></span>
 <span class="normal"><a href="#__codelineno-0-275">275</a></span>
 <span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
-<span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span>
-<span class="normal"><a href="#__codelineno-0-280">280</a></span>
-<span class="normal"><a href="#__codelineno-0-281">281</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-277">277</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]):</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Administrative-boundary source catalog for the admin backend.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Merges the bundled `catalog/` directory&#39;s per-provider `*.yaml` files and</span>
@@ -28543,36 +28460,32 @@ keys.</p>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="p">)</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dataset map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            dataset_id: A curated dataset id (`&quot;geoboundaries:adm1&quot;`,</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">                `&quot;tiger:county&quot;`, `&quot;natural_earth:countries&quot;`).</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            dataset_id: A curated dataset id (`&quot;geoboundaries:adm1&quot;`,</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">                `&quot;tiger:county&quot;`, `&quot;natural_earth:countries&quot;`).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            Dataset: The matching row.</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            Dataset: The matching row.</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            ValueError: If `dataset_id` is not a curated dataset; the message</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            ValueError: If `dataset_id` is not a curated dataset; the message</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            - A known id resolves to its row:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">                &gt;&gt;&gt; from earthlens.admin import Catalog</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;geoboundaries:adm1&quot;).provider</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">                &#39;geoboundaries&#39;</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;tiger:tract&quot;).per_state</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">                True</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            - A known id resolves to its row:</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">                &gt;&gt;&gt; from earthlens.admin import Catalog</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;geoboundaries:adm1&quot;).provider</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">                &#39;geoboundaries&#39;</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;tiger:tract&quot;).per_state</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">                True</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -28696,7 +28609,11 @@ lists the known ids with a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-256">256</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
 <span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
 <span class="normal"><a href="#__codelineno-0-259">259</a></span>
@@ -28717,63 +28634,32 @@ lists the known ids with a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-274">274</a></span>
 <span class="normal"><a href="#__codelineno-0-275">275</a></span>
 <span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
-<span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span>
-<span class="normal"><a href="#__codelineno-0-280">280</a></span>
-<span class="normal"><a href="#__codelineno-0-281">281</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
+<span class="normal"><a href="#__codelineno-0-277">277</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        dataset_id: A curated dataset id (`&quot;geoboundaries:adm1&quot;`,</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            `&quot;tiger:county&quot;`, `&quot;natural_earth:countries&quot;`).</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        dataset_id: A curated dataset id (`&quot;geoboundaries:adm1&quot;`,</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            `&quot;tiger:county&quot;`, `&quot;natural_earth:countries&quot;`).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        Dataset: The matching row.</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Dataset: The matching row.</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        ValueError: If `dataset_id` is not a curated dataset; the message</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        ValueError: If `dataset_id` is not a curated dataset; the message</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        - A known id resolves to its row:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            &gt;&gt;&gt; from earthlens.admin import Catalog</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;geoboundaries:adm1&quot;).provider</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            &#39;geoboundaries&#39;</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;tiger:tract&quot;).per_state</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            True</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.admin.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.admin.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.admin.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the dataset map (satisfies the abstract contract).</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/admin/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-252">252</a></span>
-<span class="normal"><a href="#__codelineno-0-253">253</a></span>
-<span class="normal"><a href="#__codelineno-0-254">254</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the dataset map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        - A known id resolves to its row:</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            &gt;&gt;&gt; from earthlens.admin import Catalog</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;geoboundaries:adm1&quot;).provider</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            &#39;geoboundaries&#39;</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;tiger:tract&quot;).per_state</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            True</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

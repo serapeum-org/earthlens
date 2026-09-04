@@ -2033,17 +2033,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#earthlens.cmems.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.cmems.Catalog.get_variable" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2226,17 +2215,6 @@
   
     <nav class="md-nav" aria-label="Catalog">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.cmems.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#earthlens.cmems.catalog.Catalog.get_variable" class="md-nav__link">
@@ -23956,17 +23934,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#earthlens.cmems.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.cmems.Catalog.get_variable" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24149,17 +24116,6 @@
   
     <nav class="md-nav" aria-label="Catalog">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.cmems.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#earthlens.cmems.catalog.Catalog.get_variable" class="md-nav__link">
@@ -26700,7 +26656,7 @@ toolbox exceptions are logged at ERROR.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.cmems.catalog.Dataset&lt;/code&gt;)" href="#earthlens.cmems.catalog.Dataset">Dataset</a>]</code></p>
 
 
 
@@ -26919,19 +26875,7 @@ cadence / domain / temporal coverage / variables map.</p>
 <span class="normal"><a href="#__codelineno-0-489">489</a></span>
 <span class="normal"><a href="#__codelineno-0-490">490</a></span>
 <span class="normal"><a href="#__codelineno-0-491">491</a></span>
-<span class="normal"><a href="#__codelineno-0-492">492</a></span>
-<span class="normal"><a href="#__codelineno-0-493">493</a></span>
-<span class="normal"><a href="#__codelineno-0-494">494</a></span>
-<span class="normal"><a href="#__codelineno-0-495">495</a></span>
-<span class="normal"><a href="#__codelineno-0-496">496</a></span>
-<span class="normal"><a href="#__codelineno-0-497">497</a></span>
-<span class="normal"><a href="#__codelineno-0-498">498</a></span>
-<span class="normal"><a href="#__codelineno-0-499">499</a></span>
-<span class="normal"><a href="#__codelineno-0-500">500</a></span>
-<span class="normal"><a href="#__codelineno-0-501">501</a></span>
-<span class="normal"><a href="#__codelineno-0-502">502</a></span>
-<span class="normal"><a href="#__codelineno-0-503">503</a></span>
-<span class="normal"><a href="#__codelineno-0-504">504</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-492">492</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]):</span>
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Variable catalog for the Copernicus Marine backend.</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data)</span>
@@ -27021,59 +26965,47 @@ cadence / domain / temporal coverage / variables map.</p>
 <a id="__codelineno-0-449" name="__codelineno-0-449"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="p">)</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Variable` for a `(dataset_id, name)` pair.</span>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        is done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">            dict[str, Dataset]: One entry per curated CMEMS dataset.</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">                Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Variable` for a `(dataset_id, name)` pair.</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">            dataset_id: CMEMS dataset id as it appears as a key in</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">                :attr:`datasets` (e.g.</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">                `&quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;`).</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">            variable_name: Short variable name as it appears inside</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">                the NetCDF (e.g. `&quot;thetao&quot;`, `&quot;so&quot;`).</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">            Variable: Per-variable metadata.</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">            KeyError: If `dataset_id` is not curated, or if</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">                `variable_name` is not declared under that dataset.</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">            - Look up a curated variable:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">                &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">                &gt;&gt;&gt; v = Catalog().get_variable(</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">                ...     &quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;, &quot;thetao&quot;</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">                ... )</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">                &gt;&gt;&gt; v.units</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">                &#39;degrees_C&#39;</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">            - Unknown dataset raises `KeyError`:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">                &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_variable(&quot;not-a-dataset&quot;, &quot;thetao&quot;)</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">                Traceback (most recent call last):</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">                    ...</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">                KeyError: &#39;not-a-dataset&#39;</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_id</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">variable_name</span><span class="p">]</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">            dataset_id: CMEMS dataset id as it appears as a key in</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">                :attr:`datasets` (e.g.</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">                `&quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;`).</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">            variable_name: Short variable name as it appears inside</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">                the NetCDF (e.g. `&quot;thetao&quot;`, `&quot;so&quot;`).</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">            Variable: Per-variable metadata.</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">            KeyError: If `dataset_id` is not curated, or if</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">                `variable_name` is not declared under that dataset.</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">            - Look up a curated variable:</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">                &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">                &gt;&gt;&gt; v = Catalog().get_variable(</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">                ...     &quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;, &quot;thetao&quot;</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">                &gt;&gt;&gt; v.units</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">                &#39;degrees_C&#39;</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">            - Unknown dataset raises `KeyError`:</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">                &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_variable(&quot;not-a-dataset&quot;, &quot;thetao&quot;)</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">                Traceback (most recent call last):</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">                    ...</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">                KeyError: &#39;not-a-dataset&#39;</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_id</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">variable_name</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27089,75 +27021,6 @@ cadence / domain / temporal coverage / variables map.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.cmems.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.cmems.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.cmems.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the structural per-dataset map.</p>
-<p>Satisfies the abstract base's contract; the actual parsing
-is done in :func:<code>model_post_init</code>.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.cmems.catalog.Dataset&lt;/code&gt;)" href="#earthlens.cmems.catalog.Dataset">Dataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, Dataset]: One entry per curated CMEMS dataset.
-Same object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/ocean/src/earthlens/cmems/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-452">452</a></span>
-<span class="normal"><a href="#__codelineno-0-453">453</a></span>
-<span class="normal"><a href="#__codelineno-0-454">454</a></span>
-<span class="normal"><a href="#__codelineno-0-455">455</a></span>
-<span class="normal"><a href="#__codelineno-0-456">456</a></span>
-<span class="normal"><a href="#__codelineno-0-457">457</a></span>
-<span class="normal"><a href="#__codelineno-0-458">458</a></span>
-<span class="normal"><a href="#__codelineno-0-459">459</a></span>
-<span class="normal"><a href="#__codelineno-0-460">460</a></span>
-<span class="normal"><a href="#__codelineno-0-461">461</a></span>
-<span class="normal"><a href="#__codelineno-0-462">462</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">    is done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        dict[str, Dataset]: One entry per curated CMEMS dataset.</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">            Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -27294,7 +27157,19 @@ the NetCDF (e.g. <code>"thetao"</code>, <code>"so"</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/cmems/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-464">464</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-452">452</a></span>
+<span class="normal"><a href="#__codelineno-0-453">453</a></span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span>
+<span class="normal"><a href="#__codelineno-0-455">455</a></span>
+<span class="normal"><a href="#__codelineno-0-456">456</a></span>
+<span class="normal"><a href="#__codelineno-0-457">457</a></span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span>
+<span class="normal"><a href="#__codelineno-0-459">459</a></span>
+<span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span>
+<span class="normal"><a href="#__codelineno-0-464">464</a></span>
 <span class="normal"><a href="#__codelineno-0-465">465</a></span>
 <span class="normal"><a href="#__codelineno-0-466">466</a></span>
 <span class="normal"><a href="#__codelineno-0-467">467</a></span>
@@ -27322,59 +27197,47 @@ the NetCDF (e.g. <code>"thetao"</code>, <code>"so"</code>).</p>
 <span class="normal"><a href="#__codelineno-0-489">489</a></span>
 <span class="normal"><a href="#__codelineno-0-490">490</a></span>
 <span class="normal"><a href="#__codelineno-0-491">491</a></span>
-<span class="normal"><a href="#__codelineno-0-492">492</a></span>
-<span class="normal"><a href="#__codelineno-0-493">493</a></span>
-<span class="normal"><a href="#__codelineno-0-494">494</a></span>
-<span class="normal"><a href="#__codelineno-0-495">495</a></span>
-<span class="normal"><a href="#__codelineno-0-496">496</a></span>
-<span class="normal"><a href="#__codelineno-0-497">497</a></span>
-<span class="normal"><a href="#__codelineno-0-498">498</a></span>
-<span class="normal"><a href="#__codelineno-0-499">499</a></span>
-<span class="normal"><a href="#__codelineno-0-500">500</a></span>
-<span class="normal"><a href="#__codelineno-0-501">501</a></span>
-<span class="normal"><a href="#__codelineno-0-502">502</a></span>
-<span class="normal"><a href="#__codelineno-0-503">503</a></span>
-<span class="normal"><a href="#__codelineno-0-504">504</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Variable` for a `(dataset_id, name)` pair.</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">        dataset_id: CMEMS dataset id as it appears as a key in</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">            :attr:`datasets` (e.g.</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">            `&quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;`).</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        variable_name: Short variable name as it appears inside</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">            the NetCDF (e.g. `&quot;thetao&quot;`, `&quot;so&quot;`).</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">        Variable: Per-variable metadata.</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        KeyError: If `dataset_id` is not curated, or if</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">            `variable_name` is not declared under that dataset.</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        - Look up a curated variable:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">            &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">            &gt;&gt;&gt; v = Catalog().get_variable(</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">            ...     &quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;, &quot;thetao&quot;</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">            &gt;&gt;&gt; v.units</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">            &#39;degrees_C&#39;</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">        - Unknown dataset raises `KeyError`:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">            &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_variable(&quot;not-a-dataset&quot;, &quot;thetao&quot;)</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">            KeyError: &#39;not-a-dataset&#39;</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_id</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">variable_name</span><span class="p">]</span>
+<span class="normal"><a href="#__codelineno-0-492">492</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Variable` for a `(dataset_id, name)` pair.</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        dataset_id: CMEMS dataset id as it appears as a key in</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">            :attr:`datasets` (e.g.</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">            `&quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;`).</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        variable_name: Short variable name as it appears inside</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">            the NetCDF (e.g. `&quot;thetao&quot;`, `&quot;so&quot;`).</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        Variable: Per-variable metadata.</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        KeyError: If `dataset_id` is not curated, or if</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">            `variable_name` is not declared under that dataset.</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">        - Look up a curated variable:</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">            &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">            &gt;&gt;&gt; v = Catalog().get_variable(</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">            ...     &quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;, &quot;thetao&quot;</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">            &gt;&gt;&gt; v.units</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">            &#39;degrees_C&#39;</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        - Unknown dataset raises `KeyError`:</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">            &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_variable(&quot;not-a-dataset&quot;, &quot;thetao&quot;)</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">            KeyError: &#39;not-a-dataset&#39;</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_id</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">variable_name</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -31375,7 +31238,7 @@ redirect the loader at a temporary directory or single YAML file.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.cmems.catalog.Dataset&lt;/code&gt;)" href="#earthlens.cmems.catalog.Dataset">Dataset</a>]</code></p>
 
 
 
@@ -31594,19 +31457,7 @@ cadence / domain / temporal coverage / variables map.</p>
 <span class="normal"><a href="#__codelineno-0-489">489</a></span>
 <span class="normal"><a href="#__codelineno-0-490">490</a></span>
 <span class="normal"><a href="#__codelineno-0-491">491</a></span>
-<span class="normal"><a href="#__codelineno-0-492">492</a></span>
-<span class="normal"><a href="#__codelineno-0-493">493</a></span>
-<span class="normal"><a href="#__codelineno-0-494">494</a></span>
-<span class="normal"><a href="#__codelineno-0-495">495</a></span>
-<span class="normal"><a href="#__codelineno-0-496">496</a></span>
-<span class="normal"><a href="#__codelineno-0-497">497</a></span>
-<span class="normal"><a href="#__codelineno-0-498">498</a></span>
-<span class="normal"><a href="#__codelineno-0-499">499</a></span>
-<span class="normal"><a href="#__codelineno-0-500">500</a></span>
-<span class="normal"><a href="#__codelineno-0-501">501</a></span>
-<span class="normal"><a href="#__codelineno-0-502">502</a></span>
-<span class="normal"><a href="#__codelineno-0-503">503</a></span>
-<span class="normal"><a href="#__codelineno-0-504">504</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-492">492</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]):</span>
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Variable catalog for the Copernicus Marine backend.</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data)</span>
@@ -31696,59 +31547,47 @@ cadence / domain / temporal coverage / variables map.</p>
 <a id="__codelineno-0-449" name="__codelineno-0-449"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="p">)</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Variable` for a `(dataset_id, name)` pair.</span>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        Satisfies the abstract base&#39;s contract; the actual parsing</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        is done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">            dict[str, Dataset]: One entry per curated CMEMS dataset.</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">                Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Variable` for a `(dataset_id, name)` pair.</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">            dataset_id: CMEMS dataset id as it appears as a key in</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">                :attr:`datasets` (e.g.</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">                `&quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;`).</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">            variable_name: Short variable name as it appears inside</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">                the NetCDF (e.g. `&quot;thetao&quot;`, `&quot;so&quot;`).</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">            Variable: Per-variable metadata.</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">            KeyError: If `dataset_id` is not curated, or if</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">                `variable_name` is not declared under that dataset.</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">            - Look up a curated variable:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">                &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">                &gt;&gt;&gt; v = Catalog().get_variable(</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">                ...     &quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;, &quot;thetao&quot;</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">                ... )</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">                &gt;&gt;&gt; v.units</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">                &#39;degrees_C&#39;</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">            - Unknown dataset raises `KeyError`:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">                &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_variable(&quot;not-a-dataset&quot;, &quot;thetao&quot;)</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">                Traceback (most recent call last):</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">                    ...</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">                KeyError: &#39;not-a-dataset&#39;</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_id</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">variable_name</span><span class="p">]</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">            dataset_id: CMEMS dataset id as it appears as a key in</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">                :attr:`datasets` (e.g.</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">                `&quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;`).</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">            variable_name: Short variable name as it appears inside</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">                the NetCDF (e.g. `&quot;thetao&quot;`, `&quot;so&quot;`).</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">            Variable: Per-variable metadata.</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">            KeyError: If `dataset_id` is not curated, or if</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">                `variable_name` is not declared under that dataset.</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">            - Look up a curated variable:</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">                &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">                &gt;&gt;&gt; v = Catalog().get_variable(</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">                ...     &quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;, &quot;thetao&quot;</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">                &gt;&gt;&gt; v.units</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">                &#39;degrees_C&#39;</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">            - Unknown dataset raises `KeyError`:</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">                &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_variable(&quot;not-a-dataset&quot;, &quot;thetao&quot;)</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">                Traceback (most recent call last):</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">                    ...</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">                KeyError: &#39;not-a-dataset&#39;</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_id</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">variable_name</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -31764,75 +31603,6 @@ cadence / domain / temporal coverage / variables map.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.cmems.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.cmems.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.cmems.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the structural per-dataset map.</p>
-<p>Satisfies the abstract base's contract; the actual parsing
-is done in :func:<code>model_post_init</code>.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.cmems.catalog.Dataset&lt;/code&gt;)" href="#earthlens.cmems.catalog.Dataset">Dataset</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>dict[str, Dataset]: One entry per curated CMEMS dataset.
-Same object as :attr:<code>datasets</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/ocean/src/earthlens/cmems/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-452">452</a></span>
-<span class="normal"><a href="#__codelineno-0-453">453</a></span>
-<span class="normal"><a href="#__codelineno-0-454">454</a></span>
-<span class="normal"><a href="#__codelineno-0-455">455</a></span>
-<span class="normal"><a href="#__codelineno-0-456">456</a></span>
-<span class="normal"><a href="#__codelineno-0-457">457</a></span>
-<span class="normal"><a href="#__codelineno-0-458">458</a></span>
-<span class="normal"><a href="#__codelineno-0-459">459</a></span>
-<span class="normal"><a href="#__codelineno-0-460">460</a></span>
-<span class="normal"><a href="#__codelineno-0-461">461</a></span>
-<span class="normal"><a href="#__codelineno-0-462">462</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the structural per-dataset map.</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">    Satisfies the abstract base&#39;s contract; the actual parsing</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">    is done in :func:`model_post_init`.</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        dict[str, Dataset]: One entry per curated CMEMS dataset.</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">            Same object as :attr:`datasets`.</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -31969,7 +31739,19 @@ the NetCDF (e.g. <code>"thetao"</code>, <code>"so"</code>).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/cmems/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-464">464</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-452">452</a></span>
+<span class="normal"><a href="#__codelineno-0-453">453</a></span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span>
+<span class="normal"><a href="#__codelineno-0-455">455</a></span>
+<span class="normal"><a href="#__codelineno-0-456">456</a></span>
+<span class="normal"><a href="#__codelineno-0-457">457</a></span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span>
+<span class="normal"><a href="#__codelineno-0-459">459</a></span>
+<span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span>
+<span class="normal"><a href="#__codelineno-0-464">464</a></span>
 <span class="normal"><a href="#__codelineno-0-465">465</a></span>
 <span class="normal"><a href="#__codelineno-0-466">466</a></span>
 <span class="normal"><a href="#__codelineno-0-467">467</a></span>
@@ -31997,59 +31779,47 @@ the NetCDF (e.g. <code>"thetao"</code>, <code>"so"</code>).</p>
 <span class="normal"><a href="#__codelineno-0-489">489</a></span>
 <span class="normal"><a href="#__codelineno-0-490">490</a></span>
 <span class="normal"><a href="#__codelineno-0-491">491</a></span>
-<span class="normal"><a href="#__codelineno-0-492">492</a></span>
-<span class="normal"><a href="#__codelineno-0-493">493</a></span>
-<span class="normal"><a href="#__codelineno-0-494">494</a></span>
-<span class="normal"><a href="#__codelineno-0-495">495</a></span>
-<span class="normal"><a href="#__codelineno-0-496">496</a></span>
-<span class="normal"><a href="#__codelineno-0-497">497</a></span>
-<span class="normal"><a href="#__codelineno-0-498">498</a></span>
-<span class="normal"><a href="#__codelineno-0-499">499</a></span>
-<span class="normal"><a href="#__codelineno-0-500">500</a></span>
-<span class="normal"><a href="#__codelineno-0-501">501</a></span>
-<span class="normal"><a href="#__codelineno-0-502">502</a></span>
-<span class="normal"><a href="#__codelineno-0-503">503</a></span>
-<span class="normal"><a href="#__codelineno-0-504">504</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Variable` for a `(dataset_id, name)` pair.</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">        dataset_id: CMEMS dataset id as it appears as a key in</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">            :attr:`datasets` (e.g.</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">            `&quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;`).</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        variable_name: Short variable name as it appears inside</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">            the NetCDF (e.g. `&quot;thetao&quot;`, `&quot;so&quot;`).</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">        Variable: Per-variable metadata.</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        KeyError: If `dataset_id` is not curated, or if</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">            `variable_name` is not declared under that dataset.</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        - Look up a curated variable:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">            &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">            &gt;&gt;&gt; v = Catalog().get_variable(</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">            ...     &quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;, &quot;thetao&quot;</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">            &gt;&gt;&gt; v.units</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">            &#39;degrees_C&#39;</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">        - Unknown dataset raises `KeyError`:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">            &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_variable(&quot;not-a-dataset&quot;, &quot;thetao&quot;)</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">            KeyError: &#39;not-a-dataset&#39;</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_id</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">variable_name</span><span class="p">]</span>
+<span class="normal"><a href="#__codelineno-0-492">492</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Variable` for a `(dataset_id, name)` pair.</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        dataset_id: CMEMS dataset id as it appears as a key in</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">            :attr:`datasets` (e.g.</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">            `&quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;`).</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        variable_name: Short variable name as it appears inside</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">            the NetCDF (e.g. `&quot;thetao&quot;`, `&quot;so&quot;`).</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        Variable: Per-variable metadata.</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        KeyError: If `dataset_id` is not curated, or if</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">            `variable_name` is not declared under that dataset.</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">        - Look up a curated variable:</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">            &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">            &gt;&gt;&gt; v = Catalog().get_variable(</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">            ...     &quot;cmems_mod_glo_phy_my_0.083deg_P1D-m&quot;, &quot;thetao&quot;</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">            &gt;&gt;&gt; v.units</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">            &#39;degrees_C&#39;</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        - Unknown dataset raises `KeyError`:</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">            &gt;&gt;&gt; from earthlens.cmems import Catalog</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_variable(&quot;not-a-dataset&quot;, &quot;thetao&quot;)</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">            KeyError: &#39;not-a-dataset&#39;</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_id</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">variable_name</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
