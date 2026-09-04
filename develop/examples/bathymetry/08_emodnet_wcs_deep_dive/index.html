@@ -24490,7 +24490,7 @@ temporary directory — every dataset here is fetched live, no local fixtures.</
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.bathymetry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -24500,7 +24500,7 @@ temporary directory — every dataset here is fetched live, no local fixtures.</
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 
 from earthlens.bathymetry import Catalog
 from earthlens.core import EarthLens</div>
@@ -24547,18 +24547,30 @@ not skew the colour scale. <code>aoi</code> is <code>[min_lon, min_lat, max_lon,
     <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'bathymetry'</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="n">aoi</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">out</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
     <span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">grid</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">grid</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">grid</span> <span class="o">==</span> <span class="mi">32767</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+    <span class="c1"># Hand back a Dataset so the previews keep the source georeferencing.</span>
+    <span class="k">return</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">grid</span> <span class="o">==</span> <span class="mi">32767</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">grid</span><span class="p">),</span>
+        <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+        <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">def fetch_depth(dataset, aoi):
     out = tempfile.mkdtemp()
     paths = EarthLens(
         data_source='bathymetry', dataset=dataset, aoi=aoi, path=out
     ).download(progress_bar=False)
-    grid = np.asarray(Dataset.read_file(str(paths[0])).read_array(), dtype='float32')
+    source = Dataset.read_file(paths[0])
+    grid = np.asarray(source.read_array(), dtype='float32')
     grid = grid[0] if grid.ndim == 3 else grid
-    return np.where(grid == 32767, np.nan, grid)</div>
+    # Hand back a Dataset so the previews keep the source georeferencing.
+    return Dataset.from_array(
+        np.where(grid == 32767, np.nan, grid),
+        no_data_value=np.nan,
+        geo_ref=GeoReference(geo=source.geotransform, epsg=source.epsg),
+    )</div>
 </div>
 </div>
 </div>
@@ -24754,19 +24766,15 @@ emodnet_depth.shape</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">emodnet_depth</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues_r'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'mean depth (m, negative = below sea level)'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'EMODnet DTM (~3.75″) — southern North Sea'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">glyph</span> <span class="o">=</span> <span class="n">emodnet_depth</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues_r'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'EMODnet DTM (~3.75″) — southern North Sea'</span>
+<span class="p">)</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">'mean depth (m, negative = below sea level)'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">plt.figure(figsize=(6, 5))
-plt.imshow(emodnet_depth, cmap='Blues_r')
-plt.colorbar(label='mean depth (m, negative = below sea level)')
-plt.title('EMODnet DTM (~3.75″) — southern North Sea')
-plt.axis('off')
-plt.show()</div>
+<div class="clipboard-copy-txt" id="cell-6">glyph = emodnet_depth.plot(
+    cmap='Blues_r', title='EMODnet DTM (~3.75″) — southern North Sea'
+)
+glyph.cbar.set_label('mean depth (m, negative = below sea level)')</div>
 </div>
 </div>
 </div>
@@ -25021,23 +25029,15 @@ pd.DataFrame(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">emodnet_depth</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues_r'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'EMODnet (~3.75″)'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">gebco_depth</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues_r'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'GEBCO 2020 (15″)'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># matplotlib lays the pair out; pyramids draws each georeferenced panel.</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">emodnet_depth</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues_r'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'EMODnet (~3.75″)'</span><span class="p">)</span>
+<span class="n">gebco_depth</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues_r'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'GEBCO 2020 (15″)'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-10">fig, axes = plt.subplots(1, 2, figsize=(11, 5))
-axes[0].imshow(emodnet_depth, cmap='Blues_r')
-axes[0].set_title('EMODnet (~3.75″)')
-axes[0].axis('off')
-axes[1].imshow(gebco_depth, cmap='Blues_r')
-axes[1].set_title('GEBCO 2020 (15″)')
-axes[1].axis('off')
-plt.show()</div>
+<div class="clipboard-copy-txt" id="cell-10"># matplotlib lays the pair out; pyramids draws each georeferenced panel.
+fig, axes = plt.subplots(1, 2, figsize=(11, 5))
+emodnet_depth.plot(fig=fig, ax=axes[0], cmap='Blues_r', title='EMODnet (~3.75″)')
+gebco_depth.plot(fig=fig, ax=axes[1], cmap='Blues_r', title='GEBCO 2020 (15″)')</div>
 </div>
 </div>
 </div>

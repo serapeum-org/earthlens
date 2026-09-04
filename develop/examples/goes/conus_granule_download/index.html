@@ -24361,7 +24361,6 @@ past to be sure the granules are already published.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
@@ -24372,7 +24371,6 @@ past to be sure the granules are already published.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -24562,7 +24560,8 @@ cloud channel) and warp it to WGS84.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
 <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">granule</span><span class="p">))</span>
 <span class="n">band</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s2">"CMI_C13"</span><span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="mi">4326</span><span class="p">)</span>
@@ -24570,7 +24569,8 @@ cloud channel) and warp it to WGS84.</p>
 <span class="n">image</span><span class="p">[</span><span class="n">image</span> <span class="o">&gt;=</span> <span class="mi">65535</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># mask the fill value</span>
 <span class="n">image</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">from pyramids.netcdf import NetCDF
+<div class="clipboard-copy-txt" id="cell-5">from pyramids.dataset import Dataset, GeoReference
+from pyramids.netcdf import NetCDF
 
 nc = NetCDF.read_file(str(granule))
 band = nc.get_variable("CMI_C13").to_crs(4326)
@@ -24614,25 +24614,39 @@ warmer), which is why we invert the colormap.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">98</span><span class="p">])</span>
-<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"Greys"</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"GOES-19 ABI CMI_C13 (10.3 µm) — </span><span class="si">{</span><span class="n">granule</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'_s'</span><span class="p">)[</span><span class="mi">1</span><span class="p">][:</span><span class="mi">11</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"pixels (west→east)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"pixels (north→south)"</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"packed IR counts (low = warm)"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">98</span><span class="p">])</span>
+
+<span class="c1"># The fill-masked image is derived, so it is wrapped back into a Dataset with</span>
+<span class="c1"># the reprojected band's georeferencing: same counts, real coordinates.</span>
+<span class="n">brightness</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">,</span>
+    <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+    <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">band</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">band</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">glyph</span> <span class="o">=</span> <span class="n">brightness</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">"Greys"</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"GOES-19 ABI CMI_C13 (10.3 µm) — </span><span class="si">{</span><span class="n">granule</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'_s'</span><span class="p">)[</span><span class="mi">1</span><span class="p">][:</span><span class="mi">11</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">"packed IR counts (low = warm)"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">fig, ax = plt.subplots(figsize=(9, 6))
-vmin, vmax = np.nanpercentile(image, [2, 98])
-im = ax.imshow(image, cmap="Greys", vmin=vmin, vmax=vmax)
-ax.set_title(f"GOES-19 ABI CMI_C13 (10.3 µm) — {granule.name.split('_s')[1][:11]}")
-ax.set_xlabel("pixels (west→east)")
-ax.set_ylabel("pixels (north→south)")
-fig.colorbar(im, ax=ax, shrink=0.7, label="packed IR counts (low = warm)")
-plt.tight_layout()
-plt.show()</div>
+<div class="clipboard-copy-txt" id="cell-6">vmin, vmax = np.nanpercentile(image, [2, 98])
+
+# The fill-masked image is derived, so it is wrapped back into a Dataset with
+# the reprojected band's georeferencing: same counts, real coordinates.
+brightness = Dataset.from_array(
+    image,
+    no_data_value=np.nan,
+    geo_ref=GeoReference(geo=band.geotransform, epsg=band.epsg),
+)
+glyph = brightness.plot(
+    cmap="Greys",
+    vmin=vmin,
+    vmax=vmax,
+    title=f"GOES-19 ABI CMI_C13 (10.3 µm) — {granule.name.split('_s')[1][:11]}",
+)
+glyph.cbar.set_label("packed IR counts (low = warm)")</div>
 </div>
 </div>
 </div>

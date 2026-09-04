@@ -24333,8 +24333,6 @@ is read over <code>/vsicurl</code>, not the whole multi-gigabyte cube.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -24345,8 +24343,6 @@ is read over <code>/vsicurl</code>, not the whole multi-gigabyte cube.</p>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 from pathlib import Path
 
-import matplotlib.pyplot as plt
-import numpy as np
 from pyramids.dataset import Dataset
 
 from earthlens.core import EarthLens
@@ -24446,47 +24442,29 @@ forecast step.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"bands (forecast steps):"</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">band_count</span><span class="p">,</span> <span class="s2">"| epsg:"</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"geotransform:"</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">geotransform</span><span class="p">)</span>
 
-<span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">read_array</span><span class="p">())</span>
-<span class="n">west</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">north</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">geotransform</span>
-<span class="n">extent</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">west</span><span class="p">,</span>
-    <span class="n">west</span> <span class="o">+</span> <span class="n">grid</span><span class="o">.</span><span class="n">columns</span> <span class="o">*</span> <span class="n">grid</span><span class="o">.</span><span class="n">geotransform</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-    <span class="n">north</span> <span class="o">+</span> <span class="n">grid</span><span class="o">.</span><span class="n">rows</span> <span class="o">*</span> <span class="n">grid</span><span class="o">.</span><span class="n">geotransform</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
-    <span class="n">north</span><span class="p">,</span>
-<span class="p">]</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">image</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"viridis"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"JRC medium-term TWL75 forecast — first step (North Sea)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"longitude"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"latitude"</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"total water level (m)"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># plot() derives the extent from the raster, so the hand-built one is gone.</span>
+<span class="n">glyph</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">"viridis"</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"JRC medium-term TWL75 forecast — first step (North Sea)"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">"total water level (m)"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">grid = Dataset.read_file(str(paths[0]))
+<div class="clipboard-copy-txt" id="cell-3">grid = Dataset.read_file(paths[0])
 print("bands (forecast steps):", grid.band_count, "| epsg:", grid.epsg)
 print("geotransform:", grid.geotransform)
 
-array = np.asarray(grid.read_array())
-west, _, _, north, _, _ = grid.geotransform
-extent = [
-    west,
-    west + grid.columns * grid.geotransform[1],
-    north + grid.rows * grid.geotransform[5],
-    north,
-]
-
-fig, ax = plt.subplots(figsize=(7, 5))
-image = ax.imshow(array[0], extent=extent, origin="upper", cmap="viridis")
-ax.set_title("JRC medium-term TWL75 forecast — first step (North Sea)")
-ax.set_xlabel("longitude")
-ax.set_ylabel("latitude")
-fig.colorbar(image, ax=ax, label="total water level (m)")
-plt.show()</div>
+# plot() derives the extent from the raster, so the hand-built one is gone.
+glyph = grid.plot(
+    band=0,
+    cmap="viridis",
+    title="JRC medium-term TWL75 forecast — first step (North Sea)",
+)
+glyph.cbar.set_label("total water level (m)")</div>
 </div>
 </div>
 </div>

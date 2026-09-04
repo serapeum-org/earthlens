@@ -24363,9 +24363,8 @@ written GeoTIFF; downloads go to a temporary directory next to this notebook.</p
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
@@ -24376,9 +24375,8 @@ written GeoTIFF; downloads go to a temporary directory next to this notebook.</p
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 
 from earthlens.core import EarthLens
 
@@ -24570,23 +24568,25 @@ Netherlands). Now map it.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ph_real</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"RdYlGn"</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"SoilGrids topsoil pH (H2O), 0–5 cm"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"column"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"row"</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"pH"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># The scaled pH is derived, so it is wrapped back into a Dataset carrying the</span>
+<span class="c1"># source's geotransform and EPSG: same numbers, but drawn on real coordinates.</span>
+<span class="n">ph_grid</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
+    <span class="n">ph_real</span><span class="p">,</span>
+    <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+    <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">ph</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">ph</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">glyph</span> <span class="o">=</span> <span class="n">ph_grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">"RdYlGn"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"SoilGrids topsoil pH (H2O), 0–5 cm"</span><span class="p">)</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">"pH"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">fig, ax = plt.subplots(figsize=(6, 5))
-im = ax.imshow(ph_real, cmap="RdYlGn", origin="upper")
-ax.set_title("SoilGrids topsoil pH (H2O), 0–5 cm")
-ax.set_xlabel("column")
-ax.set_ylabel("row")
-fig.colorbar(im, ax=ax, label="pH")
-plt.tight_layout()
-plt.show()</div>
+<div class="clipboard-copy-txt" id="cell-4"># The scaled pH is derived, so it is wrapped back into a Dataset carrying the
+# source's geotransform and EPSG: same numbers, but drawn on real coordinates.
+ph_grid = Dataset.from_array(
+    ph_real,
+    no_data_value=np.nan,
+    geo_ref=GeoReference(geo=ph.geotransform, epsg=ph.epsg),
+)
+glyph = ph_grid.plot(cmap="RdYlGn", title="SoilGrids topsoil pH (H2O), 0–5 cm")
+glyph.cbar.set_label("pH")</div>
 </div>
 </div>
 </div>
@@ -24624,29 +24624,35 @@ percentage.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">clay</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"clay_0-5cm_mean.tif"</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">clay</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"clay_0-5cm_mean.tif"</span><span class="p">)</span>
 <span class="n">clay_pct</span> <span class="o">=</span> <span class="n">clay</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"float64"</span><span class="p">)</span>
 <span class="n">clay_pct</span><span class="p">[</span><span class="n">clay_pct</span> <span class="o">==</span> <span class="n">NO_DATA</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 <span class="n">clay_pct</span> <span class="o">=</span> <span class="n">clay_pct</span> <span class="o">/</span> <span class="mf">10.0</span>  <span class="c1"># clay scale_factor is 10 -&gt; %</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">clay_pct</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"YlOrBr"</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"SoilGrids topsoil clay fraction, 0–5 cm"</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"clay (%)"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># Derived again -- the scale factor matters, so the rescaled values are what</span>
+<span class="c1"># gets wrapped and drawn, not the raw band.</span>
+<span class="n">clay_grid</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
+    <span class="n">clay_pct</span><span class="p">,</span>
+    <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+    <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">clay</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">clay</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">glyph</span> <span class="o">=</span> <span class="n">clay_grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">"YlOrBr"</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"SoilGrids topsoil clay fraction, 0–5 cm"</span><span class="p">)</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">"clay (%)"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">clay = Dataset.read_file(str(OUT_DIR / "clay_0-5cm_mean.tif"))
+<div class="clipboard-copy-txt" id="cell-5">clay = Dataset.read_file(OUT_DIR / "clay_0-5cm_mean.tif")
 clay_pct = clay.read_array().astype("float64")
 clay_pct[clay_pct == NO_DATA] = np.nan
 clay_pct = clay_pct / 10.0  # clay scale_factor is 10 -&gt; %
 
-fig, ax = plt.subplots(figsize=(6, 5))
-im = ax.imshow(clay_pct, cmap="YlOrBr", origin="upper")
-ax.set_title("SoilGrids topsoil clay fraction, 0–5 cm")
-fig.colorbar(im, ax=ax, label="clay (%)")
-plt.tight_layout()
-plt.show()</div>
+# Derived again -- the scale factor matters, so the rescaled values are what
+# gets wrapped and drawn, not the raw band.
+clay_grid = Dataset.from_array(
+    clay_pct,
+    no_data_value=np.nan,
+    geo_ref=GeoReference(geo=clay.geotransform, epsg=clay.epsg),
+)
+glyph = clay_grid.plot(cmap="YlOrBr", title="SoilGrids topsoil clay fraction, 0–5 cm")
+glyph.cbar.set_label("clay (%)")</div>
 </div>
 </div>
 </div>
