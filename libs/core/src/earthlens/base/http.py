@@ -185,7 +185,7 @@ def _causes(exc: BaseException) -> Iterator[BaseException]:
                 queue.append(arg)
 
 
-def _phase_from_causes(exc: BaseException) -> str:
+def _phase_from_causes(exc: BaseException) -> str | None:
     """Decide the phase of a `requests.ConnectionError` from what it wraps.
 
     `requests` collapses both phases into this one class, so the wrapped cause
@@ -203,10 +203,10 @@ def _phase_from_causes(exc: BaseException) -> str:
         exc: The connection error to inspect.
 
     Returns:
-        str: `"read"` when the request had been delivered, `"connect"`
-        otherwise. An unrecognised cause is treated as a connect failure, the
-        smaller budget, so an unknown case fails fast rather than spending the
-        full one on something that may never succeed.
+        str | None: `"read"` when the request had been delivered, `"connect"`
+        when it provably was not, and `None` when the causes say neither. The
+        caller decides what an unknown failure costs; this function does not
+        guess, because the two decisions it feeds pull in opposite directions.
 
     Examples:
         - A reset socket happened after the request was delivered:
@@ -237,7 +237,7 @@ def _phase_from_causes(exc: BaseException) -> str:
         return "read"
     if any(marker in name for name in names for marker in _CONNECT_CAUSE_NAMES):
         return "connect"
-    return "connect"
+    return None
 
 
 def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str | None:
@@ -262,8 +262,16 @@ def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str 
             method-gated one.
 
     Returns:
-        str | None: `"connect"`, `"read"`, or `None` when the failure is
-        deterministic and must not be retried at all.
+        str | None: `"connect"`, `"read"`, `"unknown"` when the causes
+        identify neither phase, or `None` when the failure is deterministic and
+        must not be retried at all.
+
+        `"unknown"` exists because the two decisions this feeds pull opposite
+        ways. For the *budget*, an unidentified failure should cost little, like
+        a connect failure. For *replay safety*, it must be treated like a read
+        failure: a connect failure is replayed for any verb precisely because
+        the request provably never arrived, and an unidentified one carries no
+        such proof.
 
     Examples:
         - A connect timeout spends the connect budget:
@@ -313,7 +321,7 @@ def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str 
     ):
         return "read"
     if isinstance(exc, requests.ConnectionError):
-        return _phase_from_causes(exc)
+        return _phase_from_causes(exc) or "unknown"
     if isinstance(exc, requests.exceptions.Timeout):
         return "read"
     # Anything else is retryable only because the caller asked for it by name.
@@ -1348,7 +1356,7 @@ class HttpClient:
         resumable = False
         # Same per-kind accounting as `_request_with_retry`: a dead host should
         # not cost a large download six full connect attempts.
-        spent = {"connect": 0, "read": 0}
+        spent = {"connect": 0, "read": 0, "unknown": 0}
         # The validator that pins the resumed bytes to the same representation
         # the first attempt read — an `ETag`, else `Last-Modified`.
         range_validator: str | None = None
@@ -1490,7 +1498,9 @@ class HttpClient:
                 # replay-safe. Re-check that if it is ever parameterised.
                 kind = classify_transport_error(exc, strict=self._default_retry_set)
                 budget = (
-                    self.connect_retries if kind == "connect" else self.read_retries
+                    self.connect_retries
+                    if kind in {"connect", "unknown"}
+                    else self.read_retries
                 )
                 if kind is None or spent[kind] >= budget or attempt >= self.max_retries:
                     discard_partial()
@@ -1621,7 +1631,7 @@ class HttpClient:
             self.raise_for_status if raise_for_status is None else raise_for_status
         )
         attempt = 0
-        spent = {"connect": 0, "read": 0}
+        spent = {"connect": 0, "read": 0, "unknown": 0}
         while True:
             self._throttle()
             try:
@@ -1631,9 +1641,10 @@ class HttpClient:
                 if kind is None:
                     # Deterministic — the next attempt reproduces it exactly.
                     raise
-                budget = (
-                    self.connect_retries if kind == "connect" else self.read_retries
-                )
+                # An unidentified failure spends the cheap budget but is
+                # replayed as cautiously as a read one.
+                cheap = kind in {"connect", "unknown"}
+                budget = self.connect_retries if cheap else self.read_retries
                 # Two guards, not one: the per-kind budget shapes *which* failure
                 # is worth repeating, and `max_retries` still caps the total, so
                 # a request alternating between the two phases cannot make
@@ -1642,15 +1653,16 @@ class HttpClient:
                     raise
                 # A *read* failure means the request was delivered and the
                 # server may already have acted, so a non-idempotent verb is
-                # replayed only when the caller vouches for it. A *connect*
-                # failure never reached the server, so it is safe for any verb.
-                if kind == "read" and not (
+                # replayed only when the caller vouches for it. Only a *connect*
+                # failure is exempt, because it provably never arrived.
+                if kind != "connect" and not (
                     self.retry_unsafe_methods or method.upper() in IDEMPOTENT_METHODS
                 ):
                     logger.debug(
-                        f"{type(exc).__name__} on {redact_url(url)}; not retrying "
-                        f"a {method.upper()} after a read-phase failure "
-                        f"(pass retry_unsafe_methods=True if it is replay-safe)"
+                        f"{type(exc).__name__} ({kind}) on {redact_url(url)}; not "
+                        f"retrying a {method.upper()}: the request may have been "
+                        f"delivered (pass retry_unsafe_methods=True if it is "
+                        f"replay-safe)"
                     )
                     raise
                 wait = self._backoff_wait(None, attempt)

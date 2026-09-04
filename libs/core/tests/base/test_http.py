@@ -1688,12 +1688,17 @@ class TestDownloadResume:
 class TestTransportClassificationEdges:
     """Edge cases of the connect/read classifier and the resume guards."""
 
-    def test_an_unrecognised_connection_error_spends_the_connect_budget(self):
-        """An unknown cause fails fast rather than burning the read budget."""
+    def test_an_unrecognised_connection_error_is_unknown_not_connect(self):
+        """It fails fast on the cheap budget without claiming the request never arrived.
+
+        Calling it `"connect"` would exempt it from the verb gate, because a
+        connect failure is replayed for any method on the grounds that the
+        server never saw it — which an unidentified failure cannot promise.
+        """
         from earthlens.base.http import classify_transport_error
 
         assert (
-            classify_transport_error(requests.ConnectionError("mystery")) == "connect"
+            classify_transport_error(requests.ConnectionError("mystery")) == "unknown"
         )
 
     def test_a_bare_timeout_is_a_read_failure(self):
@@ -1852,4 +1857,46 @@ class TestResumeValidatorGuards:
         response.headers["Last-Modified"] = "Thu, 05 Sep 2026 00:00:00 GMT"
         assert not _resume_is_safe(
             response, 5, 10, "Wed, 04 Sep 2026 00:00:00 GMT", "Last-Modified"
+        )
+
+
+@pytest.mark.unit
+class TestUnidentifiedTransportFailures:
+    """An unclassifiable failure is cheap to retry but unsafe to replay."""
+
+    def test_it_classifies_as_unknown_rather_than_connect(self):
+        """`"connect"` would assert the request never arrived, which is unproven."""
+        from earthlens.base.http import classify_transport_error
+
+        assert (
+            classify_transport_error(requests.ConnectionError("mystery")) == "unknown"
+        )
+
+    def test_a_post_is_not_replayed(self):
+        """Only a proven connect failure exempts a non-idempotent verb.
+
+        The conservative choice for the budget — the small connect one — is the
+        permissive choice for the verb gate, so the two decisions are made
+        separately.
+        """
+        session = _FlakySession(
+            1, requests.ConnectionError("mystery"), _Resp(body={"ok": 1})
+        )
+        client = HttpClient(session=session, sleep=lambda _: None)
+        with pytest.raises(requests.ConnectionError):
+            client.post("http://x")
+        assert session.calls == 1, f"POST must not replay, got {session.calls}"
+
+    def test_a_get_still_spends_the_cheap_budget(self):
+        """An idempotent verb retries, but on the connect budget, not the read one."""
+        from earthlens.base.http import DEFAULT_CONNECT_RETRIES
+
+        session = _FlakySession(
+            9, requests.ConnectionError("mystery"), _Resp(body={"ok": 1})
+        )
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=5)
+        with pytest.raises(requests.ConnectionError):
+            client.get("http://x")
+        assert session.calls == DEFAULT_CONNECT_RETRIES + 1, (
+            f"expected the cheap budget, got {session.calls} attempts"
         )
