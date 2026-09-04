@@ -99,6 +99,24 @@ def _banned_gis_target(name: str) -> str | None:
 _GDAL_ALLOWED: frozenset[str] = frozenset()
 
 
+def _enclosing_functions(tree: ast.AST) -> dict[int, ast.AST]:
+    """Map each node to the innermost function containing it.
+
+    `ast.walk` is breadth-first, so an outer function is always visited before
+    a function nested inside it and the deeper assignment lands last. That is
+    what makes the innermost owner win, and why an import in a nested function
+    is attributed once rather than once per enclosing function.
+    """
+    owners: dict[int, ast.AST] = {}
+    for func in ast.walk(tree):
+        if not isinstance(func, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        for node in ast.walk(func):
+            if node is not func:
+                owners[id(node)] = func
+    return owners
+
+
 def _pyramids_ordering_problems(path: Path) -> list[str]:
     """Return one complaint per GDAL import pyramids does not correctly precede.
 
@@ -107,30 +125,33 @@ def _pyramids_ordering_problems(path: Path) -> list[str]:
     effect of being imported. A module-scope GDAL import breaks that too -- the
     cost is paid on every import of the module, and nothing guarantees pyramids
     ran first -- so both shapes are reported here, not just the ordering.
+
+    "Above" is textual, not reachability: an `import pyramids` guarded by a
+    condition that never holds still satisfies the check. Proving it runs would
+    need control-flow analysis, and the rule is a layering convention rather
+    than a runtime assertion -- the import failing loudly is the backstop.
     """
     tree = ast.parse(_source_text(path), filename=str(path))
-    sites = [
-        (func, node)
-        for func in ast.walk(tree)
-        if isinstance(func, (ast.FunctionDef, ast.AsyncFunctionDef))
-        for node in ast.walk(func)
-        if _is_banned_gis_import(node)
-    ]
-    inside = {id(node) for _, node in sites}
-    problems = [
-        f"line {node.lineno}: GDAL imported at module scope"
-        for node in ast.walk(tree)
-        if _is_banned_gis_import(node) and id(node) not in inside
-    ]
-    problems += [
-        f"line {node.lineno}: GDAL imported in {func.name}() with no pyramids above it"
-        for func, node in sites
-        if not any(
+    owners = _enclosing_functions(tree)
+    problems: list[tuple[int, str]] = []
+    for node in ast.walk(tree):
+        if not _is_banned_gis_import(node):
+            continue
+        func = owners.get(id(node))
+        if func is None:
+            problems.append((node.lineno, "GDAL imported at module scope"))
+            continue
+        satisfied = any(
             _imports_pyramids(other) and other.lineno < node.lineno
             for other in ast.walk(func)
         )
-    ]
-    return sorted(problems)
+        if not satisfied:
+            problems.append(
+                (node.lineno, f"GDAL imported in {func.name}() with no pyramids above it")
+            )
+    # Sort on the line number, not the rendered string: lexicographically
+    # "line 10" precedes "line 2", which reports a file out of source order.
+    return [f"line {line}: {text}" for line, text in sorted(problems)]
 
 
 def _earthlens_sources() -> list[Path]:
@@ -1872,6 +1893,16 @@ def read():
 """,
         False,
     ),
+    (
+        "unreachable-pyramids",
+        """
+def read():
+    if False:
+        import pyramids
+    from osgeo import gdal
+""",
+        False,
+    ),
 ]
 
 
@@ -1966,6 +1997,29 @@ class TestGdalGuardDetection:
         probe = tmp_path / "probe.py"
         probe.write_text(source, encoding="utf-8")
         assert bool(_pyramids_ordering_problems(probe)) is has_problem, source
+
+    def test_a_nested_function_import_is_reported_once(self, tmp_path):
+        """One violation is one complaint, attributed to the innermost function."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(
+            "def outer():\n    def inner():\n        from osgeo import gdal\n",
+            encoding="utf-8",
+        )
+        problems = _pyramids_ordering_problems(probe)
+        assert len(problems) == 1, problems
+        assert "inner()" in problems[0] and "outer()" not in problems[0]
+
+    def test_ordering_problems_are_sorted_by_line_number(self, tmp_path):
+        """Complaints come back in source order, so line 2 precedes line 10."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(
+            "def a():\n    from osgeo import gdal\n"
+            + "\n" * 6
+            + "def b():\n    from osgeo import ogr\n",
+            encoding="utf-8",
+        )
+        problems = _pyramids_ordering_problems(probe)
+        assert [p.split(":")[0] for p in problems] == ["line 2", "line 10"], problems
 
     def test_ordering_problems_name_the_line_and_the_function(self, tmp_path):
         """A violation reports where it is, so the failure is actionable."""
