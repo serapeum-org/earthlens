@@ -13,30 +13,41 @@ import importlib
 
 import pytest
 
+from earthlens._backends import discover_backends
 from earthlens.base import AbstractCatalog
 
+#: The class names a backend's `catalog` module may expose, in preference order.
+CATALOG_CLASS_NAMES = ("Catalog", "StationCatalog")
+
+
+def _discover_catalogs() -> list[tuple[str, str]]:
+    """Find `(module, class-name)` for every backend that ships a catalog.
+
+    Discovered from the backend registry rather than listed by hand. A
+    hardcoded list only covers the backends someone remembered to add, and the
+    default `get_catalog()` fails *open* — a catalog that kept its rows
+    somewhere other than `datasets` would return an empty mapping rather than
+    raise, so the contract has to be checked on all of them, not a sample.
+
+    Returns:
+        list[tuple[str, str]]: Sorted `(module name, class name)` pairs.
+    """
+    pairs = []
+    for package in {entry[0] for entry in discover_backends().values()}:
+        module_name = f"{package}.catalog"
+        try:
+            module = importlib.import_module(module_name)
+        except ModuleNotFoundError:
+            continue
+        for name in CATALOG_CLASS_NAMES:
+            if hasattr(module, name):
+                pairs.append((module_name, name))
+                break
+    return sorted(pairs)
+
+
 #: (module, catalog-class-name) for every backend that ships a catalog.
-CATALOG_BACKENDS = [
-    ("earthlens.chc.catalog", "Catalog"),
-    ("earthlens.cmems.catalog", "Catalog"),
-    ("earthlens.earthdata.catalog", "Catalog"),
-    ("earthlens.ecmwf.catalog", "Catalog"),
-    ("earthlens.eumetsat.catalog", "Catalog"),
-    ("earthlens.fdsn.catalog", "Catalog"),
-    ("earthlens.firms.catalog", "Catalog"),
-    ("earthlens.gdacs.catalog", "Catalog"),
-    ("earthlens.gee.catalog", "Catalog"),
-    ("earthlens.ghsl.catalog", "Catalog"),
-    ("earthlens.nwp.catalog", "Catalog"),
-    ("earthlens.openaq.catalog", "Catalog"),
-    ("earthlens.openeo.catalog", "Catalog"),
-    ("earthlens.overture.catalog", "Catalog"),
-    ("earthlens.radar.catalog", "StationCatalog"),
-    ("earthlens.sentinel_hub.catalog", "Catalog"),
-    ("earthlens.stac.catalog", "Catalog"),
-    ("earthlens.tropycal.catalog", "Catalog"),
-    ("earthlens.usgs_water.catalog", "Catalog"),
-]
+CATALOG_BACKENDS = _discover_catalogs()
 
 
 def _build(module_name: str, class_name: str):
@@ -77,6 +88,34 @@ def test_dict_surface_matches_datasets(module_name: str, class_name: str):
     assert set(cat) == set(cat.datasets)
     first = next(iter(cat.datasets))
     assert first in cat
+
+
+def test_every_backend_ships_a_discoverable_catalog():
+    """Discovery must find one per backend package, not a subset.
+
+    If this drops, a backend's catalog stopped being importable or renamed its
+    class, and every contract check below silently stopped covering it.
+    """
+    packages = {entry[0] for entry in discover_backends().values()}
+    assert len(CATALOG_BACKENDS) == len(packages), (
+        f"{len(packages)} backend packages but {len(CATALOG_BACKENDS)} catalogs "
+        f"discovered"
+    )
+
+
+@pytest.mark.parametrize("module_name, class_name", CATALOG_BACKENDS)
+def test_get_catalog_is_not_silently_empty(module_name: str, class_name: str):
+    """The inherited default returns `datasets`, which must actually hold rows.
+
+    The base implementation cannot tell "this catalog has no rows" from "this
+    catalog keeps its rows elsewhere", so it answers `{}` for both. Asserting
+    non-empty across every backend is what turns that fail-open into a failure.
+    """
+    cat = _build(module_name, class_name)
+    assert len(cat.get_catalog()) > 0, (
+        f"{module_name}.{class_name}.get_catalog() is empty; if the rows live "
+        f"somewhere other than `datasets`, override get_catalog()"
+    )
 
 
 #: Collection backends that keep a domain `available_collections` index and
