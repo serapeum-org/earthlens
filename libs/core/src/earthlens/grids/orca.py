@@ -129,7 +129,7 @@ def from_orca(
         warnings.simplefilter("ignore", category=RuntimeWarning)
         face_values = np.nanmean(corners, axis=0)
 
-    mesh = UgridDataset.create_from_arrays(
+    mesh = UgridDataset.from_arrays(
         node_x,
         node_y,
         faces,

@@ -261,6 +261,43 @@ class TestFetch:
         assert fake_pyramids.stack_calls[-1]["no_data_value"] == 0
         assert not fake_pyramids.create_calls
 
+    def test_cdse_rename_reaches_only_the_item_lookup(
+        self, fake_pyramids, tmp_path, monkeypatch
+    ):
+        """CDSE's `B04_10m` addresses the item; the catalog's `B04` names the band.
+
+        Test scenario:
+            The item publishes CDSE's resolution-suffixed keys, so resolving the
+            href at all proves the endpoint key was used (the stand-in raises
+            KeyError otherwise). The written band names must still be the
+            catalog's own keys, and the nodata must still resolve through them.
+        """
+        monkeypatch.setenv("CDSE_S3_ACCESS_KEY", "ak")
+        monkeypatch.setenv("CDSE_S3_SECRET_KEY", "sk")
+        fake_pyramids.items_by_collection["sentinel-2-l2a"] = [
+            make_item(
+                "a",
+                "2024-01-05",
+                {"B04_10m": "https://h/a_b04.tif", "B08_10m": "https://h/a_b08.tif"},
+            )
+        ]
+        stac = _build_stac(
+            tmp_path,
+            endpoint="cdse",
+            variables={"sentinel-2-l2a": ["B04", "B08"]},
+        )
+
+        paths = stac._fetch(stac._search())
+
+        assert len(paths) == 1, f"expected one written COG, got {paths}"
+        names = fake_pyramids.stack_calls[-1]["band_names"]
+        assert names == ["B04", "B08"], (
+            f"the rename must not leak into the written band names; got {names}"
+        )
+        assert fake_pyramids.stack_calls[-1]["no_data_value"] == 0, (
+            "nodata must still resolve through the catalog's own asset keys"
+        )
+
     def test_same_resolution_bands_use_stack_bands(self, fake_pyramids, tmp_path):
         """Same-grid bands also stack via stack_bands(align=True), preserving band names."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [

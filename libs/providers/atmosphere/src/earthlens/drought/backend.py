@@ -740,7 +740,7 @@ class Drought(AbstractDataSource):
         the GeoTIFF carries no embedded SRS so `pyramids.Dataset.crop`'s
         cutline path is a no-op. We therefore compute the pixel window from
         the raster's own bounding box and rebuild the trimmed raster with
-        `Dataset.create_from_array` — a purely local operation that honours
+        `Dataset.from_array` — a purely local operation that honours
         the requested bbox regardless of what the server returned. Latitude,
         already clipped server-side, is windowed again harmlessly; if the
         server ever starts honouring `Long`, the window simply re-selects the
@@ -758,6 +758,7 @@ class Drought(AbstractDataSource):
             original file untouched and logs a warning in that case).
         """
         from pyramids.dataset import Dataset as PyramidsDataset
+        from pyramids.dataset import GeoReference
 
         west, south, east, north = bbox
         arr = dataset.read_array()
@@ -783,11 +784,10 @@ class Drought(AbstractDataSource):
             -cell_y,
         )
         nodata = dataset.no_data_value[0] if dataset.no_data_value else None
-        return PyramidsDataset.create_from_array(
+        return PyramidsDataset.from_array(
             arr=window,
-            geo=geo,
-            epsg=4326,
             no_data_value=nodata,
+            geo_ref=GeoReference(geo=geo, epsg=4326),
         )
 
     @staticmethod

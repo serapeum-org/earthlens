@@ -530,12 +530,14 @@ def test_clip_wcs_raster_trims_full_width_strip_to_bbox():
     ignores `Long`, returning a full -180..180 strip with no embedded SRS, so
     the backend must clip longitude locally rather than trust the server.
     """
-    from pyramids.dataset import Dataset
+    from pyramids.dataset import Dataset, GeoReference
 
     # 64 rows over lat 36..52, 1440 cols over lon -180..180 (0.25 deg cells).
     arr = np.arange(64 * 1440, dtype="float32").reshape(64, 1440)
     geo = (-180.0, 0.25, 0.0, 52.0, 0.0, -0.25)
-    strip = Dataset.create_from_array(arr=arr, geo=geo, epsg=4326, no_data_value=None)
+    strip = Dataset.from_array(
+        arr=arr, no_data_value=None, geo_ref=GeoReference(geo=geo, epsg=4326)
+    )
 
     clipped = Drought._clip_wcs_raster(strip, (-10.0, 36.0, 12.0, 52.0))
 
@@ -547,11 +549,13 @@ def test_clip_wcs_raster_trims_full_width_strip_to_bbox():
 
 def test_clip_wcs_raster_returns_none_when_bbox_outside_coverage():
     """A bbox entirely outside the raster yields `None` (original untouched)."""
-    from pyramids.dataset import Dataset
+    from pyramids.dataset import Dataset, GeoReference
 
     arr = np.zeros((4, 8), dtype="uint8")  # covers lon 0..8, lat 0..4
     geo = (0.0, 1.0, 0.0, 4.0, 0.0, -1.0)
-    ds = Dataset.create_from_array(arr=arr, geo=geo, epsg=4326, no_data_value=None)
+    ds = Dataset.from_array(
+        arr=arr, no_data_value=None, geo_ref=GeoReference(geo=geo, epsg=4326)
+    )
 
     assert Drought._clip_wcs_raster(ds, (20.0, 20.0, 30.0, 30.0)) is None
 

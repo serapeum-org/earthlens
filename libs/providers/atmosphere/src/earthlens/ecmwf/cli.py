@@ -188,26 +188,6 @@ def prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return {str(variable): {} for variable in variables}
 
 
-def _from_info(info: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    """Extract per-band `NETCDF_VARNAME` / long_name / units from `gdal.Info`.
-
-    Args:
-        info: A `gdal.Info(..., format="json")` mapping for one NetCDF handle.
-
-    Returns:
-        A `{variable_name: {"long_name": ..., "units": ...}}` mapping covering
-        every band that carries a `long_name` or `units` attribute.
-    """
-    out: dict[str, dict[str, Any]] = {}
-    for band in info.get("bands", []) or []:
-        meta = band.get("metadata", {}).get("", {})
-        name = meta.get("NETCDF_VARNAME")
-        long_name, units = meta.get("long_name", ""), meta.get("units", "")
-        if name and (long_name or units):
-            out[str(name)] = {"long_name": long_name, "units": units}
-    return out
-
-
 def _variable_meta(variable: Any) -> dict[str, Any] | None:
     """Pull `long_name` / `units` off one pyramids variable, whatever its shape.
 
@@ -301,20 +281,28 @@ def _read_via_pyramids(path: str) -> dict[str, dict[str, Any]]:
         # directory fail — which surfaces as a PermissionError on the dataset,
         # indistinguishable from a licence refusal, after the data has already
         # been retrieved and read.
-        close = getattr(container, "close", None)
-        if callable(close):
-            close()
+        #
+        # The release itself must not raise. `schema` is already fully read by
+        # this point, and the caller turns any exception escaping here into an
+        # empty mapping -- so an unguarded cleanup failure would silently throw
+        # away a schema that was read successfully.
+        try:
+            container.close()
+        except Exception as exc:  # noqa: BLE001 - cleanup is best-effort
+            logger.debug(
+                f"ECMWF: releasing the NetCDF handle for {path} failed "
+                f"({type(exc).__name__}: {exc})."
+            )
     return schema
 
 
 def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     """Read each NetCDF variable's `long_name` / `units`.
 
-    Goes through pyramids first, and falls back to the classic GDAL raster walk
-    when that yields nothing. The fallback is kept because the classic API is
-    what every hydrated row in the catalog was read with: a file it can still
-    describe must keep reading the same way, whatever the newer path makes of
-    it.
+    Reading goes through pyramids, which owns NetCDF I/O for this repo. An
+    unreadable container yields an empty mapping rather than raising, so a
+    caller hydrating a catalog row degrades to "nothing to add" instead of
+    failing the walk.
 
     Args:
         path: Path to a NetCDF file written by a `cdsapi` retrieve.
@@ -324,25 +312,16 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
         variable that carries a `long_name` or `units` attribute.
     """
     try:
-        schema = _read_via_pyramids(path)
-    except Exception:  # noqa: BLE001 — an unreadable container falls back
-        schema = {}
-    if schema:
-        return schema
-
-    from osgeo import gdal
-
-    gdal.UseExceptions()
-
-    top = gdal.Info(path, format="json")
-    subs = top.get("metadata", {}).get("SUBDATASETS", {})
-    if not subs:
-        return _from_info(top)
-    fallback: dict[str, dict[str, Any]] = {}
-    for key, sub_path in subs.items():
-        if key.endswith("_NAME"):
-            fallback.update(_from_info(gdal.Info(sub_path, format="json")))
-    return fallback
+        return _read_via_pyramids(path)
+    except Exception as exc:  # noqa: BLE001 — an unreadable container has nothing to add
+        # Say so. A hydration sweep calls this per granule, and a silent {} is
+        # indistinguishable from "this file genuinely declares no metadata" —
+        # the whole sweep can read nothing and still look like it worked.
+        logger.warning(
+            f"ECMWF: could not read variable metadata from {path} "
+            f"({type(exc).__name__}: {exc}); the row gains nothing from it."
+        )
+        return {}
 
 
 def _conflicts_with(prefer: dict[str, Any], entry: dict[str, Any]) -> bool:

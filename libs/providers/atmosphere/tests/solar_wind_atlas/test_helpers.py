@@ -8,7 +8,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from pyramids.dataset import Dataset
+from pyramids.dataset import Dataset, GeoReference
 
 from earthlens.base import SpatialExtent
 from earthlens.solar_wind_atlas import _helpers
@@ -123,12 +123,10 @@ def _write_geotiff(
         arr = np.arange(400, dtype="float32").reshape(20, 20)
     else:
         arr = np.full((20, 20), fill, dtype="float32")
-    Dataset.create_from_array(
+    Dataset.from_array(
         arr,
-        top_left_corner=(0.0, 0.0),
-        cell_size=0.1,
-        epsg=4326,
         no_data_value=no_data_value,
+        geo_ref=GeoReference(top_left_corner=(0.0, 0.0), cell_size=0.1, epsg=4326),
     ).to_file(str(path))
 
 

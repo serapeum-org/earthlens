@@ -408,6 +408,23 @@ class TestInformRelease:
         assert url.startswith(_helpers.INFORM_SITE)
         assert year == 2026
 
+    def test_release_url_accepts_a_mid_year_release(self, monkeypatch):
+        """The site publishes mid-year releases as `INFORM_Risk_Mid_<year>_v<n>`."""
+        html = (
+            '<a href="/inform-index/Portals/0/InfoRM/2026/INFORM_Risk_2026_v072.xlsx">2026</a>'
+            '<a href="/inform-index/Portals/0/InfoRM/2026/INFORM_Risk_Mid_2026_v073.xlsx">mid</a>'
+            '<a href="/inform-index/Portals/0/InfoRM/2026/INFORM2026_TREND_2017_2026_v72_ALL.xlsx">trend</a>'
+        )
+        monkeypatch.setattr(
+            _helpers.HttpClient, "get", lambda self, url, **kwargs: _TextResponse(html)
+        )
+        url, year = _helpers.inform_release_url()
+        assert url.endswith("/INFORM_Risk_Mid_2026_v073.xlsx"), (
+            f"the newer mid-year v073 should win over v072; got {url}"
+        )
+        assert "TREND" not in url, "the trend workbook is not a release"
+        assert year == 2026
+
     def test_release_url_without_a_link_raises(self, monkeypatch):
         """A page carrying no workbook link is reported, not silently empty."""
         monkeypatch.setattr(

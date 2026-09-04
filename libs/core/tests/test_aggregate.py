@@ -28,7 +28,7 @@ import pandas as pd
 import psutil
 import pytest
 from pydantic import ValidationError
-from pyramids.dataset import Dataset, DatasetCollection
+from pyramids.dataset import Dataset, DatasetCollection, GeoReference
 
 from earthlens.aggregate import (
     _LEVEL_DIM_CANDIDATES,
@@ -842,7 +842,7 @@ def _patch_netcdf_read(monkeypatch, fake_nc):
 
 
 def _patch_geotiff_write(monkeypatch):
-    """Patch `pyramids.dataset.Dataset.create_from_array(...).to_file(...)` to a no-op recorder.
+    """Patch `pyramids.dataset.Dataset.from_array(...).to_file(...)` to a no-op recorder.
 
     Returns the list of `(arr_shape, geo, epsg, target)` tuples that
     were "written" so tests can inspect call sites without hitting
@@ -863,8 +863,12 @@ def _patch_geotiff_write(monkeypatch):
 
     monkeypatch.setattr(
         RealDataset,
-        "create_from_array",
-        staticmethod(lambda arr, geo, epsg: _StubGeoTiff(arr, geo, epsg)),
+        "from_array",
+        staticmethod(
+            lambda arr, *, geo_ref, no_data_value=None, path=None: _StubGeoTiff(
+                arr, geo_ref.resolve_geotransform(), geo_ref.epsg
+            )
+        ),
     )
     return writes
 
@@ -1418,7 +1422,7 @@ class TestAggregateNetcdfRoundTrip:
     def test_geotransform_forwarded_to_geotiff_writer(
         self, monkeypatch, tmp_path, state_var
     ):
-        """`nc.geotransform` reaches `Dataset.create_from_array(geo=...)` verbatim."""
+        """`nc.geotransform` reaches `Dataset.from_array(geo_ref=GeoReference(geo=...))` verbatim."""
         cube = self._daily_six_hourly_array(n_days=1)
         source_geo = (-75.0, 0.125, 0.0, 5.0, 0.0, -0.125)
         nc = _FakeNetCDF(
@@ -1806,11 +1810,9 @@ def _write_real_nc(path, *, periods=6, rows=2, cols=3, nan_at=None):
         values[nan_at] = np.nan
     days = pd.date_range("2020-01-01", periods=periods, freq="D")
     for index, day in enumerate(days):
-        raster = Dataset.create_from_array(
+        raster = Dataset.from_array(
             arr=values[index],
-            top_left_corner=(0.0, 2.0),
-            cell_size=1.0,
-            epsg=4326,
+            geo_ref=GeoReference(top_left_corner=(0.0, 2.0), cell_size=1.0, epsg=4326),
         )
         raster.to_file(str(frames / f"t2m_{day:%Y.%m.%d}.tif"))
         del raster
