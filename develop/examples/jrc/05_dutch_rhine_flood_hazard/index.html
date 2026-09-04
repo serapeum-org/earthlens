@@ -24458,7 +24458,8 @@ only the pixel window the area of interest needs.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">display</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">display</span>
 
 <span class="c1"># Jupyter scales an output image down to the cell width, so a larger `figsize`</span>
 <span class="c1"># adds detail but not displayed size. Widening the container is what makes the</span>
@@ -24473,7 +24474,8 @@ only the pixel window the area of interest needs.</p>
     <span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from IPython.display import HTML, display
+<div class="clipboard-copy-txt" id="cell-1"># NBVAL_SKIP
+from IPython.display import HTML, display
 
 # Jupyter scales an output image down to the cell width, so a larger `figsize`
 # adds detail but not displayed size. Widening the container is what makes the
@@ -24511,7 +24513,8 @@ display(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
@@ -24555,7 +24558,8 @@ display(
 
 <span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"efhm-rhine-"</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import math
+<div class="clipboard-copy-txt" id="cell-2"># NBVAL_SKIP
+import math
 import tempfile
 from pathlib import Path
 
@@ -24636,7 +24640,8 @@ guaranteed to be the same pixels.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s2">"jrc"</span><span class="p">,</span>
     <span class="n">return_periods</span><span class="o">=</span><span class="n">PERIODS</span><span class="p">,</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
@@ -24658,7 +24663,8 @@ guaranteed to be the same pixels.</p>
     <span class="sa">f</span><span class="s2">"zoom: </span><span class="si">{</span><span class="n">zoomed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2"> x </span><span class="si">{</span><span class="n">zoomed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rows</span><span class="si">}</span><span class="s2"> px, cropped -- not downloaded again"</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">paths = EarthLens(
+<div class="clipboard-copy-txt" id="cell-3"># NBVAL_SKIP
+paths = EarthLens(
     data_source="jrc",
     return_periods=PERIODS,
     lat_lim=LAT_LIM,
@@ -24717,7 +24723,8 @@ no sentinel comparison.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">scales</span> <span class="o">=</span> <span class="p">{</span><span class="n">RHINE</span><span class="p">:</span> <span class="n">whole</span><span class="p">,</span> <span class="n">DELTA</span><span class="p">:</span> <span class="n">zoomed</span><span class="p">}</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
+<span class="n">scales</span> <span class="o">=</span> <span class="p">{</span><span class="n">RHINE</span><span class="p">:</span> <span class="n">whole</span><span class="p">,</span> <span class="n">DELTA</span><span class="p">:</span> <span class="n">zoomed</span><span class="p">}</span>
 
 <span class="n">measured</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">grids</span> <span class="ow">in</span> <span class="n">scales</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -24746,7 +24753,8 @@ no sentinel comparison.</p>
         <span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">scales = {RHINE: whole, DELTA: zoomed}
+<div class="clipboard-copy-txt" id="cell-4"># NBVAL_SKIP
+scales = {RHINE: whole, DELTA: zoomed}
 
 measured = {}
 for name, grids in scales.items():
@@ -24829,7 +24837,8 @@ pale blue reaching further from the channel.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># All three figures below share this colour range, so a shade means the same</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
+<span class="c1"># All three figures below share this colour range, so a shade means the same</span>
 <span class="c1"># depth in every one. That is the whole point of the comparison, so it is</span>
 <span class="c1"># computed once here rather than per figure.</span>
 <span class="n">vmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"max"</span><span class="p">]</span> <span class="k">for</span> <span class="n">rows</span> <span class="ow">in</span> <span class="n">measured</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">)</span>
@@ -24942,6 +24951,10 @@ pale blue reaching further from the channel.</p>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="n">height_in</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">gs</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_gridspec</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">panels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># The bar is shared, so hold its mappable deliberately rather than reading</span>
+    <span class="c1"># whatever `glyph` the loop happens to leave bound. Every panel gets the</span>
+    <span class="c1"># same cmap and clim below, so the first one speaks for all of them.</span>
+    <span class="n">shared_im</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">for</span> <span class="n">rp_i</span><span class="p">,</span> <span class="p">(</span><span class="n">rp</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">PERIODS</span><span class="p">,</span> <span class="n">whole</span><span class="p">)):</span>
         <span class="n">piece</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="n">rp_i</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
@@ -24955,6 +24968,7 @@ pale blue reaching further from the channel.</p>
             <span class="n">data_style</span><span class="o">=</span><span class="n">OVERLAY</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">glyph</span><span class="o">.</span><span class="n">im</span><span class="o">.</span><span class="n">set_clim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="p">)</span>
+        <span class="n">shared_im</span> <span class="o">=</span> <span class="n">shared_im</span> <span class="ow">or</span> <span class="n">glyph</span><span class="o">.</span><span class="n">im</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">RHINE</span><span class="si">}</span><span class="s2">  </span><span class="se">\u00b7</span><span class="s2">  RP</span><span class="si">{</span><span class="n">rp</span><span class="si">}</span><span class="s2">  </span><span class="se">\u00b7</span><span class="s2">  </span><span class="si">{</span><span class="n">half_label</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
             <span class="n">fontsize</span><span class="o">=</span><span class="mi">30</span> <span class="o">*</span> <span class="n">font_scale</span><span class="p">,</span>
@@ -24964,10 +24978,11 @@ pale blue reaching further from the channel.</p>
             <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">20</span> <span class="o">*</span> <span class="n">font_scale</span><span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"latitude"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">22</span> <span class="o">*</span> <span class="n">font_scale</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Axis ticks are unreadable once a feed scales the image down, so at</span>
-            <span class="c1"># posting size they are clutter rather than information.</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+            <span class="c1"># Tick LABELS are unreadable once a feed scales the image down, so</span>
+            <span class="c1"># at posting size they are clutter rather than information. Only the</span>
+            <span class="c1"># labels go: dropping the locators with `set_xticks([])` would throw</span>
+            <span class="c1"># away the georeferencing that makes these axes lon/lat.</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelbottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">labelleft</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="c1"># The numbers are for the whole river, not this half, so say so rather</span>
         <span class="c1"># than letting them read as a measurement of the panel above.</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="n">measured</span><span class="p">[</span><span class="n">RHINE</span><span class="p">][</span><span class="n">rp_i</span><span class="p">]</span>
@@ -25017,7 +25032,7 @@ pale blue reaching further from the channel.</p>
                         <span class="s2">"edgecolor"</span><span class="p">:</span> <span class="s2">"#c1121f"</span><span class="p">,</span>
                     <span class="p">},</span>
                 <span class="p">)</span>
-    <span class="n">add_depth_bar</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">glyph</span><span class="o">.</span><span class="n">im</span><span class="p">,</span> <span class="n">font_scale</span><span class="p">)</span>
+    <span class="n">add_depth_bar</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">shared_im</span><span class="p">,</span> <span class="n">font_scale</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">38</span> <span class="o">*</span> <span class="n">font_scale</span><span class="p">)</span>
     <span class="c1"># Stamped after the title so the layout it measures is the final one. Saved</span>
     <span class="c1"># without `bbox_inches="tight"`, which would rescale the mark's margin.</span>
@@ -25039,7 +25054,8 @@ pale blue reaching further from the channel.</p>
 <span class="c1"># notebook does not carry all three at once.</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig_upstream</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5"># All three figures below share this colour range, so a shade means the same
+<div class="clipboard-copy-txt" id="cell-5"># NBVAL_SKIP
+# All three figures below share this colour range, so a shade means the same
 # depth in every one. That is the whole point of the comparison, so it is
 # computed once here rather than per figure.
 vmax = max(row["max"] for rows in measured.values() for row in rows)
@@ -25152,6 +25168,10 @@ def draw_rhine_half(
     fig = plt.figure(figsize=(40, height_in), dpi=70, constrained_layout=True)
     gs = fig.add_gridspec(3, 1)
     panels = []
+    # The bar is shared, so hold its mappable deliberately rather than reading
+    # whatever `glyph` the loop happens to leave bound. Every panel gets the
+    # same cmap and clim below, so the first one speaks for all of them.
+    shared_im = None
     for rp_i, (rp, grid) in enumerate(zip(PERIODS, whole)):
         piece = grid.crop(bbox=bbox, touch=False)
         ax = fig.add_subplot(gs[rp_i, 0])
@@ -25165,6 +25185,7 @@ def draw_rhine_half(
             data_style=OVERLAY,
         )
         glyph.im.set_clim(0, vmax)
+        shared_im = shared_im or glyph.im
         ax.set_title(
             f"{RHINE}  \u00b7  RP{rp}  \u00b7  {half_label}",
             fontsize=30 * font_scale,
@@ -25174,10 +25195,11 @@ def draw_rhine_half(
             ax.tick_params(labelsize=20 * font_scale)
             ax.set_ylabel("latitude", fontsize=22 * font_scale)
         else:
-            # Axis ticks are unreadable once a feed scales the image down, so at
-            # posting size they are clutter rather than information.
-            ax.set_xticks([])
-            ax.set_yticks([])
+            # Tick LABELS are unreadable once a feed scales the image down, so
+            # at posting size they are clutter rather than information. Only the
+            # labels go: dropping the locators with `set_xticks([])` would throw
+            # away the georeferencing that makes these axes lon/lat.
+            ax.tick_params(labelbottom=False, labelleft=False)
         # The numbers are for the whole river, not this half, so say so rather
         # than letting them read as a measurement of the panel above.
         stat = measured[RHINE][rp_i]
@@ -25227,7 +25249,7 @@ def draw_rhine_half(
                         "edgecolor": "#c1121f",
                     },
                 )
-    add_depth_bar(fig, glyph.im, font_scale)
+    add_depth_bar(fig, shared_im, font_scale)
     fig.suptitle(title, fontsize=38 * font_scale)
     # Stamped after the title so the layout it measures is the final one. Saved
     # without `bbox_inches="tight"`, which would rescale the mark's margin.
@@ -25284,7 +25306,8 @@ delta. The red box marks the stretch the last figure zooms into.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig_downstream</span> <span class="o">=</span> <span class="n">draw_rhine_half</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
+<span class="n">fig_downstream</span> <span class="o">=</span> <span class="n">draw_rhine_half</span><span class="p">(</span>
     <span class="n">DOWNSTREAM</span><span class="p">,</span>
     <span class="s2">"downstream, Gorinchem to the North Sea"</span><span class="p">,</span>
     <span class="n">DOWN_TITLE</span><span class="p">,</span>
@@ -25296,7 +25319,8 @@ delta. The red box marks the stretch the last figure zooms into.</p>
 <span class="c1"># notebook does not carry all three at once.</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig_downstream</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">fig_downstream = draw_rhine_half(
+<div class="clipboard-copy-txt" id="cell-6"># NBVAL_SKIP
+fig_downstream = draw_rhine_half(
     DOWNSTREAM,
     "downstream, Gorinchem to the North Sea",
     DOWN_TITLE,
@@ -25347,7 +25371,8 @@ left to take. The depth increase is real; watch what happens to the area curve.<
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># A flooded area can only grow into ground that is still dry, so a box that is</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
+<span class="c1"># A flooded area can only grow into ground that is still dry, so a box that is</span>
 <span class="c1"># nearly full caps its own growth no matter what the water does. Measured on the</span>
 <span class="c1"># same rasters, widening the box restores the whole-river figure -- which is what</span>
 <span class="c1"># tells you the flat curve belongs to the window, not to the dikes.</span>
@@ -25386,7 +25411,8 @@ left to take. The depth increase is real; watch what happens to the area curve.<
         <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">wet_last</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">wet_first</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">:</span><span class="s2">+21.1f</span><span class="si">}</span><span class="s2">%"</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7"># A flooded area can only grow into ground that is still dry, so a box that is
+<div class="clipboard-copy-txt" id="cell-7"># NBVAL_SKIP
+# A flooded area can only grow into ground that is still dry, so a box that is
 # nearly full caps its own growth no matter what the water does. Measured on the
 # same rasters, widening the box restores the whole-river figure -- which is what
 # tells you the flat curve belongs to the window, not to the dikes.
@@ -25448,7 +25474,8 @@ for label, bbox in WIDENING.items():
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Two panels share a row and the third sits centred beneath. Four columns is what</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
+<span class="c1"># Two panels share a row and the third sits centred beneath. Four columns is what</span>
 <span class="c1"># makes that centring exact -- with three, the last panel could only sit under the</span>
 <span class="c1"># first or the second. Each panel spans half the width, so it is ~11.7in tall.</span>
 <span class="n">ZOOM_SLOTS</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))]</span>
@@ -25459,6 +25486,9 @@ for label, bbox in WIDENING.items():
     <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="n">height_in</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">gs</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_gridspec</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
     <span class="n">panels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># As above: the shared bar's mappable is chosen, not inherited from the last</span>
+    <span class="c1"># iteration of the loop.</span>
+    <span class="n">shared_im</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="p">(</span><span class="n">rp</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">PERIODS</span><span class="p">,</span> <span class="n">zoomed</span><span class="p">)):</span>
         <span class="n">row</span><span class="p">,</span> <span class="n">span</span> <span class="o">=</span> <span class="n">ZOOM_SLOTS</span><span class="p">[</span><span class="n">col</span><span class="p">]</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">span</span><span class="p">])</span>
@@ -25472,6 +25502,7 @@ for label, bbox in WIDENING.items():
             <span class="n">data_style</span><span class="o">=</span><span class="n">OVERLAY</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">glyph</span><span class="o">.</span><span class="n">im</span><span class="o">.</span><span class="n">set_clim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="p">)</span>
+        <span class="n">shared_im</span> <span class="o">=</span> <span class="n">shared_im</span> <span class="ow">or</span> <span class="n">glyph</span><span class="o">.</span><span class="n">im</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="n">measured</span><span class="p">[</span><span class="n">DELTA</span><span class="p">][</span><span class="n">col</span><span class="p">]</span>
         <span class="n">d_area</span><span class="p">,</span> <span class="n">d_deep</span> <span class="o">=</span> <span class="n">growth</span><span class="p">(</span><span class="n">measured</span><span class="p">[</span><span class="n">DELTA</span><span class="p">],</span> <span class="n">col</span><span class="p">)</span>
         <span class="n">change</span> <span class="o">=</span> <span class="p">(</span>
@@ -25490,11 +25521,12 @@ for label, bbox in WIDENING.items():
             <span class="k">if</span> <span class="n">span</span><span class="o">.</span><span class="n">start</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"latitude"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">19</span> <span class="o">*</span> <span class="n">font_scale</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Axis ticks are unreadable once a feed scales the image down, so at</span>
-            <span class="c1"># posting size they are clutter rather than information.</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
-    <span class="n">add_depth_bar</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">glyph</span><span class="o">.</span><span class="n">im</span><span class="p">,</span> <span class="n">font_scale</span><span class="p">)</span>
+            <span class="c1"># Tick LABELS are unreadable once a feed scales the image down, so</span>
+            <span class="c1"># at posting size they are clutter rather than information. Only the</span>
+            <span class="c1"># labels go: dropping the locators with `set_xticks([])` would throw</span>
+            <span class="c1"># away the georeferencing that makes these axes lon/lat.</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelbottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">labelleft</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">add_depth_bar</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">shared_im</span><span class="p">,</span> <span class="n">font_scale</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">ZOOM_TITLE</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">31</span> <span class="o">*</span> <span class="n">font_scale</span><span class="p">)</span>
     <span class="n">stamp_logo</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">panels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">height_frac</span><span class="o">=</span><span class="n">logo_frac</span><span class="p">)</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">out</span> <span class="o">/</span> <span class="n">png_name</span>
@@ -25509,7 +25541,8 @@ for label, bbox in WIDENING.items():
 <span class="c1"># notebook does not carry all three at once.</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig_zoom</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8"># Two panels share a row and the third sits centred beneath. Four columns is what
+<div class="clipboard-copy-txt" id="cell-8"># NBVAL_SKIP
+# Two panels share a row and the third sits centred beneath. Four columns is what
 # makes that centring exact -- with three, the last panel could only sit under the
 # first or the second. Each panel spans half the width, so it is ~11.7in tall.
 ZOOM_SLOTS = [(0, slice(0, 2)), (0, slice(2, 4)), (1, slice(1, 3))]
@@ -25520,6 +25553,9 @@ def draw_zoom(png_name, font_scale=1.0, height_in=28, logo_frac=0.22, ticks=True
     fig = plt.figure(figsize=(40, height_in), dpi=70, constrained_layout=True)
     gs = fig.add_gridspec(2, 4)
     panels = []
+    # As above: the shared bar's mappable is chosen, not inherited from the last
+    # iteration of the loop.
+    shared_im = None
     for col, (rp, grid) in enumerate(zip(PERIODS, zoomed)):
         row, span = ZOOM_SLOTS[col]
         ax = fig.add_subplot(gs[row, span])
@@ -25533,6 +25569,7 @@ def draw_zoom(png_name, font_scale=1.0, height_in=28, logo_frac=0.22, ticks=True
             data_style=OVERLAY,
         )
         glyph.im.set_clim(0, vmax)
+        shared_im = shared_im or glyph.im
         stat = measured[DELTA][col]
         d_area, d_deep = growth(measured[DELTA], col)
         change = (
@@ -25551,11 +25588,12 @@ def draw_zoom(png_name, font_scale=1.0, height_in=28, logo_frac=0.22, ticks=True
             if span.start == 0 or row == 1:
                 ax.set_ylabel("latitude", fontsize=19 * font_scale)
         else:
-            # Axis ticks are unreadable once a feed scales the image down, so at
-            # posting size they are clutter rather than information.
-            ax.set_xticks([])
-            ax.set_yticks([])
-    add_depth_bar(fig, glyph.im, font_scale)
+            # Tick LABELS are unreadable once a feed scales the image down, so
+            # at posting size they are clutter rather than information. Only the
+            # labels go: dropping the locators with `set_xticks([])` would throw
+            # away the georeferencing that makes these axes lon/lat.
+            ax.tick_params(labelbottom=False, labelleft=False)
+    add_depth_bar(fig, shared_im, font_scale)
     fig.suptitle(ZOOM_TITLE, fontsize=31 * font_scale)
     stamp_logo(fig, panels[0], height_frac=logo_frac)
     path = out / png_name
@@ -25608,7 +25646,8 @@ the data changes, only the presentation.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Two changes make a copy read well once a feed scales it into its column, and</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># NBVAL_SKIP</span>
+<span class="c1"># Two changes make a copy read well once a feed scales it into its column, and</span>
 <span class="c1"># neither is "more dpi" -- dpi changes the pixel count, not the proportions.</span>
 <span class="c1"># First the type goes up 2.2x relative to the figure. Second the axis ticks come</span>
 <span class="c1"># off: at that size they are illegible anyway, so they cost clutter and buy</span>
@@ -25618,55 +25657,66 @@ the data changes, only the presentation.</p>
 <span class="n">POST_SCALE</span> <span class="o">=</span> <span class="mf">2.2</span>
 <span class="n">FEED_PX</span> <span class="o">=</span> <span class="mi">552</span>
 
-<span class="n">posts</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">draw_rhine_half</span><span class="p">(</span>
-        <span class="n">UPSTREAM</span><span class="p">,</span>
-        <span class="s2">"upstream, Lobith to Gorinchem"</span><span class="p">,</span>
-        <span class="n">UP_TITLE</span><span class="p">,</span>
-        <span class="s2">"dutch_rhine_upstream_post.png"</span><span class="p">,</span>
-        <span class="n">font_scale</span><span class="o">=</span><span class="n">POST_SCALE</span><span class="p">,</span>
-        <span class="n">ticks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">height_in</span><span class="o">=</span><span class="mi">62</span><span class="p">,</span>
-        <span class="n">logo_frac</span><span class="o">=</span><span class="mf">0.26</span><span class="p">,</span>
+<span class="c1"># Built one at a time. These are the largest renders in the notebook -- 62 in</span>
+<span class="c1"># tall at 2.2x type -- so materialising all three before measuring any would</span>
+<span class="c1"># undo the close-as-you-go the earlier cells go out of their way to do.</span>
+<span class="n">recipes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span>
+        <span class="n">draw_rhine_half</span><span class="p">,</span>
+        <span class="p">(</span>
+            <span class="n">UPSTREAM</span><span class="p">,</span>
+            <span class="s2">"upstream, Lobith to Gorinchem"</span><span class="p">,</span>
+            <span class="n">UP_TITLE</span><span class="p">,</span>
+            <span class="s2">"dutch_rhine_upstream_post.png"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="p">{</span><span class="s2">"font_scale"</span><span class="p">:</span> <span class="n">POST_SCALE</span><span class="p">,</span> <span class="s2">"ticks"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"height_in"</span><span class="p">:</span> <span class="mi">62</span><span class="p">,</span> <span class="s2">"logo_frac"</span><span class="p">:</span> <span class="mf">0.26</span><span class="p">},</span>
+        <span class="mi">30</span><span class="p">,</span>
     <span class="p">),</span>
-    <span class="n">draw_rhine_half</span><span class="p">(</span>
-        <span class="n">DOWNSTREAM</span><span class="p">,</span>
-        <span class="s2">"downstream, Gorinchem to the North Sea"</span><span class="p">,</span>
-        <span class="n">DOWN_TITLE</span><span class="p">,</span>
-        <span class="s2">"dutch_rhine_downstream_post.png"</span><span class="p">,</span>
-        <span class="n">zoom_box</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">font_scale</span><span class="o">=</span><span class="n">POST_SCALE</span><span class="p">,</span>
-        <span class="n">ticks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">height_in</span><span class="o">=</span><span class="mi">62</span><span class="p">,</span>
-        <span class="n">logo_frac</span><span class="o">=</span><span class="mf">0.26</span><span class="p">,</span>
+    <span class="p">(</span>
+        <span class="n">draw_rhine_half</span><span class="p">,</span>
+        <span class="p">(</span>
+            <span class="n">DOWNSTREAM</span><span class="p">,</span>
+            <span class="s2">"downstream, Gorinchem to the North Sea"</span><span class="p">,</span>
+            <span class="n">DOWN_TITLE</span><span class="p">,</span>
+            <span class="s2">"dutch_rhine_downstream_post.png"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="p">{</span>
+            <span class="s2">"zoom_box"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">"font_scale"</span><span class="p">:</span> <span class="n">POST_SCALE</span><span class="p">,</span>
+            <span class="s2">"ticks"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"height_in"</span><span class="p">:</span> <span class="mi">62</span><span class="p">,</span>
+            <span class="s2">"logo_frac"</span><span class="p">:</span> <span class="mf">0.26</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="mi">30</span><span class="p">,</span>
     <span class="p">),</span>
-    <span class="n">draw_zoom</span><span class="p">(</span>
-        <span class="s2">"dutch_rhine_zoom_post.png"</span><span class="p">,</span>
-        <span class="n">font_scale</span><span class="o">=</span><span class="n">POST_SCALE</span><span class="p">,</span>
-        <span class="n">ticks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">height_in</span><span class="o">=</span><span class="mi">29</span><span class="p">,</span>
-        <span class="n">logo_frac</span><span class="o">=</span><span class="mf">0.26</span><span class="p">,</span>
+    <span class="p">(</span>
+        <span class="n">draw_zoom</span><span class="p">,</span>
+        <span class="p">(</span><span class="s2">"dutch_rhine_zoom_post.png"</span><span class="p">,),</span>
+        <span class="p">{</span><span class="s2">"font_scale"</span><span class="p">:</span> <span class="n">POST_SCALE</span><span class="p">,</span> <span class="s2">"ticks"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"height_in"</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span> <span class="s2">"logo_frac"</span><span class="p">:</span> <span class="mf">0.26</span><span class="p">},</span>
+        <span class="mi">26</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">]</span>
 
 <span class="nb">print</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="n">posts</span><span class="p">:</span>
+<span class="c1"># `base_pt` travels with its recipe: each builder sets its own panel-title size,</span>
+<span class="c1"># and carrying it here beats inferring it from the figure's position in a list.</span>
+<span class="k">for</span> <span class="n">build</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">base_pt</span> <span class="ow">in</span> <span class="n">recipes</span><span class="p">:</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">build</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">w_in</span><span class="p">,</span> <span class="n">h_in</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_size_inches</span><span class="p">()</span>
     <span class="c1"># A feed fits a portrait image inside about 4:5, so anything taller than 1.25</span>
     <span class="c1"># is shown narrower than the full column -- which costs back some legibility.</span>
     <span class="n">fitted</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">FEED_PX</span><span class="p">,</span> <span class="n">FEED_PX</span> <span class="o">*</span> <span class="mf">1.25</span> <span class="o">/</span> <span class="p">(</span><span class="n">h_in</span> <span class="o">/</span> <span class="n">w_in</span><span class="p">))</span>
-    <span class="c1"># Each builder sets its own panel-title size, so the metric uses the</span>
-    <span class="c1"># figure's own base rather than one number for all three.</span>
-    <span class="n">base_pt</span> <span class="o">=</span> <span class="mi">26</span> <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="n">posts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">else</span> <span class="mi">30</span>
     <span class="n">title_px</span> <span class="o">=</span> <span class="n">base_pt</span> <span class="o">*</span> <span class="n">POST_SCALE</span> <span class="o">/</span> <span class="p">(</span><span class="n">w_in</span> <span class="o">*</span> <span class="mi">72</span><span class="p">)</span> <span class="o">*</span> <span class="n">fitted</span>
     <span class="nb">print</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">"  aspect </span><span class="si">{</span><span class="n">h_in</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">w_in</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">  -&gt;  shown </span><span class="si">{</span><span class="n">fitted</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">px wide  "</span>
         <span class="sa">f</span><span class="s2">"-&gt;  panel title </span><span class="si">{</span><span class="n">title_px</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">px"</span>
     <span class="p">)</span>
-    <span class="c1"># Written to disk already; keeping them open would double the notebook size.</span>
+    <span class="c1"># Written to disk inside the builder, so close before the next one is drawn</span>
+    <span class="c1"># and only one of these figures is ever resident.</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-9"># Two changes make a copy read well once a feed scales it into its column, and
+<div class="clipboard-copy-txt" id="cell-9"># NBVAL_SKIP
+# Two changes make a copy read well once a feed scales it into its column, and
 # neither is "more dpi" -- dpi changes the pixel count, not the proportions.
 # First the type goes up 2.2x relative to the figure. Second the axis ticks come
 # off: at that size they are illegible anyway, so they cost clutter and buy
@@ -25676,52 +25726,62 @@ the data changes, only the presentation.</p>
 POST_SCALE = 2.2
 FEED_PX = 552
 
-posts = [
-    draw_rhine_half(
-        UPSTREAM,
-        "upstream, Lobith to Gorinchem",
-        UP_TITLE,
-        "dutch_rhine_upstream_post.png",
-        font_scale=POST_SCALE,
-        ticks=False,
-        height_in=62,
-        logo_frac=0.26,
+# Built one at a time. These are the largest renders in the notebook -- 62 in
+# tall at 2.2x type -- so materialising all three before measuring any would
+# undo the close-as-you-go the earlier cells go out of their way to do.
+recipes = [
+    (
+        draw_rhine_half,
+        (
+            UPSTREAM,
+            "upstream, Lobith to Gorinchem",
+            UP_TITLE,
+            "dutch_rhine_upstream_post.png",
+        ),
+        {"font_scale": POST_SCALE, "ticks": False, "height_in": 62, "logo_frac": 0.26},
+        30,
     ),
-    draw_rhine_half(
-        DOWNSTREAM,
-        "downstream, Gorinchem to the North Sea",
-        DOWN_TITLE,
-        "dutch_rhine_downstream_post.png",
-        zoom_box=True,
-        font_scale=POST_SCALE,
-        ticks=False,
-        height_in=62,
-        logo_frac=0.26,
+    (
+        draw_rhine_half,
+        (
+            DOWNSTREAM,
+            "downstream, Gorinchem to the North Sea",
+            DOWN_TITLE,
+            "dutch_rhine_downstream_post.png",
+        ),
+        {
+            "zoom_box": True,
+            "font_scale": POST_SCALE,
+            "ticks": False,
+            "height_in": 62,
+            "logo_frac": 0.26,
+        },
+        30,
     ),
-    draw_zoom(
-        "dutch_rhine_zoom_post.png",
-        font_scale=POST_SCALE,
-        ticks=False,
-        height_in=29,
-        logo_frac=0.26,
+    (
+        draw_zoom,
+        ("dutch_rhine_zoom_post.png",),
+        {"font_scale": POST_SCALE, "ticks": False, "height_in": 29, "logo_frac": 0.26},
+        26,
     ),
 ]
 
 print()
-for fig in posts:
+# `base_pt` travels with its recipe: each builder sets its own panel-title size,
+# and carrying it here beats inferring it from the figure's position in a list.
+for build, args, kwargs, base_pt in recipes:
+    fig = build(*args, **kwargs)
     w_in, h_in = fig.get_size_inches()
     # A feed fits a portrait image inside about 4:5, so anything taller than 1.25
     # is shown narrower than the full column -- which costs back some legibility.
     fitted = min(FEED_PX, FEED_PX * 1.25 / (h_in / w_in))
-    # Each builder sets its own panel-title size, so the metric uses the
-    # figure's own base rather than one number for all three.
-    base_pt = 26 if fig is posts[-1] else 30
     title_px = base_pt * POST_SCALE / (w_in * 72) * fitted
     print(
         f"  aspect {h_in / w_in:.2f}  -&gt;  shown {fitted:.0f}px wide  "
         f"-&gt;  panel title {title_px:.1f}px"
     )
-    # Written to disk already; keeping them open would double the notebook size.
+    # Written to disk inside the builder, so close before the next one is drawn
+    # and only one of these figures is ever resident.
     plt.close(fig)</div>
 </div>
 </div>
@@ -25748,9 +25808,12 @@ leaves it looking pale. A per-figure scale would fix that and make them
 incomparable, which is the one thing this notebook exists to do.</li>
 <li><strong>A small window can manufacture a finding.</strong> Measured on the zoom alone this
 would read as "a rarer flood does not spread", which is false for the river as
-a whole. The saturation cell in section 5 computes the numbers quoted here --
-88.9% of the box already flooded at RP10, capping its area growth near twelve
-per cent, against +27%, +35% and +33% as the box widens. They are repeated in
+a whole. The saturation cell in section 5 computes the numbers quoted
+here -- the zoom box is 88.9% full at RP10 and its flooded area grows +7.1%
+out to RP500, against +27%, +35% and +33% as the box widens. Being nearly
+full is what holds it down: a box already 88.9% covered cannot grow by more
+than about twelve per cent however rare the flood, so +7.1% is close to the
+most it could have shown. They are repeated in
 the prose because the docs site does not execute notebooks, so a reader who
 has not run this sees no output; run the cell and they should match. Check how
 much of an area of interest is already covered before reading a small change
