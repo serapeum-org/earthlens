@@ -42,9 +42,13 @@ client-side).
 
 from __future__ import annotations
 
+import contextlib
+import functools
 import shutil
 import time
+from collections.abc import Callable, Iterator
 from pathlib import Path
+from typing import ParamSpec, TypeVar
 
 from loguru import logger
 from pydantic import SecretStr
@@ -83,7 +87,10 @@ TAILOR_SUBMIT_BACKOFF_S = 2.0
 #: polling until the timeout.
 _TAILOR_ACTIVE = frozenset({"QUEUED", "RUNNING"})
 #: Substrings that mark a submit error as transient (worth retrying) — the
-#: EUMETSAT EPCS endpoint intermittently 502s (`A1`/`G8`).
+#: EUMETSAT EPCS endpoint intermittently 502s (`A1`/`G8`). A bounded-call
+#: timeout (`EUMDAC_HTTP_TIMEOUT_S`) surfaces as a `requests` timeout whose
+#: message contains `"timed out"` / `"connection"`, so a stalled *submit* is
+#: retried by this same set (#1146).
 _TRANSIENT_MARKERS = (
     "502",
     "bad gateway",
@@ -92,6 +99,103 @@ _TRANSIENT_MARKERS = (
     "timeout",
     "connection",
 )
+#: Per-call `(connect, read)` socket timeout injected into every eumdac HTTP
+#: request — Data Store **and** Data Tailor, including native product streaming
+#: in `_fetch`. `eumdac` sets no timeout and exposes no session to configure, so
+#: without this a stalled socket blocks forever and defeats
+#: `TAILOR_POLL_TIMEOUT_S` (#1146). The read bound is per socket read, so it caps
+#: a *stalled* stream without killing a slow-but-alive one (the only risk is a
+#: server that takes longer than the read bound to emit the first byte).
+EUMDAC_HTTP_TIMEOUT_S: tuple[float, float] = (30.0, 300.0)
+#: Substrings in a `FAILED` customisation's log tail that mark the failure as a
+#: transient EUMETSAT-side infrastructure fault (NFS / disk), worth resubmitting
+#: rather than surfacing — as opposed to a bad request, which fails fast (#1145).
+_TRANSIENT_OUTCOME_MARKERS = (
+    "stale file handle",
+    "errno 116",
+    "no space left",
+    "input/output error",
+)
+
+_P = ParamSpec("_P")
+_R = TypeVar("_R")
+
+
+@contextlib.contextmanager
+def _bounded_http(timeout: tuple[float, float] | None = None) -> Iterator[None]:
+    """Give every `requests` call a default `(connect, read)` timeout.
+
+    `eumdac` issues module-level `requests.get` / `post` / … (it owns no
+    shared `requests.Session` to configure), and every one of those funnels
+    through `requests.Session.request`. Wrapping that method so a call which
+    passes no `timeout` gets `timeout` bounds every Data Store / Data Tailor
+    socket operation — connect and each read — for the duration of the block,
+    without touching `eumdac` internals. An explicit `timeout=` is preserved.
+
+    The wrap is re-entrant (a nested block reuses the outer wrap) and restored
+    on exit. It is not concurrency-safe across threads — earthlens backends
+    run synchronously, so two downloads customising in parallel is out of
+    scope; the guard only covers nesting on one thread.
+
+    Args:
+        timeout: The `(connect, read)` timeout in seconds to inject. `None`
+            (the default, used by `_bounded_http_calls`) reads the current
+            `EUMDAC_HTTP_TIMEOUT_S` at call time, so patching that constant
+            takes effect through the decorator path.
+
+    Yields:
+        None: for the duration of the bounded block.
+    """
+    import requests  # lazy — guaranteed by earthlens-core, only needed live
+
+    if timeout is None:
+        timeout = EUMDAC_HTTP_TIMEOUT_S
+    session = requests.sessions.Session
+    original = session.request
+    if getattr(original, "_earthlens_bounded", False):
+        yield  # an outer block already wrapped it
+        return
+
+    @functools.wraps(original)
+    def _request(self, *args, **kwargs):
+        # Inject the default only when the caller gave no timeout — as a keyword
+        # or positionally. `timeout` is the 9th positional parameter of
+        # `Session.request` (method, url, params, data, headers, cookies, files,
+        # auth, timeout), i.e. `args[8]`; guarding on `len(args)` avoids a
+        # "multiple values for 'timeout'" TypeError if it is ever passed
+        # positionally.
+        if "timeout" not in kwargs and len(args) < 9:
+            kwargs["timeout"] = timeout
+        return original(self, *args, **kwargs)
+
+    _request._earthlens_bounded = True  # type: ignore[attr-defined]
+    session.request = _request  # type: ignore[method-assign]
+    try:
+        yield
+    finally:
+        session.request = original  # type: ignore[method-assign]
+
+
+def _bounded_http_calls(method: Callable[_P, _R]) -> Callable[_P, _R]:
+    """Decorator: run `method` with every `requests` call time-bounded (#1146).
+
+    Applied to the backend methods that reach the network (`_search`,
+    `_fetch`, `_tailor_one`) so a stalled Data Store / Data Tailor socket
+    cannot hang the download.
+
+    Args:
+        method: The backend method to wrap.
+
+    Returns:
+        The wrapped method, with its signature preserved.
+    """
+
+    @functools.wraps(method)
+    def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> _R:
+        with _bounded_http():
+            return method(*args, **kwargs)
+
+    return wrapper
 
 
 class EUMETSAT(AbstractDataSource):
@@ -306,6 +410,7 @@ class EUMETSAT(AbstractDataSource):
             accepted=CADENCE_ALIASES,
         )
 
+    @_bounded_http_calls
     def _search(self) -> list[RemoteProduct]:
         """Query the Data Store for products of every requested collection.
 
@@ -365,6 +470,7 @@ class EUMETSAT(AbstractDataSource):
                 )
         return products
 
+    @_bounded_http_calls
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Stream every product `_search` returned to a local file.
 
@@ -439,12 +545,19 @@ class EUMETSAT(AbstractDataSource):
             return self._tailor(tailor)
         return self._api_via_search_fetch()
 
+    @_bounded_http_calls
     def _tailor(self, tailor: TailorConfig) -> list[Path]:
         """Run the Data Tailor branch for every matching product (`G2`).
 
         Rejects a non-eligible request up front (`G5`), then searches the
         Data Store and customises each product in turn, returning the
         flattened list of customised output paths.
+
+        Bounded by `@_bounded_http_calls` (#1146) so the whole tailor path —
+        including `configure()` / `datatailor()` here, before the (also-bounded)
+        `_search` / `_tailor_one` — is time-bounded even if a future `eumdac`
+        makes those client constructors issue HTTP eagerly. The nested bounded
+        calls reuse this wrap (the context manager is re-entrant).
 
         Args:
             tailor: The `TailorConfig` describing the customisation.
@@ -496,6 +609,7 @@ class EUMETSAT(AbstractDataSource):
         used.add(candidate)
         return candidate
 
+    @_bounded_http_calls
     def _tailor_one(
         self,
         product: RemoteProduct,
@@ -509,7 +623,23 @@ class EUMETSAT(AbstractDataSource):
         row (`tailor_product_type`), and the request ROI (`tailor.bbox`
         else `self.space`), submits it, polls to a terminal state, streams
         every output to `self.root_dir`, and deletes the customisation in
-        a `finally` — even on failure — so quota is always freed.
+        a `finally` — even on failure — so quota is always freed. Every
+        network call runs time-bounded (`@_bounded_http_calls`, #1146).
+
+        A customisation that ends `FAILED` on a transient EUMETSAT-side
+        infrastructure fault — its log tail matching
+        `_TRANSIENT_OUTCOME_MARKERS` (a stale NFS handle, a full disk) — is
+        **resubmitted** up to `TAILOR_SUBMIT_RETRIES` times rather than
+        surfaced, the abandoned job being deleted first so quota is not
+        leaked (#1145). A `FAILED` from a bad request (no marker), and any
+        `KILLED` / other terminal status, still fails fast on the first
+        attempt.
+
+        Note `TAILOR_SUBMIT_RETRIES` bounds this outcome loop *and*, separately,
+        the transient-*submit* retry inside `_submit_customisation`; the two are
+        independent and compound, so a product hitting both flaky submits and
+        transient `FAILED`s can issue up to `TAILOR_SUBMIT_RETRIES ** 2` submits
+        in the (rare) worst case.
 
         A `tailor.crs` of `None` means "do not reproject": `Chain.projection`
         is `None`, which `Chain.asdict()` drops before the request is built,
@@ -579,30 +709,88 @@ class EUMETSAT(AbstractDataSource):
         ).is_dir():
             subdir = self._dedupe_name(subdir, used_dirs)
         product_dir = self.root_dir / subdir
-        cust = self._submit_customisation(datatailor, product_handle, chain)
-        try:
-            status = self._poll_customisation(cust)
-            if status != "DONE":
-                raise RuntimeError(
-                    f"Data Tailor customisation {cust} ended {status}: "
-                    f"{self._logfile_tail(cust)}"
+        # Submit → poll → (stream on DONE). A FAILED on a transient EUMETSAT-side
+        # infrastructure fault is resubmitted up to TAILOR_SUBMIT_RETRIES times,
+        # deleting the abandoned job first so quota is not leaked (#1145). (This
+        # outcome budget is independent of the transient-submit retries inside
+        # _submit_customisation; see the method docstring for the compounding.)
+        for attempt in range(1, TAILOR_SUBMIT_RETRIES + 1):
+            cust = self._submit_customisation(datatailor, product_handle, chain)
+            try:
+                status = self._poll_customisation(cust)
+                if status == "DONE":
+                    return self._stream_customisation(cust, product_dir)
+                tail = self._logfile_tail(cust)
+                if not self._is_retryable_infra_failure(status, tail, attempt):
+                    raise RuntimeError(
+                        f"Data Tailor customisation {cust} ended {status}: {tail}"
+                    )
+                logger.warning(
+                    f"Data Tailor customisation {cust} ended FAILED on a transient "
+                    f"infrastructure error; resubmitting (attempt {attempt}/"
+                    f"{TAILOR_SUBMIT_RETRIES}): {tail}"
                 )
-            product_dir.mkdir(parents=True, exist_ok=True)
-            written: list[Path] = []
-            used_names: set[str] = set()
-            for name in cust.outputs:
-                # De-dupe within a customisation so two outputs sharing a
-                # basename do not overwrite each other (L2).
-                out_name = self._dedupe_name(
-                    safe_product_filename(str(name)), used_names
-                )
-                target = product_dir / out_name
-                with cust.stream_output(name) as src, open(target, "wb") as fh:
-                    shutil.copyfileobj(src, fh)
-                written.append(target)
-            return written
-        finally:
-            self._safe_delete(cust)  # ALWAYS free quota — even on failure (G7)
+                # Delete the abandoned job BEFORE resubmitting so the retry does
+                # not leak quota (G7); null it so `finally` does not double-delete.
+                self._safe_delete(cust)
+                cust = None
+            finally:
+                if cust is not None:
+                    self._safe_delete(cust)  # ALWAYS free quota (G7)
+            time.sleep(TAILOR_SUBMIT_BACKOFF_S * attempt)
+        # The final attempt always returns (DONE) or raises (non-retryable),
+        # so control never reaches here; kept to satisfy the type checker.
+        raise RuntimeError(  # pragma: no cover
+            "Data Tailor customisation did not resolve within the retry budget."
+        )
+
+    def _stream_customisation(self, cust, product_dir: Path) -> list[Path]:
+        """Stream a `DONE` customisation's outputs into `product_dir`.
+
+        Creates `product_dir` and copies each output there, de-duping output
+        basenames so two outputs that sanitise to the same name do not
+        overwrite each other (`L2`).
+
+        Args:
+            cust: The `DONE` `eumdac` `Customisation` handle.
+            product_dir: The per-product output directory.
+
+        Returns:
+            list[Path]: The written output paths, in customisation order.
+        """
+        product_dir.mkdir(parents=True, exist_ok=True)
+        written: list[Path] = []
+        used_names: set[str] = set()
+        for name in cust.outputs:
+            out_name = self._dedupe_name(safe_product_filename(str(name)), used_names)
+            target = product_dir / out_name
+            with cust.stream_output(name) as src, open(target, "wb") as fh:
+                shutil.copyfileobj(src, fh)
+            written.append(target)
+        return written
+
+    @staticmethod
+    def _is_retryable_infra_failure(status: str, tail: str, attempt: int) -> bool:
+        """Whether a terminal status is a retryable infrastructure `FAILED`.
+
+        `True` only for a `FAILED` whose log tail matches an infrastructure
+        marker (`_TRANSIENT_OUTCOME_MARKERS`) with retry budget left; a bad
+        request (no marker) and any `KILLED` / other terminal status return
+        `False` so they fail fast (`#1145`).
+
+        Args:
+            status: The terminal customisation status.
+            tail: The customisation's log tail.
+            attempt: The 1-based attempt number just completed.
+
+        Returns:
+            bool: `True` if the customisation should be resubmitted.
+        """
+        return (
+            status == "FAILED"
+            and attempt < TAILOR_SUBMIT_RETRIES
+            and any(marker in tail.lower() for marker in _TRANSIENT_OUTCOME_MARKERS)
+        )
 
     @staticmethod
     def _safe_delete(cust) -> None:
@@ -680,8 +868,22 @@ class EUMETSAT(AbstractDataSource):
         `FAILED` / `KILLED` / an unexpected stuck state (e.g. `INACTIVE`)
         fail fast rather than polling to the timeout. Gives up after
         `TAILOR_POLL_TIMEOUT_S` so a job stuck *active* cannot hang forever
-        (`G8`); the final sleep is clamped to the remaining budget so the
-        wall-clock never overshoots the timeout.
+        (`G8`); the *sleep* between polls is clamped to the remaining budget.
+        The deadline is a **soft** bound, though: it is only checked between
+        polls, so a persistently stalled `cust.status` — which eumdac retries a
+        few times internally, each up to the injected read bound — can push the
+        real wait one bounded-call cycle (~`connect + read` × eumdac's retries)
+        past the budget before the loop rechecks and raises. That is a small
+        slop on a finite bound, versus the pre-fix unbounded hang.
+
+        Each `cust.status` read is a bounded HTTP call (the caller runs under
+        `_bounded_http`, #1146). A single poll that hits a **transient**
+        transport error — a stalled read/connect or a dropped connection — is
+        **not** fatal: the job may still be progressing server-side, so it is
+        treated like "still active" and polling continues until the wall-clock
+        deadline (#1146). A **permanent** error is not caught and fails fast:
+        eumdac wraps an HTTP 4xx/5xx response into an `EumdacError` (not a
+        `requests` exception), which propagates straight out.
 
         Args:
             cust: The `eumdac` `Customisation` handle to poll.
@@ -691,14 +893,32 @@ class EUMETSAT(AbstractDataSource):
                 any non-active value the service reports).
 
         Raises:
-            TimeoutError: When the job is still active after
-                `TAILOR_POLL_TIMEOUT_S`.
+            TimeoutError: When the job is still active (or its status could
+                not be read) after `TAILOR_POLL_TIMEOUT_S`.
         """
+        import requests  # lazy — guaranteed by earthlens-core, only needed live
+
+        # Only a genuinely *transient* transport error is ridden out: a stalled
+        # read/connect or a dropped connection. A permanent error is NOT caught
+        # so it fails fast — eumdac already wraps an HTTP 4xx/5xx response into a
+        # (non-`RequestException`) `EumdacError`, and any other `requests` error
+        # (a malformed URL, say) is a real fault, not a blip.
+        transient = (
+            requests.exceptions.Timeout,
+            requests.exceptions.ConnectionError,
+            TimeoutError,
+        )
         deadline = time.monotonic() + TAILOR_POLL_TIMEOUT_S
         delay = TAILOR_POLL_INITIAL_S
         while True:
-            status = str(cust.status).upper()
-            if status not in _TAILOR_ACTIVE:
+            try:
+                status = str(cust.status).upper()
+            except transient:
+                # A single poll HTTP call stalled or dropped; the customisation
+                # may still be running, so keep polling until the wall-clock
+                # deadline rather than aborting a healthy long-running job.
+                status = None
+            if status is not None and status not in _TAILOR_ACTIVE:
                 return status
             now = time.monotonic()
             if now >= deadline:
