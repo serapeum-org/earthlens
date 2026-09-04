@@ -164,7 +164,17 @@ def _causes(exc: BaseException):
             continue
         seen.add(id(current))
         yield current
-        for nxt in (current.__cause__, current.__context__):
+        # `reason` before the rest: `urllib3.exceptions.MaxRetryError` keeps the
+        # real failure there and puts only a formatted *string* in `args`, so a
+        # walk over `args` alone sees the wrapper and stops. Its own class name
+        # matches the connect marker, which would then classify a delivered
+        # read failure as a connect one — and connect failures are not
+        # method-gated, so a `POST` would be replayed.
+        for nxt in (
+            getattr(current, "reason", None),
+            current.__cause__,
+            current.__context__,
+        ):
             if isinstance(nxt, BaseException):
                 queue.append(nxt)
         for arg in getattr(current, "args", ()):
@@ -248,16 +258,24 @@ def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str 
         # `requests` collapses both phases into one class, so the wrapped cause
         # is the only thing separating "never connected" from "connected, then
         # the socket died".
-        for cause in _causes(exc):
+        # Two passes: a wrapper whose own name matches a marker (notably
+        # `MaxRetryError`) must not outvote the reason nested inside it, so the
+        # specific socket-level causes are looked for first.
+        causes = list(_causes(exc))
+        for cause in causes:
             if isinstance(cause, (ConnectionResetError, ConnectionAbortedError)):
                 return "read"
             if isinstance(cause, ConnectionRefusedError):
                 return "connect"
-            name = type(cause).__name__
-            if any(marker in name for marker in _READ_CAUSE_NAMES):
-                return "read"
-            if any(marker in name for marker in _CONNECT_CAUSE_NAMES):
-                return "connect"
+        names = [type(cause).__name__ for cause in causes]
+        # Read markers are searched across *every* cause before connect ones.
+        # `MaxRetryError` matches a connect marker itself while carrying the
+        # real reason inside it, so scanning cause-by-cause would let the
+        # wrapper decide before its own reason is reached.
+        if any(m in n for n in names for m in _READ_CAUSE_NAMES):
+            return "read"
+        if any(m in n for n in names for m in _CONNECT_CAUSE_NAMES):
+            return "connect"
         # An unrecognised connection error spends the smaller budget, so an
         # unknown case fails fast rather than burning the full one on something
         # that may never succeed.

@@ -8,6 +8,7 @@ from typing import Any
 
 import pytest
 import requests
+import urllib3
 
 from earthlens.base.http import (
     DEFAULT_CONNECT_RETRIES,
@@ -573,6 +574,41 @@ class TestRetryOnExceptions:
         )
         assert client.get_json("http://x") == {"ok": 1}
         assert session.calls == 2, f"expected 2 attempts, got {session.calls}"
+
+    @pytest.mark.parametrize(
+        "reason_name, expected",
+        [
+            ("ReadTimeoutError", "read"),
+            ("ProtocolError", "read"),
+            ("NewConnectionError", "connect"),
+        ],
+    )
+    def test_a_wrapped_max_retry_error_is_classified_by_its_reason(
+        self, reason_name, expected
+    ):
+        """`MaxRetryError` carries the real failure in `reason`, not in `args`.
+
+        Its own class name matches a connect marker, and connect failures are
+        not method-gated — so misreading one as a connect failure would replay
+        a `POST` whose request had in fact been delivered.
+        """
+        import urllib3.exceptions as u3
+
+        from earthlens.base.http import classify_transport_error
+
+        pool = urllib3.HTTPConnectionPool("example.org")
+        reasons = {
+            "ReadTimeoutError": u3.ReadTimeoutError(pool, "u", "timed out"),
+            "ProtocolError": u3.ProtocolError("connection aborted"),
+            "NewConnectionError": u3.NewConnectionError(None, "refused"),
+        }
+        wrapped = requests.ConnectionError(
+            u3.MaxRetryError(pool, "http://x", reason=reasons[reason_name])
+        )
+        assert classify_transport_error(wrapped) == expected, (
+            f"{reason_name} should classify as {expected}, "
+            f"got {classify_transport_error(wrapped)}"
+        )
 
     def test_default_retry_set_excludes_http_error(self):
         """`HTTPError` stays out, so 4xx responses are never replayed."""
