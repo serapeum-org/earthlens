@@ -501,6 +501,8 @@ nav:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
     - Data Catalog: examples/catalog.md
+    - Basics:
+      - Choosing an area of interest: examples/basics/01_area_of_interest.ipynb
     - Showcase — real-world events:
       - Suez Canal blockage (Ever Given): examples/showcase/suez_canal_ever_given.ipynb
       - Hunga Tonga eruption: examples/showcase/tonga_eruption.ipynb
