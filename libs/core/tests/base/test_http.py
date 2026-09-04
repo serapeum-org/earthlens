@@ -22,8 +22,10 @@ from earthlens.base.http import (
     UnsolicitedPartialContentError,
     _check_magic,
     _default_user_agent,
+    _is_local_storage_error,
     _parse_retry_after,
     _progress_total,
+    classify_transport_error,
     is_network_unreachable,
     prefer_ipv4,
     redact_url,
@@ -2334,3 +2336,82 @@ class TestDownloadProgressBar:
         assert len(seen) == 2, f"expected one bar per attempt, got {len(seen)}"
         assert all("initial" not in kwargs for kwargs in seen), seen
         assert [kwargs["total"] for kwargs in seen] == [22, 22]
+
+
+class _WriteFails:
+    """Serves a good response whose body raises `OSError` on the first block."""
+
+    def __init__(self, exc: OSError) -> None:
+        self._exc = exc
+        self.calls = 0
+
+    def get(self, url: str, **kwargs: Any) -> _ScriptedBody:
+        """Return a body that will fail while being written."""
+        self.calls += 1
+        return _RaisingBody(self._exc)
+
+
+class _RaisingBody(_ScriptedBody):
+    """A body whose stream raises the injected error instead of yielding."""
+
+    def __init__(self, exc: OSError) -> None:
+        super().__init__(_PAYLOAD)
+        self._exc = exc
+
+    def iter_content(self, chunk_size: int = 1) -> Any:
+        """Raise instead of yielding, standing in for a failing write."""
+        raise self._exc
+        yield b""  # pragma: no cover - makes this a generator
+
+
+@pytest.mark.unit
+class TestLocalStorageFailuresAreDeterministic:
+    """A failure of the destination is not a transport blip."""
+
+    @pytest.mark.parametrize(
+        "name", ["ENOSPC", "EROFS", "EACCES", "EPERM", "EFBIG", "EISDIR"]
+    )
+    def test_a_filesystem_refusal_is_never_retryable(self, name):
+        """No retry makes the disk larger or the mount writable."""
+        code = getattr(errno, name)
+        exc = OSError(code, "refused")
+        assert classify_transport_error(exc, strict=True) is None
+        assert classify_transport_error(exc, strict=False) is None
+
+    def test_a_wrapped_socket_error_is_still_a_transport_failure(self):
+        """`ConnectionResetError` is an `OSError` too, and must stay retryable."""
+        wrapped = requests.ConnectionError(ConnectionResetError("reset"))
+        assert classify_transport_error(wrapped) == "read"
+
+    def test_a_bare_socket_error_still_honours_a_caller_that_named_oserror(self):
+        """The disk rule must not swallow the socket errors that share the type."""
+        bare = ConnectionResetError(errno.ECONNRESET, "reset")
+        assert classify_transport_error(bare, strict=False) == "read"
+
+    def test_an_unrecognised_errno_keeps_the_callers_choice(self):
+        """The rule names specific conditions rather than claiming every `OSError`."""
+        exc = OSError(errno.EINTR, "interrupted")
+        assert classify_transport_error(exc, strict=True) is None
+        assert classify_transport_error(exc, strict=False) == "read"
+
+    def test_a_requests_error_is_not_mistaken_for_a_disk_error(self):
+        """`RequestException` subclasses `OSError`, so the check must exclude it."""
+        assert not _is_local_storage_error(requests.ConnectionError("boom"))
+        assert not _is_local_storage_error(
+            IncompleteDownloadError("short", written=1, expected=2)
+        )
+
+    def test_a_full_disk_is_not_retried_by_a_caller_that_named_oserror(self, tmp_path):
+        """The three archive backends pass `OSError`, and would otherwise refetch."""
+        session = _WriteFails(OSError(errno.ENOSPC, "No space left on device"))
+        client = HttpClient(
+            session=session,
+            sleep=lambda _: None,
+            max_retries=5,
+            retry_on_exceptions=(requests.RequestException, OSError),
+        )
+        with pytest.raises(OSError) as excinfo:
+            client.download("http://x/g", tmp_path / "g", progress=False)
+        assert excinfo.value.errno == errno.ENOSPC
+        assert session.calls == 1, f"expected 1 attempt, got {session.calls}"
+        assert not (tmp_path / "g.part").exists()

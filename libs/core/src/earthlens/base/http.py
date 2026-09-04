@@ -110,6 +110,69 @@ NON_RETRYABLE_EXCEPTIONS: tuple[type[BaseException], ...] = (
     requests.exceptions.ProxyError,
 )
 
+#: Local-filesystem conditions that a retry cannot improve. These reach
+#: :func:`classify_transport_error` as a bare `OSError` from the streaming write
+#: rather than from the socket, and the three backends that download multi-
+#: gigabyte archives name `OSError` in their `retry_on_exceptions`, so without
+#: this a full disk re-downloads the whole object once per retry to fail at the
+#: same byte. Every entry is a standing property of the destination — no space,
+#: no quota, a read-only mount, no permission — not a transient one.
+_DETERMINISTIC_OS_ERRNOS: frozenset[int] = frozenset(
+    code
+    for code in (
+        getattr(errno, name, None)
+        for name in (
+            "ENOSPC",
+            "EDQUOT",
+            "EROFS",
+            "EACCES",
+            "EPERM",
+            "EFBIG",
+            "EISDIR",
+            "ENOTDIR",
+            "ENAMETOOLONG",
+        )
+    )
+    if code is not None
+)
+
+
+def _is_local_storage_error(exc: BaseException) -> bool:
+    """Whether `exc` is a filesystem refusal rather than a transport failure.
+
+    A `requests` error is excluded even though `RequestException` subclasses
+    `OSError`: those carry no `errno` of their own and describe the socket, not
+    the destination.
+
+    Args:
+        exc: The exception a download attempt raised.
+
+    Returns:
+        bool: True when writing the file failed for a reason the next attempt
+        would hit again.
+
+    Examples:
+        - A full disk is deterministic:
+            ```python
+            >>> import errno
+            >>> from earthlens.base.http import _is_local_storage_error
+            >>> _is_local_storage_error(OSError(errno.ENOSPC, "No space left"))
+            True
+
+            ```
+        - A reset socket is not, even though it is also an `OSError`:
+            ```python
+            >>> from earthlens.base.http import _is_local_storage_error
+            >>> _is_local_storage_error(ConnectionResetError("reset"))
+            False
+
+            ```
+    """
+    if isinstance(exc, requests.RequestException) or not isinstance(exc, OSError):
+        return False
+    return exc.errno in _DETERMINISTIC_OS_ERRNOS
+
+
 #: Retries allowed for a failure in the *connect* phase, counted separately from
 #: :data:`DEFAULT_READ_RETRIES`. Deliberately small: a refused connection, an
 #: unresolvable name or a connect timeout almost always means the host is down
@@ -272,7 +335,9 @@ def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str 
     Returns:
         str | None: `"connect"`, `"read"`, `"unknown"` when the causes
         identify neither phase, or `None` when the failure is deterministic and
-        must not be retried at all.
+        must not be retried at all. A failure of the *destination* rather than
+        the transport — a full disk, a quota, a read-only mount — is deterministic
+        whatever `strict` says, because no retry policy makes the disk larger.
 
         `"unknown"` exists because the two decisions this feeds pull opposite
         ways. For the *budget*, an unidentified failure should cost little, like
@@ -307,6 +372,17 @@ def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str 
             True
 
             ```
+        - A full disk is never retried, even by a caller that named `OSError`
+          in its own retry set:
+            ```python
+            >>> import errno
+            >>> from earthlens.base.http import classify_transport_error
+            >>> classify_transport_error(
+            ...     OSError(errno.ENOSPC, "No space left on device"), strict=False
+            ... ) is None
+            True
+
+            ```
         - A caller that named a type itself gets it retried, on the read
           budget:
             ```python
@@ -329,6 +405,11 @@ def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str 
 
             ```
     """
+    if _is_local_storage_error(exc):
+        # Ahead of the `strict` gate: this holds however the caller configured
+        # the retry set, because the failure is the destination's, not the
+        # transport's, and a replay re-downloads the body to fail identically.
+        return None
     if strict and isinstance(exc, NON_RETRYABLE_EXCEPTIONS):
         return None
     if isinstance(exc, requests.exceptions.ConnectTimeout):
