@@ -1494,9 +1494,16 @@ class HttpClient:
                     if not resume_from:
                         # Only a full response describes the whole resource, so
                         # the resume state is captured from attempt one.
-                        resumable = "bytes" in response.headers.get(
-                            "Accept-Ranges", ""
-                        ).lower() and not response.headers.get("Content-Encoding")
+                        # Three preconditions, not one. Ranges must be
+                        # supported; the body must be unencoded, since the
+                        # staged count is of decoded bytes; and the total must
+                        # be known, because it is the only thing that can
+                        # confirm the reassembled file afterwards. A validator
+                        # is required too (checked below) — without one a
+                        # server may legally answer from a newer
+                        # representation. Resuming without any of these trades
+                        # a re-download for a file nobody can verify.
+                        expected_total = _progress_total(response.headers)
                         etag = response.headers.get("ETag", "")
                         # RFC 9110 §13.1.5: `If-Range` takes a *strong*
                         # validator. A weak one (`W/"..."`) only promises
@@ -1509,7 +1516,20 @@ class HttpClient:
                         if not range_validator:
                             range_validator = response.headers.get("Last-Modified")
                             range_validator_header = "Last-Modified"
-                        expected_total = _progress_total(response.headers)
+                        # Three preconditions, not one. Ranges must be
+                        # supported; the body must be unencoded, since the
+                        # staged count is of decoded bytes; the total must be
+                        # known, because it is the only thing that can confirm
+                        # the reassembled file; and there must be a validator,
+                        # or a server may legally answer from a newer
+                        # representation. Failing any of them, a restart costs
+                        # bandwidth while resuming would cost correctness.
+                        resumable = (
+                            "bytes" in response.headers.get("Accept-Ranges", "").lower()
+                            and not response.headers.get("Content-Encoding")
+                            and expected_total is not None
+                            and bool(range_validator)
+                        )
                     self._stream_to_file(
                         response,
                         tmp,
@@ -1518,10 +1538,30 @@ class HttpClient:
                         desc=dest.name,
                         resume_from=resume_from,
                     )
+                    if expected_total is not None and staged:
+                        # The post-condition the resume path turns on: whatever
+                        # legs it took, the assembled file must be the size the
+                        # first response described. A server may answer a range
+                        # request with a legal but *short* sub-range, or with an
+                        # end position past the object, and both produce a file
+                        # that streams cleanly and is the wrong length.
+                        # `expect_magic` cannot catch either, since the head
+                        # bytes came from the first attempt.
+                        written = tmp.stat().st_size
+                        if written != expected_total:
+                            raise RangeReadError(
+                                f"{redact_url(url)} assembled to {written} bytes, "
+                                f"expected {expected_total}"
+                            )
                     if expect_magic is not None:
                         _check_magic(tmp, expect_magic, url)
                 finally:
                     response.close()
+            except RangeReadError:
+                # A size mismatch is a server-behaviour problem, not a transport
+                # blip; repeating the same request reproduces it.
+                discard_partial()
+                raise
             except self.retry_on_exceptions as exc:
                 # No idempotency gate here, unlike `_request_with_retry`: this
                 # loop only ever issues the GET above, so the verb is always

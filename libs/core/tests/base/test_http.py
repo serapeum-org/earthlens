@@ -16,6 +16,7 @@ from earthlens.base.http import (
     DEFAULT_STATUS_FORCELIST,
     DEFAULT_TIMEOUT,
     HttpClient,
+    RangeReadError,
     RequestsGet,
     _check_magic,
     _default_user_agent,
@@ -1998,4 +1999,91 @@ class TestRemainingRetryBranches:
         assert session.calls == 1, "a POST must not be replayed on a 500"
         assert any("not retrying a POST" in r.message for r in caplog.records), (
             f"the suppression must be logged; got {[r.message for r in caplog.records]}"
+        )
+
+
+@pytest.mark.unit
+class TestResumePostCondition:
+    """Whatever legs a resume takes, the assembled file must be the right size."""
+
+    def test_a_short_sub_range_is_refused_not_published(self, tmp_path):
+        """A legal but short `206` must not be published as the whole object.
+
+        A range-capping origin or caching proxy may answer `Range: bytes=5-`
+        with `bytes 5-7/22` and an honest `Content-Length: 3`. It streams
+        cleanly, urllib3's length enforcement does not fire, and `expect_magic`
+        cannot catch it because the head bytes came from the first attempt.
+        """
+        payload = b"0123456789ABCDEFGHIJKL"
+
+        class _ShortSubRange:
+            def __init__(self):
+                self.calls = 0
+
+            def get(self, url, **kwargs):
+                self.calls += 1
+                if kwargs.get("headers", {}).get("Range"):
+                    body = _PartialBody(payload[5:8], None)
+                    body.status_code = 206
+                    body.headers["Content-Range"] = f"bytes 5-7/{len(payload)}"
+                    body.headers["Content-Length"] = "3"
+                    body.headers["ETag"] = '"v1"'
+                    return body
+                body = _PartialBody(payload, 5)
+                body.headers["ETag"] = '"v1"'
+                return body
+
+        client = HttpClient(session=_ShortSubRange(), sleep=lambda _: None)
+        dest = tmp_path / "g.bin"
+        with pytest.raises(RangeReadError, match="assembled to 8 bytes"):
+            client.download("http://x/g.bin", dest, progress=False, chunk=1)
+        assert not dest.exists(), "a mismatched assembly must not be published"
+
+    def test_no_resume_without_a_known_total(self, tmp_path):
+        """A chunked first response has no total, so nothing could verify a resume."""
+        payload = b"abcdefghij" * 5
+
+        class _Chunked:
+            def __init__(self):
+                self.calls = 0
+                self.ranged = []
+
+            def get(self, url, **kwargs):
+                self.calls += 1
+                self.ranged.append(kwargs.get("headers", {}).get("Range"))
+                body = _PartialBody(payload, 20 if self.calls == 1 else None)
+                body.headers.pop("Content-Length")
+                body.headers["ETag"] = '"v1"'
+                return body
+
+        session = _Chunked()
+        client = HttpClient(session=session, sleep=lambda _: None)
+        dest = tmp_path / "g.bin"
+        client.download("http://x/g.bin", dest, progress=False, chunk=10)
+        assert dest.read_bytes() == payload, "the restart must still produce the file"
+        assert session.ranged[1] is None, (
+            "without a total there is nothing to verify against, so no resume"
+        )
+
+    def test_no_resume_without_a_validator(self, tmp_path):
+        """Without `ETag` or `Last-Modified` a server may answer from a newer object."""
+        payload = b"abcdefghij" * 5
+
+        class _NoValidator:
+            def __init__(self):
+                self.calls = 0
+                self.ranged = []
+
+            def get(self, url, **kwargs):
+                self.calls += 1
+                self.ranged.append(kwargs.get("headers", {}).get("Range"))
+                return _PartialBody(payload, 20 if self.calls == 1 else None)
+
+        session = _NoValidator()
+        client = HttpClient(session=session, sleep=lambda _: None)
+        dest = tmp_path / "g.bin"
+        client.download("http://x/g.bin", dest, progress=False, chunk=10)
+        assert dest.read_bytes() == payload
+        assert session.ranged[1] is None, (
+            "an unpinnable representation must restart, not resume"
         )
