@@ -1224,10 +1224,12 @@ class AbstractDataSource(ABC):
 
         The shared form of the skip-if-exists check eight backends each
         hand-rolled as `dest.exists() and dest.stat().st_size > 0`. Routing
-        them through one helper means a re-run skips what it already has, a
-        failed multi-gigabyte fetch resumes instead of restarting from zero,
-        and — where the caller knows the size — a *truncated* file is no
-        longer mistaken for a finished one.
+        them through one helper means a re-run skips what it already has — so
+        a multi-granule job that died halfway carries on from the granule it
+        reached, rather than re-fetching the ones already written — and, where
+        the caller knows the size, a *truncated* file is no longer mistaken
+        for a finished one. This is resumption at the level of whole files:
+        `HttpClient.download` never resumes the bytes *within* one.
 
         "Non-empty" is a weak completeness signal on its own: it is only
         trustworthy because the shared downloader writes to a sibling

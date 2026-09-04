@@ -65,6 +65,40 @@ The default `User-Agent` is `earthlens/{version}` — deliberately **non-Mozilla
 Anubis anti-bot wall (SPEIbase) blocks browser-like agents. Pass `user_agent=` for a descriptive contact string
 (e.g. Overpass / ohsome etiquette).
 
+## Downloads read the whole object
+
+`download` reads the object **once, whole**, on every attempt. It generates no `Range` header of its own, and a
+retry re-requests from byte 0 rather than appending to what is already on disk.
+
+That is a deliberate limit, not a missing feature. Appending to a partial file is only safe if the new bytes
+provably belong to the same representation as the old ones, and the guarantees a server actually offers are not
+strong enough to prove it: `Accept-Ranges: bytes` is advertised by hosts that then ignore `Range` and send the
+whole body from zero; `Last-Modified` has one-second resolution, so a validator can match across a real change;
+and a server may answer `416` without the `Content-Range` that would say how much it actually has. Every one of
+those produces a file that is the right *size* and the wrong *bytes* — corruption that survives to the user
+rather than failing loudly.
+
+What replaces it is verification after the fact:
+
+| Response | `download` does |
+|---|---|
+| a body matching its `Content-Length` | publishes it |
+| a body **short** of it | raises `IncompleteDownloadError`, and retries once from the start |
+| a body **longer** than it, or the same short count twice | raises `IncompleteDownloadError` without retrying — both repeat |
+| no usable length (chunked, `Content-Encoding`, contradictory duplicates) | publishes it unchecked; there is no claim to check |
+| a `206` to a request that carried no `Range` | raises `UnsolicitedPartialContentError` without retrying |
+| a break *after* the last byte, when the size already matches | keeps it; the equality is the whole proof |
+
+Because the check compares against bytes as delivered, `download` sends `Accept-Encoding: identity` — but only
+when neither the call nor the constructor named that header in any casing, so a backend that needs `gzip`, or
+that sets `identity` itself to protect a magic check, keeps what it asked for.
+
+A `Range` you pass yourself is honoured verbatim: the response is accepted at its own `Content-Length`, and
+`download` does not check that the server returned the range you asked for.
+
+Interrupted *multi-file* jobs still resume — `_is_complete()` skips the granules already on disk (see
+[contracts](contracts.md)). It is only the bytes of a single file that are never resumed.
+
 ## Testability
 
 Both the transport and the wait are injectable, so the whole client is unit-testable with a fake session and no
