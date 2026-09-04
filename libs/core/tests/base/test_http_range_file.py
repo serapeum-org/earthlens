@@ -9,7 +9,12 @@ from typing import Any
 import pytest
 import requests
 
-from earthlens.base.http import HttpClient, HttpRangeFile, RangeReadError
+from earthlens.base.http import (
+    HttpClient,
+    HttpRangeFile,
+    RangeReadError,
+    redact_url,
+)
 
 
 class _RangeResp:
@@ -412,7 +417,10 @@ class TestRangeReadErrors:
         reader = _range_file(session)
         with pytest.raises(RangeReadError) as excinfo:
             reader.read(8)
-        assert "example.org" in str(excinfo.value)
+        # Compared against the reader's own redacted URL rather than a
+        # hostname literal: the point is that the message names the object
+        # that failed, whatever `redact_url` leaves of it.
+        assert redact_url(reader.url) in str(excinfo.value)
         assert isinstance(excinfo.value.__cause__, requests.ConnectionError)
 
     def test_it_is_not_an_oserror(self):
