@@ -26746,10 +26746,7 @@ endpoint serves (the refreshed index; informational).</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/imagery/src/earthlens/stac/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-294">294</a></span>
-<span class="normal"><a href="#__codelineno-0-295">295</a></span>
-<span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-297">297</a></span>
 <span class="normal"><a href="#__codelineno-0-298">298</a></span>
 <span class="normal"><a href="#__codelineno-0-299">299</a></span>
 <span class="normal"><a href="#__codelineno-0-300">300</a></span>
@@ -26981,242 +26978,245 @@ endpoint serves (the refreshed index; informational).</p>
 <span class="normal"><a href="#__codelineno-0-526">526</a></span>
 <span class="normal"><a href="#__codelineno-0-527">527</a></span>
 <span class="normal"><a href="#__codelineno-0-528">528</a></span>
-<span class="normal"><a href="#__codelineno-0-529">529</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;YAML-backed catalog of STAC endpoints, collections, and assets.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Reads every `*.yaml` under :data:`CATALOG_PATH` on construction and merges</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    them into one catalog of typed :class:`Endpoint` / :class:`Collection` /</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    :class:`Asset` models. Collections are stored under the inherited</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    :attr:`datasets` field (keyed by logical collection key); endpoints live in</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    :attr:`endpoints`; the per-endpoint `available_collections:` index lives in</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    :attr:`available_collections`.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        endpoints: Endpoint key → :class:`Endpoint`.</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        available_collections: Endpoint key → list of every collection id the</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            endpoint serves (the refreshed index; informational).</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        datasets: Logical collection key → :class:`Collection`.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        - Construct the catalog and inspect the endpoints it serves:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            &gt;&gt;&gt; sorted(cat.endpoints)  # doctest: +NORMALIZE_WHITESPACE</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            [&#39;bdc&#39;, &#39;cdse&#39;, &#39;dea&#39;, &#39;deafrica&#39;, &#39;earth-search&#39;, &#39;eodc&#39;, &#39;planetary-computer&#39;,</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">             &#39;usgs-landsat&#39;, &#39;veda&#39;]</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            &gt;&gt;&gt; cat.get_collection(&quot;sentinel-2-l2a&quot;).resolution</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            10.0</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        - Reach a collection&#39;s default asset set:</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_collection(&quot;sentinel-2-l2a&quot;).default_assets</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            [&#39;B02&#39;, &#39;B03&#39;, &#39;B04&#39;, &#39;B08&#39;]</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    &quot;&quot;&quot;</span>
+<span class="normal"><a href="#__codelineno-0-529">529</a></span>
+<span class="normal"><a href="#__codelineno-0-530">530</a></span>
+<span class="normal"><a href="#__codelineno-0-531">531</a></span>
+<span class="normal"><a href="#__codelineno-0-532">532</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;YAML-backed catalog of STAC endpoints, collections, and assets.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    Reads every `*.yaml` under :data:`CATALOG_PATH` on construction and merges</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    them into one catalog of typed :class:`Endpoint` / :class:`Collection` /</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    :class:`Asset` models. Collections are stored under the inherited</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    :attr:`datasets` field (keyed by logical collection key); endpoints live in</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    :attr:`endpoints`; the per-endpoint `available_collections:` index lives in</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    :attr:`available_collections`.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        endpoints: Endpoint key → :class:`Endpoint`.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        available_collections: Endpoint key → list of every collection id the</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            endpoint serves (the refreshed index; informational).</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        datasets: Logical collection key → :class:`Collection`.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        - Construct the catalog and inspect the endpoints it serves:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            &gt;&gt;&gt; sorted(cat.endpoints)  # doctest: +NORMALIZE_WHITESPACE</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            [&#39;bdc&#39;, &#39;cdse&#39;, &#39;dea&#39;, &#39;deafrica&#39;, &#39;earth-search&#39;, &#39;eodc&#39;, &#39;planetary-computer&#39;,</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">             &#39;usgs-landsat&#39;, &#39;veda&#39;]</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            &gt;&gt;&gt; cat.get_collection(&quot;sentinel-2-l2a&quot;).resolution</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            10.0</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        - Reach a collection&#39;s default asset set:</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_collection(&quot;sentinel-2-l2a&quot;).default_assets</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            [&#39;B02&#39;, &#39;B03&#39;, &#39;B04&#39;, &#39;B08&#39;]</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;STAC catalog&quot;</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="n">endpoints</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Endpoint</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="n">available_collections</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no collections were supplied.</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;STAC catalog&quot;</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="n">endpoints</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Endpoint</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="n">available_collections</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        `Catalog()` with no args reads the bundled `catalog/` directory through</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        the `(path, mtime)`-keyed cache. If the caller passed `datasets=...`,</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        the disk read is skipped (in-memory catalogs for tests). The base</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        `available_datasets` field is populated with the flattened, sorted</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        union of the per-endpoint `available_collections` index so it is</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        discoverable through the `AbstractCatalog` contract, then</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        `super().model_post_init` populates `catalog` from `get_catalog()`.</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors as</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">                :meth:`load`.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">endpoints</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_collections</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_collections</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">providers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">:</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                <span class="p">{</span><span class="n">cid</span> <span class="k">for</span> <span class="n">ids</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_collections</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">}</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="p">)</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the STAC catalog from disk (cached).</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">            catalog_path: Catalog directory or single `*.yaml` file. Defaults</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">                to module-level :data:`CATALOG_PATH`.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no collections were supplied.</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        `Catalog()` with no args reads the bundled `catalog/` directory through</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        the `(path, mtime)`-keyed cache. If the caller passed `datasets=...`,</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        the disk read is skipped (in-memory catalogs for tests). The base</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        `available_datasets` field is populated with the flattened, sorted</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        union of the per-endpoint `available_collections` index so it is</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        discoverable through the `AbstractCatalog` contract, then</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        `super().model_post_init` populates `catalog` from `get_catalog()`.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors as</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">                :meth:`load`.</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">endpoints</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_collections</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_collections</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">:</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">providers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">:</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>                <span class="p">{</span><span class="n">cid</span> <span class="k">for</span> <span class="n">ids</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_collections</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">}</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>            <span class="p">)</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the STAC catalog from disk (cached).</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            catalog_path: Catalog directory or single `*.yaml` file. Defaults</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">                to module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">            ValueError: Propagated from the loader.</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="n">endpoints</span><span class="p">,</span> <span class="n">available</span><span class="p">,</span> <span class="n">collections</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="n">endpoints</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">endpoints</span><span class="p">),</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>            <span class="n">available_collections</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">collections</span><span class="p">),</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="p">)</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">]:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated collection map (logical key → :class:`Collection`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">            ValueError: Propagated from the loader.</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="n">endpoints</span><span class="p">,</span> <span class="n">available</span><span class="p">,</span> <span class="n">collections</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>            <span class="n">endpoints</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">endpoints</span><span class="p">),</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="n">available_collections</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">collections</span><span class="p">),</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="p">)</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">]:</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated collection map (logical key → :class:`Collection`).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">        Alias of the inherited :meth:`get_dataset`; provided for naming clarity.</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">            collection_key: Logical collection key.</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        Alias of the inherited :meth:`get_dataset`; provided for naming clarity.</span>
 <a id="__codelineno-0-400" name="__codelineno-0-400"></a>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">            The matching :class:`Collection`.</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">            collection_key: Logical collection key.</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">            ValueError: If the key is unknown (message suggests the closest key).</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">            The matching :class:`Collection`.</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            - Look up a collection and read its native cadence:</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">                &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_collection(&quot;sentinel-2-l2a&quot;).cadence</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">                &#39;5-day&#39;</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Endpoint</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Endpoint` for `endpoint_key`.</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            ValueError: If the key is unknown (message suggests the closest key).</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            - Look up a collection and read its native cadence:</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">                &gt;&gt;&gt; Catalog().get_collection(&quot;sentinel-2-l2a&quot;).cadence</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">                &#39;5-day&#39;</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">            endpoint_key: Endpoint key.</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Endpoint</span><span class="p">:</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Endpoint` for `endpoint_key`.</span>
 <a id="__codelineno-0-423" name="__codelineno-0-423"></a>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">            The matching :class:`Endpoint`.</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">            endpoint_key: Endpoint key.</span>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            ValueError: If the endpoint is unknown.</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">            The matching :class:`Endpoint`.</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            - Read an endpoint&#39;s signer type and URL:</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">                &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">                &gt;&gt;&gt; ep = Catalog().get_endpoint(&quot;planetary-computer&quot;)</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">                &gt;&gt;&gt; ep.signer</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">                &#39;mpc-sas&#39;</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">                &gt;&gt;&gt; ep.url</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">                &#39;https://planetarycomputer.microsoft.com/api/stac/v1&#39;</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">endpoint_key</span><span class="p">]</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">endpoint_key</span><span class="si">!r}</span><span class="s2"> is not a known endpoint. &quot;</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>                <span class="sa">f</span><span class="s2">&quot;Known endpoints: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a logical collection key to the id `endpoint` actually serves.</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            ValueError: If the endpoint is unknown.</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">            - Read an endpoint&#39;s signer type and URL:</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">                &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">                &gt;&gt;&gt; ep = Catalog().get_endpoint(&quot;planetary-computer&quot;)</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">                &gt;&gt;&gt; ep.signer</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">                &#39;mpc-sas&#39;</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">                &gt;&gt;&gt; ep.url</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">                &#39;https://planetarycomputer.microsoft.com/api/stac/v1&#39;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">endpoint_key</span><span class="p">]</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">endpoint_key</span><span class="si">!r}</span><span class="s2"> is not a known endpoint. &quot;</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>                <span class="sa">f</span><span class="s2">&quot;Known endpoints: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        Applies the collection&#39;s per-endpoint `aliases`, falling back to the</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        collection&#39;s `collection_id` (then the logical key itself).</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a logical collection key to the id `endpoint` actually serves.</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">            endpoint: Endpoint key the request targets.</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">            collection_key: Logical collection key.</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">            The upstream collection id to pass to `client.search(collections=)`.</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        Applies the collection&#39;s per-endpoint `aliases`, falling back to the</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        collection&#39;s `collection_id` (then the logical key itself).</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">            endpoint: Endpoint key the request targets.</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">            collection_key: Logical collection key.</span>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">            ValueError: If `collection_key` is unknown.</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">            The upstream collection id to pass to `client.search(collections=)`.</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">            - Earth Search serves Sentinel-2 L2A under a different id:</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">                &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;earth-search&quot;, &quot;sentinel-2-l2a&quot;)</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">                &#39;sentinel-2-c1-l2a&#39;</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">            - Without an alias the collection&#39;s own id is returned:</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">                &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;planetary-computer&quot;, &quot;sentinel-2-l2a&quot;)</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">                &#39;sentinel-2-l2a&#39;</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">collection_key</span><span class="p">)</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>        <span class="k">if</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">collection</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>            <span class="k">return</span> <span class="n">collection</span><span class="o">.</span><span class="n">aliases</span><span class="p">[</span><span class="n">endpoint</span><span class="p">]</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="k">return</span> <span class="n">collection</span><span class="o">.</span><span class="n">collection_id</span> <span class="ow">or</span> <span class="n">collection_key</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_assets</span><span class="p">(</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">assets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Rename `assets` to the keys `endpoint` actually publishes.</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">        The catalog names each asset once, but an endpoint may publish the same</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">        band under a different key — CDSE splits Sentinel-2 per resolution, so</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">        the catalog&#39;s `B04` is `B04_10m` there. An asset the endpoint does not</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">        rename is returned unchanged, so only the renaming endpoints need an</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        `asset_aliases` entry.</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">            endpoint: Endpoint key the request targets.</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">            collection_key: Logical collection key.</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">            assets: Asset keys in the catalog&#39;s own naming.</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">            The asset keys to request from `endpoint`, in the given order.</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">            ValueError: If `collection_key` is unknown.</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">            - Earth Search serves Sentinel-2 L2A under a different id:</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">                &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;earth-search&quot;, &quot;sentinel-2-l2a&quot;)</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">                &#39;sentinel-2-c1-l2a&#39;</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">            - Without an alias the collection&#39;s own id is returned:</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">                &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve(&quot;planetary-computer&quot;, &quot;sentinel-2-l2a&quot;)</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">                &#39;sentinel-2-l2a&#39;</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">collection_key</span><span class="p">)</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>        <span class="k">if</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">collection</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>            <span class="k">return</span> <span class="n">collection</span><span class="o">.</span><span class="n">aliases</span><span class="p">[</span><span class="n">endpoint</span><span class="p">]</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="k">return</span> <span class="n">collection</span><span class="o">.</span><span class="n">collection_id</span> <span class="ow">or</span> <span class="n">collection_key</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_assets</span><span class="p">(</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">assets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Rename `assets` to the keys `endpoint` actually publishes.</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">        The catalog names each asset once, but an endpoint may publish the same</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        band under a different key — CDSE splits Sentinel-2 per resolution, so</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        the catalog&#39;s `B04` is `B04_10m` there. An asset the endpoint does not</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">        rename is returned unchanged, so only the renaming endpoints need an</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        `asset_aliases` entry.</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">            endpoint: Endpoint key the request targets.</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">            collection_key: Logical collection key.</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">            assets: Asset keys in the catalog&#39;s own naming.</span>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            ValueError: If `collection_key` is unknown.</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            The asset keys to request from `endpoint`, in the given order.</span>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">            - CDSE publishes Sentinel-2 bands per resolution:</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">                &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve_assets(&quot;cdse&quot;, &quot;sentinel-2-l2a&quot;, [&quot;B04&quot;])</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">                [&#39;B04_10m&#39;]</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">            - An endpoint that does not rename gets the keys unchanged:</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">                &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve_assets(</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">                ...     &quot;planetary-computer&quot;, &quot;sentinel-2-l2a&quot;, [&quot;B04&quot;]</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">                ... )</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">                [&#39;B04&#39;]</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">collection_key</span><span class="p">)</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>        <span class="n">renames</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">asset_aliases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="p">{})</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">renames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">asset</span><span class="p">,</span> <span class="n">asset</span><span class="p">)</span> <span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">assets</span><span class="p">]</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">            ValueError: If `collection_key` is unknown.</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">            - CDSE publishes Sentinel-2 bands per resolution:</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">                &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve_assets(&quot;cdse&quot;, &quot;sentinel-2-l2a&quot;, [&quot;B04&quot;])</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">                [&#39;B04_10m&#39;]</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">            - An endpoint that does not rename gets the keys unchanged:</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">                &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">                &gt;&gt;&gt; Catalog().resolve_assets(</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">                ...     &quot;planetary-computer&quot;, &quot;sentinel-2-l2a&quot;, [&quot;B04&quot;]</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">                [&#39;B04&#39;]</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">collection_key</span><span class="p">)</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="n">renames</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">asset_aliases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="p">{})</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">renames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">asset</span><span class="p">,</span> <span class="n">asset</span><span class="p">)</span> <span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">assets</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27249,11 +27249,11 @@ endpoint serves (the refreshed index; informational).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/stac/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-389">389</a></span>
-<span class="normal"><a href="#__codelineno-0-390">390</a></span>
-<span class="normal"><a href="#__codelineno-0-391">391</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">]:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated collection map (logical key → :class:`Collection`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-392">392</a></span>
+<span class="normal"><a href="#__codelineno-0-393">393</a></span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">]:</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated collection map (logical key → :class:`Collection`).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27364,10 +27364,7 @@ endpoint serves (the refreshed index; informational).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/stac/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span>
-<span class="normal"><a href="#__codelineno-0-395">395</a></span>
-<span class="normal"><a href="#__codelineno-0-396">396</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-396">396</a></span>
 <span class="normal"><a href="#__codelineno-0-397">397</a></span>
 <span class="normal"><a href="#__codelineno-0-398">398</a></span>
 <span class="normal"><a href="#__codelineno-0-399">399</a></span>
@@ -27387,30 +27384,33 @@ endpoint serves (the refreshed index; informational).</p>
 <span class="normal"><a href="#__codelineno-0-413">413</a></span>
 <span class="normal"><a href="#__codelineno-0-414">414</a></span>
 <span class="normal"><a href="#__codelineno-0-415">415</a></span>
-<span class="normal"><a href="#__codelineno-0-416">416</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">    Alias of the inherited :meth:`get_dataset`; provided for naming clarity.</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        collection_key: Logical collection key.</span>
+<span class="normal"><a href="#__codelineno-0-416">416</a></span>
+<span class="normal"><a href="#__codelineno-0-417">417</a></span>
+<span class="normal"><a href="#__codelineno-0-418">418</a></span>
+<span class="normal"><a href="#__codelineno-0-419">419</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">    Alias of the inherited :meth:`get_dataset`; provided for naming clarity.</span>
 <a id="__codelineno-0-400" name="__codelineno-0-400"></a>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        The matching :class:`Collection`.</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        collection_key: Logical collection key.</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        ValueError: If the key is unknown (message suggests the closest key).</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        The matching :class:`Collection`.</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        - Look up a collection and read its native cadence:</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_collection(&quot;sentinel-2-l2a&quot;).cadence</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            &#39;5-day&#39;</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        ValueError: If the key is unknown (message suggests the closest key).</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        - Look up a collection and read its native cadence:</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">            &gt;&gt;&gt; Catalog().get_collection(&quot;sentinel-2-l2a&quot;).cadence</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            &#39;5-day&#39;</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27523,10 +27523,7 @@ endpoint serves (the refreshed index; informational).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/stac/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-418">418</a></span>
-<span class="normal"><a href="#__codelineno-0-419">419</a></span>
-<span class="normal"><a href="#__codelineno-0-420">420</a></span>
-<span class="normal"><a href="#__codelineno-0-421">421</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-421">421</a></span>
 <span class="normal"><a href="#__codelineno-0-422">422</a></span>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
 <span class="normal"><a href="#__codelineno-0-424">424</a></span>
@@ -27553,37 +27550,40 @@ endpoint serves (the refreshed index; informational).</p>
 <span class="normal"><a href="#__codelineno-0-445">445</a></span>
 <span class="normal"><a href="#__codelineno-0-446">446</a></span>
 <span class="normal"><a href="#__codelineno-0-447">447</a></span>
-<span class="normal"><a href="#__codelineno-0-448">448</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Endpoint</span><span class="p">:</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Endpoint` for `endpoint_key`.</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">        endpoint_key: Endpoint key.</span>
+<span class="normal"><a href="#__codelineno-0-448">448</a></span>
+<span class="normal"><a href="#__codelineno-0-449">449</a></span>
+<span class="normal"><a href="#__codelineno-0-450">450</a></span>
+<span class="normal"><a href="#__codelineno-0-451">451</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Endpoint</span><span class="p">:</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Endpoint` for `endpoint_key`.</span>
 <a id="__codelineno-0-423" name="__codelineno-0-423"></a>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        The matching :class:`Endpoint`.</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        endpoint_key: Endpoint key.</span>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        ValueError: If the endpoint is unknown.</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        The matching :class:`Endpoint`.</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        - Read an endpoint&#39;s signer type and URL:</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">            &gt;&gt;&gt; ep = Catalog().get_endpoint(&quot;planetary-computer&quot;)</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">            &gt;&gt;&gt; ep.signer</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            &#39;mpc-sas&#39;</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">            &gt;&gt;&gt; ep.url</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            &#39;https://planetarycomputer.microsoft.com/api/stac/v1&#39;</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">endpoint_key</span><span class="p">]</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">endpoint_key</span><span class="si">!r}</span><span class="s2"> is not a known endpoint. &quot;</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>            <span class="sa">f</span><span class="s2">&quot;Known endpoints: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        ValueError: If the endpoint is unknown.</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        - Read an endpoint&#39;s signer type and URL:</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">            &gt;&gt;&gt; ep = Catalog().get_endpoint(&quot;planetary-computer&quot;)</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            &gt;&gt;&gt; ep.signer</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">            &#39;mpc-sas&#39;</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            &gt;&gt;&gt; ep.url</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">            &#39;https://planetarycomputer.microsoft.com/api/stac/v1&#39;</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">endpoint_key</span><span class="p">]</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">endpoint_key</span><span class="si">!r}</span><span class="s2"> is not a known endpoint. &quot;</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>            <span class="sa">f</span><span class="s2">&quot;Known endpoints: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27688,10 +27688,7 @@ to module-level :data:<code>CATALOG_PATH</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/stac/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-367">367</a></span>
-<span class="normal"><a href="#__codelineno-0-368">368</a></span>
-<span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-370">370</a></span>
 <span class="normal"><a href="#__codelineno-0-371">371</a></span>
 <span class="normal"><a href="#__codelineno-0-372">372</a></span>
 <span class="normal"><a href="#__codelineno-0-373">373</a></span>
@@ -27708,27 +27705,30 @@ to module-level :data:<code>CATALOG_PATH</code>.</p>
 <span class="normal"><a href="#__codelineno-0-384">384</a></span>
 <span class="normal"><a href="#__codelineno-0-385">385</a></span>
 <span class="normal"><a href="#__codelineno-0-386">386</a></span>
-<span class="normal"><a href="#__codelineno-0-387">387</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the STAC catalog from disk (cached).</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        catalog_path: Catalog directory or single `*.yaml` file. Defaults</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            to module-level :data:`CATALOG_PATH`.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span>
+<span class="normal"><a href="#__codelineno-0-389">389</a></span>
+<span class="normal"><a href="#__codelineno-0-390">390</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the STAC catalog from disk (cached).</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        catalog_path: Catalog directory or single `*.yaml` file. Defaults</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            to module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        ValueError: Propagated from the loader.</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>    <span class="n">endpoints</span><span class="p">,</span> <span class="n">available</span><span class="p">,</span> <span class="n">collections</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">endpoints</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">endpoints</span><span class="p">),</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="n">available_collections</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">collections</span><span class="p">),</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="p">)</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        ValueError: Propagated from the loader.</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="n">endpoints</span><span class="p">,</span> <span class="n">available</span><span class="p">,</span> <span class="n">collections</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="n">endpoints</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">endpoints</span><span class="p">),</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">available_collections</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">collections</span><span class="p">),</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27782,10 +27782,7 @@ discoverable through the <code>AbstractCatalog</code> contract, then
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/stac/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-342">342</a></span>
 <span class="normal"><a href="#__codelineno-0-343">343</a></span>
 <span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
@@ -27808,33 +27805,36 @@ discoverable through the <code>AbstractCatalog</code> contract, then
 <span class="normal"><a href="#__codelineno-0-362">362</a></span>
 <span class="normal"><a href="#__codelineno-0-363">363</a></span>
 <span class="normal"><a href="#__codelineno-0-364">364</a></span>
-<span class="normal"><a href="#__codelineno-0-365">365</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no collections were supplied.</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    `Catalog()` with no args reads the bundled `catalog/` directory through</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">    the `(path, mtime)`-keyed cache. If the caller passed `datasets=...`,</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    the disk read is skipped (in-memory catalogs for tests). The base</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    `available_datasets` field is populated with the flattened, sorted</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    union of the per-endpoint `available_collections` index so it is</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    discoverable through the `AbstractCatalog` contract, then</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    `super().model_post_init` populates `catalog` from `get_catalog()`.</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors as</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">            :meth:`load`.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">endpoints</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_collections</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_collections</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">providers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">:</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>            <span class="p">{</span><span class="n">cid</span> <span class="k">for</span> <span class="n">ids</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_collections</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">}</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="p">)</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span>
+<span class="normal"><a href="#__codelineno-0-366">366</a></span>
+<span class="normal"><a href="#__codelineno-0-367">367</a></span>
+<span class="normal"><a href="#__codelineno-0-368">368</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no collections were supplied.</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    `Catalog()` with no args reads the bundled `catalog/` directory through</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    the `(path, mtime)`-keyed cache. If the caller passed `datasets=...`,</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    the disk read is skipped (in-memory catalogs for tests). The base</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    `available_datasets` field is populated with the flattened, sorted</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">    union of the per-endpoint `available_collections` index so it is</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    discoverable through the `AbstractCatalog` contract, then</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    `super().model_post_init` populates `catalog` from `get_catalog()`.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors as</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            :meth:`load`.</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">endpoints</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_collections</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_collections</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">:</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">providers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">)</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">:</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>            <span class="p">{</span><span class="n">cid</span> <span class="k">for</span> <span class="n">ids</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_collections</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">}</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="p">)</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27967,10 +27967,7 @@ collection's <code>collection_id</code> (then the logical key itself).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/stac/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-450">450</a></span>
-<span class="normal"><a href="#__codelineno-0-451">451</a></span>
-<span class="normal"><a href="#__codelineno-0-452">452</a></span>
-<span class="normal"><a href="#__codelineno-0-453">453</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-453">453</a></span>
 <span class="normal"><a href="#__codelineno-0-454">454</a></span>
 <span class="normal"><a href="#__codelineno-0-455">455</a></span>
 <span class="normal"><a href="#__codelineno-0-456">456</a></span>
@@ -28002,42 +27999,45 @@ collection's <code>collection_id</code> (then the logical key itself).</p>
 <span class="normal"><a href="#__codelineno-0-482">482</a></span>
 <span class="normal"><a href="#__codelineno-0-483">483</a></span>
 <span class="normal"><a href="#__codelineno-0-484">484</a></span>
-<span class="normal"><a href="#__codelineno-0-485">485</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a logical collection key to the id `endpoint` actually serves.</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">    Applies the collection&#39;s per-endpoint `aliases`, falling back to the</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">    collection&#39;s `collection_id` (then the logical key itself).</span>
+<span class="normal"><a href="#__codelineno-0-485">485</a></span>
+<span class="normal"><a href="#__codelineno-0-486">486</a></span>
+<span class="normal"><a href="#__codelineno-0-487">487</a></span>
+<span class="normal"><a href="#__codelineno-0-488">488</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a logical collection key to the id `endpoint` actually serves.</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        endpoint: Endpoint key the request targets.</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        collection_key: Logical collection key.</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">        The upstream collection id to pass to `client.search(collections=)`.</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">    Applies the collection&#39;s per-endpoint `aliases`, falling back to the</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    collection&#39;s `collection_id` (then the logical key itself).</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        endpoint: Endpoint key the request targets.</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">        collection_key: Logical collection key.</span>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">        ValueError: If `collection_key` is unknown.</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">        The upstream collection id to pass to `client.search(collections=)`.</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">        - Earth Search serves Sentinel-2 L2A under a different id:</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;earth-search&quot;, &quot;sentinel-2-l2a&quot;)</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">            &#39;sentinel-2-c1-l2a&#39;</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        - Without an alias the collection&#39;s own id is returned:</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;planetary-computer&quot;, &quot;sentinel-2-l2a&quot;)</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">            &#39;sentinel-2-l2a&#39;</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">collection_key</span><span class="p">)</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>    <span class="k">if</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">collection</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>        <span class="k">return</span> <span class="n">collection</span><span class="o">.</span><span class="n">aliases</span><span class="p">[</span><span class="n">endpoint</span><span class="p">]</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>    <span class="k">return</span> <span class="n">collection</span><span class="o">.</span><span class="n">collection_id</span> <span class="ow">or</span> <span class="n">collection_key</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">        ValueError: If `collection_key` is unknown.</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">        - Earth Search serves Sentinel-2 L2A under a different id:</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;earth-search&quot;, &quot;sentinel-2-l2a&quot;)</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">            &#39;sentinel-2-c1-l2a&#39;</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        - Without an alias the collection&#39;s own id is returned:</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve(&quot;planetary-computer&quot;, &quot;sentinel-2-l2a&quot;)</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">            &#39;sentinel-2-l2a&#39;</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">collection_key</span><span class="p">)</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>    <span class="k">if</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">collection</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="k">return</span> <span class="n">collection</span><span class="o">.</span><span class="n">aliases</span><span class="p">[</span><span class="n">endpoint</span><span class="p">]</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>    <span class="k">return</span> <span class="n">collection</span><span class="o">.</span><span class="n">collection_id</span> <span class="ow">or</span> <span class="n">collection_key</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28191,10 +28191,7 @@ rename is returned unchanged, so only the renaming endpoints need an
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/stac/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-487">487</a></span>
-<span class="normal"><a href="#__codelineno-0-488">488</a></span>
-<span class="normal"><a href="#__codelineno-0-489">489</a></span>
-<span class="normal"><a href="#__codelineno-0-490">490</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-490">490</a></span>
 <span class="normal"><a href="#__codelineno-0-491">491</a></span>
 <span class="normal"><a href="#__codelineno-0-492">492</a></span>
 <span class="normal"><a href="#__codelineno-0-493">493</a></span>
@@ -28233,49 +28230,52 @@ rename is returned unchanged, so only the renaming endpoints need an
 <span class="normal"><a href="#__codelineno-0-526">526</a></span>
 <span class="normal"><a href="#__codelineno-0-527">527</a></span>
 <span class="normal"><a href="#__codelineno-0-528">528</a></span>
-<span class="normal"><a href="#__codelineno-0-529">529</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_assets</span><span class="p">(</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">assets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Rename `assets` to the keys `endpoint` actually publishes.</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">    The catalog names each asset once, but an endpoint may publish the same</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">    band under a different key — CDSE splits Sentinel-2 per resolution, so</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">    the catalog&#39;s `B04` is `B04_10m` there. An asset the endpoint does not</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">    rename is returned unchanged, so only the renaming endpoints need an</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">    `asset_aliases` entry.</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        endpoint: Endpoint key the request targets.</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        collection_key: Logical collection key.</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        assets: Asset keys in the catalog&#39;s own naming.</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        The asset keys to request from `endpoint`, in the given order.</span>
+<span class="normal"><a href="#__codelineno-0-529">529</a></span>
+<span class="normal"><a href="#__codelineno-0-530">530</a></span>
+<span class="normal"><a href="#__codelineno-0-531">531</a></span>
+<span class="normal"><a href="#__codelineno-0-532">532</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_assets</span><span class="p">(</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">assets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Rename `assets` to the keys `endpoint` actually publishes.</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">    The catalog names each asset once, but an endpoint may publish the same</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">    band under a different key — CDSE splits Sentinel-2 per resolution, so</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">    the catalog&#39;s `B04` is `B04_10m` there. An asset the endpoint does not</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">    rename is returned unchanged, so only the renaming endpoints need an</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">    `asset_aliases` entry.</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        endpoint: Endpoint key the request targets.</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">        collection_key: Logical collection key.</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        assets: Asset keys in the catalog&#39;s own naming.</span>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        ValueError: If `collection_key` is unknown.</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        The asset keys to request from `endpoint`, in the given order.</span>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        - CDSE publishes Sentinel-2 bands per resolution:</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve_assets(&quot;cdse&quot;, &quot;sentinel-2-l2a&quot;, [&quot;B04&quot;])</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">            [&#39;B04_10m&#39;]</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">        - An endpoint that does not rename gets the keys unchanged:</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve_assets(</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">            ...     &quot;planetary-computer&quot;, &quot;sentinel-2-l2a&quot;, [&quot;B04&quot;]</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">            [&#39;B04&#39;]</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">collection_key</span><span class="p">)</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>    <span class="n">renames</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">asset_aliases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="p">{})</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">renames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">asset</span><span class="p">,</span> <span class="n">asset</span><span class="p">)</span> <span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">assets</span><span class="p">]</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        ValueError: If `collection_key` is unknown.</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">        - CDSE publishes Sentinel-2 bands per resolution:</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve_assets(&quot;cdse&quot;, &quot;sentinel-2-l2a&quot;, [&quot;B04&quot;])</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">            [&#39;B04_10m&#39;]</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        - An endpoint that does not rename gets the keys unchanged:</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import Catalog</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">            &gt;&gt;&gt; Catalog().resolve_assets(</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">            ...     &quot;planetary-computer&quot;, &quot;sentinel-2-l2a&quot;, [&quot;B04&quot;]</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">            [&#39;B04&#39;]</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">collection_key</span><span class="p">)</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>    <span class="n">renames</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">asset_aliases</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="p">{})</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">renames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">asset</span><span class="p">,</span> <span class="n">asset</span><span class="p">)</span> <span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">assets</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28366,7 +28366,10 @@ endpoint key (e.g. <code>{"earth-search": "sentinel-2-c1-l2a"}</code>).</p>
 endpoint key then by the catalog's own asset key (e.g. CDSE serves
 Sentinel-2 bands per resolution, so <code>B04</code> is <code>B04_10m</code> there). Only
 the endpoints that rename need an entry; an asset with no override
-is passed through unchanged.</p>
+is passed through unchanged. Both keys are checked when the catalog
+loads — an endpoint no <code>endpoints:</code> block declares, or an asset this
+collection does not carry, is rejected rather than silently doing
+nothing. Resolve with <code>Catalog.resolve_assets</code>.</p>
               </div>
             </td>
           </tr>
@@ -28510,7 +28513,10 @@ informational only; the actual routing comes from <code>signer</code>
 <span class="normal"><a href="#__codelineno-0-171">171</a></span>
 <span class="normal"><a href="#__codelineno-0-172">172</a></span>
 <span class="normal"><a href="#__codelineno-0-173">173</a></span>
-<span class="normal"><a href="#__codelineno-0-174">174</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="k">class</span><span class="w"> </span><span class="nc">Collection</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-174">174</a></span>
+<span class="normal"><a href="#__codelineno-0-175">175</a></span>
+<span class="normal"><a href="#__codelineno-0-176">176</a></span>
+<span class="normal"><a href="#__codelineno-0-177">177</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="k">class</span><span class="w"> </span><span class="nc">Collection</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One curated STAC collection, addressed by a logical key.</span>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    Attributes:</span>
@@ -28523,37 +28529,40 @@ informational only; the actual routing comes from <code>signer</code>
 <a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">            endpoint key then by the catalog&#39;s own asset key (e.g. CDSE serves</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">            Sentinel-2 bands per resolution, so `B04` is `B04_10m` there). Only</span>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">            the endpoints that rename need an entry; an asset with no override</span>
-<a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">            is passed through unchanged.</span>
-<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">        default_assets: Asset keys pulled when the request names no assets.</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">        cadence: Native revisit cadence label, or `None`.</span>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">        resolution: Native ground sample distance in metres, or `None`.</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">        extent: Spatial/temporal coverage.</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">        assets: Asset key → :class:`Asset` metadata.</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">        signer: Optional per-collection signer override. When set, the backend</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">            reads this collection&#39;s assets with this signer instead of the</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">            endpoint&#39;s default — e.g. `&quot;aws-requester-pays&quot;` for a collection</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">            whose assets sit on a requester-pays S3 bucket (Earth Search&#39;s</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">            `landsat-c2-l2` → `s3://usgs-landsat`). `None` uses the endpoint</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            signer.</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">        requires_token: Documentation flag for token-gated collections (e.g. a</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">            Brazil Data Cube row that needs `$BDC_ACCESS_TOKEN`). The flag is</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">            informational only; the actual routing comes from `signer`</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">            (e.g. `signer: bdc-token`). Defaults to `False`.</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a>    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a>    <span class="n">collection_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a>    <span class="n">aliases</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a>    <span class="n">asset_aliases</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a>    <span class="n">default_assets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="n">cadence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="n">extent</span><span class="p">:</span> <span class="n">Extent</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a>    <span class="n">assets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Asset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="n">signer</span><span class="p">:</span> <span class="n">SignerType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a>    <span class="n">requires_token</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">            is passed through unchanged. Both keys are checked when the catalog</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">            loads — an endpoint no `endpoints:` block declares, or an asset this</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">            collection does not carry, is rejected rather than silently doing</span>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">            nothing. Resolve with `Catalog.resolve_assets`.</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">        default_assets: Asset keys pulled when the request names no assets.</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">        cadence: Native revisit cadence label, or `None`.</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">        resolution: Native ground sample distance in metres, or `None`.</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        extent: Spatial/temporal coverage.</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">        assets: Asset key → :class:`Asset` metadata.</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">        signer: Optional per-collection signer override. When set, the backend</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">            reads this collection&#39;s assets with this signer instead of the</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            endpoint&#39;s default — e.g. `&quot;aws-requester-pays&quot;` for a collection</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">            whose assets sit on a requester-pays S3 bucket (Earth Search&#39;s</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">            `landsat-c2-l2` → `s3://usgs-landsat`). `None` uses the endpoint</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">            signer.</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        requires_token: Documentation flag for token-gated collections (e.g. a</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">            Brazil Data Cube row that needs `$BDC_ACCESS_TOKEN`). The flag is</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            informational only; the actual routing comes from `signer`</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            (e.g. `signer: bdc-token`). Defaults to `False`.</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a>    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a>    <span class="n">collection_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="n">aliases</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="n">asset_aliases</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="n">default_assets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>    <span class="n">cadence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a>    <span class="n">extent</span><span class="p">:</span> <span class="n">Extent</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a>    <span class="n">assets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Asset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a>    <span class="n">signer</span><span class="p">:</span> <span class="n">SignerType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a>    <span class="n">requires_token</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
