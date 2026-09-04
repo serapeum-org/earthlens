@@ -96,8 +96,42 @@ that sets `identity` itself to protect a magic check, keeps what it asked for.
 A `Range` you pass yourself is honoured verbatim: the response is accepted at its own `Content-Length`, and
 `download` does not check that the server returned the range you asked for.
 
-Interrupted *multi-file* jobs still resume — `_is_complete()` skips the granules already on disk (see
-[contracts](contracts.md)). It is only the bytes of a single file that are never resumed.
+Interrupted *multi-file* jobs resume at file granularity — `_is_complete()` skips the granules already on disk
+(see [contracts](contracts.md)).
+
+## Resuming a single file (`resume=True`)
+
+Within one file, `download(url, dest, resume=True)` will continue a broken transfer instead of re-reading it. It
+is **off by default**: everything above is what the other callers get.
+
+Resume is only *attempted* when the first response proved it is possible — a `200` advertising
+`Accept-Ranges: bytes`, a known `Content-Length`, no content coding, and a **strong** `ETag`. A weak tag
+(`W/"..."`) never arms, and `Last-Modified` is never used: its one-second resolution matches across a change made
+inside the same second.
+
+Arming is the cheap half. A strong `ETag` is **not** sufficient — measured, `data.worldpop.org` sends one and then
+answers a `Range` with `200` and the whole body. So the binding checks are on the reply, and all must hold before
+one byte is appended:
+
+| check | why |
+|---|---|
+| status is `206` | absorbs the `200`-with-the-whole-object case, a `416`, a redirect, an error status |
+| `Content-Range` start, end and total all match what was asked | the object has not been replaced or re-cut |
+| `ETag` still names the anchored representation | a `206` may not rename what `If-Range` selected |
+| no content or transfer coding | `Range` addresses the *encoded* octets; the staged count is of decoded ones |
+| the first 64 KiB re-send a window already on disk and **match it byte for byte** | see below |
+
+That last one is the only check that reads the body. Every other gate compares one server claim against another,
+so a server deriving a truthful `Content-Range` from the request while streaming a different slice satisfies all
+of them. Re-reading a window we already hold is what makes the append safe.
+
+Anything else discards the staged bytes and re-reads the whole object, and resume then stays off for the rest of
+the call — so a badly-behaved server costs exactly one extra request, not a restart/resume cycle. Only bytes
+*this call* wrote are ever built on, so a `.part` left by a killed run is never mistaken for a prefix, and the
+assembled file passes the same length and `expect_magic` gates as a whole-object read.
+
+Measured: geofabrik, DWD radklim (13.5 GB) and GHSL all emit strong ETags and honour `Range` exactly; worldpop
+and Zenodo do not arm or are refused.
 
 ## Testability
 

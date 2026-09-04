@@ -39,10 +39,10 @@ import io
 import re
 import threading
 import time
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Mapping
 from email.utils import parsedate_to_datetime
 from pathlib import Path
-from typing import Any, TypeVar, cast
+from typing import Any, NamedTuple, TypeVar, cast
 from urllib.parse import urlsplit
 
 import requests
@@ -432,6 +432,218 @@ IDEMPOTENT_METHODS: frozenset[str] = frozenset(
 )
 
 #: Streaming chunk size (bytes) for :meth:`HttpClient.download` — 1 MiB.
+#: Bytes of already-downloaded tail that a resumed request re-fetches and
+#: compares against the staging file before appending anything.
+#:
+#: This is the only check in the resume path that reads the *body*. Every other
+#: gate — the status, the `Content-Range` arithmetic, the `ETag` — tests the
+#: server's claims against the server's own other claims, so a server that
+#: builds a truthful `Content-Range` from the request while streaming bytes from
+#: somewhere else passes all of them. Re-reading a window we already hold and
+#: demanding it match byte for byte is what makes the append safe, and 64 KiB is
+#: cheap against the multi-gigabyte archives resume exists for.
+_RESUME_OVERLAP = 64 * 1024
+
+#: `bytes <first>-<last>/<complete-length>`. The `*` forms a server may send on a
+#: `416` are deliberately unmatched: the resume path treats any non-`206` as a
+#: reason to stop resuming, so there is nothing to parse them for.
+_CONTENT_RANGE_RE = re.compile(r"^bytes\s+(\d+)-(\d+)/(\d+)$", re.IGNORECASE)
+
+
+class _ResumeAnchor(NamedTuple):
+    """The identity of the representation a resumed request must re-open.
+
+    Captured from the first response and never updated, so every later leg is
+    checked against the object the transfer started on rather than against
+    whatever the server most recently said.
+
+    Attributes:
+        total: The complete length the first response advertised.
+        etag: The strong entity tag that first response carried.
+    """
+
+    total: int
+    etag: str
+
+
+def _strong_etag(headers: Mapping[str, str]) -> str | None:
+    """Return the response's entity tag, but only when it is a strong one.
+
+    `If-Range` is only meaningful with a strong validator. A weak tag (`W/"x"`)
+    marks representations that are *semantically* equivalent but may differ byte
+    for byte, which is precisely the distinction a resumed download depends on,
+    and `Last-Modified` is worse still: it has one-second resolution, so it
+    matches across a change made within the same second as the one it records.
+
+    Args:
+        headers: The response headers.
+
+    Returns:
+        str | None: The quoted strong entity tag, or `None` when the header is
+        absent, weak, or not a quoted-string.
+
+    Examples:
+        - A strong tag is returned verbatim, quotes included:
+            ```python
+            >>> from earthlens.base.http import _strong_etag
+            >>> _strong_etag({"ETag": '"68402913-323959b10"'})
+            '"68402913-323959b10"'
+
+            ```
+        - A weak tag is refused, and so is a missing one:
+            ```python
+            >>> from earthlens.base.http import _strong_etag
+            >>> _strong_etag({"ETag": 'W/"7"'}) is None
+            True
+            >>> _strong_etag({}) is None
+            True
+
+            ```
+    """
+    etag = (headers.get("ETag") or "").strip()
+    if not etag or etag[:2].upper() == "W/":
+        return None
+    if len(etag) < 2 or not etag.startswith('"') or not etag.endswith('"'):
+        return None
+    return etag
+
+
+def _parse_content_range(value: str | None) -> tuple[int, int, int] | None:
+    """Parse a `206`'s `Content-Range` into `(first, last, total)`.
+
+    Args:
+        value: The raw header value, if any.
+
+    Returns:
+        tuple[int, int, int] | None: The three byte counts, or `None` when the
+        header is absent or not the complete `bytes a-b/c` form.
+
+    Examples:
+        - The complete form parses:
+            ```python
+            >>> from earthlens.base.http import _parse_content_range
+            >>> _parse_content_range("bytes 100-199/13481909008")
+            (100, 199, 13481909008)
+
+            ```
+        - An unsatisfied-range or unknown-total form does not:
+            ```python
+            >>> from earthlens.base.http import _parse_content_range
+            >>> _parse_content_range("bytes */13481909008") is None
+            True
+            >>> _parse_content_range(None) is None
+            True
+
+            ```
+    """
+    if not value:
+        return None
+    match = _CONTENT_RANGE_RE.match(value.strip())
+    if match is None:
+        return None
+    first, last, total = (int(part) for part in match.groups())
+    return first, last, total
+
+
+class _ResumeRefused(Exception):
+    """A resumed leg failed one of its gates, so the resume is abandoned.
+
+    Private and never raised out of `download`: it is caught in the attempt
+    loop, which discards the staged bytes and restarts the object from zero.
+    Resume then stays off for the rest of the call, so a server that answers a
+    ranged request badly costs exactly one extra attempt rather than looping.
+    """
+
+
+def _arm_resume_anchor(
+    response: requests.Response, total: int | None
+) -> _ResumeAnchor | None:
+    """Capture what a later ranged request would have to re-open, if anything.
+
+    Arming is deliberately permissive: it only records that a resumed request is
+    worth *attempting*. Nothing here can make an append safe, because every
+    value it reads is the server's own claim — worldpop advertises
+    `Accept-Ranges: bytes` and a strong `ETag`, then answers a `Range` with the
+    whole object. The binding checks are on the resumed response and on the
+    bytes it returns.
+
+    Args:
+        response: The first response of the transfer.
+        total: The complete length `_progress_total` derived from it, if any.
+
+    Returns:
+        _ResumeAnchor | None: The frozen identity of the representation, or
+        `None` when this transfer can never be resumed.
+    """
+    if response.status_code != 200 or not total:
+        return None
+    encoding = (response.headers.get("Content-Encoding") or "").strip().lower()
+    if encoding and encoding != "identity":
+        return None
+    accepts = {
+        token.strip().lower()
+        for token in (response.headers.get("Accept-Ranges") or "").split(",")
+    }
+    if "bytes" not in accepts:
+        return None
+    etag = _strong_etag(response.headers)
+    if etag is None:
+        return None
+    return _ResumeAnchor(total=total, etag=etag)
+
+
+def _resume_refusal(
+    response: requests.Response, anchor: _ResumeAnchor, resume_at: int
+) -> str | None:
+    """Say why a resumed response must not be appended, or `None` if it may be.
+
+    A flat sequence of independent tests rather than one boolean chain, so no
+    condition can be short-circuited by another and each is reachable from a
+    single hand-built response.
+
+    Args:
+        response: The answer to the ranged request.
+        anchor: The representation the transfer started on.
+        resume_at: Bytes already staged; the window starts `_RESUME_OVERLAP`
+            before this.
+
+    Returns:
+        str | None: The refusal reason, or `None` when every header check
+        passes. The body still has to match the staged overlap.
+    """
+    if response.status_code != 206:
+        # Absorbs every "the server did not honour the Range" shape at once: a
+        # 200 with the whole object (worldpop, and any stale `If-Range`), a 416,
+        # a redirect, an error status. None of them is consumed in place.
+        return f"status {response.status_code}, expected 206"
+    encoding = (response.headers.get("Content-Encoding") or "").strip().lower()
+    if encoding and encoding != "identity":
+        return f"Content-Encoding {encoding!r} on a ranged reply"
+    coding = (response.headers.get("Transfer-Encoding") or "").strip().lower()
+    if coding and coding != "identity":
+        return f"Transfer-Encoding {coding!r} on a ranged reply"
+    parsed = _parse_content_range(response.headers.get("Content-Range"))
+    if parsed is None:
+        return "no parseable Content-Range"
+    first, last, total = parsed
+    expected_first = resume_at - _RESUME_OVERLAP
+    if first != expected_first:
+        return f"Content-Range starts at {first}, expected {expected_first}"
+    if last != anchor.total - 1:
+        return f"Content-Range ends at {last}, expected {anchor.total - 1}"
+    if total != anchor.total:
+        return f"Content-Range total {total}, expected {anchor.total}"
+    etag = (response.headers.get("ETag") or "").strip()
+    if etag and etag != anchor.etag:
+        # A 206 is only permitted to describe the representation `If-Range`
+        # named; one that renames it is describing a different object.
+        return f"ETag {etag!r} is not the anchored {anchor.etag!r}"
+    declared = _progress_total(response.headers)
+    if declared is not None and declared != last - first + 1:
+        return f"Content-Length {declared}, expected {last - first + 1}"
+    return None
+
+
 DEFAULT_CHUNK_SIZE = 1 << 20
 
 #: Buffer size (bytes) :meth:`HttpRangeFile.buffered` wraps the raw
@@ -1247,6 +1459,105 @@ class HttpClient:
         finally:
             bar.close()
 
+    def _append_resumed_body(
+        self,
+        response: requests.Response,
+        dest: Path,
+        *,
+        overlap_at: int,
+        overlap: int,
+        total: int,
+        chunk: int,
+        progress: bool,
+        desc: str,
+    ) -> None:
+        """Check the re-sent overlap against the staged file, then append.
+
+        The overlap is read and compared **before the file is opened for
+        writing**, so a server whose body does not match the bytes already on
+        disk cannot modify the staging file at all. That ordering is the
+        guarantee: every other resume gate compares one server claim against
+        another, and a server that derives a truthful `Content-Range` from the
+        request while streaming a different slice satisfies all of them.
+
+        Args:
+            response: The open `206` response, positioned at `overlap_at`.
+            dest: The staging file holding the bytes downloaded so far.
+            overlap_at: Offset the re-sent window starts at.
+            overlap: Length of that window.
+            total: The object's complete length, for the progress bar.
+            chunk: Streaming block size in bytes.
+            progress: Whether to show the progress bar.
+            desc: The bar label.
+
+        Raises:
+            _ResumeRefused: When the body ends inside the overlap, when the
+                overlap does not match the staged bytes, or when the staging
+                file cannot be read back for a non-deterministic reason.
+            OSError: For a deterministic filesystem refusal (a full disk, a
+                read-only mount), which a restart would hit again.
+        """
+        blocks = response.iter_content(chunk_size=chunk)
+        head = bytearray()
+        remainder = b""
+        for block in blocks:
+            if not block:
+                continue
+            wanted = overlap - len(head)
+            head.extend(block[:wanted])
+            if len(head) >= overlap:
+                remainder = block[wanted:]
+                break
+        if len(head) < overlap:
+            raise _ResumeRefused(
+                f"the resumed body ended after {len(head):,} bytes, inside the "
+                f"{overlap:,}-byte overlap"
+            )
+
+        try:
+            with open(dest, "rb") as handle:
+                handle.seek(overlap_at)
+                staged = handle.read(overlap)
+        except OSError as exc:
+            if exc.errno in _DETERMINISTIC_OS_ERRNOS:
+                raise
+            raise _ResumeRefused(
+                f"the staged file could not be read back: {exc}"
+            ) from exc
+        if bytes(head) != staged:
+            raise _ResumeRefused(
+                f"the re-sent {overlap:,}-byte overlap at {overlap_at:,} does "
+                f"not match the staged bytes; the server is not serving the "
+                f"representation this transfer started on"
+            )
+
+        resume_at = overlap_at + overlap
+        bar = tqdm(
+            total=total,
+            initial=resume_at,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            disable=not progress,
+            desc=desc,
+        )
+        try:
+            with open(dest, "r+b") as handle:
+                # Truncate rather than seek alone: the staged file may hold
+                # bytes past the overlap from a previous attempt, and appending
+                # after them would leave a gap the size check cannot see.
+                handle.truncate(resume_at)
+                handle.seek(resume_at)
+                if remainder:
+                    handle.write(remainder)
+                    bar.update(len(remainder))
+                for block in blocks:
+                    if block:
+                        handle.write(block)
+                        bar.update(len(block))
+        finally:
+            bar.close()
+
     def download(
         self,
         url: str,
@@ -1258,6 +1569,7 @@ class HttpClient:
         expect_magic: bytes | tuple[bytes, ...] | None = None,
         headers: dict[str, str] | None = None,
         timeout: Timeout | None = None,
+        resume: bool = False,
         **kwargs: Any,
     ) -> Path:
         """Stream `url` to `dest` atomically, optionally showing a `tqdm` bar.
@@ -1272,13 +1584,11 @@ class HttpClient:
         or an exception in `retry_on_exceptions` retries the attempt (after
         cleaning the temp), honouring the `Retry-After`/back-off policy.
 
-        Every attempt reads the object **once, whole**. `download` generates no
-        `Range` header of its own: a resumed transfer has to prove that the
-        bytes it appends belong to the same representation as the bytes already
-        on disk, and the guarantees a server actually offers are not strong
-        enough to prove it. Instead the body is verified after the fact — a
-        response that advertised a `Content-Length` must deliver exactly that
-        many bytes — and a short read is retried from the start.
+        By default every attempt reads the object **once, whole**, and the body
+        is verified after the fact: a response that advertised a
+        `Content-Length` must deliver exactly that many bytes, and a short read
+        is retried from the start. Pass `resume=True` to let a retry continue a
+        broken transfer instead of re-reading it; see that argument.
 
         Args:
             url: Absolute request URL.
@@ -1313,6 +1623,29 @@ class HttpClient:
                 float or a `(connect, read)` pair — the latter fails a dead
                 host on the short connect budget without shortening the long
                 read budget a large download needs.
+            resume: Continue a broken transfer with a ranged request instead
+                of re-reading the object, when — and only when — the server has
+                proved it can be done safely. Off by default; the whole-object
+                path above is unchanged for every caller that does not opt in.
+
+                A resumed request is only *attempted* when the first response
+                was a `200` that advertised `Accept-Ranges: bytes`, a known
+                `Content-Length`, no content coding, and a **strong** `ETag`
+                (never `Last-Modified`, whose one-second resolution matches
+                across a change made within the same second). It is only
+                *appended* when the reply is a `206` whose `Content-Range`
+                start, end and total all match what was asked for, whose `ETag`
+                still names the anchored representation, and — the check none of
+                the others can stand in for — whose first `_RESUME_OVERLAP`
+                bytes re-send a window already on disk and match it byte for
+                byte. Every other answer, a `200` with the whole body included,
+                discards the staged bytes and re-reads the object; resume then
+                stays off for the rest of the call.
+
+                Only bytes *this call* wrote are ever built on, so a `.part`
+                left by an earlier run is never treated as a prefix. The
+                assembled file goes through the same length and `expect_magic`
+                gates as a whole-object read.
             **kwargs: Extra keyword arguments forwarded to `requests`.
 
         Returns:
@@ -1351,6 +1684,17 @@ class HttpClient:
         # validation would run on a file that had already replaced a good one.
         staged = atomic or expect_magic is not None
         tmp = dest.with_name(dest.name + ".part") if staged else dest
+        # Bytes of `tmp` that *this call* wrote and that a resumed request
+        # may therefore build on. It is never seeded from a file found on
+        # disk: a `.part` left by a killed run belongs to an unknown object,
+        # and resuming onto it would publish a file assembled from two.
+        banked = 0
+        # Captured from the first response; frozen thereafter, so every leg
+        # is checked against the representation the transfer started on.
+        anchor: _ResumeAnchor | None = None
+        # One strike. A server that answers a ranged request badly costs a
+        # single extra attempt, never a restart/resume cycle.
+        resume_off = not resume
 
         def discard_partial() -> None:
             """Remove the partial write, but never a caller-owned `dest`.
@@ -1362,6 +1706,10 @@ class HttpClient:
             deleting it as well would only turn a truncated file into a missing
             one, and would destroy a file this call never owned.
             """
+            nonlocal banked
+            # Reset together: the count means "bytes of `tmp` this call
+            # wrote", so it cannot outlive the file it describes.
+            banked = 0
             if staged:
                 tmp.unlink(missing_ok=True)
 
@@ -1413,6 +1761,30 @@ class HttpClient:
             response: requests.Response | None = None
             expected_total: int | None = None
             status_wait: float | None = None
+            # A resumed leg re-fetches `_RESUME_OVERLAP` bytes it already
+            # holds, so `banked` must exceed the overlap for the leg to make
+            # forward progress at all.
+            resume_at = 0
+            leg: _ResumeAnchor | None = None
+            if (
+                not resume_off
+                and staged
+                and anchor is not None
+                and not caller_sent_range
+                and _RESUME_OVERLAP < banked < anchor.total
+            ):
+                resume_at, leg = banked, anchor
+            attempt_headers = merged
+            if leg is not None:
+                attempt_headers = {
+                    **merged,
+                    "Range": f"bytes={resume_at - _RESUME_OVERLAP}-{leg.total - 1}",
+                    "If-Range": leg.etag,
+                    # `Range` addresses the *encoded* representation while
+                    # the staged count is of decoded bytes, so a coded reply
+                    # would make the offsets mean different things.
+                    "Accept-Encoding": "identity",
+                }
             try:
                 # Inside the retrying `try`: a failure here is a connect-phase
                 # failure and must be retried like any other, which is why the
@@ -1421,7 +1793,7 @@ class HttpClient:
                     "GET",
                     url,
                     stream=True,
-                    headers=merged,
+                    headers=attempt_headers,
                     timeout=effective_timeout,
                     **kwargs,
                 )
@@ -1444,21 +1816,45 @@ class HttpClient:
                             f"{status_wait:.1f}s"
                         )
                     else:
-                        if response.status_code == 206 and not caller_sent_range:
-                            raise UnsolicitedPartialContentError(
-                                f"{redact_url(url)} answered 206 to a request "
-                                "carrying no Range; the body is a fragment",
-                                response=response,
+                        if leg is not None:
+                            refusal = _resume_refusal(response, leg, resume_at)
+                            if refusal is not None:
+                                raise _ResumeRefused(refusal)
+                            expected_total = leg.total
+                            self._append_resumed_body(
+                                response,
+                                tmp,
+                                overlap_at=resume_at - _RESUME_OVERLAP,
+                                overlap=_RESUME_OVERLAP,
+                                total=leg.total,
+                                chunk=chunk,
+                                progress=progress,
+                                desc=dest.name,
                             )
-                        response.raise_for_status()
-                        expected_total = _progress_total(response.headers)
-                        self._stream_to_file(
-                            response,
-                            tmp,
-                            chunk=chunk,
-                            progress=progress,
-                            desc=dest.name,
-                        )
+                        else:
+                            if response.status_code == 206 and not caller_sent_range:
+                                raise UnsolicitedPartialContentError(
+                                    f"{redact_url(url)} answered 206 to a request "
+                                    "carrying no Range; the body is a fragment",
+                                    response=response,
+                                )
+                            response.raise_for_status()
+                            expected_total = _progress_total(response.headers)
+                            if not resume_off and anchor is None and staged:
+                                # Recorded before the body is read, so a break
+                                # part-way through still leaves an anchor to
+                                # resume against.
+                                anchor = _arm_resume_anchor(response, expected_total)
+                            self._stream_to_file(
+                                response,
+                                tmp,
+                                chunk=chunk,
+                                progress=progress,
+                                desc=dest.name,
+                            )
+                        # One verification for both paths: a resumed file is
+                        # published through the same size and magic gates as a
+                        # whole-object read, never a weaker door.
                         written = tmp.stat().st_size
                         best_written = max(best_written, written)
                         if expected_total is not None and written != expected_total:
@@ -1473,6 +1869,27 @@ class HttpClient:
                 finally:
                     if response is not None:
                         response.close()
+            except _ResumeRefused as exc:
+                # Never re-armed for the rest of the call, so a server that
+                # answers a ranged request badly costs exactly one extra
+                # attempt rather than a restart/resume cycle.
+                resume_off = True
+                logger.warning(
+                    f"{redact_url(url)}: refusing to resume ({exc}); discarding "
+                    f"{banked:,} staged bytes and re-reading the whole object"
+                )
+                discard_partial()
+                if attempt >= self.max_retries:
+                    # A backstop, not the primary bound: `resume_off` already
+                    # caps refusals at one per call. Without it the loop's
+                    # termination would rest on that single flag, and a refusal
+                    # would otherwise re-read the object with no budget left.
+                    raise requests.ConnectionError(
+                        f"{redact_url(url)}: resume refused ({exc}) with no "
+                        f"retry budget left after {attempt + 1} attempts"
+                    ) from exc
+                attempt += 1
+                continue
             except UnsolicitedPartialContentError:
                 # Deterministic: a server that volunteers partial content to a
                 # Range-less request returns the same fragment next time.
@@ -1530,13 +1947,36 @@ class HttpClient:
                             f"attempts; best read {best_written:,} bytes"
                         ) from exc
                     spent[key] += 1
+                    try:
+                        staged_now = tmp.stat().st_size if tmp.exists() else 0
+                    except OSError:
+                        staged_now = 0
+                    staged_now = max(staged_now, best_written)
+                    kept = 0
+                    if not resume_off and staged and anchor is not None:
+                        # Bank only what THIS attempt wrote: `_stream_to_file`
+                        # truncated `tmp` before writing, so whatever is there
+                        # now came from this call and from this representation.
+                        size = staged_now
+                        if _RESUME_OVERLAP < size < anchor.total:
+                            kept = size
+                    banked = kept
                     logger.warning(
                         f"{type(exc).__name__} ({kind}) on {redact_url(url)} after "
-                        f"{best_written:,} bytes; discarding and restarting, "
-                        f"{key} retry {spent[key]}/{budget} "
+                        # The staged size, not `best_written`: a break part-way
+                        # through the body never reaches the line that updates
+                        # `best_written`, so it would read 0 here.
+                        f"{staged_now:,} bytes; "
+                        + (
+                            f"keeping {kept:,} staged bytes to resume from, "
+                            if kept
+                            else "discarding and restarting, "
+                        )
+                        + f"{key} retry {spent[key]}/{budget} "
                         f"(attempt {attempt + 1}/{self.max_retries})"
                     )
-                    discard_partial()
+                    if not kept:
+                        discard_partial()
                     self._sleep(self._backoff_wait(None, attempt))
                     attempt += 1
                     continue

@@ -23,6 +23,7 @@ from earthlens.base.http import (
     _check_magic,
     _default_user_agent,
     _is_local_storage_error,
+    _parse_content_range,
     _parse_retry_after,
     _progress_total,
     classify_transport_error,
@@ -2416,3 +2417,437 @@ class TestLocalStorageFailuresAreDeterministic:
         assert excinfo.value.errno == errno.ENOSPC
         assert session.calls == 1, f"expected 1 attempt, got {session.calls}"
         assert not (tmp_path / "g.part").exists()
+
+
+# ---------------------------------------------------------------------------
+# Opt-in resume.
+#
+# `_ResumeServer` below is a range-serving object store whose misbehaviour is
+# configurable, so each adversarial shape the design was attacked with is a
+# constructor argument rather than a bespoke fake.
+# ---------------------------------------------------------------------------
+
+_OBJECT = bytes(range(256)) * 800  # 204,800 bytes, > _RESUME_OVERLAP
+_BREAK_AT = 120_000  # leaves a staged prefix comfortably above the overlap
+
+
+class _ResumeBody:
+    """One response from `_ResumeServer`."""
+
+    def __init__(
+        self,
+        payload: bytes,
+        *,
+        status: int,
+        headers: dict[str, str],
+        break_at: int | None = None,
+    ) -> None:
+        self.payload = payload
+        self.status_code = status
+        self.headers = headers
+        self.break_at = break_at
+        self.closed = False
+
+    def iter_content(self, chunk_size: int = 1) -> Any:
+        """Yield the payload, breaking at `break_at` if one was set."""
+        emitted = 0
+        for i in range(0, len(self.payload), chunk_size):
+            block = self.payload[i : i + chunk_size]
+            if self.break_at is not None and emitted + len(block) > self.break_at:
+                give = self.break_at - emitted
+                if give > 0:
+                    yield block[:give]
+                raise _read_reset()
+            emitted += len(block)
+            yield block
+
+    def raise_for_status(self) -> None:
+        """Raise for a 4xx/5xx, as `requests` does."""
+        if self.status_code >= 400:
+            raise requests.HTTPError(f"HTTP {self.status_code}")
+
+    def close(self) -> None:
+        """Record the release."""
+        self.closed = True
+
+
+class _ResumeServer:
+    """A range-serving store whose every misbehaviour is a constructor flag."""
+
+    def __init__(
+        self,
+        payload: bytes = _OBJECT,
+        *,
+        etag: str | None = '"v1"',
+        accept_ranges: bool = True,
+        encoding: str | None = None,
+        break_first_at: int | None = _BREAK_AT,
+        break_every_whole: bool = False,
+        honour_range: bool = True,
+        leg_status: int | None = None,
+        leg_etag: str | None = None,
+        leg_encoding: str | None = None,
+        leg_content_range: str | None = None,
+        leg_payload: bytes | None = None,
+        leg_break_at: int | None = None,
+    ) -> None:
+        self.payload = payload
+        self.etag = etag
+        self.accept_ranges = accept_ranges
+        self.encoding = encoding
+        self.break_first_at = break_first_at
+        self.break_every_whole = break_every_whole
+        self.honour_range = honour_range
+        self.leg_status = leg_status
+        self.leg_etag = leg_etag
+        self.leg_encoding = leg_encoding
+        self.leg_content_range = leg_content_range
+        self.leg_payload = leg_payload
+        self.leg_break_at = leg_break_at
+        self.requests: list[dict[str, str]] = []
+
+    @property
+    def calls(self) -> int:
+        """How many requests were issued."""
+        return len(self.requests)
+
+    @property
+    def ranged(self) -> list[dict[str, str]]:
+        """Just the requests that carried a `Range`."""
+        return [r for r in self.requests if "Range" in r]
+
+    def get(self, url: str, **kwargs: Any) -> _ResumeBody:
+        """Answer a whole-object or ranged request."""
+        sent = dict(kwargs.get("headers") or {})
+        self.requests.append(sent)
+        wanted = sent.get("Range")
+        if wanted is None or not self.honour_range:
+            return self._whole()
+        first, last = (int(p) for p in wanted.removeprefix("bytes=").split("-"))
+        return self._partial(first, last)
+
+    def _base_headers(self) -> dict[str, str]:
+        """Headers common to both response shapes."""
+        headers: dict[str, str] = {}
+        if self.etag is not None:
+            headers["ETag"] = self.etag
+        if self.accept_ranges:
+            headers["Accept-Ranges"] = "bytes"
+        if self.encoding:
+            headers["Content-Encoding"] = self.encoding
+        return headers
+
+    def _whole(self) -> _ResumeBody:
+        """The 200 answer, optionally breaking part-way."""
+        headers = self._base_headers()
+        headers["Content-Length"] = str(len(self.payload))
+        breaks = self.break_every_whole or len(self.requests) == 1
+        return _ResumeBody(
+            self.payload,
+            status=200,
+            headers=headers,
+            break_at=self.break_first_at if breaks else None,
+        )
+
+    def _partial(self, first: int, last: int) -> _ResumeBody:
+        """The 206 answer, with whatever misbehaviour was configured."""
+        headers = self._base_headers()
+        if self.leg_etag is not None:
+            headers["ETag"] = self.leg_etag
+        if self.leg_encoding:
+            headers["Content-Encoding"] = self.leg_encoding
+        body = (
+            self.leg_payload
+            if self.leg_payload is not None
+            else self.payload[first : last + 1]
+        )
+        headers["Content-Range"] = (
+            self.leg_content_range
+            if self.leg_content_range is not None
+            else f"bytes {first}-{last}/{len(self.payload)}"
+        )
+        # A self-consistent lie: derive Content-Length from the range the
+        # response *claims*, so the length cross-check cannot stand in for the
+        # start/end/total gates under test.
+        claimed = _parse_content_range(headers["Content-Range"])
+        headers["Content-Length"] = str(
+            claimed[1] - claimed[0] + 1 if claimed else len(body)
+        )
+        return _ResumeBody(
+            body,
+            status=self.leg_status or 206,
+            headers=headers,
+            break_at=self.leg_break_at,
+        )
+
+
+def _resume_client(server: _ResumeServer, **kwargs: Any) -> HttpClient:
+    """Build a client over a resume server with no real sleeping."""
+    kwargs.setdefault("max_retries", 3)
+    return HttpClient(session=server, sleep=lambda _: None, **kwargs)
+
+
+@pytest.mark.unit
+class TestResumeIsOptIn:
+    """Nothing about the default path changes."""
+
+    def test_no_range_is_sent_without_the_flag(self, tmp_path):
+        """The 1400 existing call sites must behave exactly as before."""
+        server = _ResumeServer()
+        _resume_client(server).download(
+            "http://x/g", tmp_path / "g", progress=False, chunk=4096
+        )
+        assert server.ranged == []
+
+    def test_the_object_still_arrives_intact_without_the_flag(self, tmp_path):
+        """A mid-stream break is still repaired by a full restart."""
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        _resume_client(server).download("http://x/g", dest, progress=False, chunk=4096)
+        assert dest.read_bytes() == _OBJECT
+
+
+@pytest.mark.unit
+class TestResumeHappyPath:
+    """What the feature is for."""
+
+    def test_a_broken_transfer_is_resumed_rather_than_restarted(self, tmp_path):
+        """The second request asks for the tail, and the file is byte-correct."""
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.calls == 2
+        sent = server.ranged[0]
+        assert sent["Range"] == f"bytes={_BREAK_AT - 65536}-{len(_OBJECT) - 1}"
+        assert sent["If-Range"] == '"v1"'
+        assert sent["Accept-Encoding"] == "identity"
+
+    def test_the_resumed_leg_re_fetches_the_overlap(self, tmp_path):
+        """The window starts before the staged end so the bytes can be compared."""
+        server = _ResumeServer()
+        _resume_client(server).download(
+            "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+        )
+        first = int(server.ranged[0]["Range"].removeprefix("bytes=").split("-")[0])
+        assert _BREAK_AT - first == 65536
+
+    def test_no_part_file_survives_a_resumed_download(self, tmp_path):
+        """The staging file is still renamed, not left behind."""
+        _resume_client(_ResumeServer()).download(
+            "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+        )
+        assert not (tmp_path / "g.part").exists()
+
+
+@pytest.mark.unit
+class TestResumeRefusesBadResponses:
+    """Every gate, one server misbehaviour each."""
+
+    @pytest.mark.parametrize(
+        "kwargs, reason",
+        [
+            ({"honour_range": False}, "answers 200 with the whole object"),
+            ({"leg_status": 416}, "answers 416"),
+            ({"leg_content_range": "bytes 999-204799/204800"}, "wrong range start"),
+            (
+                {"leg_content_range": f"bytes {_BREAK_AT - 65536}-204798/204800"},
+                "range stops short of the object end",
+            ),
+            (
+                {"leg_content_range": f"bytes {_BREAK_AT - 65536}-204799/999999"},
+                "range reports a different complete length",
+            ),
+            ({"leg_content_range": "bytes */204800"}, "unparseable Content-Range"),
+            ({"leg_content_range": None, "leg_etag": '"v2"'}, "renamed ETag"),
+            ({"leg_encoding": "gzip"}, "coded ranged reply"),
+        ],
+        ids=[
+            "200-whole",
+            "416",
+            "wrong-start",
+            "wrong-end",
+            "wrong-total",
+            "star-range",
+            "etag-change",
+            "gzip-leg",
+        ],
+    )
+    def test_a_bad_leg_falls_back_to_a_whole_read(self, tmp_path, kwargs, reason):
+        """The leg must be refused, not merely survived.
+
+        Asserting only that the file is right would pass with the gate deleted,
+        because this fake is honest about the bytes it sends. The request count
+        is what distinguishes "refused and re-read the object" (three requests)
+        from "accepted the bad leg" (two).
+        """
+        dest = tmp_path / "g"
+        server = _ResumeServer(**kwargs)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert len(server.ranged) == 1, reason
+        assert server.calls == 3, f"the leg was accepted despite {reason}"
+        assert dest.read_bytes() == _OBJECT
+        assert not (tmp_path / "g.part").exists()
+
+    def test_a_lying_body_with_truthful_headers_is_caught(self, tmp_path):
+        """The attack no header check can see: right Content-Range, wrong bytes.
+
+        Every arithmetic gate passes here, so only the overlap comparison
+        stands between this and a published file that never existed upstream.
+        """
+        dest = tmp_path / "g"
+        start = _BREAK_AT - 65536
+        wrong = bytes(1 for _ in range(len(_OBJECT) - start))
+        server = _ResumeServer(leg_payload=wrong)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert b"\x01" * 200 not in dest.read_bytes()
+
+    def test_a_refusal_disarms_resume_for_the_rest_of_the_call(self, tmp_path):
+        """One strike, so a bad server cannot drive a restart/resume cycle.
+
+        Every whole-object read breaks here, so without the disarm the call
+        would bank and re-arm on each pass and issue a ranged request per retry.
+        """
+        server = _ResumeServer(honour_range=False, break_every_whole=True)
+        client = _resume_client(server, max_retries=4)
+        with pytest.raises(requests.RequestException):
+            client.download(
+                "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+            )
+        assert len(server.ranged) == 1, (
+            f"resume re-armed after a refusal: {len(server.ranged)} ranged requests"
+        )
+
+
+@pytest.mark.unit
+class TestResumeArmingConditions:
+    """When a ranged request is never worth attempting."""
+
+    @pytest.mark.parametrize(
+        "kwargs, why",
+        [
+            ({"etag": 'W/"7"'}, "a weak validator cannot anchor a representation"),
+            ({"etag": None}, "no validator at all"),
+            ({"accept_ranges": False}, "the server does not advertise ranges"),
+            ({"encoding": "gzip"}, "a coded body makes the offset meaningless"),
+        ],
+        ids=["weak-etag", "no-etag", "no-accept-ranges", "coded-body"],
+    )
+    def test_it_never_arms(self, tmp_path, kwargs, why):
+        """No Range is sent at all, and the object still arrives."""
+        dest = tmp_path / "g"
+        server = _ResumeServer(**kwargs)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert server.ranged == [], why
+        assert dest.read_bytes() == _OBJECT
+
+    def test_a_callers_own_range_disables_resume(self, tmp_path):
+        """If the caller owns the object boundaries, we never add ours on top."""
+        server = _ResumeServer(break_first_at=None)
+        _resume_client(server).download(
+            "http://x/g",
+            tmp_path / "g",
+            progress=False,
+            chunk=4096,
+            resume=True,
+            headers={"Range": "bytes=0-99"},
+        )
+        assert all(r["Range"] == "bytes=0-99" for r in server.ranged)
+
+    def test_a_break_inside_the_overlap_does_not_arm(self, tmp_path):
+        """Below the overlap a resumed leg would make no forward progress."""
+        dest = tmp_path / "g"
+        server = _ResumeServer(break_first_at=1024)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert server.ranged == []
+        assert dest.read_bytes() == _OBJECT
+
+
+@pytest.mark.unit
+class TestResumeNeverTrustsFoundBytes:
+    """A `.part` this call did not write is never resumed from."""
+
+    def test_a_stale_part_is_not_used_as_the_resume_prefix(self, tmp_path):
+        """Otherwise the published file is half a previous, unrelated object."""
+        dest = tmp_path / "g"
+        (tmp_path / "g.part").write_bytes(b"\xff" * 190_000)
+        server = _ResumeServer()
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert b"\xff" * 1000 not in dest.read_bytes()
+
+    def test_the_resumed_leg_starts_from_this_calls_own_byte_count(self, tmp_path):
+        """The offset must come from the truncating write, not the stale size."""
+        (tmp_path / "g.part").write_bytes(b"\xff" * 190_000)
+        server = _ResumeServer()
+        _resume_client(server).download(
+            "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+        )
+        first = int(server.ranged[0]["Range"].removeprefix("bytes=").split("-")[0])
+        assert first == _BREAK_AT - 65536, "offset was taken from the stale file"
+
+
+@pytest.mark.unit
+class TestResumeStillVerifies:
+    """A resumed file is published through the same gates as a whole read."""
+
+    def test_a_resumed_leg_that_ends_short_does_not_publish(self, tmp_path):
+        """The length post-condition applies to the assembled file too."""
+        dest = tmp_path / "g"
+        server = _ResumeServer(leg_break_at=1000)
+        client = _resume_client(server, max_retries=1)
+        with pytest.raises(requests.RequestException):
+            client.download("http://x/g", dest, progress=False, chunk=4096, resume=True)
+        assert not dest.exists()
+        assert not (tmp_path / "g.part").exists()
+
+    def test_a_resumed_file_is_magic_checked(self, tmp_path):
+        """`expect_magic` runs on the assembled object, not on the first leg."""
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        client = _resume_client(server)
+        with pytest.raises(ValueError):
+            client.download(
+                "http://x/g",
+                dest,
+                progress=False,
+                chunk=4096,
+                resume=True,
+                expect_magic=b"NOPE",
+            )
+        assert not dest.exists()
+
+    def test_a_refusal_with_no_budget_left_raises_instead_of_looping(self, tmp_path):
+        """The refusal path is bounded by the retry budget, not only by the disarm."""
+        server = _ResumeServer(honour_range=False, break_every_whole=True)
+        client = _resume_client(server, max_retries=1)
+        with pytest.raises(requests.ConnectionError, match="no retry budget left"):
+            client.download(
+                "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+            )
+        assert not (tmp_path / "g.part").exists()
+
+    def test_a_resumed_download_matches_a_restarted_one_byte_for_byte(self, tmp_path):
+        """The whole point: resuming must not change what lands on disk."""
+        restarted = tmp_path / "restarted"
+        resumed = tmp_path / "resumed"
+        _resume_client(_ResumeServer()).download(
+            "http://x/g", restarted, progress=False, chunk=4096
+        )
+        _resume_client(_ResumeServer()).download(
+            "http://x/g", resumed, progress=False, chunk=4096, resume=True
+        )
+        assert restarted.read_bytes() == resumed.read_bytes() == _OBJECT
