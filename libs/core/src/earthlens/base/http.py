@@ -225,6 +225,14 @@ def _phase_from_causes(exc: BaseException) -> str | None:
             'connect'
 
             ```
+        - Nothing recognisable inside means no verdict, rather than a guess:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import _phase_from_causes
+            >>> _phase_from_causes(requests.ConnectionError("mystery")) is None
+            True
+
+            ```
     """
     causes = list(_causes(exc))
     for cause in causes:
@@ -308,6 +316,16 @@ def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str 
             ...     requests.exceptions.ContentDecodingError(), strict=False
             ... )
             'read'
+
+            ```
+        - A connection error wrapping nothing recognisable is `"unknown"`,
+          not `"connect"` — it spends the cheap budget but is not exempt from
+          the idempotency gate:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import classify_transport_error
+            >>> classify_transport_error(requests.ConnectionError("mystery"))
+            'unknown'
 
             ```
     """
