@@ -866,7 +866,7 @@ def _patch_geotiff_write(monkeypatch):
         "from_array",
         staticmethod(
             lambda arr, *, geo_ref, no_data_value=None, path=None: _StubGeoTiff(
-                arr, geo_ref.geo, geo_ref.epsg
+                arr, geo_ref.resolve_geotransform(), geo_ref.epsg
             )
         ),
     )

@@ -19,8 +19,9 @@ def _forbid_network(request, monkeypatch):
 
     def _blocked(*args, **kwargs):
         raise AssertionError(
-            "a non-e2e JRC test attempted a real HTTP request; inject the "
-            "`http_text` / `http_bytes` seam instead."
+            "a non-e2e JRC test attempted to reach the network; inject the "
+            "`http_text` / `http_bytes` seam, or stub "
+            "`pyramids.netcdf.NetCDF.read_file` for a cube read."
         )
 
     import requests

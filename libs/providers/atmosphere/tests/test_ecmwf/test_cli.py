@@ -760,8 +760,8 @@ class TestDeepProber:
         assert captured["variable"] == ["all"]
         assert captured["lake"] == ["achit"]
 
-    def test_read_netcdf_var_meta_via_gdal(self, tmp_path):
-        """_read_netcdf_var_meta reads long_name/units from a NetCDF via GDAL."""
+    def test_read_netcdf_var_meta_reads_a_netcdf(self, tmp_path):
+        """_read_netcdf_var_meta reads long_name/units from a NetCDF."""
         import numpy as np
         import xarray as xr
 
