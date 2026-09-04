@@ -2113,26 +2113,47 @@ class TestGdalGuardDetection:
         assert found and "unparseable" in found[0][1]
 
     def test_the_guard_governs_tests_and_tools_too(self):
-        """The rule covers the test and tooling trees, not only shipped source."""
+        """Every tree the rule claims to cover has governed files in it."""
         # Scope is a behavioural contract, not an implementation detail. An
         # `osgeo` import in a test or a notebook is the same layering break as
         # one in src/, so a glob narrowed back to src/ would un-govern most of
-        # the repo while every test stayed green.
-        governed = _earthlens_sources()
-        trees = {path.relative_to(_ROOT).parts for path in governed}
-        assert any("src" in parts for parts in trees), "shipped source is ungoverned"
-        assert any("tests" in parts for parts in trees), "the test tree is ungoverned"
-        assert any(parts[0] == "tools" for parts in trees), "tools/ is ungoverned"
-        assert any(parts[-1].endswith(".ipynb") for parts in trees), (
+        # the repo.
+        #
+        # One `any()` per kind of tree does not catch that. Dropping the
+        # provider-source pattern leaves all five providers unwatched while a
+        # single core file still satisfies "some src is covered". So derive the
+        # expectation from the repo's own layout and check it tree by tree: a
+        # new provider theme is then covered without editing this test, and a
+        # narrowed glob fails naming the trees it dropped.
+        governed = {
+            str(path.relative_to(_ROOT)).replace("\\", "/")
+            for path in _earthlens_sources()
+        }
+        themes = sorted(
+            path.name for path in (_ROOT / "libs/providers").iterdir() if path.is_dir()
+        )
+        assert len(themes) >= 5, f"provider layout changed unexpectedly: {themes}"
+
+        required = ["libs/core/src", "libs/core/tests", "tools", "docs/examples"]
+        required += [f"libs/providers/{theme}/src" for theme in themes]
+        required += [f"libs/providers/{theme}/tests" for theme in themes]
+        unwatched = [
+            tree
+            for tree in required
+            if not any(name.startswith(f"{tree}/") for name in governed)
+        ]
+        assert unwatched == [], f"the guard no longer watches: {unwatched}"
+
+        assert any(name.endswith(".ipynb") for name in governed), (
             "the example notebooks are ungoverned, and they are where this repo's "
             "raw-GDAL workarounds have historically lived"
         )
         junk = [
-            path
-            for path in governed
-            if "__pycache__" in path.parts or "build" in path.parts
+            name
+            for name in governed
+            if "__pycache__" in name.split("/") or "build" in name.split("/")
         ]
-        assert junk == [], f"generated files are not source: {junk[:3]}"
+        assert junk == [], f"generated files are not source: {sorted(junk)[:3]}"
 
     def test_reports_the_line_it_found(self, tmp_path):
         """The offender's line number is reported so the failure is actionable."""
