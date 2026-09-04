@@ -625,7 +625,6 @@ _ERGONOMIC_ANNOTATIONS: dict[str, Any] = {
 }
 
 
-@functools.cache
 def native_parameters(backend_cls: type) -> frozenset[str]:
     """Parameter names a backend's own `__init__` declares.
 
@@ -639,9 +638,13 @@ def native_parameters(backend_cls: type) -> frozenset[str]:
     Args:
         backend_cls: An `AbstractDataSource` subclass.
 
-    Cached on the class, like the sibling `_parameters` helper: a backend's
-    declared parameters cannot change after the class is built, and this is
-    called on the facade's hot construction path.
+    Deliberately uncached, unlike the sibling `_parameters` helper. Keying a
+    cache on the class would retain every class ever passed — including the
+    throwaway ones tests build — and the premise that a backend's parameters
+    cannot change is not quite true here: `__init_subclass__` replaces
+    `__init__`, and a caller may patch it again, after which a cached answer
+    would be wrong. `inspect.signature` is cheap enough that neither risk is
+    worth taking.
 
     Returns:
         frozenset[str]: The declared names, minus the ergonomic ones the
