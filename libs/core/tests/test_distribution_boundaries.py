@@ -152,7 +152,12 @@ def _gis_imports(path: Path) -> list[tuple[int, str]]:
 
 
 def _is_banned_gis_import(node: ast.AST) -> bool:
-    """Return whether `node` is an import statement pulling in a banned GIS module."""
+    """Return whether `node` is an absolute import of a banned GIS module.
+
+    Relative imports are excluded: `from .osgeo import gdal` names a sibling
+    module inside earthlens, not GDAL, so treating it as a violation would fail
+    correct code.
+    """
     if isinstance(node, ast.Import):
         return any(
             alias.name.split(".", 1)[0] in _BANNED_GIS_MODULES for alias in node.names
