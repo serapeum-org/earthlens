@@ -185,6 +185,61 @@ def _causes(exc: BaseException) -> Iterator[BaseException]:
                 queue.append(arg)
 
 
+def _phase_from_causes(exc: BaseException) -> str:
+    """Decide the phase of a `requests.ConnectionError` from what it wraps.
+
+    `requests` collapses both phases into this one class, so the wrapped cause
+    is the only thing separating "never connected" from "connected, then the
+    socket died".
+
+    The socket-level causes are checked before the name markers, and read
+    markers across *every* cause before connect ones, because a wrapper can
+    match a marker itself while carrying the real reason inside it —
+    `MaxRetryError` matches the connect marker and commonly wraps a read
+    failure, so scanning cause-by-cause would let the wrapper outvote its own
+    reason.
+
+    Args:
+        exc: The connection error to inspect.
+
+    Returns:
+        str: `"read"` when the request had been delivered, `"connect"`
+        otherwise. An unrecognised cause is treated as a connect failure, the
+        smaller budget, so an unknown case fails fast rather than spending the
+        full one on something that may never succeed.
+
+    Examples:
+        - A reset socket happened after the request was delivered:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import _phase_from_causes
+            >>> _phase_from_causes(requests.ConnectionError(ConnectionResetError()))
+            'read'
+
+            ```
+        - A refused connection never reached the server:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import _phase_from_causes
+            >>> _phase_from_causes(requests.ConnectionError(ConnectionRefusedError()))
+            'connect'
+
+            ```
+    """
+    causes = list(_causes(exc))
+    for cause in causes:
+        if isinstance(cause, (ConnectionResetError, ConnectionAbortedError)):
+            return "read"
+        if isinstance(cause, ConnectionRefusedError):
+            return "connect"
+    names = [type(cause).__name__ for cause in causes]
+    if any(marker in name for name in names for marker in _READ_CAUSE_NAMES):
+        return "read"
+    if any(marker in name for name in names for marker in _CONNECT_CAUSE_NAMES):
+        return "connect"
+    return "connect"
+
+
 def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str | None:
     """Say whether a transport failure is retryable, and which budget it spends.
 
@@ -258,31 +313,7 @@ def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str 
     ):
         return "read"
     if isinstance(exc, requests.ConnectionError):
-        # `requests` collapses both phases into one class, so the wrapped cause
-        # is the only thing separating "never connected" from "connected, then
-        # the socket died".
-        # Two passes: a wrapper whose own name matches a marker (notably
-        # `MaxRetryError`) must not outvote the reason nested inside it, so the
-        # specific socket-level causes are looked for first.
-        causes = list(_causes(exc))
-        for cause in causes:
-            if isinstance(cause, (ConnectionResetError, ConnectionAbortedError)):
-                return "read"
-            if isinstance(cause, ConnectionRefusedError):
-                return "connect"
-        names = [type(cause).__name__ for cause in causes]
-        # Read markers are searched across *every* cause before connect ones.
-        # `MaxRetryError` matches a connect marker itself while carrying the
-        # real reason inside it, so scanning cause-by-cause would let the
-        # wrapper decide before its own reason is reached.
-        if any(m in n for n in names for m in _READ_CAUSE_NAMES):
-            return "read"
-        if any(m in n for n in names for m in _CONNECT_CAUSE_NAMES):
-            return "connect"
-        # An unrecognised connection error spends the smaller budget, so an
-        # unknown case fails fast rather than burning the full one on something
-        # that may never succeed.
-        return "connect"
+        return _phase_from_causes(exc)
     if isinstance(exc, requests.exceptions.Timeout):
         return "read"
     # Anything else is retryable only because the caller asked for it by name.

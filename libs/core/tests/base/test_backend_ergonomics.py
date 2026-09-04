@@ -70,9 +70,8 @@ class TestBackendDirectErgonomics:
         completion while it did.
         """
         params = inspect.signature(CHIRPS.__init__).parameters
-        assert "variables" in params and "lat_lim" in params, (
-            f"native parameters must survive, got {list(params)}"
-        )
+        assert "variables" in params, f"variables must survive, got {list(params)}"
+        assert "lat_lim" in params, f"lat_lim must survive, got {list(params)}"
         assert not any(p.kind == p.VAR_KEYWORD for p in params.values()), (
             "the wrapper must not degrade the signature to **kwargs"
         )

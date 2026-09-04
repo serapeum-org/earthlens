@@ -1515,9 +1515,11 @@ class TestDownloadResume:
         client.download("http://x/granule.bin", dest, progress=False, chunk=50)
         assert dest.read_bytes() == payload, "the reassembled file must match exactly"
         assert session.requests[0] is None, "the first attempt is a plain GET"
-        assert session.requests[1] is not None and session.requests[1].startswith(
-            "bytes="
-        ), f"the retry should carry a Range header, got {session.requests[1]!r}"
+        resumed = session.requests[1]
+        assert resumed is not None, "the retry must issue a second request"
+        assert resumed.startswith("bytes="), (
+            f"the retry should carry a Range header, got {resumed!r}"
+        )
 
     def test_the_resumed_request_disables_content_encoding(self, tmp_path):
         """`Range` addresses encoded bytes, so the resume must ask for identity.
