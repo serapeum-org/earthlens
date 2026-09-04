@@ -1694,7 +1694,8 @@ class TestDownloadErrorTypes:
         from earthlens.base.http import IncompleteDownloadError
 
         err = IncompleteDownloadError("boom")
-        assert err.written is None and err.expected is None
+        assert err.written is None
+        assert err.expected is None
 
     def test_an_unsolicited_206_is_a_status_error_not_a_transport_one(self):
         """It must not be swept up by the transport retry set.
