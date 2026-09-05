@@ -2839,6 +2839,47 @@ class TestResumeArmingConditions:
 
 
 @pytest.mark.unit
+class TestResumeBanksOnlyWhatIsOnDisk:
+    """The offset a resumed request asks for must equal the staged file size."""
+
+    def test_an_earlier_larger_attempt_does_not_inflate_the_offset(self, tmp_path):
+        """A high-water mark across attempts outlives the file that produced it.
+
+        Attempt 1 ends cleanly but short, so it is discarded; attempt 2 breaks
+        earlier. Banking the larger, older count would aim the ranged request
+        past the end of the staged file, guaranteeing a refusal and blaming the
+        server for a local accounting error.
+        """
+        dest = tmp_path / "g"
+        server = _ShrinkingResumeServer()
+        _resume_client(server, max_retries=5).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        ranged = server.ranged
+        assert ranged, "the second break should still have armed a resume"
+        first = int(ranged[0]["Range"].removeprefix("bytes=").split("-")[0])
+        assert first == 100_000 - 65536, (
+            f"the leg asked from {first}, so it banked something other than the "
+            f"100,000 bytes attempt 2 actually wrote"
+        )
+
+
+class _ShrinkingResumeServer(_ResumeServer):
+    """Ends short on the first read, then breaks earlier on the second."""
+
+    def _whole(self) -> _ResumeBody:
+        """Serve a clean-but-short body, then a body that breaks at 100,000."""
+        headers = self._base_headers()
+        headers["Content-Length"] = str(len(self.payload))
+        n = len(self.requests)
+        if n == 1:
+            # Ends cleanly at 190,000: an IncompleteDownloadError, discarded.
+            return _ResumeBody(self.payload[:190_000], status=200, headers=headers)
+        return _ResumeBody(self.payload, status=200, headers=headers, break_at=100_000)
+
+
+@pytest.mark.unit
 class TestResumeHelperEdges:
     """Branches of the resume helpers a server-level test cannot reach."""
 

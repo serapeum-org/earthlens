@@ -1981,7 +1981,6 @@ class HttpClient:
                         staged_now = tmp.stat().st_size if tmp.exists() else 0
                     except OSError:
                         staged_now = 0
-                    staged_now = max(staged_now, best_written)
                     kept = 0
                     if not resume_off and staged and anchor is not None:
                         # Bank only what THIS attempt wrote: `_stream_to_file`
@@ -1993,9 +1992,10 @@ class HttpClient:
                     banked = kept
                     logger.warning(
                         f"{type(exc).__name__} ({kind}) on {redact_url(url)} after "
-                        # The staged size, not `best_written`: a break part-way
-                        # through the body never reaches the line that updates
-                        # `best_written`, so it would read 0 here.
+                        # The size on disk right now, never `best_written`: that
+                        # is a high-water mark across attempts and outlives the
+                        # file that produced it, so banking it would point a
+                        # resumed request past the end of the staged file.
                         f"{staged_now:,} bytes; "
                         + (
                             f"keeping {kept:,} staged bytes to resume from, "
