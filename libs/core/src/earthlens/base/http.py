@@ -1756,6 +1756,36 @@ class HttpClient:
                 return False
             return tmp.stat().st_size == expected
 
+        def salvage_publishable(expected: int | None) -> bool:
+            """Whether the staged bytes are the whole object *and* pass every gate.
+
+            The salvage runs `expect_magic` itself rather than falling through to
+            the publish. Without it a body that breaks after its last byte
+            reaches `dest` through a weaker door than one that does not, so a
+            200-served HTML error page whose `Content-Length` happens to match
+            would land under a `.nc` name with the magic check never run.
+
+            Args:
+                expected: The length the response advertised, if any.
+
+            Returns:
+                bool: True when the file may be published as it stands.
+
+            Raises:
+                ValueError: When `expect_magic` is set and the staged body does
+                    not start with one of the prefixes. The partial is discarded
+                    first, exactly as on the whole-object path.
+            """
+            if not salvaged(expected):
+                return False
+            if expect_magic is not None:
+                try:
+                    _check_magic(tmp, expect_magic, url)
+                except BaseException:
+                    discard_partial()
+                    raise
+            return True
+
         while True:
             self._throttle()
             response: requests.Response | None = None
@@ -1923,7 +1953,7 @@ class HttpClient:
                 attempt += 1
                 continue
             except self.retry_on_exceptions as exc:
-                if salvaged(expected_total):
+                if salvage_publishable(expected_total):
                     logger.debug(
                         f"{redact_url(url)} broke after the last byte; the "
                         f"{expected_total:,}-byte body is already complete"
@@ -1984,7 +2014,7 @@ class HttpClient:
                 # Wider than the client's retry set on purpose: the salvage
                 # issues no request and reads no header, so the caller's retry
                 # policy is not the right gate - the size equality is the proof.
-                if not salvaged(expected_total):
+                if not salvage_publishable(expected_total):
                     discard_partial()
                     raise
                 logger.debug(

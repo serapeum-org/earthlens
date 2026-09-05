@@ -2274,6 +2274,35 @@ class TestDownloadSalvage:
             client.download("http://x/g", tmp_path / "g", progress=False, chunk=1)
         assert not (tmp_path / "g.part").exists()
 
+    def test_a_salvaged_body_still_has_to_pass_the_magic_check(self, tmp_path):
+        """A break after the last byte must not be a weaker door to `dest`.
+
+        An error page served with a 200 whose `Content-Length` happens to match
+        is exactly what `expect_magic` exists to stop, and it reaches the
+        salvage branch whenever the stream breaks as it ends.
+        """
+        dest = tmp_path / "grid.nc"
+        page = b"<html>an error page served with a 200</html>"
+        session = _ScriptedSession(_ScriptedBody(page, break_at_end=True))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=2)
+        with pytest.raises(ValueError):
+            client.download(
+                "http://x/grid.nc", dest, progress=False, chunk=8, expect_magic=b"CDF"
+            )
+        assert not dest.exists(), "an unverified body was published"
+        assert not (tmp_path / "grid.nc.part").exists()
+
+    def test_a_salvaged_body_with_the_right_magic_is_published(self, tmp_path):
+        """The gate must not break the salvage it guards."""
+        dest = tmp_path / "grid.nc"
+        body = b"CDF" + b"payload" * 10
+        session = _ScriptedSession(_ScriptedBody(body, break_at_end=True))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/grid.nc", dest, progress=False, chunk=8, expect_magic=b"CDF"
+        )
+        assert dest.read_bytes() == body
+        assert session.calls == 1
+
     def test_an_incomplete_body_that_breaks_is_not_salvaged(self, tmp_path):
         """Without the equality there is no proof, so the error propagates."""
         session = _ScriptedSession(_ScriptedBody(_PAYLOAD, stop_after=5))
