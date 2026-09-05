@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import builtins
 import errno
 import time
 from typing import Any
@@ -26,6 +27,7 @@ from earthlens.base.http import (
     _parse_content_range,
     _parse_retry_after,
     _progress_total,
+    _strong_etag,
     classify_transport_error,
     is_network_unreachable,
     prefer_ipv4,
@@ -2490,6 +2492,8 @@ class _ResumeServer:
         leg_content_range: str | None = None,
         leg_payload: bytes | None = None,
         leg_break_at: int | None = None,
+        leg_content_length: str | None = None,
+        leg_transfer_encoding: str | None = None,
     ) -> None:
         self.payload = payload
         self.etag = etag
@@ -2504,6 +2508,8 @@ class _ResumeServer:
         self.leg_content_range = leg_content_range
         self.leg_payload = leg_payload
         self.leg_break_at = leg_break_at
+        self.leg_content_length = leg_content_length
+        self.leg_transfer_encoding = leg_transfer_encoding
         self.requests: list[dict[str, str]] = []
 
     @property
@@ -2570,9 +2576,11 @@ class _ResumeServer:
         # response *claims*, so the length cross-check cannot stand in for the
         # start/end/total gates under test.
         claimed = _parse_content_range(headers["Content-Range"])
-        headers["Content-Length"] = str(
+        headers["Content-Length"] = self.leg_content_length or str(
             claimed[1] - claimed[0] + 1 if claimed else len(body)
         )
+        if self.leg_transfer_encoding:
+            headers["Transfer-Encoding"] = self.leg_transfer_encoding
         return _ResumeBody(
             body,
             status=self.leg_status or 206,
@@ -2663,6 +2671,11 @@ class TestResumeRefusesBadResponses:
             ({"leg_content_range": "bytes */204800"}, "unparseable Content-Range"),
             ({"leg_content_range": None, "leg_etag": '"v2"'}, "renamed ETag"),
             ({"leg_encoding": "gzip"}, "coded ranged reply"),
+            ({"leg_transfer_encoding": "chunked"}, "chunked ranged reply"),
+            (
+                {"leg_content_length": "12"},
+                "Content-Length disagrees with the Content-Range",
+            ),
         ],
         ids=[
             "200-whole",
@@ -2673,6 +2686,8 @@ class TestResumeRefusesBadResponses:
             "star-range",
             "etag-change",
             "gzip-leg",
+            "chunked-leg",
+            "length-mismatch",
         ],
     )
     def test_a_bad_leg_falls_back_to_a_whole_read(self, tmp_path, kwargs, reason):
@@ -2708,6 +2723,26 @@ class TestResumeRefusesBadResponses:
         )
         assert dest.read_bytes() == _OBJECT
         assert b"\x01" * 200 not in dest.read_bytes()
+
+    def test_a_leg_ending_inside_the_overlap_is_refused(self, tmp_path):
+        """There are not enough bytes to compare, so nothing may be appended."""
+        dest = tmp_path / "g"
+        server = _ResumeServer(leg_payload=b"z" * 100)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.calls == 3
+
+    def test_a_chunk_size_that_straddles_the_overlap_still_resumes(self, tmp_path):
+        """The overlap rarely lands on a chunk boundary, so the split is exercised."""
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=5000, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.calls == 2
 
     def test_a_refusal_disarms_resume_for_the_rest_of_the_call(self, tmp_path):
         """One strike, so a bad server cannot drive a restart/resume cycle.
@@ -2772,6 +2807,80 @@ class TestResumeArmingConditions:
         )
         assert server.ranged == []
         assert dest.read_bytes() == _OBJECT
+
+
+@pytest.mark.unit
+class TestResumeHelperEdges:
+    """Branches of the resume helpers a server-level test cannot reach."""
+
+    @pytest.mark.parametrize(
+        "value", ["abc", '"unterminated', 'trailing"', '"', ""], ids=list("abcde")
+    )
+    def test_a_malformed_entity_tag_does_not_anchor(self, value):
+        """An `ETag` that is not a quoted-string cannot identify a representation."""
+        assert _strong_etag({"ETag": value}) is None
+
+    def test_empty_keepalive_blocks_do_not_count_toward_the_overlap(self, tmp_path):
+        """A chunked keepalive yields empty blocks; they carry no bytes to compare."""
+        dest = tmp_path / "g"
+        server = _KeepaliveResumeServer()
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.calls == 2
+
+    def test_an_unreadable_staging_file_disarms_instead_of_raising(
+        self, tmp_path, monkeypatch
+    ):
+        """A local read-back failure is not the server's fault, so restart quietly."""
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        real_open = builtins.open
+
+        def _failing_open(file, mode="r", *args, **kwargs):
+            if str(file).endswith(".part") and "r" in mode and "+" not in mode:
+                raise OSError(errno.ENOENT, "vanished")
+            return real_open(file, mode, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "open", _failing_open)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.calls == 3, "the leg should have been refused, not raised"
+
+
+class _KeepaliveResumeServer(_ResumeServer):
+    """A resume server whose ranged body is padded with empty blocks."""
+
+    def _partial(self, first: int, last: int) -> _ResumeBody:
+        """Return the normal 206, but yielding empty blocks between real ones."""
+        body = super()._partial(first, last)
+        return _EmptyPaddedBody(body)
+
+
+class _EmptyPaddedBody:
+    """Wraps a body, interleaving zero-length blocks into its stream."""
+
+    def __init__(self, inner: _ResumeBody) -> None:
+        self._inner = inner
+        self.status_code = inner.status_code
+        self.headers = inner.headers
+
+    def iter_content(self, chunk_size: int = 1) -> Any:
+        """Yield an empty block before every real one."""
+        for block in self._inner.iter_content(chunk_size):
+            yield b""
+            yield block
+
+    def raise_for_status(self) -> None:
+        """Delegate."""
+        self._inner.raise_for_status()
+
+    def close(self) -> None:
+        """Delegate."""
+        self._inner.close()
 
 
 @pytest.mark.unit
