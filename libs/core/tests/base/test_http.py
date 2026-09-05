@@ -22,12 +22,14 @@ from earthlens.base.http import (
     RangeReadError,
     RequestsGet,
     UnsolicitedPartialContentError,
+    _arm_resume_anchor,
     _check_magic,
     _default_user_agent,
     _is_local_storage_error,
     _parse_content_range,
     _parse_retry_after,
     _progress_total,
+    _ResumeAnchor,
     _strong_etag,
     classify_transport_error,
     is_network_unreachable,
@@ -2470,6 +2472,15 @@ class TestLocalStorageFailuresAreDeterministic:
 # constructor argument rather than a bespoke fake.
 # ---------------------------------------------------------------------------
 
+
+class _HeaderOnlyResponse:
+    """A response stand-in for helpers that read only the status and headers."""
+
+    def __init__(self, status: int, headers: dict[str, str]) -> None:
+        self.status_code = status
+        self.headers = headers
+
+
 _OBJECT = bytes(range(256)) * 800  # 204,800 bytes, > _RESUME_OVERLAP
 _BREAK_AT = 120_000  # leaves a staged prefix comfortably above the overlap
 
@@ -2816,7 +2827,11 @@ class TestResumeArmingConditions:
             ({"etag": 'W/"7"'}, "a weak validator cannot anchor a representation"),
             ({"etag": None}, "no validator at all"),
             ({"accept_ranges": False}, "the server does not advertise ranges"),
-            ({"encoding": "gzip"}, "a coded body makes the offset meaningless"),
+            (
+                {"encoding": "gzip"},
+                "a coded body has no usable length, so no anchor is possible "
+                "(the encoding gate itself is checked directly below)",
+            ),
         ],
         ids=["weak-etag", "no-etag", "no-accept-ranges", "coded-body"],
     )
@@ -2905,6 +2920,27 @@ class TestResumeHelperEdges:
     def test_a_malformed_entity_tag_does_not_anchor(self, value):
         """An `ETag` that is not a quoted-string cannot identify a representation."""
         assert _strong_etag({"ETag": value}) is None
+
+    def test_a_coded_response_never_anchors_even_with_a_length(self):
+        """The encoding gate, which no end-to-end case can reach.
+
+        `download` derives the total with `_progress_total`, which already
+        returns `None` for a coded body, so the check inside
+        `_arm_resume_anchor` is defence in depth and has to be exercised
+        directly or not at all.
+        """
+        response = _HeaderOnlyResponse(
+            200,
+            {
+                "Content-Length": "1000",
+                "Content-Encoding": "gzip",
+                "Accept-Ranges": "bytes",
+                "ETag": '"v1"',
+            },
+        )
+        assert _arm_resume_anchor(response, 1000) is None
+        response.headers.pop("Content-Encoding")
+        assert _arm_resume_anchor(response, 1000) == _ResumeAnchor(1000, '"v1"')
 
     def test_empty_keepalive_blocks_do_not_count_toward_the_overlap(self, tmp_path):
         """A chunked keepalive yields empty blocks; they carry no bytes to compare."""
