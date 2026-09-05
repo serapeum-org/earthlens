@@ -207,7 +207,8 @@ No `path` given; download() writes 'chc' output under ~/.earthlens/data/chc/ (lo
 ```
 
 An omitted `path=` resolves to the configured output directory — `set_output_dir()`, else `EARTHLENS_DATA_DIR`,
-else `~/.earthlens/data` — and the facade adds a per-source subdirectory. Pass `path=` to control it per call, or
+else `~/.earthlens/data` — and the facade adds a per-source subdirectory, with a qualified `source:topic`
+key flattening its colon (`jrc:coastal-forecast` writes to `jrc_coastal-forecast/`). Pass `path=` to control it per call, or
 see [Configuration](reference/configuration.md) to set it once for the whole process.
 
 If you are upgrading and a script that globbed `./earthlens-data/**` now finds nothing, that is why: the default

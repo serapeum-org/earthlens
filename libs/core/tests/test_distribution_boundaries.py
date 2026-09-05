@@ -5,12 +5,22 @@ independently, so a provider that imports an underscore-private core symbol has 
 undeclared contract: any core release free to rename its internals breaks the
 installed provider at runtime, in one code path, without failing core's own tests.
 These tests keep that boundary explicit.
+
+The file has since grown the repo's other layering guards, which share the same
+shape -- walk the source, assert a rule no single review would catch. The
+largest is the GDAL rule: GIS I/O belongs to pyramids, so `osgeo` must not be
+imported anywhere in earthlens, including its tests, tooling and notebooks.
 """
 
 from __future__ import annotations
 
 import ast
+import functools
+import json
+import re
+import sys
 from pathlib import Path
+from types import MappingProxyType
 
 import pytest
 
@@ -57,6 +67,317 @@ def _core_imports(path: Path):
                 continue
             for alias in node.names:
                 yield node.module, alias.name
+
+
+#: GDAL and its siblings belong to pyramids, never to earthlens. `osgeo` is not
+#: even importable on its own here -- pyramids vendors it and puts it on the
+#: path as a side effect of being imported -- so a bare import is both a layering
+#: break and a latent `ModuleNotFoundError`.
+_BANNED_GIS_MODULES = frozenset({"osgeo", "gdal", "ogr", "osr"})
+
+
+def _banned_gis_target(name: str) -> str | None:
+    """Return the banned GIS module a dotted import path reaches, else `None`.
+
+    Matching only the first segment would miss the one spelling most likely to
+    be reached for: pyramids vendors GDAL at `pyramids/_vendor/osgeo`, and
+    CLAUDE.md names that path, so `from pyramids._vendor.osgeo import gdal` is
+    documented, rooted at `pyramids`, and exactly what this rule forbids. Any
+    segment naming a banned module counts, wherever it sits in the path.
+    """
+    parts = name.split(".")
+    for index, part in enumerate(parts):
+        if part in _BANNED_GIS_MODULES:
+            return ".".join(parts[: index + 1])
+    return None
+
+
+#: Files allowed to reach for GDAL directly. Empty, and meant to stay that way.
+#:
+#: It held one entry: `jrc/_helpers.py`, whose `gdal_module()` read a CF `time`
+#: coordinate's `units` through the multidim API because under the HDF5 driver
+#: (which GDAL picks for any NetCDF-4 over `/vsicurl` on Windows) that attribute
+#: never reached `meta_data.get_dimension().attrs`. serapeum-org/pyramids#1078
+#: fixed that, pyramids 0.59 shipped it, and the accessor is gone -- so the
+#: allowance retired itself: `test_the_allowance_is_still_used` failed on the
+#: merge that removed the import, which is exactly what it is for.
+#:
+#: Adding an entry means a pyramids gap you have filed an issue for. Name the
+#: issue here, and note that `test_the_sanctioned_site_imports_pyramids_first`
+#: only has something to check while this set is non-empty.
+_GDAL_ALLOWED: frozenset[str] = frozenset()
+
+
+def _enclosing_functions(tree: ast.AST) -> dict[int, ast.AST]:
+    """Map each node to the innermost function containing it.
+
+    Carries the current function down the tree rather than reading it back out
+    of a traversal order. `ast.walk` happens to be breadth-first today, which
+    would make the deepest assignment land last, but its own docstring promises
+    "no specified order" -- so depending on that would be building on something
+    CPython declines to guarantee.
+
+    A node inside a nested function maps to the inner function alone, which is
+    what keeps one GDAL import from being reported once per enclosing function.
+    """
+    owners: dict[int, ast.AST] = {}
+    stack: list[tuple[ast.AST, ast.AST | None]] = [(tree, None)]
+    while stack:
+        node, current = stack.pop()
+        for child in ast.iter_child_nodes(node):
+            if current is not None:
+                owners[id(child)] = current
+            deeper = (
+                child
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+                else current
+            )
+            stack.append((child, deeper))
+    return owners
+
+
+def _pyramids_ordering_problems(path: Path) -> list[str]:
+    """Return one complaint per GDAL import pyramids does not correctly precede.
+
+    The rule is that `import pyramids` runs inside the same function, above the
+    GDAL import: pyramids vendors osgeo and only puts it on the path as a side
+    effect of being imported. A module-scope GDAL import breaks that too -- the
+    cost is paid on every import of the module, and nothing guarantees pyramids
+    ran first -- so both shapes are reported here, not just the ordering.
+
+    "Above" is textual, not reachability: an `import pyramids` guarded by a
+    condition that never holds still satisfies the check. Proving it runs would
+    need control-flow analysis, and the rule is a layering convention rather
+    than a runtime assertion -- the import failing loudly is the backstop.
+    """
+    tree = ast.parse(_source_text(path), filename=str(path))
+    owners = _enclosing_functions(tree)
+    problems: list[tuple[int, str]] = []
+    for node in ast.walk(tree):
+        if not _is_banned_gis_import(node):
+            continue
+        func = owners.get(id(node))
+        if func is None:
+            problems.append((node.lineno, "GDAL imported at module scope"))
+            continue
+        satisfied = any(
+            _imports_pyramids(other) and other.lineno < node.lineno
+            for other in ast.walk(func)
+        )
+        if not satisfied:
+            problems.append(
+                (
+                    node.lineno,
+                    f"GDAL imported in {func.name}() with no pyramids above it",
+                )
+            )
+    # Sort on the line number, not the rendered string: lexicographically
+    # "line 10" precedes "line 2", which reports a file out of source order.
+    return [f"line {line}: {text}" for line, text in sorted(problems)]
+
+
+#: Directory names that are never repo source. `.ipynb_checkpoints` is Jupyter's
+#: autosave and is gitignored, so scanning it would fail the guard on a file the
+#: author cannot fix by editing the tracked notebook.
+_EXCLUDED_DIRS = frozenset({"build", "__pycache__", ".ipynb_checkpoints"})
+
+
+def _earthlens_sources() -> list[Path]:
+    """Return every earthlens Python file the GDAL rule governs.
+
+    Covers the test and tooling trees and the example notebooks, not just
+    shipped source. Both have carried direct GDAL in this repo's history, so a
+    rule that watched `src/` alone would be looking in the wrong place.
+    """
+    return sorted(
+        path
+        for pattern in (
+            "libs/core/src/earthlens/**/*.py",
+            "libs/providers/*/src/earthlens/**/*.py",
+            "libs/core/tests/**/*.py",
+            "libs/providers/*/tests/**/*.py",
+            "tools/**/*.py",
+            # Notebooks are where this repo's raw-GDAL escape hatches have
+            # actually lived, so a rule that skipped them would watch the wrong
+            # tree. `_source_text` lifts their code cells out for parsing.
+            "docs/examples/**/*.ipynb",
+            "examples/**/*.ipynb",
+        )
+        for path in _ROOT.glob(pattern)
+        if not _EXCLUDED_DIRS.intersection(path.parts)
+    )
+
+
+@functools.cache
+def _governed_findings() -> MappingProxyType[str, list[tuple[int, str]]]:
+    """Return `{path: findings}` for every governed file that has any.
+
+    Cached because two tests ask for it and a full scan parses over a thousand
+    files. Read-only for the same reason: a cached mapping is shared, so a
+    caller that added or removed a key would be editing what every later test
+    sees. Callers build their own filtered views instead.
+    """
+    return MappingProxyType(
+        {
+            name: hits
+            for path in _earthlens_sources()
+            if (hits := _gis_imports(path))
+            and (name := str(path.relative_to(_ROOT)).replace("\\", "/"))
+        }
+    )
+
+
+#: IPython help on an object: `obj?` / `pd.DataFrame??`. Matched as a whole line
+#: rather than by a trailing `?`, so a prose line inside a triple-quoted string
+#: ("is this a question?") is left alone -- blanking that would break the string
+#: and turn a clean file into an `unparseable` finding.
+_IPYTHON_HELP = re.compile(r"[A-Za-z_][\w.]*\?{1,2}")
+
+#: An IPython capture: `files = !ls`, `a, b = !cmd`. The shell escape is what
+#: makes the line non-Python; the assignment target itself is ordinary.
+_IPYTHON_CAPTURE = re.compile(r"[A-Za-z_][\w\s,.\[\]]*=\s*!.*")
+
+
+def _source_text(path: Path) -> str:
+    """Return a file's Python source, unwrapping a notebook into one module.
+
+    A `.ipynb` is JSON, so its code has to be lifted out before it can be
+    parsed. IPython syntax that is not Python -- line magics (`%timeit`), shell
+    escapes (`!pip`), captures (`files = !ls`), help (`obj?`) and the entire
+    body of a `%%bash`-style cell magic -- is blanked rather than dropped, so a
+    reported line number still points at the right place in the concatenated
+    cells. Blanking beats skipping the cell, which would stop scanning the rest.
+    """
+    if path.suffix != ".ipynb":
+        return path.read_text(encoding="utf-8")
+    notebook = json.loads(path.read_text(encoding="utf-8"))
+    lines: list[str] = []
+    for cell in notebook.get("cells", []):
+        if cell.get("cell_type") != "code":
+            continue
+        # nbformat types `source` as multiline_string -- a list of lines OR one
+        # plain string, both valid. Iterating a string yields CHARACTERS, which
+        # would put one character on each line and hide every import in the
+        # cell, so normalise the shape before splitting.
+        source = cell.get("source") or []
+        if isinstance(source, str):
+            source = source.splitlines(keepends=True)
+        # A cell magic governs the whole cell: `%%bash` makes the body shell,
+        # not Python. Only its header line starts with `%`, so blanking per line
+        # would hand the shell body to `ast.parse`.
+        cell_magic = bool(source) and source[0].lstrip().startswith("%%")
+        for line in source:
+            body = line.rstrip("\n")
+            stripped = body.strip()
+            not_python = (
+                cell_magic
+                or stripped[:1] in {"%", "!", "?"}
+                or _IPYTHON_HELP.fullmatch(stripped) is not None
+                or _IPYTHON_CAPTURE.fullmatch(stripped) is not None
+            )
+            lines.append("\n" if not_python else body + "\n")
+        lines.append("\n")
+    return "".join(lines)
+
+
+def _gis_imports(path: Path) -> list[tuple[int, str]]:
+    """Return `(lineno, what)` for every banned GIS import in `path`.
+
+    Walks the AST rather than grepping, so `from osgeo.gdal import Translate`,
+    `import osgeo.gdal as g`, multi-line `from ... import (...)` continuations
+    and the dynamic forms are all caught. "Dynamic" means a STRING LITERAL
+    argument: `importlib.import_module("osgeo")`, a bare `import_module("osgeo")`
+    pulled in with `from importlib import import_module`, and
+    `__import__("osgeo")`. A name computed at runtime is out of reach of a static
+    walk, and pretending otherwise would overstate what this guard proves.
+    """
+    found: list[tuple[int, str]] = []
+    try:
+        tree = ast.parse(_source_text(path), filename=str(path))
+    except (SyntaxError, ValueError) as error:
+        # A file the guard cannot read is a hole in the guard. Report it as a
+        # finding so the failure names the file, rather than letting the whole
+        # test error out with a traceback that buries which one was at fault.
+        return [(getattr(error, "lineno", 0) or 0, f"unparseable: {error}")]
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if _banned_gis_target(alias.name):
+                    found.append((node.lineno, alias.name))
+        elif isinstance(node, ast.ImportFrom):
+            # `node.level` > 0 is a relative import, which resolves to a sibling
+            # module inside earthlens -- a local `osgeo.py` would be odd, but it
+            # is not GDAL, so flagging it would be a false positive.
+            if not node.level:
+                # Check each imported name too: `from pyramids._vendor
+                # import osgeo` puts the banned module in the alias, not
+                # in `node.module`.
+                module = node.module or ""
+                for alias in node.names:
+                    reached = _banned_gis_target(f"{module}.{alias.name}")
+                    if reached:
+                        found.append((node.lineno, f"from {reached}"))
+                        break
+        elif isinstance(node, ast.Call):
+            # Match on the callee's NAME, not on the node shape: an attribute
+            # call (`importlib.import_module`) and a plain name call (a bare
+            # `import_module` imported from importlib, or `__import__`) reach
+            # the same place, and keying off the shape silently missed the
+            # bare form.
+            func = node.func
+            if isinstance(func, ast.Attribute):
+                called: str | None = func.attr
+            elif isinstance(func, ast.Name):
+                called = func.id
+            else:
+                called = None
+            target = None
+            if (
+                called in {"import_module", "__import__"}
+                and node.args
+                and isinstance(node.args[0], ast.Constant)
+                and isinstance(node.args[0].value, str)
+            ):
+                target = node.args[0].value
+            if target and _banned_gis_target(target):
+                found.append((node.lineno, f"dynamic:{target}"))
+    return found
+
+
+def _is_banned_gis_import(node: ast.AST) -> bool:
+    """Return whether `node` is an absolute import of a banned GIS module.
+
+    Relative imports are excluded: `from .osgeo import gdal` names a sibling
+    module inside earthlens, not GDAL, so treating it as a violation would fail
+    correct code.
+    """
+    if isinstance(node, ast.Import):
+        return any(_banned_gis_target(alias.name) for alias in node.names)
+    if isinstance(node, ast.ImportFrom):
+        if node.level:
+            return False
+        module = node.module or ""
+        return any(_banned_gis_target(f"{module}.{alias.name}") for alias in node.names)
+    return False
+
+
+def _imports_pyramids(node: ast.AST) -> bool:
+    """Return whether `node` imports pyramids in a form that vendors osgeo.
+
+    A reach into `pyramids._vendor.osgeo` does not count. It is rooted at
+    `pyramids`, so a first-segment test would let the banned import satisfy the
+    very rule that exists to precede it.
+    """
+    if _is_banned_gis_import(node):
+        return False
+    if isinstance(node, ast.Import):
+        return any(alias.name.split(".", 1)[0] == "pyramids" for alias in node.names)
+    if isinstance(node, ast.ImportFrom):
+        # `from pyramids import dataset` imports the PACKAGE first and runs its
+        # __init__, so it puts the vendored osgeo on the path exactly as a plain
+        # `import pyramids` does. Rejecting this form would fail correct code.
+        return not node.level and (node.module or "").split(".", 1)[0] == "pyramids"
+    return False
 
 
 _SOURCES = _provider_sources()
@@ -1506,3 +1827,527 @@ class TestSingleSecretAuthAdoption:
             f"these single-secret backends still read os.environ instead of "
             f"delegating the fallback to SingleSecretAuth: {offenders}"
         )
+
+
+class TestNoDirectGdal:
+    """GIS I/O goes through pyramids; earthlens imports `osgeo` nowhere."""
+
+    def test_every_governed_file_parses(self):
+        """A file the guard cannot parse is a blind spot, and says so itself."""
+        # Kept apart from the GDAL assertion below: a syntax error is not a
+        # layering break, and telling its author to use `Dataset` / `NetCDF` or
+        # to add the file to `_GDAL_ALLOWED` would send them somewhere useless.
+        broken = {
+            name: hits
+            for name, hits in _governed_findings().items()
+            if any(what.startswith("unparseable") for _, what in hits)
+        }
+        assert broken == {}, (
+            "the guard could not parse these, so it cannot vouch for them. Fix the "
+            "syntax, or -- for a notebook -- teach `_source_text` the cell form it "
+            f"chokes on: {broken}"
+        )
+
+    def test_no_unsanctioned_gdal_import(self):
+        """Every earthlens source is free of GDAL beyond the declared allowance."""
+        unsanctioned = {
+            name: [(line, what) for line, what in hits if "unparseable" not in what]
+            for name, hits in _governed_findings().items()
+            if name not in _GDAL_ALLOWED
+        }
+        unsanctioned = {name: hits for name, hits in unsanctioned.items() if hits}
+        assert unsanctioned == {}, (
+            "GIS I/O belongs to pyramids -- use Dataset / NetCDF / FeatureCollection. "
+            "If pyramids genuinely cannot do it, file an issue there and add the site "
+            f"to _GDAL_ALLOWED with the issue number: {unsanctioned}"
+        )
+
+    def test_the_allowance_is_still_used(self):
+        """A stale allowance is a lie about the codebase, so it must still bite."""
+        if not _GDAL_ALLOWED:
+            pytest.skip("the allowance is empty, so no entry in it can be stale")
+        live = {
+            str(path.relative_to(_ROOT)).replace("\\", "/")
+            for path in _earthlens_sources()
+            if _gis_imports(path)
+        }
+        assert _GDAL_ALLOWED <= live, (
+            "_GDAL_ALLOWED names a file that no longer imports GDAL; drop the entry: "
+            f"{sorted(_GDAL_ALLOWED - live)}"
+        )
+
+    def test_the_sanctioned_site_imports_pyramids_first(self):
+        """A sanctioned site loads pyramids before osgeo, in that same function."""
+        # Skipping rather than passing: with no allowance there is no site to
+        # check, and a green tick would claim an assurance nothing produced. The
+        # rule itself stays covered -- TestGdalGuardDetection exercises
+        # `_pyramids_ordering_problems` directly on synthetic files.
+        if not _GDAL_ALLOWED:
+            pytest.skip(
+                "no sanctioned GDAL site; the rule is covered on synthetic files"
+            )
+        for name in sorted(_GDAL_ALLOWED):
+            problems = _pyramids_ordering_problems(_ROOT / name)
+            assert problems == [], f"{name}: {'; '.join(problems)}"
+
+
+#: `(id, source, has_problem)` for the pyramids-before-osgeo rule. These keep the
+#: rule covered while `_GDAL_ALLOWED` is empty and the repo test above skips.
+_ORDERING_PROBES = [
+    (
+        "pyramids-first",
+        """
+def read():
+    import pyramids
+    from osgeo import gdal
+""",
+        False,
+    ),
+    (
+        "pyramids-after",
+        """
+def read():
+    from osgeo import gdal
+    import pyramids
+""",
+        True,
+    ),
+    (
+        "no-pyramids",
+        """
+def read():
+    from osgeo import gdal
+""",
+        True,
+    ),
+    (
+        "module-scope",
+        """
+from osgeo import gdal
+
+
+def read():
+    return gdal
+""",
+        True,
+    ),
+    (
+        "pyramids-in-another-function",
+        """
+def warm():
+    import pyramids
+
+
+def read():
+    from osgeo import gdal
+""",
+        True,
+    ),
+    (
+        "from-import-vendors-too",
+        """
+def read():
+    from pyramids.dataset import Dataset
+    import osgeo.gdal
+""",
+        False,
+    ),
+    (
+        "unreachable-pyramids",
+        """
+def read():
+    if False:
+        import pyramids
+    from osgeo import gdal
+""",
+        False,
+    ),
+]
+
+
+#: Every spelling that reaches GDAL, paired with the id it reports under. The
+#: guard is only worth its name if it catches all of them, and nothing here is
+#: hypothetical -- the bare `import_module` form slipped through until it was
+#: probed, because the matcher keyed off the AST node shape instead of the
+#: callee's name.
+_GDAL_SPELLINGS = [
+    ("plain", "import osgeo\n"),
+    ("dotted", "import osgeo.gdal\n"),
+    ("aliased", "import osgeo.gdal as g\n"),
+    ("from", "from osgeo import gdal\n"),
+    ("from-dotted", "from osgeo.gdal import Translate\n"),
+    ("sibling-ogr", "from ogr import Open\n"),
+    ("sibling-osr", "import osr\n"),
+    (
+        "dynamic-dotted",
+        'import importlib\nimportlib.import_module("osgeo")\n',
+    ),
+    (
+        "dynamic-bare",
+        'from importlib import import_module\nimport_module("osgeo")\n',
+    ),
+    ("dynamic-dunder", '__import__("osgeo")\n'),
+    # pyramids vendors GDAL at `pyramids/_vendor/osgeo` and CLAUDE.md names that
+    # path, so this is the documented spelling -- rooted at `pyramids`, which a
+    # first-segment test reads as an ordinary pyramids import.
+    ("vendored-from", "from pyramids._vendor.osgeo import gdal\n"),
+    ("vendored-import", "import pyramids._vendor.osgeo.gdal as gdal\n"),
+    ("vendored-fromlist", "from pyramids._vendor import osgeo\n"),
+    (
+        "vendored-dynamic",
+        'import importlib\nimportlib.import_module("pyramids._vendor.osgeo")\n',
+    ),
+]
+
+#: Sources that must NOT trip the guard, so it stays usable. The relative forms
+#: matter: `from .osgeo import gdal` names a sibling module inside earthlens, so
+#: it is not GDAL and flagging it would be a false positive.
+_INNOCENT_SOURCES = [
+    ("relative-module", "from .osgeo import gdal\n"),
+    # The IPython-help rule matches a whole line, so prose that merely ends in a
+    # question mark keeps its line -- blanking it would break the string it sits
+    # in and report the file as unparseable.
+    ("prose-question", 'MSG = """\nis this a question?\n"""\n'),
+    ("relative-package", "from . import osgeo\n"),
+    ("pyramids", "import pyramids\n"),
+    ("pyramids-from", "from pyramids.dataset import Dataset\n"),
+    (
+        "unrelated-dynamic",
+        'import importlib\nimportlib.import_module("json")\n',
+    ),
+    ("name-merely-contains-osgeo", "import osgeohelper\n"),
+]
+
+
+class TestGdalGuardDetection:
+    """The GDAL guard is only as good as what `_gis_imports` can see."""
+
+    @pytest.mark.parametrize(
+        "source",
+        [src for _, src in _GDAL_SPELLINGS],
+        ids=[i for i, _ in _GDAL_SPELLINGS],
+    )
+    def test_every_gdal_spelling_is_caught(self, source, tmp_path):
+        """Each way of reaching GDAL is detected, static or dynamic."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(source, encoding="utf-8")
+        assert _gis_imports(probe), f"guard missed this import:\n{source}"
+
+    @pytest.mark.parametrize(
+        "source",
+        [src for _, src in _INNOCENT_SOURCES],
+        ids=[i for i, _ in _INNOCENT_SOURCES],
+    )
+    def test_innocent_sources_are_left_alone(self, source, tmp_path):
+        """A guard that fires on ordinary imports would be turned off."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(source, encoding="utf-8")
+        assert _gis_imports(probe) == [], f"guard false-positived on:\n{source}"
+
+    @pytest.mark.parametrize(
+        "source, has_problem",
+        [(src, bad) for _, src, bad in _ORDERING_PROBES],
+        ids=[name for name, _, _ in _ORDERING_PROBES],
+    )
+    def test_pyramids_ordering_is_judged_inside_the_function(
+        self, source, has_problem, tmp_path
+    ):
+        """The pyramids-before-osgeo rule is judged per function, not per file."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(source, encoding="utf-8")
+        assert bool(_pyramids_ordering_problems(probe)) is has_problem, source
+
+    def test_a_nested_function_import_is_reported_once(self, tmp_path):
+        """One violation is one complaint, attributed to the innermost function."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(
+            "def outer():\n    def inner():\n        from osgeo import gdal\n",
+            encoding="utf-8",
+        )
+        problems = _pyramids_ordering_problems(probe)
+        assert len(problems) == 1, problems
+        assert "inner()" in problems[0], problems
+        assert "outer()" not in problems[0], problems
+
+    def test_ordering_problems_are_sorted_by_line_number(self, tmp_path):
+        """Complaints come back in source order, so line 2 precedes line 10."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(
+            "def a():\n    from osgeo import gdal\n"
+            + "\n" * 6
+            + "def b():\n    from osgeo import ogr\n",
+            encoding="utf-8",
+        )
+        problems = _pyramids_ordering_problems(probe)
+        assert [p.split(":")[0] for p in problems] == ["line 2", "line 10"], problems
+
+    def test_ordering_problems_name_the_line_and_the_function(self, tmp_path):
+        """A violation reports where it is, so the failure is actionable."""
+        probe = tmp_path / "probe.py"
+        probe.write_text("def read():\n    from osgeo import gdal\n", encoding="utf-8")
+        problems = _pyramids_ordering_problems(probe)
+        assert len(problems) == 1
+        assert "line 2" in problems[0], problems
+        assert "read()" in problems[0], problems
+
+    def test_a_notebook_code_cell_is_scanned(self, tmp_path):
+        """A GDAL import inside a notebook code cell is found, JSON and all."""
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps(
+                {
+                    "cells": [
+                        {
+                            "cell_type": "markdown",
+                            "source": ["from osgeo import gdal\n"],
+                        },
+                        {"cell_type": "code", "source": ["import pyramids\n"]},
+                        {"cell_type": "code", "source": ["from osgeo import gdal\n"]},
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe), "a code cell's GDAL import was missed"
+
+    def test_a_notebook_markdown_cell_is_not_scanned(self, tmp_path):
+        """Prose that mentions the import is not a violation."""
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps(
+                {
+                    "cells": [
+                        {
+                            "cell_type": "markdown",
+                            "source": ["Do not write `from osgeo import gdal`.\n"],
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe) == []
+
+    def test_ipython_magics_do_not_break_parsing(self, tmp_path):
+        """A cell using `%` / `!` still parses, so the rest of it is scanned."""
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps(
+                {
+                    "cells": [
+                        {
+                            "cell_type": "code",
+                            "source": [
+                                "%matplotlib inline\n",
+                                "!echo hello\n",
+                                "from osgeo import gdal\n",
+                            ],
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe) == [(3, "from osgeo")]
+
+    def test_a_string_valued_source_is_scanned(self, tmp_path):
+        """nbformat allows `source` to be one string, and it is still scanned."""
+        # Iterating a string yields characters, which would put one character on
+        # each line and hide every import in the cell.
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps(
+                {"cells": [{"cell_type": "code", "source": "from osgeo import gdal\n"}]}
+            ),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe) == [(1, "from osgeo")]
+
+    def test_a_string_valued_source_does_not_manufacture_a_finding(self, tmp_path):
+        """A clean cell given as one string parses, rather than reporting garbage."""
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps(
+                {"cells": [{"cell_type": "code", "source": "import pyramids\nx = 1\n"}]}
+            ),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe) == []
+
+    @pytest.mark.parametrize(
+        "source",
+        [
+            pytest.param(["import os\n", "pd.DataFrame?\n"], id="trailing-help"),
+            pytest.param(["files = !ls\n"], id="capture"),
+            pytest.param(
+                ["if True:\n", "    %matplotlib inline\n", "    x = 1\n"],
+                id="indented-magic",
+            ),
+            pytest.param(["%%bash\n", "echo hello && ls -la\n"], id="cell-magic"),
+        ],
+    )
+    def test_ipython_syntax_is_not_reported_as_a_violation(self, source, tmp_path):
+        """Ordinary IPython cell syntax is not Python, and not a GDAL finding."""
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps({"cells": [{"cell_type": "code", "source": source}]}),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe) == []
+
+    def test_a_cell_magic_does_not_hide_a_later_cell(self, tmp_path):
+        """Blanking a `%%bash` body stops at that cell, so the rest stays scanned."""
+        probe = tmp_path / "probe.ipynb"
+        probe.write_text(
+            json.dumps(
+                {
+                    "cells": [
+                        {"cell_type": "code", "source": ["%%bash\n", "echo hi\n"]},
+                        {"cell_type": "code", "source": ["from osgeo import gdal\n"]},
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        assert _gis_imports(probe) == [(4, "from osgeo")]
+
+    def test_the_vendored_path_does_not_satisfy_the_ordering_rule(self, tmp_path):
+        """Reaching into pyramids' vendored osgeo is the violation, not the remedy."""
+        probe = tmp_path / "probe.py"
+        probe.write_text(
+            "def read():\n    from pyramids._vendor.osgeo import gdal\n",
+            encoding="utf-8",
+        )
+        assert _pyramids_ordering_problems(probe) != []
+
+    def test_an_unparseable_file_is_reported_not_raised(self, tmp_path):
+        """A file the guard cannot parse becomes a finding naming the file."""
+        probe = tmp_path / "broken.py"
+        probe.write_text("def oops(:\n", encoding="utf-8")
+        found = _gis_imports(probe)
+        assert found, "a file the guard cannot parse produced no finding"
+        assert "unparseable" in found[0][1], found
+
+    def test_generated_and_checkpoint_files_are_not_source(self, monkeypatch, tmp_path):
+        """Build output, bytecode caches and Jupyter autosaves are not repo source."""
+        # Driven off a tree of our own rather than the repo, since none of these
+        # exist here right now and committing one to prove the point would be
+        # absurd. `_governed_findings` is cached and reads `_ROOT` too, so this
+        # must not call it -- doing so would cache this tmp tree for every later
+        # test in the session.
+        (tmp_path / "libs/core/src/earthlens").mkdir(parents=True)
+        (tmp_path / "libs/core/src/earthlens/real.py").write_text(
+            "import pyramids\n", encoding="utf-8"
+        )
+        (tmp_path / "libs/core/src/earthlens/__pycache__").mkdir()
+        (tmp_path / "libs/core/src/earthlens/__pycache__/real.py").write_text(
+            "from osgeo import gdal\n", encoding="utf-8"
+        )
+        (tmp_path / "docs/examples/demo/.ipynb_checkpoints").mkdir(parents=True)
+        (tmp_path / "docs/examples/demo/kept.ipynb").write_text(
+            json.dumps({"cells": []}), encoding="utf-8"
+        )
+        (
+            tmp_path / "docs/examples/demo/.ipynb_checkpoints/kept-checkpoint.ipynb"
+        ).write_text(json.dumps({"cells": []}), encoding="utf-8")
+
+        monkeypatch.setattr(
+            sys.modules[_earthlens_sources.__module__], "_ROOT", tmp_path
+        )
+        governed = {
+            str(path.relative_to(tmp_path)).replace("\\", "/")
+            for path in _earthlens_sources()
+        }
+        assert governed == {
+            "libs/core/src/earthlens/real.py",
+            "docs/examples/demo/kept.ipynb",
+        }, f"unexpected file set: {sorted(governed)}"
+
+    def test_the_guard_governs_tests_and_tools_too(self):
+        """Every tree the rule claims to cover has governed files in it."""
+        # Scope is a behavioural contract, not an implementation detail. An
+        # `osgeo` import in a test or a notebook is the same layering break as
+        # one in src/, so a glob narrowed back to src/ would un-govern most of
+        # the repo.
+        #
+        # One `any()` per kind of tree does not catch that. Dropping the
+        # provider-source pattern leaves all five providers unwatched while a
+        # single core file still satisfies "some src is covered". So derive the
+        # expectation from the repo's own layout and check it tree by tree: a
+        # new provider theme is then covered without editing this test, and a
+        # narrowed glob fails naming the trees it dropped.
+        governed = {
+            str(path.relative_to(_ROOT)).replace("\\", "/")
+            for path in _earthlens_sources()
+        }
+        themes = sorted(
+            path.name for path in (_ROOT / "libs/providers").iterdir() if path.is_dir()
+        )
+        assert len(themes) >= 5, f"provider layout changed unexpectedly: {themes}"
+
+        required = ["libs/core/src", "libs/core/tests", "tools", "docs/examples"]
+        required += [f"libs/providers/{theme}/src" for theme in themes]
+        required += [f"libs/providers/{theme}/tests" for theme in themes]
+        unwatched = [
+            tree
+            for tree in required
+            if not any(name.startswith(f"{tree}/") for name in governed)
+        ]
+        assert unwatched == [], f"the guard no longer watches: {unwatched}"
+
+        assert any(name.endswith(".ipynb") for name in governed), (
+            "the example notebooks are ungoverned, and they are where this repo's "
+            "raw-GDAL workarounds have historically lived"
+        )
+        junk = [
+            name
+            for name in governed
+            if "__pycache__" in name.split("/") or "build" in name.split("/")
+        ]
+        assert junk == [], f"generated files are not source: {sorted(junk)[:3]}"
+
+    def test_reports_the_line_it_found(self, tmp_path):
+        """The offender's line number is reported so the failure is actionable."""
+        probe = tmp_path / "probe.py"
+        probe.write_text("x = 1\n" + "from osgeo import gdal\n", encoding="utf-8")
+        assert _gis_imports(probe) == [(2, "from osgeo")]
+
+    def test_is_banned_gis_import_matches_only_import_nodes(self):
+        """The node predicate accepts GDAL imports and rejects anything else."""
+        banned = ast.parse("from osgeo import gdal").body[0]
+        innocent = ast.parse("import pyramids").body[0]
+        call = ast.parse("f()").body[0]
+        assert _is_banned_gis_import(banned)
+        assert not _is_banned_gis_import(innocent)
+        assert not _is_banned_gis_import(call)
+
+    def test_imports_pyramids_matches_every_vendoring_form(self):
+        """Any import that loads the pyramids package counts, from-imports included."""
+        vendoring = [
+            "import pyramids",
+            "import pyramids.dataset",
+            "from pyramids import dataset",
+            "from pyramids.dataset import Dataset",
+        ]
+        for source in vendoring:
+            node = ast.parse(source).body[0]
+            assert _imports_pyramids(node), f"{source!r} does vendor osgeo"
+        assert not _imports_pyramids(ast.parse("from json import loads").body[0])
+
+    @pytest.mark.parametrize(
+        "source",
+        [
+            pytest.param("from .pyramids import helper", id="relative-module"),
+            pytest.param("from . import pyramids", id="relative-package"),
+            pytest.param(
+                "from pyramids._vendor.osgeo import gdal", id="vendored-osgeo"
+            ),
+        ],
+    )
+    def test_imports_pyramids_rejects_what_does_not_vendor_osgeo(self, source):
+        """Only the real pyramids package counts as having put osgeo on the path."""
+        # A relative `.pyramids` is a sibling module inside earthlens, not the
+        # package, so it runs no vendoring __init__. The vendored path is the
+        # banned import itself -- letting it count would have it satisfy the very
+        # rule that exists to precede it.
+        assert not _imports_pyramids(ast.parse(source).body[0])

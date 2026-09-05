@@ -69,6 +69,16 @@ plain HTTP and pull in no additional SDK.
 | PVGIS solar radiation and PV performance (EU JRC) | `pvgis`, `pvgis:solar-pv` | tabular | none (public) | — | [PVGIS](pvgis/introduction.md) |
 | Risk indicators (ThinkHazard! / INFORM / Global Forest Watch) | `risk-indicators`, `thinkhazard`, `inform`, `gfw`, `global-forest-watch` | tabular | none, except GFW (`GFW_API_KEY`) | — | [Risk indicators](risk_indicators/introduction.md) |
 | Global Solar Atlas and Global Wind Atlas (World Bank / ESMAP) | `solar-wind-atlas`, `global-solar-atlas`, `global-wind-atlas`, `gsa`, `gwa` | raster | none (public) | — | [Solar & Wind Atlas](solar_wind_atlas/introduction.md) |
+| European Commission JRC (European Flood Hazard Map + probabilistic sea-level forecasts) | `jrc`, `efhm`, `jrc-flood`, `jrc-flood-hazard`, `jrc-sea-level`, `jrc:european-flood-hazard`, `jrc:sea-level-forecast`, `jrc:coastal-forecast`, `jrc:twl-forecast` | raster | none | — | [JRC](jrc/introduction.md) |
+| WRI Aqueduct riverine flood risk | `aqueduct`, `aqueduct-floods`, `aqueduct-flood-risk` | vector | none | — | [Aqueduct](aqueduct/introduction.md) |
+| CatRaRE heavy-rainfall events (DWD) | `catrare` | vector | none | — | [CatRaRE](catrare/introduction.md) |
+| FABDEM bare-earth elevation | `fabdem`, `fab-dem`, `fabdem:bare-earth-dem` | raster | none | — | [FABDEM](fabdem/introduction.md) |
+| FLODIS observed flood footprints and impacts | `flodis` | tabular | none | — | [FLODIS](flodis/introduction.md) |
+| FLOPROS flood-protection standards | `flopros` | vector | none | — | [FLOPROS](flopros/introduction.md) |
+| HANZE historical European flood impacts | `hanze` | tabular | none | — | [HANZE](hanze/introduction.md) |
+| ISIMIP bias-adjusted climate forcing | `isimip` | raster | none | `isimip` | [ISIMIP](isimip/introduction.md) |
+| US flood exposure and loss (USACE NSI + FEMA NFHL / NFIP) | `nsi`, `nfhl`, `nfip` | vector | none | — | [NSI](nsi/introduction.md) |
+| DWD RADKLIM / RADOLAN radar precipitation | `radklim`, `radolan` | raster | none | — | [RADKLIM](radklim/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
 (GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX, Sentinel Hub, WorldPop)

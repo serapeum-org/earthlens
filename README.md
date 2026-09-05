@@ -163,6 +163,7 @@ for the full walkthrough of each one.
 | <img src="docs/_images/logos/ecmwf.png" height="20"> | [Copernicus Climate Data Store (ECMWF)](https://cds.climate.copernicus.eu) | `ecmwf` |
 | <img src="docs/_images/logos/climate_indices.svg" height="20"> | [NOAA Physical Sciences Laboratory](https://psl.noaa.gov/data/climateindices/) | `climate-indices` |
 | <img src="docs/_images/logos/cmip6.svg" height="20"> | [WCRP CMIP6](https://wcrp-cmip.org/) | `cmip6` |
+|   | [ISIMIP](https://www.isimip.org/) | `isimip` |
 
 **Disasters & risk**
 
@@ -172,6 +173,13 @@ for the full walkthrough of each one.
 | <img src="docs/_images/logos/gdacs.png" height="20"> | [GDACS](https://www.gdacs.org/) | `gdacs` |
 | <img src="docs/_images/logos/firms.png" height="20"> | [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/) | `firms` |
 | <img src="docs/_images/logos/risk_indicators.svg" height="20"> | [ThinkHazard! (GFDRR/World Bank)](https://thinkhazard.org) | `risk-indicators` |
+|   | [WRI Aqueduct](https://www.wri.org/aqueduct) | `aqueduct` |
+|   | [EM-DAT (CRED, UCLouvain)](https://www.emdat.be/) | `emdat` |
+|   | [FLODIS observed flood impacts](https://doi.org/10.5281/zenodo.8123096) | `flodis` |
+|   | [FLOPROS flood-protection standards](https://nhess.copernicus.org/articles/16/1049/2016/) | `flopros` |
+|   | [HANZE historical European floods](https://naturalhazards.eu/) | `hanze` |
+|   | [European Commission Joint Research Centre (CEMS)](https://data.jrc.ec.europa.eu/) | `jrc` |
+|   | [USACE National Structure Inventory](https://nsi.sec.usace.army.mil/) | `nsi` |
 
 **Elevation & bathymetry**
 
@@ -179,6 +187,7 @@ for the full walkthrough of each one.
 |---|---|---|
 | <img src="docs/_images/logos/dem.svg" height="20"> | [Copernicus DEM (ESA)](https://spacedata.copernicus.eu/collections/copernicus-digital-elevation-model) | `dem` |
 | <img src="docs/_images/logos/bathymetry.png" height="20"> | [GEBCO](https://www.gebco.net/) | `bathymetry` |
+|   | [FABDEM (Fathom / University of Bristol)](https://www.fathom.global/) | `fabdem` |
 
 **Glaciers & cryosphere**
 
@@ -198,6 +207,7 @@ for the full walkthrough of each one.
 |---|---|---|
 |   | [NOAA National Water Model](https://water.noaa.gov/about/nwm) | `nwm` |
 | <img src="docs/_images/logos/usgs-water.svg" height="20"> | [USGS National Water Information System](https://waterdata.usgs.gov/) | `usgs-water` |
+|   | [Caravan large-sample hydrology](https://github.com/kratzert/Caravan) | `caravan` |
 
 **Multi-mission imagery & data platforms**
 
@@ -234,6 +244,7 @@ for the full walkthrough of each one.
 |---|---|---|
 | <img src="docs/_images/logos/chc.png" height="20"> | [Climate Hazards Center (UCSB)](https://www.chc.ucsb.edu/) | `chc` |
 | <img src="docs/_images/logos/drought.svg" height="20"> | [Copernicus European Drought Observatory / NDMC](https://drought.emergency.copernicus.eu/) | `drought` |
+|   | [GloH2O (MSWEP / MSWX)](https://www.gloh2o.org/) | `mswep` |
 
 **Renewable energy**
 
@@ -280,6 +291,8 @@ for the full walkthrough of each one.
 | | Provider | `data_source` |
 |---|---|---|
 | <img src="docs/_images/logos/radar.svg" height="20"> | [NOAA NEXRAD](https://www.roc.noaa.gov/) | `radar` |
+|   | [DWD CatRaRE](https://www.dwd.de/EN/ourservices/radarklimatologie/radarklimatologie.html) | `catrare` |
+|   | [DWD RADKLIM / RADOLAN](https://opendata.dwd.de) | `radklim` |
 
 Logos are each provider's own mark, used only to identify which service a backend talks to
 (not an endorsement of earthlens by that provider) — see

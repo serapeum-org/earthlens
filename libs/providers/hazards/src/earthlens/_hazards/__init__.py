@@ -22,7 +22,7 @@ _NSI = "earthlens.nsi"
 _JRC = "earthlens.jrc"
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 38 data-source keys.
+#: distribution's 39 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
@@ -49,6 +49,10 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'hdx': ('earthlens.hdx', 'HDX', 'hdx', {}),
     'overture': ('earthlens.overture', 'Overture', 'overture', {}),
     'firms': ('earthlens.firms', 'FIRMS', '', {}),
+    # The bare source key, as every other backend answers to its own name.
+    # JRC is a source, not a reserved topic, so it needs no qualifier; it
+    # resolves to the EFHM, the flood-hazard product the aliases below serve.
+    'jrc': (_JRC, 'JRC', '', {}),
     'jrc-flood': (_JRC, 'JRC', '', {}),
     'efhm': (_JRC, 'JRC', '', {}),
     'jrc-flood-hazard': (_JRC, 'JRC', '', {}),

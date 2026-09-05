@@ -11,7 +11,7 @@ from earthlens.earthlens import EarthLens
 
 pytestmark = pytest.mark.jrc
 
-KEYS = ["jrc-flood", "efhm", "jrc-flood-hazard", "jrc:european-flood-hazard"]
+KEYS = ["jrc", "jrc-flood", "efhm", "jrc-flood-hazard", "jrc:european-flood-hazard"]
 
 #: The EFHM src package files that must never import xarray (raster I/O is pyramids').
 _SRC_DIR = Path(earthlens.jrc.__file__).parent
@@ -30,6 +30,42 @@ class TestRegistry:
     def test_keys_resolve_to_jrcflood_class(self, key: str) -> None:
         """All keys resolve to `earthlens.jrc.JRC`."""
         assert EarthLens.DataSources[key] is earthlens.jrc.JRC
+
+
+@pytest.mark.unit
+class TestDatasetResolution:
+    """Tests for how `dataset=` and the bare facade key reach a catalog row."""
+
+    def test_bare_facade_key_reaches_the_efhm(self, tmp_path):
+        """`data_source="jrc"` resolves to the EFHM without naming a dataset."""
+        # The facade key arrives as dataset=None, so the empty-string branch is
+        # what carries it -- not any alias spelled into the dataset vocabulary.
+        backend = EarthLens(
+            data_source="jrc", return_periods=[10], path=tmp_path
+        ).datasource
+        assert backend._resolve_dataset_id(None, None) == "efhm"
+
+    @pytest.mark.parametrize(
+        "alias", ["jrc", "jrc-flood-hazard", "jrc:european-flood-hazard"]
+    )
+    def test_facade_aliases_are_not_dataset_names(self, alias, tmp_path):
+        """`dataset=` names catalog rows and family selectors, never facade keys."""
+        backend = EarthLens(
+            data_source="jrc", return_periods=[10], path=tmp_path
+        ).datasource
+        with pytest.raises(ValueError):
+            backend._resolve_dataset_id(alias, None)
+
+    @pytest.mark.parametrize("dataset", ["flood", "jrc-flood", "FLOOD", "  flood  "])
+    def test_accepted_flood_selectors_reach_the_efhm(self, dataset, tmp_path):
+        """The selectors the resolver accepts for the EFHM keep resolving to it."""
+        # This round removed `"jrc"` from that tuple; nothing covered the members
+        # left in it, so dropping another would have been silent. Case and
+        # surrounding space are included because the resolver normalises both.
+        backend = EarthLens(
+            data_source="jrc", return_periods=[10], path=tmp_path
+        ).datasource
+        assert backend._resolve_dataset_id(dataset, None) == "efhm"
 
 
 @pytest.mark.unit

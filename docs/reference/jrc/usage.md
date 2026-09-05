@@ -16,7 +16,7 @@ sea-level products further down. See
 from earthlens.core import EarthLens
 
 paths = EarthLens(
-    data_source="jrc-flood",
+    data_source="jrc",
     lat_lim=[51.8, 52.0],       # [south, north]
     lon_lim=[4.8, 5.0],         # [west, east], -180..180
     return_periods=[100],       # 1-in-100-year flood
@@ -36,7 +36,7 @@ depth.epsg                  # 4326 (WGS84)
 array = depth.read_array()  # river-flood water depth in metres (-9999 = no data)
 ```
 
-The `efhm`, `jrc-flood-hazard`, and `jrc:european-flood-hazard` aliases route to the
+The `efhm`, `jrc-flood`, `jrc-flood-hazard`, and `jrc:european-flood-hazard` aliases route to the
 same backend.
 
 ## Several return periods at once
