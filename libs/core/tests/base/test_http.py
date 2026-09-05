@@ -1992,7 +1992,7 @@ class TestDownloadRequestShape:
         assert sent["Range"] == "bytes=0-5"
 
     def test_every_attempt_issues_an_identical_request(self, tmp_path):
-        """No leg differs from another, because there is no per-attempt header state."""
+        """Without `resume=`, no leg differs from another: there is no per-attempt state."""
         session = _ScriptedSession(_ScriptedBody(_PAYLOAD, stop_after=5))
         client = HttpClient(session=session, sleep=lambda _: None, max_retries=3)
         with pytest.raises(requests.RequestException):
@@ -2364,7 +2364,7 @@ class TestDownloadProgressBar:
     """The bar describes one attempt, never an offset into a previous one."""
 
     def test_one_bar_per_attempt_starting_from_zero(self, tmp_path, monkeypatch):
-        """`initial=` was only ever meaningful for a resume, which no longer exists."""
+        """A whole-object attempt always starts from zero, whatever it retries after."""
         seen: list[dict[str, Any]] = []
         monkeypatch.setattr("earthlens.base.http.tqdm", _RecordingTqdm(seen))
         session = _ScriptedSession(

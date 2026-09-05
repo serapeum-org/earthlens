@@ -65,18 +65,19 @@ The default `User-Agent` is `earthlens/{version}` — deliberately **non-Mozilla
 Anubis anti-bot wall (SPEIbase) blocks browser-like agents. Pass `user_agent=` for a descriptive contact string
 (e.g. Overpass / ohsome etiquette).
 
-## Downloads read the whole object
+## Downloads read the whole object, and verify it
 
-`download` reads the object **once, whole**, on every attempt. It generates no `Range` header of its own, and a
-retry re-requests from byte 0 rather than appending to what is already on disk.
+By default `download` reads the object **once, whole**, on every attempt: it generates no `Range` header of its
+own, and a retry re-requests from byte 0 rather than appending to what is already on disk. Resuming is available
+but opt-in — see [Resuming a single file](#resuming-a-single-filetrue) below.
 
-That is a deliberate limit, not a missing feature. Appending to a partial file is only safe if the new bytes
-provably belong to the same representation as the old ones, and the guarantees a server actually offers are not
-strong enough to prove it: `Accept-Ranges: bytes` is advertised by hosts that then ignore `Range` and send the
+Restarting is the default because appending to a partial file is only safe if the new bytes provably belong to
+the same representation as the old ones, and most servers do not give you enough to prove it: `Accept-Ranges: bytes` is advertised by hosts that then ignore `Range` and send the
 whole body from zero; `Last-Modified` has one-second resolution, so a validator can match across a real change;
 and a server may answer `416` without the `Content-Range` that would say how much it actually has. Every one of
 those produces a file that is the right *size* and the wrong *bytes* — corruption that survives to the user
-rather than failing loudly.
+rather than failing loudly. The opt-in path below refuses to resume unless the server clears every one of those
+hazards.
 
 What replaces it is verification after the fact:
 
