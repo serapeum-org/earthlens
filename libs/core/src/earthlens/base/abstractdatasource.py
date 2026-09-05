@@ -612,11 +612,16 @@ def _passed_aggregate(function: Any, args: tuple[Any, ...], kw: dict[str, Any]) 
 #: drift apart, and typed as loosely as the wrapper actually accepts: `aoi`
 #: takes a bbox, a point, a shapely geometry, GeoJSON, WKT or a GeoDataFrame.
 #:
-#: Real objects, not strings. `functools.wraps` copies `__module__` onto the
-#: wrapper, so a stringified annotation would be resolved in the *backend's*
-#: namespace — where `Any` is usually not imported — and
-#: `typing.get_type_hints` / `pydantic.validate_call` would raise `NameError`.
-#: That is the exact tooling this table exists to keep working.
+#: Real objects, not strings, and the reason is `__wrapped__` rather than
+#: `__module__`. `functools.wraps` points the wrapper's `__wrapped__` at the
+#: backend's own `__init__`, and `typing.get_type_hints` follows it, resolving
+#: against the *wrapped* function's `__globals__` — the backend module, where
+#: `Any` is usually not imported. `pydantic.validate_call` gets there by a
+#: different route, reading `sys.modules[fn.__module__]`, which `wraps` also
+#: rewrites to the backend. Verified on 3.14.6: swapping one entry for its
+#: string spelling makes `typing.get_type_hints(backend.__init__)` raise
+#: `NameError: name 'Any' is not defined`, and passing
+#: `globalns=wrapper.__globals__` explicitly makes it resolve again.
 _ERGONOMIC_ANNOTATIONS: dict[str, Any] = {
     "aoi": Any,
     "buffer": float | None,

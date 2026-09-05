@@ -1499,29 +1499,60 @@ class TestErgonomicKwargsAreDiscoverable:
             f"{name} advertised on {sorted(advertised - expected)} that reject it, "
             f"missing from {sorted(expected - advertised)} that accept it"
         )
+        # The set above is derived from the same predicate production uses, so
+        # it catches drift between rule and signature but not a wrong rule.
+        # These two are asserted by hand: if the rule and the emitted signature
+        # ever change together, this still fails.
+        must_not_see = {"buffer": "WorldPop", "dataset": "CMIP6"}[name]
+        assert must_not_see not in advertised, (
+            f"{must_not_see} must never advertise {name}"
+        )
 
     def test_the_synthesized_annotations_resolve(self):
         """`get_type_hints` must work on every backend the wrapper touches.
 
-        `functools.wraps` copies `__module__` onto the wrapper, so a
-        *stringified* annotation is resolved in the backend's namespace — where
-        `Any` is usually not imported — and every signature-driven tool
-        (`typing.get_type_hints`, `pydantic.validate_call`) raises `NameError`.
-        That is the tooling the annotations exist to serve.
+        `functools.wraps` points `__wrapped__` at the backend's own `__init__`,
+        and `get_type_hints` follows it, resolving against that function's
+        globals — the backend module, where `Any` is usually not imported. A
+        stringified annotation therefore raises `NameError` there, which is the
+        tooling these annotations exist to serve.
         """
         import typing
 
-        broken = []
+        from earthlens.base.abstractdatasource import _ERGONOMIC_ANNOTATIONS
+
+        # Every value in the table must already be an object. A string here is
+        # the actual defect, and it is checkable without touching a backend.
+        stringly = {
+            name: value
+            for name, value in _ERGONOMIC_ANNOTATIONS.items()
+            if isinstance(value, str)
+        }
+        assert not stringly, f"synthesized annotations must be objects, not {stringly}"
+
+        # The symbols the table would need resolved if it ever were stringified.
+        ours = {"Any", "float", "str", "None", "object", "list"}
+        broken, foreign, unexplained = [], [], []
         for key in sorted(EarthLens.DataSources):
             backend = EarthLens.DataSources[key]
             try:
                 typing.get_type_hints(backend.__init__)
             except NameError as exc:
-                if any(n in str(exc) for n in ("Any", "float", "str")):
-                    broken.append((backend.__name__, str(exc)))
-            except Exception:  # noqa: BLE001 - other failures are pre-existing
-                continue
+                missing = str(exc).split("'")[1] if "'" in str(exc) else str(exc)
+                # A backend's own annotations may name a TYPE_CHECKING-only
+                # import; that is its business, not this table's. Split rather
+                # than filter loosely, so neither kind can hide the other.
+                bucket = broken if missing in ours else foreign
+                bucket.append((backend.__name__, missing))
+            except Exception as exc:  # noqa: BLE001 - reported, never swallowed
+                unexplained.append((backend.__name__, f"{type(exc).__name__}: {exc}"))
         assert not broken, f"synthesized annotations fail to resolve on {broken}"
+        assert not unexplained, (
+            f"get_type_hints raised something other than NameError on {unexplained}"
+        )
+        # `foreign` is pre-existing and deliberately not asserted on; naming it
+        # keeps it visible instead of swallowed by a bare `except`.
+        assert isinstance(foreign, list)
 
     def test_a_native_parameter_is_not_shadowed_by_a_synthesized_one(self):
         """A backend declaring its own `aoi=` keeps that one, not the wrapper's.
@@ -1540,7 +1571,16 @@ class TestErgonomicKwargsAreDiscoverable:
         assert "aoi" in native_parameters(worldpop), (
             "a native aoi= must still read as native"
         )
-        assert aoi.annotation is not None, "the native annotation must survive"
+        native_aoi = inspect.signature(inspect.unwrap(worldpop.__init__)).parameters[
+            "aoi"
+        ]
+        assert aoi.annotation == native_aoi.annotation, (
+            f"the wrapper replaced WorldPop's own aoi annotation "
+            f"({native_aoi.annotation!r}) with {aoi.annotation!r}"
+        )
+        assert aoi.annotation is not inspect.Parameter.empty, (
+            "an annotation-less parameter would also pass an `is not None` test"
+        )
 
     def test_a_backend_is_not_offered_a_parameter_it_must_reject(self):
         """Facet-only and native-aoi backends drop the kwargs that cannot work.
