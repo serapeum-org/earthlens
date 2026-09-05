@@ -501,6 +501,8 @@ nav:
     - Authentication: examples/authentication.md
     - Data Sources: examples/data-sources.md
     - Data Catalog: examples/catalog.md
+    - Basics:
+      - Choosing an area of interest: examples/basics/01_area_of_interest.ipynb
     - Showcase — real-world events:
       - Suez Canal blockage (Ever Given): examples/showcase/suez_canal_ever_given.ipynb
       - Hunga Tonga eruption: examples/showcase/tonga_eruption.ipynb
@@ -837,6 +839,7 @@ nav:
     - Base contracts: reference/base/contracts.md
     - Bounded results (base): reference/base/bounded-results.md
     - Extents & warnings: reference/base/extents.md
+    - Area of interest: reference/base/area-of-interest.md
     - Authentication API: reference/base/auth-api.md
     - Catalog & utilities: reference/base/catalog-api.md
     - HTTP client (base): reference/base/http-client.md

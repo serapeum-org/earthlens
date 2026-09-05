@@ -231,7 +231,7 @@ def _polygon_or_none(shape: Any) -> Any:
 def _geojson_polygon(obj: Mapping[str, Any]) -> Any:
     """Return a shapely (multi)polygon for a GeoJSON mapping, or `None`.
 
-    Mirrors :func:`_geojson_bounds`'s structural handling (bare geometry,
+    Mirrors `_geojson_bounds`'s structural handling (bare geometry,
     `Feature`, `FeatureCollection`) but yields the dissolved polygon
     geometry rather than its envelope. Non-polygonal or unparseable input
     returns `None` so the caller clips to the bbox instead.
@@ -303,17 +303,40 @@ def resolve_aoi(
 ) -> tuple[list[float], list[float], Any]:
     """Coerce a flexible area-of-interest into `(lat_lim, lon_lim, geometry)`.
 
-    The same flexible `aoi` channel as :func:`normalize_aoi`, but it also
-    returns the polygon mask when the area of interest had a real
-    (non-rectangular) shape. Raster backends that clip via
-    `pyramids.Dataset.crop` use that mask to clip the fetched bbox to the
-    exact polygon; for bbox / point inputs the geometry is `None` and a
-    plain bbox clip is exact. See :func:`normalize_aoi` for the accepted
-    `aoi` forms and the bbox semantics.
+    The single `aoi` channel accepts every shape the popular EO packages
+    accept, so a caller never has to remember EarthLens's legacy
+    lat-then-lon two-list convention. Accepted forms:
+
+    * a bbox sequence `[min_lon, min_lat, max_lon, max_lat]` — the
+      GeoJSON / STAC **W, S, E, N** order;
+    * a bbox mapping with any spelling of the four edges (`min_lon` /
+      `lonmin` / `minx` / `west`, …);
+    * a `(lon, lat)` point — requires `buffer` (a half-width in degrees),
+      which is grown into a square box;
+    * a shapely geometry, or any object exposing `__geo_interface__`
+      (e.g. a `geopandas` row);
+    * a GeoJSON geometry / `Feature` / `FeatureCollection` mapping;
+    * a WKT string (parsed with shapely);
+    * a `GeoDataFrame` / `GeoSeries` (via its `total_bounds`, reprojected
+      to WGS84 first when the frame declares another CRS).
+
+    All coordinates are WGS84 degrees, and the returned pairs use the
+    internal `[min, max]` shape that every backend's `_create_grid`
+    consumes.
+
+    Unlike `normalize_aoi`, this also returns the polygon mask when the
+    area of interest had a real (non-rectangular) shape: a (multi)polygon
+    keeps its geometry, while a bbox, a point, or a points / lines frame
+    yields `None` and a plain bbox clip is exact. Raster backends pass the
+    mask to `pyramids.Dataset.crop` as its `mask=` argument — but only
+    those advertising `SUPPORTS_POLYGON_AOI` do so. The rest fall back to
+    the bounding box and emit a `PolygonAoiWarning`.
 
     Args:
-        aoi: The area of interest in any of the accepted forms.
-        buffer: Half-width in degrees for the `(lon, lat)` point form.
+        aoi: The area of interest in any of the accepted forms above.
+        buffer: Half-width in degrees. Required for, and only used by,
+            the `(lon, lat)` point form; a buffered point near a pole is
+            clamped to the valid latitude / longitude ranges.
 
     Returns:
         `(lat_lim, lon_lim, geometry)` where the pairs are `[min, max]`
@@ -323,8 +346,52 @@ def resolve_aoi(
 
     Raises:
         ValueError: If `aoi` is malformed, a point is given without
-            `buffer`, or the resulting box is degenerate / inverted.
+            `buffer`, or the resulting box is degenerate / inverted —
+            including a west-of-east box, which denotes an antimeridian
+            crossing and must be split into two requests.
         TypeError: If `aoi` is of an unsupported type.
+
+    Examples:
+        - A bbox is read as W, S, E, N and needs no mask:
+            ```python
+            >>> lat_lim, lon_lim, geometry = resolve_aoi([-75.0, 4.0, -74.0, 5.0])
+            >>> lat_lim, lon_lim
+            ([4.0, 5.0], [-75.0, -74.0])
+            >>> geometry is None
+            True
+
+            ```
+        - A WKT polygon keeps its shape as a WGS84 clip mask:
+            ```python
+            >>> lat_lim, lon_lim, geometry = resolve_aoi(
+            ...     "POLYGON ((-75 4, -74 4, -74 5, -75 5, -75 4))"
+            ... )
+            >>> lon_lim
+            [-75.0, -74.0]
+            >>> geometry.crs.to_epsg()
+            4326
+            >>> geometry.geometry.iloc[0].geom_type
+            'Polygon'
+
+            ```
+        - A point is grown into a square box by `buffer`:
+            ```python
+            >>> resolve_aoi((-74.5, 4.5), buffer=0.5)[:2]
+            ([4.0, 5.0], [-75.0, -74.0])
+
+            ```
+        - Omitting `buffer` for a point raises:
+            ```python
+            >>> resolve_aoi((-74.5, 4.5))
+            Traceback (most recent call last):
+                ...
+            ValueError: a point aoi=(lon, lat) requires buffer= (a half-width in degrees) to define an area
+
+            ```
+
+    See Also:
+        normalize_aoi: The same channel, bbox only, when no mask is needed.
+        crop_to_aoi: Applies the resolved bbox and mask to a dataset.
     """
     geom: Any = None
     if isinstance(aoi, str):
@@ -379,8 +446,9 @@ def resolve_aoi(
     else:
         raise TypeError(
             f"unsupported aoi type {type(aoi).__name__}; pass a bbox "
-            "[W, S, E, N], a (lon, lat) point with buffer=, a shapely "
-            "geometry / GeoJSON / WKT, or a GeoDataFrame"
+            "[W, S, E, N], a bbox mapping (min_lon / lonmin / minx / west "
+            "keys), a (lon, lat) point with buffer=, a shapely geometry / "
+            "GeoJSON / WKT, or a GeoDataFrame"
         )
 
     if min_lon > max_lon:
@@ -424,7 +492,7 @@ def normalize_aoi(
     All coordinates are assumed to be WGS84 degrees. The returned pairs
     use the internal `[min, max]` shape that every backend's
     `_create_grid` already consumes, so no backend has to change. This is
-    the bbox-only view of :func:`resolve_aoi`; use that when you also need
+    the bbox-only view of `resolve_aoi`; use that when you also need
     the polygon mask for precise (non-rectangular) clipping.
 
     Args:
@@ -695,8 +763,8 @@ def crop_to_aoi(
 
     Args:
         dataset: A `pyramids.Dataset` (anything exposing `crop`).
-        space: A :class:`~earthlens.base.abstractdatasource.SpatialExtent`
-            (anything exposing an optional `geometry`).
+        space: A `SpatialExtent` (anything exposing an optional
+            `geometry`).
         bbox: The fallback `(west, south, east, north)` quadruple, used
             when `space` has no polygon `geometry`.
         epsg: CRS of `bbox`. Defaults to `4326`.
@@ -761,7 +829,7 @@ def _crop_to_mask(dataset: Any, geometry: Any, *, touch: bool) -> Any:
 def mask_to_geometry(dataset: Any, space: Any, *, touch: bool = True) -> Any:
     """Mask an already-bbox-clipped `Dataset` / `NetCDF` to a polygon, if any.
 
-    The counterpart to :func:`crop_to_aoi` for backends that have *already*
+    The counterpart to `crop_to_aoi` for backends that have *already*
     cropped to the bbox by another route — CHIRPS's in-array numpy clip, or
     a server-side bbox (ECMWF's CDS `area`, a NetCDF cube). When `space`
     carries a polygon `geometry`, the dataset is masked to that exact shape
@@ -772,8 +840,8 @@ def mask_to_geometry(dataset: Any, space: Any, *, touch: bool = True) -> Any:
 
     Args:
         dataset: A `pyramids.Dataset` / `NetCDF` (anything exposing `crop`).
-        space: A :class:`~earthlens.base.abstractdatasource.SpatialExtent`
-            (anything exposing an optional `geometry`).
+        space: A `SpatialExtent` (anything exposing an optional
+            `geometry`).
         touch: Whether to keep cells merely touching the polygon. Defaults
             to `True`.
 
