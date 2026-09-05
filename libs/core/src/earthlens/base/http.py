@@ -1658,6 +1658,10 @@ class HttpClient:
                 carried no `Range` — the body is a fragment of the object, and
                 repeating the request returns the same fragment, so this is
                 raised rather than retried whatever the client's retry policy.
+            requests.HTTPError: Also when a resumed leg is refused because the
+                server answered with an error status and the retry budget is
+                spent — the status and `.response` are preserved rather than
+                being flattened into a transport error.
             IncompleteDownloadError: When the bytes written do not equal the
                 `Content-Length` the response advertised. A short body is
                 retried from the start; a long one, a repeat of the same count,
@@ -1914,6 +1918,13 @@ class HttpClient:
                     # caps refusals at one per call. Without it the loop's
                     # termination would rest on that single flag, and a refusal
                     # would otherwise re-read the object with no budget left.
+                    if response is not None and response.status_code >= 400:
+                        # Report what the server actually said. Backends branch
+                        # on `exc.response.status_code` to tell a missing
+                        # granule (404/410) from a real failure, and a
+                        # synthesised `ConnectionError` would both drop the
+                        # status and reclassify a permanent error as transport.
+                        response.raise_for_status()
                     raise requests.ConnectionError(
                         f"{redact_url(url)}: resume refused ({exc}) with no "
                         f"retry budget left after {attempt + 1} attempts"

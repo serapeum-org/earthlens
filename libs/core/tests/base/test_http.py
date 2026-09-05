@@ -1804,9 +1804,13 @@ class _ScriptedBody:
             raise _read_reset()
 
     def raise_for_status(self) -> None:
-        """Raise for a 4xx/5xx, as `requests` does."""
+        """Raise for a 4xx/5xx, as `requests` does.
+
+        `response=self` matters: real `requests` always attaches it, and
+        backends branch on `exc.response.status_code`.
+        """
         if self.status_code >= 400:
-            raise requests.HTTPError(f"HTTP {self.status_code}")
+            raise requests.HTTPError(f"HTTP {self.status_code}", response=self)
 
     def close(self) -> None:
         """Record that the response was released."""
@@ -2493,9 +2497,13 @@ class _ResumeBody:
             yield block
 
     def raise_for_status(self) -> None:
-        """Raise for a 4xx/5xx, as `requests` does."""
+        """Raise for a 4xx/5xx, as `requests` does.
+
+        `response=self` matters: real `requests` always attaches it, and
+        backends branch on `exc.response.status_code`.
+        """
         if self.status_code >= 400:
-            raise requests.HTTPError(f"HTTP {self.status_code}")
+            raise requests.HTTPError(f"HTTP {self.status_code}", response=self)
 
     def close(self) -> None:
         """Record the release."""
@@ -3008,6 +3016,18 @@ class TestResumeStillVerifies:
                 expect_magic=b"NOPE",
             )
         assert not dest.exists()
+
+    @pytest.mark.parametrize("status", [404, 410, 503])
+    def test_an_error_status_on_a_leg_keeps_its_status(self, tmp_path, status):
+        """Backends tell a missing granule from a real failure by the status."""
+        server = _ResumeServer(leg_status=status)
+        client = _resume_client(server, max_retries=1)
+        with pytest.raises(requests.HTTPError) as excinfo:
+            client.download(
+                "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+            )
+        assert excinfo.value.response is not None
+        assert excinfo.value.response.status_code == status
 
     def test_a_refusal_with_no_budget_left_raises_instead_of_looping(self, tmp_path):
         """The refusal path is bounded by the retry budget, not only by the disarm."""
