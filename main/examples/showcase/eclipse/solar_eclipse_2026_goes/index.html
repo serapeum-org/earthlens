@@ -17842,6 +17842,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Showcase - how much worse is a rarer flood, and how your window changes the answer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -24827,7 +24855,7 @@ for d in (REGION_DIR, GLOBE_DIR):
 
     <span class="k">def</span><span class="w"> </span><span class="nf">cmi</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
         <span class="c1"># Warp the geostationary band straight to the lat/lon map window: pyramids reads</span>
-        <span class="c1"># the GOES geos CRS from the granule and reprojects via GDAL (bilinear). Off-disk</span>
+        <span class="c1"># the GOES geos CRS from the granule and reprojects (bilinear). Off-disk</span>
         <span class="c1"># pixels come back masked -&gt; fill with 0 so space stays black.</span>
         <span class="n">view</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">warped_view</span><span class="p">(</span>
             <span class="mi">4326</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"bilinear"</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="n">CELL</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
@@ -24862,7 +24890,7 @@ for d in (REGION_DIR, GLOBE_DIR):
 
     def cmi(name):
         # Warp the geostationary band straight to the lat/lon map window: pyramids reads
-        # the GOES geos CRS from the granule and reprojects via GDAL (bilinear). Off-disk
+        # the GOES geos CRS from the granule and reprojects (bilinear). Off-disk
         # pixels come back masked -&gt; fill with 0 so space stays black.
         view = nc.get_variable(name).warped_view(
             4326, method="bilinear", cell_size=CELL, bbox=(W, S, E, N)
