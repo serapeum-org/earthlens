@@ -33,6 +33,7 @@ parameter accepts).
 
 from __future__ import annotations
 
+import contextlib
 import datetime as dt
 import errno
 import io
@@ -1571,9 +1572,11 @@ class HttpClient:
         )
         try:
             with open(dest, "r+b") as handle:
-                # Truncate rather than seek alone: the staged file may hold
-                # bytes past the overlap from a previous attempt, and appending
-                # after them would leave a gap the size check cannot see.
+                # `resume_at` is this call's own byte count for this file, so
+                # the seek already lands at its end. The truncate states that
+                # invariant rather than guarding a reachable state: were the
+                # staged file ever longer, appending after it would leave a gap
+                # no size check could see.
                 handle.truncate(resume_at)
                 handle.seek(resume_at)
                 if remainder:
@@ -1743,7 +1746,13 @@ class HttpClient:
             # wrote", so it cannot outlive the file it describes.
             banked = 0
             if staged:
-                tmp.unlink(missing_ok=True)
+                # Suppressed: this runs from every failure path, including
+                # `except BaseException`, and on Windows the unlink can raise
+                # `PermissionError` when the handle has only just been released.
+                # Removing the temp is a promise, but it must not become a
+                # second failure that replaces the real one.
+                with contextlib.suppress(OSError):
+                    tmp.unlink(missing_ok=True)
 
         merged = self._merge_headers(headers)
         # Header names are case-insensitive, and `_merge_headers` returns a
