@@ -17872,34 +17872,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -23806,9 +23778,6 @@ rather than raising.</p>
 </table>
 <p>The facade adds a per-source subdirectory when <code>path</code> is omitted, so <code>EarthLens(data_source="chc", …).download()</code>
 writes under <code>&lt;output_dir()&gt;/chc/</code>.</p>
-<p>A qualified <code>source:topic</code> key flattens its colon, because a colon cannot appear in a Windows path component:
-<code>EarthLens(data_source="jrc:coastal-forecast", …).download()</code> writes under <code>&lt;output_dir()&gt;/jrc_coastal-forecast/</code>.
-It stays one directory per key, which is what the empty-default cleanup relies on.</p>
 <div class="admonition note">
 <p class="admonition-title">This changed</p>
 <p>Before this was introduced, omitting <code>path=</code> wrote to the current working directory, and the facade wrote to

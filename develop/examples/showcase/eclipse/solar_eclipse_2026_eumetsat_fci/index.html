@@ -17864,34 +17864,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -25311,7 +25283,7 @@ invents imagery — both only attenuate or tint pixels that already carry data.<
     <span class="n">out</span> <span class="o">=</span> <span class="n">soften</span><span class="p">(</span><span class="n">declip_cyan</span><span class="p">(</span><span class="n">rgb</span><span class="p">),</span> <span class="n">alpha</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
         <span class="n">ds</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">band</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
-    <span class="n">ds</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># flush the in-place writes before the next frame reads them</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">path</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">def declip_cyan(rgb, tol=10.0, sigma=22.0, strength=0.9):
@@ -25411,7 +25383,7 @@ def soften_file(path, **kwargs):
     out = soften(declip_cyan(rgb), alpha, **kwargs)
     for i in range(3):
         ds.write_array(out[..., i], band=i)
-    ds.close()  # flush the in-place writes before the next frame reads them
+    ds.close()
     return path</div>
 </div>
 </div>
@@ -25656,9 +25628,9 @@ def soften_file(path, **kwargs):
                 <span class="c1"># umbra's deepest cycles. Passing None for R/G/B does not leave them</span>
                 <span class="c1"># nodata-free: pyramids-gis's SetNoDataValue(None) call fails on a</span>
                 <span class="c1"># Byte band and falls back to NaN, so they end up tagged</span>
-                <span class="c1"># a NaN `GDAL_NODATA` instead. That is harmless here -- no Byte pixel is</span>
+                <span class="c1"># GDAL_NODATA=nan instead. That is harmless here -- no Byte pixel is</span>
                 <span class="c1"># ever exactly NaN, so it behaves like "no nodata" for every real</span>
-                <span class="c1"># value -- but it is real metadata a stricter reader would see,</span>
+                <span class="c1"># value -- but it is real metadata a stricter GDAL reader would see,</span>
                 <span class="c1"># not an omitted one. Alpha still carries the real coverage signal</span>
                 <span class="c1"># (0 off-disc, ~255 on) for anything that wants it.</span>
                 <span class="n">no_data_value</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
@@ -25891,9 +25863,9 @@ def render_cycle(slot):
                 # umbra's deepest cycles. Passing None for R/G/B does not leave them
                 # nodata-free: pyramids-gis's SetNoDataValue(None) call fails on a
                 # Byte band and falls back to NaN, so they end up tagged
-                # a NaN `GDAL_NODATA` instead. That is harmless here -- no Byte pixel is
+                # GDAL_NODATA=nan instead. That is harmless here -- no Byte pixel is
                 # ever exactly NaN, so it behaves like "no nodata" for every real
-                # value -- but it is real metadata a stricter reader would see,
+                # value -- but it is real metadata a stricter GDAL reader would see,
                 # not an omitted one. Alpha still carries the real coverage signal
                 # (0 off-disc, ~255 on) for anything that wants it.
                 no_data_value=[None, None, None, 0],

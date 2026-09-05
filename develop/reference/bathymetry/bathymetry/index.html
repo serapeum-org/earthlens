@@ -4923,17 +4923,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.bathymetry.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.bathymetry.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5061,17 +5050,6 @@
     <span class="md-ellipsis">
       
         get
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.bathymetry.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -18120,34 +18098,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/jrc/05_dutch_rhine_flood_hazard/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase - how much worse is a rarer flood, and how your window changes the answer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -23906,17 +23856,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.bathymetry.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.bathymetry.Catalog.load" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24044,17 +23983,6 @@
     <span class="md-ellipsis">
       
         get
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.bathymetry.catalog.Catalog.get_catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_catalog
       
     </span>
   </a>
@@ -24836,7 +24764,22 @@ are static).</p>
 <span class="normal"><a href="#__codelineno-0-549">549</a></span>
 <span class="normal"><a href="#__codelineno-0-550">550</a></span>
 <span class="normal"><a href="#__codelineno-0-551">551</a></span>
-<span class="normal"><a href="#__codelineno-0-552">552</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="k">class</span><span class="w"> </span><span class="nc">Bathymetry</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-552">552</a></span>
+<span class="normal"><a href="#__codelineno-0-553">553</a></span>
+<span class="normal"><a href="#__codelineno-0-554">554</a></span>
+<span class="normal"><a href="#__codelineno-0-555">555</a></span>
+<span class="normal"><a href="#__codelineno-0-556">556</a></span>
+<span class="normal"><a href="#__codelineno-0-557">557</a></span>
+<span class="normal"><a href="#__codelineno-0-558">558</a></span>
+<span class="normal"><a href="#__codelineno-0-559">559</a></span>
+<span class="normal"><a href="#__codelineno-0-560">560</a></span>
+<span class="normal"><a href="#__codelineno-0-561">561</a></span>
+<span class="normal"><a href="#__codelineno-0-562">562</a></span>
+<span class="normal"><a href="#__codelineno-0-563">563</a></span>
+<span class="normal"><a href="#__codelineno-0-564">564</a></span>
+<span class="normal"><a href="#__codelineno-0-565">565</a></span>
+<span class="normal"><a href="#__codelineno-0-566">566</a></span>
+<span class="normal"><a href="#__codelineno-0-567">567</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="k">class</span><span class="w"> </span><span class="nc">Bathymetry</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Global topography / bathymetry DEM backend (raster GeoTIFF output).</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    Fetches a curated static DEM (GEBCO 2020, ETOPO1 ice / bedrock via ERDDAP</span>
@@ -25235,96 +25178,111 @@ are static).</p>
 <a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="n">http</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">()</span>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>            <span class="n">http</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">expect_magic</span><span class="o">=</span><span class="n">_NETCDF_MAGIC</span><span class="p">)</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>                <span class="sa">f</span><span class="s2">&quot;bathymetry request for </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> failed over &quot;</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_extent_label</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">. The bbox may be outside the &quot;</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>                <span class="sa">f</span><span class="s2">&quot;DEM&#39;s coverage, or too large for the server (shrink it).&quot;</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>                <span class="sa">f</span><span class="s2">&quot;bathymetry </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> returned a non-NetCDF body over &quot;</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_extent_label</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2"> The bbox may be outside &quot;</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>                <span class="sa">f</span><span class="s2">&quot;coverage or too large (shrink it).&quot;</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="k">return</span> <span class="n">dest</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_to_geotiff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nc_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tif_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the NetCDF band with pyramids, mask to the AOI, write a GeoTIFF.</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        The ERDDAP `griddap` server already subsets to the request *bbox*, so</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        no client-side bbox crop is needed. A polygon `aoi=`, however, is only</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        expressed to the server as its bounding box — so the exact polygon is</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        applied here with the shared `mask_to_geometry` (a no-op when the</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        request carries no polygon), matching every other raster backend.</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">            nc_path: The downloaded NetCDF subset.</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">            variable: The elevation band name to extract.</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">            tif_path: Destination GeoTIFF path.</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">            ValueError: Propagated from pyramids if the band is absent /</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">                unreadable.</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">nc_path</span><span class="p">))</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">band</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="n">band</span> <span class="o">=</span> <span class="n">mask_to_geometry</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">)</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>        <span class="n">band</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tif_path</span><span class="p">))</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_estimated_size</span><span class="p">(</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the estimated subset pixel dimensions, warn past a threshold.</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            row: The resolved catalog row.</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">            bbox: `(west, south, east, north)` of the request.</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>        <span class="n">dims</span> <span class="o">=</span> <span class="n">estimate_grid_pixels</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">native_resolution</span><span class="p">)</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="k">if</span> <span class="n">dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="k">return</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">dims</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>        <span class="n">total</span> <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="n">height</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>            <span class="sa">f</span><span class="s2">&quot;bathymetry </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: ~</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2"> px &quot;</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">total</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> cells) at </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">native_resolution</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>        <span class="p">)</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>        <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="n">_LARGE_PIXEL_THRESHOLD</span><span class="p">:</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>                <span class="n">message</span> <span class="o">+</span> <span class="s2">&quot; — large subset; the server may reject it. &quot;</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>                <span class="s2">&quot;Consider a smaller bbox.&quot;</span>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a>            <span class="p">)</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_extent_label</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Render the request bbox for error / warning messages.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="k">return</span> <span class="p">(</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>            <span class="sa">f</span><span class="s2">&quot;bbox [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="si">}</span><span class="s2">, &quot;</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="si">}</span><span class="s2">]&quot;</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>        <span class="p">)</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the DEM subset(s) as written GeoTIFF(s).</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">            progress_bar: Accepted for signature parity; one request per call.</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">            list[Path]: The written GeoTIFF DEM subset path(s).</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">            ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">                (from :meth:`_download`).</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>            <span class="n">http</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>                <span class="n">url</span><span class="p">,</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>                <span class="n">dest</span><span class="p">,</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>                <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>                <span class="n">expect_magic</span><span class="o">=</span><span class="n">_NETCDF_MAGIC</span><span class="p">,</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>                <span class="c1"># `Accept-Encoding: gzip, deflate` opts back out of the</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>                <span class="c1"># `identity` default `download` otherwise stamps on. That default</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>                <span class="c1"># exists so the body can be checked against its `Content-Length`,</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>                <span class="c1"># but ERDDAP streams griddap chunked and sends no `Content-Length`</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>                <span class="c1"># at all, so here `identity` buys no check — it only costs wire</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>                <span class="c1"># bytes (measured on a 5x5-degree subset: 2.91 MB uncompressed</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>                <span class="c1"># against 1.83 MB gzipped from CoastWatch, 190 KB against 136 KB</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>                <span class="c1"># from Upwell). `requests` decodes transparently, so `expect_magic`</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>                <span class="c1"># still sees real NetCDF.</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>                <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Accept-Encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;gzip, deflate&quot;</span><span class="p">},</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>            <span class="p">)</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>                <span class="sa">f</span><span class="s2">&quot;bathymetry request for </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> failed over &quot;</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_extent_label</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">. The bbox may be outside the &quot;</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>                <span class="sa">f</span><span class="s2">&quot;DEM&#39;s coverage, or too large for the server (shrink it).&quot;</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>                <span class="sa">f</span><span class="s2">&quot;bathymetry </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> returned a non-NetCDF body over &quot;</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_extent_label</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2"> The bbox may be outside &quot;</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>                <span class="sa">f</span><span class="s2">&quot;coverage or too large (shrink it).&quot;</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="k">return</span> <span class="n">dest</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_to_geotiff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nc_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tif_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the NetCDF band with pyramids, mask to the AOI, write a GeoTIFF.</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        The ERDDAP `griddap` server already subsets to the request *bbox*, so</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        no client-side bbox crop is needed. A polygon `aoi=`, however, is only</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">        expressed to the server as its bounding box — so the exact polygon is</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        applied here with the shared `mask_to_geometry` (a no-op when the</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        request carries no polygon), matching every other raster backend.</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">            nc_path: The downloaded NetCDF subset.</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">            variable: The elevation band name to extract.</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">            tif_path: Destination GeoTIFF path.</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            ValueError: Propagated from pyramids if the band is absent /</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">                unreadable.</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">nc_path</span><span class="p">))</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="n">band</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="n">band</span> <span class="o">=</span> <span class="n">mask_to_geometry</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">)</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>        <span class="n">band</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tif_path</span><span class="p">))</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_estimated_size</span><span class="p">(</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the estimated subset pixel dimensions, warn past a threshold.</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">            row: The resolved catalog row.</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">            bbox: `(west, south, east, north)` of the request.</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>        <span class="n">dims</span> <span class="o">=</span> <span class="n">estimate_grid_pixels</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">native_resolution</span><span class="p">)</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>        <span class="k">if</span> <span class="n">dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>            <span class="k">return</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>        <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">dims</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="n">total</span> <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="n">height</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>            <span class="sa">f</span><span class="s2">&quot;bathymetry </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: ~</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2"> px &quot;</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">total</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> cells) at </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">native_resolution</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>        <span class="p">)</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>        <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="n">_LARGE_PIXEL_THRESHOLD</span><span class="p">:</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>                <span class="n">message</span> <span class="o">+</span> <span class="s2">&quot; — large subset; the server may reject it. &quot;</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>                <span class="s2">&quot;Consider a smaller bbox.&quot;</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>            <span class="p">)</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_extent_label</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Render the request bbox for error / warning messages.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a>        <span class="k">return</span> <span class="p">(</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>            <span class="sa">f</span><span class="s2">&quot;bbox [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="si">}</span><span class="s2">, &quot;</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="si">}</span><span class="s2">]&quot;</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="p">)</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the DEM subset(s) as written GeoTIFF(s).</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">            progress_bar: Accepted for signature parity; one request per call.</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            list[Path]: The written GeoTIFF DEM subset path(s).</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">                (from :meth:`_download`).</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25855,39 +25813,39 @@ bounding box is missing.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/land/src/earthlens/bathymetry/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-536">536</a></span>
-<span class="normal"><a href="#__codelineno-0-537">537</a></span>
-<span class="normal"><a href="#__codelineno-0-538">538</a></span>
-<span class="normal"><a href="#__codelineno-0-539">539</a></span>
-<span class="normal"><a href="#__codelineno-0-540">540</a></span>
-<span class="normal"><a href="#__codelineno-0-541">541</a></span>
-<span class="normal"><a href="#__codelineno-0-542">542</a></span>
-<span class="normal"><a href="#__codelineno-0-543">543</a></span>
-<span class="normal"><a href="#__codelineno-0-544">544</a></span>
-<span class="normal"><a href="#__codelineno-0-545">545</a></span>
-<span class="normal"><a href="#__codelineno-0-546">546</a></span>
-<span class="normal"><a href="#__codelineno-0-547">547</a></span>
-<span class="normal"><a href="#__codelineno-0-548">548</a></span>
-<span class="normal"><a href="#__codelineno-0-549">549</a></span>
-<span class="normal"><a href="#__codelineno-0-550">550</a></span>
-<span class="normal"><a href="#__codelineno-0-551">551</a></span>
-<span class="normal"><a href="#__codelineno-0-552">552</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the DEM subset(s) as written GeoTIFF(s).</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">        progress_bar: Accepted for signature parity; one request per call.</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        list[Path]: The written GeoTIFF DEM subset path(s).</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">        ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">            (from :meth:`_download`).</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-551">551</a></span>
+<span class="normal"><a href="#__codelineno-0-552">552</a></span>
+<span class="normal"><a href="#__codelineno-0-553">553</a></span>
+<span class="normal"><a href="#__codelineno-0-554">554</a></span>
+<span class="normal"><a href="#__codelineno-0-555">555</a></span>
+<span class="normal"><a href="#__codelineno-0-556">556</a></span>
+<span class="normal"><a href="#__codelineno-0-557">557</a></span>
+<span class="normal"><a href="#__codelineno-0-558">558</a></span>
+<span class="normal"><a href="#__codelineno-0-559">559</a></span>
+<span class="normal"><a href="#__codelineno-0-560">560</a></span>
+<span class="normal"><a href="#__codelineno-0-561">561</a></span>
+<span class="normal"><a href="#__codelineno-0-562">562</a></span>
+<span class="normal"><a href="#__codelineno-0-563">563</a></span>
+<span class="normal"><a href="#__codelineno-0-564">564</a></span>
+<span class="normal"><a href="#__codelineno-0-565">565</a></span>
+<span class="normal"><a href="#__codelineno-0-566">566</a></span>
+<span class="normal"><a href="#__codelineno-0-567">567</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the DEM subset(s) as written GeoTIFF(s).</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        progress_bar: Accepted for signature parity; one request per call.</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        list[Path]: The written GeoTIFF DEM subset path(s).</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">            (from :meth:`_download`).</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25915,7 +25873,7 @@ bounding box is missing.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.bathymetry.catalog.Dataset&lt;/code&gt;)" href="#earthlens.bathymetry.catalog.Dataset">Dataset</a>]</code></p>
 
 
 
@@ -26057,11 +26015,7 @@ curated keys.</p>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]):</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;DEM endpoint / transport catalog for the bathymetry backend.</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    Merges the bundled `catalog/` directory&#39;s per-family `*.yaml` files and</span>
@@ -26120,35 +26074,31 @@ curated keys.</p>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="p">)</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dataset map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            dataset_id: A curated DEM id (`&quot;gebco_2020&quot;`, `&quot;etopo1_ice&quot;`).</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            Dataset: The matching row.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            dataset_id: A curated DEM id (`&quot;gebco_2020&quot;`, `&quot;etopo1_ice&quot;`).</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            Dataset: The matching row.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            ValueError: If `dataset_id` is not a curated DEM; the message</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            ValueError: If `dataset_id` is not a curated DEM; the message</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            - A known id resolves to its row:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                &gt;&gt;&gt; from earthlens.bathymetry import Catalog</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;etopo1_ice&quot;).transport</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                &#39;erddap-griddap&#39;</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;gebco_2020&quot;).variable</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                &#39;elevation&#39;</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            - A known id resolves to its row:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                &gt;&gt;&gt; from earthlens.bathymetry import Catalog</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;etopo1_ice&quot;).transport</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                &#39;erddap-griddap&#39;</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;gebco_2020&quot;).variable</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                &#39;elevation&#39;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26271,7 +26221,11 @@ lists the known ids with a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/land/src/earthlens/bathymetry/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-307">307</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-303">303</a></span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span>
+<span class="normal"><a href="#__codelineno-0-306">306</a></span>
+<span class="normal"><a href="#__codelineno-0-307">307</a></span>
 <span class="normal"><a href="#__codelineno-0-308">308</a></span>
 <span class="normal"><a href="#__codelineno-0-309">309</a></span>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
@@ -26291,62 +26245,31 @@ lists the known ids with a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        dataset_id: A curated DEM id (`&quot;gebco_2020&quot;`, `&quot;etopo1_ice&quot;`).</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        Dataset: The matching row.</span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        dataset_id: A curated DEM id (`&quot;gebco_2020&quot;`, `&quot;etopo1_ice&quot;`).</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Dataset: The matching row.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        ValueError: If `dataset_id` is not a curated DEM; the message</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        ValueError: If `dataset_id` is not a curated DEM; the message</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        - A known id resolves to its row:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            &gt;&gt;&gt; from earthlens.bathymetry import Catalog</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;etopo1_ice&quot;).transport</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            &#39;erddap-griddap&#39;</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;gebco_2020&quot;).variable</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            &#39;elevation&#39;</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.bathymetry.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.bathymetry.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.bathymetry.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the dataset map (satisfies the abstract contract).</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/land/src/earthlens/bathymetry/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-303">303</a></span>
-<span class="normal"><a href="#__codelineno-0-304">304</a></span>
-<span class="normal"><a href="#__codelineno-0-305">305</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the dataset map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        - A known id resolves to its row:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            &gt;&gt;&gt; from earthlens.bathymetry import Catalog</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;etopo1_ice&quot;).transport</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            &#39;erddap-griddap&#39;</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;gebco_2020&quot;).variable</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            &#39;elevation&#39;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27649,7 +27572,22 @@ are static).</p>
 <span class="normal"><a href="#__codelineno-0-549">549</a></span>
 <span class="normal"><a href="#__codelineno-0-550">550</a></span>
 <span class="normal"><a href="#__codelineno-0-551">551</a></span>
-<span class="normal"><a href="#__codelineno-0-552">552</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="k">class</span><span class="w"> </span><span class="nc">Bathymetry</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-552">552</a></span>
+<span class="normal"><a href="#__codelineno-0-553">553</a></span>
+<span class="normal"><a href="#__codelineno-0-554">554</a></span>
+<span class="normal"><a href="#__codelineno-0-555">555</a></span>
+<span class="normal"><a href="#__codelineno-0-556">556</a></span>
+<span class="normal"><a href="#__codelineno-0-557">557</a></span>
+<span class="normal"><a href="#__codelineno-0-558">558</a></span>
+<span class="normal"><a href="#__codelineno-0-559">559</a></span>
+<span class="normal"><a href="#__codelineno-0-560">560</a></span>
+<span class="normal"><a href="#__codelineno-0-561">561</a></span>
+<span class="normal"><a href="#__codelineno-0-562">562</a></span>
+<span class="normal"><a href="#__codelineno-0-563">563</a></span>
+<span class="normal"><a href="#__codelineno-0-564">564</a></span>
+<span class="normal"><a href="#__codelineno-0-565">565</a></span>
+<span class="normal"><a href="#__codelineno-0-566">566</a></span>
+<span class="normal"><a href="#__codelineno-0-567">567</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="k">class</span><span class="w"> </span><span class="nc">Bathymetry</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Global topography / bathymetry DEM backend (raster GeoTIFF output).</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    Fetches a curated static DEM (GEBCO 2020, ETOPO1 ice / bedrock via ERDDAP</span>
@@ -28048,96 +27986,111 @@ are static).</p>
 <a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="n">http</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">()</span>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>            <span class="n">http</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">expect_magic</span><span class="o">=</span><span class="n">_NETCDF_MAGIC</span><span class="p">)</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>                <span class="sa">f</span><span class="s2">&quot;bathymetry request for </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> failed over &quot;</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_extent_label</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">. The bbox may be outside the &quot;</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>                <span class="sa">f</span><span class="s2">&quot;DEM&#39;s coverage, or too large for the server (shrink it).&quot;</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>                <span class="sa">f</span><span class="s2">&quot;bathymetry </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> returned a non-NetCDF body over &quot;</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_extent_label</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2"> The bbox may be outside &quot;</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>                <span class="sa">f</span><span class="s2">&quot;coverage or too large (shrink it).&quot;</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="k">return</span> <span class="n">dest</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_to_geotiff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nc_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tif_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the NetCDF band with pyramids, mask to the AOI, write a GeoTIFF.</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        The ERDDAP `griddap` server already subsets to the request *bbox*, so</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        no client-side bbox crop is needed. A polygon `aoi=`, however, is only</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        expressed to the server as its bounding box — so the exact polygon is</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        applied here with the shared `mask_to_geometry` (a no-op when the</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        request carries no polygon), matching every other raster backend.</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">            nc_path: The downloaded NetCDF subset.</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">            variable: The elevation band name to extract.</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">            tif_path: Destination GeoTIFF path.</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">            ValueError: Propagated from pyramids if the band is absent /</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">                unreadable.</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">nc_path</span><span class="p">))</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">band</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="n">band</span> <span class="o">=</span> <span class="n">mask_to_geometry</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">)</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>        <span class="n">band</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tif_path</span><span class="p">))</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_estimated_size</span><span class="p">(</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the estimated subset pixel dimensions, warn past a threshold.</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            row: The resolved catalog row.</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">            bbox: `(west, south, east, north)` of the request.</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>        <span class="n">dims</span> <span class="o">=</span> <span class="n">estimate_grid_pixels</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">native_resolution</span><span class="p">)</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="k">if</span> <span class="n">dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="k">return</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">dims</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>        <span class="n">total</span> <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="n">height</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>            <span class="sa">f</span><span class="s2">&quot;bathymetry </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: ~</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2"> px &quot;</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">total</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> cells) at </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">native_resolution</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>        <span class="p">)</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>        <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="n">_LARGE_PIXEL_THRESHOLD</span><span class="p">:</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>                <span class="n">message</span> <span class="o">+</span> <span class="s2">&quot; — large subset; the server may reject it. &quot;</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>                <span class="s2">&quot;Consider a smaller bbox.&quot;</span>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a>            <span class="p">)</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_extent_label</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Render the request bbox for error / warning messages.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="k">return</span> <span class="p">(</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>            <span class="sa">f</span><span class="s2">&quot;bbox [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="si">}</span><span class="s2">, &quot;</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="si">}</span><span class="s2">]&quot;</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>        <span class="p">)</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the DEM subset(s) as written GeoTIFF(s).</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">            progress_bar: Accepted for signature parity; one request per call.</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">            list[Path]: The written GeoTIFF DEM subset path(s).</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">            ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">                (from :meth:`_download`).</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>            <span class="n">http</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>                <span class="n">url</span><span class="p">,</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>                <span class="n">dest</span><span class="p">,</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>                <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>                <span class="n">expect_magic</span><span class="o">=</span><span class="n">_NETCDF_MAGIC</span><span class="p">,</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>                <span class="c1"># `Accept-Encoding: gzip, deflate` opts back out of the</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>                <span class="c1"># `identity` default `download` otherwise stamps on. That default</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>                <span class="c1"># exists so the body can be checked against its `Content-Length`,</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>                <span class="c1"># but ERDDAP streams griddap chunked and sends no `Content-Length`</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>                <span class="c1"># at all, so here `identity` buys no check — it only costs wire</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>                <span class="c1"># bytes (measured on a 5x5-degree subset: 2.91 MB uncompressed</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>                <span class="c1"># against 1.83 MB gzipped from CoastWatch, 190 KB against 136 KB</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>                <span class="c1"># from Upwell). `requests` decodes transparently, so `expect_magic`</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>                <span class="c1"># still sees real NetCDF.</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>                <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Accept-Encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;gzip, deflate&quot;</span><span class="p">},</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>            <span class="p">)</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>                <span class="sa">f</span><span class="s2">&quot;bathymetry request for </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> failed over &quot;</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_extent_label</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">. The bbox may be outside the &quot;</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>                <span class="sa">f</span><span class="s2">&quot;DEM&#39;s coverage, or too large for the server (shrink it).&quot;</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>                <span class="sa">f</span><span class="s2">&quot;bathymetry </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2"> returned a non-NetCDF body over &quot;</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_extent_label</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2"> The bbox may be outside &quot;</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>                <span class="sa">f</span><span class="s2">&quot;coverage or too large (shrink it).&quot;</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="k">return</span> <span class="n">dest</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_to_geotiff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nc_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tif_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the NetCDF band with pyramids, mask to the AOI, write a GeoTIFF.</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        The ERDDAP `griddap` server already subsets to the request *bbox*, so</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        no client-side bbox crop is needed. A polygon `aoi=`, however, is only</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">        expressed to the server as its bounding box — so the exact polygon is</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        applied here with the shared `mask_to_geometry` (a no-op when the</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        request carries no polygon), matching every other raster backend.</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">            nc_path: The downloaded NetCDF subset.</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">            variable: The elevation band name to extract.</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">            tif_path: Destination GeoTIFF path.</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            ValueError: Propagated from pyramids if the band is absent /</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">                unreadable.</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">nc_path</span><span class="p">))</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="n">band</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="n">band</span> <span class="o">=</span> <span class="n">mask_to_geometry</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">)</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>        <span class="n">band</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tif_path</span><span class="p">))</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_estimated_size</span><span class="p">(</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the estimated subset pixel dimensions, warn past a threshold.</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">            row: The resolved catalog row.</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">            bbox: `(west, south, east, north)` of the request.</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>        <span class="n">dims</span> <span class="o">=</span> <span class="n">estimate_grid_pixels</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">native_resolution</span><span class="p">)</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>        <span class="k">if</span> <span class="n">dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>            <span class="k">return</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>        <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">dims</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="n">total</span> <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="n">height</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>            <span class="sa">f</span><span class="s2">&quot;bathymetry </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: ~</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2"> px &quot;</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">total</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> cells) at </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">native_resolution</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>        <span class="p">)</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>        <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="n">_LARGE_PIXEL_THRESHOLD</span><span class="p">:</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>                <span class="n">message</span> <span class="o">+</span> <span class="s2">&quot; — large subset; the server may reject it. &quot;</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>                <span class="s2">&quot;Consider a smaller bbox.&quot;</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>            <span class="p">)</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_extent_label</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Render the request bbox for error / warning messages.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a>        <span class="k">return</span> <span class="p">(</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>            <span class="sa">f</span><span class="s2">&quot;bbox [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="si">}</span><span class="s2">, &quot;</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="si">}</span><span class="s2">]&quot;</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="p">)</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the DEM subset(s) as written GeoTIFF(s).</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">            progress_bar: Accepted for signature parity; one request per call.</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            list[Path]: The written GeoTIFF DEM subset path(s).</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">                (from :meth:`_download`).</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -28668,39 +28621,39 @@ bounding box is missing.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/land/src/earthlens/bathymetry/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-536">536</a></span>
-<span class="normal"><a href="#__codelineno-0-537">537</a></span>
-<span class="normal"><a href="#__codelineno-0-538">538</a></span>
-<span class="normal"><a href="#__codelineno-0-539">539</a></span>
-<span class="normal"><a href="#__codelineno-0-540">540</a></span>
-<span class="normal"><a href="#__codelineno-0-541">541</a></span>
-<span class="normal"><a href="#__codelineno-0-542">542</a></span>
-<span class="normal"><a href="#__codelineno-0-543">543</a></span>
-<span class="normal"><a href="#__codelineno-0-544">544</a></span>
-<span class="normal"><a href="#__codelineno-0-545">545</a></span>
-<span class="normal"><a href="#__codelineno-0-546">546</a></span>
-<span class="normal"><a href="#__codelineno-0-547">547</a></span>
-<span class="normal"><a href="#__codelineno-0-548">548</a></span>
-<span class="normal"><a href="#__codelineno-0-549">549</a></span>
-<span class="normal"><a href="#__codelineno-0-550">550</a></span>
-<span class="normal"><a href="#__codelineno-0-551">551</a></span>
-<span class="normal"><a href="#__codelineno-0-552">552</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the DEM subset(s) as written GeoTIFF(s).</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">        progress_bar: Accepted for signature parity; one request per call.</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        list[Path]: The written GeoTIFF DEM subset path(s).</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">        ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">            (from :meth:`_download`).</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-551">551</a></span>
+<span class="normal"><a href="#__codelineno-0-552">552</a></span>
+<span class="normal"><a href="#__codelineno-0-553">553</a></span>
+<span class="normal"><a href="#__codelineno-0-554">554</a></span>
+<span class="normal"><a href="#__codelineno-0-555">555</a></span>
+<span class="normal"><a href="#__codelineno-0-556">556</a></span>
+<span class="normal"><a href="#__codelineno-0-557">557</a></span>
+<span class="normal"><a href="#__codelineno-0-558">558</a></span>
+<span class="normal"><a href="#__codelineno-0-559">559</a></span>
+<span class="normal"><a href="#__codelineno-0-560">560</a></span>
+<span class="normal"><a href="#__codelineno-0-561">561</a></span>
+<span class="normal"><a href="#__codelineno-0-562">562</a></span>
+<span class="normal"><a href="#__codelineno-0-563">563</a></span>
+<span class="normal"><a href="#__codelineno-0-564">564</a></span>
+<span class="normal"><a href="#__codelineno-0-565">565</a></span>
+<span class="normal"><a href="#__codelineno-0-566">566</a></span>
+<span class="normal"><a href="#__codelineno-0-567">567</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the DEM subset(s) as written GeoTIFF(s).</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        progress_bar: Accepted for signature parity; one request per call.</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        list[Path]: The written GeoTIFF DEM subset path(s).</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">            (from :meth:`_download`).</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28788,7 +28741,7 @@ so a future row can carry a different endpoint without a model change.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractCatalog&lt;/code&gt;" href="../../abstract-datasource/#earthlens.base.AbstractCatalog">AbstractCatalog</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Dataset&lt;/code&gt; (&lt;code&gt;earthlens.bathymetry.catalog.Dataset&lt;/code&gt;)" href="#earthlens.bathymetry.catalog.Dataset">Dataset</a>]</code></p>
 
 
 
@@ -28930,11 +28883,7 @@ curated keys.</p>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]):</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;DEM endpoint / transport catalog for the bathymetry backend.</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    Merges the bundled `catalog/` directory&#39;s per-family `*.yaml` files and</span>
@@ -28993,35 +28942,31 @@ curated keys.</p>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="p">)</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dataset map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            dataset_id: A curated DEM id (`&quot;gebco_2020&quot;`, `&quot;etopo1_ice&quot;`).</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            Dataset: The matching row.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            dataset_id: A curated DEM id (`&quot;gebco_2020&quot;`, `&quot;etopo1_ice&quot;`).</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            Dataset: The matching row.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            ValueError: If `dataset_id` is not a curated DEM; the message</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            ValueError: If `dataset_id` is not a curated DEM; the message</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            - A known id resolves to its row:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                &gt;&gt;&gt; from earthlens.bathymetry import Catalog</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;etopo1_ice&quot;).transport</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                &#39;erddap-griddap&#39;</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;gebco_2020&quot;).variable</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                &#39;elevation&#39;</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            - A known id resolves to its row:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                &gt;&gt;&gt; from earthlens.bathymetry import Catalog</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;etopo1_ice&quot;).transport</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                &#39;erddap-griddap&#39;</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;gebco_2020&quot;).variable</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                &#39;elevation&#39;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29144,7 +29089,11 @@ lists the known ids with a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/land/src/earthlens/bathymetry/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-307">307</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-303">303</a></span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span>
+<span class="normal"><a href="#__codelineno-0-306">306</a></span>
+<span class="normal"><a href="#__codelineno-0-307">307</a></span>
 <span class="normal"><a href="#__codelineno-0-308">308</a></span>
 <span class="normal"><a href="#__codelineno-0-309">309</a></span>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
@@ -29164,62 +29113,31 @@ lists the known ids with a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        dataset_id: A curated DEM id (`&quot;gebco_2020&quot;`, `&quot;etopo1_ice&quot;`).</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        Dataset: The matching row.</span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        dataset_id: A curated DEM id (`&quot;gebco_2020&quot;`, `&quot;etopo1_ice&quot;`).</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Dataset: The matching row.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        ValueError: If `dataset_id` is not a curated DEM; the message</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        ValueError: If `dataset_id` is not a curated DEM; the message</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        - A known id resolves to its row:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            &gt;&gt;&gt; from earthlens.bathymetry import Catalog</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;etopo1_ice&quot;).transport</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            &#39;erddap-griddap&#39;</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;gebco_2020&quot;).variable</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            &#39;elevation&#39;</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.bathymetry.catalog.Catalog.get_catalog" class="doc doc-heading"><a href="#earthlens.bathymetry.catalog.Catalog.get_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">get_catalog</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.bathymetry.catalog.Catalog.get_catalog" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the dataset map (satisfies the abstract contract).</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/land/src/earthlens/bathymetry/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-303">303</a></span>
-<span class="normal"><a href="#__codelineno-0-304">304</a></span>
-<span class="normal"><a href="#__codelineno-0-305">305</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the dataset map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        - A known id resolves to its row:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            &gt;&gt;&gt; from earthlens.bathymetry import Catalog</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;etopo1_ice&quot;).transport</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            &#39;erddap-griddap&#39;</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;gebco_2020&quot;).variable</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            &#39;elevation&#39;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
