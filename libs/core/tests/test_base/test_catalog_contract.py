@@ -12,6 +12,7 @@ from __future__ import annotations
 import importlib
 
 import pytest
+from loguru import logger
 
 from earthlens._backends import discover_backends
 from earthlens.base import AbstractCatalog
@@ -54,6 +55,23 @@ def _build(module_name: str, class_name: str):
     """Import and instantiate a backend's catalog from the bundled YAML."""
     module = importlib.import_module(module_name)
     return getattr(module, class_name)()
+
+
+class _RowsKeptElsewhere(AbstractCatalog):
+    """A catalog that does not keep its rows in `datasets`, as a subclass may."""
+
+
+def test_an_empty_catalog_warns_instead_of_answering_silently():
+    """An out-of-tree subclass keeping rows elsewhere gets told, not ignored."""
+    messages: list[str] = []
+    handler = logger.add(
+        lambda m: messages.append(m.record["message"]), level="WARNING"
+    )
+    try:
+        assert _RowsKeptElsewhere().get_catalog() == {}
+    finally:
+        logger.remove(handler)
+    assert any("override get_catalog()" in m for m in messages), messages
 
 
 @pytest.mark.parametrize("module_name, class_name", CATALOG_BACKENDS)

@@ -2592,6 +2592,16 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
 
                 ```
         """
+        if not self.datasets:
+            # The default cannot tell "no rows" from "rows kept elsewhere", so
+            # it answers an empty mapping for both. Every in-repo catalog is
+            # covered by a contract test; an out-of-tree subclass gets this
+            # instead of silence.
+            logger.warning(
+                f"{type(self).__name__}.get_catalog() is empty. If this "
+                f"catalog keeps its rows somewhere other than `datasets`, "
+                f"override get_catalog()."
+            )
         return self.datasets
 
     def get_variable(self, dataset_key: str, variable_name: str) -> Any:

@@ -1659,6 +1659,12 @@ class HttpClient:
                 proved it can be done safely. Off by default; the whole-object
                 path above is unchanged for every caller that does not opt in.
 
+                Requires staging, so it has no effect under `atomic=False`
+                unless `expect_magic` forces staging back on. Resuming means
+                keeping a partial file between attempts, and that is only safe
+                in the private `<dest>.part` this method owns — never in a
+                caller-supplied `dest` that a failed attempt must not damage.
+
                 A resumed request is only *attempted* when the first response
                 was a `200` that advertised `Accept-Ranges: bytes`, a known
                 `Content-Length`, no content coding, and a **strong** `ETag`
