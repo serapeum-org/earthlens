@@ -1,5 +1,18 @@
 # Change Log
 
+## 0.22.0 (2026-09-05)
+
+### Feat
+
+- **core,hazards**: flatten qualified facade keys into usable directory names (#1154)
+- **cli**: audit catalog variables, not just dataset ids (#1155)
+
+### Fix
+
+- **deps**: migrate to the pyramids 0.59 constructor API (#1158)
+- **eumetsat**: bound every eumdac HTTP call and retry an infrastructure FAILED  (#1159)
+- **ecmwf**: repair the rows whose request the store cannot answer (#1126)
+
 ## 0.21.0 (2026-08-31)
 
 ### BREAKING CHANGE
