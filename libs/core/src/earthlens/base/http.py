@@ -459,7 +459,6 @@ IDEMPOTENT_METHODS: frozenset[str] = frozenset(
     {"GET", "HEAD", "OPTIONS", "TRACE", "PUT", "DELETE"}
 )
 
-#: Streaming chunk size (bytes) for :meth:`HttpClient.download` — 1 MiB.
 #: Bytes of already-downloaded tail that a resumed request re-fetches and
 #: compares against the staging file before appending anything.
 #:
@@ -672,6 +671,7 @@ def _resume_refusal(
     return None
 
 
+#: Streaming chunk size (bytes) for :meth:`HttpClient.download` — 1 MiB.
 DEFAULT_CHUNK_SIZE = 1 << 20
 
 #: Buffer size (bytes) :meth:`HttpRangeFile.buffered` wraps the raw
