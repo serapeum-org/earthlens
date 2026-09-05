@@ -63,6 +63,22 @@ Timeout = float | tuple[float, float]
 #: a full minute, while a slow-but-alive transfer keeps the 60s read budget it
 #: had before. Bounding both phases with one value made the short failure and
 #: the long transfer share a budget that could only suit one of them.
+#:
+#: The 10s figure is measured, not chosen. DNS + TCP + TLS to the mirrors this
+#: repo actually fetches from — CHC UCSB, DWD, JRC, Zenodo, Geofabrik, WorldPop,
+#: CDS — completes in 0.06-0.49s, so 10s carries roughly twenty times the
+#: observed worst case.
+#:
+#: One host looked like a counter-example and is worth recording, because it
+#: argues the opposite of what it first appears to. `coastwatch.pfeg.noaa.gov`
+#: needs 21.4s (reproducibly, 5/5) to connect via `socket.create_connection` —
+#: over twice this budget. It is dual-stack with a dead IPv6 route, and a
+#: connect timeout applies *per address*, so `requests` abandons the IPv6
+#: attempt at 10s and reaches the object over IPv4 0.9s later: 10.95s in total,
+#: successful. Raising the budget to 30s does not help that host, it makes it
+#: slower (21.7s measured), because the wait on the dead route grows with the
+#: budget. A short connect timeout is what makes dual-stack fallback quick.
+#: See also :func:`prefer_ipv4` for backends that want to skip IPv6 outright.
 DEFAULT_TIMEOUT: Timeout = (10.0, 60.0)
 
 #: Maximum retries for a retryable status before the last response's
