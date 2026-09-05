@@ -37,6 +37,7 @@ import datetime as dt
 import errno
 import io
 import re
+import sys
 import threading
 import time
 from collections.abc import Callable, Iterator, Mapping
@@ -117,22 +118,33 @@ NON_RETRYABLE_EXCEPTIONS: tuple[type[BaseException], ...] = (
 #: this a full disk re-downloads the whole object once per retry to fail at the
 #: same byte. Every entry is a standing property of the destination — no space,
 #: no quota, a read-only mount, no permission — not a transient one.
+_DETERMINISTIC_ERRNO_NAMES: tuple[str, ...] = (
+    "ENOSPC",
+    "EDQUOT",
+    "EROFS",
+    "EFBIG",
+    "EISDIR",
+    "ENOTDIR",
+    "ENAMETOOLONG",
+)
+
+#: `EACCES` / `EPERM` join the set only away from Windows. On POSIX they are a
+#: standing property of the destination, like the rest. On Windows they are also
+#: how a *sharing violation* surfaces — another process (an indexer, antivirus,
+#: Google Drive for Desktop, a handle not yet released) holding the file — which
+#: is the textbook transient failure there. Measured on Windows 11: a write to a
+#: locked region raises `PermissionError` with `errno=EACCES` and no `winerror`,
+#: and unlinking an open file raises `errno=EACCES` with `winerror=32`, so
+#: neither a `winerror` test nor the errno alone can separate the two cases.
+#: Retrying a genuinely permanent permission error costs a bounded number of
+#: attempts; refusing to retry a sharing violation fails a multi-gigabyte
+#: download outright, and this repo's primary platform is Windows.
+if sys.platform != "win32":
+    _DETERMINISTIC_ERRNO_NAMES += ("EACCES", "EPERM")
+
 _DETERMINISTIC_OS_ERRNOS: frozenset[int] = frozenset(
     code
-    for code in (
-        getattr(errno, name, None)
-        for name in (
-            "ENOSPC",
-            "EDQUOT",
-            "EROFS",
-            "EACCES",
-            "EPERM",
-            "EFBIG",
-            "EISDIR",
-            "ENOTDIR",
-            "ENAMETOOLONG",
-        )
-    )
+    for code in (getattr(errno, name, None) for name in _DETERMINISTIC_ERRNO_NAMES)
     if code is not None
 )
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import builtins
 import errno
+import sys
 import time
 from typing import Any
 
@@ -2405,15 +2406,22 @@ class _RaisingBody(_ScriptedBody):
 class TestLocalStorageFailuresAreDeterministic:
     """A failure of the destination is not a transport blip."""
 
-    @pytest.mark.parametrize(
-        "name", ["ENOSPC", "EROFS", "EACCES", "EPERM", "EFBIG", "EISDIR"]
-    )
+    @pytest.mark.parametrize("name", ["ENOSPC", "EROFS", "EFBIG", "EISDIR"])
     def test_a_filesystem_refusal_is_never_retryable(self, name):
         """No retry makes the disk larger or the mount writable."""
         code = getattr(errno, name)
         exc = OSError(code, "refused")
         assert classify_transport_error(exc, strict=True) is None
         assert classify_transport_error(exc, strict=False) is None
+
+    @pytest.mark.parametrize("name", ["EACCES", "EPERM"])
+    def test_a_permission_error_follows_the_platform(self, name):
+        """On Windows these are also how a transient sharing violation arrives."""
+        exc = OSError(getattr(errno, name), "denied")
+        if sys.platform == "win32":
+            assert classify_transport_error(exc, strict=False) == "read"
+        else:
+            assert classify_transport_error(exc, strict=False) is None
 
     def test_a_wrapped_socket_error_is_still_a_transport_failure(self):
         """`ConnectionResetError` is an `OSError` too, and must stay retryable."""
