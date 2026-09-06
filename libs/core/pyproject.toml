@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-core"
-version = "0.21.0"
+version = "0.22.0"
 description = "Core abstractions, facade and CLI for earthlens — no provider SDKs"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
