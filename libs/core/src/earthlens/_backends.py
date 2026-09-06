@@ -85,6 +85,13 @@ class AmbiguousDataSourceError(ValueError):
     """
 
 
+#: Separator the `source:topic` facade-key grammar puts in a qualified key.
+#: Lives here because this module owns the grammar; `earthlens.py` imports it
+#: to flatten a key into a directory name, since Windows refuses `:` in a path
+#: component.
+KEY_TOPIC_SEPARATOR = ":"
+
+
 def topic_claimants(keys: Iterable[str], topic: str) -> list[str]:
     """Return the sorted `source:topic` keys that serve a bare `topic`.
 
@@ -100,7 +107,11 @@ def topic_claimants(keys: Iterable[str], topic: str) -> list[str]:
         list[str]: Every registered key of the form `<source>:<topic>`, sorted;
         empty when no source exposes the topic.
     """
-    return sorted(key for key in keys if ":" in key and key.split(":", 1)[1] == topic)
+    return sorted(
+        key
+        for key in keys
+        if KEY_TOPIC_SEPARATOR in key and key.split(KEY_TOPIC_SEPARATOR, 1)[1] == topic
+    )
 
 
 def discover_backends() -> dict[str, BackendSpec]:

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-core"
-version = "0.21.0"
+version = "0.22.0"
 description = "Core abstractions, facade and CLI for earthlens — no provider SDKs"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -110,6 +110,7 @@ markers = [
     "ecmwf: tests for the ECMWF/CDS backend (requires the `ecmwf` extra: cdsapi).",
     "gee: tests for the Google Earth Engine backend (requires the `gee` extra: earthengine-api).",
     "integration: exercises multiple modules together with mocked I/O.",
+    "jrc: tests for the JRC hazards backend (European Flood Hazard Map + the probabilistic sea-level forecasts; open HTTPS, no extra SDK).",
     "nwm: tests for the NOAA National Water Model backend (requires the `nwm` extra: boto3; unsigned noaa-nwm-pds bucket).",
     "s3: tests for the S3 backend (requires the `s3` extra: boto3).",
     "slow: mark test as slow.",

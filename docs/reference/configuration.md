@@ -47,6 +47,10 @@ rather than raising.
 The facade adds a per-source subdirectory when `path` is omitted, so `EarthLens(data_source="chc", …).download()`
 writes under `<output_dir()>/chc/`.
 
+A qualified `source:topic` key flattens its colon, because a colon cannot appear in a Windows path component:
+`EarthLens(data_source="jrc:coastal-forecast", …).download()` writes under `<output_dir()>/jrc_coastal-forecast/`.
+It stays one directory per key, which is what the empty-default cleanup relies on.
+
 !!! note "This changed"
 
     Before this was introduced, omitting `path=` wrote to the current working directory, and the facade wrote to

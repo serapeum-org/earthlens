@@ -201,6 +201,13 @@ docs/examples/*/*/insar_stack*/
 docs/examples/*/soilgrids_*/
 docs/examples/*/*/soilgrids_*/
 
+# Executed copies of the docs notebooks, mirroring docs/examples/ one directory
+# per backend. Running a notebook writes its outputs back into the .ipynb, so
+# these carry embedded figures and result blobs that the tracked, stripped
+# originals deliberately do not. Root-anchored, since only the top-level tree
+# is the executed mirror.
+/executed-notebooks/
+
 # Loose working media in the repo root and under docs/: scratch renders and
 # source clips that are not part of the documentation. Ignored rather than
 # deleted -- they are working files, but they are large and sit exactly where

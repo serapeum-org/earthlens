@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-land"
-version = "0.21.0"
+version = "0.22.0"
 description = "terrain, elevation, soil, ecology and population backends for earthlens"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -33,7 +33,7 @@ requires-python = ">=3.11,<4"
 # this distribution brings the backends' code without their dependencies —
 # `pip install earthlens-land[<backend>]` adds exactly one backend's SDK.
 dependencies = [
-    "earthlens-core ==0.21.0",
+    "earthlens-core ==0.22.0",
 ]
 
 [project.optional-dependencies]
