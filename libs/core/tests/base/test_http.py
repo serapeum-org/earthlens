@@ -3463,8 +3463,11 @@ class TestResumeHelperEdges:
             "open",
             _OpenFailsOnPartReadback(OSError(errno.EROFS, "read-only file system")),
         )
+        # The client is built outside the block: if its construction raised,
+        # the test would pass without ever reaching the download under test.
+        client = _resume_client(server)
         with pytest.raises(OSError) as excinfo:
-            _resume_client(server).download(
+            client.download(
                 "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
             )
         assert excinfo.value.errno == errno.EROFS, (

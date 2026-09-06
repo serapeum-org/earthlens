@@ -652,14 +652,47 @@ def _arm_resume_anchor(
     return _ResumeAnchor(total=total, etag=etag)
 
 
+def _content_range_refusal(
+    value: str | None, anchor: _ResumeAnchor, expected_first: int
+) -> tuple[str | None, tuple[int, int, int] | None]:
+    """Check a `206`'s `Content-Range` against the window that was asked for.
+
+    Split out so each gate stays a separate statement: the three comparisons
+    below are the arithmetic half of the refusal, and folding them into the
+    caller's sequence made one function long enough to invite exactly the
+    boolean-chaining this design refuses.
+
+    Args:
+        value: The raw `Content-Range` header, if any.
+        anchor: The representation the transfer started on.
+        expected_first: The offset the request asked the window to start at.
+
+    Returns:
+        tuple[str | None, tuple[int, int, int] | None]: The refusal reason (or
+        `None`), and the parsed `(first, last, total)` when it parsed at all.
+    """
+    parsed = _parse_content_range(value)
+    if parsed is None:
+        return "no parseable Content-Range", None
+    first, last, total = parsed
+    if first != expected_first:
+        return f"Content-Range starts at {first}, expected {expected_first}", parsed
+    if last != anchor.total - 1:
+        return f"Content-Range ends at {last}, expected {anchor.total - 1}", parsed
+    if total != anchor.total:
+        return f"Content-Range total {total}, expected {anchor.total}", parsed
+    return None, parsed
+
+
 def _resume_refusal(
     response: requests.Response, anchor: _ResumeAnchor, resume_at: int
 ) -> str | None:
     """Say why a resumed response must not be appended, or `None` if it may be.
 
-    A flat sequence of independent tests rather than one boolean chain, so no
-    condition can be short-circuited by another and each is reachable from a
-    single hand-built response.
+    Each gate is a separate statement rather than a term in a boolean chain, so
+    none can be short-circuited by another and each is reachable from a single
+    hand-built response. That property is the point: every one of these was
+    written because a server was observed doing the thing it rejects.
 
     Args:
         response: The answer to the ranged request.
@@ -676,29 +709,25 @@ def _resume_refusal(
         # 200 with the whole object (worldpop, and any stale `If-Range`), a 416,
         # a redirect, an error status. None of them is consumed in place.
         return f"status {response.status_code}, expected 206"
-    encoding = (response.headers.get("Content-Encoding") or "").strip().lower()
+    headers = response.headers
+    encoding = (headers.get("Content-Encoding") or "").strip().lower()
     if encoding and encoding != "identity":
         return f"Content-Encoding {encoding!r} on a ranged reply"
-    coding = (response.headers.get("Transfer-Encoding") or "").strip().lower()
+    coding = (headers.get("Transfer-Encoding") or "").strip().lower()
     if coding and coding != "identity":
         return f"Transfer-Encoding {coding!r} on a ranged reply"
-    parsed = _parse_content_range(response.headers.get("Content-Range"))
-    if parsed is None:
-        return "no parseable Content-Range"
-    first, last, total = parsed
-    expected_first = resume_at - _RESUME_OVERLAP
-    if first != expected_first:
-        return f"Content-Range starts at {first}, expected {expected_first}"
-    if last != anchor.total - 1:
-        return f"Content-Range ends at {last}, expected {anchor.total - 1}"
-    if total != anchor.total:
-        return f"Content-Range total {total}, expected {anchor.total}"
-    etag = (response.headers.get("ETag") or "").strip()
+    reason, parsed = _content_range_refusal(
+        headers.get("Content-Range"), anchor, resume_at - _RESUME_OVERLAP
+    )
+    if reason is not None:
+        return reason
+    etag = (headers.get("ETag") or "").strip()
     if etag and etag != anchor.etag:
         # A 206 is only permitted to describe the representation `If-Range`
         # named; one that renames it is describing a different object.
         return f"ETag {etag!r} is not the anchored {anchor.etag!r}"
-    declared = _progress_total(response.headers)
+    first, last, _ = parsed if parsed is not None else (0, -1, 0)
+    declared = _progress_total(headers)
     if declared is not None and declared != last - first + 1:
         return f"Content-Length {declared}, expected {last - first + 1}"
     return None
