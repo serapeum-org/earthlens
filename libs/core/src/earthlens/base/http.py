@@ -1808,10 +1808,14 @@ class HttpClient:
         last_written: int | None = None
         best_written = 0
         if staged and tmp.exists():
-            logger.debug(
-                f"{redact_url(url)}: discarding a pre-existing "
-                f"{tmp.stat().st_size:,}-byte {tmp.name}"
-            )
+            # Suppressed for the same reason as the salvage stat below: this is
+            # a log line, and it runs before the first request, so a filesystem
+            # blip here must not cost the whole download.
+            with contextlib.suppress(OSError):
+                logger.debug(
+                    f"{redact_url(url)}: discarding a pre-existing "
+                    f"{tmp.stat().st_size:,}-byte {tmp.name}"
+                )
 
         def salvaged(expected: int | None) -> bool:
             """Whether the bytes on disk already are the whole object.
@@ -1828,7 +1832,17 @@ class HttpClient:
             """
             if not verify_length or expected is None or not tmp.exists():
                 return False
-            return tmp.stat().st_size == expected
+            try:
+                return tmp.stat().st_size == expected
+            except OSError:
+                # This runs as the FIRST statement of both transport `except`
+                # handlers, and an exception raised inside a handler is not
+                # caught by its own `try` — so an unguarded failure here would
+                # leave `download` with the filesystem's errno instead of the
+                # transport error, and with none of the retry budget spent.
+                # Unprovable is not salvageable: fall through to the ordinary
+                # retry path.
+                return False
 
         def salvage_publishable(expected: int | None) -> bool:
             """Whether the staged bytes are the whole object *and* pass every gate.

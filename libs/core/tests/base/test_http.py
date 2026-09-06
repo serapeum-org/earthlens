@@ -2376,6 +2376,55 @@ class TestDownloadSalvage:
             )
         assert not (tmp_path / "g.part").exists()
 
+    def test_a_stat_failure_during_salvage_retries_instead_of_escaping(
+        self, tmp_path, monkeypatch
+    ):
+        """The salvage check runs first in both handlers, so it must not raise.
+
+        On 3.14 `Path.exists()` goes to `os.stat` directly, so patching
+        `Path.stat` intercepts only the explicit measurement — which is the one
+        the guard wraps, and the first statement either transport handler runs.
+        An exception from inside an `except` handler is not caught by that
+        handler's own `try`, so without the guard the filesystem's errno
+        replaces the transport error and none of the retry budget is spent.
+        """
+        dest = tmp_path / "g"
+        session = _ScriptedSession(
+            _ScriptedBody(_PAYLOAD, stop_after=5), _ScriptedBody(_PAYLOAD)
+        )
+        real_stat = Path.stat
+        # The first explicit staging-file stat after the break is the
+        # salvage's; the handler's own (already guarded) one comes after.
+        state = {"broken": False, "seen": 0, "raised": False}
+        real_iter = _ScriptedBody.iter_content
+
+        def _iter(self, chunk_size=1):
+            try:
+                yield from real_iter(self, chunk_size)
+            except BaseException:
+                state["broken"] = True
+                raise
+
+        def _stat(self, *args, **kwargs):
+            if self.name.endswith(".part") and state["broken"]:
+                state["seen"] += 1
+                if state["seen"] == 1:
+                    state["raised"] = True
+                    raise OSError(errno.EACCES, "sharing violation")
+            return real_stat(self, *args, **kwargs)
+
+        monkeypatch.setattr(_ScriptedBody, "iter_content", _iter)
+        monkeypatch.setattr(Path, "stat", _stat)
+        HttpClient(session=session, sleep=lambda _: None, max_retries=3).download(
+            "http://x/g", dest, progress=False, chunk=1
+        )
+        assert state["raised"], "the salvage stat never failed; the test proves nothing"
+        assert session.calls == 2, (
+            f"the transport break should have been retried; got {session.calls} "
+            f"request(s), so the stat error escaped instead"
+        )
+        assert dest.read_bytes() == _PAYLOAD
+
     def test_an_incomplete_body_that_breaks_is_not_salvaged(self, tmp_path):
         """Without the equality there is no proof, so the error propagates."""
         session = _ScriptedSession(_ScriptedBody(_PAYLOAD, stop_after=5))
