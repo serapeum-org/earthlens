@@ -10,12 +10,16 @@ the catalog-consistency alignment).
 from __future__ import annotations
 
 import importlib
+from typing import Any
 
 import pytest
+import yaml
 from loguru import logger
+from pydantic import BaseModel
 
 from earthlens._backends import discover_backends
 from earthlens.base import AbstractCatalog
+from earthlens.base.abstractdatasource import _WARNED_EMPTY_CATALOGS
 
 #: The class names a backend's `catalog` module may expose, in preference order.
 CATALOG_CLASS_NAMES = ("Catalog", "StationCatalog")
@@ -61,7 +65,37 @@ class _RowsKeptElsewhere(AbstractCatalog):
     """A catalog that does not keep its rows in `datasets`, as a subclass may."""
 
 
-def test_an_empty_catalog_warns_instead_of_answering_silently():
+class _Row(BaseModel):
+    """A pydantic row, the shape nearly every backend catalog stores."""
+
+    name: str
+    note: str | None = None
+
+
+class _ModelRowCatalog(AbstractCatalog[_Row]):
+    """A catalog whose rows are pydantic models."""
+
+
+class _PlainRowCatalog(AbstractCatalog[Any]):
+    """A catalog whose rows are plain mappings, which the base must also render."""
+
+
+@pytest.fixture
+def a_first_read():
+    """Empty the once-per-class warning registry, then put back what was there.
+
+    The registry is module-level state, so without this a test asserting on the
+    first read of an empty catalog would depend on what ran before it, and would
+    not survive being run twice in one session.
+    """
+    before = set(_WARNED_EMPTY_CATALOGS)
+    _WARNED_EMPTY_CATALOGS.clear()
+    yield
+    _WARNED_EMPTY_CATALOGS.clear()
+    _WARNED_EMPTY_CATALOGS.update(before)
+
+
+def test_an_empty_catalog_warns_instead_of_answering_silently(a_first_read):
     """An out-of-tree subclass keeping rows elsewhere gets told, not ignored."""
     messages: list[str] = []
     handler = logger.add(
@@ -75,7 +109,7 @@ def test_an_empty_catalog_warns_instead_of_answering_silently():
     assert len(messages) == 1, f"expected one warning, got {len(messages)}"
 
 
-def test_the_empty_catalog_warning_does_not_repeat_per_access():
+def test_the_empty_catalog_warning_does_not_repeat_per_access(a_first_read):
     """`catalog` is recomputed per read, so warning per call means one per loop."""
 
     class _AlsoElsewhere(AbstractCatalog):
@@ -94,6 +128,64 @@ def test_the_empty_catalog_warning_does_not_repeat_per_access():
     finally:
         logger.remove(handler)
     assert len(messages) == 1, f"five reads produced {len(messages)} warnings"
+
+
+def test_str_dumps_the_rows_as_yaml_without_their_empty_fields():
+    """`__str__` is the human view of the rows, so unset fields are noise."""
+    dumped = str(_ModelRowCatalog(datasets={"a": _Row(name="alpha")}))
+    assert yaml.safe_load(dumped) == {"a": {"name": "alpha"}}, dumped
+    assert "note" not in dumped, f"an unset field should be omitted; got {dumped!r}"
+
+
+def test_str_renders_a_row_that_is_not_a_pydantic_model():
+    """A subclass may store plain mappings, which have no `model_dump`."""
+    dumped = str(_PlainRowCatalog(datasets={"a": {"name": "alpha"}}))
+    assert yaml.safe_load(dumped) == {"a": {"name": "alpha"}}, dumped
+
+
+def test_str_keeps_insertion_order_rather_than_sorting():
+    """Catalog files are curated in a deliberate order, and the dump keeps it."""
+    catalog = _ModelRowCatalog(
+        datasets={"zulu": _Row(name="z"), "alpha": _Row(name="a")}
+    )
+    order = list(yaml.safe_load(str(catalog)))
+    assert order == ["zulu", "alpha"], f"the dump reordered the rows: {order}"
+
+
+def test_str_writes_non_ascii_text_as_itself():
+    """Escaping a place name into ASCII escape sequences makes the dump unreadable."""
+    dumped = str(_ModelRowCatalog(datasets={"a": _Row(name="Åland")}))
+    assert "Åland" in dumped, f"non-ASCII text was escaped: {dumped!r}"
+
+
+def test_getitem_translates_the_did_you_mean_error_into_a_keyerror():
+    """The dict surface has to raise what `dict` raises, not `get_dataset`'s error."""
+    catalog = _ModelRowCatalog(datasets={"alpha": _Row(name="a")})
+    assert catalog["alpha"].name == "a"
+    with pytest.raises(KeyError) as excinfo:
+        catalog["alfa"]
+    assert excinfo.value.args == ("alfa",), excinfo.value.args
+    assert isinstance(excinfo.value.__cause__, ValueError), (
+        "the did-you-mean message must survive as the cause"
+    )
+
+
+def test_repr_reports_counts_not_contents():
+    """A catalog holds hundreds of rows, so a repr that dumps them is unusable."""
+    catalog = _ModelRowCatalog(
+        datasets={"alpha": _Row(name="a")}, available_datasets=["x", "y", "z"]
+    )
+    rendered = repr(catalog)
+    assert rendered == "_ModelRowCatalog(datasets=1, available_datasets=3)", rendered
+
+
+def test_get_provider_names_the_near_miss_it_found():
+    """A slug is easy to mistype, and the registry is the only place to check it."""
+    catalog = _ModelRowCatalog(providers={"ucsb-chc": {"name": "CHC"}})
+    assert catalog.get_provider("ucsb-chc") == {"name": "CHC"}
+    with pytest.raises(ValueError, match="Did you mean 'ucsb-chc'") as excinfo:
+        catalog.get_provider("ucsb-chp")
+    assert "Known providers: ['ucsb-chc']" in str(excinfo.value), excinfo.value
 
 
 @pytest.mark.parametrize("module_name, class_name", CATALOG_BACKENDS)

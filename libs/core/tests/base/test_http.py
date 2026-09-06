@@ -3,17 +3,21 @@
 from __future__ import annotations
 
 import builtins
+import contextlib
 import errno
 import functools
 import importlib.util
+import os
 import sys
 import time
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
 import pytest
 import requests
 import urllib3
+from loguru import logger
 
 from earthlens.base import http as http_module
 from earthlens.base.http import (
@@ -154,6 +158,29 @@ def _client(
     waits: list[float] = []
     client = HttpClient(session=session, sleep=waits.append, **kwargs)
     return client, session, waits
+
+
+@contextlib.contextmanager
+def _captured_debug_logs() -> Iterator[list[str]]:
+    """Collect the loguru messages emitted at `DEBUG` inside the block."""
+    messages: list[str] = []
+    handler = logger.add(lambda m: messages.append(m.record["message"]), level="DEBUG")
+    try:
+        yield messages
+    finally:
+        logger.remove(handler)
+
+
+def _exists_via_os(path: Path, *, follow_symlinks: bool = True) -> bool:
+    """A `Path.exists` that never routes through `Path.stat`.
+
+    Before 3.14 `exists()` was implemented on top of `self.stat()` and re-raised
+    anything that was not a missing-file errno, so a test making `Path.stat`
+    refuse would have the refusal land on the existence check rather than on the
+    measurement it aims at. Substituting the 3.14 implementation pins such a test
+    to the same statement on every supported version.
+    """
+    return os.path.exists(path) if follow_symlinks else os.path.lexists(path)
 
 
 def _http_for_platform(platform: str, monkeypatch: pytest.MonkeyPatch) -> Any:
@@ -2412,12 +2439,12 @@ class TestDownloadSalvage:
     ):
         """The salvage check runs first in both handlers, so it must not raise.
 
-        On 3.14 `Path.exists()` goes to `os.stat` directly, so patching
-        `Path.stat` intercepts only the explicit measurement — which is the one
-        the guard wraps, and the first statement either transport handler runs.
-        An exception from inside an `except` handler is not caught by that
-        handler's own `try`, so without the guard the filesystem's errno
-        replaces the transport error and none of the retry budget is spent.
+        `Path.exists` is substituted first so patching `Path.stat` intercepts
+        only the explicit measurement — which is the one the guard wraps, and
+        the first statement either transport handler runs. An exception from
+        inside an `except` handler is not caught by that handler's own `try`, so
+        without the guard the filesystem's errno replaces the transport error
+        and none of the retry budget is spent.
         """
         dest = tmp_path / "g"
         session = _ScriptedSession(
@@ -2444,6 +2471,7 @@ class TestDownloadSalvage:
                     raise OSError(errno.EACCES, "sharing violation")
             return real_stat(self, *args, **kwargs)
 
+        monkeypatch.setattr(Path, "exists", _exists_via_os)
         monkeypatch.setattr(_ScriptedBody, "iter_content", _iter)
         monkeypatch.setattr(Path, "stat", _stat)
         HttpClient(session=session, sleep=lambda _: None, max_retries=3).download(
@@ -2503,6 +2531,100 @@ class TestDownloadCleanupAndOrdering:
         )
         client.download("http://x/g", tmp_path / "g", progress=False)
         assert events[:2] == ["close", "sleep"], f"ordering was {events}"
+
+
+class _PartUnlinkFails:
+    """A `Path.unlink` replacement that refuses to remove a `.part` file.
+
+    Stands in for the sharing violation Windows raises when a handle has only
+    just been released, so the staging file survives the cleanup that promised
+    to remove it. Every other path is deleted normally.
+    """
+
+    def __init__(self, exc: OSError) -> None:
+        self._exc = exc
+        self._real = Path.unlink
+        self.fired = False
+
+    def __get__(self, instance: Any, owner: Any = None) -> Any:
+        """Bind like a method, so an instance can replace `Path.unlink`."""
+        if instance is None:
+            return self
+        return functools.partial(self.__call__, instance)
+
+    def __call__(self, path: Path, *args: Any, **kwargs: Any) -> Any:
+        """Refuse for the staging file; defer to the real `unlink` otherwise."""
+        if path.name.endswith(".part"):
+            self.fired = True
+            raise self._exc
+        return self._real(path, *args, **kwargs)
+
+
+class _PartLooksPresentOnce:
+    """A `Path.exists` replacement that claims a missing `.part` is there, once.
+
+    Reproduces the race the startup log line sits in — the staging file is
+    removed between the existence check and the measurement — without patching
+    `Path.stat`, whose reach differs across the supported versions.
+    """
+
+    def __init__(self) -> None:
+        self._real = Path.exists
+        self.fired = False
+
+    def __get__(self, instance: Any, owner: Any = None) -> Any:
+        """Bind like a method, so an instance can replace `Path.exists`."""
+        if instance is None:
+            return self
+        return functools.partial(self.__call__, instance)
+
+    def __call__(self, path: Path, *args: Any, **kwargs: Any) -> bool:
+        """Claim the first `.part` asked about is present, then step aside."""
+        if path.name.endswith(".part") and not self.fired:
+            self.fired = True
+            return True
+        return bool(self._real(path, *args, **kwargs))
+
+
+@pytest.mark.unit
+class TestStagingFileNoiseNeverReplacesTheOutcome:
+    """Sizing and removing `<dest>.part` is bookkeeping, never the result."""
+
+    def test_a_part_that_vanishes_before_it_is_sized_still_downloads(
+        self, tmp_path, monkeypatch
+    ):
+        """The startup log measures a file another process may already have removed."""
+        dest = tmp_path / "g"
+        lying = _PartLooksPresentOnce()
+        monkeypatch.setattr(Path, "exists", lying)
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", dest, progress=False
+        )
+        assert lying.fired, "the staging file was never claimed present"
+        assert dest.read_bytes() == _PAYLOAD
+        assert session.calls == 1, "sizing a stale .part must not cost an attempt"
+
+    def test_a_part_that_cannot_be_removed_is_logged_not_raised(
+        self, tmp_path, monkeypatch
+    ):
+        """The transport failure is the answer; the surviving temp is a note."""
+        dest = tmp_path / "g"
+        (tmp_path / "g.part").write_bytes(b"Z" * 99)
+        refusing = _PartUnlinkFails(PermissionError(errno.EACCES, "file in use"))
+        monkeypatch.setattr(Path, "unlink", refusing)
+        client = HttpClient(
+            session=_AlwaysRaises(requests.exceptions.SSLError("bad cert")),
+            sleep=lambda _: None,
+            max_retries=0,
+        )
+        with _captured_debug_logs() as messages:
+            with pytest.raises(requests.exceptions.SSLError, match="bad cert"):
+                client.download("http://x/g", dest, progress=False)
+        assert refusing.fired, "the cleanup never tried to remove the staging file"
+        assert any("could not remove g.part" in m for m in messages), (
+            f"a temp that outlived its promise must be reported; got {messages}"
+        )
 
 
 @pytest.mark.unit
@@ -3019,6 +3141,24 @@ class TestResumeLegIsolation:
         assert dest.read_bytes() == _OBJECT
         assert 206 not in seen, f"the predicate was shown a leg: {seen}"
 
+    def test_the_status_forcelist_never_sees_a_leg(self, tmp_path):
+        """The status half of the same exemption, which the predicate test misses.
+
+        A rewrite that guarded only the predicate would leave a `206` in the
+        forcelist replaying the leg instead of appending it, costing an extra
+        whole-object read.
+        """
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        _resume_client(server, status_forcelist=(206,)).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.calls == 2, (
+            f"the leg should have finished the transfer; {server.calls} requests "
+            f"means it was replayed as a retryable status"
+        )
+
     def test_the_exhaustion_message_reports_the_bytes_actually_reached(self, tmp_path):
         """`best read 0 bytes` after a six-figure transfer is worse than silence."""
         server = _ResumeServer(break_every_whole=True, honour_range=False)
@@ -3351,6 +3491,7 @@ class TestResumeHelperEdges:
         # is about the second. An earlier version reached it by turning the
         # length check off, which is now refused alongside `resume=True`.
         failing = _PartStatFailsOnce(OSError(errno.EIO, "I/O error"), after=1)
+        monkeypatch.setattr(Path, "exists", _exists_via_os)
         monkeypatch.setattr(Path, "stat", failing)
         _resume_client(server).download(
             "http://x/g", dest, progress=False, chunk=4096, resume=True
