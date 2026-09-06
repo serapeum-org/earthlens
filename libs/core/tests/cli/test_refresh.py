@@ -363,7 +363,9 @@ class TestAuditOne:
             raise RuntimeError("connection refused")
 
         monkeypatch.setattr(stac_cli, "get_json", boom)
-        assert audit_one(_info("stac")).status == "error", "failure captured"
+        outcome = audit_one(_info("stac"))
+        assert outcome.status == "error", "failure captured"
+        assert "connection refused" in outcome.detail, "reason preserved"
 
     def test_variable_drift_flags_a_recased_variable(self, monkeypatch):
         """A curated variable the server re-cased (wtmp -> WTMP) is drift (#1129)."""

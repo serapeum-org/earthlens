@@ -167,7 +167,7 @@ class SentinelHubAuth(AbstractAuth[SentinelHubCredentials]):
         return self._base_url
 
     def _resolve_pair(self) -> tuple[str | None, str | None]:
-        """Return the `(client_id, client_secret)` to use (env → kwargs).
+        """Return the `(client_id, client_secret)` to use (kwargs → env).
 
         Explicit credentials on the object win over the environment.
 
@@ -183,7 +183,7 @@ class SentinelHubAuth(AbstractAuth[SentinelHubCredentials]):
     def configure(self) -> None:
         """Build the `SHConfig` (base/token urls + credentials); idempotent.
 
-        Resolves credentials env → kwargs → profile. A second call after
+        Resolves credentials kwargs → env → profile. A second call after
         :meth:`is_authenticated` returns `True` is a no-op.
 
         Raises:

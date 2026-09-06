@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 import io
 import ssl
 
@@ -14,6 +15,7 @@ from earthlens.gee import io as io_module
 from earthlens.gee.io import (
     _DEFAULT_RETRIES,
     _TRANSIENT_NETWORK_EXCEPTIONS,
+    _callable_name,
     _retry_on_transient_errors,
     feature_collection_to_dataframe,
     feature_collection_to_gdf,
@@ -60,8 +62,53 @@ def fake_read_csv(monkeypatch):
     monkeypatch.setattr(io_module.pd, "read_csv", _stub)
 
 
+def _always_reset(*_args, **_kwargs):
+    """Always raise the transient error the retry helper is meant to catch."""
+    raise ConnectionResetError("boom")
+
+
+class _Callable:
+    """A callable instance, which carries no `__name__`."""
+
+    def __call__(self):
+        return None
+
+
+class TestCallableName:
+    """Tests for the display-name helper used by the retry logger."""
+
+    def test_plain_function_uses_its_name(self):
+        """A def'd function reports its own `__name__`."""
+        assert _callable_name(_always_reset) == "_always_reset"
+
+    def test_partial_unwraps_to_the_wrapped_function(self):
+        """A partial reports the function it targets, not 'partial'."""
+        assert _callable_name(functools.partial(_always_reset, 1)) == "_always_reset"
+
+    def test_nested_partial_unwraps_all_the_way(self):
+        """Partials wrapping partials still resolve to the underlying function."""
+        doubled = functools.partial(functools.partial(_always_reset, 1), 2)
+        assert _callable_name(doubled) == "_always_reset"
+
+    def test_callable_instance_falls_back_to_its_type(self):
+        """An object with no `__name__` reports its class name instead."""
+        assert _callable_name(_Callable()) == "_Callable"
+
+
 class TestRetryOnTransientErrors:
     """Tests for the small retry helper (N2)."""
+
+    def test_partial_target_preserves_the_original_error(self):
+        """Retrying a partial re-raises the transient error, not an AttributeError.
+
+        The warning's f-string is evaluated on every retry, so a bare
+        `fn.__name__` there used to abort the retry and mask the real failure.
+        """
+        wrapped = _retry_on_transient_errors(
+            functools.partial(_always_reset, 1), tries=2, sleep=lambda s: None
+        )
+        with pytest.raises(ConnectionResetError, match="boom"):
+            wrapped()
 
     def test_returns_value_when_fn_succeeds_first_try(self):
         """A function that succeeds on first call is invoked exactly once."""
