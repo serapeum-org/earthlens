@@ -1601,6 +1601,7 @@ class HttpClient:
         headers: dict[str, str] | None = None,
         timeout: Timeout | None = None,
         resume: bool = False,
+        verify_length: bool = True,
         **kwargs: Any,
     ) -> Path:
         """Stream `url` to `dest` atomically, optionally showing a `tqdm` bar.
@@ -1654,6 +1655,20 @@ class HttpClient:
                 float or a `(connect, read)` pair — the latter fails a dead
                 host on the short connect budget without shortening the long
                 read budget a large download needs.
+            verify_length: Compare the bytes written against the
+                `Content-Length` the response advertised, and raise
+                `IncompleteDownloadError` on a mismatch. On by default.
+
+                Pass `False` for a server that misreports the size of a body it
+                generates on the fly, where the check would fail a download that
+                is actually fine. It is a separate switch from `Accept-Encoding`
+                on purpose: a coded body already has no checkable length — the
+                header counts encoded octets and the file counts decoded ones —
+                so asking for `gzip` disables the check as a side effect, and
+                that side effect should not be the only way to express the
+                intent. Turning the check off also disables the salvage, whose
+                whole proof is the same size equality.
+
             resume: Continue a broken transfer with a ranged request instead
                 of re-reading the object, when — and only when — the server has
                 proved it can be done safely. Off by default; the whole-object
@@ -1799,7 +1814,7 @@ class HttpClient:
             Returns:
                 bool: True when the staged file is exactly that long.
             """
-            if expected is None or not tmp.exists():
+            if not verify_length or expected is None or not tmp.exists():
                 return False
             return tmp.stat().st_size == expected
 
@@ -1934,7 +1949,11 @@ class HttpClient:
                         # whole-object read, never a weaker door.
                         written = tmp.stat().st_size
                         best_written = max(best_written, written)
-                        if expected_total is not None and written != expected_total:
+                        if (
+                            verify_length
+                            and expected_total is not None
+                            and written != expected_total
+                        ):
                             raise IncompleteDownloadError(
                                 f"{redact_url(url)} delivered {written:,} of "
                                 f"{expected_total:,} advertised bytes",

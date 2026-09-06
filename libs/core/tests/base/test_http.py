@@ -2036,6 +2036,33 @@ class TestDownloadWritesWholeObjects:
             client.download("http://x/g", dest, progress=False, atomic=False)
         assert dest.read_bytes() == _PAYLOAD[:8]
 
+    def test_verify_length_false_publishes_a_body_that_misses_its_length(
+        self, tmp_path
+    ):
+        """An explicit switch for a server that misreports a body it generates."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], advertised=22))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", dest, progress=False, verify_length=False
+        )
+        assert dest.read_bytes() == _PAYLOAD[:8]
+        assert session.calls == 1, "no retry: nothing was judged wrong"
+
+    def test_verify_length_false_does_not_silently_change_the_wire(self, tmp_path):
+        """The point of the switch: it is not `Accept-Encoding` in disguise."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", tmp_path / "g", progress=False, verify_length=False
+        )
+        assert session.requests[0][1]["Accept-Encoding"] == "identity"
+
+    def test_the_check_is_on_by_default(self, tmp_path):
+        """Every existing call site keeps the post-condition it has today."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], advertised=22))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=0)
+        with pytest.raises(IncompleteDownloadError):
+            client.download("http://x/g", tmp_path / "g", progress=False)
+
     def test_a_body_without_a_length_is_published_unchecked(self, tmp_path):
         """A chunked response makes no length claim, so `download` makes none either."""
         dest = tmp_path / "g"
@@ -2309,6 +2336,20 @@ class TestDownloadSalvage:
         )
         assert dest.read_bytes() == body
         assert session.calls == 1
+
+    def test_the_salvage_follows_verify_length(self, tmp_path):
+        """The salvage's only proof is the size equality, so the switch governs it."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, break_at_end=True))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=0)
+        with pytest.raises(requests.ConnectionError):
+            client.download(
+                "http://x/g",
+                tmp_path / "g",
+                progress=False,
+                chunk=1,
+                verify_length=False,
+            )
+        assert not (tmp_path / "g.part").exists()
 
     def test_an_incomplete_body_that_breaks_is_not_salvaged(self, tmp_path):
         """Without the equality there is no proof, so the error propagates."""
