@@ -2431,9 +2431,12 @@ class AbstractDataSource(ABC):
 RowT = TypeVar("RowT")
 
 
-#: Catalog classes already warned about an empty `datasets`. The condition is a
-#: property of the class, and `catalog` is recomputed per read, so warning per
-#: call would mean one line per loop iteration.
+#: Concrete catalog classes already warned about an empty `datasets`, keyed by
+#: `type(self)` so every instance of one subclass shares a single warning. An
+#: empty default catalog is a property of the class rather than of an instance,
+#: and :attr:`AbstractCatalog.catalog` recomputes `get_catalog()` on every read,
+#: so warning per call would put one line in the log per loop iteration. Never
+#: pruned — it holds at most one entry per catalog class defined in the process.
 _WARNED_EMPTY_CATALOGS: set[type] = set()
 
 
@@ -2556,11 +2559,17 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
     def model_post_init(self, __context: Any) -> None:
         """Fill an empty catalog from disk, then run the subclass's wiring.
 
-        `Catalog()` with no arguments reads from disk; passing `datasets=...`
-        skips the read, which is what lets a test build a catalog from literals.
-        A field the caller already supplied is never overwritten, so a partial
-        construction (`datasets=` but no `available_datasets=`) still gets the
-        rest filled in.
+        `Catalog()` with no arguments reads from disk, and so does
+        `Catalog(datasets={})` — the gate is whether :attr:`datasets` is falsy,
+        and an empty mapping is indistinguishable from an absent one here. A
+        **non-empty** `datasets=` suppresses the read entirely, so the other
+        fields :meth:`_autoload` would have filled keep their defaults too:
+        `Catalog(datasets={...})` is a catalog built from literals, not a
+        partially-filled one.
+
+        Within a read, a field the caller already supplied is never overwritten
+        — `Catalog(available_datasets=[...])` keeps that list and takes
+        :attr:`datasets` from disk.
 
         This used to be written out in all 48 provider catalogs. The bodies
         differed only in the loader call, and the surrounding rule had drifted —
@@ -2590,9 +2599,12 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
         A backend whose catalog is genuinely a different shape still
         overrides this. When it does not, and :attr:`datasets` is empty,
         the empty mapping is returned but a warning is logged naming the
-        class — the default cannot tell "no rows" from "rows kept in some
-        other field", and a catalog that silently has no entries is harder
-        to notice than one that complains.
+        class — the default cannot tell "no rows yet" from "rows kept in
+        some other field", and a catalog that silently has no entries is
+        harder to notice than one that complains. The warning is emitted
+        once per class, not once per call: :attr:`catalog` recomputes this
+        on every read, so a caller iterating it would otherwise be warned
+        on each access.
 
         Returns:
             dict[str, RowT]: The `{key: row}` mapping backing this catalog,

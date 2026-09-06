@@ -166,7 +166,9 @@ if sys.platform != "win32":
 #: separates the two cases, whereas the full read budget would re-download a
 #: multi-gigabyte object five times to fail at the same byte. That amplification
 #: is what the deterministic set exists to prevent, and honouring Windows must
-#: not reintroduce it.
+#: not reintroduce it. Empty on every other platform, where the same two errnos
+#: are a standing property of the destination and join
+#: :data:`_DETERMINISTIC_ERRNO_NAMES` instead.
 _TRANSIENT_PERMISSION_ERRNOS: frozenset[int] = (
     frozenset()
     if sys.platform != "win32"
@@ -391,6 +393,14 @@ def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str 
         the transport — a full disk, a quota, a read-only mount — is deterministic
         whatever `strict` says, because no retry policy makes the disk larger.
 
+        The one destination failure that is not deterministic is a permission
+        errno on Windows, where the same `EACCES` / `EPERM` reports both a
+        standing refusal and a transient sharing violation. That answers
+        `"connect"`: retryable, since a violation clears in seconds, but on the
+        small budget, so a genuinely permanent one costs one extra attempt
+        rather than a whole re-read. Off Windows those errnos are deterministic
+        like the rest and answer `None`.
+
         `"unknown"` exists because the two decisions this feeds pull opposite
         ways. For the *budget*, an unidentified failure should cost little, like
         a connect failure. For *replay safety*, it must be treated like a read
@@ -432,6 +442,19 @@ def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str 
             >>> classify_transport_error(
             ...     OSError(errno.ENOSPC, "No space left on device"), strict=False
             ... ) is None
+            True
+
+            ```
+        - A permission error is a possible sharing violation on Windows, so it
+          is retried there on the small connect budget; anywhere else it is a
+          standing property of the destination and is not retried at all:
+            ```python
+            >>> import errno, sys
+            >>> from earthlens.base.http import classify_transport_error
+            >>> locked = PermissionError(errno.EACCES, "the file is in use")
+            >>> classify_transport_error(locked) == (
+            ...     "connect" if sys.platform == "win32" else None
+            ... )
             True
 
             ```
@@ -657,10 +680,14 @@ def _content_range_refusal(
 ) -> tuple[str | None, tuple[int, int, int] | None]:
     """Check a `206`'s `Content-Range` against the window that was asked for.
 
-    Split out so each gate stays a separate statement: the three comparisons
-    below are the arithmetic half of the refusal, and folding them into the
-    caller's sequence made one function long enough to invite exactly the
-    boolean-chaining this design refuses.
+    The arithmetic half of :func:`_resume_refusal`, split out so each of the
+    three comparisons stays a statement of its own rather than a term in a
+    boolean chain — none can then be short-circuited by another, and each is
+    reachable from a single hand-built header.
+
+    The parsed triple comes back alongside the verdict because the caller needs
+    `first` and `last` for its own `Content-Length` check; re-parsing the header
+    there would let the two reads of one string disagree.
 
     Args:
         value: The raw `Content-Range` header, if any.
@@ -668,8 +695,46 @@ def _content_range_refusal(
         expected_first: The offset the request asked the window to start at.
 
     Returns:
-        tuple[str | None, tuple[int, int, int] | None]: The refusal reason (or
-        `None`), and the parsed `(first, last, total)` when it parsed at all.
+        tuple[str | None, tuple[int, int, int] | None]: The refusal reason, or
+        `None` when the start, the end and the total all match; and the parsed
+        `(first, last, total)`, which is `None` only when the header was absent
+        or malformed — a header that parsed is handed back even when it is
+        refused.
+
+    Examples:
+        - A window that starts, ends and totals where it was asked to is
+          accepted, and the parsed triple comes back with it:
+            ```python
+            >>> from earthlens.base.http import _ResumeAnchor, _content_range_refusal
+            >>> anchor = _ResumeAnchor(total=1000, etag='"abc"')
+            >>> _content_range_refusal("bytes 400-999/1000", anchor, 400)
+            (None, (400, 999, 1000))
+
+            ```
+        - A server that ignored the offset is refused, and what it did send is
+          still reported:
+            ```python
+            >>> from earthlens.base.http import _ResumeAnchor, _content_range_refusal
+            >>> anchor = _ResumeAnchor(total=1000, etag='"abc"')
+            >>> reason, parsed = _content_range_refusal("bytes 0-999/1000", anchor, 400)
+            >>> reason
+            'Content-Range starts at 0, expected 400'
+            >>> parsed
+            (0, 999, 1000)
+
+            ```
+        - A missing or unreadable header is refused with nothing to report:
+            ```python
+            >>> from earthlens.base.http import _ResumeAnchor, _content_range_refusal
+            >>> anchor = _ResumeAnchor(total=1000, etag='"abc"')
+            >>> _content_range_refusal(None, anchor, 400)
+            ('no parseable Content-Range', None)
+
+            ```
+
+    See Also:
+        _resume_refusal: The full gate sequence this is one step of.
+        _parse_content_range: The header parser it reads through.
     """
     parsed = _parse_content_range(value)
     if parsed is None:
@@ -691,8 +756,13 @@ def _resume_refusal(
 
     Each gate is a separate statement rather than a term in a boolean chain, so
     none can be short-circuited by another and each is reachable from a single
-    hand-built response. That property is the point: every one of these was
-    written because a server was observed doing the thing it rejects.
+    hand-built response. That property is the point: these gates exist because
+    servers were observed doing the things they reject — worldpop advertises
+    `Accept-Ranges: bytes` and a strong `ETag`, then answers a `Range` with the
+    whole object under a `200`.
+
+    The three `Content-Range` comparisons live in :func:`_content_range_refusal`
+    and are consulted here in sequence with the rest.
 
     Args:
         response: The answer to the ranged request.
@@ -1720,26 +1790,34 @@ class HttpClient:
                 of re-reading the object, when — and only when — the server has
                 proved it can be done safely. Off by default; the whole-object
                 path above is unchanged for every caller that does not opt in.
+                It requires `verify_length=True`, the default — the pair
+                `resume=True, verify_length=False` raises `ValueError`.
 
                 Three things make it inert, silently, so they are listed
                 together. It requires staging, so it does nothing under
-                `atomic=False` unless `expect_magic` forces staging back on. It
-                stands down when a `Range` is already present in the merged
-                headers — including one set on the client, which disables
-                resume for every call on it — because a caller who owns the
-                object boundaries should not have ours added on top. And a leg
-                only arms when the previous one gained more than the overlap it
-                re-fetches, since below that a restart is cheaper.
+                `atomic=False` unless `expect_magic` forces staging back on:
+                resuming means keeping a partial file between attempts, and
+                that is only safe in the private `<dest>.part` this method
+                owns, never in a caller-supplied `dest` that a failed attempt
+                must not damage. It stands down when a `Range` is already
+                present in the merged headers — including one set on the
+                client, which disables resume for every call on it — because a
+                caller who owns the object boundaries should not have ours
+                added on top. And a leg only arms once more than
+                `_RESUME_OVERLAP` bytes have been banked since the previous leg
+                started, because a leg that gains less than the overlap it
+                re-fetches costs more than it saves.
 
                 On a leg `download` also overrides two headers rather than
                 merging under them: `Accept-Encoding: identity`, because a
                 coded reply would make the byte offsets mean something else,
                 and `If-Range`, which must name the representation the transfer
                 anchored on. This is the one place caller headers are not
-                honoured verbatim. Resuming means
-                keeping a partial file between attempts, and that is only safe
-                in the private `<dest>.part` this method owns — never in a
-                caller-supplied `dest` that a failed attempt must not damage.
+                honoured verbatim. A leg is likewise exempt from
+                `status_forcelist` and from any `retry_predicate`: both are
+                written against whole-object responses, and neither can judge —
+                or even parse — a `206` fragment of one. The refusal gates
+                below are the leg's own check in their place.
 
                 A resumed request is only *attempted* when the first response
                 was a `200` that advertised `Accept-Ranges: bytes`, a known
@@ -1769,16 +1847,15 @@ class HttpClient:
                 **both** directions: an over-long body — a mis-framed response,
                 a spliced proxy body — is published too, because a length you
                 do not believe cannot catch one. It also disables the salvage,
-                whose whole proof is the same size equality, and it cannot be
-                combined with `resume=True`, which is addressed by that length
-                and raises `ValueError` here.
+                whose whole proof is that same size equality. And it cannot be
+                combined with `resume=True`, which is addressed by the length it
+                distrusts: the pair raises `ValueError` before anything is sent.
 
-                It is a separate switch from `Accept-Encoding` on purpose: a coded body already has no checkable length — the
-                header counts encoded octets and the file counts decoded ones —
-                so asking for `gzip` disables the check as a side effect, and
-                that side effect should not be the only way to express the
-                intent. Turning the check off also disables the salvage, whose
-                whole proof is the same size equality.
+                It is a separate switch from `Accept-Encoding` on purpose: a
+                coded body already has no checkable length — the header counts
+                encoded octets and the file counts decoded ones — so asking for
+                `gzip` disables the check as a side effect, and that side effect
+                should not be the only way to express the intent.
             **kwargs: Extra keyword arguments forwarded to `requests`.
 
         Returns:
@@ -1787,7 +1864,8 @@ class HttpClient:
         Raises:
             ValueError: When `expect_magic` is given and the body does not
                 start with any of the supplied prefixes, or when `resume=True`
-                is combined with `verify_length=False`.
+                is combined with `verify_length=False` — the latter refused up
+                front, before a parent directory is created or a request sent.
             UnsolicitedPartialContentError: When a `206` answers a request that
                 carried no `Range` — the body is a fragment of the object, and
                 repeating the request returns the same fragment, so this is
@@ -1865,6 +1943,10 @@ class HttpClient:
             `_stream_to_file` has already truncated by opening it `"wb"` —
             deleting it as well would only turn a truncated file into a missing
             one, and would destroy a file this call never owned.
+
+            An unlink that fails is logged and swallowed, never raised: this
+            runs from every failure path, so a second error here would replace
+            the real one on its way out.
             """
             nonlocal banked
             # Reset together: the count means "bytes of `tmp` this call
@@ -1920,13 +2002,19 @@ class HttpClient:
 
             A transfer can break after the last byte but before the stream
             frames its end. The equality is the entire proof, so this asks no
-            question of the server and consults no retry policy.
+            question of the server and consults no retry policy. It also never
+            raises: it is the first thing a transport handler runs, and an
+            exception from inside a handler escapes past its own `try`.
 
             Args:
                 expected: The length the response advertised, if any.
 
             Returns:
-                bool: True when the staged file is exactly that long.
+                bool: True when the staged file is exactly that long. False
+                when the check is switched off, when the response advertised no
+                length, when nothing is staged, and when the size cannot be
+                read at all — an unprovable salvage is not a salvage, so the
+                ordinary retry path takes over.
             """
             if not verify_length or expected is None or not tmp.exists():
                 return False
