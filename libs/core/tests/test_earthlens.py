@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import glob
+import inspect
 import os
 import pathlib
 import shutil
@@ -19,6 +20,7 @@ from earthlens._backends import (
     discover_backends,
 )
 from earthlens.aggregate import AggregationConfig
+from earthlens.base.abstractdatasource import native_parameters
 from earthlens.chc import CHIRPS
 from earthlens.earthlens import EarthLens, _LazyRegistry, _source_dirname
 from earthlens.ecmwf import ECMWF
@@ -1448,6 +1450,219 @@ class TestFacadeAoi:
                 aoi="USA",
                 buffer=0.5,
             )
+
+
+@pytest.mark.unit
+class TestErgonomicKwargsAreDiscoverable:
+    """The wrapper advertises the kwargs it adds, without confusing detection.
+
+    `functools.wraps` restores the unwrapped signature, so the four ergonomic
+    parameters used to be invisible to `help()`, IDE autocomplete and every
+    signature-driven tool while working perfectly at runtime.
+    """
+
+    @pytest.mark.parametrize("name", ["aoi", "cadence"])
+    def test_every_backend_advertises_the_universal_kwargs(self, name):
+        """`aoi=` and `cadence=` work on every backend, so every one advertises them."""
+        missing = [
+            EarthLens.DataSources[key].__name__
+            for key in sorted(EarthLens.DataSources)
+            if name
+            not in inspect.signature(EarthLens.DataSources[key].__init__).parameters
+        ]
+        assert not missing, f"{name} is hidden on {sorted(set(missing))}"
+
+    @pytest.mark.parametrize("name", ["buffer", "dataset"])
+    def test_the_conditional_kwargs_are_advertised_wherever_they_work(self, name):
+        """`buffer=` and `dataset=` appear on exactly the backends that accept them.
+
+        They are withheld only where they could not work — `buffer=` from a
+        backend that interprets `aoi=` itself, `dataset=` from one addressing
+        its data by facet keywords. The expected set is derived from those two
+        rules rather than approximated, so a backend silently losing a kwarg
+        fails here.
+        """
+        expected, advertised = set(), set()
+        for key in sorted(EarthLens.DataSources):
+            backend = EarthLens.DataSources[key]
+            params = inspect.signature(backend.__init__).parameters
+            native = native_parameters(backend)
+            if name in native:
+                continue
+            if name == "buffer":
+                works = "aoi" not in native
+            else:
+                works = "variables" in native or any(
+                    p.kind is inspect.Parameter.VAR_KEYWORD for p in params.values()
+                )
+            if works:
+                expected.add(backend.__name__)
+            if name in params:
+                advertised.add(backend.__name__)
+        assert advertised == expected, (
+            f"{name} advertised on {sorted(advertised - expected)} that reject it, "
+            f"missing from {sorted(expected - advertised)} that accept it"
+        )
+        # The set above is derived from the same predicate production uses, so
+        # it catches drift between rule and signature but not a wrong rule.
+        # These two are asserted by hand: if the rule and the emitted signature
+        # ever change together, this still fails.
+        must_not_see = {"buffer": "WorldPop", "dataset": "CMIP6"}[name]
+        assert must_not_see not in advertised, (
+            f"{must_not_see} must never advertise {name}"
+        )
+
+    def test_the_synthesized_annotations_resolve(self):
+        """`get_type_hints` returns the wrapper's synthesized annotations, resolved.
+
+        This asserts the observable contract rather than the table behind it.
+        `functools.wraps` points `__wrapped__` at the backend's own `__init__`
+        and `get_type_hints` follows it, resolving against that function's
+        globals — the backend module, where `Any` is not imported. So the
+        wrapper has to re-bind the synthesized annotations onto itself, and
+        they have to be objects: a string would raise `NameError` there. Both
+        halves fail this test if either is dropped.
+        """
+        import typing
+
+        from earthlens.base.abstractdatasource import _ERGONOMIC_ANNOTATIONS
+
+        # A backend that gets all four kwargs synthesized, so the assertion
+        # below covers every entry in the table rather than one of them.
+        target, synthesized = None, frozenset()
+        for key in sorted(EarthLens.DataSources):
+            backend = EarthLens.DataSources[key]
+            params = getattr(backend.__init__, "_ergonomic_params", frozenset())
+            if len(params) > len(synthesized):
+                target, synthesized = backend, params
+        assert target is not None
+        assert synthesized == set(_ERGONOMIC_ANNOTATIONS), (
+            f"expected a backend taking every synthesized kwarg; {target.__name__} "
+            f"takes {sorted(synthesized)}"
+        )
+
+        hints = typing.get_type_hints(target.__init__)
+        for name in sorted(synthesized):
+            assert name in hints, (
+                f"{target.__name__}.__init__ does not expose a resolved "
+                f"annotation for the synthesized {name!r}"
+            )
+            assert hints[name] == _ERGONOMIC_ANNOTATIONS[name], (
+                f"{name!r} resolved to {hints[name]!r}, not the declared "
+                f"{_ERGONOMIC_ANNOTATIONS[name]!r}"
+            )
+
+    def test_get_type_hints_works_on_every_backend(self):
+        """No backend's `__init__` is left unresolvable by the wrapper.
+
+        A backend's own annotations may name a `TYPE_CHECKING`-only import,
+        which is its business and pre-existing; those are separated from
+        symbols the synthesized table would need, so neither hides the other.
+        """
+        import typing
+
+        from earthlens.base.abstractdatasource import _ERGONOMIC_ANNOTATIONS
+
+        ours = {"Any", "float", "str", "None", "object", "list"}
+        broken, foreign, unexplained = [], [], []
+        for key in sorted(EarthLens.DataSources):
+            backend = EarthLens.DataSources[key]
+            try:
+                typing.get_type_hints(backend.__init__)
+            except NameError as exc:
+                missing = str(exc).split("'")[1] if "'" in str(exc) else str(exc)
+                bucket = broken if missing in ours else foreign
+                bucket.append((backend.__name__, missing))
+            except Exception as exc:  # noqa: BLE001 - reported, never swallowed
+                unexplained.append((backend.__name__, f"{type(exc).__name__}: {exc}"))
+        assert not broken, f"synthesized annotations fail to resolve on {broken}"
+        assert not unexplained, (
+            f"get_type_hints raised something other than NameError on {unexplained}"
+        )
+        assert not any(name in _ERGONOMIC_ANNOTATIONS for _, name in foreign), (
+            f"a synthesized name leaked into the pre-existing bucket: {foreign}"
+        )
+
+    def test_a_native_parameter_is_not_shadowed_by_a_synthesized_one(self):
+        """A backend declaring its own `aoi=` keeps that one, not the wrapper's.
+
+        Asserting no duplicates would prove nothing — `inspect.Signature`
+        rejects those at construction, so the failure would surface at import.
+        What can actually go wrong is the native parameter being replaced by
+        the untyped, `None`-defaulted stand-in.
+        """
+        worldpop = EarthLens.DataSources["worldpop"]
+        aoi = inspect.signature(worldpop.__init__).parameters["aoi"]
+        synthesized = getattr(worldpop.__init__, "_ergonomic_params", frozenset())
+        assert "aoi" not in synthesized, (
+            "WorldPop declares aoi= itself; the wrapper must not add its own"
+        )
+        assert "aoi" in native_parameters(worldpop), (
+            "a native aoi= must still read as native"
+        )
+        # Compared against the synthesized stand-in rather than another
+        # derivation of the same signature object: the contract is that the
+        # wrapper's own annotation did NOT replace the backend's.
+        from earthlens.base.abstractdatasource import _ERGONOMIC_ANNOTATIONS
+
+        assert aoi.annotation is not inspect.Parameter.empty, (
+            "an annotation-less parameter would also pass an `is not None` test"
+        )
+        assert aoi.annotation != _ERGONOMIC_ANNOTATIONS["aoi"], (
+            f"WorldPop's own aoi annotation was replaced by the synthesized "
+            f"{_ERGONOMIC_ANNOTATIONS['aoi']!r}"
+        )
+        assert "list[float]" in str(aoi.annotation), (
+            f"expected WorldPop's own bbox-bearing annotation, got {aoi.annotation!r}"
+        )
+
+    def test_a_backend_is_not_offered_a_parameter_it_must_reject(self):
+        """Facet-only and native-aoi backends drop the kwargs that cannot work.
+
+        `cmip6` addresses its data by facet keywords, so `dataset=` can only
+        raise there; `buffer=` only shapes a point `aoi=` the wrapper resolves,
+        so it is meaningless on a backend that interprets `aoi=` itself.
+        """
+        cmip6 = inspect.signature(EarthLens.DataSources["cmip6"].__init__).parameters
+        assert "dataset" not in cmip6, "cmip6 is facet-only; dataset= cannot work"
+        worldpop = inspect.signature(
+            EarthLens.DataSources["worldpop"].__init__
+        ).parameters
+        assert "buffer" not in worldpop, "WorldPop interprets aoi= itself"
+
+    def test_options_for_does_not_leak_the_ergonomic_kwargs(self):
+        """No backend advertises a facade-resolved kwarg as its own option.
+
+        `options_for` subtracts `_FACADE_PARAMS` from the introspected
+        signature, so advertising the wrapper's parameters would otherwise
+        report `cadence` as a backend-specific option on every key — and it
+        also renders the unknown-kwarg error text.
+        """
+        ergonomic = {"aoi", "buffer", "cadence", "dataset"}
+        leaking = {
+            key
+            for key in EarthLens.DataSources
+            if ergonomic & set(EarthLens.options_for(key))
+        }
+        assert not leaking, (
+            f"ergonomic kwargs leaked into options_for for {sorted(leaking)}"
+        )
+
+    def test_options_for_is_empty_for_a_backend_with_no_extra_options(self):
+        """CHIRPS declares nothing beyond the facade's own parameters."""
+        assert EarthLens.options_for("chc") == [], (
+            f"expected no backend options for chc, got {EarthLens.options_for('chc')}"
+        )
+
+    def test_native_parameters_still_distinguishes_a_real_aoi(self):
+        """The advertised kwargs must not make every backend look aoi-native.
+
+        The facade routes `aoi=` verbatim to a backend that interprets it
+        itself and resolves it to `lat_lim`/`lon_lim` for one that does not, so
+        conflating the two silently changes what every request selects.
+        """
+        assert "aoi" in native_parameters(EarthLens.DataSources["worldpop"])
+        assert "aoi" not in native_parameters(EarthLens.DataSources["chc"])
 
 
 def _require_qualified_keys() -> list[str]:

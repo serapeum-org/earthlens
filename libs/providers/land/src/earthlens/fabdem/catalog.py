@@ -117,7 +117,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Product catalog for the FABDEM backend.
 
     Reads the bundled `fabdem_data_catalog.yaml` and exposes its single row
@@ -184,14 +184,6 @@ class Catalog(AbstractCatalog):
         path = catalog_path if catalog_path is not None else CATALOG_PATH
         payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="FABDEM")
         return cls(**payload)
-
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the product map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Dataset]: Same object as `datasets`.
-        """
-        return self.datasets
 
     def get(self, key: str) -> Dataset:
         """Return the `Dataset` for `key`, with a did-you-mean hint.

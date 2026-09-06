@@ -116,7 +116,7 @@ class Country(BaseModel):
     region: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Country]):
     """Country catalog for the WDPA / Protected Planet backend.
 
     Reads the bundled `wdpa_data_catalog.yaml` (shipped as package data) and
@@ -186,14 +186,6 @@ class Catalog(AbstractCatalog):
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         rows, available = _load_catalog_data(catalog_path)
         return cls(datasets=dict(rows), available_datasets=list(available))
-
-    def get_catalog(self) -> dict[str, Country]:
-        """Return the country map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Country]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def resolve_iso3(self, selector: str) -> str:
         """Resolve a `variables` selector to an ISO3 country code.

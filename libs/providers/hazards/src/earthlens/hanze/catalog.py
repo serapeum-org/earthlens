@@ -260,7 +260,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[FloodType]):
     """Catalog for the HANZE backend.
 
     Reads the bundled `hanze_data_catalog.yaml` (shipped as package data) and
@@ -360,23 +360,6 @@ class Catalog(AbstractCatalog):
             catalog_path, _CATALOG_CACHE, _parse_catalog, provider="HANZE"
         )
         return cls(**parsed)
-
-    def get_catalog(self) -> dict[str, FloodType]:
-        """Return the flood-type map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, FloodType]: Same object as :attr:`datasets`.
-
-        Examples:
-            - The flood-type map is keyed by the `Type` string:
-                ```python
-                >>> from earthlens.hanze import Catalog
-                >>> sorted(Catalog().get_catalog())
-                ['Coastal', 'Flash', 'River', 'River/Coastal']
-
-                ```
-        """
-        return self.datasets
 
     def get_flood_type(self, flood_type: str) -> FloodType:
         """Return the :class:`FloodType` for `flood_type`, with a did-you-mean hint.

@@ -328,7 +328,7 @@ def _load_catalog_data(
     return cached_value
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Collection]):
     """YAML-backed catalog of Sentinel Hub collections and evalscript recipes.
 
     Reads every `*.yaml` under :data:`CATALOG_PATH` on construction and merges
@@ -416,10 +416,6 @@ class Catalog(AbstractCatalog):
             recipes=dict(recipes),
             available_collections=list(av_cols),
         )
-
-    def get_catalog(self) -> dict[str, Collection]:
-        """Return the curated collection map (logical key → :class:`Collection`)."""
-        return self.datasets
 
     def get_collection(self, collection_key: str) -> Collection:
         """Return the :class:`Collection` for `collection_key` (did-you-mean on miss).

@@ -126,7 +126,7 @@ def _parse_parameters(files: list[Path]) -> dict[str, Parameter]:
     return parameters
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Parameter]):
     """Pollutant-parameter catalog for the OpenAQ backend.
 
     Reads the bundled `openaq_data_catalog.yaml` (shipped as package
@@ -247,15 +247,6 @@ class Catalog(AbstractCatalog):
             catalog_path, _CATALOG_CACHE, _parse_parameters, provider="OpenAQ"
         )
         return cls(datasets=dict(parameters))
-
-    def get_catalog(self) -> dict[str, Parameter]:
-        """Return the parameter map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Parameter]: Same object as :attr:`datasets` /
-                :attr:`parameters`.
-        """
-        return self.datasets
 
     def get_parameter(self, name: str) -> Parameter:
         """Resolve a pollutant name to its :class:`Parameter` row.

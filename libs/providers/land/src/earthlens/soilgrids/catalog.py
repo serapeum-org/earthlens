@@ -172,7 +172,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Property]]:
     return _CATALOG_CACHE[key]
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Property]):
     """Property / depth / quantile catalog for the SoilGrids backend.
 
     Merges the bundled `catalog/` directory's per-group `*.yaml` files and
@@ -234,10 +234,6 @@ class Catalog(AbstractCatalog):
             datasets=dict(datasets),
             available_datasets=list(available),
         )
-
-    def get_catalog(self) -> dict[str, Property]:
-        """Return the property map (satisfies the abstract contract)."""
-        return self.datasets
 
     def get(self, property_id: str) -> Property:
         """Return the `Property` for a curated id, did-you-mean on miss.

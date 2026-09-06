@@ -99,7 +99,7 @@ def _parse_argo_catalog(files: list[Path]):
     return families
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Family]):
     """Parameter-family catalog for the Argo backend.
 
     Reads the bundled `argo_data_catalog.yaml` (shipped as package data)
@@ -169,14 +169,6 @@ class Catalog(AbstractCatalog):
             catalog_path, _CATALOG_CACHE, _parse_argo_catalog, provider="Argo"
         )
         return cls(datasets=dict(cached))
-
-    def get_catalog(self) -> dict[str, Family]:
-        """Return the family map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Family]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get_family(self, name: str) -> Family:
         """Return the :class:`Family` for `name`, with a did-you-mean hint.

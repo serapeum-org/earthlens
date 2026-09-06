@@ -210,7 +210,7 @@ def _parse_osm_catalog(files: list[Path]):
     return (datasets, regions)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Named-query catalog for the OpenStreetMap backend.
 
     Reads the bundled `osm_data_catalog.yaml` (shipped as package data) and
@@ -294,14 +294,6 @@ class Catalog(AbstractCatalog):
             catalog_path, _CATALOG_CACHE, _parse_osm_catalog, provider="OSM"
         )
         return cls(datasets=dict(datasets), regions=dict(regions))
-
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the named-query map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Dataset]: Same object as `datasets`.
-        """
-        return self.datasets
 
     def get(self, query_id: str) -> Dataset:
         """Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.

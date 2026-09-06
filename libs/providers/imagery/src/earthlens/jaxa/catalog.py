@@ -191,7 +191,7 @@ class Dataset(BaseModel):
         return self
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Reader for the bundled JAXA dataset catalog.
 
     Subclasses :class:`AbstractCatalog` so the dict-like surface
@@ -281,24 +281,6 @@ class Catalog(AbstractCatalog):
         path = catalog_path if catalog_path is not None else CATALOG_PATH
         payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="jaxa")
         return cls(**payload)
-
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the dataset map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Dataset]: Same object as :attr:`datasets`.
-
-        Examples:
-            - Inspect one of the rows by canonical key:
-                ```python
-                >>> from earthlens.jaxa import Catalog
-                >>> cat = Catalog()
-                >>> cat.get_catalog()["aw3d30"].protocol
-                'jaxa-earth'
-
-                ```
-        """
-        return self.datasets
 
     def get(self, key: str) -> Dataset:
         """Return the :class:`Dataset` for `key` (canonical, alias, or raw id).

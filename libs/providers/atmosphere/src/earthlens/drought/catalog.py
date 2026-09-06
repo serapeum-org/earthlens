@@ -225,7 +225,7 @@ class Dataset(BaseModel):
     license_note: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Dataset catalog for the `earthlens.drought` backend.
 
     Reads the bundled `catalog/` directory (shipped as package data) and
@@ -294,18 +294,6 @@ class Catalog(AbstractCatalog):
             available_datasets=list(available),
             datasets=dict(datasets),
         )
-
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the structural per-dataset map.
-
-        Satisfies the abstract base's contract; the actual parsing is done
-        in `model_post_init`.
-
-        Returns:
-            dict[str, Dataset]: One entry per curated dataset (same object
-                as `datasets`).
-        """
-        return self.datasets
 
     def get(self, dataset_id: str) -> Dataset:
         """Resolve a dataset id to its row, with a did-you-mean on miss.

@@ -31,15 +31,48 @@ class _FakeFtp:
 
     `_fetch_dates_sequential` opens one session up front and hands it to every
     `_api` call, so stubbing `_api` alone still leaves a real anonymous login
-    against `data.chc.ucsb.edu` in the path -- which turns these unit tests into
-    live-network tests. Both cleanup helpers are no-ops here.
+    against `data.chc.ucsb.edu` in the path — which turns these unit tests into
+    live-network tests.
+
+    Records whether it was closed, so a test can assert the loop's session
+    handling rather than only that it did not dial out.
     """
 
+    def __init__(self):
+        self.closed = False
+
     def quit(self) -> None:
-        """Close the session."""
+        """Close the session, as `_close_ftp_quietly` prefers."""
+        self.closed = True
 
     def close(self) -> None:
-        """Drop the session."""
+        """Drop the session, the fallback `_close_ftp_quietly` uses."""
+        self.closed = True
+
+
+@pytest.fixture
+def offline_ftp(monkeypatch):
+    """Replace the module's FTP session helpers so no connection is opened.
+
+    Only `_open_ftp` is replaced. `_reopen_ftp` and `_close_ftp_quietly` are
+    left as the production functions, so the reopen assertion exercises the
+    real code path rather than the fixture's imitation of it — `_reopen_ftp`
+    closes the old session and calls the patched opener, and
+    `_close_ftp_quietly` calls `quit()` on the fake.
+
+    Returns:
+        list[_FakeFtp]: Every session handed out, newest last, so a test can
+        assert the loop reopened after a failure and closed what it opened.
+    """
+    handed_out: list[_FakeFtp] = []
+
+    def _open() -> _FakeFtp:
+        session = _FakeFtp()
+        handed_out.append(session)
+        return session
+
+    monkeypatch.setattr(chc_backend, "_open_ftp", _open)
+    return handed_out
 
 
 class _CountingApiSpy:
@@ -61,13 +94,12 @@ class TestPerDateResilience:
     """`_download_dataset` keeps going past a per-date exception (M1)."""
 
     def test_sequential_path_continues_past_failed_date(
-        self, tmp_path: Path, monkeypatch
+        self, tmp_path: Path, monkeypatch, offline_ftp
     ):
         """A 5-day batch where the 3rd date raises still attempts dates 4 and 5."""
         chirps = _build_chirps(tmp_path)
         spy = _CountingApiSpy()
         monkeypatch.setattr(chirps, "_api", spy)
-        monkeypatch.setattr(chc_backend, "_open_ftp", _FakeFtp)
         # Run the per-dataset loop directly so the test doesn't depend on
         # `download()`'s outer try/except.
         ds = chirps.catalog.datasets["global-daily"]
@@ -79,9 +111,16 @@ class TestPerDateResilience:
             "the per-date loop must visit ALL 5 dates after M1, "
             f"got {len(spy.dates_seen)}: {[d.date() for d in spy.dates_seen]}"
         )
+        assert len(offline_ftp) == 2, (
+            "a failed date must reopen the session before continuing, "
+            f"got {len(offline_ftp)} session(s)"
+        )
+        assert all(session.closed for session in offline_ftp), (
+            "every session handed out must be closed"
+        )
 
     def test_sequential_path_logs_failed_date_summary(
-        self, tmp_path: Path, monkeypatch, caplog
+        self, tmp_path: Path, monkeypatch, caplog, offline_ftp
     ):
         """After M1, the failure summary log names the date count and a sample."""
         import logging
@@ -89,7 +128,6 @@ class TestPerDateResilience:
         chirps = _build_chirps(tmp_path)
         spy = _CountingApiSpy()
         monkeypatch.setattr(chirps, "_api", spy)
-        monkeypatch.setattr(chc_backend, "_open_ftp", _FakeFtp)
         ds = chirps.catalog.datasets["global-daily"]
         var = ds.variables["precipitation"]
         # Bridge loguru to the std `logging` records caplog watches.

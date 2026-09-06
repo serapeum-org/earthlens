@@ -224,7 +224,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[GOESProduct]):
     """Product / domain / satellite catalog for the GOES ABI backend.
 
     Reads the bundled `goes_data_catalog.yaml` (shipped as package data)
@@ -318,14 +318,6 @@ class Catalog(AbstractCatalog):
         path = catalog_path if catalog_path is not None else CATALOG_PATH
         payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="GOES")
         return cls(**payload)
-
-    def get_catalog(self) -> dict[str, GOESProduct]:
-        """Return the product map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, GOESProduct]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get_product(self, key: str) -> GOESProduct:
         """Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.

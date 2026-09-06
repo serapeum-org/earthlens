@@ -114,7 +114,7 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
     return value
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[FloprosDataset]):
     """Catalog for the FLOPROS flood-protection-standard backend.
 
     Reads the bundled `flopros_data_catalog.yaml` (shipped as package data) and
@@ -179,14 +179,6 @@ class Catalog(AbstractCatalog):
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(**_load_catalog_data(catalog_path))
-
-    def get_catalog(self) -> dict[str, FloprosDataset]:
-        """Return the dataset map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, FloprosDataset]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get(self, dataset: str = "flopros") -> FloprosDataset:
         """Resolve a dataset name to its :class:`FloprosDataset` row.

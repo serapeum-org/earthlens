@@ -143,7 +143,7 @@ class Parameter(BaseModel):
     services: list[str] = Field(default_factory=list)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Parameter]):
     """Parameter-code catalog for the USGS Water backend.
 
     Reads the bundled `usgs_water_data_catalog.yaml` (shipped as
@@ -259,15 +259,6 @@ class Catalog(AbstractCatalog):
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(datasets=dict(_load_catalog_data(catalog_path)))
-
-    def get_catalog(self) -> dict[str, Parameter]:
-        """Return the parameter map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Parameter]: Same object as :attr:`datasets` /
-                :attr:`parameters`.
-        """
-        return self.datasets
 
     @property
     def available_parameters(self) -> list[str]:

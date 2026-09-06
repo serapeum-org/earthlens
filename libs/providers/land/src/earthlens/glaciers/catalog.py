@@ -304,7 +304,7 @@ class Region(BaseModel):
         return self
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Dataset + region catalog for the glaciers backend.
 
     Reads the bundled sharded `catalog/` directory (shipped as package data) and
@@ -390,14 +390,6 @@ class Catalog(AbstractCatalog):
             regions=dict(regions),
             available_datasets=list(available),
         )
-
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the dataset map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Dataset]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get(self, dataset_id: str) -> Dataset:
         """Resolve a dataset id to its :class:`Dataset` row.

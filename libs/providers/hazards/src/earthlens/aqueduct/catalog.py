@@ -189,7 +189,7 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
     return value
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[AdminLevel]):
     """Catalog for the Aqueduct riverine flood-risk backend.
 
     Reads the bundled `aqueduct_data_catalog.yaml` (shipped as package data) and
@@ -287,14 +287,6 @@ class Catalog(AbstractCatalog):
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(**_load_catalog_data(catalog_path))
-
-    def get_catalog(self) -> dict[str, AdminLevel]:
-        """Return the admin-level map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, AdminLevel]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get(self, admin_level: str) -> AdminLevel:
         """Resolve an admin-level name to its :class:`AdminLevel` row.

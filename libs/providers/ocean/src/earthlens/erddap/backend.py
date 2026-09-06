@@ -432,7 +432,22 @@ class ERDDAP(AbstractDataSource):
         # (in pyramids or the user's own read), so `expect_magic` validates
         # the leading bytes and discards the partial write instead.
         try:
-            http.download(url, dest, progress=False, expect_magic=_NETCDF_MAGIC)
+            http.download(
+                url,
+                dest,
+                progress=False,
+                expect_magic=_NETCDF_MAGIC,
+                # `Accept-Encoding: gzip, deflate` opts back out of the
+                # `identity` default `download` otherwise stamps on. That default
+                # exists so the body can be checked against its `Content-Length`,
+                # but ERDDAP streams griddap chunked and sends no `Content-Length`
+                # at all, so here `identity` buys no check — it only costs wire
+                # bytes (measured on a 5x5-degree subset: 2.91 MB uncompressed
+                # against 1.83 MB gzipped from CoastWatch, 190 KB against 136 KB
+                # from Upwell). `requests` decodes transparently, so `expect_magic`
+                # still sees real NetCDF.
+                headers={"Accept-Encoding": "gzip, deflate"},
+            )
         except requests.exceptions.HTTPError as exc:
             raise ValueError(
                 f"ERDDAP griddap request for {row.dataset_id!r} failed over "

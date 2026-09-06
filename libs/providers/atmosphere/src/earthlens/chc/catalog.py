@@ -623,7 +623,7 @@ def _load_catalog_directory(
     return available, regions_map, structural
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Variable catalog for the CHIRPS FTP data source.
 
     Reads the per-family `catalog/*.yaml` files (shipped as package data) and
@@ -739,29 +739,6 @@ class Catalog(AbstractCatalog):
             available_regions=dict(regions_map),
             datasets=dict(datasets),
         )
-
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the structural per-dataset map.
-
-        Satisfies the abstract base's contract; the actual parsing
-        is done in :func:`model_post_init`.
-
-        Returns:
-            dict[str, Dataset]: One entry per CHIRPS dataset. Same
-            object as :attr:`datasets`.
-
-        Examples:
-            - Inspect the dataset map:
-
-                ```python
-                >>> from earthlens.chc import Catalog
-                >>> mapping = Catalog().get_catalog()
-                >>> "global-daily" in mapping
-                True
-
-                ```
-        """
-        return self.datasets
 
     def get_variable(self, dataset_key: str, variable_name: str) -> Variable:
         """Return the :class:`Variable` for a `(dataset, variable)` pair.

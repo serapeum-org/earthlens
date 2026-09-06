@@ -183,7 +183,7 @@ class Source(BaseModel):
         return self
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Source]):
     """Source catalog for the NSI backend.
 
     Reads the bundled `nsi_data_catalog.yaml` (shipped as package data) and
@@ -242,14 +242,6 @@ class Catalog(AbstractCatalog):
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(datasets=dict(_load_catalog_data(catalog_path)))
-
-    def get_catalog(self) -> dict[str, Source]:
-        """Return the source map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Source]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get(self, source_id: str) -> Source:
         """Resolve a source name to its :class:`Source` row.

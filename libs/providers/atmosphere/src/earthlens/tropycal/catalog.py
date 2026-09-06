@@ -169,7 +169,7 @@ class Basin(BaseModel):
     fields: dict[str, TrackField] = Field(default_factory=dict)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Basin]):
     """Basin -> track-field catalog for the Tropycal backend.
 
     Reads the bundled `tropycal_data_catalog.yaml` (shipped as package
@@ -250,14 +250,6 @@ class Catalog(AbstractCatalog):
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         basins = _load_basins(catalog_path)
         return cls(datasets=dict(basins), available_datasets=sorted(basins))
-
-    def get_catalog(self) -> dict[str, Basin]:
-        """Return the basin map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Basin]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get_basin(self, code: str) -> Basin:
         """Return the :class:`Basin` for `code`, with a did-you-mean hint.

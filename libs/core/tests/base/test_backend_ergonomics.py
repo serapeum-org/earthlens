@@ -4,6 +4,10 @@ import inspect
 
 import pytest
 
+from earthlens.base.abstractdatasource import (
+    _ERGONOMIC_ANNOTATIONS,
+    AbstractDataSource,
+)
 from earthlens.chc import CHIRPS
 
 
@@ -62,13 +66,24 @@ class TestBackendDirectErgonomics:
         with pytest.raises(ValueError, match="buffer= only applies"):
             self._chc(tmp_path, buffer=0.5)
 
-    def test_signature_introspection_preserved(self):
-        """The wrapper keeps the backend's real signature for introspection."""
+    def test_signature_keeps_native_params_and_adds_the_ergonomic_ones(self):
+        """The wrapper preserves the backend's own parameters and appends its own.
+
+        It deliberately no longer reports the *unwrapped* signature: the four
+        kwargs the wrapper accepts were invisible to `help()` and to IDE
+        completion while it did.
+        """
         params = inspect.signature(CHIRPS.__init__).parameters
-        assert "variables" in params and "lat_lim" in params
+        assert "variables" in params, f"variables must survive, got {list(params)}"
+        assert "lat_lim" in params, f"lat_lim must survive, got {list(params)}"
         assert not any(p.kind == p.VAR_KEYWORD for p in params.values()), (
-            "wrapped __init__ must still expose the real (no **kwargs) signature"
+            "the wrapper must not degrade the signature to **kwargs"
         )
+        for name in ("aoi", "buffer", "cadence", "dataset"):
+            assert name in params, f"{name} should be advertised, got {list(params)}"
+            assert params[name].kind is inspect.Parameter.KEYWORD_ONLY, (
+                f"{name} must be keyword-only"
+            )
 
 
 class TestBackendPolygonMask:
@@ -266,3 +281,65 @@ class TestNativeAoiBackendUnaffected:
             path=str(tmp_path),
         )
         assert backend is not None
+
+
+class _DeclaresEveryReachableKwarg(AbstractDataSource):
+    """A backend naming every ergonomic kwarg the wrapper could reach it with.
+
+    `buffer=` is unreachable because the native `aoi=` is interpreted by the
+    backend, so between `existing` and that rule there is nothing left to
+    synthesise. No real backend is shaped this way yet; the wrapper still has
+    to leave such a signature exactly as declared.
+    """
+
+    def __init__(self, aoi=None, cadence=None, dataset=None, variables=None):
+        """Accept the four names natively and record nothing."""
+
+
+class _AddressedByFacets(AbstractDataSource):
+    """A backend keyed by facet arguments, declaring neither `variables` nor `**kw`."""
+
+    def __init__(self, variable_id=None, source_id=None):
+        """Accept only facet keywords."""
+
+
+class TestErgonomicSignatureSynthesis:
+    """What `__init_subclass__` appends to a backend's own signature, and when."""
+
+    def test_a_backend_declaring_everything_gains_no_synthesized_parameter(self):
+        """Nothing is appended, and the declared signature is passed through intact."""
+        init = _DeclaresEveryReachableKwarg.__init__
+        assert init._ergonomic_params == frozenset(), (
+            f"nothing should be synthesised, got {sorted(init._ergonomic_params)}"
+        )
+        params = inspect.signature(init).parameters
+        assert list(params) == ["self", "aoi", "cadence", "dataset", "variables"], (
+            f"the declared signature must survive verbatim, got {list(params)}"
+        )
+        assert "buffer" not in params, (
+            "buffer= is meaningless on a backend that interprets aoi= itself"
+        )
+        for name in ("aoi", "cadence", "dataset"):
+            assert params[name].kind is inspect.Parameter.POSITIONAL_OR_KEYWORD, (
+                f"{name} must keep the kind the backend declared, not become "
+                f"keyword-only"
+            )
+
+    def test_a_facet_addressed_backend_is_not_offered_dataset(self):
+        """`dataset=` would have nowhere to land, so it is withheld; the rest is not."""
+        init = _AddressedByFacets.__init__
+        assert init._ergonomic_params == {"aoi", "buffer", "cadence"}, (
+            f"got {sorted(init._ergonomic_params)}"
+        )
+        params = inspect.signature(init).parameters
+        assert "dataset" not in params, "dataset= cannot reach a facet-keyed backend"
+        assert list(params)[:3] == ["self", "variable_id", "source_id"], (
+            f"the native parameters must come first, got {list(params)}"
+        )
+        for name in ("aoi", "buffer", "cadence"):
+            assert params[name].kind is inspect.Parameter.KEYWORD_ONLY, (
+                f"{name} must be advertised keyword-only"
+            )
+            assert init.__annotations__[name] is _ERGONOMIC_ANNOTATIONS[name], (
+                f"{name} must carry the same annotation the signature advertises"
+            )

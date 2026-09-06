@@ -157,7 +157,18 @@ class NSI(AbstractDataSource):
         self._filters = dict(filters) if filters else {}
         self._max_records = max_records
         self._output_format: OutputFormat = output_format
-        self._http: HttpClient = HttpClient(session=session)
+        # The structures endpoint is queried with a `POST` carrying the AOI
+        # polygon and answers with GeoJSON — a read with no side effect, so
+        # replaying it after a transient `5xx` or a dropped connection cannot
+        # double-submit anything. Without this the client would decline to
+        # retry it, since a `POST` is otherwise assumed unsafe to repeat.
+        #
+        # Set on the client rather than per call because there is no per-call
+        # override, and it is equivalent here: every other request this client
+        # makes is a `GET`, which the idempotency gate never blocks. A future
+        # `POST` on this client would inherit the promise, so check it still
+        # holds before adding one.
+        self._http: HttpClient = HttpClient(session=session, retry_unsafe_methods=True)
 
         # G1 — the per-instance output shape comes from the resolved source.
         self.OUTPUT_KIND = self._source.output_kind

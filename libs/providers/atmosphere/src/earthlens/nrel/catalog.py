@@ -133,7 +133,7 @@ class Product(BaseModel):
     description: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Product]):
     """Product catalog for the NREL backend.
 
     Reads the bundled `nrel_data_catalog.yaml` (shipped as package data) and
@@ -228,14 +228,6 @@ class Catalog(AbstractCatalog):
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(datasets=dict(_load_catalog_data(catalog_path)))
-
-    def get_catalog(self) -> dict[str, Product]:
-        """Return the product map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Product]: Same object as `datasets` / `products`.
-        """
-        return self.datasets
 
     def available(self) -> list[str]:
         """The sorted list of curated product ids.

@@ -476,7 +476,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[MswepProduct]):
     """Product catalog for the MSWEP / MSWX backend.
 
     Reads the bundled `mswep_data_catalog.yaml` (shipped as package
@@ -570,14 +570,6 @@ class Catalog(AbstractCatalog):
         path = catalog_path if catalog_path is not None else CATALOG_PATH
         payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="MSWEP")
         return cls(**payload)
-
-    def get_catalog(self) -> dict[str, MswepProduct]:
-        """Return the product map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, MswepProduct]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get_product(self, key: str) -> MswepProduct:
         """Return the :class:`MswepProduct` for `key`, with a did-you-mean hint.

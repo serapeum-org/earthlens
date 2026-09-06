@@ -141,7 +141,7 @@ class Provider(BaseModel):
     docs_url: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Provider]):
     """Provider catalog for the FDSN seismic-event backend.
 
     Reads the bundled `fdsn_data_catalog.yaml` (shipped as package
@@ -247,11 +247,3 @@ class Catalog(AbstractCatalog):
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         rows = _load_catalog_data(catalog_path)
         return cls(datasets=dict(rows))
-
-    def get_catalog(self) -> dict[str, Provider]:
-        """Return the network map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Provider]: Same object as :attr:`datasets`.
-        """
-        return self.datasets

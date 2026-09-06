@@ -283,7 +283,7 @@ class Dataset(BaseModel):
         )
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Loader for the bundled EM-DAT dataset catalog.
 
     Reads `emdat_data_catalog.yaml` on construction (`Catalog()`) and exposes
@@ -366,14 +366,6 @@ class Catalog(AbstractCatalog):
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         datasets, vocabularies = _load_catalog_data(catalog_path)
         return cls(datasets=dict(datasets), hazard_vocabularies=dict(vocabularies))
-
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the dataset map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Dataset]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get(self, dataset_id: str) -> Dataset:
         """Resolve a dataset id to its :class:`Dataset` row.

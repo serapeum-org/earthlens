@@ -125,7 +125,7 @@ def _parse_datasets(files: list[Path]) -> dict[str, DEMDataset]:
     return datasets
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[DEMDataset]):
     """Dataset catalog for the DEM backend.
 
     Reads the bundled `dem_data_catalog.yaml` (shipped as package data)
@@ -203,11 +203,3 @@ class Catalog(AbstractCatalog):
         path = catalog_path if catalog_path is not None else CATALOG_PATH
         rows = load_catalog(path, _CATALOG_CACHE, _parse_datasets, provider="DEM")
         return cls(datasets=dict(rows))
-
-    def get_catalog(self) -> dict[str, DEMDataset]:
-        """Return the dataset map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, DEMDataset]: Same object as :attr:`datasets`.
-        """
-        return self.datasets

@@ -333,7 +333,7 @@ class EumetsatDataset(BaseModel):
     temporal: TemporalCoverage = Field(default_factory=TemporalCoverage)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[EumetsatDataset]):
     """Dataset catalog for the EUMETSAT Data Store backend.
 
     Reads the bundled `catalog/` directory (shipped as package data) and
@@ -400,18 +400,6 @@ class Catalog(AbstractCatalog):
             available_datasets=list(available),
             datasets=dict(datasets),
         )
-
-    def get_catalog(self) -> dict[str, EumetsatDataset]:
-        """Return the structural per-dataset map.
-
-        Satisfies the abstract base's contract; the actual parsing is
-        done in `model_post_init`.
-
-        Returns:
-            dict[str, EumetsatDataset]: One entry per curated dataset.
-                Same object as `datasets`.
-        """
-        return self.datasets
 
     def resolve(
         self, key: str, group: DataStoreGroup | str | None = None

@@ -119,7 +119,7 @@ def _parse_pollutants(files: list[Path]) -> dict[str, Pollutant]:
     return pollutants
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Pollutant]):
     """Pollutant catalog for the AirNow backend.
 
     Reads the bundled `airnow_data_catalog.yaml` (shipped as package
@@ -214,15 +214,6 @@ class Catalog(AbstractCatalog):
             catalog_path, _CATALOG_CACHE, _parse_pollutants, provider="AirNow"
         )
         return cls(datasets=dict(pollutants))
-
-    def get_catalog(self) -> dict[str, Pollutant]:
-        """Return the pollutant map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Pollutant]: Same object as `datasets` /
-                `pollutants`.
-        """
-        return self.datasets
 
     def get_pollutant(self, name: str) -> Pollutant:
         """Resolve a pollutant name to its `Pollutant` row.

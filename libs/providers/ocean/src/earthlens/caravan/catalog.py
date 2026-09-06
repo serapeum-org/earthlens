@@ -441,7 +441,7 @@ class Extension(BaseModel):
         return release
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Extension]):
     """Extension and variable catalog for the Caravan backend.
 
     Reads the bundled `caravan_data_catalog.yaml` (shipped as package data) and
@@ -518,14 +518,6 @@ class Catalog(AbstractCatalog):
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(**_load_catalog_data(path))
-
-    def get_catalog(self) -> dict[str, Extension]:
-        """Return the extension map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Extension]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     @property
     def available_extensions(self) -> list[str]:

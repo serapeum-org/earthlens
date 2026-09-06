@@ -435,7 +435,7 @@ class EarthdataDataset(BaseModel):
     temporal: TemporalCoverage = Field(default_factory=TemporalCoverage)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[EarthdataDataset]):
     """Dataset catalog for the NASA Earthdata backend.
 
     Reads the bundled `catalog/` directory (shipped as package data)
@@ -640,18 +640,6 @@ class Catalog(AbstractCatalog):
                 f"{provider_code!r} is not a registered CMR provider. "
                 f"Known: {sorted(self.daacs)}.{hint}"
             ) from None
-
-    def get_catalog(self) -> dict[str, EarthdataDataset]:
-        """Return the structural per-dataset map.
-
-        Satisfies the abstract base's contract; the actual parsing is
-        done in :func:`model_post_init`.
-
-        Returns:
-            dict[str, EarthdataDataset]: One entry per curated dataset.
-                Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def resolve(self, key: str, daac: str | None = None) -> EarthdataDataset:
         """Resolve a dataset key (optionally disambiguated by DAAC).

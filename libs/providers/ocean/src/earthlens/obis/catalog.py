@@ -119,7 +119,7 @@ class Species(BaseModel):
     title: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Species]):
     """Species catalog for the OBIS occurrence backend.
 
     Reads the bundled `obis_data_catalog.yaml` (shipped as package data)
@@ -192,14 +192,6 @@ class Catalog(AbstractCatalog):
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         rows, available = _load_catalog_data(catalog_path)
         return cls(datasets=dict(rows), available_datasets=list(available))
-
-    def get_catalog(self) -> dict[str, Species]:
-        """Return the species map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Species]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def resolve_scientific_name(self, selector: str) -> str:
         """Resolve a `variables` selector to an OBIS `scientificname`.

@@ -199,7 +199,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Cmip6Variable]):
     """Config + curated-vocabulary catalog for the CMIP6 backend.
 
     Reads the bundled `cmip6_data_catalog.yaml` (shipped as package data) and
@@ -331,14 +331,6 @@ class Catalog(AbstractCatalog):
                     f"{path} {model.__name__} {key!r} failed validation:\n{exc}"
                 ) from exc
         return out
-
-    def get_catalog(self) -> dict[str, Cmip6Variable]:
-        """Return the curated variable map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Cmip6Variable]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get_experiment(self, key: str) -> Experiment:
         """Return the :class:`Experiment` for `key`, with a did-you-mean hint.

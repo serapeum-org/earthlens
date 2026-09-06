@@ -246,7 +246,7 @@ def _parse_overture_catalog(files: list[Path]):
     return (themes, releases, available)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Theme]):
     """Theme/type catalog for the Overture Maps backend.
 
     Reads the bundled `overture_data_catalog.yaml` (shipped as package
@@ -339,14 +339,6 @@ class Catalog(AbstractCatalog):
             available_releases=list(releases),
             available_datasets=list(available),
         )
-
-    def get_catalog(self) -> dict[str, Theme]:
-        """Return the theme map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Theme]: Same object as `datasets`.
-        """
-        return self.datasets
 
     def get_theme(self, name: str) -> Theme:
         """Return the `Theme` for `name`, with a did-you-mean hint on miss.

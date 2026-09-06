@@ -400,7 +400,7 @@ class Product(BaseModel):
         return DataFrame(rows, columns=["band", "values", "color", "alpha"])
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Product]):
     """Product / availability catalog for the GHSL backend.
 
     Merges the bundled `catalog/` directory's per-family `*.yaml` files and
@@ -477,10 +477,6 @@ class Catalog(AbstractCatalog):
             datasets=dict(products),
             available_datasets=list(available),
         )
-
-    def get_catalog(self) -> dict[str, Product]:
-        """Return the product map (satisfies the abstract contract)."""
-        return self.datasets
 
     def get(self, code: str) -> Product:
         """Return the `Product` for a canonical code, did-you-mean on miss.

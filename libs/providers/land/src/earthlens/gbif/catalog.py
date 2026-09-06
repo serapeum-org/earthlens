@@ -154,7 +154,7 @@ class Taxon(BaseModel):
     rank: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Taxon]):
     """Taxon catalog for the GBIF occurrence backend.
 
     Reads the bundled `gbif_data_catalog.yaml` (shipped as package data)
@@ -237,14 +237,6 @@ class Catalog(AbstractCatalog):
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         rows, available = _load_catalog_data(catalog_path)
         return cls(datasets=dict(rows), available_datasets=list(available))
-
-    def get_catalog(self) -> dict[str, Taxon]:
-        """Return the taxon map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Taxon]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def resolve_taxon_key(self, selector: str | int) -> int:
         """Resolve a `variables` selector to a GBIF backbone `taxonKey`.

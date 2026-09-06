@@ -231,7 +231,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     return {"datasets": products, "configurations": configurations}
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[NWMProduct]):
     """Product + configuration catalog for the NWM backend.
 
     Reads the bundled `nwm_data_catalog.yaml` (shipped as package data)
@@ -323,14 +323,6 @@ class Catalog(AbstractCatalog):
         path = catalog_path if catalog_path is not None else CATALOG_PATH
         payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="NWM")
         return cls(**payload)
-
-    def get_catalog(self) -> dict[str, NWMProduct]:
-        """Return the product map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, NWMProduct]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get_product(self, key: str) -> NWMProduct:
         """Return the :class:`NWMProduct` for `key`, with a did-you-mean hint.

@@ -130,7 +130,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[RadklimProduct]):
     """Catalog of DWD RADKLIM / RADOLAN products.
 
     Reads the bundled `radklim_data_catalog.yaml` (shipped as package data) and
@@ -212,14 +212,6 @@ class Catalog(AbstractCatalog):
         path = catalog_path if catalog_path is not None else CATALOG_PATH
         payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="RADKLIM")
         return cls(**payload)
-
-    def get_catalog(self) -> dict[str, RadklimProduct]:
-        """Return the product map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, RadklimProduct]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get_product(self, key: str) -> RadklimProduct:
         """Return the :class:`RadklimProduct` for `key`, with a did-you-mean hint.

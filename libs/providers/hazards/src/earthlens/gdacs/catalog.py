@@ -111,7 +111,7 @@ def _parse_hazard_types(files: list[Path]) -> dict[str, HazardType]:
     return hazards
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[HazardType]):
     """Hazard-type catalog for the GDACS backend.
 
     Reads the bundled `gdacs_data_catalog.yaml` (shipped as package
@@ -187,14 +187,6 @@ class Catalog(AbstractCatalog):
             catalog_path, _CATALOG_CACHE, _parse_hazard_types, provider="GDACS"
         )
         return cls(datasets=dict(hazards))
-
-    def get_catalog(self) -> dict[str, HazardType]:
-        """Return the hazard-type map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, HazardType]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get_hazard(self, code: str) -> HazardType:
         """Return the :class:`HazardType` for `code`, with a did-you-mean hint.

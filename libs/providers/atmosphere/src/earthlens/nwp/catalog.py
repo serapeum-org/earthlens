@@ -251,7 +251,7 @@ class NWPModel(BaseModel):
     description: str | None = None
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[NWPModel]):
     """Model catalog for the NWP backend.
 
     Reads the bundled `nwp_data_catalog.yaml` (shipped as package data)
@@ -295,10 +295,6 @@ class Catalog(AbstractCatalog):
                 the bundled catalog.
         """
         return {"datasets": _load_catalog_data(CATALOG_PATH)}
-
-    def get_catalog(self) -> dict[str, NWPModel]:
-        """Return the structural per-model map (satisfies the base contract)."""
-        return self.datasets
 
     def get_model(self, model_key: str) -> NWPModel:
         """Resolve a model key to its :class:`NWPModel` row.

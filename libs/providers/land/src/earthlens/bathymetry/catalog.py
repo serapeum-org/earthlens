@@ -241,7 +241,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
     return _CATALOG_CACHE[key]
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """DEM endpoint / transport catalog for the bathymetry backend.
 
     Merges the bundled `catalog/` directory's per-family `*.yaml` files and
@@ -299,10 +299,6 @@ class Catalog(AbstractCatalog):
             datasets=dict(datasets),
             available_datasets=list(available),
         )
-
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the dataset map (satisfies the abstract contract)."""
-        return self.datasets
 
     def get(self, dataset_id: str) -> Dataset:
         """Return the `Dataset` for a curated id, did-you-mean on miss.

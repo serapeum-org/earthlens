@@ -10,7 +10,7 @@ from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, cast
 
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -607,6 +607,99 @@ def _passed_aggregate(function: Any, args: tuple[Any, ...], kw: dict[str, Any]) 
     return bound.arguments.get("aggregate") is not None
 
 
+#: Annotations for the parameters `__init_subclass__` appends to a backend's
+#: signature. Declared once so `__signature__` and `__annotations__` cannot
+#: drift apart, and typed as loosely as the wrapper actually accepts: `aoi`
+#: takes a bbox, a point, a shapely geometry, GeoJSON, WKT or a GeoDataFrame.
+#:
+#: Real objects, not strings, and the reason is `__wrapped__` rather than
+#: `__module__`. `functools.wraps` points the wrapper's `__wrapped__` at the
+#: backend's own `__init__`, and `typing.get_type_hints` follows it, resolving
+#: against the *wrapped* function's `__globals__` — the backend module, where
+#: `Any` is usually not imported. `pydantic.validate_call` gets there by a
+#: different route, reading `sys.modules[fn.__module__]`, which `wraps` also
+#: rewrites to the backend. Verified on 3.14.6: swapping one entry for its
+#: string spelling makes `typing.get_type_hints(backend.__init__)` raise
+#: `NameError: name 'Any' is not defined`, and passing
+#: `globalns=wrapper.__globals__` explicitly makes it resolve again.
+_ERGONOMIC_ANNOTATIONS: dict[str, Any] = {
+    "aoi": Any,
+    "buffer": float | None,
+    "cadence": str | None,
+    "dataset": str | None,
+}
+
+
+def native_parameters(backend_cls: type) -> frozenset[str]:
+    """Parameter names a backend's own `__init__` declares.
+
+    The `__init_subclass__` wrapper advertises `aoi`, `buffer`, `cadence` and
+    `dataset` on every backend's signature so they are discoverable, which means
+    a plain `"aoi" in inspect.signature(cls.__init__).parameters` can no longer
+    distinguish a backend that interprets `aoi=` *itself* (WorldPop's ISO3 /
+    GeoDataFrame form) from one the wrapper resolves for. Callers that need that
+    distinction ask here instead of introspecting directly.
+
+    Deliberately uncached, unlike the sibling `_parameters` helper. Keying a
+    cache on the class would retain every class ever passed, and the premise
+    that a backend's parameters cannot change is not quite true here:
+    `__init_subclass__` replaces `__init__`, and a caller may patch it again,
+    after which a cached answer would be wrong. `inspect.signature` is cheap
+    enough that neither risk is worth taking.
+
+    Args:
+        backend_cls: An `AbstractDataSource` subclass.
+
+    Returns:
+        frozenset[str]: The declared names, minus the ergonomic ones the
+        wrapper synthesised. Empty when the signature cannot be read.
+
+    Examples:
+        - CHIRPS takes `aoi=` only through the wrapper, so it is not native
+          even though the signature advertises it:
+            ```python
+            >>> import inspect
+            >>> from earthlens.base.abstractdatasource import native_parameters
+            >>> from earthlens.chc import CHIRPS
+            >>> "aoi" in inspect.signature(CHIRPS.__init__).parameters
+            True
+            >>> "aoi" in native_parameters(CHIRPS)
+            False
+            >>> sorted(native_parameters(CHIRPS))[:3]
+            ['end', 'fmt', 'lat_lim']
+            >>> "self" in native_parameters(CHIRPS)
+            False
+
+            ```
+        - WorldPop declares its own richer `aoi=`, so it reports as native
+          and the facade forwards the value untouched:
+            ```python
+            >>> from earthlens.base.abstractdatasource import native_parameters
+            >>> from earthlens.worldpop import WorldPop
+            >>> "aoi" in native_parameters(WorldPop)
+            True
+
+            ```
+    """
+    # `object.__init__` means every real class answers this, so the `None`
+    # branch guards only a class that shadows `__init__` with a non-callable —
+    # which the tests construct deliberately. It is kept because this is a
+    # public helper answering a question about arbitrary input.
+    init = getattr(backend_cls, "__init__", None)
+    if init is None:
+        return frozenset()
+    synthetic: frozenset[str] = getattr(init, "_ergonomic_params", frozenset())
+    try:
+        declared = frozenset(inspect.signature(init).parameters)
+    except (TypeError, ValueError):
+        return frozenset()
+    # `self` is not something a caller can pass. The `inspect.signature(cls)`
+    # call this function replaced dropped it implicitly; reading `__init__`
+    # directly does not, and the question here is "what does this backend
+    # accept?".
+    return declared - synthetic - {"self"}
+
+
 def _describe_remote_product(product: Any) -> str:
     """Render a product for the :meth:`AbstractDataSource._run_items` log lines.
 
@@ -837,7 +930,8 @@ class AbstractDataSource(ABC):
         orig = cls.__dict__.get("__init__")
         if orig is None or getattr(orig, "_ergonomic", False):
             return
-        params = inspect.signature(orig).parameters
+        native_signature = inspect.signature(orig)
+        params = native_signature.parameters
         native_aoi = "aoi" in params
         native_dataset = "dataset" in params
 
@@ -886,6 +980,63 @@ class AbstractDataSource(ABC):
                 self._attach_clip_geometry(clip_geometry)
 
         __init__._ergonomic = True  # type: ignore[attr-defined]
+        # `functools.wraps` copies `__wrapped__`, and `inspect.signature`
+        # follows it by default — so without this the four parameters the
+        # wrapper adds are invisible to `help()`, to IDE autocomplete and to
+        # every signature-driven tool, on a backend that accepts them happily
+        # at runtime. Re-advertise them as keyword-only, appended to whatever
+        # the backend already declares, and drop any the backend names itself
+        # so a native `aoi=` / `dataset=` is not listed twice.
+        existing = set(params)
+        # A backend that declares neither `variables` nor `**kwargs` addresses
+        # its data by facet keywords (cmip6's `variable_id=` / `source_id=`), so
+        # `dataset=` can never reach anything there; and `buffer=` only shapes a
+        # point `aoi=` that the wrapper itself resolves, so it is meaningless on
+        # a backend that interprets `aoi=` natively. Advertising either would
+        # promise a parameter whose only possible outcome is an error.
+        facet_only = "variables" not in existing and not any(
+            p.kind is inspect.Parameter.VAR_KEYWORD for p in params.values()
+        )
+        unsupported = set()
+        if facet_only:
+            unsupported.add("dataset")
+        if native_aoi:
+            unsupported.add("buffer")
+        extra = [
+            inspect.Parameter(
+                name,
+                inspect.Parameter.KEYWORD_ONLY,
+                default=None,
+                annotation=_ERGONOMIC_ANNOTATIONS[name],
+            )
+            for name in ("aoi", "buffer", "cadence", "dataset")
+            if name not in existing and name not in unsupported
+        ]
+        __init__._ergonomic_params = frozenset(  # type: ignore[attr-defined]
+            p.name for p in extra
+        )
+        if extra:
+            declared = list(params.values())
+            # Keyword-only parameters must precede any **kwargs.
+            var_kw = [p for p in declared if p.kind is inspect.Parameter.VAR_KEYWORD]
+            head = [p for p in declared if p.kind is not inspect.Parameter.VAR_KEYWORD]
+            __init__.__signature__ = native_signature.replace(  # type: ignore[attr-defined]
+                parameters=head + extra + var_kw
+            )
+            # `functools.wraps` gave the wrapper the native's annotations —
+            # under PEP 649 (3.14) by copying `__annotate__`, so the two share
+            # one source rather than a dict. Without this assignment the
+            # signature and the annotations disagree and anything that pairs
+            # them (pydantic `validate_call`, signature-driven CLI builders)
+            # sees an untyped parameter. Rebinding rather than mutating is what
+            # makes it safe: reading `__annotations__` materialises a dict from
+            # the shared `__annotate__`, and assigning a new one detaches the
+            # wrapper (3.14 sets its `__annotate__` to `None`), so the native
+            # function keeps the annotations it declared.
+            __init__.__annotations__ = {
+                **__init__.__annotations__,
+                **{p.name: _ERGONOMIC_ANNOTATIONS[p.name] for p in extra},
+            }
         cls.__init__ = __init__  # type: ignore[method-assign]
 
     @classmethod
@@ -1083,10 +1234,13 @@ class AbstractDataSource(ABC):
 
         The shared form of the skip-if-exists check eight backends each
         hand-rolled as `dest.exists() and dest.stat().st_size > 0`. Routing
-        them through one helper means a re-run skips what it already has, a
-        failed multi-gigabyte fetch resumes instead of restarting from zero,
-        and — where the caller knows the size — a *truncated* file is no
-        longer mistaken for a finished one.
+        them through one helper means a re-run skips what it already has — so
+        a multi-granule job that died halfway carries on from the granule it
+        reached, rather than re-fetching the ones already written — and, where
+        the caller knows the size, a *truncated* file is no longer mistaken
+        for a finished one. This is resumption at the level of whole files,
+        and is a separate mechanism from `HttpClient.download`'s `resume=`,
+        which continues a broken transfer *within* a single file.
 
         "Non-empty" is a weak completeness signal on its own: it is only
         trustworthy because the shared downloader writes to a sibling
@@ -1103,13 +1257,11 @@ class AbstractDataSource(ABC):
                 Wire a backend's `force=` download kwarg through here.
 
         Returns:
-            bool: `True` when `dest` can be reused as-is.
-
-        Examples:
-            - The check is a pure function of the path, so it can be exercised
-              on any backend instance. `libs/core/tests/base/test_hook_defaults.py`
-              covers the full matrix: missing, empty, written, wrong size,
-              exact size, a directory, and `force=True`.
+            bool: `True` when `dest` can be reused as-is. A missing path, a
+            path that is not a regular file (a directory reports a size too,
+            and on Windows that size is `0`), a size that misses an
+            `expected_size`, an empty file when no size was given, and
+            `force=True` all report `False`.
         """
         if force:
             return False
@@ -2271,32 +2423,71 @@ class AbstractDataSource(ABC):
         return results
 
 
-class AbstractCatalog(BaseModel):
+#: The row type a concrete catalog holds. Providers parameterise
+#: :class:`AbstractCatalog` with their own pydantic row model
+#: (`AbstractCatalog[Dataset]`), so `datasets`, `get_catalog` and
+#: `get_dataset` keep that type instead of degrading to `Any`. Left
+#: unparameterised the catalog still works; it is simply untyped in the rows.
+RowT = TypeVar("RowT")
+
+
+#: Concrete catalog classes already warned about an empty `datasets`, keyed by
+#: `type(self)` so every instance of one subclass shares a single warning. An
+#: empty default catalog is a property of the class rather than of an instance,
+#: and :attr:`AbstractCatalog.catalog` recomputes `get_catalog()` on every read,
+#: so warning per call would put one line in the log per loop iteration. Never
+#: pruned — it holds at most one entry per catalog class defined in the process.
+_WARNED_EMPTY_CATALOGS: set[type] = set()
+
+
+class AbstractCatalog(BaseModel, Generic[RowT]):
     """Abstract base class for per-data-source variable catalogs.
 
     Subclasses load a backend-specific catalog (a YAML file, an
-    in-code dict, or a remote query) in :meth:`get_catalog` and
-    expose individual entries via :meth:`get_variable`. The
-    :func:`model_post_init` hook eagerly populates :attr:`catalog`
-    after pydantic validation runs, so subclasses can treat the
-    catalog as a mapping thereafter without writing their own
-    `__init__`.
+    in-code dict, or a remote query) and expose its entries through the
+    dict-like surface below — `len`, `in`, `[key]`, iteration and
+    :meth:`get_dataset` — plus :meth:`get_variable` for the two-level
+    catalogs. The :meth:`model_post_init` hook fills the row fields from
+    :meth:`_autoload` only while the field is still falsy, so `Catalog()`
+    reads from disk and so does `Catalog(datasets={})` — an empty mapping
+    is indistinguishable from an absent one here. Only a non-empty
+    `Catalog(datasets=...)` is kept as handed, and no subclass writes its
+    own `__init__`.
+
+    Generic in `RowT`, the row model the backend stores. Parameterising
+    the base — `class Catalog(AbstractCatalog[Dataset])` — keeps
+    :attr:`datasets`, :meth:`get_catalog`, :meth:`get_dataset` and
+    `[key]` typed as that model instead of degrading to `Any`. Leaving it
+    unparameterised is allowed and changes nothing at runtime.
 
     Subclasses pass through pydantic's normal `BaseModel.__init__`
     — declare any backend-specific construction parameters as
-    pydantic fields rather than `__init__` arguments. Override
-    :meth:`get_catalog` (and optionally :meth:`get_variable`); the
-    base implementations raise :class:`NotImplementedError` to flag
-    a missing override at first use rather than silently returning
-    an empty mapping.
+    pydantic fields rather than `__init__` arguments.
+
+    :meth:`get_catalog` defaults to returning :attr:`datasets`, which is
+    where every backend keeps its rows and what the dict surface below
+    already reads, so a subclass storing them there needs no override.
+    **A subclass whose rows live in another field must override it** —
+    otherwise `get_catalog()` and the :attr:`catalog` property report an
+    empty mapping rather than failing, and a catalog that silently has no
+    entries is harder to notice than one that raises. :meth:`get_variable`
+    still raises :class:`NotImplementedError`, since there is no sensible
+    default for a per-dataset variable level.
 
     Attributes:
-        catalog: Read-only view of the mapping returned by
-            :meth:`get_catalog`. Populated post-init; defaults to an
-            empty dict so the field is always present. Type and
-            shape are backend-specific (a concrete subclass typically
-            stores typed value objects, e.g. `dict[str, Variable]`
-            for the ECMWF backend).
+        datasets: The curated `{key: row}` mapping every backend keeps its
+            rows in, and what the dict-like surface reads. Rows are the
+            backend's own typed model — `dict[str, Dataset]` for the ECMWF
+            and GEE catalogs, `dict[str, Pollutant]` for the air-quality
+            ones — which is what `RowT` names.
+        available_datasets: Informational index of the dataset ids the
+            upstream advertises, curated or not. Empty when the backend
+            ships none.
+        providers: Provider-registry rows, for the backends that populate
+            the base `providers` field. Empty otherwise.
+        catalog: Read-only `MappingProxyType` view over whatever
+            :meth:`get_catalog` returns, rebuilt on each access, so it can
+            neither drift from the rows nor be written through.
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -2314,7 +2505,7 @@ class AbstractCatalog(BaseModel):
     _entry_noun: str = "datasets"
 
     available_datasets: list[str] = Field(default_factory=list)
-    datasets: dict[str, Any] = Field(default_factory=dict)
+    datasets: dict[str, RowT] = Field(default_factory=dict)
     providers: dict[str, Any] = Field(default_factory=dict)
 
     @property
@@ -2368,11 +2559,17 @@ class AbstractCatalog(BaseModel):
     def model_post_init(self, __context: Any) -> None:
         """Fill an empty catalog from disk, then run the subclass's wiring.
 
-        `Catalog()` with no arguments reads from disk; passing `datasets=...`
-        skips the read, which is what lets a test build a catalog from literals.
-        A field the caller already supplied is never overwritten, so a partial
-        construction (`datasets=` but no `available_datasets=`) still gets the
-        rest filled in.
+        `Catalog()` with no arguments reads from disk, and so does
+        `Catalog(datasets={})` — the gate is whether :attr:`datasets` is falsy,
+        and an empty mapping is indistinguishable from an absent one here. A
+        **non-empty** `datasets=` suppresses the read entirely, so the other
+        fields :meth:`_autoload` would have filled keep their defaults too:
+        `Catalog(datasets={...})` is a catalog built from literals, not a
+        partially-filled one.
+
+        Within a read, a field the caller already supplied is never overwritten
+        — `Catalog(available_datasets=[...])` keeps that list and takes
+        :attr:`datasets` from disk.
 
         This used to be written out in all 48 provider catalogs. The bodies
         differed only in the loader call, and the surrounding rule had drifted —
@@ -2389,17 +2586,69 @@ class AbstractCatalog(BaseModel):
                 if not getattr(self, field, None):
                     setattr(self, field, value)
 
-    def get_catalog(self) -> Any:
-        """Read the catalog of the datasource from disk or retrieve it from server.
+    def get_catalog(self) -> dict[str, RowT]:
+        """Return the catalog's rows.
 
-        Abstract; concrete subclasses must override and return their
-        backend-specific catalog object (e.g. a pydantic `Catalog`
-        instance, a `dict`, or whatever shape the backend uses).
+        Defaults to :attr:`datasets`, which is where every backend keeps
+        them and what the inherited dict surface (`len`, `in`, `[]`,
+        iteration, :meth:`get_dataset`) already reads. Raising
+        `NotImplementedError` here instead made the method mandatory, and
+        all 61 provider catalogs answered it with the same
+        `return self.datasets`.
 
-        Raises:
-            NotImplementedError: Always, until overridden by a subclass.
+        A backend whose catalog is genuinely a different shape still
+        overrides this. When it does not, and :attr:`datasets` is empty,
+        the empty mapping is returned but a warning is logged naming the
+        class — the default cannot tell "no rows yet" from "rows kept in
+        some other field", and a catalog that silently has no entries is
+        harder to notice than one that complains. The warning is emitted
+        once per class, not once per call: :attr:`catalog` recomputes this
+        on every read, so a caller iterating it would otherwise be warned
+        on each access.
+
+        Returns:
+            dict[str, RowT]: The `{key: row}` mapping backing this catalog,
+            typed as the row model the subclass parameterised the base with.
+            This is :attr:`datasets` itself, not a copy, so callers that
+            need an unwritable view should read :attr:`catalog` instead.
+
+        Examples:
+            - Read the rows and inspect one:
+                ```python
+                >>> from earthlens.chc import Catalog
+                >>> rows = Catalog().get_catalog()
+                >>> "africa-daily" in rows
+                True
+                >>> sorted(rows["africa-daily"].variables)
+                ['precipitation']
+
+                ```
+            - It is the same mapping the dict surface reads, so `len` and
+              iteration agree with it:
+                ```python
+                >>> from earthlens.chc import Catalog
+                >>> catalog = Catalog()
+                >>> len(catalog.get_catalog()) == len(catalog)
+                True
+                >>> sorted(catalog.get_catalog())[:2]
+                ['africa-2-monthly', 'africa-3-monthly']
+
+                ```
         """
-        raise NotImplementedError
+        if not self.datasets and type(self) not in _WARNED_EMPTY_CATALOGS:
+            # The default cannot tell "nothing curated yet" from "rows kept
+            # elsewhere", so it answers an empty mapping for both. Every
+            # in-repo catalog is covered by a contract test; an out-of-tree
+            # subclass gets this instead of silence. Once per class, because
+            # `catalog` is a property recomputed on every read and a caller
+            # iterating it would otherwise be warned per access.
+            _WARNED_EMPTY_CATALOGS.add(type(self))
+            logger.warning(
+                f"{type(self).__name__}.get_catalog() is empty — either the "
+                f"catalog has no rows yet, or it keeps them somewhere other "
+                f"than `datasets`, in which case override get_catalog()."
+            )
+        return self.datasets
 
     def get_variable(self, dataset_key: str, variable_name: str) -> Any:
         """Return one leaf (variable / band / asset) of a dataset.
@@ -2444,7 +2693,7 @@ class AbstractCatalog(BaseModel):
 
     # -- shared dict-like surface over `datasets` (M1 from catalog-cross-backend-comparison)
 
-    def get_dataset(self, name: str) -> Any:
+    def get_dataset(self, name: str) -> RowT:
         """Return the dataset record for `name`, with a did-you-mean hint on miss.
 
         Backend-generic: looks up `name` in :attr:`datasets` and raises
@@ -2472,7 +2721,7 @@ class AbstractCatalog(BaseModel):
                 f"Known {self._entry_noun}: {sorted(self.datasets)}.{hint}"
             ) from None
 
-    def __getitem__(self, name: str) -> Any:
+    def __getitem__(self, name: str) -> RowT:
         """`cat[name]` — dict-style lookup; raises `KeyError` on miss."""
         try:
             return self.get_dataset(name)
@@ -2583,7 +2832,9 @@ class AbstractCatalog(BaseModel):
         """
         import yaml
 
-        body = {}
+        # Annotated: the branches store a dumped dict and a raw row, so the
+        # inferred type would come from whichever ran first.
+        body: dict[str, Any] = {}
         for key, dataset in self.datasets.items():
             if isinstance(dataset, BaseModel):
                 body[key] = dataset.model_dump(exclude_none=True)

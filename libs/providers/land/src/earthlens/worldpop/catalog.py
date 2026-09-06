@@ -247,7 +247,7 @@ def _load_products(path: Path) -> dict[str, Product]:
     return load_catalog(path, _CATALOG_CACHE, _parse_products, provider="WorldPop")
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Product]):
     """Product / sub-alias availability catalog for the WorldPop backend.
 
     Reads the bundled `worldpop_data_catalog.yaml` and exposes its
@@ -314,10 +314,6 @@ class Catalog(AbstractCatalog):
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         products = _load_products(catalog_path)
         return cls(datasets=dict(products), available_datasets=sorted(products))
-
-    def get_catalog(self) -> dict[str, Product]:
-        """Return the product map (satisfies the abstract contract)."""
-        return self.datasets
 
     def get(self, alias: str) -> Product:
         """Return the `Product` for a canonical alias, did-you-mean on miss.

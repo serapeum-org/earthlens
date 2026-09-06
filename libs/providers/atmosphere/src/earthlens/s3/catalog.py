@@ -272,7 +272,7 @@ def _parse_s3_catalog(files: list[Path]):
     return (datasets, available)
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Dataset]):
     """Registry of the AWS Open-Data S3 datasets the backend can fetch.
 
     Reads the bundled `s3_data_catalog.yaml` and exposes its `datasets:`
@@ -357,10 +357,6 @@ class Catalog(AbstractCatalog):
             catalog_path, _CATALOG_CACHE, _parse_s3_catalog, provider="ERA5-S3"
         )
         return cls(datasets=dict(datasets), available_datasets=list(available))
-
-    def get_catalog(self) -> dict[str, Dataset]:
-        """Return the dataset map (satisfies the abstract contract)."""
-        return self.datasets
 
     def resolve(self, dataset: str | dict[str, Any] | Dataset) -> Dataset:
         """Resolve a dataset selector to a validated `Dataset`.

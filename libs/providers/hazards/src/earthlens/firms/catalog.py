@@ -190,7 +190,7 @@ def _parse_sensors(files: list[Path]) -> dict[str, Sensor]:
     return sensors
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Sensor]):
     """Sensor catalog for the NASA FIRMS backend.
 
     Reads the bundled `firms_data_catalog.yaml` (shipped as package
@@ -272,14 +272,6 @@ class Catalog(AbstractCatalog):
             catalog_path, _CATALOG_CACHE, _parse_sensors, provider="FIRMS"
         )
         return cls(datasets=dict(sensors))
-
-    def get_catalog(self) -> dict[str, Sensor]:
-        """Return the sensor map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Sensor]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get_sensor(self, code: str) -> Sensor:
         """Return the :class:`Sensor` for `code`, with a did-you-mean hint.

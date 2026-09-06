@@ -2,22 +2,44 @@
 
 from __future__ import annotations
 
+import builtins
+import contextlib
 import errno
+import functools
+import importlib.util
+import os
+import sys
 import time
+from collections.abc import Iterator
+from pathlib import Path
 from typing import Any
 
 import pytest
 import requests
+import urllib3
+from loguru import logger
 
+from earthlens.base import http as http_module
 from earthlens.base.http import (
+    DEFAULT_CONNECT_RETRIES,
+    DEFAULT_RETRY_EXCEPTIONS,
     DEFAULT_STATUS_FORCELIST,
     DEFAULT_TIMEOUT,
     HttpClient,
+    IncompleteDownloadError,
+    RangeReadError,
     RequestsGet,
+    UnsolicitedPartialContentError,
+    _arm_resume_anchor,
     _check_magic,
     _default_user_agent,
+    _is_local_storage_error,
+    _parse_content_range,
     _parse_retry_after,
     _progress_total,
+    _ResumeAnchor,
+    _strong_etag,
+    classify_transport_error,
     is_network_unreachable,
     prefer_ipv4,
     redact_url,
@@ -104,6 +126,19 @@ class _FlakySession:
             raise self._exc
         return self._response
 
+    def post(self, url: str, **kwargs: Any) -> _Resp:
+        return self.get(url, **kwargs)
+
+
+def _read_reset() -> requests.ConnectionError:
+    """A connection error that carries a mid-response reset as its cause."""
+    return requests.ConnectionError(ConnectionResetError("connection reset by peer"))
+
+
+def _connect_refused() -> requests.ConnectionError:
+    """A connection error that carries a refused connect as its cause."""
+    return requests.ConnectionError(ConnectionRefusedError("connection refused"))
+
 
 class _Clock:
     """Deterministic monotonic clock returning scripted values in order."""
@@ -123,6 +158,51 @@ def _client(
     waits: list[float] = []
     client = HttpClient(session=session, sleep=waits.append, **kwargs)
     return client, session, waits
+
+
+@contextlib.contextmanager
+def _captured_debug_logs() -> Iterator[list[str]]:
+    """Collect the loguru messages emitted at `DEBUG` inside the block."""
+    messages: list[str] = []
+    handler = logger.add(lambda m: messages.append(m.record["message"]), level="DEBUG")
+    try:
+        yield messages
+    finally:
+        logger.remove(handler)
+
+
+def _exists_via_os(path: Path, *, follow_symlinks: bool = True) -> bool:
+    """A `Path.exists` that never routes through `Path.stat`.
+
+    Before 3.14 `exists()` was implemented on top of `self.stat()` and re-raised
+    anything that was not a missing-file errno, so a test making `Path.stat`
+    refuse would have the refusal land on the existence check rather than on the
+    measurement it aims at. Substituting the 3.14 implementation pins such a test
+    to the same statement on every supported version.
+    """
+    return os.path.exists(path) if follow_symlinks else os.path.lexists(path)
+
+
+def _http_for_platform(platform: str, monkeypatch: pytest.MonkeyPatch) -> Any:
+    """Execute a second, private copy of `http.py` under a patched `sys.platform`.
+
+    The deterministic-errno set is built once at import time, so the branch this
+    interpreter did not take is only observable by running the module again with
+    `sys.platform` saying something else. The copy is never registered in
+    `sys.modules`, so nothing else in the session can pick it up by accident.
+
+    Patched through `monkeypatch` rather than by assigning `sys.platform`: the
+    attribute is process-global, so a bare assignment is a cross-test race the
+    moment the suite runs distributed or threaded, and an interpreter-level
+    abort would leave it wrong for everything after it.
+    """
+    spec = importlib.util.spec_from_file_location(
+        f"_earthlens_http_platform_probe_{platform}", http_module.__file__
+    )
+    module = importlib.util.module_from_spec(spec)
+    monkeypatch.setattr(sys, "platform", platform)
+    spec.loader.exec_module(module)
+    return module
 
 
 @pytest.mark.unit
@@ -463,10 +543,8 @@ class TestRetryOnExceptions:
     """Retrying on configured transport exceptions."""
 
     def test_retries_configured_exception_then_succeeds(self):
-        """A configured exception is retried with back-off, then succeeds."""
-        session = _FlakySession(
-            2, requests.ConnectionError("boom"), _Resp(body={"ok": 1})
-        )
+        """A configured read-phase exception is retried with back-off, then succeeds."""
+        session = _FlakySession(2, _read_reset(), _Resp(body={"ok": 1}))
         waits: list[float] = []
         client = HttpClient(
             session=session,
@@ -475,16 +553,182 @@ class TestRetryOnExceptions:
             retry_on_exceptions=(requests.ConnectionError,),
         )
         assert client.get_json("http://x") == {"ok": 1}
-        assert session.calls == 3
-        assert waits == [2.0, 4.0]
+        assert session.calls == 3, f"expected 3 attempts, got {session.calls}"
+        assert waits == [2.0, 4.0], f"unexpected back-off schedule: {waits}"
 
     def test_unconfigured_exception_propagates_immediately(self):
-        """An exception not in retry_on_exceptions is not retried."""
-        session = _FlakySession(1, requests.ConnectionError("boom"), _Resp(body={}))
+        """An exception not in retry_on_exceptions is not retried.
+
+        `TooManyRedirects` is outside `DEFAULT_RETRY_EXCEPTIONS` on purpose: a
+        redirect loop is a deterministic misconfiguration, so replaying it just
+        repeats the loop.
+        """
+        session = _FlakySession(1, requests.TooManyRedirects("loop"), _Resp(body={}))
         client = HttpClient(session=session)
+        with pytest.raises(requests.TooManyRedirects):
+            client.get("http://x")
+        assert session.calls == 1, f"expected no retry, got {session.calls} attempts"
+
+    def test_read_failures_are_retried_by_default(self):
+        """A socket reset mid-response is retried without the caller configuring it."""
+        session = _FlakySession(2, _read_reset(), _Resp(body={"ok": 1}))
+        client = HttpClient(session=session, sleep=lambda _: None)
+        assert client.get_json("http://x") == {"ok": 1}
+        assert session.calls == 3, f"expected 3 attempts, got {session.calls}"
+
+    def test_connect_failures_get_the_smaller_budget(self):
+        """A host that will not accept a connection fails fast, not after six tries.
+
+        The connect budget is deliberately separate: a refused connection rarely
+        starts succeeding within a back-off window, so spending the full read
+        budget on it turns a clear failure into a slow one.
+        """
+        session = _FlakySession(9, _connect_refused(), _Resp(body={"ok": 1}))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=5)
         with pytest.raises(requests.ConnectionError):
             client.get("http://x")
-        assert session.calls == 1
+        assert session.calls == DEFAULT_CONNECT_RETRIES + 1, (
+            f"connect budget should cap attempts at {DEFAULT_CONNECT_RETRIES + 1}, "
+            f"got {session.calls}"
+        )
+
+    @pytest.mark.parametrize(
+        "exc_name", ["SSLError", "ProxyError"], ids=["ssl", "proxy"]
+    )
+    def test_deterministic_failures_are_never_retried(self, exc_name):
+        """A bad certificate or proxy is reproduced exactly, so it is not replayed."""
+        exc = getattr(requests.exceptions, exc_name)("nope")
+        session = _FlakySession(1, exc, _Resp(body={"ok": 1}))
+        client = HttpClient(session=session, sleep=lambda _: None)
+        with pytest.raises(requests.exceptions.RequestException):
+            client.get("http://x")
+        assert session.calls == 1, (
+            f"{exc_name} is deterministic and must not be retried; "
+            f"got {session.calls} attempts"
+        )
+
+    def test_an_explicit_retry_set_is_not_second_guessed(self):
+        """A type the caller named is retried even if the classifier would not.
+
+        The classifier decides which budget a failure spends; naming a type in
+        `retry_on_exceptions` is already the decision to retry it. Vetoing that
+        would silently disable a knob the caller set — as it did for the
+        `ContentDecodingError` that risk_indicators retries on purpose.
+        """
+        session = _FlakySession(
+            2, requests.exceptions.ContentDecodingError("gzip"), _Resp(body={"ok": 1})
+        )
+        client = HttpClient(
+            session=session,
+            sleep=lambda _: None,
+            retry_on_exceptions=(requests.exceptions.ContentDecodingError,),
+        )
+        assert client.get_json("http://x") == {"ok": 1}
+        assert session.calls == 3, f"expected 3 attempts, got {session.calls}"
+
+    def test_an_explicit_set_overrides_the_never_retry_list(self):
+        """`SSLError` is retried when the caller asks for it by name."""
+        session = _FlakySession(
+            1, requests.exceptions.SSLError("cert"), _Resp(body={"ok": 1})
+        )
+        client = HttpClient(
+            session=session,
+            sleep=lambda _: None,
+            retry_on_exceptions=(requests.exceptions.SSLError,),
+        )
+        assert client.get_json("http://x") == {"ok": 1}
+        assert session.calls == 2, f"expected 2 attempts, got {session.calls}"
+
+    @pytest.mark.parametrize(
+        "reason_name, expected",
+        [
+            ("ReadTimeoutError", "read"),
+            ("ProtocolError", "read"),
+            ("NewConnectionError", "connect"),
+        ],
+    )
+    def test_a_wrapped_max_retry_error_is_classified_by_its_reason(
+        self, reason_name, expected
+    ):
+        """`MaxRetryError` carries the real failure in `reason`, not in `args`.
+
+        Its own class name matches a connect marker, and connect failures are
+        not method-gated — so misreading one as a connect failure would replay
+        a `POST` whose request had in fact been delivered.
+        """
+        import urllib3.exceptions as u3
+
+        from earthlens.base.http import classify_transport_error
+
+        pool = urllib3.HTTPConnectionPool("example.org")
+        reasons = {
+            "ReadTimeoutError": u3.ReadTimeoutError(pool, "u", "timed out"),
+            "ProtocolError": u3.ProtocolError("connection aborted"),
+            "NewConnectionError": u3.NewConnectionError(None, "refused"),
+        }
+        wrapped = requests.ConnectionError(
+            u3.MaxRetryError(pool, "http://x", reason=reasons[reason_name])
+        )
+        assert classify_transport_error(wrapped) == expected, (
+            f"{reason_name} should classify as {expected}, "
+            f"got {classify_transport_error(wrapped)}"
+        )
+
+    def test_policy_selection_does_not_depend_on_object_identity(self):
+        """An equal-valued retry tuple behaves the same however it is spelled.
+
+        Deriving the strict policy from `is DEFAULT_RETRY_EXCEPTIONS` made two
+        equal tuples behave oppositely, and made `DEFAULT_RETRY_EXCEPTIONS +
+        (Extra,)` silently drop the never-retry veto.
+        """
+        respelled = (
+            requests.ConnectionError,
+            requests.exceptions.Timeout,
+            requests.exceptions.ChunkedEncodingError,
+        )
+        as_constant = HttpClient(
+            max_retries=5, retry_on_exceptions=DEFAULT_RETRY_EXCEPTIONS
+        )
+        as_literal = HttpClient(max_retries=5, retry_on_exceptions=respelled)
+        assert as_constant.connect_retries == as_literal.connect_retries, (
+            "equal retry sets must yield the same connect budget"
+        )
+        default = HttpClient(max_retries=5)
+        assert default.connect_retries == DEFAULT_CONNECT_RETRIES, (
+            "the untouched default keeps the small connect budget"
+        )
+
+    def test_default_retry_set_excludes_http_error(self):
+        """`HTTPError` stays out, so 4xx responses are never replayed."""
+        assert not any(
+            issubclass(requests.HTTPError, exc) for exc in DEFAULT_RETRY_EXCEPTIONS
+        )
+
+    def test_post_is_not_replayed_after_a_read_failure(self):
+        """A non-idempotent verb is not replayed: the server may have acted."""
+        session = _FlakySession(1, _read_reset(), _Resp(body={"ok": 1}))
+        client = HttpClient(session=session, sleep=lambda _: None)
+        with pytest.raises(requests.ConnectionError):
+            client.post("http://x")
+        assert session.calls == 1, f"POST must not replay, got {session.calls} attempts"
+
+    def test_post_is_replayed_after_a_connect_failure(self):
+        """A connect failure never reached the server, so replaying it is safe."""
+        session = _FlakySession(1, _connect_refused(), _Resp(body={"ok": 1}))
+        client = HttpClient(session=session, sleep=lambda _: None)
+        client.post("http://x")
+        assert session.calls == 2, (
+            f"a connect failure is safe to replay for any verb, got {session.calls}"
+        )
+
+    def test_post_is_replayed_when_the_caller_opts_in(self):
+        """`retry_unsafe_methods=True` is the caller vouching for replay safety."""
+        session = _FlakySession(2, _read_reset(), _Resp(body={"ok": 1}))
+        client = HttpClient(
+            session=session, sleep=lambda _: None, retry_unsafe_methods=True
+        )
+        client.post("http://x")
+        assert session.calls == 3, f"expected 3 attempts, got {session.calls}"
 
     def test_exhausted_exception_reraises(self):
         """A persistent configured exception re-raises after the budget."""
@@ -1230,3 +1474,2209 @@ class TestRetryLoginForcingIpv4:
             retry_login_forcing_ipv4(login)
         assert calls["n"] == 2
         assert _restore_has_ipv6.HAS_IPV6 is False
+
+
+class _PartialBody:
+    """A streaming response that yields `stop_after` bytes then raises.
+
+    `Content-Length` always states the *whole* payload, so a fake that stops
+    early is an honest short body — the shape a length post-condition has to
+    catch.
+    """
+
+    def __init__(self, payload: bytes, stop_after: int | None):
+        self.payload = payload
+        self.stop_after = stop_after
+        self.status_code = 200
+        self.headers = {"Content-Length": str(len(payload))}
+        self.closed = False
+
+    def iter_content(self, chunk_size: int = 1):
+        """Yield the payload in blocks, breaking once `stop_after` is passed."""
+        emitted = 0
+        for i in range(0, len(self.payload), chunk_size):
+            block = self.payload[i : i + chunk_size]
+            if self.stop_after is not None and emitted + len(block) > self.stop_after:
+                raise requests.ConnectionError(ConnectionResetError("reset"))
+            emitted += len(block)
+            yield block
+
+    def raise_for_status(self) -> None:
+        """No-op: these fixtures only model 2xx bodies."""
+
+    def close(self) -> None:
+        self.closed = True
+
+
+@pytest.mark.unit
+class TestTransportClassificationEdges:
+    """Edge cases of the connect/read classifier and the resume guards."""
+
+    def test_an_unrecognised_connection_error_is_unknown_not_connect(self):
+        """It fails fast on the cheap budget without claiming the request never arrived.
+
+        Calling it `"connect"` would exempt it from the verb gate, because a
+        connect failure is replayed for any method on the grounds that the
+        server never saw it — which an unidentified failure cannot promise.
+        """
+        from earthlens.base.http import classify_transport_error
+
+        assert (
+            classify_transport_error(requests.ConnectionError("mystery")) == "unknown"
+        )
+
+    def test_a_bare_timeout_is_a_read_failure(self):
+        """A `Timeout` that is not a `ConnectTimeout` happened after connecting."""
+        from earthlens.base.http import classify_transport_error
+
+        assert classify_transport_error(requests.exceptions.Timeout()) == "read"
+
+    def test_a_cycle_in_the_cause_chain_terminates(self):
+        """`_causes` must not loop on an exception that references itself."""
+        from earthlens.base.http import _causes
+
+        first = requests.ConnectionError("a")
+        second = requests.ConnectionError("b")
+        first.__cause__ = second
+        second.__cause__ = first
+        assert len(list(_causes(first))) >= 2, "the walk must yield both and stop"
+
+    def test_an_explicit_connect_retries_overrides_both_defaults(self):
+        """The argument wins over the default-set and caller-set resolutions."""
+        assert HttpClient(max_retries=5, connect_retries=3).connect_retries == 3
+
+
+@pytest.mark.unit
+class TestUnidentifiedTransportFailures:
+    """An unclassifiable failure is cheap to retry but unsafe to replay."""
+
+    def test_it_classifies_as_unknown_rather_than_connect(self):
+        """`"connect"` would assert the request never arrived, which is unproven."""
+        from earthlens.base.http import classify_transport_error
+
+        assert (
+            classify_transport_error(requests.ConnectionError("mystery")) == "unknown"
+        )
+
+    def test_a_post_is_not_replayed(self):
+        """Only a proven connect failure exempts a non-idempotent verb.
+
+        The conservative choice for the budget — the small connect one — is the
+        permissive choice for the verb gate, so the two decisions are made
+        separately.
+        """
+        session = _FlakySession(
+            1, requests.ConnectionError("mystery"), _Resp(body={"ok": 1})
+        )
+        client = HttpClient(session=session, sleep=lambda _: None)
+        with pytest.raises(requests.ConnectionError):
+            client.post("http://x")
+        assert session.calls == 1, f"POST must not replay, got {session.calls}"
+
+    def test_a_get_still_spends_the_cheap_budget(self):
+        """An idempotent verb retries, but on the connect budget, not the read one."""
+        from earthlens.base.http import DEFAULT_CONNECT_RETRIES
+
+        session = _FlakySession(
+            9, requests.ConnectionError("mystery"), _Resp(body={"ok": 1})
+        )
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=5)
+        with pytest.raises(requests.ConnectionError):
+            client.get("http://x")
+        assert session.calls == DEFAULT_CONNECT_RETRIES + 1, (
+            f"expected the cheap budget, got {session.calls} attempts"
+        )
+
+
+@pytest.mark.unit
+class TestRetryOptOutIsHonoured:
+    """`max_retries=0` still disables retry after the transport default was armed."""
+
+    def test_zero_max_retries_makes_exactly_one_attempt(self):
+        """Nine backends pass `max_retries=0` to opt out; arming a default must not undo that.
+
+        The per-kind connect budget defaults to 1, which would otherwise
+        re-enable a retry for a client that asked for none.
+        """
+        session = _FlakySession(
+            9, requests.ConnectionError(ConnectionResetError("r")), _Resp(body={})
+        )
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=0)
+        with pytest.raises(requests.ConnectionError):
+            client.get("http://x")
+        assert session.calls == 1, (
+            f"max_retries=0 must mean one attempt, got {session.calls}"
+        )
+
+
+@pytest.mark.unit
+class TestRemainingRetryBranches:
+    """Branches the earlier suites reached only indirectly."""
+
+    def test_a_connect_timeout_classifies_as_connect(self):
+        """`ConnectTimeout` is the one unambiguous connect-phase exception."""
+        from earthlens.base.http import classify_transport_error
+
+        assert (
+            classify_transport_error(requests.exceptions.ConnectTimeout()) == "connect"
+        )
+
+    def test_a_read_timeout_classifies_as_read(self):
+        """`ReadTimeout` means the connection was made and the response stalled."""
+        from earthlens.base.http import classify_transport_error
+
+        assert classify_transport_error(requests.exceptions.ReadTimeout()) == "read"
+
+    def test_a_status_suppression_on_a_post_is_logged(self, caplog):
+        """The `5xx`-on-`POST` refusal is visible, matching the transport one."""
+        import logging
+
+        from loguru import logger as _loguru
+
+        class _Resp500:
+            def __init__(self):
+                self.status_code = 500
+                self.headers = {}
+
+            def close(self):
+                """No-op."""
+
+            def raise_for_status(self):
+                """No-op: the caller disabled raising."""
+
+        class _S:
+            def __init__(self):
+                self.calls = 0
+
+            def post(self, url, **kwargs):
+                self.calls += 1
+                return _Resp500()
+
+        handler = _loguru.add(
+            lambda m: logging.getLogger().debug(m.record["message"]), level="DEBUG"
+        )
+        try:
+            with caplog.at_level(logging.DEBUG):
+                session = _S()
+                HttpClient(
+                    session=session, sleep=lambda _: None, raise_for_status=False
+                ).post("http://x")
+        finally:
+            _loguru.remove(handler)
+        assert session.calls == 1, "a POST must not be replayed on a 500"
+        assert any("not retrying a POST" in r.message for r in caplog.records), (
+            f"the suppression must be logged; got {[r.message for r in caplog.records]}"
+        )
+
+
+@pytest.mark.unit
+class TestProgressTotalRejectsUntrustworthyLengths:
+    """`_progress_total` is the single source of "how big is this body"."""
+
+    @pytest.mark.parametrize(
+        "headers, expected",
+        [
+            ({"Content-Length": "22"}, 22),
+            ({"Content-Length": " 22 "}, 22),
+            ({"Content-Length": "22, 22"}, 22),
+            ({"Content-Length": "22, 40"}, None),
+            ({"Content-Length": "22", "Transfer-Encoding": "chunked"}, None),
+            ({"Content-Length": "22", "Transfer-Encoding": "identity"}, 22),
+            ({"Content-Length": "22", "Content-Encoding": "gzip"}, None),
+            ({"Content-Length": "22", "Content-Encoding": "identity"}, 22),
+            ({"Content-Length": "\u00b2\u00b2"}, None),
+            ({"Content-Length": ""}, None),
+            ({"Content-Length": "22,"}, None),
+            ({}, None),
+        ],
+        ids=[
+            "plain",
+            "padded",
+            "duplicate-agreeing",
+            "duplicate-conflicting",
+            "chunked-wins",
+            "identity-coding-ok",
+            "gzip-encoded",
+            "identity-encoding-ok",
+            "unicode-digits",
+            "empty",
+            "trailing-comma",
+            "absent",
+        ],
+    )
+    def test_only_a_length_describing_the_delivered_bytes_is_used(
+        self, headers, expected
+    ):
+        """A length that will not match the stream is reported as unknown."""
+        from earthlens.base.http import _progress_total
+
+        assert _progress_total(headers) == expected
+
+    def test_a_chunked_body_is_unknown_even_with_a_wellformed_length(self):
+        """RFC 9110 6.3: a transfer coding makes `Content-Length` non-describing.
+
+        urllib3 frames the body by the chunked encoding, so a length check
+        against the header would report a complete body as truncated.
+        """
+        from earthlens.base.http import _progress_total
+
+        assert (
+            _progress_total(
+                {"Content-Length": "1048576", "Transfer-Encoding": "chunked"}
+            )
+            is None
+        )
+
+
+@pytest.mark.unit
+class TestDownloadErrorTypes:
+    """The two download verdicts land in the right exception families."""
+
+    def test_incomplete_download_is_a_transport_error(self):
+        """Providers' error handlers catch `requests` transport errors, so it must be one."""
+        from earthlens.base.http import IncompleteDownloadError
+
+        err = IncompleteDownloadError("short body", written=8, expected=22)
+        assert isinstance(err, requests.ConnectionError)
+        assert isinstance(err, requests.RequestException)
+        assert isinstance(err, OSError)
+
+    def test_incomplete_download_carries_both_sizes(self):
+        """A caller deciding what to do needs the mismatch, not just the fact of it."""
+        from earthlens.base.http import IncompleteDownloadError
+
+        err = IncompleteDownloadError("short body", written=8, expected=22)
+        assert (err.written, err.expected) == (8, 22)
+
+    def test_incomplete_download_defaults_its_sizes(self):
+        """It stays constructible without them, like any `requests` error."""
+        from earthlens.base.http import IncompleteDownloadError
+
+        err = IncompleteDownloadError("boom")
+        assert err.written is None
+        assert err.expected is None
+
+    def test_an_unsolicited_206_is_a_status_error_not_a_transport_one(self):
+        """It must not be swept up by the transport retry set.
+
+        A server that volunteers partial content to a Range-less request does
+        not stop doing so, so replaying reproduces the same fragment.
+        """
+        from earthlens.base.http import (
+            DEFAULT_RETRY_EXCEPTIONS,
+            UnsolicitedPartialContentError,
+        )
+
+        assert issubclass(UnsolicitedPartialContentError, requests.HTTPError)
+        assert not issubclass(UnsolicitedPartialContentError, requests.ConnectionError)
+        assert not issubclass(UnsolicitedPartialContentError, DEFAULT_RETRY_EXCEPTIONS)
+
+    @pytest.mark.parametrize(
+        "name",
+        ["IncompleteDownloadError", "UnsolicitedPartialContentError", "RangeReadError"],
+    )
+    def test_the_error_types_are_exported(self, name):
+        """Both new names, and the existing one, reach callers from `earthlens.base`."""
+        import earthlens.base as base
+
+        assert hasattr(base, name), f"{name} is not importable from earthlens.base"
+        assert name in base.__all__, f"{name} is missing from __all__"
+
+
+@pytest.mark.unit
+class TestAcceptEncodingProvenance:
+    """Whether the caller chose `Accept-Encoding`, or it is the client's default."""
+
+    @pytest.mark.parametrize(
+        "headers, explicit",
+        [
+            (None, False),
+            ({"X-Api-Key": "k"}, False),
+            ({"Accept-Encoding": "gzip"}, True),
+            ({"accept-encoding": "gzip"}, True),
+            ({"ACCEPT-ENCODING": "br"}, True),
+        ],
+        ids=["none", "unrelated", "canonical", "lowercase", "uppercase"],
+    )
+    def test_the_flag_records_who_set_it(self, headers, explicit):
+        """`_default_headers` cannot answer this after the merge, so it is recorded."""
+        assert HttpClient(headers=headers)._accept_encoding_is_explicit is explicit
+
+    def test_the_clients_own_default_is_still_stamped(self):
+        """Recording provenance must not change what is actually sent."""
+        client = HttpClient()
+        assert client.default_headers["Accept-Encoding"] == "gzip, deflate"
+
+    def test_a_callers_choice_still_wins_the_header(self):
+        """The flag is additional information, not a replacement for the merge."""
+        client = HttpClient(headers={"Accept-Encoding": "identity"})
+        assert client.default_headers["Accept-Encoding"] == "identity"
+
+
+# ---------------------------------------------------------------------------
+# `download` invariants.
+#
+# The fakes below stand in for the transport, so shapes urllib3 would reject on
+# a real socket are reachable here on purpose: what is pinned is `download`'s
+# own guarantee, not urllib3's.
+# ---------------------------------------------------------------------------
+
+_PAYLOAD = b"0123456789ABCDEFGHIJKL"  # 22 bytes
+
+
+class _ScriptedBody:
+    """One response: a status, headers, and a body that may break part-way."""
+
+    def __init__(
+        self,
+        payload: bytes,
+        *,
+        status: int = 200,
+        advertised: int | None = None,
+        stop_after: int | None = None,
+        break_at_end: bool = False,
+        omit_length: bool = False,
+    ) -> None:
+        self.payload = payload
+        self.status_code = status
+        self.stop_after = stop_after
+        self.break_at_end = break_at_end
+        self.headers: dict[str, str] = {}
+        if not omit_length:
+            length = len(payload) if advertised is None else advertised
+            self.headers["Content-Length"] = str(length)
+        self.closed = False
+
+    def iter_content(self, chunk_size: int = 1) -> Any:
+        """Yield the payload, optionally breaking mid-way or after the last byte."""
+        emitted = 0
+        for i in range(0, len(self.payload), chunk_size):
+            block = self.payload[i : i + chunk_size]
+            if self.stop_after is not None and emitted + len(block) > self.stop_after:
+                raise _read_reset()
+            emitted += len(block)
+            yield block
+        if self.break_at_end:
+            raise _read_reset()
+
+    def raise_for_status(self) -> None:
+        """Raise for a 4xx/5xx, as `requests` does.
+
+        `response=self` matters: real `requests` always attaches it, and
+        backends branch on `exc.response.status_code`.
+        """
+        if self.status_code >= 400:
+            raise requests.HTTPError(f"HTTP {self.status_code}", response=self)
+
+    def close(self) -> None:
+        """Record that the response was released."""
+        self.closed = True
+
+
+def _clone_body(body: _ScriptedBody) -> _ScriptedBody:
+    """Copy a scripted response, since a body can only be consumed once."""
+    clone = _ScriptedBody(body.payload, status=body.status_code)
+    clone.headers = dict(body.headers)
+    clone.stop_after = body.stop_after
+    clone.break_at_end = body.break_at_end
+    return clone
+
+
+class _ScriptedSession:
+    """Serves scripted responses in order, repeating the last one, and records requests."""
+
+    def __init__(self, *responses: _ScriptedBody) -> None:
+        self._responses = list(responses)
+        self.requests: list[tuple[str, dict[str, str]]] = []
+
+    def get(self, url: str, **kwargs: Any) -> _ScriptedBody:
+        """Return the next scripted response, recording the request shape."""
+        self.requests.append((url, dict(kwargs.get("headers") or {})))
+        index = min(len(self.requests) - 1, len(self._responses) - 1)
+        return _clone_body(self._responses[index])
+
+    @property
+    def calls(self) -> int:
+        """How many requests were issued."""
+        return len(self.requests)
+
+
+class _ConnectThenGood:
+    """Fails to connect once, then serves the object."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def get(self, url: str, **kwargs: Any) -> _ScriptedBody:
+        """Raise a refused connect on the first call, then return the body."""
+        self.calls += 1
+        if self.calls == 1:
+            raise _connect_refused()
+        return _ScriptedBody(_PAYLOAD)
+
+
+class _AlwaysRaises:
+    """Raises the same transport error on every request."""
+
+    def __init__(self, exc: BaseException) -> None:
+        self._exc = exc
+        self.calls = 0
+
+    def get(self, url: str, **kwargs: Any) -> Any:
+        """Record the attempt and raise."""
+        self.calls += 1
+        raise self._exc
+
+
+class _RecordingBody:
+    """Wraps a scripted body, logging its release into a shared event list."""
+
+    def __init__(self, inner: _ScriptedBody, events: list[str]) -> None:
+        self._inner = inner
+        self._events = events
+        self.status_code = inner.status_code
+        self.headers = inner.headers
+
+    def iter_content(self, chunk_size: int = 1) -> Any:
+        """Delegate to the wrapped body."""
+        return self._inner.iter_content(chunk_size)
+
+    def raise_for_status(self) -> None:
+        """Delegate to the wrapped body."""
+        self._inner.raise_for_status()
+
+    def close(self) -> None:
+        """Log the release, then delegate."""
+        self._events.append("close")
+        self._inner.close()
+
+
+class _ClosingSession:
+    """Serves a 503 then a 200, logging closes into a shared event list."""
+
+    def __init__(self, events: list[str]) -> None:
+        self.events = events
+        self.calls = 0
+
+    def get(self, url: str, **kwargs: Any) -> _RecordingBody:
+        """Return a retryable status first, then the object."""
+        self.calls += 1
+        body = (
+            _ScriptedBody(b"", status=503)
+            if self.calls == 1
+            else _ScriptedBody(_PAYLOAD)
+        )
+        return _RecordingBody(body, self.events)
+
+
+class _NullBar:
+    """A `tqdm` stand-in that renders nothing."""
+
+    def update(self, n: int) -> None:
+        """Ignore progress."""
+
+    def close(self) -> None:
+        """Ignore closure."""
+
+
+class _RecordingTqdm:
+    """A `tqdm` stand-in that records the keyword arguments of every bar built."""
+
+    def __init__(self, seen: list[dict[str, Any]]) -> None:
+        self.seen = seen
+
+    def __call__(self, *args: Any, **kwargs: Any) -> _NullBar:
+        """Record one bar's construction and hand back an inert bar."""
+        self.seen.append(kwargs)
+        return _NullBar()
+
+
+def _raise_interrupt(wait: float) -> None:
+    """Stand in for a Ctrl-C arriving during a sleep."""
+    raise KeyboardInterrupt
+
+
+@pytest.mark.unit
+class TestDownloadRequestShape:
+    """What `download` puts on the wire, and that every attempt puts the same thing."""
+
+    def test_identity_is_the_default_encoding(self, tmp_path):
+        """The length check compares against delivered bytes, so nothing is encoded."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", tmp_path / "g", progress=False
+        )
+        assert session.requests[0][1]["Accept-Encoding"] == "identity"
+
+    def test_a_per_call_encoding_wins(self, tmp_path):
+        """A backend protecting its own magic check keeps the encoding it asked for."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g",
+            tmp_path / "g",
+            progress=False,
+            headers={"Accept-Encoding": "gzip"},
+        )
+        assert session.requests[0][1]["Accept-Encoding"] == "gzip"
+
+    @pytest.mark.parametrize(
+        "key", ["Accept-Encoding", "accept-encoding", "ACCEPT-ENCODING"]
+    )
+    def test_a_constructor_encoding_wins_in_any_casing(self, tmp_path, key):
+        """Header names are case-insensitive, so the provenance check must be too."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        HttpClient(
+            session=session, sleep=lambda _: None, headers={key: "gzip"}
+        ).download("http://x/g", tmp_path / "g", progress=False)
+        sent = {name.lower(): value for name, value in session.requests[0][1].items()}
+        assert sent["accept-encoding"] == "gzip"
+
+    def test_other_caller_headers_pass_through_verbatim(self, tmp_path):
+        """`download` rewrites nothing it did not add."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g",
+            tmp_path / "g",
+            progress=False,
+            headers={"X-Api-Key": "secret", "Range": "bytes=0-5"},
+        )
+        sent = session.requests[0][1]
+        assert sent["X-Api-Key"] == "secret"
+        assert sent["Range"] == "bytes=0-5"
+
+    def test_every_attempt_issues_an_identical_request(self, tmp_path):
+        """Without `resume=`, no leg differs from another: there is no per-attempt state."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, stop_after=5))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=3)
+        with pytest.raises(requests.RequestException):
+            client.download("http://x/g", tmp_path / "g", progress=False, chunk=1)
+        shapes = {(url, tuple(sorted(sent.items()))) for url, sent in session.requests}
+        assert session.calls > 1, "the fixture must induce more than one attempt"
+        assert len(shapes) == 1, f"attempts differed: {shapes}"
+
+
+@pytest.mark.unit
+class TestDownloadWritesWholeObjects:
+    """Every attempt truncates, and a body that misses its length never publishes."""
+
+    def test_a_stale_part_file_is_truncated_not_appended(self, tmp_path):
+        """No byte survives from a write this call did not make."""
+        dest = tmp_path / "g"
+        (tmp_path / "g.part").write_bytes(b"Z" * 999)
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", dest, progress=False
+        )
+        assert dest.read_bytes() == _PAYLOAD
+
+    def test_a_short_body_raises_and_publishes_nothing(self, tmp_path):
+        """A body shorter than its own `Content-Length` is never renamed onto `dest`."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], advertised=22))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=2)
+        with pytest.raises(IncompleteDownloadError) as excinfo:
+            client.download("http://x/g", dest, progress=False)
+        assert (excinfo.value.written, excinfo.value.expected) == (8, 22)
+        assert not dest.exists()
+        assert not (tmp_path / "g.part").exists()
+
+    def test_a_short_body_leaves_a_truncated_dest_when_not_atomic(self, tmp_path):
+        """Without staging there is no partial to discard, only the caller's own file."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], advertised=22))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=0)
+        with pytest.raises(IncompleteDownloadError):
+            client.download("http://x/g", dest, progress=False, atomic=False)
+        assert dest.read_bytes() == _PAYLOAD[:8]
+
+    def test_verify_length_false_publishes_a_body_that_misses_its_length(
+        self, tmp_path
+    ):
+        """An explicit switch for a server that misreports a body it generates."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], advertised=22))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", dest, progress=False, verify_length=False
+        )
+        assert dest.read_bytes() == _PAYLOAD[:8]
+        assert session.calls == 1, "no retry: nothing was judged wrong"
+
+    def test_verify_length_false_does_not_silently_change_the_wire(self, tmp_path):
+        """The point of the switch: it is not `Accept-Encoding` in disguise."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", tmp_path / "g", progress=False, verify_length=False
+        )
+        assert session.requests[0][1]["Accept-Encoding"] == "identity"
+
+    def test_resume_with_the_length_check_off_is_refused(self, tmp_path):
+        """The pair is contradictory: resume is addressed by the length it distrusts.
+
+        A resumed leg's `Range` end and its `Content-Range` comparison both come
+        from the advertised total, and the length post-condition is the only
+        proof the assembly reached it, so the combination would publish a
+        correct-prefix-but-short file with nothing raised or logged.
+        """
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        client = HttpClient(session=session, sleep=lambda _: None)
+        with pytest.raises(ValueError, match="resume=True requires verify_length=True"):
+            client.download(
+                "http://x/g",
+                tmp_path / "g",
+                progress=False,
+                resume=True,
+                verify_length=False,
+            )
+        assert session.calls == 0, "it must refuse before touching the network"
+
+    def test_verify_length_false_also_stops_rejecting_an_over_long_body(self, tmp_path):
+        """A length you do not believe cannot catch a body that exceeds it either."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, advertised=8))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", dest, progress=False, verify_length=False
+        )
+        assert dest.read_bytes() == _PAYLOAD
+        assert session.calls == 1
+
+    def test_the_check_is_on_by_default(self, tmp_path):
+        """Every existing call site keeps the post-condition it has today."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], advertised=22))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=0)
+        with pytest.raises(IncompleteDownloadError):
+            client.download("http://x/g", tmp_path / "g", progress=False)
+
+    def test_a_body_without_a_length_is_published_unchecked(self, tmp_path):
+        """A chunked response makes no length claim, so `download` makes none either."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, omit_length=True))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", dest, progress=False
+        )
+        assert dest.read_bytes() == _PAYLOAD
+
+    def test_a_failed_magic_check_publishes_nothing(self, tmp_path):
+        """The magic check runs before the rename, not after."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        client = HttpClient(session=session, sleep=lambda _: None)
+        with pytest.raises(ValueError):
+            client.download("http://x/g", dest, progress=False, expect_magic=b"XYZ")
+        assert not dest.exists()
+        assert not (tmp_path / "g.part").exists()
+
+
+@pytest.mark.unit
+class TestUnsolicitedPartialContent:
+    """A `206` answering a Range-less request is refused, for every client shape."""
+
+    @pytest.mark.parametrize(
+        "retry_on_exceptions",
+        [
+            None,
+            (requests.RequestException, OSError),
+            (requests.RequestException,),
+            (requests.ConnectionError, requests.Timeout, OSError),
+        ],
+        ids=[
+            "default",
+            "requestexception-oserror",
+            "requestexception",
+            "conn-timeout-os",
+        ],
+    )
+    def test_it_is_refused_in_exactly_one_request(self, tmp_path, retry_on_exceptions):
+        """Replay returns the same fragment, so no retry policy may retry it."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], status=206))
+        extra = (
+            {}
+            if retry_on_exceptions is None
+            else {"retry_on_exceptions": retry_on_exceptions}
+        )
+        client = HttpClient(
+            session=session, sleep=lambda _: None, max_retries=5, **extra
+        )
+        with pytest.raises(UnsolicitedPartialContentError):
+            client.download("http://x/g", tmp_path / "g", progress=False)
+        assert session.calls == 1, f"expected one request, got {session.calls}"
+        assert not (tmp_path / "g.part").exists()
+
+    def test_a_206_answering_a_caller_range_is_accepted(self, tmp_path):
+        """A caller who asked for a range gets the fragment they requested."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], status=206))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", dest, progress=False, headers={"Range": "bytes=0-7"}
+        )
+        assert dest.read_bytes() == _PAYLOAD[:8]
+
+    def test_a_caller_range_is_recognised_in_any_casing(self, tmp_path):
+        """The Range test folds case, so a lowercase header still counts as solicited."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], status=206))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", dest, progress=False, headers={"range": "bytes=0-7"}
+        )
+        assert dest.read_bytes() == _PAYLOAD[:8]
+
+
+@pytest.mark.unit
+class TestDownloadRetryBudgets:
+    """How many requests each failure kind is worth."""
+
+    def test_a_short_body_is_retried_then_succeeds(self, tmp_path):
+        """A transient truncation is worth one more read."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(
+            _ScriptedBody(_PAYLOAD[:8], advertised=22), _ScriptedBody(_PAYLOAD)
+        )
+        HttpClient(session=session, sleep=lambda _: None, max_retries=3).download(
+            "http://x/g", dest, progress=False
+        )
+        assert dest.read_bytes() == _PAYLOAD
+        assert session.calls == 2
+
+    def test_an_identical_short_body_is_not_retried_to_exhaustion(self, tmp_path):
+        """The same byte count twice is deterministic, not a blip."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], advertised=22))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=5)
+        with pytest.raises(IncompleteDownloadError):
+            client.download("http://x/g", tmp_path / "g", progress=False)
+        assert session.calls == 2, f"expected 2 attempts, got {session.calls}"
+
+    def test_an_over_long_body_is_not_retried(self, tmp_path):
+        """A stream that disagrees with its own header repeats that disagreement."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, advertised=8))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=5)
+        with pytest.raises(IncompleteDownloadError):
+            client.download("http://x/g", tmp_path / "g", progress=False)
+        assert session.calls == 1, f"expected 1 attempt, got {session.calls}"
+
+    def test_opting_out_of_transport_retry_disables_the_length_retry(self, tmp_path):
+        """`retry_on_exceptions=()` is the documented opt-out and is honoured here too."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], advertised=22))
+        client = HttpClient(
+            session=session, sleep=lambda _: None, max_retries=5, retry_on_exceptions=()
+        )
+        with pytest.raises(IncompleteDownloadError):
+            client.download("http://x/g", tmp_path / "g", progress=False)
+        assert session.calls == 1
+
+    def test_zero_max_retries_makes_one_attempt(self, tmp_path):
+        """Nine backends opt out this way, and the per-kind budgets must not re-arm them."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, stop_after=5))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=0)
+        with pytest.raises(requests.RequestException):
+            client.download("http://x/g", tmp_path / "g", progress=False, chunk=1)
+        assert session.calls == 1
+
+    def test_a_connect_failure_is_retried_then_succeeds(self, tmp_path):
+        """The canary for `_send` living inside the retrying `try`."""
+        dest = tmp_path / "g"
+        session = _ConnectThenGood()
+        HttpClient(session=session, sleep=lambda _: None, max_retries=3).download(
+            "http://x/g", dest, progress=False
+        )
+        assert dest.read_bytes() == _PAYLOAD
+        assert session.calls == 2, f"expected 2 requests, got {session.calls}"
+
+    def test_a_connect_failure_spends_only_the_connect_budget(self, tmp_path):
+        """A dead host must not cost a large download the full read budget."""
+        session = _AlwaysRaises(_connect_refused())
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=5)
+        with pytest.raises(requests.ConnectionError):
+            client.download("http://x/g", tmp_path / "g", progress=False)
+        assert session.calls == DEFAULT_CONNECT_RETRIES + 1
+
+    def test_a_read_failure_spends_the_read_budget(self, tmp_path):
+        """A mid-response reset is the genuinely transient case, so it keeps the budget."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, stop_after=5))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=3)
+        with pytest.raises(requests.ConnectionError):
+            client.download("http://x/g", tmp_path / "g", progress=False, chunk=1)
+        assert session.calls == 4
+
+    def test_a_deterministic_transport_error_is_not_retried(self, tmp_path):
+        """An invalid certificate reproduces exactly, so replaying it only delays it."""
+        session = _AlwaysRaises(requests.exceptions.SSLError("bad cert"))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=5)
+        with pytest.raises(requests.exceptions.SSLError):
+            client.download("http://x/g", tmp_path / "g", progress=False)
+        assert session.calls == 1
+
+    def test_a_416_is_only_an_error_status_now(self, tmp_path):
+        """Nothing asks for a range, so a 416 carries no special meaning."""
+        session = _ScriptedSession(_ScriptedBody(b"", status=416))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=0)
+        with pytest.raises(requests.HTTPError):
+            client.download("http://x/g", tmp_path / "g", progress=False)
+        assert not (tmp_path / "g.part").exists()
+
+
+@pytest.mark.unit
+class TestNoExitPathLeavesAPartial:
+    """A `.part` from an earlier call must not survive this call, however it ends."""
+
+    @pytest.mark.parametrize(
+        "session, expected",
+        [
+            (
+                _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], status=206)),
+                UnsolicitedPartialContentError,
+            ),
+            (_ScriptedSession(_ScriptedBody(b"", status=416)), requests.HTTPError),
+            (
+                _ScriptedSession(_ScriptedBody(_PAYLOAD, advertised=8)),
+                IncompleteDownloadError,
+            ),
+            (
+                _AlwaysRaises(requests.exceptions.SSLError("bad cert")),
+                requests.exceptions.SSLError,
+            ),
+            (_AlwaysRaises(_connect_refused()), requests.ConnectionError),
+            (
+                _ScriptedSession(_ScriptedBody(_PAYLOAD, stop_after=5)),
+                requests.ConnectionError,
+            ),
+        ],
+        ids=["unsolicited-206", "416", "over-long", "bad-cert", "refused", "reset"],
+    )
+    def test_a_stale_partial_is_discarded_however_the_attempt_fails(
+        self, tmp_path, session, expected
+    ):
+        """Each refusal path calls the same cleanup, so none may skip it."""
+        dest = tmp_path / "g"
+        (tmp_path / "g.part").write_bytes(b"Z" * 999)
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=0)
+        with pytest.raises(expected):
+            client.download("http://x/g", dest, progress=False, chunk=1)
+        assert not (tmp_path / "g.part").exists()
+        assert not dest.exists()
+
+
+@pytest.mark.unit
+class TestDownloadSalvage:
+    """A break after the last byte does not cost another read."""
+
+    def test_a_complete_body_that_breaks_late_is_kept(self, tmp_path):
+        """The size equality is the whole proof, so no second request is made."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, break_at_end=True))
+        HttpClient(session=session, sleep=lambda _: None, max_retries=3).download(
+            "http://x/g", dest, progress=False, chunk=1
+        )
+        assert dest.read_bytes() == _PAYLOAD
+        assert session.calls == 1, f"expected 1 request, got {session.calls}"
+
+    def test_a_late_break_is_salvaged_even_with_retry_disabled(self, tmp_path):
+        """The salvage issues no request, so the retry policy is not its gate."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, break_at_end=True))
+        HttpClient(
+            session=session,
+            sleep=lambda _: None,
+            max_retries=0,
+            retry_on_exceptions=(),
+        ).download("http://x/g", dest, progress=False, chunk=1)
+        assert dest.read_bytes() == _PAYLOAD
+        assert session.calls == 1
+
+    def test_a_late_break_without_a_length_is_not_salvaged(self, tmp_path):
+        """With no advertised total there is nothing to compare against."""
+        session = _ScriptedSession(
+            _ScriptedBody(_PAYLOAD, break_at_end=True, omit_length=True)
+        )
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=0)
+        with pytest.raises(requests.ConnectionError):
+            client.download("http://x/g", tmp_path / "g", progress=False, chunk=1)
+        assert not (tmp_path / "g.part").exists()
+
+    def test_a_salvaged_body_still_has_to_pass_the_magic_check(self, tmp_path):
+        """A break after the last byte must not be a weaker door to `dest`.
+
+        An error page served with a 200 whose `Content-Length` happens to match
+        is exactly what `expect_magic` exists to stop, and it reaches the
+        salvage branch whenever the stream breaks as it ends.
+        """
+        dest = tmp_path / "grid.nc"
+        page = b"<html>an error page served with a 200</html>"
+        session = _ScriptedSession(_ScriptedBody(page, break_at_end=True))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=2)
+        with pytest.raises(ValueError):
+            client.download(
+                "http://x/grid.nc", dest, progress=False, chunk=8, expect_magic=b"CDF"
+            )
+        assert not dest.exists(), "an unverified body was published"
+        assert not (tmp_path / "grid.nc.part").exists()
+
+    def test_a_salvaged_body_with_the_right_magic_is_published(self, tmp_path):
+        """The gate must not break the salvage it guards."""
+        dest = tmp_path / "grid.nc"
+        body = b"CDF" + b"payload" * 10
+        session = _ScriptedSession(_ScriptedBody(body, break_at_end=True))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/grid.nc", dest, progress=False, chunk=8, expect_magic=b"CDF"
+        )
+        assert dest.read_bytes() == body
+        assert session.calls == 1
+
+    def test_the_salvage_follows_verify_length(self, tmp_path):
+        """The salvage's only proof is the size equality, so the switch governs it."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, break_at_end=True))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=0)
+        with pytest.raises(requests.ConnectionError):
+            client.download(
+                "http://x/g",
+                tmp_path / "g",
+                progress=False,
+                chunk=1,
+                verify_length=False,
+            )
+        assert not (tmp_path / "g.part").exists()
+
+    def test_a_stat_failure_during_salvage_retries_instead_of_escaping(
+        self, tmp_path, monkeypatch
+    ):
+        """The salvage check runs first in both handlers, so it must not raise.
+
+        `Path.exists` is substituted first so patching `Path.stat` intercepts
+        only the explicit measurement — which is the one the guard wraps, and
+        the first statement either transport handler runs. An exception from
+        inside an `except` handler is not caught by that handler's own `try`, so
+        without the guard the filesystem's errno replaces the transport error
+        and none of the retry budget is spent.
+        """
+        dest = tmp_path / "g"
+        session = _ScriptedSession(
+            _ScriptedBody(_PAYLOAD, stop_after=5), _ScriptedBody(_PAYLOAD)
+        )
+        real_stat = Path.stat
+        # The first explicit staging-file stat after the break is the
+        # salvage's; the handler's own (already guarded) one comes after.
+        state = {"broken": False, "seen": 0, "raised": False}
+        real_iter = _ScriptedBody.iter_content
+
+        def _iter(self, chunk_size=1):
+            try:
+                yield from real_iter(self, chunk_size)
+            except BaseException:
+                state["broken"] = True
+                raise
+
+        def _stat(self, *args, **kwargs):
+            if self.name.endswith(".part") and state["broken"]:
+                state["seen"] += 1
+                if state["seen"] == 1:
+                    state["raised"] = True
+                    raise OSError(errno.EACCES, "sharing violation")
+            return real_stat(self, *args, **kwargs)
+
+        monkeypatch.setattr(Path, "exists", _exists_via_os)
+        monkeypatch.setattr(_ScriptedBody, "iter_content", _iter)
+        monkeypatch.setattr(Path, "stat", _stat)
+        HttpClient(session=session, sleep=lambda _: None, max_retries=3).download(
+            "http://x/g", dest, progress=False, chunk=1
+        )
+        assert state["raised"], "the salvage stat never failed; the test proves nothing"
+        assert session.calls == 2, (
+            f"the transport break should have been retried; got {session.calls} "
+            f"request(s), so the stat error escaped instead"
+        )
+        assert dest.read_bytes() == _PAYLOAD
+
+    def test_an_incomplete_body_that_breaks_is_not_salvaged(self, tmp_path):
+        """Without the equality there is no proof, so the error propagates."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, stop_after=5))
+        client = HttpClient(session=session, sleep=lambda _: None, max_retries=0)
+        with pytest.raises(requests.ConnectionError):
+            client.download("http://x/g", tmp_path / "g", progress=False, chunk=1)
+        assert not (tmp_path / "g.part").exists()
+
+
+@pytest.mark.unit
+class TestDownloadCleanupAndOrdering:
+    """Nothing is left behind, and nothing is held open across a sleep."""
+
+    def test_an_interrupt_from_the_backoff_sleep_leaves_nothing_behind(self, tmp_path):
+        """A `BaseException` from the sleep still unwinds the staging file."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, stop_after=5))
+        client = HttpClient(session=session, sleep=_raise_interrupt, max_retries=3)
+        with pytest.raises(KeyboardInterrupt):
+            client.download("http://x/g", tmp_path / "g", progress=False, chunk=1)
+        assert not (tmp_path / "g.part").exists()
+        assert not (tmp_path / "g").exists()
+
+    def test_an_interrupt_from_the_throttle_leaves_nothing_behind(self, tmp_path):
+        """The throttle sleeps before the request, and must publish nothing either."""
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        client = HttpClient(
+            session=session,
+            sleep=_raise_interrupt,
+            min_interval=5.0,
+            clock=lambda: 0.0,
+        )
+        client._last_request = 0.0
+        with pytest.raises(KeyboardInterrupt):
+            client.download("http://x/g", tmp_path / "g", progress=False)
+        assert session.calls == 0
+        assert not (tmp_path / "g.part").exists()
+        assert not (tmp_path / "g").exists()
+
+    def test_the_response_is_closed_before_the_backoff_sleep(self, tmp_path):
+        """A streamed socket must not be held open across a retry wait."""
+        events: list[str] = []
+        session = _ClosingSession(events)
+        client = HttpClient(
+            session=session, sleep=lambda wait: events.append("sleep"), max_retries=3
+        )
+        client.download("http://x/g", tmp_path / "g", progress=False)
+        assert events[:2] == ["close", "sleep"], f"ordering was {events}"
+
+
+class _PartUnlinkFails:
+    """A `Path.unlink` replacement that refuses to remove a `.part` file.
+
+    Stands in for the sharing violation Windows raises when a handle has only
+    just been released, so the staging file survives the cleanup that promised
+    to remove it. Every other path is deleted normally.
+    """
+
+    def __init__(self, exc: OSError) -> None:
+        self._exc = exc
+        self._real = Path.unlink
+        self.fired = False
+
+    def __get__(self, instance: Any, owner: Any = None) -> Any:
+        """Bind like a method, so an instance can replace `Path.unlink`."""
+        if instance is None:
+            return self
+        return functools.partial(self.__call__, instance)
+
+    def __call__(self, path: Path, *args: Any, **kwargs: Any) -> Any:
+        """Refuse for the staging file; defer to the real `unlink` otherwise."""
+        if path.name.endswith(".part"):
+            self.fired = True
+            raise self._exc
+        return self._real(path, *args, **kwargs)
+
+
+class _PartLooksPresentOnce:
+    """A `Path.exists` replacement that claims a missing `.part` is there, once.
+
+    Reproduces the race the startup log line sits in — the staging file is
+    removed between the existence check and the measurement — without patching
+    `Path.stat`, whose reach differs across the supported versions.
+    """
+
+    def __init__(self) -> None:
+        self._real = Path.exists
+        self.fired = False
+
+    def __get__(self, instance: Any, owner: Any = None) -> Any:
+        """Bind like a method, so an instance can replace `Path.exists`."""
+        if instance is None:
+            return self
+        return functools.partial(self.__call__, instance)
+
+    def __call__(self, path: Path, *args: Any, **kwargs: Any) -> bool:
+        """Claim the first `.part` asked about is present, then step aside."""
+        if path.name.endswith(".part") and not self.fired:
+            self.fired = True
+            return True
+        return bool(self._real(path, *args, **kwargs))
+
+
+@pytest.mark.unit
+class TestStagingFileNoiseNeverReplacesTheOutcome:
+    """Sizing and removing `<dest>.part` is bookkeeping, never the result."""
+
+    def test_a_part_that_vanishes_before_it_is_sized_still_downloads(
+        self, tmp_path, monkeypatch
+    ):
+        """The startup log measures a file another process may already have removed."""
+        dest = tmp_path / "g"
+        lying = _PartLooksPresentOnce()
+        monkeypatch.setattr(Path, "exists", lying)
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", dest, progress=False
+        )
+        assert lying.fired, "the staging file was never claimed present"
+        assert dest.read_bytes() == _PAYLOAD
+        assert session.calls == 1, "sizing a stale .part must not cost an attempt"
+
+    def test_a_part_that_cannot_be_removed_is_logged_not_raised(
+        self, tmp_path, monkeypatch
+    ):
+        """The transport failure is the answer; the surviving temp is a note."""
+        dest = tmp_path / "g"
+        (tmp_path / "g.part").write_bytes(b"Z" * 99)
+        refusing = _PartUnlinkFails(PermissionError(errno.EACCES, "file in use"))
+        monkeypatch.setattr(Path, "unlink", refusing)
+        client = HttpClient(
+            session=_AlwaysRaises(requests.exceptions.SSLError("bad cert")),
+            sleep=lambda _: None,
+            max_retries=0,
+        )
+        with _captured_debug_logs() as messages:
+            with pytest.raises(requests.exceptions.SSLError, match="bad cert"):
+                client.download("http://x/g", dest, progress=False)
+        assert refusing.fired, "the cleanup never tried to remove the staging file"
+        assert any("could not remove g.part" in m for m in messages), (
+            f"a temp that outlived its promise must be reported; got {messages}"
+        )
+
+
+@pytest.mark.unit
+class TestDownloadProgressBar:
+    """The bar describes one attempt, never an offset into a previous one."""
+
+    def test_one_bar_per_attempt_starting_from_zero(self, tmp_path, monkeypatch):
+        """A whole-object attempt always starts from zero, whatever it retries after."""
+        seen: list[dict[str, Any]] = []
+        monkeypatch.setattr("earthlens.base.http.tqdm", _RecordingTqdm(seen))
+        session = _ScriptedSession(
+            _ScriptedBody(_PAYLOAD[:8], advertised=22), _ScriptedBody(_PAYLOAD)
+        )
+        HttpClient(session=session, sleep=lambda _: None, max_retries=3).download(
+            "http://x/g", tmp_path / "g", progress=False
+        )
+        assert len(seen) == 2, f"expected one bar per attempt, got {len(seen)}"
+        assert all("initial" not in kwargs for kwargs in seen), seen
+        assert [kwargs["total"] for kwargs in seen] == [22, 22]
+
+
+class _WriteFails:
+    """Serves a good response whose body raises `OSError` on the first block."""
+
+    def __init__(self, exc: OSError) -> None:
+        self._exc = exc
+        self.calls = 0
+
+    def get(self, url: str, **kwargs: Any) -> _ScriptedBody:
+        """Return a body that will fail while being written."""
+        self.calls += 1
+        return _RaisingBody(self._exc)
+
+
+class _RaisingBody(_ScriptedBody):
+    """A body whose stream raises the injected error instead of yielding."""
+
+    def __init__(self, exc: OSError) -> None:
+        super().__init__(_PAYLOAD)
+        self._exc = exc
+
+    def iter_content(self, chunk_size: int = 1) -> Any:
+        """Raise instead of yielding, standing in for a failing write."""
+        raise self._exc
+        yield b""  # pragma: no cover - makes this a generator
+
+
+@pytest.mark.unit
+class TestLocalStorageFailuresAreDeterministic:
+    """A failure of the destination is not a transport blip."""
+
+    @pytest.mark.parametrize("name", ["ENOSPC", "EROFS", "EFBIG", "EISDIR"])
+    def test_a_filesystem_refusal_is_never_retryable(self, name):
+        """No retry makes the disk larger or the mount writable."""
+        code = getattr(errno, name)
+        exc = OSError(code, "refused")
+        assert classify_transport_error(exc, strict=True) is None
+        assert classify_transport_error(exc, strict=False) is None
+
+    @pytest.mark.parametrize("name", ["EACCES", "EPERM"])
+    def test_a_permission_error_follows_the_platform(self, name):
+        """On Windows these are also how a transient sharing violation arrives.
+
+        Retryable there, but on the connect budget: one attempt clears a
+        sharing violation, while the read budget would re-download a
+        multi-gigabyte object to fail at the same byte.
+        """
+        exc = OSError(getattr(errno, name), "denied")
+        if sys.platform == "win32":
+            assert classify_transport_error(exc, strict=False) == "connect"
+        else:
+            assert classify_transport_error(exc, strict=False) is None
+
+    def test_a_wrapped_socket_error_is_still_a_transport_failure(self):
+        """`ConnectionResetError` is an `OSError` too, and must stay retryable."""
+        wrapped = requests.ConnectionError(ConnectionResetError("reset"))
+        assert classify_transport_error(wrapped) == "read"
+
+    def test_a_bare_socket_error_still_honours_a_caller_that_named_oserror(self):
+        """The disk rule must not swallow the socket errors that share the type."""
+        bare = ConnectionResetError(errno.ECONNRESET, "reset")
+        assert classify_transport_error(bare, strict=False) == "read"
+
+    def test_an_unrecognised_errno_keeps_the_callers_choice(self):
+        """The rule names specific conditions rather than claiming every `OSError`."""
+        exc = OSError(errno.EINTR, "interrupted")
+        assert classify_transport_error(exc, strict=True) is None
+        assert classify_transport_error(exc, strict=False) == "read"
+
+    def test_a_requests_error_is_not_mistaken_for_a_disk_error(self):
+        """`RequestException` subclasses `OSError`, so the check must exclude it."""
+        assert not _is_local_storage_error(requests.ConnectionError("boom"))
+        assert not _is_local_storage_error(
+            IncompleteDownloadError("short", written=1, expected=2)
+        )
+
+    def test_a_full_disk_is_not_retried_by_a_caller_that_named_oserror(self, tmp_path):
+        """The three archive backends pass `OSError`, and would otherwise refetch."""
+        session = _WriteFails(OSError(errno.ENOSPC, "No space left on device"))
+        client = HttpClient(
+            session=session,
+            sleep=lambda _: None,
+            max_retries=5,
+            retry_on_exceptions=(requests.RequestException, OSError),
+        )
+        with pytest.raises(OSError) as excinfo:
+            client.download("http://x/g", tmp_path / "g", progress=False)
+        assert excinfo.value.errno == errno.ENOSPC
+        assert session.calls == 1, f"expected 1 attempt, got {session.calls}"
+        assert not (tmp_path / "g.part").exists()
+
+
+@pytest.mark.unit
+class TestDeterministicErrnoPlatformGate:
+    """`EACCES` / `EPERM` are deterministic only away from Windows.
+
+    The gate runs at import time, so one of its two outcomes is invisible to
+    the interpreter running the suite. Both are exercised here against private
+    re-executions of the module.
+    """
+
+    def test_posix_treats_a_denied_write_as_permanent(self, monkeypatch):
+        """On POSIX a refused write is a standing property of the destination."""
+        posix = _http_for_platform("linux", monkeypatch)
+        assert errno.EACCES in posix._DETERMINISTIC_OS_ERRNOS, (
+            "EACCES must be deterministic away from Windows"
+        )
+        assert errno.EPERM in posix._DETERMINISTIC_OS_ERRNOS, (
+            "EPERM must be deterministic away from Windows"
+        )
+        verdict = posix.classify_transport_error(
+            OSError(errno.EACCES, "denied"), strict=False
+        )
+        assert verdict is None, (
+            f"a POSIX permission error must not retry, got {verdict}"
+        )
+
+    def test_windows_keeps_a_denied_write_retryable(self, monkeypatch):
+        """On Windows the same errno is how a transient sharing violation arrives."""
+        win = _http_for_platform("win32", monkeypatch)
+        assert errno.EACCES not in win._DETERMINISTIC_OS_ERRNOS, (
+            "EACCES on Windows is also a sharing violation, so it must stay retryable"
+        )
+        assert errno.EPERM not in win._DETERMINISTIC_OS_ERRNOS, (
+            "EPERM on Windows is also a sharing violation, so it must stay retryable"
+        )
+        verdict = win.classify_transport_error(
+            OSError(errno.EACCES, "denied"), strict=False
+        )
+        assert verdict == "connect", (
+            f"a Windows permission error must be retryable but on the small "
+            f"budget — one attempt clears a sharing violation, the read budget "
+            f"would re-download the whole object; got {verdict!r}"
+        )
+
+    def test_the_gate_moves_only_the_two_permission_errnos(self, monkeypatch):
+        """A full disk or a read-only mount is deterministic on either platform."""
+        posix = _http_for_platform("linux", monkeypatch)
+        win = _http_for_platform("win32", monkeypatch)
+        assert win._DETERMINISTIC_OS_ERRNOS < posix._DETERMINISTIC_OS_ERRNOS, (
+            "the Windows set must be a strict subset of the POSIX one"
+        )
+        moved = posix._DETERMINISTIC_OS_ERRNOS - win._DETERMINISTIC_OS_ERRNOS
+        assert moved == {errno.EACCES, errno.EPERM}, (
+            f"only the permission errnos may differ by platform, got {sorted(moved)}"
+        )
+        assert errno.ENOSPC in win._DETERMINISTIC_OS_ERRNOS, "ENOSPC must never move"
+
+
+# ---------------------------------------------------------------------------
+# Opt-in resume.
+#
+# `_ResumeServer` below is a range-serving object store whose misbehaviour is
+# configurable, so each adversarial shape the design was attacked with is a
+# constructor argument rather than a bespoke fake.
+# ---------------------------------------------------------------------------
+
+
+class _HeaderOnlyResponse:
+    """A response stand-in for helpers that read only the status and headers."""
+
+    def __init__(self, status: int, headers: dict[str, str]) -> None:
+        self.status_code = status
+        self.headers = headers
+
+
+_OBJECT = bytes(range(256)) * 800  # 204,800 bytes, > _RESUME_OVERLAP
+_BREAK_AT = 120_000  # leaves a staged prefix comfortably above the overlap
+
+
+class _ResumeBody:
+    """One response from `_ResumeServer`."""
+
+    def __init__(
+        self,
+        payload: bytes,
+        *,
+        status: int,
+        headers: dict[str, str],
+        break_at: int | None = None,
+    ) -> None:
+        self.payload = payload
+        self.status_code = status
+        self.headers = headers
+        self.break_at = break_at
+        self.closed = False
+
+    def iter_content(self, chunk_size: int = 1) -> Any:
+        """Yield the payload, breaking at `break_at` if one was set."""
+        emitted = 0
+        for i in range(0, len(self.payload), chunk_size):
+            block = self.payload[i : i + chunk_size]
+            if self.break_at is not None and emitted + len(block) > self.break_at:
+                give = self.break_at - emitted
+                if give > 0:
+                    yield block[:give]
+                raise _read_reset()
+            emitted += len(block)
+            yield block
+
+    def raise_for_status(self) -> None:
+        """Raise for a 4xx/5xx, as `requests` does.
+
+        `response=self` matters: real `requests` always attaches it, and
+        backends branch on `exc.response.status_code`.
+        """
+        if self.status_code >= 400:
+            raise requests.HTTPError(f"HTTP {self.status_code}", response=self)
+
+    def close(self) -> None:
+        """Record the release."""
+        self.closed = True
+
+
+class _ResumeServer:
+    """A range-serving store whose every misbehaviour is a constructor flag."""
+
+    def __init__(
+        self,
+        payload: bytes = _OBJECT,
+        *,
+        etag: str | None = '"v1"',
+        accept_ranges: bool = True,
+        encoding: str | None = None,
+        break_first_at: int | None = _BREAK_AT,
+        break_every_whole: bool = False,
+        honour_range: bool = True,
+        leg_status: int | None = None,
+        leg_etag: str | None = None,
+        leg_encoding: str | None = None,
+        leg_content_range: str | None = None,
+        leg_payload: bytes | None = None,
+        leg_break_at: int | None = None,
+        leg_breaks: list[int | None] | None = None,
+        leg_content_length: str | None = None,
+        leg_transfer_encoding: str | None = None,
+    ) -> None:
+        self.payload = payload
+        self.etag = etag
+        self.accept_ranges = accept_ranges
+        self.encoding = encoding
+        self.break_first_at = break_first_at
+        self.break_every_whole = break_every_whole
+        self.honour_range = honour_range
+        self.leg_status = leg_status
+        self.leg_etag = leg_etag
+        self.leg_encoding = leg_encoding
+        self.leg_content_range = leg_content_range
+        self.leg_payload = leg_payload
+        self.leg_break_at = leg_break_at
+        # One entry per ranged leg, consumed in order; `None` completes it.
+        self.leg_breaks = list(leg_breaks) if leg_breaks is not None else None
+        self.legs_served = 0
+        self.leg_content_length = leg_content_length
+        self.leg_transfer_encoding = leg_transfer_encoding
+        self.requests: list[dict[str, str]] = []
+
+    @property
+    def calls(self) -> int:
+        """How many requests were issued."""
+        return len(self.requests)
+
+    @property
+    def ranged(self) -> list[dict[str, str]]:
+        """Just the requests that carried a `Range`."""
+        return [r for r in self.requests if "Range" in r]
+
+    def get(self, url: str, **kwargs: Any) -> _ResumeBody:
+        """Answer a whole-object or ranged request."""
+        sent = dict(kwargs.get("headers") or {})
+        self.requests.append(sent)
+        wanted = sent.get("Range")
+        if wanted is None or not self.honour_range:
+            return self._whole()
+        first, last = (int(p) for p in wanted.removeprefix("bytes=").split("-"))
+        return self._partial(first, last)
+
+    def _base_headers(self) -> dict[str, str]:
+        """Headers common to both response shapes."""
+        headers: dict[str, str] = {}
+        if self.etag is not None:
+            headers["ETag"] = self.etag
+        if self.accept_ranges:
+            headers["Accept-Ranges"] = "bytes"
+        if self.encoding:
+            headers["Content-Encoding"] = self.encoding
+        return headers
+
+    def _whole(self) -> _ResumeBody:
+        """The 200 answer, optionally breaking part-way."""
+        headers = self._base_headers()
+        headers["Content-Length"] = str(len(self.payload))
+        breaks = self.break_every_whole or len(self.requests) == 1
+        return _ResumeBody(
+            self.payload,
+            status=200,
+            headers=headers,
+            break_at=self.break_first_at if breaks else None,
+        )
+
+    def _partial(self, first: int, last: int) -> _ResumeBody:
+        """The 206 answer, with whatever misbehaviour was configured."""
+        headers = self._base_headers()
+        if self.leg_etag is not None:
+            headers["ETag"] = self.leg_etag
+        if self.leg_encoding:
+            headers["Content-Encoding"] = self.leg_encoding
+        body = (
+            self.leg_payload
+            if self.leg_payload is not None
+            else self.payload[first : last + 1]
+        )
+        headers["Content-Range"] = (
+            self.leg_content_range
+            if self.leg_content_range is not None
+            else f"bytes {first}-{last}/{len(self.payload)}"
+        )
+        # A self-consistent lie: derive Content-Length from the range the
+        # response *claims*, so the length cross-check cannot stand in for the
+        # start/end/total gates under test.
+        claimed = _parse_content_range(headers["Content-Range"])
+        headers["Content-Length"] = self.leg_content_length or str(
+            claimed[1] - claimed[0] + 1 if claimed else len(body)
+        )
+        if self.leg_transfer_encoding:
+            headers["Transfer-Encoding"] = self.leg_transfer_encoding
+        break_at = self.leg_break_at
+        if self.leg_breaks is not None:
+            index = self.legs_served
+            break_at = self.leg_breaks[index] if index < len(self.leg_breaks) else None
+        self.legs_served += 1
+        return _ResumeBody(
+            body,
+            status=self.leg_status or 206,
+            headers=headers,
+            break_at=break_at,
+        )
+
+
+def _resume_client(server: _ResumeServer, **kwargs: Any) -> HttpClient:
+    """Build a client over a resume server with no real sleeping."""
+    kwargs.setdefault("max_retries", 3)
+    return HttpClient(session=server, sleep=lambda _: None, **kwargs)
+
+
+@pytest.mark.unit
+class TestResumeIsOptIn:
+    """Nothing about the default path changes."""
+
+    def test_no_range_is_sent_without_the_flag(self, tmp_path):
+        """The 1400 existing call sites must behave exactly as before."""
+        server = _ResumeServer()
+        _resume_client(server).download(
+            "http://x/g", tmp_path / "g", progress=False, chunk=4096
+        )
+        assert server.ranged == []
+
+    def test_the_object_still_arrives_intact_without_the_flag(self, tmp_path):
+        """A mid-stream break is still repaired by a full restart."""
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        _resume_client(server).download("http://x/g", dest, progress=False, chunk=4096)
+        assert dest.read_bytes() == _OBJECT
+
+
+@pytest.mark.unit
+class TestResumeHappyPath:
+    """What the feature is for."""
+
+    def test_a_broken_transfer_is_resumed_rather_than_restarted(self, tmp_path):
+        """The second request asks for the tail, and the file is byte-correct."""
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.calls == 2
+        sent = server.ranged[0]
+        assert sent["Range"] == f"bytes={_BREAK_AT - 65536}-{len(_OBJECT) - 1}"
+        assert sent["If-Range"] == '"v1"'
+        assert sent["Accept-Encoding"] == "identity"
+
+    def test_the_resumed_leg_re_fetches_the_overlap(self, tmp_path):
+        """The window starts before the staged end so the bytes can be compared."""
+        server = _ResumeServer()
+        _resume_client(server).download(
+            "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+        )
+        first = int(server.ranged[0]["Range"].removeprefix("bytes=").split("-")[0])
+        assert _BREAK_AT - first == 65536
+
+    def test_no_part_file_survives_a_resumed_download(self, tmp_path):
+        """The staging file is still renamed, not left behind."""
+        _resume_client(_ResumeServer()).download(
+            "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+        )
+        assert not (tmp_path / "g.part").exists()
+
+
+#: A megabyte, so several legs can each net more than the 64 KiB overlap.
+_BIG_OBJECT = bytes(range(256)) * 4096
+
+
+@pytest.mark.unit
+class TestResumeAcrossSeveralLegs:
+    """The behaviour the feature exists for: a resumed leg that breaks and resumes."""
+
+    def test_a_leg_that_breaks_past_the_overlap_is_itself_resumed(self, tmp_path):
+        """Each leg starts one overlap behind the bytes the previous one banked.
+
+        The `Range` progression is the part that binds. A bytes-only assertion
+        would pass with a leg deleted, and the offset arithmetic across legs is
+        exactly what an innocent change to `banked` or the truncate would break
+        silently.
+
+        Note the accounting: a leg delivering N bytes only advances the file by
+        `N - overlap`, because it re-fetches the overlap it is verified against.
+        """
+        dest = tmp_path / "g"
+        overlap, total = 65536, len(_BIG_OBJECT)
+        server = _ResumeServer(
+            _BIG_OBJECT, break_first_at=200_000, leg_breaks=[200_000, 200_000, None]
+        )
+        _resume_client(server, max_retries=6).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _BIG_OBJECT
+
+        first = 200_000 - overlap
+        second = first + 200_000 - overlap
+        third = second + 200_000 - overlap
+        assert [r["Range"] for r in server.ranged] == [
+            f"bytes={first}-{total - 1}",
+            f"bytes={second}-{total - 1}",
+            f"bytes={third}-{total - 1}",
+        ]
+
+    def test_every_leg_carries_the_anchored_validator(self, tmp_path):
+        """The anchor is frozen at the first response, not refreshed per leg."""
+        server = _ResumeServer(
+            _BIG_OBJECT, break_first_at=200_000, leg_breaks=[200_000, None]
+        )
+        _resume_client(server, max_retries=6).download(
+            "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+        )
+        assert len(server.ranged) >= 2
+        assert {r["If-Range"] for r in server.ranged} == {'"v1"'}
+
+    def test_a_leg_that_gains_less_than_the_overlap_stops_resuming(self, tmp_path):
+        """Re-fetching 64 KiB to gain less than that costs more than a restart.
+
+        Without the minimum-progress guard a server dribbling a few bytes per
+        leg re-sends the whole overlap each time and burns the read budget.
+        """
+        dest = tmp_path / "g"
+        # 100,000 delivered on a range starting one overlap back nets 34,464 —
+        # below the overlap, so the next leg must not be armed.
+        server = _ResumeServer(leg_breaks=[100_000, None])
+        _resume_client(server, max_retries=6).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert len(server.ranged) == 1, (
+            f"a leg netting less than the overlap re-armed: "
+            f"{[r['Range'] for r in server.ranged]}"
+        )
+
+
+@pytest.mark.unit
+class TestResumeLegIsolation:
+    """A ranged leg must not be judged by gates written for whole objects."""
+
+    def test_a_retry_predicate_never_sees_a_leg(self, tmp_path):
+        """The existing predicates call `r.json()`; a `206` is a byte fragment.
+
+        Handing one to a predicate written against whole-object responses makes
+        it judge — or fail to parse — a slice of the object, and the exception
+        escapes through the blanket handler.
+        """
+        seen: list[int] = []
+
+        def _predicate(response):
+            seen.append(response.status_code)
+            if response.status_code == 206:
+                raise ValueError("a predicate was handed a byte fragment")
+            return False
+
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        _resume_client(server, retry_predicate=_predicate).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert 206 not in seen, f"the predicate was shown a leg: {seen}"
+
+    def test_the_status_forcelist_never_sees_a_leg(self, tmp_path):
+        """The status half of the same exemption, which the predicate test misses.
+
+        A rewrite that guarded only the predicate would leave a `206` in the
+        forcelist replaying the leg instead of appending it, costing an extra
+        whole-object read.
+        """
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        _resume_client(server, status_forcelist=(206,)).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.calls == 2, (
+            f"the leg should have finished the transfer; {server.calls} requests "
+            f"means it was replayed as a retryable status"
+        )
+
+    def test_the_exhaustion_message_reports_the_bytes_actually_reached(self, tmp_path):
+        """`best read 0 bytes` after a six-figure transfer is worse than silence."""
+        server = _ResumeServer(break_every_whole=True, honour_range=False)
+        client = _resume_client(server, max_retries=2)
+        with pytest.raises(requests.ConnectionError) as excinfo:
+            client.download(
+                "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+            )
+        assert "best read 0 bytes" not in str(excinfo.value), (
+            f"the high-water mark was never observed: {excinfo.value}"
+        )
+        assert f"best read {_BREAK_AT:,} bytes" in str(excinfo.value), excinfo.value
+
+
+@pytest.mark.unit
+class TestResumeRefusesBadResponses:
+    """Every gate, one server misbehaviour each."""
+
+    @pytest.mark.parametrize(
+        "kwargs, reason",
+        [
+            ({"honour_range": False}, "answers 200 with the whole object"),
+            ({"leg_status": 416}, "answers 416"),
+            ({"leg_content_range": "bytes 999-204799/204800"}, "wrong range start"),
+            (
+                {"leg_content_range": f"bytes {_BREAK_AT - 65536}-204798/204800"},
+                "range stops short of the object end",
+            ),
+            (
+                {"leg_content_range": f"bytes {_BREAK_AT - 65536}-204799/999999"},
+                "range reports a different complete length",
+            ),
+            ({"leg_content_range": "bytes */204800"}, "unparseable Content-Range"),
+            ({"leg_content_range": None, "leg_etag": '"v2"'}, "renamed ETag"),
+            ({"leg_encoding": "gzip"}, "coded ranged reply"),
+            ({"leg_transfer_encoding": "chunked"}, "chunked ranged reply"),
+            (
+                {"leg_content_length": "12"},
+                "Content-Length disagrees with the Content-Range",
+            ),
+        ],
+        ids=[
+            "200-whole",
+            "416",
+            "wrong-start",
+            "wrong-end",
+            "wrong-total",
+            "star-range",
+            "etag-change",
+            "gzip-leg",
+            "chunked-leg",
+            "length-mismatch",
+        ],
+    )
+    def test_a_bad_leg_falls_back_to_a_whole_read(self, tmp_path, kwargs, reason):
+        """The leg must be refused, not merely survived.
+
+        Asserting only that the file is right would pass with the gate deleted,
+        because this fake is honest about the bytes it sends. The request count
+        is what distinguishes "refused and re-read the object" (three requests)
+        from "accepted the bad leg" (two).
+        """
+        dest = tmp_path / "g"
+        server = _ResumeServer(**kwargs)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert len(server.ranged) == 1, reason
+        assert server.calls == 3, f"the leg was accepted despite {reason}"
+        assert dest.read_bytes() == _OBJECT
+        assert not (tmp_path / "g.part").exists()
+
+    def test_a_lying_body_with_truthful_headers_is_caught(self, tmp_path):
+        """The attack no header check can see: right Content-Range, wrong bytes.
+
+        Every arithmetic gate passes here, so only the overlap comparison
+        stands between this and a published file that never existed upstream.
+        """
+        dest = tmp_path / "g"
+        start = _BREAK_AT - 65536
+        wrong = bytes(1 for _ in range(len(_OBJECT) - start))
+        server = _ResumeServer(leg_payload=wrong)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert b"\x01" * 200 not in dest.read_bytes()
+
+    def test_a_leg_ending_inside_the_overlap_is_refused(self, tmp_path):
+        """There are not enough bytes to compare, so nothing may be appended."""
+        dest = tmp_path / "g"
+        server = _ResumeServer(leg_payload=b"z" * 100)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.calls == 3
+
+    def test_a_chunk_size_that_straddles_the_overlap_still_resumes(self, tmp_path):
+        """The overlap rarely lands on a chunk boundary, so the split is exercised."""
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=5000, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.calls == 2
+
+    def test_a_refusal_disarms_resume_for_the_rest_of_the_call(self, tmp_path):
+        """One strike, so a bad server cannot drive a restart/resume cycle.
+
+        Every whole-object read breaks here, so without the disarm the call
+        would bank and re-arm on each pass and issue a ranged request per retry.
+        """
+        server = _ResumeServer(honour_range=False, break_every_whole=True)
+        client = _resume_client(server, max_retries=4)
+        with pytest.raises(requests.RequestException):
+            client.download(
+                "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+            )
+        assert len(server.ranged) == 1, (
+            f"resume re-armed after a refusal: {len(server.ranged)} ranged requests"
+        )
+
+
+@pytest.mark.unit
+class TestResumeArmingConditions:
+    """When a ranged request is never worth attempting."""
+
+    @pytest.mark.parametrize(
+        "kwargs, why",
+        [
+            ({"etag": 'W/"7"'}, "a weak validator cannot anchor a representation"),
+            ({"etag": None}, "no validator at all"),
+            ({"accept_ranges": False}, "the server does not advertise ranges"),
+            (
+                {"encoding": "gzip"},
+                "a coded body has no usable length, so no anchor is possible "
+                "(the encoding gate itself is checked directly below)",
+            ),
+        ],
+        ids=["weak-etag", "no-etag", "no-accept-ranges", "coded-body"],
+    )
+    def test_it_never_arms(self, tmp_path, kwargs, why):
+        """No Range is sent at all, and the object still arrives."""
+        dest = tmp_path / "g"
+        server = _ResumeServer(**kwargs)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert server.ranged == [], why
+        assert dest.read_bytes() == _OBJECT
+
+    def test_a_callers_own_range_disables_resume(self, tmp_path):
+        """If the caller owns the object boundaries, we never add ours on top."""
+        server = _ResumeServer(break_first_at=None)
+        _resume_client(server).download(
+            "http://x/g",
+            tmp_path / "g",
+            progress=False,
+            chunk=4096,
+            resume=True,
+            headers={"Range": "bytes=0-99"},
+        )
+        assert all(r["Range"] == "bytes=0-99" for r in server.ranged)
+
+    def test_a_break_inside_the_overlap_does_not_arm(self, tmp_path):
+        """Below the overlap a resumed leg would make no forward progress."""
+        dest = tmp_path / "g"
+        server = _ResumeServer(break_first_at=1024)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert server.ranged == []
+        assert dest.read_bytes() == _OBJECT
+
+
+@pytest.mark.unit
+class TestResumeBanksOnlyWhatIsOnDisk:
+    """The offset a resumed request asks for must equal the staged file size."""
+
+    def test_an_earlier_larger_attempt_does_not_inflate_the_offset(self, tmp_path):
+        """A high-water mark across attempts outlives the file that produced it.
+
+        Attempt 1 ends cleanly but short, so it is discarded; attempt 2 breaks
+        earlier. Banking the larger, older count would aim the ranged request
+        past the end of the staged file, guaranteeing a refusal and blaming the
+        server for a local accounting error.
+        """
+        dest = tmp_path / "g"
+        server = _ShrinkingResumeServer()
+        _resume_client(server, max_retries=5).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        ranged = server.ranged
+        assert ranged, "the second break should still have armed a resume"
+        first = int(ranged[0]["Range"].removeprefix("bytes=").split("-")[0])
+        assert first == 100_000 - 65536, (
+            f"the leg asked from {first}, so it banked something other than the "
+            f"100,000 bytes attempt 2 actually wrote"
+        )
+
+
+class _ShrinkingResumeServer(_ResumeServer):
+    """Ends short on the first read, then breaks earlier on the second."""
+
+    def _whole(self) -> _ResumeBody:
+        """Serve a clean-but-short body, then a body that breaks at 100,000."""
+        headers = self._base_headers()
+        headers["Content-Length"] = str(len(self.payload))
+        n = len(self.requests)
+        if n == 1:
+            # Ends cleanly at 190,000: an IncompleteDownloadError, discarded.
+            return _ResumeBody(self.payload[:190_000], status=200, headers=headers)
+        return _ResumeBody(self.payload, status=200, headers=headers, break_at=100_000)
+
+
+@pytest.mark.unit
+class TestResumeHelperEdges:
+    """Branches of the resume helpers a server-level test cannot reach."""
+
+    @pytest.mark.parametrize(
+        "value", ["abc", '"unterminated', 'trailing"', '"', ""], ids=list("abcde")
+    )
+    def test_a_malformed_entity_tag_does_not_anchor(self, value):
+        """An `ETag` that is not a quoted-string cannot identify a representation."""
+        assert _strong_etag({"ETag": value}) is None
+
+    @pytest.mark.parametrize("value", [None, "", "   "], ids=["none", "empty", "blank"])
+    def test_an_absent_content_range_parses_to_nothing(self, value):
+        """A reply carrying no `Content-Range` has no window to check.
+
+        `None` is the shape a real `headers.get` returns, and the guard has to
+        answer it before the regex sees it.
+        """
+        assert _parse_content_range(value) is None, f"{value!r} is not a byte range"
+
+    def test_a_coded_response_never_anchors_even_with_a_length(self):
+        """The encoding gate, which no end-to-end case can reach.
+
+        `download` derives the total with `_progress_total`, which already
+        returns `None` for a coded body, so the check inside
+        `_arm_resume_anchor` is defence in depth and has to be exercised
+        directly or not at all.
+        """
+        response = _HeaderOnlyResponse(
+            200,
+            {
+                "Content-Length": "1000",
+                "Content-Encoding": "gzip",
+                "Accept-Ranges": "bytes",
+                "ETag": '"v1"',
+            },
+        )
+        assert _arm_resume_anchor(response, 1000) is None
+        response.headers.pop("Content-Encoding")
+        assert _arm_resume_anchor(response, 1000) == _ResumeAnchor(1000, '"v1"')
+
+    def test_empty_keepalive_blocks_do_not_count_toward_the_overlap(self, tmp_path):
+        """A chunked keepalive yields empty blocks; they carry no bytes to compare."""
+        dest = tmp_path / "g"
+        server = _KeepaliveResumeServer()
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.calls == 2
+
+    def test_an_unreadable_staging_file_disarms_instead_of_raising(
+        self, tmp_path, monkeypatch
+    ):
+        """A local read-back failure is not the server's fault, so restart quietly."""
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        real_open = builtins.open
+
+        def _failing_open(file, mode="r", *args, **kwargs):
+            if str(file).endswith(".part") and "r" in mode and "+" not in mode:
+                raise OSError(errno.ENOENT, "vanished")
+            return real_open(file, mode, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "open", _failing_open)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.calls == 3, "the leg should have been refused, not raised"
+
+    def test_a_deterministic_read_back_failure_is_raised_not_refused(
+        self, tmp_path, monkeypatch
+    ):
+        """A read-only mount is not a bad leg, so it must not trigger a re-read.
+
+        The sibling case above turns an unreadable staging file into a refusal
+        and restarts the object. Doing that for a standing filesystem condition
+        would re-read the whole object only to hit the same refusal again.
+        """
+        server = _ResumeServer()
+        monkeypatch.setattr(
+            builtins,
+            "open",
+            _OpenFailsOnPartReadback(OSError(errno.EROFS, "read-only file system")),
+        )
+        # The client is built outside the block: if its construction raised,
+        # the test would pass without ever reaching the download under test.
+        client = _resume_client(server)
+        with pytest.raises(OSError) as excinfo:
+            client.download(
+                "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+            )
+        assert excinfo.value.errno == errno.EROFS, (
+            f"the filesystem errno must survive, got {excinfo.value!r}"
+        )
+        assert server.calls == 2, (
+            f"the object must not be re-read after a disk refusal, got "
+            f"{server.calls} requests"
+        )
+        assert not (tmp_path / "g.part").exists()
+
+    def test_an_unstattable_staging_file_banks_nothing(self, tmp_path, monkeypatch):
+        """A failed `stat` between attempts leaves no prefix to resume from.
+
+        The happy path resumes this exact server with one ranged request. When
+        the size cannot be read the count must fall back to zero and the object
+        be re-read whole, rather than the error escaping `download` or a stale
+        high-water mark standing in for it.
+        """
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        # `after=1` lets the salvage's own measurement through so the refusal
+        # lands on the banking stat; the two are separate guards and this test
+        # is about the second. An earlier version reached it by turning the
+        # length check off, which is now refused alongside `resume=True`.
+        failing = _PartStatFailsOnce(OSError(errno.EIO, "I/O error"), after=1)
+        monkeypatch.setattr(Path, "exists", _exists_via_os)
+        monkeypatch.setattr(Path, "stat", failing)
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert failing.fired, "the banking stat never failed; the test proves nothing"
+        assert dest.read_bytes() == _OBJECT
+        assert server.ranged == [], "an unreadable size must not be banked as progress"
+        assert server.calls == 2, f"expected one restart, got {server.calls} requests"
+
+
+class _OpenFailsOnPartReadback:
+    """A stand-in for `open` that refuses a read-only open of the staging file.
+
+    Only the read-back of the re-sent overlap matches; the streaming writes and
+    every other file in the test still go to the real `open`.
+    """
+
+    def __init__(self, exc: OSError) -> None:
+        self._exc = exc
+        self._real = builtins.open
+
+    def __call__(self, file: Any, mode: str = "r", *args: Any, **kwargs: Any) -> Any:
+        """Raise for a read-only open of a `.part`, else defer to the real one."""
+        if str(file).endswith(".part") and "r" in mode and "+" not in mode:
+            raise self._exc
+        return self._real(file, mode, *args, **kwargs)
+
+
+class _PartStatFailsOnce:
+    """A `Path.stat` replacement that refuses one stat of a `.part` file.
+
+    The real `stat` runs first, so a missing file still reports missing and the
+    refusal only lands once the staging file genuinely exists. One shot, so the
+    attempt that follows can size the finished object normally.
+
+    `after` lets earlier staging-file stats through untouched, which is how a
+    caller reaches a specific one: with the length check on, the salvage
+    measures the file before the banking step does.
+    """
+
+    def __init__(self, exc: OSError, after: int = 0) -> None:
+        self._exc = exc
+        self._real = Path.stat
+        self._after = after
+        self.seen = 0
+        self.fired = False
+
+    def __get__(self, instance: Any, owner: Any = None) -> Any:
+        """Bind like a method, so `path.stat()` reaches `__call__` with the path."""
+        if instance is None:
+            return self
+        return functools.partial(self, instance)
+
+    def __call__(self, path: Path, *args: Any, **kwargs: Any) -> Any:
+        """Defer to the real `stat`, then refuse once for the staging file."""
+        result = self._real(path, *args, **kwargs)
+        if path.name.endswith(".part") and not self.fired:
+            self.seen += 1
+            if self.seen > self._after:
+                self.fired = True
+                raise self._exc
+        return result
+
+
+class _KeepaliveResumeServer(_ResumeServer):
+    """A resume server whose ranged body is padded with empty blocks."""
+
+    def _partial(self, first: int, last: int) -> _ResumeBody:
+        """Return the normal 206, but yielding empty blocks between real ones."""
+        body = super()._partial(first, last)
+        return _EmptyPaddedBody(body)
+
+
+class _EmptyPaddedBody:
+    """Wraps a body, interleaving zero-length blocks into its stream."""
+
+    def __init__(self, inner: _ResumeBody) -> None:
+        self._inner = inner
+        self.status_code = inner.status_code
+        self.headers = inner.headers
+
+    def iter_content(self, chunk_size: int = 1) -> Any:
+        """Yield an empty block before every real one."""
+        for block in self._inner.iter_content(chunk_size):
+            yield b""
+            yield block
+
+    def raise_for_status(self) -> None:
+        """Delegate."""
+        self._inner.raise_for_status()
+
+    def close(self) -> None:
+        """Delegate."""
+        self._inner.close()
+
+
+@pytest.mark.unit
+class TestResumeNeverTrustsFoundBytes:
+    """A `.part` this call did not write is never resumed from."""
+
+    def test_a_stale_part_is_not_used_as_the_resume_prefix(self, tmp_path):
+        """Otherwise the published file is half a previous, unrelated object."""
+        dest = tmp_path / "g"
+        (tmp_path / "g.part").write_bytes(b"\xff" * 190_000)
+        server = _ResumeServer()
+        _resume_client(server).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert b"\xff" * 1000 not in dest.read_bytes()
+
+    def test_the_resumed_leg_starts_from_this_calls_own_byte_count(self, tmp_path):
+        """The offset must come from the truncating write, not the stale size."""
+        (tmp_path / "g.part").write_bytes(b"\xff" * 190_000)
+        server = _ResumeServer()
+        _resume_client(server).download(
+            "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+        )
+        first = int(server.ranged[0]["Range"].removeprefix("bytes=").split("-")[0])
+        assert first == _BREAK_AT - 65536, "offset was taken from the stale file"
+
+
+@pytest.mark.unit
+class TestResumeStillVerifies:
+    """A resumed file is published through the same gates as a whole read."""
+
+    def test_a_resumed_leg_that_ends_short_does_not_publish(self, tmp_path):
+        """The length post-condition applies to the assembled file too."""
+        dest = tmp_path / "g"
+        server = _ResumeServer(leg_break_at=1000)
+        client = _resume_client(server, max_retries=1)
+        with pytest.raises(requests.RequestException):
+            client.download("http://x/g", dest, progress=False, chunk=4096, resume=True)
+        assert not dest.exists()
+        assert not (tmp_path / "g.part").exists()
+
+    def test_a_resumed_file_is_magic_checked(self, tmp_path):
+        """`expect_magic` runs on the assembled object, not on the first leg."""
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        client = _resume_client(server)
+        with pytest.raises(ValueError):
+            client.download(
+                "http://x/g",
+                dest,
+                progress=False,
+                chunk=4096,
+                resume=True,
+                expect_magic=b"NOPE",
+            )
+        assert not dest.exists()
+
+    @pytest.mark.parametrize("status", [404, 410, 503])
+    def test_an_error_status_on_a_leg_keeps_its_status(self, tmp_path, status):
+        """Backends tell a missing granule from a real failure by the status."""
+        server = _ResumeServer(leg_status=status)
+        client = _resume_client(server, max_retries=1)
+        with pytest.raises(requests.HTTPError) as excinfo:
+            client.download(
+                "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+            )
+        assert excinfo.value.response is not None
+        assert excinfo.value.response.status_code == status
+
+    def test_a_refusal_with_no_budget_left_raises_instead_of_looping(self, tmp_path):
+        """The refusal path is bounded by the retry budget, not only by the disarm."""
+        server = _ResumeServer(honour_range=False, break_every_whole=True)
+        client = _resume_client(server, max_retries=1)
+        with pytest.raises(requests.ConnectionError, match="no retry budget left"):
+            client.download(
+                "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+            )
+        assert not (tmp_path / "g.part").exists()
+
+    def test_a_resumed_download_matches_a_restarted_one_byte_for_byte(self, tmp_path):
+        """The whole point: resuming must not change what lands on disk."""
+        restarted = tmp_path / "restarted"
+        resumed = tmp_path / "resumed"
+        _resume_client(_ResumeServer()).download(
+            "http://x/g", restarted, progress=False, chunk=4096
+        )
+        _resume_client(_ResumeServer()).download(
+            "http://x/g", resumed, progress=False, chunk=4096, resume=True
+        )
+        assert restarted.read_bytes() == resumed.read_bytes() == _OBJECT

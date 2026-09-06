@@ -186,7 +186,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     }
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Variable]):
     """Config + curated-vocabulary catalog for the ISIMIP backend.
 
     Reads the bundled `isimip_data_catalog.yaml` (shipped as package data) and
@@ -312,14 +312,6 @@ class Catalog(AbstractCatalog):
                     f"{path} {model.__name__} {key!r} failed validation:\n{exc}"
                 ) from exc
         return out
-
-    def get_catalog(self) -> dict[str, Variable]:
-        """Return the curated variable map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Variable]: Same object as :attr:`datasets`.
-        """
-        return self.datasets
 
     def get_forcing(self, key: str) -> Forcing:
         """Return the :class:`Forcing` for `key`, with a did-you-mean hint.

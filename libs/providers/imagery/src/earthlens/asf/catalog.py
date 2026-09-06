@@ -200,7 +200,7 @@ class Product(BaseModel):
         return self
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Product]):
     """Product catalog for the ASF InSAR backend.
 
     Reads the bundled `asf_data_catalog.yaml` (shipped as package
@@ -340,15 +340,6 @@ class Catalog(AbstractCatalog):
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(datasets=dict(_load_catalog_data(catalog_path)))
-
-    def get_catalog(self) -> dict[str, Product]:
-        """Return the product map (satisfies the abstract contract).
-
-        Returns:
-            dict[str, Product]: Same object as :attr:`datasets` /
-                :attr:`products`.
-        """
-        return self.datasets
 
     @property
     def available_products(self) -> list[str]:

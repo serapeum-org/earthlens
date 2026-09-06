@@ -99,7 +99,7 @@ class Station(BaseModel):
     state: str = ""
 
 
-class Catalog(AbstractCatalog):
+class Catalog(AbstractCatalog[Station]):
     """Catalog of NEXRAD WSR-88D sites.
 
     Reads the bundled `radar_data_catalog.yaml` and exposes its `stations:` block
@@ -130,10 +130,6 @@ class Catalog(AbstractCatalog):
             dict[str, Any]: The `stations:` map keyed by site id.
         """
         return {"datasets": _load_stations(CATALOG_PATH)}
-
-    def get_catalog(self) -> dict[str, Station]:
-        """Return the structural per-site map (satisfies the base contract)."""
-        return self.datasets
 
     def get_station(self, site_id: str) -> Station:
         """Resolve a site id to its :class:`Station` (did-you-mean on miss).

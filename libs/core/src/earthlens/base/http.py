@@ -33,16 +33,18 @@ parameter accepts).
 
 from __future__ import annotations
 
+import contextlib
 import datetime as dt
 import errno
 import io
 import re
+import sys
 import threading
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator, Mapping
 from email.utils import parsedate_to_datetime
 from pathlib import Path
-from typing import Any, TypeVar, cast
+from typing import Any, NamedTuple, TypeVar, cast
 from urllib.parse import urlsplit
 
 import requests
@@ -57,7 +59,28 @@ from tqdm import tqdm
 Timeout = float | tuple[float, float]
 
 #: Per-request timeout (seconds) applied when a call passes no `timeout`.
-DEFAULT_TIMEOUT: Timeout = 60.0
+#: A `(connect, read)` pair rather than one number: a host that is down or
+#: firewalled fails its TCP handshake in 10s instead of occupying a thread for
+#: a full minute, while a slow-but-alive transfer keeps the 60s read budget it
+#: had before. Bounding both phases with one value made the short failure and
+#: the long transfer share a budget that could only suit one of them.
+#:
+#: The 10s figure is measured, not chosen. DNS + TCP + TLS to the mirrors this
+#: repo actually fetches from — CHC UCSB, DWD, JRC, Zenodo, Geofabrik, WorldPop,
+#: CDS — completes in 0.06-0.49s, so 10s carries roughly twenty times the
+#: observed worst case.
+#:
+#: One host looked like a counter-example and is worth recording, because it
+#: argues the opposite of what it first appears to. `coastwatch.pfeg.noaa.gov`
+#: needs 21.4s (reproducibly, 5/5) to connect via `socket.create_connection` —
+#: over twice this budget. It is dual-stack with a dead IPv6 route, and a
+#: connect timeout applies *per address*, so `requests` abandons the IPv6
+#: attempt at 10s and reaches the object over IPv4 0.9s later: 10.95s in total,
+#: successful. Raising the budget to 30s does not help that host, it makes it
+#: slower (21.7s measured), because the wait on the dead route grows with the
+#: budget. A short connect timeout is what makes dual-stack fallback quick.
+#: See also :func:`prefer_ipv4` for backends that want to skip IPv6 outright.
+DEFAULT_TIMEOUT: Timeout = (10.0, 60.0)
 
 #: Maximum retries for a retryable status before the last response's
 #: error is raised.
@@ -75,6 +98,710 @@ DEFAULT_MAX_BACKOFF = 300.0
 #: HTTP statuses that trigger a retry. `429` (rate-limited) plus the
 #: transient `5xx` gateway/unavailable family.
 DEFAULT_STATUS_FORCELIST: tuple[int, ...] = (429, 500, 502, 503, 504)
+
+#: Transport-level exceptions the retry loop inspects. These are the failures
+#: that never reach an HTTP status — a refused or reset connection, a DNS blip,
+#: a handshake or read that timed out, a response body truncated mid-stream — so
+#: `status_forcelist` cannot describe them. Membership here only means "the loop
+#: looks at it"; :func:`classify_transport_error` then decides whether it is
+#: retryable at all and which budget it spends.
+#:
+#: `requests.RequestException` is deliberately NOT the entry here: it is the
+#: base of `HTTPError` too, so retrying on it would re-issue requests for 4xx
+#: responses that will never succeed.
+DEFAULT_RETRY_EXCEPTIONS: tuple[type[BaseException], ...] = (
+    requests.ConnectionError,
+    requests.exceptions.Timeout,
+    requests.exceptions.ChunkedEncodingError,
+)
+
+#: Transport failures that are never retried, however they are classified. A
+#: certificate that does not validate and a proxy that is misconfigured are
+#: deterministic: the next attempt reproduces them exactly, so retrying only
+#: delays the same error by the whole back-off budget. Both subclass
+#: `requests.ConnectionError`, so they would otherwise be swept in by it.
+#:
+#: This mirrors urllib3, whose `Retry._is_connection_error` narrows to a connect
+#: *timeout* rather than accepting every connection error.
+NON_RETRYABLE_EXCEPTIONS: tuple[type[BaseException], ...] = (
+    requests.exceptions.SSLError,
+    requests.exceptions.ProxyError,
+)
+
+#: Local-filesystem conditions that a retry cannot improve. These reach
+#: :func:`classify_transport_error` as a bare `OSError` from the streaming write
+#: rather than from the socket, and the three backends that download multi-
+#: gigabyte archives name `OSError` in their `retry_on_exceptions`, so without
+#: this a full disk re-downloads the whole object once per retry to fail at the
+#: same byte. Every entry is a standing property of the destination — no space,
+#: no quota, a read-only mount, no permission — not a transient one.
+_DETERMINISTIC_ERRNO_NAMES: tuple[str, ...] = (
+    "ENOSPC",
+    "EDQUOT",
+    "EROFS",
+    "EFBIG",
+    "EISDIR",
+    "ENOTDIR",
+    "ENAMETOOLONG",
+)
+
+#: `EACCES` / `EPERM` join the set only away from Windows. On POSIX they are a
+#: standing property of the destination, like the rest. On Windows they are also
+#: how a *sharing violation* surfaces — another process (an indexer, antivirus,
+#: Google Drive for Desktop, a handle not yet released) holding the file — which
+#: is the textbook transient failure there. Measured on Windows 11: a write to a
+#: locked region raises `PermissionError` with `errno=EACCES` and no `winerror`,
+#: and unlinking an open file raises `errno=EACCES` with `winerror=32`, so
+#: neither a `winerror` test nor the errno alone can separate the two cases.
+#: Retrying a genuinely permanent permission error costs a bounded number of
+#: attempts; refusing to retry a sharing violation fails a multi-gigabyte
+#: download outright, and this repo's primary platform is Windows.
+if sys.platform != "win32":
+    _DETERMINISTIC_ERRNO_NAMES += ("EACCES", "EPERM")
+
+#: Permission errnos on Windows, where one code covers both a permanent refusal
+#: and a transient sharing violation. They stay retryable there — see
+#: :data:`_DETERMINISTIC_ERRNO_NAMES` — but on the *connect* budget rather than
+#: the read one: a sharing violation clears in seconds, so a single retry
+#: separates the two cases, whereas the full read budget would re-download a
+#: multi-gigabyte object five times to fail at the same byte. That amplification
+#: is what the deterministic set exists to prevent, and honouring Windows must
+#: not reintroduce it. Empty on every other platform, where the same two errnos
+#: are a standing property of the destination and join
+#: :data:`_DETERMINISTIC_ERRNO_NAMES` instead.
+_TRANSIENT_PERMISSION_ERRNOS: frozenset[int] = (
+    frozenset()
+    if sys.platform != "win32"
+    else frozenset(
+        code
+        for code in (getattr(errno, name, None) for name in ("EACCES", "EPERM"))
+        if code is not None
+    )
+)
+
+#: The errno *values* behind :data:`_DETERMINISTIC_ERRNO_NAMES`, resolved once at
+#: import. Built by name and filtered rather than written as literals because the
+#: set is platform-dependent — `EDQUOT` is missing from some builds, and the two
+#: permission errnos are only appended away from Windows — so a name this
+#: platform does not define is simply dropped instead of failing the import.
+_DETERMINISTIC_OS_ERRNOS: frozenset[int] = frozenset(
+    code
+    for code in (getattr(errno, name, None) for name in _DETERMINISTIC_ERRNO_NAMES)
+    if code is not None
+)
+
+
+def _is_local_storage_error(exc: BaseException) -> bool:
+    """Whether `exc` is a filesystem refusal rather than a transport failure.
+
+    A `requests` error is excluded even though `RequestException` subclasses
+    `OSError`: those carry no `errno` of their own and describe the socket, not
+    the destination.
+
+    Args:
+        exc: The exception a download attempt raised.
+
+    Returns:
+        bool: True when writing the file failed for a reason the next attempt
+        would hit again.
+
+    Examples:
+        - A full disk is deterministic:
+            ```python
+            >>> import errno
+            >>> from earthlens.base.http import _is_local_storage_error
+            >>> _is_local_storage_error(OSError(errno.ENOSPC, "No space left"))
+            True
+
+            ```
+        - A reset socket is not, even though it is also an `OSError`:
+            ```python
+            >>> from earthlens.base.http import _is_local_storage_error
+            >>> _is_local_storage_error(ConnectionResetError("reset"))
+            False
+
+            ```
+    """
+    if isinstance(exc, requests.RequestException) or not isinstance(exc, OSError):
+        return False
+    return exc.errno in _DETERMINISTIC_OS_ERRNOS
+
+
+#: Retries allowed for a failure in the *connect* phase, counted separately from
+#: :data:`DEFAULT_READ_RETRIES`. Deliberately small: a refused connection, an
+#: unresolvable name or a connect timeout almost always means the host is down
+#: or blocked, and a generous budget turns a fast, clear failure into a slow
+#: one. With the default connect timeout this bounds a dead host at about two
+#: attempts rather than six.
+DEFAULT_CONNECT_RETRIES = 1
+
+#: Retries allowed for a failure in the *read* phase — a socket reset partway
+#: through a response, a read timeout, a truncated body. This is the genuinely
+#: transient case worth retrying, so it keeps the full budget. `None` means
+#: "use `max_retries`".
+DEFAULT_READ_RETRIES: int | None = None
+
+#: Statuses a server uses to ask for a later retry, rather than to report that
+#: it already failed. `429` and `503` (and `413`, per RFC 9110) are an explicit
+#: "come back later", so replaying them is safe for any method. The remaining
+#: `status_forcelist` entries — `500`, `502`, `504` — mean the server received
+#: the request and may have acted on it before failing, so those are replayed
+#: only for idempotent methods. Matches urllib3's `RETRY_AFTER_STATUS_CODES`.
+RETRY_AFTER_STATUS_CODES: frozenset[int] = frozenset({413, 429, 503})
+
+#: Substrings of the wrapped exception's class name identifying a failure raised
+#: while *establishing* the connection. Matched by name rather than against
+#: imported `urllib3` classes: the wrapped cause is an implementation detail of
+#: how `requests` happens to reach the network today, so a name match keeps
+#: working if that changes, and this module stays free of a second dependency on
+#: `urllib3`'s exception taxonomy. (`prefer_ipv4` does import `urllib3`, for a
+#: module global it can only reach that way.)
+_CONNECT_CAUSE_NAMES = ("NewConnection", "NameResolution", "ConnectTimeout", "MaxRetry")
+
+#: The same, for a failure raised once the connection was established and the
+#: request had therefore been delivered.
+_READ_CAUSE_NAMES = ("Protocol", "ReadTimeout", "IncompleteRead", "Decode")
+
+
+def _causes(exc: BaseException) -> Iterator[BaseException]:
+    """Yield a transport exception and every cause wrapped inside it.
+
+    `requests` puts the underlying urllib3 error in `args[0]` rather than in
+    `__cause__`, and that error wraps the socket error the same way, so both the
+    exception chain and the arguments are walked.
+
+    Args:
+        exc: The exception to unwrap.
+
+    Yields:
+        BaseException: Each nested cause, outermost first.
+    """
+    seen: set[int] = set()
+    queue: list[BaseException] = [exc]
+    while queue:
+        current = queue.pop(0)
+        if id(current) in seen:
+            continue
+        seen.add(id(current))
+        yield current
+        # `reason` before the rest: `urllib3.exceptions.MaxRetryError` keeps the
+        # real failure there and puts only a formatted *string* in `args`, so a
+        # walk over `args` alone sees the wrapper and stops. Its own class name
+        # matches the connect marker, which would then classify a delivered
+        # read failure as a connect one — and connect failures are not
+        # method-gated, so a `POST` would be replayed.
+        for nxt in (
+            getattr(current, "reason", None),
+            current.__cause__,
+            current.__context__,
+        ):
+            if isinstance(nxt, BaseException):
+                queue.append(nxt)
+        for arg in getattr(current, "args", ()):
+            if isinstance(arg, BaseException):
+                queue.append(arg)
+
+
+def _phase_from_causes(exc: BaseException) -> str | None:
+    """Decide the phase of a `requests.ConnectionError` from what it wraps.
+
+    `requests` collapses both phases into this one class, so the wrapped cause
+    is the only thing separating "never connected" from "connected, then the
+    socket died".
+
+    The socket-level causes are checked before the name markers, and read
+    markers across *every* cause before connect ones, because a wrapper can
+    match a marker itself while carrying the real reason inside it —
+    `MaxRetryError` matches the connect marker and commonly wraps a read
+    failure, so scanning cause-by-cause would let the wrapper outvote its own
+    reason.
+
+    Args:
+        exc: The connection error to inspect.
+
+    Returns:
+        str | None: `"read"` when the request had been delivered, `"connect"`
+        when it provably was not, and `None` when the causes say neither. The
+        caller decides what an unknown failure costs; this function does not
+        guess, because the two decisions it feeds pull in opposite directions.
+
+    Examples:
+        - A reset socket happened after the request was delivered:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import _phase_from_causes
+            >>> _phase_from_causes(requests.ConnectionError(ConnectionResetError()))
+            'read'
+
+            ```
+        - A refused connection never reached the server:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import _phase_from_causes
+            >>> _phase_from_causes(requests.ConnectionError(ConnectionRefusedError()))
+            'connect'
+
+            ```
+        - Nothing recognisable inside means no verdict, rather than a guess:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import _phase_from_causes
+            >>> _phase_from_causes(requests.ConnectionError("mystery")) is None
+            True
+
+            ```
+    """
+    causes = list(_causes(exc))
+    for cause in causes:
+        if isinstance(cause, (ConnectionResetError, ConnectionAbortedError)):
+            return "read"
+        if isinstance(cause, ConnectionRefusedError):
+            return "connect"
+    names = [type(cause).__name__ for cause in causes]
+    if any(marker in name for name in names for marker in _READ_CAUSE_NAMES):
+        return "read"
+    if any(marker in name for name in names for marker in _CONNECT_CAUSE_NAMES):
+        return "connect"
+    return None
+
+
+def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str | None:
+    """Say whether a transport failure is retryable, and which budget it spends.
+
+    Splits the failure the way urllib3's `Retry` does, because the two kinds
+    warrant opposite policies. A **connect** failure means the request was never
+    delivered, so replaying it is safe for any method but rarely productive —
+    the host is usually down or blocked. A **read** failure means the server
+    accepted the request and the response broke afterwards, so it may already
+    have acted on it, but the failure itself is the transient one worth
+    retrying.
+
+    Args:
+        exc: The exception raised by the transport.
+        strict: Whether to veto failures this function considers
+            never-retryable. `True` while the client is using
+            :data:`DEFAULT_RETRY_EXCEPTIONS`. `False` when the caller passed
+            its own `retry_on_exceptions`, in which case naming a type *is*
+            the decision to retry it and this function only chooses the
+            budget — an unrecognised type then spends the read budget, the
+            method-gated one.
+
+    Returns:
+        str | None: `"connect"`, `"read"`, `"unknown"` when the causes
+        identify neither phase, or `None` when the failure is deterministic and
+        must not be retried at all. A failure of the *destination* rather than
+        the transport — a full disk, a quota, a read-only mount — is deterministic
+        whatever `strict` says, because no retry policy makes the disk larger.
+
+        The one destination failure that is not deterministic is a permission
+        errno on Windows, where the same `EACCES` / `EPERM` reports both a
+        standing refusal and a transient sharing violation. That answers
+        `"connect"`: retryable, since a violation clears in seconds, but on the
+        small budget, so a genuinely permanent one costs one extra attempt
+        rather than a whole re-read. Off Windows those errnos are deterministic
+        like the rest and answer `None`.
+
+        `"unknown"` exists because the two decisions this feeds pull opposite
+        ways. For the *budget*, an unidentified failure should cost little, like
+        a connect failure. For *replay safety*, it must be treated like a read
+        failure: a connect failure is replayed for any verb precisely because
+        the request provably never arrived, and an unidentified one carries no
+        such proof.
+
+    Examples:
+        - A connect timeout spends the connect budget:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import classify_transport_error
+            >>> classify_transport_error(requests.exceptions.ConnectTimeout())
+            'connect'
+
+            ```
+        - A body that stops mid-stream spends the read budget:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import classify_transport_error
+            >>> classify_transport_error(requests.exceptions.ChunkedEncodingError())
+            'read'
+
+            ```
+        - A certificate that does not validate is never retried under the
+          default set:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import classify_transport_error
+            >>> classify_transport_error(requests.exceptions.SSLError()) is None
+            True
+
+            ```
+        - A full disk is never retried, even by a caller that named `OSError`
+          in its own retry set:
+            ```python
+            >>> import errno
+            >>> from earthlens.base.http import classify_transport_error
+            >>> classify_transport_error(
+            ...     OSError(errno.ENOSPC, "No space left on device"), strict=False
+            ... ) is None
+            True
+
+            ```
+        - A permission error is a possible sharing violation on Windows, so it
+          is retried there on the small connect budget; anywhere else it is a
+          standing property of the destination and is not retried at all:
+            ```python
+            >>> import errno, sys
+            >>> from earthlens.base.http import classify_transport_error
+            >>> locked = PermissionError(errno.EACCES, "the file is in use")
+            >>> classify_transport_error(locked) == (
+            ...     "connect" if sys.platform == "win32" else None
+            ... )
+            True
+
+            ```
+        - A caller that named a type itself gets it retried, on the read
+          budget:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import classify_transport_error
+            >>> classify_transport_error(
+            ...     requests.exceptions.ContentDecodingError(), strict=False
+            ... )
+            'read'
+
+            ```
+        - A connection error wrapping nothing recognisable is `"unknown"`,
+          not `"connect"` — it spends the cheap budget but is not exempt from
+          the idempotency gate:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import classify_transport_error
+            >>> classify_transport_error(requests.ConnectionError("mystery"))
+            'unknown'
+
+            ```
+    """
+    if _is_local_storage_error(exc):
+        # Ahead of the `strict` gate: this holds however the caller configured
+        # the retry set, because the failure is the destination's, not the
+        # transport's, and a replay re-downloads the body to fail identically.
+        return None
+    if strict and isinstance(exc, NON_RETRYABLE_EXCEPTIONS):
+        return None
+    if (
+        isinstance(exc, OSError)
+        and not isinstance(exc, requests.RequestException)
+        and exc.errno in _TRANSIENT_PERMISSION_ERRNOS
+    ):
+        # Windows only: retryable, because it may be a sharing violation, but on
+        # the small budget — one attempt clears one, five would re-download the
+        # whole object to fail identically.
+        return "connect"
+    if isinstance(exc, requests.exceptions.ConnectTimeout):
+        return "connect"
+    if isinstance(
+        exc,
+        (requests.exceptions.ReadTimeout, requests.exceptions.ChunkedEncodingError),
+    ):
+        return "read"
+    if isinstance(exc, requests.ConnectionError):
+        return _phase_from_causes(exc) or "unknown"
+    if isinstance(exc, requests.exceptions.Timeout):
+        return "read"
+    # Anything else is retryable only because the caller asked for it by name.
+    return None if strict else "read"
+
+
+IDEMPOTENT_METHODS: frozenset[str] = frozenset(
+    {"GET", "HEAD", "OPTIONS", "TRACE", "PUT", "DELETE"}
+)
+
+#: Bytes of already-downloaded tail that a resumed request re-fetches and
+#: compares against the staging file before appending anything.
+#:
+#: This is the only check in the resume path that reads the *body*. Every other
+#: gate — the status, the `Content-Range` arithmetic, the `ETag` — tests the
+#: server's claims against the server's own other claims, so a server that
+#: builds a truthful `Content-Range` from the request while streaming bytes from
+#: somewhere else passes all of them. Re-reading a window we already hold and
+#: demanding it match byte for byte is what makes the append safe, and 64 KiB is
+#: cheap against the multi-gigabyte archives resume exists for.
+_RESUME_OVERLAP = 64 * 1024
+
+#: `bytes <first>-<last>/<complete-length>`. The `*` forms a server may send on a
+#: `416` are deliberately unmatched: the resume path treats any non-`206` as a
+#: reason to stop resuming, so there is nothing to parse them for.
+_CONTENT_RANGE_RE = re.compile(r"^bytes\s+(\d+)-(\d+)/(\d+)$", re.IGNORECASE)
+
+
+class _ResumeAnchor(NamedTuple):
+    """The identity of the representation a resumed request must re-open.
+
+    Captured from the first response and never updated, so every later leg is
+    checked against the object the transfer started on rather than against
+    whatever the server most recently said.
+
+    Attributes:
+        total: The complete length the first response advertised.
+        etag: The strong entity tag that first response carried.
+    """
+
+    total: int
+    etag: str
+
+
+def _strong_etag(headers: Mapping[str, str]) -> str | None:
+    """Return the response's entity tag, but only when it is a strong one.
+
+    `If-Range` is only meaningful with a strong validator. A weak tag (`W/"x"`)
+    marks representations that are *semantically* equivalent but may differ byte
+    for byte, which is precisely the distinction a resumed download depends on,
+    and `Last-Modified` is worse still: it has one-second resolution, so it
+    matches across a change made within the same second as the one it records.
+
+    Args:
+        headers: The response headers.
+
+    Returns:
+        str | None: The quoted strong entity tag, or `None` when the header is
+        absent, weak, or not a quoted-string.
+
+    Examples:
+        - A strong tag is returned verbatim, quotes included:
+            ```python
+            >>> from earthlens.base.http import _strong_etag
+            >>> _strong_etag({"ETag": '"68402913-323959b10"'})
+            '"68402913-323959b10"'
+
+            ```
+        - A weak tag is refused, and so is a missing one:
+            ```python
+            >>> from earthlens.base.http import _strong_etag
+            >>> _strong_etag({"ETag": 'W/"7"'}) is None
+            True
+            >>> _strong_etag({}) is None
+            True
+
+            ```
+    """
+    etag = (headers.get("ETag") or "").strip()
+    if not etag or etag[:2].upper() == "W/":
+        return None
+    if len(etag) < 2 or not etag.startswith('"') or not etag.endswith('"'):
+        return None
+    return etag
+
+
+def _parse_content_range(value: str | None) -> tuple[int, int, int] | None:
+    """Parse a `206`'s `Content-Range` into `(first, last, total)`.
+
+    Args:
+        value: The raw header value, if any.
+
+    Returns:
+        tuple[int, int, int] | None: The three byte counts, or `None` when the
+        header is absent or not the complete `bytes a-b/c` form.
+
+    Examples:
+        - The complete form parses:
+            ```python
+            >>> from earthlens.base.http import _parse_content_range
+            >>> _parse_content_range("bytes 100-199/13481909008")
+            (100, 199, 13481909008)
+
+            ```
+        - An unsatisfied-range or unknown-total form does not:
+            ```python
+            >>> from earthlens.base.http import _parse_content_range
+            >>> _parse_content_range("bytes */13481909008") is None
+            True
+            >>> _parse_content_range(None) is None
+            True
+
+            ```
+    """
+    if not value:
+        return None
+    match = _CONTENT_RANGE_RE.match(value.strip())
+    if match is None:
+        return None
+    first, last, total = (int(part) for part in match.groups())
+    return first, last, total
+
+
+class _ResumeRefused(Exception):
+    """A resumed leg failed one of its gates, so the resume is abandoned.
+
+    Private and never raised out of `download`: it is caught in the attempt
+    loop, which discards the staged bytes and restarts the object from zero.
+    Resume then stays off for the rest of the call, so a server that answers a
+    ranged request badly costs exactly one extra attempt rather than looping.
+    """
+
+
+def _arm_resume_anchor(
+    response: requests.Response, total: int | None
+) -> _ResumeAnchor | None:
+    """Capture what a later ranged request would have to re-open, if anything.
+
+    Arming is deliberately permissive: it only records that a resumed request is
+    worth *attempting*. Nothing here can make an append safe, because every
+    value it reads is the server's own claim — worldpop advertises
+    `Accept-Ranges: bytes` and a strong `ETag`, then answers a `Range` with the
+    whole object. The binding checks are on the resumed response and on the
+    bytes it returns.
+
+    Args:
+        response: The first response of the transfer.
+        total: The complete length `_progress_total` derived from it, if any.
+
+    Returns:
+        _ResumeAnchor | None: The frozen identity of the representation, or
+        `None` when this transfer can never be resumed.
+    """
+    if response.status_code != 200 or not total:
+        return None
+    encoding = (response.headers.get("Content-Encoding") or "").strip().lower()
+    if encoding and encoding != "identity":
+        return None
+    accepts = {
+        token.strip().lower()
+        for token in (response.headers.get("Accept-Ranges") or "").split(",")
+    }
+    if "bytes" not in accepts:
+        return None
+    etag = _strong_etag(response.headers)
+    if etag is None:
+        return None
+    return _ResumeAnchor(total=total, etag=etag)
+
+
+def _content_range_refusal(
+    value: str | None, anchor: _ResumeAnchor, expected_first: int
+) -> tuple[str | None, tuple[int, int, int] | None]:
+    """Check a `206`'s `Content-Range` against the window that was asked for.
+
+    The arithmetic half of :func:`_resume_refusal`, split out so each of the
+    three comparisons stays a statement of its own rather than a term in a
+    boolean chain — none can then be short-circuited by another, and each is
+    reachable from a single hand-built header.
+
+    The parsed triple comes back alongside the verdict because the caller needs
+    `first` and `last` for its own `Content-Length` check; re-parsing the header
+    there would let the two reads of one string disagree.
+
+    Args:
+        value: The raw `Content-Range` header, if any.
+        anchor: The representation the transfer started on.
+        expected_first: The offset the request asked the window to start at.
+
+    Returns:
+        tuple[str | None, tuple[int, int, int] | None]: The refusal reason, or
+        `None` when the start, the end and the total all match; and the parsed
+        `(first, last, total)`, which is `None` only when the header was absent
+        or malformed — a header that parsed is handed back even when it is
+        refused.
+
+    Examples:
+        - A window that starts, ends and totals where it was asked to is
+          accepted, and the parsed triple comes back with it:
+            ```python
+            >>> from earthlens.base.http import _ResumeAnchor, _content_range_refusal
+            >>> anchor = _ResumeAnchor(total=1000, etag='"abc"')
+            >>> _content_range_refusal("bytes 400-999/1000", anchor, 400)
+            (None, (400, 999, 1000))
+
+            ```
+        - A server that ignored the offset is refused, and what it did send is
+          still reported:
+            ```python
+            >>> from earthlens.base.http import _ResumeAnchor, _content_range_refusal
+            >>> anchor = _ResumeAnchor(total=1000, etag='"abc"')
+            >>> reason, parsed = _content_range_refusal("bytes 0-999/1000", anchor, 400)
+            >>> reason
+            'Content-Range starts at 0, expected 400'
+            >>> parsed
+            (0, 999, 1000)
+
+            ```
+        - A missing or unreadable header is refused with nothing to report:
+            ```python
+            >>> from earthlens.base.http import _ResumeAnchor, _content_range_refusal
+            >>> anchor = _ResumeAnchor(total=1000, etag='"abc"')
+            >>> _content_range_refusal(None, anchor, 400)
+            ('no parseable Content-Range', None)
+
+            ```
+
+    See Also:
+        _resume_refusal: The full gate sequence this is one step of.
+        _parse_content_range: The header parser it reads through.
+    """
+    parsed = _parse_content_range(value)
+    if parsed is None:
+        return "no parseable Content-Range", None
+    first, last, total = parsed
+    if first != expected_first:
+        return f"Content-Range starts at {first}, expected {expected_first}", parsed
+    if last != anchor.total - 1:
+        return f"Content-Range ends at {last}, expected {anchor.total - 1}", parsed
+    if total != anchor.total:
+        return f"Content-Range total {total}, expected {anchor.total}", parsed
+    return None, parsed
+
+
+def _resume_refusal(
+    response: requests.Response, anchor: _ResumeAnchor, resume_at: int
+) -> str | None:
+    """Say why a resumed response must not be appended, or `None` if it may be.
+
+    Each gate is a separate statement rather than a term in a boolean chain, so
+    none can be short-circuited by another and each is reachable from a single
+    hand-built response. That property is the point: these gates exist because
+    servers were observed doing the things they reject — worldpop advertises
+    `Accept-Ranges: bytes` and a strong `ETag`, then answers a `Range` with the
+    whole object under a `200`.
+
+    The three `Content-Range` comparisons live in :func:`_content_range_refusal`
+    and are consulted here in sequence with the rest.
+
+    Args:
+        response: The answer to the ranged request.
+        anchor: The representation the transfer started on.
+        resume_at: Bytes already staged; the window starts `_RESUME_OVERLAP`
+            before this.
+
+    Returns:
+        str | None: The refusal reason, or `None` when every header check
+        passes. The body still has to match the staged overlap.
+    """
+    if response.status_code != 206:
+        # Absorbs every "the server did not honour the Range" shape at once: a
+        # 200 with the whole object (worldpop, and any stale `If-Range`), a 416,
+        # a redirect, an error status. None of them is consumed in place.
+        return f"status {response.status_code}, expected 206"
+    headers = response.headers
+    encoding = (headers.get("Content-Encoding") or "").strip().lower()
+    if encoding and encoding != "identity":
+        return f"Content-Encoding {encoding!r} on a ranged reply"
+    coding = (headers.get("Transfer-Encoding") or "").strip().lower()
+    if coding and coding != "identity":
+        return f"Transfer-Encoding {coding!r} on a ranged reply"
+    reason, parsed = _content_range_refusal(
+        headers.get("Content-Range"), anchor, resume_at - _RESUME_OVERLAP
+    )
+    if reason is not None:
+        return reason
+    etag = (headers.get("ETag") or "").strip()
+    if etag and etag != anchor.etag:
+        # A 206 is only permitted to describe the representation `If-Range`
+        # named; one that renames it is describing a different object.
+        return f"ETag {etag!r} is not the anchored {anchor.etag!r}"
+    first, last, _ = parsed if parsed is not None else (0, -1, 0)
+    declared = _progress_total(headers)
+    if declared is not None and declared != last - first + 1:
+        return f"Content-Length {declared}, expected {last - first + 1}"
+    return None
+
 
 #: Streaming chunk size (bytes) for :meth:`HttpClient.download` — 1 MiB.
 DEFAULT_CHUNK_SIZE = 1 << 20
@@ -246,25 +973,86 @@ def _check_magic(path: Path, magic: bytes | tuple[bytes, ...], url: str) -> None
 def _progress_total(headers: Any) -> int | None:
     """Return the download progress-bar total from response headers.
 
-    Uses `Content-Length` only for an untransformed body: it reports the
-    *compressed* size, but `iter_content` yields *decompressed* bytes, so
-    a `Content-Encoding` (e.g. gzip) response would overshoot the bar. In
-    that case (or when the length is absent / non-numeric) the total is
-    `None` and the bar runs unbounded.
+    Uses `Content-Length` only when it actually describes the bytes the
+    caller will receive. Four things disqualify it:
+
+    * a `Content-Encoding` other than `identity` — the header reports the
+      *compressed* size while `iter_content` yields *decompressed* bytes;
+    * a `Transfer-Encoding` — RFC 9110 §6.3 requires a recipient to ignore
+      `Content-Length` when one is present, and urllib3 does, so the header
+      describes nothing the stream will match;
+    * a duplicated header whose comma-joined values disagree;
+    * a value that is absent, empty, or not ASCII digits.
+
+    In any of those cases the total is `None`: the progress bar runs
+    unbounded and callers that verify a length know not to.
+
+    This is the single source of "how big is this body", so a wrong answer
+    here becomes a wrong length check rather than only a wrong bar.
 
     Args:
         headers: The response headers mapping.
 
     Returns:
-        The byte total, or `None` when it cannot be trusted.
+        int | None: The byte total the body will deliver, or `None` when the
+        headers do not determine one.
+
+    Examples:
+        - A plain unencoded body reports its length:
+            ```python
+            >>> from earthlens.base.http import _progress_total
+            >>> _progress_total({"Content-Length": "22"})
+            22
+
+            ```
+        - A chunked body has no usable length, even when the header is
+          present and well-formed:
+            ```python
+            >>> from earthlens.base.http import _progress_total
+            >>> _progress_total(
+            ...     {"Content-Length": "22", "Transfer-Encoding": "chunked"}
+            ... ) is None
+            True
+
+            ```
+        - A duplicated header agreeing with itself is honoured; one that
+          contradicts itself is not:
+            ```python
+            >>> from earthlens.base.http import _progress_total
+            >>> _progress_total({"Content-Length": "22, 22"})
+            22
+            >>> _progress_total({"Content-Length": "22, 40"}) is None
+            True
+
+            ```
     """
     encoding = (headers.get("Content-Encoding") or "").strip().lower()
     if encoding and encoding != "identity":
         return None
+    # RFC 9110 §6.3: a recipient MUST ignore `Content-Length` when a transfer
+    # coding is present, and urllib3 does — the body is framed by the chunked
+    # encoding, not by the header. Reading it anyway yields a number the stream
+    # will not match, which a length check would then report as a truncation.
+    coding = (headers.get("Transfer-Encoding") or "").strip().lower()
+    if coding and coding != "identity":
+        return None
     raw_length = headers.get("Content-Length")
-    if raw_length is not None and raw_length.isdigit():
-        return int(raw_length)
-    return None
+    if raw_length is None:
+        return None
+    # A duplicated header arrives comma-joined. Identical values are the same
+    # claim stated twice and are honoured; differing ones are a contradiction
+    # no reader can resolve, so the total is unknown.
+    parts = [part.strip() for part in str(raw_length).split(",")]
+    if not parts or not all(parts):
+        return None
+    # `str.isdigit` accepts superscripts and other Unicode digit forms that
+    # `int()` then rejects or reads differently; a header is ASCII.
+    if not all(part.isascii() and part.isdigit() for part in parts):
+        return None
+    values = {int(part) for part in parts}
+    if len(values) != 1:
+        return None
+    return values.pop()
 
 
 def _default_user_agent() -> str:
@@ -509,6 +1297,10 @@ class HttpClient:
         status_forcelist: HTTP statuses that trigger a retry.
         max_backoff: Ceiling in seconds on any single retry wait.
         retry_on_exceptions: Transport exception types that trigger a retry.
+        connect_retries: Retry budget for connect-phase failures.
+        read_retries: Retry budget for read-phase failures.
+        retry_unsafe_methods: Whether a read-phase failure may replay a
+            non-idempotent verb such as `POST`.
         raise_for_status: Whether the final response is `raise_for_status`-ed.
         min_interval: Minimum seconds between consecutive requests.
 
@@ -533,7 +1325,10 @@ class HttpClient:
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
         status_forcelist: tuple[int, ...] = DEFAULT_STATUS_FORCELIST,
         max_backoff: float | None = DEFAULT_MAX_BACKOFF,
-        retry_on_exceptions: tuple[type[BaseException], ...] = (),
+        retry_on_exceptions: tuple[type[BaseException], ...] | None = None,
+        connect_retries: int | None = None,
+        read_retries: int | None = DEFAULT_READ_RETRIES,
+        retry_unsafe_methods: bool = False,
         retry_predicate: Callable[[requests.Response], bool] | None = None,
         raise_for_status: bool = True,
         min_interval: float = 0.0,
@@ -565,10 +1360,33 @@ class HttpClient:
                 large `Retry-After` cannot pin the thread indefinitely.
                 `None` disables the cap.
             retry_on_exceptions: Exception types that also trigger a retry
-                when raised by the transport (e.g.
-                `(requests.ConnectionError, requests.Timeout)`). Empty
-                (the default) retries on status only, never on a raised
-                exception.
+                when raised by the transport. `None` (the default) uses
+                :data:`DEFAULT_RETRY_EXCEPTIONS` — a refused or reset
+                connection, a timeout, a body truncated mid-stream — and is
+                what selects the strict policy: the never-retry list applies
+                and `connect_retries` takes its small default. Passing any
+                tuple, including an equal-valued one, means the caller owns
+                the policy: nothing is vetoed and `connect_retries` follows
+                `max_retries`. Pass `()` to retry on status only.
+            connect_retries: Retries allowed for a failure in the connect
+                phase, counted separately from `read_retries`. `None` (the
+                default) resolves to :data:`DEFAULT_CONNECT_RETRIES` while
+                the client uses the default exception set — a host that will
+                not accept a connection rarely starts doing so within a
+                back-off window — and to `max_retries` when the caller
+                supplied its own `retry_on_exceptions`, since that caller
+                already chose how hard to try.
+            read_retries: Retries allowed for a failure after the connection
+                was established — a reset mid-response, a read timeout, a
+                truncated body. `None` (the default) means `max_retries`.
+                This is the transient case a retry actually helps.
+            retry_unsafe_methods: Whether a *read*-phase failure may replay a
+                non-idempotent verb. `False` (the default) replays only the
+                methods in :data:`IDEMPOTENT_METHODS`, because a response
+                that broke after the request was delivered may already have
+                been acted on, so replaying a `POST` risks a double
+                submission. Connect-phase failures are replayed for any
+                method regardless, since the request was never delivered.
             retry_predicate: An optional callback `(response) -> bool`
                 that, when it returns `True`, marks a response retryable
                 even if its status is not in `status_forcelist` (e.g. a
@@ -594,7 +1412,29 @@ class HttpClient:
         self.backoff_factor = backoff_factor
         self.status_forcelist = tuple(status_forcelist)
         self.max_backoff = max_backoff
-        self.retry_on_exceptions = tuple(retry_on_exceptions)
+        # `None` means "use the default set" — an explicit sentinel rather than
+        # an identity test against the constant, so a caller who re-spells the
+        # same tuple, or writes `DEFAULT_RETRY_EXCEPTIONS + (Extra,)`, gets the
+        # behaviour the value implies instead of one that depends on which
+        # object it is.
+        self._default_retry_set = retry_on_exceptions is None
+        self.retry_on_exceptions = tuple(
+            DEFAULT_RETRY_EXCEPTIONS
+            if retry_on_exceptions is None
+            else retry_on_exceptions
+        )
+        # The small connect budget is a property of the *default* policy. A
+        # caller that brought its own `retry_on_exceptions` already chose how
+        # hard to try, and silently capping its `max_retries` for one phase
+        # would change a number it set deliberately.
+        if connect_retries is not None:
+            self.connect_retries = connect_retries
+        elif self._default_retry_set:
+            self.connect_retries = DEFAULT_CONNECT_RETRIES
+        else:
+            self.connect_retries = max_retries
+        self.read_retries = max_retries if read_retries is None else read_retries
+        self.retry_unsafe_methods = retry_unsafe_methods
         self._retry_predicate = retry_predicate
         self.raise_for_status = raise_for_status
         self.min_interval = min_interval
@@ -608,6 +1448,14 @@ class HttpClient:
         }
         if headers:
             self._default_headers.update(headers)
+        # `_default_headers` stamps the client's own `gzip, deflate` above and
+        # then lets the caller's headers overwrite it, so afterwards the two are
+        # indistinguishable. `download()` places an `identity` default
+        # *underneath* a caller's choice and has to know which it is looking at,
+        # so the distinction is recorded here while it still exists.
+        self._accept_encoding_is_explicit: bool = any(
+            key.lower() == "accept-encoding" for key in (headers or {})
+        )
 
     @property
     def default_headers(self) -> dict[str, str]:
@@ -641,7 +1489,17 @@ class HttpClient:
         Args:
             method: HTTP verb (`"GET"`, `"POST"`, ...).
             url: Absolute request URL.
-            headers: Per-request headers merged over the client defaults.
+            headers: Per-request headers merged over the client defaults, and
+                passed through verbatim. `download` adds only one header of its
+                own, `Accept-Encoding: identity`, and only when neither this
+                argument nor the constructor's `headers=` named it in any
+                casing — the length check compares against bytes as delivered,
+                which a transparently-encoded body would not match. Pass
+                `{"Accept-Encoding": "gzip"}` to override that.
+
+                A `Range` here is honoured as written: the response is accepted
+                at its own `Content-Length`, and `download` does **not** check
+                that the server returned the range you asked for.
             timeout: Per-request timeout override (seconds), as a single
                 float or a `(connect, read)` pair. Defaults to the client's
                 `timeout`.
@@ -707,6 +1565,15 @@ class HttpClient:
         `Retry-After`/back-off policy as the other verbs; the retry
         decision reads only the status line, never the body.
 
+        A body that breaks **after** this returns is therefore the
+        caller's to handle: the iteration happens outside the retry loop,
+        so a `ChunkedEncodingError` raised mid-stream escapes it. The
+        default transport retry covers the non-streaming verbs, whose
+        bodies `requests` materialises inside the loop, and
+        :meth:`download`, which owns its own. A caller streaming a large
+        body that needs the same protection should use :meth:`download`
+        or re-request on failure itself.
+
         Args:
             url: Absolute request URL.
             **kwargs: Keyword arguments forwarded to :meth:`get`.
@@ -752,6 +1619,107 @@ class HttpClient:
         finally:
             bar.close()
 
+    def _append_resumed_body(
+        self,
+        response: requests.Response,
+        dest: Path,
+        *,
+        overlap_at: int,
+        overlap: int,
+        total: int,
+        chunk: int,
+        progress: bool,
+        desc: str,
+    ) -> None:
+        """Check the re-sent overlap against the staged file, then append.
+
+        The overlap is read and compared **before the file is opened for
+        writing**, so a server whose body does not match the bytes already on
+        disk cannot modify the staging file at all. That ordering is the
+        guarantee: every other resume gate compares one server claim against
+        another, and a server that derives a truthful `Content-Range` from the
+        request while streaming a different slice satisfies all of them.
+
+        Args:
+            response: The open `206` response, positioned at `overlap_at`.
+            dest: The staging file holding the bytes downloaded so far.
+            overlap_at: Offset the re-sent window starts at.
+            overlap: Length of that window.
+            total: The object's complete length, for the progress bar.
+            chunk: Streaming block size in bytes.
+            progress: Whether to show the progress bar.
+            desc: The bar label.
+
+        Raises:
+            _ResumeRefused: When the body ends inside the overlap, when the
+                overlap does not match the staged bytes, or when the staging
+                file cannot be read back for a non-deterministic reason.
+            OSError: For a deterministic filesystem refusal (a full disk, a
+                read-only mount), which a restart would hit again.
+        """
+        blocks = response.iter_content(chunk_size=chunk)
+        head = bytearray()
+        remainder = b""
+        for block in blocks:
+            if not block:
+                continue
+            wanted = overlap - len(head)
+            head.extend(block[:wanted])
+            if len(head) >= overlap:
+                remainder = block[wanted:]
+                break
+        if len(head) < overlap:
+            raise _ResumeRefused(
+                f"the resumed body ended after {len(head):,} bytes, inside the "
+                f"{overlap:,}-byte overlap"
+            )
+
+        try:
+            with open(dest, "rb") as handle:
+                handle.seek(overlap_at)
+                staged = handle.read(overlap)
+        except OSError as exc:
+            if exc.errno in _DETERMINISTIC_OS_ERRNOS:
+                raise
+            raise _ResumeRefused(
+                f"the staged file could not be read back: {exc}"
+            ) from exc
+        if bytes(head) != staged:
+            raise _ResumeRefused(
+                f"the re-sent {overlap:,}-byte overlap at {overlap_at:,} does "
+                f"not match the staged bytes; the server is not serving the "
+                f"representation this transfer started on"
+            )
+
+        resume_at = overlap_at + overlap
+        bar = tqdm(
+            total=total,
+            initial=resume_at,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            disable=not progress,
+            desc=desc,
+        )
+        try:
+            with open(dest, "r+b") as handle:
+                # `resume_at` is this call's own byte count for this file, so
+                # the seek already lands at its end. The truncate states that
+                # invariant rather than guarding a reachable state: were the
+                # staged file ever longer, appending after it would leave a gap
+                # no size check could see.
+                handle.truncate(resume_at)
+                handle.seek(resume_at)
+                if remainder:
+                    handle.write(remainder)
+                    bar.update(len(remainder))
+                for block in blocks:
+                    if block:
+                        handle.write(block)
+                        bar.update(len(block))
+        finally:
+            bar.close()
+
     def download(
         self,
         url: str,
@@ -763,6 +1731,8 @@ class HttpClient:
         expect_magic: bytes | tuple[bytes, ...] | None = None,
         headers: dict[str, str] | None = None,
         timeout: Timeout | None = None,
+        resume: bool = False,
+        verify_length: bool = True,
         **kwargs: Any,
     ) -> Path:
         """Stream `url` to `dest` atomically, optionally showing a `tqdm` bar.
@@ -776,6 +1746,12 @@ class HttpClient:
         The whole download is retry-wrapped: a status in `status_forcelist`
         or an exception in `retry_on_exceptions` retries the attempt (after
         cleaning the temp), honouring the `Retry-After`/back-off policy.
+
+        By default every attempt reads the object **once, whole**, and the body
+        is verified after the fact: a response that advertised a
+        `Content-Length` must deliver exactly that many bytes, and a short read
+        is retried from the start. Pass `resume=True` to let a retry continue a
+        broken transfer instead of re-reading it; see that argument.
 
         Args:
             url: Absolute request URL.
@@ -792,7 +1768,14 @@ class HttpClient:
                 leaves `dest` short, and any previous contents are gone. The
                 failure path does not additionally delete it, but that is damage
                 limitation, not a guarantee — `atomic=False` is only appropriate
-                when `dest` is known to be disposable.
+                when `dest` is known to be disposable. The length check below
+                runs in both modes; under `atomic=False` a failed check leaves
+                the caller-owned `dest` short, because there is no staging file
+                to discard.
+
+                Two calls downloading the same `dest` concurrently share one
+                `<dest>.part` and will interleave into it. Serialising that is
+                the caller's job.
             expect_magic: One or more byte prefixes the body must start with
                 (e.g. `b"CDF"` / `b"\\x89HDF"` for NetCDF). A body that starts
                 with none of them raises `ValueError` and the partial write is
@@ -803,6 +1786,76 @@ class HttpClient:
                 float or a `(connect, read)` pair — the latter fails a dead
                 host on the short connect budget without shortening the long
                 read budget a large download needs.
+            resume: Continue a broken transfer with a ranged request instead
+                of re-reading the object, when — and only when — the server has
+                proved it can be done safely. Off by default; the whole-object
+                path above is unchanged for every caller that does not opt in.
+                It requires `verify_length=True`, the default — the pair
+                `resume=True, verify_length=False` raises `ValueError`.
+
+                Three things make it inert, silently, so they are listed
+                together. It requires staging, so it does nothing under
+                `atomic=False` unless `expect_magic` forces staging back on:
+                resuming means keeping a partial file between attempts, and
+                that is only safe in the private `<dest>.part` this method
+                owns, never in a caller-supplied `dest` that a failed attempt
+                must not damage. It stands down when a `Range` is already
+                present in the merged headers — including one set on the
+                client, which disables resume for every call on it — because a
+                caller who owns the object boundaries should not have ours
+                added on top. And a leg only arms once more than
+                `_RESUME_OVERLAP` bytes have been banked since the previous leg
+                started, because a leg that gains less than the overlap it
+                re-fetches costs more than it saves.
+
+                On a leg `download` also overrides two headers rather than
+                merging under them: `Accept-Encoding: identity`, because a
+                coded reply would make the byte offsets mean something else,
+                and `If-Range`, which must name the representation the transfer
+                anchored on. This is the one place caller headers are not
+                honoured verbatim. A leg is likewise exempt from
+                `status_forcelist` and from any `retry_predicate`: both are
+                written against whole-object responses, and neither can judge —
+                or even parse — a `206` fragment of one. The refusal gates
+                below are the leg's own check in their place.
+
+                A resumed request is only *attempted* when the first response
+                was a `200` that advertised `Accept-Ranges: bytes`, a known
+                `Content-Length`, no content coding, and a **strong** `ETag`
+                (never `Last-Modified`, whose one-second resolution matches
+                across a change made within the same second). It is only
+                *appended* when the reply is a `206` whose `Content-Range`
+                start, end and total all match what was asked for, whose `ETag`
+                still names the anchored representation, and — the check none of
+                the others can stand in for — whose first `_RESUME_OVERLAP`
+                bytes re-send a window already on disk and match it byte for
+                byte. Every other answer, a `200` with the whole body included,
+                discards the staged bytes and re-reads the object; resume then
+                stays off for the rest of the call.
+
+                Only bytes *this call* wrote are ever built on, so a `.part`
+                left by an earlier run is never treated as a prefix. The
+                assembled file goes through the same length and `expect_magic`
+                gates as a whole-object read.
+            verify_length: Compare the bytes written against the
+                `Content-Length` the response advertised, and raise
+                `IncompleteDownloadError` on a mismatch. On by default.
+
+                Pass `False` for a server that misreports the size of a body it
+                generates on the fly, where the check would fail a download that
+                is actually fine. This distrusts the advertised length in
+                **both** directions: an over-long body — a mis-framed response,
+                a spliced proxy body — is published too, because a length you
+                do not believe cannot catch one. It also disables the salvage,
+                whose whole proof is that same size equality. And it cannot be
+                combined with `resume=True`, which is addressed by the length it
+                distrusts: the pair raises `ValueError` before anything is sent.
+
+                It is a separate switch from `Accept-Encoding` on purpose: a
+                coded body already has no checkable length — the header counts
+                encoded octets and the file counts decoded ones — so asking for
+                `gzip` disables the check as a side effect, and that side effect
+                should not be the only way to express the intent.
             **kwargs: Extra keyword arguments forwarded to `requests`.
 
         Returns:
@@ -810,7 +1863,18 @@ class HttpClient:
 
         Raises:
             ValueError: When `expect_magic` is given and the body does not
-                start with any of the supplied prefixes.
+                start with any of the supplied prefixes, or when `resume=True`
+                is combined with `verify_length=False` — the latter refused up
+                front, before a parent directory is created or a request sent.
+            UnsolicitedPartialContentError: When a `206` answers a request that
+                carried no `Range` — the body is a fragment of the object, and
+                repeating the request returns the same fragment, so this is
+                raised rather than retried whatever the client's retry policy.
+            IncompleteDownloadError: When the bytes written do not equal the
+                `Content-Length` the response advertised. A short body is
+                retried from the start; a long one, a repeat of the same byte
+                count, a spent read or attempt budget, or a client that opted
+                out of transport retry raises at once.
             requests.HTTPError: On an error status — `download` always
                 calls `raise_for_status` (the client's `raise_for_status`
                 flag governs the verb methods, not `download`; a file
@@ -820,9 +1884,36 @@ class HttpClient:
                 of `requests.HTTPError` (e.g. `requests.RequestException`,
                 as ghsl/glaciers pass) will **retry** an error status
                 before raising it, mirroring their old download loops.
-                Also the last transport exception after the retry budget
-                is exhausted.
+                This is also how a refused resume surfaces when the ranged
+                reply carried an error status and the retry budget is spent:
+                the status and `.response` reach the caller intact rather than
+                being flattened into a transport error.
+            requests.ConnectionError: When a resumed leg is refused, the retry
+                budget is spent, and the ranged reply carried no error status
+                to report in its place. A refusal with budget left never
+                escapes at all: the staged bytes are discarded, the object is
+                re-read whole, and resume stays off for the rest of the call.
+            BaseException: Once the transport retry budget is spent, the last
+                transport failure is re-raised as a fresh instance of its own
+                type, with a message naming the attempt count and the largest
+                byte count any attempt reached.
+            OSError: From `mkdir`, the streaming write, `stat` or `replace`,
+                unchanged. `RangeReadError` is never raised here.
         """
+        if resume and not verify_length:
+            # Contradictory, not merely risky. A resumed leg's `Range` end and
+            # its `Content-Range` check are both derived from the advertised
+            # total, and the length post-condition is the only thing that
+            # proves the assembly reached it — `_resume_refusal` validates the
+            # window the server claimed, never the bytes it delivered. Asking
+            # to resume is asserting the total is trustworthy; asking to skip
+            # the check is asserting it is not. Refuse rather than silently
+            # publish a correct-prefix-but-short file.
+            raise ValueError(
+                "resume=True requires verify_length=True: a resumed transfer is "
+                "addressed by the advertised Content-Length, so the length check "
+                "is the only proof the assembled file is complete."
+            )
         dest = Path(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
         # `expect_magic` promises a rejected body is discarded, which is only
@@ -831,6 +1922,17 @@ class HttpClient:
         # validation would run on a file that had already replaced a good one.
         staged = atomic or expect_magic is not None
         tmp = dest.with_name(dest.name + ".part") if staged else dest
+        # Bytes of `tmp` that *this call* wrote and that a resumed request
+        # may therefore build on. It is never seeded from a file found on
+        # disk: a `.part` left by a killed run belongs to an unknown object,
+        # and resuming onto it would publish a file assembled from two.
+        banked = 0
+        # Captured from the first response; frozen thereafter, so every leg
+        # is checked against the representation the transfer started on.
+        anchor: _ResumeAnchor | None = None
+        # One strike. A server that answers a ranged request badly costs a
+        # single extra attempt, never a restart/resume cycle.
+        resume_off = not resume
 
         def discard_partial() -> None:
             """Remove the partial write, but never a caller-owned `dest`.
@@ -841,64 +1943,392 @@ class HttpClient:
             `_stream_to_file` has already truncated by opening it `"wb"` —
             deleting it as well would only turn a truncated file into a missing
             one, and would destroy a file this call never owned.
+
+            An unlink that fails is logged and swallowed, never raised: this
+            runs from every failure path, so a second error here would replace
+            the real one on its way out.
             """
+            nonlocal banked
+            # Reset together: the count means "bytes of `tmp` this call
+            # wrote", so it cannot outlive the file it describes.
+            banked = 0
             if staged:
-                tmp.unlink(missing_ok=True)
+                # This runs from every failure path, including
+                # `except BaseException`, and on Windows the unlink can raise
+                # `PermissionError` when the handle has only just been released.
+                # Removing the temp is a promise, but it must not become a
+                # second failure that replaces the real one — so it is caught
+                # and logged rather than suppressed silently, since the file it
+                # promised to remove is still there.
+                try:
+                    tmp.unlink(missing_ok=True)
+                except OSError as exc:
+                    logger.debug(f"could not remove {tmp.name}: {exc}")
 
         merged = self._merge_headers(headers)
+        # Header names are case-insensitive, and `_merge_headers` returns a
+        # plain dict, so every test on them is folded explicitly.
+        per_call = {key.lower() for key in (headers or {})}
+        caller_sent_range = "range" in {key.lower() for key in merged}
+        if "accept-encoding" not in per_call and not self._accept_encoding_is_explicit:
+            # The length check below compares against the bytes as delivered, so
+            # a transparently-encoded body would fail it. This sits *underneath*
+            # the caller: a backend that asked for `gzip`, or for `identity` to
+            # protect its own magic check, keeps what it asked for.
+            merged["Accept-Encoding"] = "identity"
         effective_timeout = self.timeout if timeout is None else timeout
         attempt = 0
+        # Per-kind accounting, as in `_request_with_retry`: a dead host should
+        # not cost a large download six full connect attempts.
+        spent = {"connect": 0, "read": 0}
+        # The byte count the previous attempt reached. A second attempt landing
+        # on the identical number is deterministic, not a transport blip.
+        last_written: int | None = None
+        best_written = 0
+        # What the previous leg had banked, so per-leg progress is checkable.
+        last_banked = 0
+        if staged and tmp.exists():
+            # Suppressed for the same reason as the salvage stat below: this is
+            # a log line, and it runs before the first request, so a filesystem
+            # blip here must not cost the whole download.
+            with contextlib.suppress(OSError):
+                logger.debug(
+                    f"{redact_url(url)}: discarding a pre-existing "
+                    f"{tmp.stat().st_size:,}-byte {tmp.name}"
+                )
+
+        def salvaged(expected: int | None) -> bool:
+            """Whether the bytes on disk already are the whole object.
+
+            A transfer can break after the last byte but before the stream
+            frames its end. The equality is the entire proof, so this asks no
+            question of the server and consults no retry policy. It also never
+            raises: it is the first thing a transport handler runs, and an
+            exception from inside a handler escapes past its own `try`.
+
+            Args:
+                expected: The length the response advertised, if any.
+
+            Returns:
+                bool: True when the staged file is exactly that long. False
+                when the check is switched off, when the response advertised no
+                length, when nothing is staged, and when the size cannot be
+                read at all — an unprovable salvage is not a salvage, so the
+                ordinary retry path takes over.
+            """
+            if not verify_length or expected is None or not tmp.exists():
+                return False
+            try:
+                return tmp.stat().st_size == expected
+            except OSError:
+                # This runs as the FIRST statement of both transport `except`
+                # handlers, and an exception raised inside a handler is not
+                # caught by its own `try` — so an unguarded failure here would
+                # leave `download` with the filesystem's errno instead of the
+                # transport error, and with none of the retry budget spent.
+                # Unprovable is not salvageable: fall through to the ordinary
+                # retry path.
+                return False
+
+        def salvage_publishable(expected: int | None) -> bool:
+            """Whether the staged bytes are the whole object *and* pass every gate.
+
+            The salvage runs `expect_magic` itself rather than falling through to
+            the publish. Without it a body that breaks after its last byte
+            reaches `dest` through a weaker door than one that does not, so a
+            200-served HTML error page whose `Content-Length` happens to match
+            would land under a `.nc` name with the magic check never run.
+
+            Args:
+                expected: The length the response advertised, if any.
+
+            Returns:
+                bool: True when the file may be published as it stands.
+
+            Raises:
+                ValueError: When `expect_magic` is set and the staged body does
+                    not start with one of the prefixes. The partial is discarded
+                    first, exactly as on the whole-object path.
+            """
+            if not salvaged(expected):
+                return False
+            if expect_magic is not None:
+                try:
+                    _check_magic(tmp, expect_magic, url)
+                except BaseException:
+                    discard_partial()
+                    raise
+            return True
+
         while True:
             self._throttle()
+            response: requests.Response | None = None
+            expected_total: int | None = None
+            status_wait: float | None = None
+            # A resumed leg re-fetches `_RESUME_OVERLAP` bytes it already
+            # holds, so `banked` must exceed the overlap for the leg to make
+            # forward progress at all.
+            resume_at = 0
+            leg: _ResumeAnchor | None = None
+            if (
+                not resume_off
+                and staged
+                and anchor is not None
+                and not caller_sent_range
+                and _RESUME_OVERLAP < banked < anchor.total
+                # Each leg re-fetches the overlap, so a leg that advanced less
+                # than that cost more than it saved. Without this a server
+                # dribbling a byte per leg burns the whole read budget
+                # re-sending 64 KiB apiece, where a plain restart is cheaper.
+                and banked - last_banked > _RESUME_OVERLAP
+            ):
+                resume_at, leg = banked, anchor
+                last_banked = banked
+            attempt_headers = merged
+            if leg is not None:
+                attempt_headers = {
+                    **merged,
+                    "Range": f"bytes={resume_at - _RESUME_OVERLAP}-{leg.total - 1}",
+                    "If-Range": leg.etag,
+                    # `Range` addresses the *encoded* representation while
+                    # the staged count is of decoded bytes, so a coded reply
+                    # would make the offsets mean different things.
+                    "Accept-Encoding": "identity",
+                }
             try:
+                # Inside the retrying `try`: a failure here is a connect-phase
+                # failure and must be retried like any other, which is why the
+                # send and the body processing share one handler.
                 response = self._send(
                     "GET",
                     url,
                     stream=True,
-                    headers=merged,
+                    headers=attempt_headers,
                     timeout=effective_timeout,
                     **kwargs,
                 )
                 try:
-                    retryable = response.status_code in self.status_forcelist or (
-                        self._retry_predicate is not None
-                        and self._retry_predicate(response)
+                    # A resumed leg is exempt: `status_forcelist` and a
+                    # `retry_predicate` are written against whole-object
+                    # responses (the existing ones call `r.json()`), and handing
+                    # one a `206` byte fragment would have it judge — or fail to
+                    # parse — a slice of the object. The leg has its own gate.
+                    retryable = leg is None and (
+                        response.status_code in self.status_forcelist
+                        or (
+                            self._retry_predicate is not None
+                            and self._retry_predicate(response)
+                        )
                     )
                     if retryable and attempt < self.max_retries:
-                        retry_after = _parse_retry_after(
-                            response.headers.get("Retry-After")
+                        # Recorded, not slept on: the sleep happens after the
+                        # `finally` below has released the streamed connection,
+                        # rather than holding a socket open across the back-off.
+                        status_wait = self._backoff_wait(
+                            _parse_retry_after(response.headers.get("Retry-After")),
+                            attempt,
                         )
-                        wait = self._backoff_wait(retry_after, attempt)
                         logger.warning(
-                            f"HTTP {response.status_code} on {redact_url(url)}; retry "
-                            f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
+                            f"HTTP {response.status_code} on {redact_url(url)}; "
+                            f"retry {attempt + 1}/{self.max_retries} after "
+                            f"{status_wait:.1f}s"
                         )
-                        self._sleep(wait)
-                        attempt += 1
-                        continue
-                    response.raise_for_status()
-                    self._stream_to_file(
-                        response, tmp, chunk=chunk, progress=progress, desc=dest.name
-                    )
-                    if expect_magic is not None:
-                        _check_magic(tmp, expect_magic, url)
+                    else:
+                        if leg is not None:
+                            refusal = _resume_refusal(response, leg, resume_at)
+                            if refusal is not None:
+                                raise _ResumeRefused(refusal)
+                            expected_total = leg.total
+                            self._append_resumed_body(
+                                response,
+                                tmp,
+                                overlap_at=resume_at - _RESUME_OVERLAP,
+                                overlap=_RESUME_OVERLAP,
+                                total=leg.total,
+                                chunk=chunk,
+                                progress=progress,
+                                desc=dest.name,
+                            )
+                        else:
+                            if response.status_code == 206 and not caller_sent_range:
+                                raise UnsolicitedPartialContentError(
+                                    f"{redact_url(url)} answered 206 to a request "
+                                    "carrying no Range; the body is a fragment",
+                                    response=response,
+                                )
+                            response.raise_for_status()
+                            expected_total = _progress_total(response.headers)
+                            if not resume_off and anchor is None and staged:
+                                # Recorded before the body is read, so a break
+                                # part-way through still leaves an anchor to
+                                # resume against.
+                                anchor = _arm_resume_anchor(response, expected_total)
+                            self._stream_to_file(
+                                response,
+                                tmp,
+                                chunk=chunk,
+                                progress=progress,
+                                desc=dest.name,
+                            )
+                        # One verification for both paths: a resumed file is
+                        # published through the same size and magic gates as a
+                        # whole-object read, never a weaker door.
+                        written = tmp.stat().st_size
+                        best_written = max(best_written, written)
+                        if (
+                            verify_length
+                            and expected_total is not None
+                            and written != expected_total
+                        ):
+                            raise IncompleteDownloadError(
+                                f"{redact_url(url)} delivered {written:,} of "
+                                f"{expected_total:,} advertised bytes",
+                                written=written,
+                                expected=expected_total,
+                            )
+                        if expect_magic is not None:
+                            _check_magic(tmp, expect_magic, url)
                 finally:
-                    response.close()
-            except self.retry_on_exceptions as exc:
+                    if response is not None:
+                        response.close()
+            except _ResumeRefused as exc:
+                # Never re-armed for the rest of the call, so a server that
+                # answers a ranged request badly costs exactly one extra
+                # attempt rather than a restart/resume cycle.
+                resume_off = True
+                logger.warning(
+                    f"{redact_url(url)}: refusing to resume ({exc}); discarding "
+                    f"{banked:,} staged bytes and re-reading the whole object"
+                )
                 discard_partial()
                 if attempt >= self.max_retries:
-                    raise
-                wait = self._backoff_wait(None, attempt)
-                logger.warning(
-                    f"{type(exc).__name__} on {redact_url(url)}; retry "
-                    f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
-                )
-                self._sleep(wait)
+                    # A backstop, not the primary bound: `resume_off` already
+                    # caps refusals at one per call. Without it the loop's
+                    # termination would rest on that single flag, and a refusal
+                    # would otherwise re-read the object with no budget left.
+                    if response is not None and response.status_code >= 400:
+                        # Report what the server actually said. Backends branch
+                        # on `exc.response.status_code` to tell a missing
+                        # granule (404/410) from a real failure, and a
+                        # synthesised `ConnectionError` would both drop the
+                        # status and reclassify a permanent error as transport.
+                        response.raise_for_status()
+                    raise requests.ConnectionError(
+                        f"{redact_url(url)}: resume refused ({exc}) with no "
+                        f"retry budget left after {attempt + 1} attempts"
+                    ) from exc
                 attempt += 1
                 continue
+            except UnsolicitedPartialContentError:
+                # Deterministic: a server that volunteers partial content to a
+                # Range-less request returns the same fragment next time.
+                discard_partial()
+                raise
+            except IncompleteDownloadError as exc:
+                over_delivered = (
+                    exc.written is not None
+                    and exc.expected is not None
+                    and exc.written > exc.expected
+                )
+                if (
+                    over_delivered
+                    or not self.retry_on_exceptions
+                    or exc.written == last_written
+                    or spent["read"] >= self.read_retries
+                    or attempt >= self.max_retries
+                ):
+                    discard_partial()
+                    raise
+                spent["read"] += 1
+                last_written = exc.written
+                logger.warning(
+                    f"{redact_url(url)} delivered {exc.written:,} of "
+                    f"{exc.expected:,} bytes; discarding and restarting, read "
+                    f"retry {spent['read']}/{self.read_retries} "
+                    f"(attempt {attempt + 1}/{self.max_retries})"
+                )
+                discard_partial()
+                self._sleep(self._backoff_wait(None, attempt))
+                attempt += 1
+                continue
+            except self.retry_on_exceptions as exc:
+                if salvage_publishable(expected_total):
+                    logger.debug(
+                        f"{redact_url(url)} broke after the last byte; the "
+                        f"{expected_total:,}-byte body is already complete"
+                    )
+                else:
+                    kind = classify_transport_error(exc, strict=self._default_retry_set)
+                    if kind is None:
+                        # Deterministic - the next attempt reproduces it.
+                        discard_partial()
+                        raise
+                    # `response is None` is exactly "the failure happened before
+                    # a response object existed", which is the connect phase.
+                    if kind == "connect" or (kind == "unknown" and response is None):
+                        key, budget = "connect", self.connect_retries
+                    else:
+                        key, budget = "read", self.read_retries
+                    if spent[key] >= budget or attempt >= self.max_retries:
+                        discard_partial()
+                        raise type(exc)(
+                            f"{redact_url(url)} failed after {attempt + 1} "
+                            f"attempts; best read {best_written:,} bytes"
+                        ) from exc
+                    spent[key] += 1
+                    try:
+                        staged_now = tmp.stat().st_size if tmp.exists() else 0
+                    except OSError:
+                        staged_now = 0
+                    best_written = max(best_written, staged_now)
+                    kept = 0
+                    if not resume_off and staged and anchor is not None:
+                        # Bank only what THIS attempt wrote: `_stream_to_file`
+                        # truncated `tmp` before writing, so whatever is there
+                        # now came from this call and from this representation.
+                        size = staged_now
+                        if _RESUME_OVERLAP < size < anchor.total:
+                            kept = size
+                    banked = kept
+                    logger.warning(
+                        f"{type(exc).__name__} ({kind}) on {redact_url(url)} after "
+                        # The size on disk right now, never `best_written`: that
+                        # is a high-water mark across attempts and outlives the
+                        # file that produced it, so banking it would point a
+                        # resumed request past the end of the staged file.
+                        f"{staged_now:,} bytes; "
+                        + (
+                            f"keeping {kept:,} staged bytes to resume from, "
+                            if kept
+                            else "discarding and restarting, "
+                        )
+                        + f"{key} retry {spent[key]}/{budget} "
+                        f"(attempt {attempt + 1}/{self.max_retries})"
+                    )
+                    if not kept:
+                        discard_partial()
+                    self._sleep(self._backoff_wait(None, attempt))
+                    attempt += 1
+                    continue
+            except requests.RequestException:
+                # Wider than the client's retry set on purpose: the salvage
+                # issues no request and reads no header, so the caller's retry
+                # policy is not the right gate - the size equality is the proof.
+                if not salvage_publishable(expected_total):
+                    discard_partial()
+                    raise
+                logger.debug(
+                    f"{redact_url(url)} broke after the last byte; the "
+                    f"{expected_total:,}-byte body is already complete"
+                )
             except BaseException:
                 discard_partial()
                 raise
+            if status_wait is not None:
+                # The response is closed by now, so nothing is held open.
+                self._sleep(status_wait)
+                attempt += 1
+                continue
             if staged:
                 # Guard the rename too, so the "removes the temp on any
                 # failure" promise holds if the final replace fails.
@@ -998,24 +2428,81 @@ class HttpClient:
             self.raise_for_status if raise_for_status is None else raise_for_status
         )
         attempt = 0
+        # Keyed by *budget*, not by classification: `connect` and `unknown`
+        # draw on the same allowance, so counting them apart would let a request
+        # alternating between the two spend it twice.
+        spent = {"connect": 0, "read": 0}
         while True:
             self._throttle()
             try:
                 response = self._send(method, url, **kwargs)
             except self.retry_on_exceptions as exc:
-                if attempt >= self.max_retries:
+                kind = classify_transport_error(exc, strict=self._default_retry_set)
+                if kind is None:
+                    # Deterministic — the next attempt reproduces it exactly.
+                    raise
+                # An unidentified failure spends the cheap budget but is
+                # replayed as cautiously as a read one.
+                cheap = kind in {"connect", "unknown"}
+                key = "connect" if cheap else "read"
+                budget = self.connect_retries if cheap else self.read_retries
+                # Two guards, not one: the per-kind budget shapes *which* failure
+                # is worth repeating, and `max_retries` still caps the total, so
+                # a request alternating between the two phases cannot make
+                # `connect_retries + read_retries` attempts.
+                if spent[key] >= budget or attempt >= self.max_retries:
+                    raise
+                # A *read* failure means the request was delivered and the
+                # server may already have acted, so a non-idempotent verb is
+                # replayed only when the caller vouches for it. Only a *connect*
+                # failure is exempt, because it provably never arrived.
+                if kind != "connect" and not (
+                    self.retry_unsafe_methods or method.upper() in IDEMPOTENT_METHODS
+                ):
+                    logger.debug(
+                        f"{type(exc).__name__} ({kind}) on {redact_url(url)}; not "
+                        f"retrying a {method.upper()}: the request may have been "
+                        f"delivered (pass retry_unsafe_methods=True if it is "
+                        f"replay-safe)"
+                    )
                     raise
                 wait = self._backoff_wait(None, attempt)
                 logger.warning(
-                    f"{type(exc).__name__} on {redact_url(url)}; retry "
-                    f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
+                    f"{type(exc).__name__} ({kind}) on {redact_url(url)}; retry "
+                    f"{spent[key] + 1}/{budget} after {wait:.1f}s"
                 )
                 self._sleep(wait)
+                spent[key] += 1
                 attempt += 1
                 continue
-            retryable = response.status_code in self.status_forcelist or (
-                self._retry_predicate is not None and self._retry_predicate(response)
+            by_status = response.status_code in self.status_forcelist
+            by_predicate = self._retry_predicate is not None and self._retry_predicate(
+                response
             )
+            if (
+                by_status
+                and response.status_code not in RETRY_AFTER_STATUS_CODES
+                and not (
+                    self.retry_unsafe_methods or method.upper() in IDEMPOTENT_METHODS
+                )
+            ):
+                # `500` / `502` / `504` report that the server already had the
+                # request, so replaying a non-idempotent verb risks the same
+                # double submission the read-phase gate prevents. A `429` /
+                # `503` / `413` is the server asking for a later attempt, which
+                # is safe for any method.
+                logger.debug(
+                    f"HTTP {response.status_code} on {redact_url(url)}; not "
+                    f"retrying a {method.upper()}: the server already had the "
+                    f"request (pass retry_unsafe_methods=True if it is "
+                    f"replay-safe)"
+                )
+                by_status = False
+            # A `retry_predicate` is the caller inspecting the response and
+            # saying "this one is not really a success" — often on a `200` whose
+            # body carries a rate-limit. That is their judgement about their own
+            # endpoint, so the verb gate does not overrule it.
+            retryable = by_status or by_predicate
             if retryable and attempt < self.max_retries:
                 retry_after = _parse_retry_after(response.headers.get("Retry-After"))
                 wait = self._backoff_wait(retry_after, attempt)
@@ -1059,6 +2546,93 @@ class HttpClient:
         if callable(verb):
             return cast("requests.Response", verb(url, **kwargs))
         return self._session.request(method, url, **kwargs)
+
+
+class IncompleteDownloadError(requests.ConnectionError):
+    """A download finished with a body that did not match its advertised length.
+
+    Raised when the bytes written do not equal the `Content-Length` the
+    accepted response declared — in either direction. A short body is the
+    common case (a connection that ended cleanly at the wrong place, or a
+    server that under-sent its own claim); a long one means the stream and the
+    header disagree about what the object is, which is no safer to publish.
+
+    Derives from `requests.ConnectionError`, and so from `RequestException`
+    and `OSError`, for two reasons: the failure *is* a transport outcome, and
+    the providers' error-normalisation handlers already catch that family, so
+    a truncated download reaches them as the network error it is rather than
+    as an unfamiliar type that escapes their `except` clauses.
+
+    Attributes:
+        written: Bytes actually on disk when the mismatch was detected.
+        expected: The length the response advertised.
+
+    Examples:
+        - The two sizes travel with the error, so a caller can decide:
+            ```python
+            >>> from earthlens.base.http import IncompleteDownloadError
+            >>> err = IncompleteDownloadError("short body", written=8, expected=22)
+            >>> err.written, err.expected
+            (8, 22)
+
+            ```
+        - It is a `requests` transport error, so existing handlers catch it:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import IncompleteDownloadError
+            >>> issubclass(IncompleteDownloadError, requests.RequestException)
+            True
+            >>> issubclass(IncompleteDownloadError, OSError)
+            True
+
+            ```
+    """
+
+    def __init__(
+        self,
+        *args: Any,
+        written: int | None = None,
+        expected: int | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """Record the two sizes alongside the usual `requests` error fields.
+
+        Args:
+            *args: Positional arguments forwarded to `requests.ConnectionError`.
+            written: Bytes on disk when the mismatch was detected.
+            expected: The length the response advertised.
+            **kwargs: Keyword arguments forwarded to `requests.ConnectionError`.
+        """
+        super().__init__(*args, **kwargs)
+        self.written = written
+        self.expected = expected
+
+
+class UnsolicitedPartialContentError(requests.HTTPError):
+    """A `206` answered a request that carried no `Range` header.
+
+    The body is a fragment of the object, not the object, so writing it would
+    publish a partial file as a complete one. Repeating the request reproduces
+    the same answer — a server that volunteers partial content does not stop
+    doing so — which is why this is raised rather than retried, and why it is
+    caught ahead of the retry policy rather than by it.
+
+    Derives from `requests.HTTPError` because it is a verdict on the status
+    line. Note that `HTTPError` is *not* a `ConnectionError`, so the transport
+    retry set does not match it.
+
+    Examples:
+        - It is an HTTP-status error, not a transport one:
+            ```python
+            >>> import requests
+            >>> from earthlens.base.http import UnsolicitedPartialContentError
+            >>> issubclass(UnsolicitedPartialContentError, requests.HTTPError)
+            True
+            >>> issubclass(UnsolicitedPartialContentError, requests.ConnectionError)
+            False
+
+            ```
+    """
 
 
 class RangeReadError(Exception):
