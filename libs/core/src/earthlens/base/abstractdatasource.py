@@ -640,16 +640,15 @@ def native_parameters(backend_cls: type) -> frozenset[str]:
     GeoDataFrame form) from one the wrapper resolves for. Callers that need that
     distinction ask here instead of introspecting directly.
 
+    Deliberately uncached, unlike the sibling `_parameters` helper. Keying a
+    cache on the class would retain every class ever passed, and the premise
+    that a backend's parameters cannot change is not quite true here:
+    `__init_subclass__` replaces `__init__`, and a caller may patch it again,
+    after which a cached answer would be wrong. `inspect.signature` is cheap
+    enough that neither risk is worth taking.
+
     Args:
         backend_cls: An `AbstractDataSource` subclass.
-
-    Deliberately uncached, unlike the sibling `_parameters` helper. Keying a
-    cache on the class would retain every class ever passed — including the
-    throwaway ones tests build — and the premise that a backend's parameters
-    cannot change is not quite true here: `__init_subclass__` replaces
-    `__init__`, and a caller may patch it again, after which a cached answer
-    would be wrong. `inspect.signature` is cheap enough that neither risk is
-    worth taking.
 
     Returns:
         frozenset[str]: The declared names, minus the ergonomic ones the
@@ -1239,8 +1238,9 @@ class AbstractDataSource(ABC):
         a multi-granule job that died halfway carries on from the granule it
         reached, rather than re-fetching the ones already written — and, where
         the caller knows the size, a *truncated* file is no longer mistaken
-        for a finished one. This is resumption at the level of whole files:
-        `HttpClient.download` never resumes the bytes *within* one.
+        for a finished one. This is resumption at the level of whole files,
+        and is a separate mechanism from `HttpClient.download`'s `resume=`,
+        which continues a broken transfer *within* a single file.
 
         "Non-empty" is a weak completeness signal on its own: it is only
         trustworthy because the shared downloader writes to a sibling
@@ -1257,13 +1257,11 @@ class AbstractDataSource(ABC):
                 Wire a backend's `force=` download kwarg through here.
 
         Returns:
-            bool: `True` when `dest` can be reused as-is.
-
-        Examples:
-            - The check is a pure function of the path, so it can be exercised
-              on any backend instance. `libs/core/tests/base/test_hook_defaults.py`
-              covers the full matrix: missing, empty, written, wrong size,
-              exact size, a directory, and `force=True`.
+            bool: `True` when `dest` can be reused as-is. A missing path, a
+            path that is not a regular file (a directory reports a size too,
+            and on Windows that size is `0`), a size that misses an
+            `expected_size`, an empty file when no size was given, and
+            `force=True` all report `False`.
         """
         if force:
             return False
@@ -2437,12 +2435,19 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
     """Abstract base class for per-data-source variable catalogs.
 
     Subclasses load a backend-specific catalog (a YAML file, an
-    in-code dict, or a remote query) in :meth:`get_catalog` and
-    expose individual entries via :meth:`get_variable`. The
-    :func:`model_post_init` hook eagerly populates :attr:`catalog`
-    after pydantic validation runs, so subclasses can treat the
-    catalog as a mapping thereafter without writing their own
-    `__init__`.
+    in-code dict, or a remote query) and expose its entries through the
+    dict-like surface below — `len`, `in`, `[key]`, iteration and
+    :meth:`get_dataset` — plus :meth:`get_variable` for the two-level
+    catalogs. The :meth:`model_post_init` hook fills the row fields from
+    :meth:`_autoload` only when the caller supplied none, so `Catalog()`
+    reads from disk while `Catalog(datasets=...)` keeps exactly what it
+    was handed, and no subclass writes its own `__init__`.
+
+    Generic in `RowT`, the row model the backend stores. Parameterising
+    the base — `class Catalog(AbstractCatalog[Dataset])` — keeps
+    :attr:`datasets`, :meth:`get_catalog`, :meth:`get_dataset` and
+    `[key]` typed as that model instead of degrading to `Any`. Leaving it
+    unparameterised is allowed and changes nothing at runtime.
 
     Subclasses pass through pydantic's normal `BaseModel.__init__`
     — declare any backend-specific construction parameters as
@@ -2459,12 +2464,19 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
     default for a per-dataset variable level.
 
     Attributes:
-        catalog: Read-only view of the mapping returned by
-            :meth:`get_catalog`. Populated post-init; defaults to an
-            empty dict so the field is always present. Type and
-            shape are backend-specific (a concrete subclass typically
-            stores typed value objects, e.g. `dict[str, Variable]`
-            for the ECMWF backend).
+        datasets: The curated `{key: row}` mapping every backend keeps its
+            rows in, and what the dict-like surface reads. Rows are the
+            backend's own typed model — `dict[str, Dataset]` for the ECMWF
+            and GEE catalogs, `dict[str, Pollutant]` for the air-quality
+            ones — which is what `RowT` names.
+        available_datasets: Informational index of the dataset ids the
+            upstream advertises, curated or not. Empty when the backend
+            ships none.
+        providers: Provider-registry rows, for the backends that populate
+            the base `providers` field. Empty otherwise.
+        catalog: Read-only `MappingProxyType` view over whatever
+            :meth:`get_catalog` returns, rebuilt on each access, so it can
+            neither drift from the rows nor be written through.
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -2568,11 +2580,17 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
         `return self.datasets`.
 
         A backend whose catalog is genuinely a different shape still
-        overrides this.
+        overrides this. When it does not, and :attr:`datasets` is empty,
+        the empty mapping is returned but a warning is logged naming the
+        class — the default cannot tell "no rows" from "rows kept in some
+        other field", and a catalog that silently has no entries is harder
+        to notice than one that complains.
 
         Returns:
             dict[str, RowT]: The `{key: row}` mapping backing this catalog,
             typed as the row model the subclass parameterised the base with.
+            This is :attr:`datasets` itself, not a copy, so callers that
+            need an unwritable view should read :attr:`catalog` instead.
 
         Examples:
             - Read the rows and inspect one:

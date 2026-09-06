@@ -159,6 +159,11 @@ _DETERMINISTIC_ERRNO_NAMES: tuple[str, ...] = (
 if sys.platform != "win32":
     _DETERMINISTIC_ERRNO_NAMES += ("EACCES", "EPERM")
 
+#: The errno *values* behind :data:`_DETERMINISTIC_ERRNO_NAMES`, resolved once at
+#: import. Built by name and filtered rather than written as literals because the
+#: set is platform-dependent — `EDQUOT` is missing from some builds, and the two
+#: permission errnos are only appended away from Windows — so a name this
+#: platform does not define is simply dropped instead of failing the import.
 _DETERMINISTIC_OS_ERRNOS: frozenset[int] = frozenset(
     code
     for code in (getattr(errno, name, None) for name in _DETERMINISTIC_ERRNO_NAMES)
@@ -1655,20 +1660,6 @@ class HttpClient:
                 float or a `(connect, read)` pair — the latter fails a dead
                 host on the short connect budget without shortening the long
                 read budget a large download needs.
-            verify_length: Compare the bytes written against the
-                `Content-Length` the response advertised, and raise
-                `IncompleteDownloadError` on a mismatch. On by default.
-
-                Pass `False` for a server that misreports the size of a body it
-                generates on the fly, where the check would fail a download that
-                is actually fine. It is a separate switch from `Accept-Encoding`
-                on purpose: a coded body already has no checkable length — the
-                header counts encoded octets and the file counts decoded ones —
-                so asking for `gzip` disables the check as a side effect, and
-                that side effect should not be the only way to express the
-                intent. Turning the check off also disables the salvage, whose
-                whole proof is the same size equality.
-
             resume: Continue a broken transfer with a ranged request instead
                 of re-reading the object, when — and only when — the server has
                 proved it can be done safely. Off by default; the whole-object
@@ -1698,6 +1689,19 @@ class HttpClient:
                 left by an earlier run is never treated as a prefix. The
                 assembled file goes through the same length and `expect_magic`
                 gates as a whole-object read.
+            verify_length: Compare the bytes written against the
+                `Content-Length` the response advertised, and raise
+                `IncompleteDownloadError` on a mismatch. On by default.
+
+                Pass `False` for a server that misreports the size of a body it
+                generates on the fly, where the check would fail a download that
+                is actually fine. It is a separate switch from `Accept-Encoding`
+                on purpose: a coded body already has no checkable length — the
+                header counts encoded octets and the file counts decoded ones —
+                so asking for `gzip` disables the check as a side effect, and
+                that side effect should not be the only way to express the
+                intent. Turning the check off also disables the salvage, whose
+                whole proof is the same size equality.
             **kwargs: Extra keyword arguments forwarded to `requests`.
 
         Returns:
@@ -1710,14 +1714,11 @@ class HttpClient:
                 carried no `Range` — the body is a fragment of the object, and
                 repeating the request returns the same fragment, so this is
                 raised rather than retried whatever the client's retry policy.
-            requests.HTTPError: Also when a resumed leg is refused because the
-                server answered with an error status and the retry budget is
-                spent — the status and `.response` are preserved rather than
-                being flattened into a transport error.
             IncompleteDownloadError: When the bytes written do not equal the
                 `Content-Length` the response advertised. A short body is
-                retried from the start; a long one, a repeat of the same count,
-                or a client that opted out of transport retry raises at once.
+                retried from the start; a long one, a repeat of the same byte
+                count, a spent read or attempt budget, or a client that opted
+                out of transport retry raises at once.
             requests.HTTPError: On an error status — `download` always
                 calls `raise_for_status` (the client's `raise_for_status`
                 flag governs the verb methods, not `download`; a file
@@ -1727,8 +1728,19 @@ class HttpClient:
                 of `requests.HTTPError` (e.g. `requests.RequestException`,
                 as ghsl/glaciers pass) will **retry** an error status
                 before raising it, mirroring their old download loops.
-                Also the last transport exception after the retry budget
-                is exhausted.
+                This is also how a refused resume surfaces when the ranged
+                reply carried an error status and the retry budget is spent:
+                the status and `.response` reach the caller intact rather than
+                being flattened into a transport error.
+            requests.ConnectionError: When a resumed leg is refused, the retry
+                budget is spent, and the ranged reply carried no error status
+                to report in its place. A refusal with budget left never
+                escapes at all: the staged bytes are discarded, the object is
+                re-read whole, and resume stays off for the rest of the call.
+            BaseException: Once the transport retry budget is spent, the last
+                transport failure is re-raised as a fresh instance of its own
+                type, with a message naming the attempt count and the largest
+                byte count any attempt reached.
             OSError: From `mkdir`, the streaming write, `stat` or `replace`,
                 unchanged. `RangeReadError` is never raised here.
         """
