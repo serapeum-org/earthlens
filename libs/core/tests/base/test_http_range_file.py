@@ -433,8 +433,12 @@ class TestRangeReadErrors:
             _zip_blob(), requests.HTTPError("503 Service Unavailable")
         )
         reader = _range_file(session)
+        # `buffered()` outside the block: if it were the call that raised, the
+        # test would pass without ever reaching `ZipFile`, which is the thing
+        # under test.
+        buffered = reader.buffered()
         with pytest.raises(RangeReadError):
-            zipfile.ZipFile(reader.buffered())
+            zipfile.ZipFile(buffered)
 
     def test_an_http_error_status_still_reaches_the_caller(self):
         """`raise_for_status` inside the client is a `RequestException` too."""
