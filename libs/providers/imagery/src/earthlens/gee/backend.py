@@ -2705,8 +2705,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         per axis. The bbox is split with :func:`split_aoi_for_url`, each
         sub-extent is downloaded via :meth:`_download_one_url_tile`, and
         the per-tile tifs are mosaicked into `<prefix>.tif` with
-        :func:`pyramids.dataset.merge.merge_rasters`. Per-tile tifs are
-        deleted on success.
+        :func:`pyramids.dataset.merge.merge_rasters`, inheriting the tiles'
+        declared no-data rather than `merge_rasters`' `0` default (which would
+        mask legitimate zeros — sea-level elevation, zero rainfall). Per-tile
+        tifs are deleted on success.
         """
         sub_extents = split_aoi_for_url(self.space, scale)
         logger.info(
@@ -2723,7 +2725,19 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 self._download_one_url_tile(image, sub_region, scale, sub_prefix)
             )
         target = self.root_dir / f"{prefix}.tif"
-        merge_rasters([str(p) for p in tile_paths], str(target))
+        # merge_rasters defaults no_data_value to 0, which would both mask real
+        # zeros (sea-level SRTM, zero rainfall, zero surface-water occurrence)
+        # and drop whatever the tiles declared. Inherit it instead; "none"
+        # leaves the output without a no-data value, as the tiles have.
+        tile_no_data = PyramidsDataset.read_file(str(tile_paths[0])).no_data_value
+        fill = (
+            tile_no_data[0] if isinstance(tile_no_data, (list, tuple)) else tile_no_data
+        )
+        merge_rasters(
+            [str(p) for p in tile_paths],
+            str(target),
+            no_data_value=fill if fill is not None else "none",
+        )
         for p in tile_paths:
             p.unlink(missing_ok=True)
         logger.info(f"Stitched {len(tile_paths)} tile(s) into {target} via pyramids.")

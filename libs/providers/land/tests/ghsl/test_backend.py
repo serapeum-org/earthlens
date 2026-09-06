@@ -43,8 +43,17 @@ def patched_io(monkeypatch, tmp_path):
             make_tiny_tif(target, epsg=4326)
         return target
 
-    def fake_merge(src, dst, *, dst_crs=None, resampling=None, **kw):
-        records.append({"n": len(src), "dst_crs": dst_crs, "resampling": resampling})
+    def fake_merge(
+        src, dst, *, dst_crs=None, resampling=None, no_data_value=None, **kw
+    ):
+        records.append(
+            {
+                "n": len(src),
+                "dst_crs": dst_crs,
+                "resampling": resampling,
+                "no_data_value": no_data_value,
+            }
+        )
         shutil.copy(src[0], dst)
 
     monkeypatch.setattr(backend_mod, "download_and_unzip", fake_download)
@@ -370,6 +379,20 @@ class TestReviewFixes:
         out = g.download(progress_bar=False)
         assert len(out) == 1, f"expected one mosaicked output, got {out}"
         assert patched_io[-1]["n"] == 2, "both tiles should reach merge_rasters"
+
+    def test_merge_inherits_the_source_no_data(self, tmp_path, patched_io, monkeypatch):
+        """JRC's -200 sentinel reaches merge_rasters, not its 0 default."""
+        g = _build(tmp_path, ["GHS_POP"])
+        monkeypatch.setattr(
+            g,
+            "_urls_for",
+            lambda code, epoch: [
+                "https://x/GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R6_C18.zip",
+                "https://x/GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R6_C19.zip",
+            ],
+        )
+        g.download(progress_bar=False)
+        assert patched_io[-1]["no_data_value"] == -200.0
 
     def test_localise_idempotent_skips_remerge(self, tmp_path, patched_io):
         """A repeated identical download reuses the output without re-merging (L4)."""

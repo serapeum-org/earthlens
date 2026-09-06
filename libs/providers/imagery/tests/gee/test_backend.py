@@ -226,8 +226,11 @@ class _FakeHTTPResponse:
 class _FakePyramidsHandle:
     """Stand-in for a `pyramids.dataset.Dataset` returned by `from_bytes`."""
 
-    def __init__(self, body: bytes):
+    def __init__(self, body: bytes, no_data_value=(None,)):
         self._body = body
+        # Real getDownloadURL tiles declare no no-data; the backend reads this
+        # to inherit it rather than letting merge_rasters stamp its 0 default.
+        self.no_data_value = no_data_value
 
     def to_file(self, path: str) -> None:
         from pathlib import Path as _Path
@@ -1646,6 +1649,7 @@ class TestAutoSplit:
 
         assert len(merge_calls) == 1
         assert merge_calls[0]["dst"] == str(target)
+        assert merge_calls[0]["kwargs"]["no_data_value"] == "none"
         assert len(merge_calls[0]["src"]) > 1
         for tile_path in merge_calls[0]["src"]:
             assert tile_path.endswith(".tif")

@@ -662,7 +662,10 @@ class GHSL(AbstractDataSource):
         The pyramids-consuming core: `merge_rasters` mosaics the tiles **and**
         reprojects them to the output CRS in one call (skipped when the source
         already matches the output CRS), then `Dataset.crop` clips to the AOI
-        bbox. Categorical products reproject with nearest-neighbour (so class
+        bbox. The mosaic inherits the source tiles' declared no-data (JRC uses
+        `-200`, or `65535` on the uint16 products) instead of `merge_rasters`'
+        `0` default, which would mask every zero-population / zero-built-up
+        cell and promote the real sentinel to valid data. Categorical products reproject with nearest-neighbour (so class
         codes are never blended); those with a curated legend also carry a
         colour table + a `.legend.json` sidecar, while a legend-less categorical
         product (e.g. `GHS_BUILT_C_VEG`) still gets the safe NN resampling but
@@ -693,11 +696,22 @@ class GHSL(AbstractDataSource):
 
         self._raw_dir.mkdir(parents=True, exist_ok=True)
         merged = self._raw_dir / f"{rp.id}_merged.tif"
+        # merge_rasters defaults no_data_value to 0, which is doubly wrong for
+        # GHSL: 0 is an ordinary value (no population, no built-up surface), and
+        # JRC's own sentinel (-200, or 65535 on the uint16 products) would be
+        # demoted to valid data. Inherit what the source tiles declare.
+        source_no_data = Dataset.read_file(str(tifs[0])).no_data_value
+        fill = (
+            source_no_data[0]
+            if isinstance(source_no_data, (list, tuple))
+            else source_no_data
+        )
         merge_rasters(
             src=[str(t) for t in tifs],
             dst=str(merged),
             dst_crs=dst_crs,
             resampling=resampling,
+            no_data_value=fill if fill is not None else "none",
         )
 
         dataset = Dataset.read_file(str(merged))
