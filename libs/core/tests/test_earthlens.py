@@ -1509,28 +1509,56 @@ class TestErgonomicKwargsAreDiscoverable:
         )
 
     def test_the_synthesized_annotations_resolve(self):
-        """`get_type_hints` must work on every backend the wrapper touches.
+        """`get_type_hints` returns the wrapper's synthesized annotations, resolved.
 
-        `functools.wraps` points `__wrapped__` at the backend's own `__init__`,
+        This asserts the observable contract rather than the table behind it.
+        `functools.wraps` points `__wrapped__` at the backend's own `__init__`
         and `get_type_hints` follows it, resolving against that function's
-        globals — the backend module, where `Any` is usually not imported. A
-        stringified annotation therefore raises `NameError` there, which is the
-        tooling these annotations exist to serve.
+        globals — the backend module, where `Any` is not imported. So the
+        wrapper has to re-bind the synthesized annotations onto itself, and
+        they have to be objects: a string would raise `NameError` there. Both
+        halves fail this test if either is dropped.
         """
         import typing
 
         from earthlens.base.abstractdatasource import _ERGONOMIC_ANNOTATIONS
 
-        # Every value in the table must already be an object. A string here is
-        # the actual defect, and it is checkable without touching a backend.
-        stringly = {
-            name: value
-            for name, value in _ERGONOMIC_ANNOTATIONS.items()
-            if isinstance(value, str)
-        }
-        assert not stringly, f"synthesized annotations must be objects, not {stringly}"
+        # A backend that gets all four kwargs synthesized, so the assertion
+        # below covers every entry in the table rather than one of them.
+        target, synthesized = None, frozenset()
+        for key in sorted(EarthLens.DataSources):
+            backend = EarthLens.DataSources[key]
+            params = getattr(backend.__init__, "_ergonomic_params", frozenset())
+            if len(params) > len(synthesized):
+                target, synthesized = backend, params
+        assert target is not None
+        assert synthesized == set(_ERGONOMIC_ANNOTATIONS), (
+            f"expected a backend taking every synthesized kwarg; {target.__name__} "
+            f"takes {sorted(synthesized)}"
+        )
 
-        # The symbols the table would need resolved if it ever were stringified.
+        hints = typing.get_type_hints(target.__init__)
+        for name in sorted(synthesized):
+            assert name in hints, (
+                f"{target.__name__}.__init__ does not expose a resolved "
+                f"annotation for the synthesized {name!r}"
+            )
+            assert hints[name] == _ERGONOMIC_ANNOTATIONS[name], (
+                f"{name!r} resolved to {hints[name]!r}, not the declared "
+                f"{_ERGONOMIC_ANNOTATIONS[name]!r}"
+            )
+
+    def test_get_type_hints_works_on_every_backend(self):
+        """No backend's `__init__` is left unresolvable by the wrapper.
+
+        A backend's own annotations may name a `TYPE_CHECKING`-only import,
+        which is its business and pre-existing; those are separated from
+        symbols the synthesized table would need, so neither hides the other.
+        """
+        import typing
+
+        from earthlens.base.abstractdatasource import _ERGONOMIC_ANNOTATIONS
+
         ours = {"Any", "float", "str", "None", "object", "list"}
         broken, foreign, unexplained = [], [], []
         for key in sorted(EarthLens.DataSources):
@@ -1539,9 +1567,6 @@ class TestErgonomicKwargsAreDiscoverable:
                 typing.get_type_hints(backend.__init__)
             except NameError as exc:
                 missing = str(exc).split("'")[1] if "'" in str(exc) else str(exc)
-                # A backend's own annotations may name a TYPE_CHECKING-only
-                # import; that is its business, not this table's. Split rather
-                # than filter loosely, so neither kind can hide the other.
                 bucket = broken if missing in ours else foreign
                 bucket.append((backend.__name__, missing))
             except Exception as exc:  # noqa: BLE001 - reported, never swallowed
@@ -1550,9 +1575,9 @@ class TestErgonomicKwargsAreDiscoverable:
         assert not unexplained, (
             f"get_type_hints raised something other than NameError on {unexplained}"
         )
-        # `foreign` is pre-existing and deliberately not asserted on; naming it
-        # keeps it visible instead of swallowed by a bare `except`.
-        assert isinstance(foreign, list)
+        assert not any(name in _ERGONOMIC_ANNOTATIONS for _, name in foreign), (
+            f"a synthesized name leaked into the pre-existing bucket: {foreign}"
+        )
 
     def test_a_native_parameter_is_not_shadowed_by_a_synthesized_one(self):
         """A backend declaring its own `aoi=` keeps that one, not the wrapper's.
@@ -1571,15 +1596,20 @@ class TestErgonomicKwargsAreDiscoverable:
         assert "aoi" in native_parameters(worldpop), (
             "a native aoi= must still read as native"
         )
-        native_aoi = inspect.signature(inspect.unwrap(worldpop.__init__)).parameters[
-            "aoi"
-        ]
-        assert aoi.annotation == native_aoi.annotation, (
-            f"the wrapper replaced WorldPop's own aoi annotation "
-            f"({native_aoi.annotation!r}) with {aoi.annotation!r}"
-        )
+        # Compared against the synthesized stand-in rather than another
+        # derivation of the same signature object: the contract is that the
+        # wrapper's own annotation did NOT replace the backend's.
+        from earthlens.base.abstractdatasource import _ERGONOMIC_ANNOTATIONS
+
         assert aoi.annotation is not inspect.Parameter.empty, (
             "an annotation-less parameter would also pass an `is not None` test"
+        )
+        assert aoi.annotation != _ERGONOMIC_ANNOTATIONS["aoi"], (
+            f"WorldPop's own aoi annotation was replaced by the synthesized "
+            f"{_ERGONOMIC_ANNOTATIONS['aoi']!r}"
+        )
+        assert "list[float]" in str(aoi.annotation), (
+            f"expected WorldPop's own bbox-bearing annotation, got {aoi.annotation!r}"
         )
 
     def test_a_backend_is_not_offered_a_parameter_it_must_reject(self):
