@@ -237,6 +237,10 @@ class _FakePyramidsHandle:
 
         _Path(path).write_bytes(self._body)
 
+    def close(self) -> None:
+        """No-op stand-in for `Dataset.close`, which releases the GDAL handle."""
+        return None
+
 
 class _FakePyramidsDataset:
     """Stand-in for `pyramids.dataset.Dataset` — captures `from_*` calls."""

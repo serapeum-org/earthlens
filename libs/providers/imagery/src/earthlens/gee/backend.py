@@ -2729,7 +2729,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # zeros (sea-level SRTM, zero rainfall, zero surface-water occurrence)
         # and drop whatever the tiles declared. Inherit it instead; "none"
         # leaves the output without a no-data value, as the tiles have.
-        tile_no_data = PyramidsDataset.read_file(str(tile_paths[0])).no_data_value
+        first_tile = PyramidsDataset.read_file(tile_paths[0])
+        tile_no_data = first_tile.no_data_value
+        first_tile.close()  # release the handle before the tiles are unlinked
         fill = (
             tile_no_data[0] if isinstance(tile_no_data, (list, tuple)) else tile_no_data
         )

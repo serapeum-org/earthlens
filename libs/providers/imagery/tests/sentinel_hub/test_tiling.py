@@ -34,7 +34,7 @@ def recorded_merge(monkeypatch):
     calls = []
 
     def _fake_merge(src, dst, **kwargs):
-        calls.append((list(src), str(dst)))
+        calls.append((list(src), str(dst), kwargs))
         Path(dst).write_bytes(b"II*\x00merged")
 
     monkeypatch.setattr(merge_mod, "merge_rasters", _fake_merge)
@@ -52,9 +52,11 @@ class TestTiling:
         assert len(paths) == 1
         assert paths[0].name == "sentinel-2-l2a-ndvi.tif"
         assert paths[0].exists()
+        # the rendered tiles' own no-data reaches merge_rasters, not its 0 default
+        assert recorded_merge[-1][2]["no_data_value"] == -9999.0
         # one merge call, four tile sources
         assert len(recorded_merge) == 1
-        srcs, dst = recorded_merge[0]
+        srcs, dst, _kw = recorded_merge[0]
         assert len(srcs) == 4
         assert dst == str(paths[0])
 

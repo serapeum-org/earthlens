@@ -135,11 +135,21 @@ class FakeSentinelHubRequest:
         return {"identifier": identifier, "format": response_format}
 
     def get_data(self, save_data: bool = False) -> list:
-        """Write one placeholder GeoTIFF under `data_folder` and return a payload."""
+        """Write one small real GeoTIFF under `data_folder` and return a payload."""
+        import numpy as np
+        from pyramids.dataset import Dataset, GeoReference
+
         folder = Path(self.data_folder) / "abc123hash"
         folder.mkdir(parents=True, exist_ok=True)
         target = folder / "response.tiff"
-        target.write_bytes(b"II*\x00fake-geotiff")
+        # A readable raster rather than bare TIFF magic: the tiling path reads
+        # each rendered tile back to inherit its no-data before mosaicking.
+        Dataset.from_array(
+            np.arange(9, dtype="float32").reshape(3, 3),
+            geo_ref=GeoReference(
+                top_left_corner=(14.0, 40.5), cell_size=0.1, epsg=4326
+            ),
+        ).to_file(str(target))
         self._written = [str(target.relative_to(self.data_folder))]
         return [b"fake-array"]
 
