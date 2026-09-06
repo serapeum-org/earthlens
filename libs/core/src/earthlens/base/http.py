@@ -1801,13 +1801,17 @@ class HttpClient:
             # wrote", so it cannot outlive the file it describes.
             banked = 0
             if staged:
-                # Suppressed: this runs from every failure path, including
+                # This runs from every failure path, including
                 # `except BaseException`, and on Windows the unlink can raise
                 # `PermissionError` when the handle has only just been released.
                 # Removing the temp is a promise, but it must not become a
-                # second failure that replaces the real one.
-                with contextlib.suppress(OSError):
+                # second failure that replaces the real one — so it is caught
+                # and logged rather than suppressed silently, since the file it
+                # promised to remove is still there.
+                try:
                     tmp.unlink(missing_ok=True)
+                except OSError as exc:
+                    logger.debug(f"could not remove {tmp.name}: {exc}")
 
         merged = self._merge_headers(headers)
         # Header names are case-insensitive, and `_merge_headers` returns a
@@ -1829,6 +1833,8 @@ class HttpClient:
         # on the identical number is deterministic, not a transport blip.
         last_written: int | None = None
         best_written = 0
+        # What the previous leg had banked, so per-leg progress is checkable.
+        last_banked = 0
         if staged and tmp.exists():
             # Suppressed for the same reason as the salvage stat below: this is
             # a log line, and it runs before the first request, so a filesystem
@@ -1912,8 +1918,14 @@ class HttpClient:
                 and anchor is not None
                 and not caller_sent_range
                 and _RESUME_OVERLAP < banked < anchor.total
+                # Each leg re-fetches the overlap, so a leg that advanced less
+                # than that cost more than it saved. Without this a server
+                # dribbling a byte per leg burns the whole read budget
+                # re-sending 64 KiB apiece, where a plain restart is cheaper.
+                and banked - last_banked > _RESUME_OVERLAP
             ):
                 resume_at, leg = banked, anchor
+                last_banked = banked
             attempt_headers = merged
             if leg is not None:
                 attempt_headers = {
@@ -1938,9 +1950,17 @@ class HttpClient:
                     **kwargs,
                 )
                 try:
-                    retryable = response.status_code in self.status_forcelist or (
-                        self._retry_predicate is not None
-                        and self._retry_predicate(response)
+                    # A resumed leg is exempt: `status_forcelist` and a
+                    # `retry_predicate` are written against whole-object
+                    # responses (the existing ones call `r.json()`), and handing
+                    # one a `206` byte fragment would have it judge — or fail to
+                    # parse — a slice of the object. The leg has its own gate.
+                    retryable = leg is None and (
+                        response.status_code in self.status_forcelist
+                        or (
+                            self._retry_predicate is not None
+                            and self._retry_predicate(response)
+                        )
                     )
                     if retryable and attempt < self.max_retries:
                         # Recorded, not slept on: the sleep happens after the
@@ -2102,6 +2122,7 @@ class HttpClient:
                         staged_now = tmp.stat().st_size if tmp.exists() else 0
                     except OSError:
                         staged_now = 0
+                    best_written = max(best_written, staged_now)
                     kept = 0
                     if not resume_off and staged and anchor is not None:
                         # Bank only what THIS attempt wrote: `_stream_to_file`

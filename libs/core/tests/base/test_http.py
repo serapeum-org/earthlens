@@ -2915,6 +2915,10 @@ class TestResumeHappyPath:
         assert not (tmp_path / "g.part").exists()
 
 
+#: A megabyte, so several legs can each net more than the 64 KiB overlap.
+_BIG_OBJECT = bytes(range(256)) * 4096
+
+
 @pytest.mark.unit
 class TestResumeAcrossSeveralLegs:
     """The behaviour the feature exists for: a resumed leg that breaks and resumes."""
@@ -2923,37 +2927,102 @@ class TestResumeAcrossSeveralLegs:
         """Each leg starts one overlap behind the bytes the previous one banked.
 
         The `Range` progression is the part that binds. A bytes-only assertion
-        would pass with the middle leg deleted, and the offset arithmetic is
-        exactly what an innocent change to `banked` / `overlap_at` / the
-        truncate would break silently.
+        would pass with a leg deleted, and the offset arithmetic across legs is
+        exactly what an innocent change to `banked` or the truncate would break
+        silently.
+
+        Note the accounting: a leg delivering N bytes only advances the file by
+        `N - overlap`, because it re-fetches the overlap it is verified against.
         """
         dest = tmp_path / "g"
-        # whole read breaks at 120,000; leg 1 delivers 100,000 of its range then
-        # breaks; leg 2 breaks immediately; leg 3 completes.
-        server = _ResumeServer(leg_breaks=[100_000, 0, None])
+        overlap, total = 65536, len(_BIG_OBJECT)
+        server = _ResumeServer(
+            _BIG_OBJECT, break_first_at=200_000, leg_breaks=[200_000, 200_000, None]
+        )
         _resume_client(server, max_retries=6).download(
             "http://x/g", dest, progress=False, chunk=4096, resume=True
         )
-        assert dest.read_bytes() == _OBJECT
+        assert dest.read_bytes() == _BIG_OBJECT
 
-        overlap, total = 65536, len(_OBJECT)
-        first_leg = _BREAK_AT - overlap
-        # leg 1 staged `first_leg + 100_000`, so leg 2 starts an overlap behind it
-        second_leg = first_leg + 100_000 - overlap
+        first = 200_000 - overlap
+        second = first + 200_000 - overlap
+        third = second + 200_000 - overlap
         assert [r["Range"] for r in server.ranged] == [
-            f"bytes={first_leg}-{total - 1}",
-            f"bytes={second_leg}-{total - 1}",
-            f"bytes={second_leg}-{total - 1}",
+            f"bytes={first}-{total - 1}",
+            f"bytes={second}-{total - 1}",
+            f"bytes={third}-{total - 1}",
         ]
 
     def test_every_leg_carries_the_anchored_validator(self, tmp_path):
         """The anchor is frozen at the first response, not refreshed per leg."""
-        server = _ResumeServer(leg_breaks=[100_000, None])
+        server = _ResumeServer(
+            _BIG_OBJECT, break_first_at=200_000, leg_breaks=[200_000, None]
+        )
         _resume_client(server, max_retries=6).download(
             "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
         )
         assert len(server.ranged) >= 2
         assert {r["If-Range"] for r in server.ranged} == {'"v1"'}
+
+    def test_a_leg_that_gains_less_than_the_overlap_stops_resuming(self, tmp_path):
+        """Re-fetching 64 KiB to gain less than that costs more than a restart.
+
+        Without the minimum-progress guard a server dribbling a few bytes per
+        leg re-sends the whole overlap each time and burns the read budget.
+        """
+        dest = tmp_path / "g"
+        # 100,000 delivered on a range starting one overlap back nets 34,464 —
+        # below the overlap, so the next leg must not be armed.
+        server = _ResumeServer(leg_breaks=[100_000, None])
+        _resume_client(server, max_retries=6).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert len(server.ranged) == 1, (
+            f"a leg netting less than the overlap re-armed: "
+            f"{[r['Range'] for r in server.ranged]}"
+        )
+
+
+@pytest.mark.unit
+class TestResumeLegIsolation:
+    """A ranged leg must not be judged by gates written for whole objects."""
+
+    def test_a_retry_predicate_never_sees_a_leg(self, tmp_path):
+        """The existing predicates call `r.json()`; a `206` is a byte fragment.
+
+        Handing one to a predicate written against whole-object responses makes
+        it judge — or fail to parse — a slice of the object, and the exception
+        escapes through the blanket handler.
+        """
+        seen: list[int] = []
+
+        def _predicate(response):
+            seen.append(response.status_code)
+            if response.status_code == 206:
+                raise ValueError("a predicate was handed a byte fragment")
+            return False
+
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        _resume_client(server, retry_predicate=_predicate).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert 206 not in seen, f"the predicate was shown a leg: {seen}"
+
+    def test_the_exhaustion_message_reports_the_bytes_actually_reached(self, tmp_path):
+        """`best read 0 bytes` after a six-figure transfer is worse than silence."""
+        server = _ResumeServer(break_every_whole=True, honour_range=False)
+        client = _resume_client(server, max_retries=2)
+        with pytest.raises(requests.ConnectionError) as excinfo:
+            client.download(
+                "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+            )
+        assert "best read 0 bytes" not in str(excinfo.value), (
+            f"the high-water mark was never observed: {excinfo.value}"
+        )
+        assert f"best read {_BREAK_AT:,} bytes" in str(excinfo.value), excinfo.value
 
 
 @pytest.mark.unit
