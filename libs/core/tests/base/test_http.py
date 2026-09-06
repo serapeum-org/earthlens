@@ -2081,6 +2081,36 @@ class TestDownloadWritesWholeObjects:
         )
         assert session.requests[0][1]["Accept-Encoding"] == "identity"
 
+    def test_resume_with_the_length_check_off_is_refused(self, tmp_path):
+        """The pair is contradictory: resume is addressed by the length it distrusts.
+
+        A resumed leg's `Range` end and its `Content-Range` comparison both come
+        from the advertised total, and the length post-condition is the only
+        proof the assembly reached it, so the combination would publish a
+        correct-prefix-but-short file with nothing raised or logged.
+        """
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD))
+        client = HttpClient(session=session, sleep=lambda _: None)
+        with pytest.raises(ValueError, match="resume=True requires verify_length=True"):
+            client.download(
+                "http://x/g",
+                tmp_path / "g",
+                progress=False,
+                resume=True,
+                verify_length=False,
+            )
+        assert session.calls == 0, "it must refuse before touching the network"
+
+    def test_verify_length_false_also_stops_rejecting_an_over_long_body(self, tmp_path):
+        """A length you do not believe cannot catch a body that exceeds it either."""
+        dest = tmp_path / "g"
+        session = _ScriptedSession(_ScriptedBody(_PAYLOAD, advertised=8))
+        HttpClient(session=session, sleep=lambda _: None).download(
+            "http://x/g", dest, progress=False, verify_length=False
+        )
+        assert dest.read_bytes() == _PAYLOAD
+        assert session.calls == 1
+
     def test_the_check_is_on_by_default(self, tmp_path):
         """Every existing call site keeps the post-condition it has today."""
         session = _ScriptedSession(_ScriptedBody(_PAYLOAD[:8], advertised=22))
@@ -3189,17 +3219,16 @@ class TestResumeHelperEdges:
         """
         dest = tmp_path / "g"
         server = _ResumeServer()
-        monkeypatch.setattr(
-            Path, "stat", _PartStatFailsOnce(OSError(errno.EIO, "I/O error"))
-        )
+        # `after=1` lets the salvage's own measurement through so the refusal
+        # lands on the banking stat; the two are separate guards and this test
+        # is about the second. An earlier version reached it by turning the
+        # length check off, which is now refused alongside `resume=True`.
+        failing = _PartStatFailsOnce(OSError(errno.EIO, "I/O error"), after=1)
+        monkeypatch.setattr(Path, "stat", failing)
         _resume_client(server).download(
-            "http://x/g",
-            dest,
-            progress=False,
-            chunk=4096,
-            resume=True,
-            verify_length=False,
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
         )
+        assert failing.fired, "the banking stat never failed; the test proves nothing"
         assert dest.read_bytes() == _OBJECT
         assert server.ranged == [], "an unreadable size must not be banked as progress"
         assert server.calls == 2, f"expected one restart, got {server.calls} requests"
@@ -3224,16 +3253,22 @@ class _OpenFailsOnPartReadback:
 
 
 class _PartStatFailsOnce:
-    """A `Path.stat` replacement that refuses the first stat of a `.part` file.
+    """A `Path.stat` replacement that refuses one stat of a `.part` file.
 
     The real `stat` runs first, so a missing file still reports missing and the
     refusal only lands once the staging file genuinely exists. One shot, so the
     attempt that follows can size the finished object normally.
+
+    `after` lets earlier staging-file stats through untouched, which is how a
+    caller reaches a specific one: with the length check on, the salvage
+    measures the file before the banking step does.
     """
 
-    def __init__(self, exc: OSError) -> None:
+    def __init__(self, exc: OSError, after: int = 0) -> None:
         self._exc = exc
         self._real = Path.stat
+        self._after = after
+        self.seen = 0
         self.fired = False
 
     def __get__(self, instance: Any, owner: Any = None) -> Any:
@@ -3246,8 +3281,10 @@ class _PartStatFailsOnce:
         """Defer to the real `stat`, then refuse once for the staging file."""
         result = self._real(path, *args, **kwargs)
         if path.name.endswith(".part") and not self.fired:
-            self.fired = True
-            raise self._exc
+            self.seen += 1
+            if self.seen > self._after:
+                self.fired = True
+                raise self._exc
         return result
 
 

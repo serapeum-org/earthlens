@@ -1695,8 +1695,15 @@ class HttpClient:
 
                 Pass `False` for a server that misreports the size of a body it
                 generates on the fly, where the check would fail a download that
-                is actually fine. It is a separate switch from `Accept-Encoding`
-                on purpose: a coded body already has no checkable length — the
+                is actually fine. This distrusts the advertised length in
+                **both** directions: an over-long body — a mis-framed response,
+                a spliced proxy body — is published too, because a length you
+                do not believe cannot catch one. It also disables the salvage,
+                whose whole proof is the same size equality, and it cannot be
+                combined with `resume=True`, which is addressed by that length
+                and raises `ValueError` here.
+
+                It is a separate switch from `Accept-Encoding` on purpose: a coded body already has no checkable length — the
                 header counts encoded octets and the file counts decoded ones —
                 so asking for `gzip` disables the check as a side effect, and
                 that side effect should not be the only way to express the
@@ -1709,7 +1716,8 @@ class HttpClient:
 
         Raises:
             ValueError: When `expect_magic` is given and the body does not
-                start with any of the supplied prefixes.
+                start with any of the supplied prefixes, or when `resume=True`
+                is combined with `verify_length=False`.
             UnsolicitedPartialContentError: When a `206` answers a request that
                 carried no `Range` — the body is a fragment of the object, and
                 repeating the request returns the same fragment, so this is
@@ -1744,6 +1752,20 @@ class HttpClient:
             OSError: From `mkdir`, the streaming write, `stat` or `replace`,
                 unchanged. `RangeReadError` is never raised here.
         """
+        if resume and not verify_length:
+            # Contradictory, not merely risky. A resumed leg's `Range` end and
+            # its `Content-Range` check are both derived from the advertised
+            # total, and the length post-condition is the only thing that
+            # proves the assembly reached it — `_resume_refusal` validates the
+            # window the server claimed, never the bytes it delivered. Asking
+            # to resume is asserting the total is trustworthy; asking to skip
+            # the check is asserting it is not. Refuse rather than silently
+            # publish a correct-prefix-but-short file.
+            raise ValueError(
+                "resume=True requires verify_length=True: a resumed transfer is "
+                "addressed by the advertised Content-Length, so the length check "
+                "is the only proof the assembled file is complete."
+            )
         dest = Path(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
         # `expect_magic` promises a rejected body is discarded, which is only
