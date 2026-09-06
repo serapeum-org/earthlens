@@ -159,6 +159,24 @@ _DETERMINISTIC_ERRNO_NAMES: tuple[str, ...] = (
 if sys.platform != "win32":
     _DETERMINISTIC_ERRNO_NAMES += ("EACCES", "EPERM")
 
+#: Permission errnos on Windows, where one code covers both a permanent refusal
+#: and a transient sharing violation. They stay retryable there — see
+#: :data:`_DETERMINISTIC_ERRNO_NAMES` — but on the *connect* budget rather than
+#: the read one: a sharing violation clears in seconds, so a single retry
+#: separates the two cases, whereas the full read budget would re-download a
+#: multi-gigabyte object five times to fail at the same byte. That amplification
+#: is what the deterministic set exists to prevent, and honouring Windows must
+#: not reintroduce it.
+_TRANSIENT_PERMISSION_ERRNOS: frozenset[int] = (
+    frozenset()
+    if sys.platform != "win32"
+    else frozenset(
+        code
+        for code in (getattr(errno, name, None) for name in ("EACCES", "EPERM"))
+        if code is not None
+    )
+)
+
 #: The errno *values* behind :data:`_DETERMINISTIC_ERRNO_NAMES`, resolved once at
 #: import. Built by name and filtered rather than written as literals because the
 #: set is platform-dependent — `EDQUOT` is missing from some builds, and the two
@@ -446,6 +464,15 @@ def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str 
         return None
     if strict and isinstance(exc, NON_RETRYABLE_EXCEPTIONS):
         return None
+    if (
+        isinstance(exc, OSError)
+        and not isinstance(exc, requests.RequestException)
+        and exc.errno in _TRANSIENT_PERMISSION_ERRNOS
+    ):
+        # Windows only: retryable, because it may be a sharing violation, but on
+        # the small budget — one attempt clears one, five would re-download the
+        # whole object to fail identically.
+        return "connect"
     if isinstance(exc, requests.exceptions.ConnectTimeout):
         return "connect"
     if isinstance(
@@ -1665,8 +1692,22 @@ class HttpClient:
                 proved it can be done safely. Off by default; the whole-object
                 path above is unchanged for every caller that does not opt in.
 
-                Requires staging, so it has no effect under `atomic=False`
-                unless `expect_magic` forces staging back on. Resuming means
+                Three things make it inert, silently, so they are listed
+                together. It requires staging, so it does nothing under
+                `atomic=False` unless `expect_magic` forces staging back on. It
+                stands down when a `Range` is already present in the merged
+                headers — including one set on the client, which disables
+                resume for every call on it — because a caller who owns the
+                object boundaries should not have ours added on top. And a leg
+                only arms when the previous one gained more than the overlap it
+                re-fetches, since below that a restart is cheaper.
+
+                On a leg `download` also overrides two headers rather than
+                merging under them: `Accept-Encoding: identity`, because a
+                coded reply would make the byte offsets mean something else,
+                and `If-Range`, which must name the representation the transfer
+                anchored on. This is the one place caller headers are not
+                honoured verbatim. Resuming means
                 keeping a partial file between attempts, and that is only safe
                 in the private `<dest>.part` this method owns — never in a
                 caller-supplied `dest` that a failed attempt must not damage.

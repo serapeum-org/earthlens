@@ -69,7 +69,7 @@ Anubis anti-bot wall (SPEIbase) blocks browser-like agents. Pass `user_agent=` f
 
 By default `download` reads the object **once, whole**, on every attempt: it generates no `Range` header of its
 own, and a retry re-requests from byte 0 rather than appending to what is already on disk. Resuming is available
-but opt-in — see [Resuming a single file](#resuming-a-single-filetrue) below.
+but opt-in — see [Resuming a single file](#resuming-a-single-file-resumetrue) below.
 
 Restarting is the default because appending to a partial file is only safe if the new bytes provably belong to
 the same representation as the old ones, and most servers do not give you enough to prove it: `Accept-Ranges: bytes` is advertised by hosts that then ignore `Range` and send the
@@ -84,11 +84,17 @@ What replaces it is verification after the fact:
 | Response | `download` does |
 |---|---|
 | a body matching its `Content-Length` | publishes it |
-| a body **short** of it | raises `IncompleteDownloadError`, and retries once from the start |
+| a body **short** of it | raises `IncompleteDownloadError`, retrying from the start until the read budget or a repeated byte count stops it |
 | a body **longer** than it, or the same short count twice | raises `IncompleteDownloadError` without retrying — both repeat |
 | no usable length (chunked, `Content-Encoding`, contradictory duplicates) | publishes it unchecked; there is no claim to check |
 | a `206` to a request that carried no `Range` | raises `UnsolicitedPartialContentError` without retrying |
 | a break *after* the last byte, when the size already matches | keeps it; the equality is the whole proof |
+
+The table above is what `verify_length=True` (the default) buys. Pass `verify_length=False` for a server that
+misreports the size of a body it generates on the fly, where the check would fail a download that is actually
+fine. It distrusts the advertised length in **both** directions, so an over-long body is published too, and it
+disables the salvage, whose proof is the same size equality. It cannot be combined with `resume=True`, which is
+addressed by that same length — the pair raises `ValueError`.
 
 Because the check compares against bytes as delivered, `download` sends `Accept-Encoding: identity` — but only
 when neither the call nor the constructor named that header in any casing, so a backend that needs `gzip`, or

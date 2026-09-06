@@ -156,24 +156,25 @@ def _client(
     return client, session, waits
 
 
-def _http_for_platform(platform: str) -> Any:
+def _http_for_platform(platform: str, monkeypatch: pytest.MonkeyPatch) -> Any:
     """Execute a second, private copy of `http.py` under a patched `sys.platform`.
 
     The deterministic-errno set is built once at import time, so the branch this
     interpreter did not take is only observable by running the module again with
     `sys.platform` saying something else. The copy is never registered in
     `sys.modules`, so nothing else in the session can pick it up by accident.
+
+    Patched through `monkeypatch` rather than by assigning `sys.platform`: the
+    attribute is process-global, so a bare assignment is a cross-test race the
+    moment the suite runs distributed or threaded, and an interpreter-level
+    abort would leave it wrong for everything after it.
     """
     spec = importlib.util.spec_from_file_location(
         f"_earthlens_http_platform_probe_{platform}", http_module.__file__
     )
     module = importlib.util.module_from_spec(spec)
-    real = sys.platform
-    sys.platform = platform
-    try:
-        spec.loader.exec_module(module)
-    finally:
-        sys.platform = real
+    monkeypatch.setattr(sys, "platform", platform)
+    spec.loader.exec_module(module)
     return module
 
 
@@ -2563,10 +2564,15 @@ class TestLocalStorageFailuresAreDeterministic:
 
     @pytest.mark.parametrize("name", ["EACCES", "EPERM"])
     def test_a_permission_error_follows_the_platform(self, name):
-        """On Windows these are also how a transient sharing violation arrives."""
+        """On Windows these are also how a transient sharing violation arrives.
+
+        Retryable there, but on the connect budget: one attempt clears a
+        sharing violation, while the read budget would re-download a
+        multi-gigabyte object to fail at the same byte.
+        """
         exc = OSError(getattr(errno, name), "denied")
         if sys.platform == "win32":
-            assert classify_transport_error(exc, strict=False) == "read"
+            assert classify_transport_error(exc, strict=False) == "connect"
         else:
             assert classify_transport_error(exc, strict=False) is None
 
@@ -2618,9 +2624,9 @@ class TestDeterministicErrnoPlatformGate:
     re-executions of the module.
     """
 
-    def test_posix_treats_a_denied_write_as_permanent(self):
+    def test_posix_treats_a_denied_write_as_permanent(self, monkeypatch):
         """On POSIX a refused write is a standing property of the destination."""
-        posix = _http_for_platform("linux")
+        posix = _http_for_platform("linux", monkeypatch)
         assert errno.EACCES in posix._DETERMINISTIC_OS_ERRNOS, (
             "EACCES must be deterministic away from Windows"
         )
@@ -2634,9 +2640,9 @@ class TestDeterministicErrnoPlatformGate:
             f"a POSIX permission error must not retry, got {verdict}"
         )
 
-    def test_windows_keeps_a_denied_write_retryable(self):
+    def test_windows_keeps_a_denied_write_retryable(self, monkeypatch):
         """On Windows the same errno is how a transient sharing violation arrives."""
-        win = _http_for_platform("win32")
+        win = _http_for_platform("win32", monkeypatch)
         assert errno.EACCES not in win._DETERMINISTIC_OS_ERRNOS, (
             "EACCES on Windows is also a sharing violation, so it must stay retryable"
         )
@@ -2646,14 +2652,16 @@ class TestDeterministicErrnoPlatformGate:
         verdict = win.classify_transport_error(
             OSError(errno.EACCES, "denied"), strict=False
         )
-        assert verdict == "read", (
-            f"a Windows sharing violation should retry, got {verdict}"
+        assert verdict == "connect", (
+            f"a Windows permission error must be retryable but on the small "
+            f"budget — one attempt clears a sharing violation, the read budget "
+            f"would re-download the whole object; got {verdict!r}"
         )
 
-    def test_the_gate_moves_only_the_two_permission_errnos(self):
+    def test_the_gate_moves_only_the_two_permission_errnos(self, monkeypatch):
         """A full disk or a read-only mount is deterministic on either platform."""
-        posix = _http_for_platform("linux")
-        win = _http_for_platform("win32")
+        posix = _http_for_platform("linux", monkeypatch)
+        win = _http_for_platform("win32", monkeypatch)
         assert win._DETERMINISTIC_OS_ERRNOS < posix._DETERMINISTIC_OS_ERRNOS, (
             "the Windows set must be a strict subset of the POSIX one"
         )

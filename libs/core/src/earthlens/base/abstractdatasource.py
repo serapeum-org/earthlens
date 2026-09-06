@@ -2431,6 +2431,12 @@ class AbstractDataSource(ABC):
 RowT = TypeVar("RowT")
 
 
+#: Catalog classes already warned about an empty `datasets`. The condition is a
+#: property of the class, and `catalog` is recomputed per read, so warning per
+#: call would mean one line per loop iteration.
+_WARNED_EMPTY_CATALOGS: set[type] = set()
+
+
 class AbstractCatalog(BaseModel, Generic[RowT]):
     """Abstract base class for per-data-source variable catalogs.
 
@@ -2439,9 +2445,11 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
     dict-like surface below — `len`, `in`, `[key]`, iteration and
     :meth:`get_dataset` — plus :meth:`get_variable` for the two-level
     catalogs. The :meth:`model_post_init` hook fills the row fields from
-    :meth:`_autoload` only when the caller supplied none, so `Catalog()`
-    reads from disk while `Catalog(datasets=...)` keeps exactly what it
-    was handed, and no subclass writes its own `__init__`.
+    :meth:`_autoload` only while the field is still falsy, so `Catalog()`
+    reads from disk and so does `Catalog(datasets={})` — an empty mapping
+    is indistinguishable from an absent one here. Only a non-empty
+    `Catalog(datasets=...)` is kept as handed, and no subclass writes its
+    own `__init__`.
 
     Generic in `RowT`, the row model the backend stores. Parameterising
     the base — `class Catalog(AbstractCatalog[Dataset])` — keeps
@@ -2615,15 +2623,18 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
 
                 ```
         """
-        if not self.datasets:
-            # The default cannot tell "no rows" from "rows kept elsewhere", so
-            # it answers an empty mapping for both. Every in-repo catalog is
-            # covered by a contract test; an out-of-tree subclass gets this
-            # instead of silence.
+        if not self.datasets and type(self) not in _WARNED_EMPTY_CATALOGS:
+            # The default cannot tell "nothing curated yet" from "rows kept
+            # elsewhere", so it answers an empty mapping for both. Every
+            # in-repo catalog is covered by a contract test; an out-of-tree
+            # subclass gets this instead of silence. Once per class, because
+            # `catalog` is a property recomputed on every read and a caller
+            # iterating it would otherwise be warned per access.
+            _WARNED_EMPTY_CATALOGS.add(type(self))
             logger.warning(
-                f"{type(self).__name__}.get_catalog() is empty. If this "
-                f"catalog keeps its rows somewhere other than `datasets`, "
-                f"override get_catalog()."
+                f"{type(self).__name__}.get_catalog() is empty — either the "
+                f"catalog has no rows yet, or it keeps them somewhere other "
+                f"than `datasets`, in which case override get_catalog()."
             )
         return self.datasets
 

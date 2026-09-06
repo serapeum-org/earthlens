@@ -72,6 +72,28 @@ def test_an_empty_catalog_warns_instead_of_answering_silently():
     finally:
         logger.remove(handler)
     assert any("override get_catalog()" in m for m in messages), messages
+    assert len(messages) == 1, f"expected one warning, got {len(messages)}"
+
+
+def test_the_empty_catalog_warning_does_not_repeat_per_access():
+    """`catalog` is recomputed per read, so warning per call means one per loop."""
+
+    class _AlsoElsewhere(AbstractCatalog):
+        """A second empty catalog, so the once-per-class registry is exercised."""
+
+    messages: list[str] = []
+    handler = logger.add(
+        lambda m: messages.append(m.record["message"]), level="WARNING"
+    )
+    try:
+        catalog = _AlsoElsewhere()
+        for _ in range(3):
+            assert catalog.catalog == {}
+        for _ in range(2):
+            assert catalog.get_catalog() == {}
+    finally:
+        logger.remove(handler)
+    assert len(messages) == 1, f"five reads produced {len(messages)} warnings"
 
 
 @pytest.mark.parametrize("module_name, class_name", CATALOG_BACKENDS)
