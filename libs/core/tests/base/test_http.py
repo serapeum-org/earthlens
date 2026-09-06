@@ -2748,6 +2748,7 @@ class _ResumeServer:
         leg_content_range: str | None = None,
         leg_payload: bytes | None = None,
         leg_break_at: int | None = None,
+        leg_breaks: list[int | None] | None = None,
         leg_content_length: str | None = None,
         leg_transfer_encoding: str | None = None,
     ) -> None:
@@ -2764,6 +2765,9 @@ class _ResumeServer:
         self.leg_content_range = leg_content_range
         self.leg_payload = leg_payload
         self.leg_break_at = leg_break_at
+        # One entry per ranged leg, consumed in order; `None` completes it.
+        self.leg_breaks = list(leg_breaks) if leg_breaks is not None else None
+        self.legs_served = 0
         self.leg_content_length = leg_content_length
         self.leg_transfer_encoding = leg_transfer_encoding
         self.requests: list[dict[str, str]] = []
@@ -2837,11 +2841,16 @@ class _ResumeServer:
         )
         if self.leg_transfer_encoding:
             headers["Transfer-Encoding"] = self.leg_transfer_encoding
+        break_at = self.leg_break_at
+        if self.leg_breaks is not None:
+            index = self.legs_served
+            break_at = self.leg_breaks[index] if index < len(self.leg_breaks) else None
+        self.legs_served += 1
         return _ResumeBody(
             body,
             status=self.leg_status or 206,
             headers=headers,
-            break_at=self.leg_break_at,
+            break_at=break_at,
         )
 
 
@@ -2904,6 +2913,47 @@ class TestResumeHappyPath:
             "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
         )
         assert not (tmp_path / "g.part").exists()
+
+
+@pytest.mark.unit
+class TestResumeAcrossSeveralLegs:
+    """The behaviour the feature exists for: a resumed leg that breaks and resumes."""
+
+    def test_a_leg_that_breaks_past_the_overlap_is_itself_resumed(self, tmp_path):
+        """Each leg starts one overlap behind the bytes the previous one banked.
+
+        The `Range` progression is the part that binds. A bytes-only assertion
+        would pass with the middle leg deleted, and the offset arithmetic is
+        exactly what an innocent change to `banked` / `overlap_at` / the
+        truncate would break silently.
+        """
+        dest = tmp_path / "g"
+        # whole read breaks at 120,000; leg 1 delivers 100,000 of its range then
+        # breaks; leg 2 breaks immediately; leg 3 completes.
+        server = _ResumeServer(leg_breaks=[100_000, 0, None])
+        _resume_client(server, max_retries=6).download(
+            "http://x/g", dest, progress=False, chunk=4096, resume=True
+        )
+        assert dest.read_bytes() == _OBJECT
+
+        overlap, total = 65536, len(_OBJECT)
+        first_leg = _BREAK_AT - overlap
+        # leg 1 staged `first_leg + 100_000`, so leg 2 starts an overlap behind it
+        second_leg = first_leg + 100_000 - overlap
+        assert [r["Range"] for r in server.ranged] == [
+            f"bytes={first_leg}-{total - 1}",
+            f"bytes={second_leg}-{total - 1}",
+            f"bytes={second_leg}-{total - 1}",
+        ]
+
+    def test_every_leg_carries_the_anchored_validator(self, tmp_path):
+        """The anchor is frozen at the first response, not refreshed per leg."""
+        server = _ResumeServer(leg_breaks=[100_000, None])
+        _resume_client(server, max_retries=6).download(
+            "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+        )
+        assert len(server.ranged) >= 2
+        assert {r["If-Range"] for r in server.ranged} == {'"v1"'}
 
 
 @pytest.mark.unit
