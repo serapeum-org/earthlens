@@ -4,14 +4,18 @@ from __future__ import annotations
 
 import builtins
 import errno
+import functools
+import importlib.util
 import sys
 import time
+from pathlib import Path
 from typing import Any
 
 import pytest
 import requests
 import urllib3
 
+from earthlens.base import http as http_module
 from earthlens.base.http import (
     DEFAULT_CONNECT_RETRIES,
     DEFAULT_RETRY_EXCEPTIONS,
@@ -150,6 +154,27 @@ def _client(
     waits: list[float] = []
     client = HttpClient(session=session, sleep=waits.append, **kwargs)
     return client, session, waits
+
+
+def _http_for_platform(platform: str) -> Any:
+    """Execute a second, private copy of `http.py` under a patched `sys.platform`.
+
+    The deterministic-errno set is built once at import time, so the branch this
+    interpreter did not take is only observable by running the module again with
+    `sys.platform` saying something else. The copy is never registered in
+    `sys.modules`, so nothing else in the session can pick it up by accident.
+    """
+    spec = importlib.util.spec_from_file_location(
+        f"_earthlens_http_platform_probe_{platform}", http_module.__file__
+    )
+    module = importlib.util.module_from_spec(spec)
+    real = sys.platform
+    sys.platform = platform
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.platform = real
+    return module
 
 
 @pytest.mark.unit
@@ -2505,6 +2530,61 @@ class TestLocalStorageFailuresAreDeterministic:
         assert not (tmp_path / "g.part").exists()
 
 
+@pytest.mark.unit
+class TestDeterministicErrnoPlatformGate:
+    """`EACCES` / `EPERM` are deterministic only away from Windows.
+
+    The gate runs at import time, so one of its two outcomes is invisible to
+    the interpreter running the suite. Both are exercised here against private
+    re-executions of the module.
+    """
+
+    def test_posix_treats_a_denied_write_as_permanent(self):
+        """On POSIX a refused write is a standing property of the destination."""
+        posix = _http_for_platform("linux")
+        assert errno.EACCES in posix._DETERMINISTIC_OS_ERRNOS, (
+            "EACCES must be deterministic away from Windows"
+        )
+        assert errno.EPERM in posix._DETERMINISTIC_OS_ERRNOS, (
+            "EPERM must be deterministic away from Windows"
+        )
+        verdict = posix.classify_transport_error(
+            OSError(errno.EACCES, "denied"), strict=False
+        )
+        assert verdict is None, (
+            f"a POSIX permission error must not retry, got {verdict}"
+        )
+
+    def test_windows_keeps_a_denied_write_retryable(self):
+        """On Windows the same errno is how a transient sharing violation arrives."""
+        win = _http_for_platform("win32")
+        assert errno.EACCES not in win._DETERMINISTIC_OS_ERRNOS, (
+            "EACCES on Windows is also a sharing violation, so it must stay retryable"
+        )
+        assert errno.EPERM not in win._DETERMINISTIC_OS_ERRNOS, (
+            "EPERM on Windows is also a sharing violation, so it must stay retryable"
+        )
+        verdict = win.classify_transport_error(
+            OSError(errno.EACCES, "denied"), strict=False
+        )
+        assert verdict == "read", (
+            f"a Windows sharing violation should retry, got {verdict}"
+        )
+
+    def test_the_gate_moves_only_the_two_permission_errnos(self):
+        """A full disk or a read-only mount is deterministic on either platform."""
+        posix = _http_for_platform("linux")
+        win = _http_for_platform("win32")
+        assert win._DETERMINISTIC_OS_ERRNOS < posix._DETERMINISTIC_OS_ERRNOS, (
+            "the Windows set must be a strict subset of the POSIX one"
+        )
+        moved = posix._DETERMINISTIC_OS_ERRNOS - win._DETERMINISTIC_OS_ERRNOS
+        assert moved == {errno.EACCES, errno.EPERM}, (
+            f"only the permission errnos may differ by platform, got {sorted(moved)}"
+        )
+        assert errno.ENOSPC in win._DETERMINISTIC_OS_ERRNOS, "ENOSPC must never move"
+
+
 # ---------------------------------------------------------------------------
 # Opt-in resume.
 #
@@ -2962,6 +3042,15 @@ class TestResumeHelperEdges:
         """An `ETag` that is not a quoted-string cannot identify a representation."""
         assert _strong_etag({"ETag": value}) is None
 
+    @pytest.mark.parametrize("value", [None, "", "   "], ids=["none", "empty", "blank"])
+    def test_an_absent_content_range_parses_to_nothing(self, value):
+        """A reply carrying no `Content-Range` has no window to check.
+
+        `None` is the shape a real `headers.get` returns, and the guard has to
+        answer it before the regex sees it.
+        """
+        assert _parse_content_range(value) is None, f"{value!r} is not a byte range"
+
     def test_a_coded_response_never_anchors_even_with_a_length(self):
         """The encoding gate, which no end-to-end case can reach.
 
@@ -3012,6 +3101,105 @@ class TestResumeHelperEdges:
         )
         assert dest.read_bytes() == _OBJECT
         assert server.calls == 3, "the leg should have been refused, not raised"
+
+    def test_a_deterministic_read_back_failure_is_raised_not_refused(
+        self, tmp_path, monkeypatch
+    ):
+        """A read-only mount is not a bad leg, so it must not trigger a re-read.
+
+        The sibling case above turns an unreadable staging file into a refusal
+        and restarts the object. Doing that for a standing filesystem condition
+        would re-read the whole object only to hit the same refusal again.
+        """
+        server = _ResumeServer()
+        monkeypatch.setattr(
+            builtins,
+            "open",
+            _OpenFailsOnPartReadback(OSError(errno.EROFS, "read-only file system")),
+        )
+        with pytest.raises(OSError) as excinfo:
+            _resume_client(server).download(
+                "http://x/g", tmp_path / "g", progress=False, chunk=4096, resume=True
+            )
+        assert excinfo.value.errno == errno.EROFS, (
+            f"the filesystem errno must survive, got {excinfo.value!r}"
+        )
+        assert server.calls == 2, (
+            f"the object must not be re-read after a disk refusal, got "
+            f"{server.calls} requests"
+        )
+        assert not (tmp_path / "g.part").exists()
+
+    def test_an_unstattable_staging_file_banks_nothing(self, tmp_path, monkeypatch):
+        """A failed `stat` between attempts leaves no prefix to resume from.
+
+        The happy path resumes this exact server with one ranged request. When
+        the size cannot be read the count must fall back to zero and the object
+        be re-read whole, rather than the error escaping `download` or a stale
+        high-water mark standing in for it.
+        """
+        dest = tmp_path / "g"
+        server = _ResumeServer()
+        monkeypatch.setattr(
+            Path, "stat", _PartStatFailsOnce(OSError(errno.EIO, "I/O error"))
+        )
+        _resume_client(server).download(
+            "http://x/g",
+            dest,
+            progress=False,
+            chunk=4096,
+            resume=True,
+            verify_length=False,
+        )
+        assert dest.read_bytes() == _OBJECT
+        assert server.ranged == [], "an unreadable size must not be banked as progress"
+        assert server.calls == 2, f"expected one restart, got {server.calls} requests"
+
+
+class _OpenFailsOnPartReadback:
+    """A stand-in for `open` that refuses a read-only open of the staging file.
+
+    Only the read-back of the re-sent overlap matches; the streaming writes and
+    every other file in the test still go to the real `open`.
+    """
+
+    def __init__(self, exc: OSError) -> None:
+        self._exc = exc
+        self._real = builtins.open
+
+    def __call__(self, file: Any, mode: str = "r", *args: Any, **kwargs: Any) -> Any:
+        """Raise for a read-only open of a `.part`, else defer to the real one."""
+        if str(file).endswith(".part") and "r" in mode and "+" not in mode:
+            raise self._exc
+        return self._real(file, mode, *args, **kwargs)
+
+
+class _PartStatFailsOnce:
+    """A `Path.stat` replacement that refuses the first stat of a `.part` file.
+
+    The real `stat` runs first, so a missing file still reports missing and the
+    refusal only lands once the staging file genuinely exists. One shot, so the
+    attempt that follows can size the finished object normally.
+    """
+
+    def __init__(self, exc: OSError) -> None:
+        self._exc = exc
+        self._real = Path.stat
+        self.fired = False
+
+    def __get__(self, instance: Any, owner: Any = None) -> Any:
+        """Bind like a method, so `path.stat()` reaches `__call__` with the path."""
+        if instance is None:
+            return self
+        return functools.partial(self, instance)
+
+    def __call__(self, path: Path, *args: Any, **kwargs: Any) -> Any:
+        """Defer to the real `stat`, then refuse once for the staging file."""
+        result = self._real(path, *args, **kwargs)
+        if path.name.endswith(".part") and not self.fired:
+            self.fired = True
+            raise self._exc
+        return result
 
 
 class _KeepaliveResumeServer(_ResumeServer):
