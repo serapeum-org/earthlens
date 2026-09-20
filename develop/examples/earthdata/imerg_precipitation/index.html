@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,6 +12544,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    An ECMWF-style temperature animation over Europe — June → July 2026
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -14378,6 +14406,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#map-the-precipitation-field" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Map the precipitation field
+      
+    </span>
+  </a>
   
 </li>
       
@@ -23717,6 +23756,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#map-the-precipitation-field" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Map the precipitation field
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -24613,11 +24663,19 @@ OUT_DIR.mkdir(exist_ok=True)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">imerg</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">),</span> <span class="s1">'granule(s):'</span><span class="p">,</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">imerg</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">),</span> <span class="s1">'granule(s):'</span><span class="p">,</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'skipped live query: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">paths = imerg.download(progress_bar=False)
-print(len(paths), 'granule(s):', [Path(p).name for p in paths])</div>
+<div class="clipboard-copy-txt" id="cell-3">paths = None
+try:
+    paths = imerg.download(progress_bar=False)
+    print(len(paths), 'granule(s):', [Path(p).name for p in paths])
+except Exception as exc:
+    print(f'skipped live query: {type(exc).__name__}: {exc}')</div>
 </div>
 </div>
 </div>
@@ -24630,10 +24688,7 @@ print(len(paths), 'granule(s):', [Path(p).name for p in paths])</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Open the granule with pyramids' <code>NetCDF</code> — IMERG keeps its fields under a single
-HDF5 group, which <code>get_group</code> reaches — and plot the June 2023 mean precipitation
-rate. The download above is no longer guarded: a failure there should stop the
-notebook rather than be reported as a skipped step.</p>
+<h2 id="map-the-precipitation-field">Map the precipitation field<a class="anchor-link" href="#map-the-precipitation-field">¶</a></h2><p>If the download succeeded, open the granule with <code>xarray</code> (the data lives in the <code>Grid</code> group) and plot the June 2023 mean precipitation rate. This step is also guarded so a read / plotting surprise does not mask the download above.</p>
 </div>
 </div>
 </div>
@@ -24656,61 +24711,35 @@ notebook rather than be reported as a skipped step.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">Basemap</span><span class="p">,</span> <span class="n">ColorBar</span><span class="p">,</span> <span class="n">ColorScaling</span><span class="p">,</span> <span class="n">Feature</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">paths</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
-<span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">grid</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="s1">'Grid'</span><span class="p">)</span>  <span class="c1"># IMERG stores its fields under a single HDF5 group</span>
-<span class="n">precip</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s1">'precipitation'</span><span class="p">)</span>
-<span class="n">stats</span> <span class="o">=</span> <span class="n">precip</span><span class="o">.</span><span class="n">stats</span><span class="p">(</span><span class="n">approx_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'grid </span><span class="si">{</span><span class="n">precip</span><span class="o">.</span><span class="n">rows</span><span class="si">}</span><span class="s1"> x </span><span class="si">{</span><span class="n">precip</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s1">, epsg </span><span class="si">{</span><span class="n">precip</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s1">'rate min/mean/max: </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">"min"</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> / '</span>
-    <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">"mean"</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">"max"</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> mm/hr'</span>
-<span class="p">)</span>
-
-<span class="n">precip</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">'YlGnBu'</span><span class="p">,</span>
-    <span class="n">color</span><span class="o">=</span><span class="n">ColorScaling</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">gamma</span><span class="o">=</span><span class="mf">0.4</span><span class="p">),</span>
-    <span class="c1"># Coastlines only, no relief: the field is opaque and global, so a tile basemap</span>
-    <span class="c1"># underneath it would never be seen. The outline is what makes the monsoons and</span>
-    <span class="c1"># the subtropical dry zones readable as geography.</span>
-    <span class="n">basemap</span><span class="o">=</span><span class="n">Basemap</span><span class="p">(</span>
-        <span class="n">relief</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">features</span><span class="o">=</span><span class="p">[</span><span class="n">Feature</span><span class="p">(</span><span class="s1">'coastline'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'#444'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)],</span>
-    <span class="p">),</span>
-    <span class="n">colorbar</span><span class="o">=</span><span class="n">ColorBar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'precipitation rate (mm/hr)'</span><span class="p">),</span>
-    <span class="n">title</span><span class="o">=</span><span class="s1">'GPM IMERG monthly precipitation rate, June 2023'</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">group</span><span class="o">=</span><span class="s1">'Grid'</span><span class="p">)</span>
+        <span class="n">precip</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'precipitation'</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+        <span class="n">precip</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">precip</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'viridis'</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'GPM IMERG monthly precipitation rate, June 2023'</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'plot step skipped: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">from pyramids.netcdf import NetCDF
-from pyramids.plot import Basemap, ColorBar, ColorScaling, Feature
+<div class="clipboard-copy-txt" id="cell-4">if paths:
+    try:
+        import matplotlib.pyplot as plt
+        import xarray as xr
 
-nc = NetCDF.read_file(paths[0], read_only=True)
-grid = nc.get_group('Grid')  # IMERG stores its fields under a single HDF5 group
-precip = grid.get_variable('precipitation')
-stats = precip.stats(approx_ok=False)
-print(f'grid {precip.rows} x {precip.columns}, epsg {precip.epsg}')
-print(
-    f'rate min/mean/max: {float(stats["min"].iloc[0]):.2f} / '
-    f'{float(stats["mean"].iloc[0]):.2f} / {float(stats["max"].iloc[0]):.2f} mm/hr'
-)
-
-precip.plot(
-    cmap='YlGnBu',
-    color=ColorScaling.power(gamma=0.4),
-    # Coastlines only, no relief: the field is opaque and global, so a tile basemap
-    # underneath it would never be seen. The outline is what makes the monsoons and
-    # the subtropical dry zones readable as geography.
-    basemap=Basemap(
-        relief=False,
-        features=[Feature('coastline', edgecolor='#444', linewidth=0.4)],
-    ),
-    colorbar=ColorBar(label='precipitation rate (mm/hr)'),
-    title='GPM IMERG monthly precipitation rate, June 2023',
-)
-nc.close()</div>
+        ds = xr.open_dataset(paths[0], group='Grid')
+        precip = ds['precipitation'].isel(time=0)
+        fig, ax = plt.subplots(figsize=(10, 5))
+        precip.where(precip &gt;= 0).T.plot(ax=ax, cmap='viridis', robust=True)
+        ax.set_title('GPM IMERG monthly precipitation rate, June 2023')
+        plt.tight_layout()
+        plt.show()
+    except Exception as exc:
+        print(f'plot step skipped: {type(exc).__name__}: {exc}')</div>
 </div>
 </div>
 </div>

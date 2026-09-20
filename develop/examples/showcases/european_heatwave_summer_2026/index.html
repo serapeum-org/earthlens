@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12546,6 +12546,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../europe_temperature_2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    An ECMWF-style temperature animation over Europe — June → July 2026
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24633,9 +24661,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">SOCIAL_FIGSIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">4.18</span><span class="p">)</span>
 <span class="c1"># END verified live against CDS's own ERA5-Land availability (a request past this</span>
 <span class="c1"># raises ValueError -- "does not match any constraint entry" -- rather than silently</span>
-<span class="c1"># returning nothing). Re-verify before bumping this further: the day CDS actually</span>
-<span class="c1"># publishes through moves roughly a week behind the real calendar date.</span>
-<span class="n">START</span><span class="p">,</span> <span class="n">END</span> <span class="o">=</span> <span class="s2">"2026-05-15"</span><span class="p">,</span> <span class="s2">"2026-09-07"</span>
+<span class="c1"># returning nothing).</span>
+<span class="n">START</span><span class="p">,</span> <span class="n">END</span> <span class="o">=</span> <span class="s2">"2026-05-15"</span><span class="p">,</span> <span class="s2">"2026-08-31"</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">stamp_watermark</span><span class="p">(</span>
@@ -24717,9 +24744,8 @@ LOGO = (
 SOCIAL_FIGSIZE = (8.0, 4.18)
 # END verified live against CDS's own ERA5-Land availability (a request past this
 # raises ValueError -- "does not match any constraint entry" -- rather than silently
-# returning nothing). Re-verify before bumping this further: the day CDS actually
-# publishes through moves roughly a week behind the real calendar date.
-START, END = "2026-05-15", "2026-09-07"
+# returning nothing).
+START, END = "2026-05-15", "2026-08-31"
 
 
 def stamp_watermark(
@@ -24773,7 +24799,7 @@ def stamp_watermark(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="1-fetch-the-whole-window-in-one-cds-request">1 · Fetch the whole window in one CDS request<a class="anchor-link" href="#1-fetch-the-whole-window-in-one-cds-request">¶</a></h2><p>The <code>ecmwf</code> backend takes the whole date range in a <strong>single</strong> request and returns one multi-day NetCDF — <code>aggregate=</code> then reduces it into one GeoTIFF per day (<code>op="mean"</code>, the natural daily summary for a state variable like 2 m temperature) without a second pass. CDS is a queue, not a live API ("this may take several minutes" per the <code>ecmwf</code> backend's own log line), but that is still one wait for the whole ~3.5-month window rather than ~110 separate waits.</p>
+<h2 id="1-fetch-the-whole-window-in-one-cds-request">1 · Fetch the whole window in one CDS request<a class="anchor-link" href="#1-fetch-the-whole-window-in-one-cds-request">¶</a></h2><p>Unlike <code>europe_temperature_2026.ipynb</code>'s per-day <code>gee</code> loop, the <code>ecmwf</code> backend takes the whole date range in a <strong>single</strong> request and returns one multi-day NetCDF — <code>aggregate=</code> then reduces it into one GeoTIFF per day (<code>op="mean"</code>, the natural daily summary for a state variable like 2 m temperature) without a second pass. CDS is a queue, not a live API ("this may take several minutes" per the <code>ecmwf</code> backend's own log line), but that is still one wait for the whole ~3.5-month window rather than ~110 separate waits.</p>
 </div>
 </div>
 </div>
@@ -24802,58 +24828,20 @@ def stamp_watermark(
     <span class="c1"># CDS is a queue, not a live API -- only submit a request when the</span>
     <span class="c1"># aggregated output isn't already on disk, same caching convention as</span>
     <span class="c1"># every other fetch helper in this notebook.</span>
-    <span class="c1">#</span>
-    <span class="c1"># One request per calendar month boundary, not one request for the whole</span>
-    <span class="c1"># window: CDS builds a single day=[01..31] list applied uniformly across</span>
-    <span class="c1"># every month named in the request, so a request spanning into a month</span>
-    <span class="c1"># that is still being published gets rejected in full the moment that</span>
-    <span class="c1"># list contains a day CDS has not published yet -- confirmed live, a</span>
-    <span class="c1"># single request for the whole START..END span returns zero files even</span>
-    <span class="c1"># though every earlier month in it is complete. Splitting at the most</span>
-    <span class="c1"># recent full month boundary keeps each request's day range something</span>
-    <span class="c1"># CDS will actually answer.</span>
-    <span class="n">end_ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">END</span><span class="p">)</span>
-    <span class="n">month_start</span> <span class="o">=</span> <span class="n">end_ts</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">START</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">month_start</span><span class="p">:</span>
-        <span class="n">windows</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">(</span><span class="n">START</span><span class="p">,</span> <span class="p">(</span><span class="n">month_start</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)),</span>
-            <span class="p">(</span><span class="n">month_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">),</span> <span class="n">END</span><span class="p">),</span>
-        <span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">windows</span> <span class="o">=</span> <span class="p">[(</span><span class="n">START</span><span class="p">,</span> <span class="n">END</span><span class="p">)]</span>
-
-    <span class="n">daily_tifs</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">w_start</span><span class="p">,</span> <span class="n">w_end</span> <span class="ow">in</span> <span class="n">windows</span><span class="p">:</span>
-        <span class="n">job</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-            <span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
-            <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"reanalysis-era5-land"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"2m-temperature"</span><span class="p">]},</span>
-            <span class="n">start</span><span class="o">=</span><span class="n">w_start</span><span class="p">,</span>
-            <span class="n">end</span><span class="o">=</span><span class="n">w_end</span><span class="p">,</span>
-            <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">EUROPE</span><span class="p">,</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+        <span class="n">data_source</span><span class="o">=</span><span class="s2">"ecmwf"</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"reanalysis-era5-land"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"2m-temperature"</span><span class="p">]},</span>
+        <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="n">END</span><span class="p">,</span>
+        <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"daily"</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">EUROPE</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">daily_tifs</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+        <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span>
+            <span class="n">freq</span><span class="o">=</span><span class="s2">"D"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">raw_kelvin_dir</span>
         <span class="p">)</span>
-        <span class="n">daily_tifs</span> <span class="o">+=</span> <span class="n">job</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
-            <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span>
-                <span class="n">freq</span><span class="o">=</span><span class="s2">"D"</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">raw_kelvin_dir</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-    <span class="n">daily_tifs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">daily_tifs</span><span class="p">)</span>
-
-<span class="c1"># The cache check above only asks "is raw_kelvin_dir non-empty", not "does it</span>
-<span class="c1"># cover what START/END are asking for right now" -- so a stale cache from a</span>
-<span class="c1"># previous, narrower window is served silently, with no error. Catch that</span>
-<span class="c1"># here instead of downstream: reparse each cached file's own date and compare</span>
-<span class="c1"># the set against the calendar days START..END actually calls for.</span>
-<span class="n">cached_days</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span>
-    <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"%Y%m</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">daily_tifs</span><span class="p">]</span>
-<span class="p">)</span>
-<span class="n">expected_days</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">START</span><span class="p">,</span> <span class="n">END</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"D"</span><span class="p">)</span>
-<span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">cached_days</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">expected_days</span><span class="p">),</span> <span class="p">(</span>
-    <span class="sa">f</span><span class="s2">"cached tiles cover </span><span class="si">{</span><span class="n">cached_days</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="si">}</span><span class="s2">..</span><span class="si">{</span><span class="n">cached_days</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="si">}</span><span class="s2"> "</span>
-    <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cached_days</span><span class="p">)</span><span class="si">}</span><span class="s2"> days) but START/END ask for </span><span class="si">{</span><span class="n">START</span><span class="si">}</span><span class="s2">..</span><span class="si">{</span><span class="n">END</span><span class="si">}</span><span class="s2"> "</span>
-    <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">expected_days</span><span class="p">)</span><span class="si">}</span><span class="s2"> days) -- delete </span><span class="si">{</span><span class="n">raw_kelvin_dir</span><span class="si">}</span><span class="s2"> and re-run"</span>
-<span class="p">)</span>
+    <span class="p">)</span>
 <span class="nb">len</span><span class="p">(</span><span class="n">daily_tifs</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">raw_kelvin_dir = OUT / "raw_kelvin"
@@ -24862,58 +24850,20 @@ if not daily_tifs:
     # CDS is a queue, not a live API -- only submit a request when the
     # aggregated output isn't already on disk, same caching convention as
     # every other fetch helper in this notebook.
-    #
-    # One request per calendar month boundary, not one request for the whole
-    # window: CDS builds a single day=[01..31] list applied uniformly across
-    # every month named in the request, so a request spanning into a month
-    # that is still being published gets rejected in full the moment that
-    # list contains a day CDS has not published yet -- confirmed live, a
-    # single request for the whole START..END span returns zero files even
-    # though every earlier month in it is complete. Splitting at the most
-    # recent full month boundary keeps each request's day range something
-    # CDS will actually answer.
-    end_ts = pd.Timestamp(END)
-    month_start = end_ts.replace(day=1)
-    if pd.Timestamp(START) &lt; month_start:
-        windows = [
-            (START, (month_start - pd.Timedelta(days=1)).strftime("%Y-%m-%d")),
-            (month_start.strftime("%Y-%m-%d"), END),
-        ]
-    else:
-        windows = [(START, END)]
-
-    daily_tifs = []
-    for w_start, w_end in windows:
-        job = EarthLens(
-            data_source="ecmwf",
-            variables={"reanalysis-era5-land": ["2m-temperature"]},
-            start=w_start,
-            end=w_end,
-            temporal_resolution="daily",
-            path=OUT,
-            **EUROPE,
+    job = EarthLens(
+        data_source="ecmwf",
+        variables={"reanalysis-era5-land": ["2m-temperature"]},
+        start=START,
+        end=END,
+        temporal_resolution="daily",
+        path=OUT,
+        **EUROPE,
+    )
+    daily_tifs = job.download(
+        aggregate=AggregationConfig(
+            freq="D", op="mean", cell_size=0.1, out_dir=raw_kelvin_dir
         )
-        daily_tifs += job.download(
-            aggregate=AggregationConfig(
-                freq="D", op="mean", cell_size=0.1, out_dir=raw_kelvin_dir
-            )
-        )
-    daily_tifs = sorted(daily_tifs)
-
-# The cache check above only asks "is raw_kelvin_dir non-empty", not "does it
-# cover what START/END are asking for right now" -- so a stale cache from a
-# previous, narrower window is served silently, with no error. Catch that
-# here instead of downstream: reparse each cached file's own date and compare
-# the set against the calendar days START..END actually calls for.
-cached_days = pd.DatetimeIndex(
-    [pd.to_datetime(Path(p).stem.split("_")[-1], format="%Y%m%d") for p in daily_tifs]
-)
-expected_days = pd.date_range(START, END, freq="D")
-assert set(cached_days) == set(expected_days), (
-    f"cached tiles cover {cached_days.min().date()}..{cached_days.max().date()} "
-    f"({len(cached_days)} days) but START/END ask for {START}..{END} "
-    f"({len(expected_days)} days) -- delete {raw_kelvin_dir} and re-run"
-)
+    )
 len(daily_tifs)</div>
 </div>
 </div>
@@ -25095,7 +25045,7 @@ plt.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="3-animate-with-the-ecmwf-2t-preset">3 · Animate with the ECMWF <code>"2t"</code> preset<a class="anchor-link" href="#3-animate-with-the-ecmwf-2t-preset">¶</a></h2><p>The ECMWF-social-media look (<code>style="2t"</code> → <code>apply_blank_canvas</code> → <code>add_reference_map(style="ecmwf-dark")</code>), but the full summer instead of six weeks, and rendered at exactly 1200x627 px — LinkedIn's recommended single-image post size, the same <code>SOCIAL_FIGSIZE</code> used by the el_nino showcase's animations regardless of Europe's own narrower aspect ratio. Rendered once to <code>.mp4</code> (ready for a native LinkedIn video post) and the <code>.gif</code> embedded below — as an <code>&lt;img&gt;</code>, not an HTML5 <code>&lt;video&gt;</code>, so it plays in every viewer with no JavaScript — is derived from that file via cleopatra's <code>gif_from_video</code>, rather than re-rendering the whole animation a second time.</p>
+<h2 id="3-animate-with-the-ecmwf-2t-preset">3 · Animate with the ECMWF <code>"2t"</code> preset<a class="anchor-link" href="#3-animate-with-the-ecmwf-2t-preset">¶</a></h2><p>The same recipe as <code>europe_temperature_2026.ipynb</code>'s ECMWF-social-media look (<code>style="2t"</code> → <code>apply_blank_canvas</code> → <code>add_reference_map(style="ecmwf-dark")</code>), but the full summer instead of six weeks, and rendered at exactly 1200x627 px — LinkedIn's recommended single-image post size, the same <code>SOCIAL_FIGSIZE</code> used by the el_nino showcase's animations regardless of Europe's own narrower aspect ratio. Rendered once to <code>.mp4</code> (ready for a native LinkedIn video post) and the <code>.gif</code> embedded below — as an <code>&lt;img&gt;</code>, not an HTML5 <code>&lt;video&gt;</code>, so it plays in every viewer with no JavaScript — is derived from that file via cleopatra's <code>gif_from_video</code>, rather than re-rendering the whole animation a second time.</p>
 </div>
 </div>
 </div>
@@ -25126,8 +25076,8 @@ plt.show()</div>
 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"</span><span class="si">%d</span><span class="s2"> %b"</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">daily</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
 <span class="n">glyph</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">cmap</span><span class="o">=</span><span class="n">t2m_cmap</span><span class="p">,</span>
-    <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">vmax</span><span class="o">=</span><span class="mi">38</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">SOCIAL_FIGSIZE</span><span class="p">,</span>
     <span class="n">animation_axis_values</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
     <span class="c1"># apply_blank_canvas only strips the map axes -- it doesn't touch the</span>
@@ -25147,14 +25097,6 @@ plt.show()</div>
 <span class="c1"># all three social showcases.</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="o">*</span><span class="n">SOCIAL_FIGSIZE</span><span class="p">)</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">set_dpi</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span>
-<span class="c1"># The default colorbar axes sits close enough to the figure's right edge that</span>
-<span class="c1"># its rotated label runs past the canvas -- shifting only the colorbar's own</span>
-<span class="c1"># axes left (figure-fraction) leaves the map axes, and everything drawn on</span>
-<span class="c1"># it, completely untouched.</span>
-<span class="n">cbar_pos</span> <span class="o">=</span> <span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span>
-    <span class="p">[</span><span class="n">cbar_pos</span><span class="o">.</span><span class="n">x0</span> <span class="o">-</span> <span class="mf">0.025</span><span class="p">,</span> <span class="n">cbar_pos</span><span class="o">.</span><span class="n">y0</span><span class="p">,</span> <span class="n">cbar_pos</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">cbar_pos</span><span class="o">.</span><span class="n">height</span><span class="p">]</span>
-<span class="p">)</span>
 <span class="c1"># Both bake their position from the figure's CURRENT size, so they must come</span>
 <span class="c1"># after set_dpi/set_size_inches -- and before save_animation, which reads the</span>
 <span class="c1"># figure as its final frame.</span>
@@ -25197,8 +25139,8 @@ cube = DatasetCollection.from_files(celsius_paths)
 labels = [d.strftime("%d %b") for d in daily.index]
 glyph = cube.plot(
     cmap=t2m_cmap,
-    vmin=0,
-    vmax=38,
+    vmin=5,
+    vmax=40,
     figsize=SOCIAL_FIGSIZE,
     animation_axis_values=labels,
     # apply_blank_canvas only strips the map axes -- it doesn't touch the
@@ -25218,14 +25160,6 @@ glyph.add_reference_map(style="dark", extent=[west, south, east, north])
 # all three social showcases.
 glyph.fig.set_size_inches(*SOCIAL_FIGSIZE)
 glyph.fig.set_dpi(150)
-# The default colorbar axes sits close enough to the figure's right edge that
-# its rotated label runs past the canvas -- shifting only the colorbar's own
-# axes left (figure-fraction) leaves the map axes, and everything drawn on
-# it, completely untouched.
-cbar_pos = glyph.cbar.ax.get_position()
-glyph.cbar.ax.set_position(
-    [cbar_pos.x0 - 0.025, cbar_pos.y0, cbar_pos.width, cbar_pos.height]
-)
 # Both bake their position from the figure's CURRENT size, so they must come
 # after set_dpi/set_size_inches -- and before save_animation, which reads the
 # figure as its final frame.

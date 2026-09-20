@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12637,6 +12637,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../europe_temperature_2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    An ECMWF-style temperature animation over Europe — June → July 2026
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24522,6 +24550,7 @@ embeds the GIF. Earth Engine needs a service account, read from the <code>GEE_SE
 <span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"out"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"aral"</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ARAL</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">43.4</span><span class="p">,</span> <span class="mf">46.8</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">58.2</span><span class="p">,</span> <span class="mf">61.6</span><span class="p">])</span>  <span class="c1"># the whole Aral basin</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
 from pathlib import Path
@@ -24536,7 +24565,8 @@ from earthlens.core import EarthLens
 SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]
 SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]
 OUT = Path("out") / "aral"
-OUT.mkdir(parents=True, exist_ok=True)</div>
+OUT.mkdir(parents=True, exist_ok=True)
+ARAL = dict(lat_lim=[43.4, 46.8], lon_lim=[58.2, 61.6])  # the whole Aral basin</div>
 </div>
 </div>
 </div>
@@ -24601,8 +24631,7 @@ true-colour bands <code>SR_B3</code> / <code>SR_B2</code> / <code>SR_B1</code>, 
         <span class="n">scale</span><span class="o">=</span><span class="mf">400.0</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span>
         <span class="n">export_via</span><span class="o">=</span><span class="s2">"url"</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">43.4</span><span class="p">,</span> <span class="mf">46.8</span><span class="p">],</span>  <span class="c1"># the whole Aral basin</span>
-        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">58.2</span><span class="p">,</span> <span class="mf">61.6</span><span class="p">],</span>
+        <span class="o">**</span><span class="n">ARAL</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">job</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -24635,8 +24664,7 @@ for year in range(1986, 2024):
         scale=400.0,
         path=OUT / str(year),
         export_via="url",
-        lat_lim=[43.4, 46.8],  # the whole Aral basin
-        lon_lim=[58.2, 61.6],
+        **ARAL,
     )
     job.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
     paths = job.download(progress_bar=False)

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12524,6 +12524,34 @@
     
   
     Sub-daily hurricanes in true colour: Ida (2021) &amp; Milton (2024)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    An ECMWF-style temperature animation over Europe — June → July 2026
   
 
     
@@ -25052,11 +25080,7 @@ them into a <code>(12, lat, lon)</code> cube.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">stack_monthly</span><span class="p">(</span><span class="n">cds_variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Stack the 12 monthly GeoTIFFs for one variable into a (12, lat, lon) cube."""</span>
-    <span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-        <span class="n">agg_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cds_variable</span><span class="si">}</span><span class="s2">_reanalysis-era5-single-levels-monthly-means_1MS_*.tif"</span>
-        <span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cds_variable</span><span class="si">}</span><span class="s2">_1MS_*.tif"</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">agg_dir = OUT / "aggregated"
@@ -25064,11 +25088,7 @@ them into a <code>(12, lat, lon)</code> cube.</p>
 
 def stack_monthly(cds_variable: str) -&gt; np.ndarray:
     """Stack the 12 monthly GeoTIFFs for one variable into a (12, lat, lon) cube."""
-    paths = sorted(
-        agg_dir.glob(
-            f"{cds_variable}_reanalysis-era5-single-levels-monthly-means_1MS_*.tif"
-        )
-    )
+    paths = sorted(agg_dir.glob(f"{cds_variable}_1MS_*.tif"))
     return np.stack([Dataset.read_file(p).read_array() for p in paths])</div>
 </div>
 </div>

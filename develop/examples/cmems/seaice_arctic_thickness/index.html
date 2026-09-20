@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,6 +12544,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    An ECMWF-style temperature animation over Europe — June → July 2026
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24526,9 +24554,9 @@ Arctic sea-ice thickness from the merged CryoSat-2 / SMOS L4 product and
 render it as a map over the Arctic basin.</p>
 <p>Dataset <code>esa_obs-si_arc_phy-sit_nrt_l4-multi_P1D-m</code> is near-real-time
 and surface-only (no depth axis). Sea-ice <strong>thickness</strong> retrieval from
-altimetry is winter-weighted, so coverage is densest Oct–Apr. Its
-coverage starts 2023-10-18; we pin a mid-winter date inside that window
-rather than computing one from today's date.</p>
+altimetry is winter-weighted — coverage is densest Oct–Apr — and the
+NRT window rolls forward, so we probe a recent date and note that a
+deep-summer re-run may need an earlier (winter) date.</p>
 <p>Reads credentials from <code>COPERNICUSMARINE_SERVICE_USERNAME</code> /
 <code>COPERNICUSMARINE_SERVICE_PASSWORD</code>.</p>
 </div>
@@ -24542,7 +24570,7 @@ rather than computing one from today's date.</p>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>The imports: <code>numpy</code> and <code>matplotlib</code> for the array math and the map,
-<code>pyramids</code> plus pyramids' <code>NetCDF</code> for reading the downloaded L4 file, and
+<code>xarray</code> plus pyramids' <code>NetCDF</code> for reading the downloaded L4 file, and
 <code>earthlens</code> for the unified <code>EarthLens</code> entry point and the CMEMS
 <code>Catalog</code>. The output directory is created up front.</p>
 </div>
@@ -24567,13 +24595,14 @@ rather than computing one from today's date.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColorBar</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cmems</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -24581,13 +24610,14 @@ rather than computing one from today's date.</p>
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'data/cmems-seaice'</span><span class="p">)</span>
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import os
+<div class="clipboard-copy-txt" id="cell-1">import datetime as dt
+import os
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
-from pyramids.dataset import Dataset, GeoReference
+import xarray as xr
 from pyramids.netcdf import NetCDF
-from pyramids.plot import ColorBar
 
 from earthlens.cmems import Catalog
 from earthlens.core import EarthLens
@@ -24606,12 +24636,9 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="request-parameters">Request parameters<a class="anchor-link" href="#request-parameters">¶</a></h3><p>The dataset id and the probe date are both fixed. A docs example should give the
-same answer whichever day it runs — and "near-real-time" is not a promise that
-the window keeps rolling. This product has not advanced past <strong>2026-04-12</strong>, so
-a date derived from <code>datetime.now()</code> walks off the end of the coverage and the
-subset is rejected with <code>CoordinatesOutOfDatasetBounds</code>. Mid-February also sits
-in the dense part of the altimetry retrieval season.</p>
+<h3 id="request-parameters">Request parameters<a class="anchor-link" href="#request-parameters">¶</a></h3><p>The dataset id is fixed; the probe date is computed ~45 days back to stay
+inside the rolling NRT window. In deep summer (when thickness coverage
+thins out) bump this to a winter date such as <code>'2024-02-15'</code>.</p>
 </div>
 </div>
 </div>
@@ -24635,16 +24662,14 @@ in the dense part of the altimetry retrieval season.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">DATASET_ID</span> <span class="o">=</span> <span class="s1">'esa_obs-si_arc_phy-sit_nrt_l4-multi_P1D-m'</span>
-<span class="c1"># Pinned, not computed from today: the NRT window has not advanced past</span>
-<span class="c1"># 2026-04-12, so a `now - N days` probe falls outside the coverage</span>
-<span class="c1"># (2023-10-18 onward) and the subset fails.</span>
-<span class="n">PROBE_DATE</span> <span class="o">=</span> <span class="s1">'2026-02-15'</span>
+<span class="c1"># ~45 days back keeps us inside the rolling NRT window; in deep summer</span>
+<span class="c1"># bump this to a winter date (e.g. '2024-02-15') where SIT coverage is dense.</span>
+<span class="n">PROBE_DATE</span> <span class="o">=</span> <span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">UTC</span><span class="p">)</span> <span class="o">-</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">45</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">DATASET_ID = 'esa_obs-si_arc_phy-sit_nrt_l4-multi_P1D-m'
-# Pinned, not computed from today: the NRT window has not advanced past
-# 2026-04-12, so a `now - N days` probe falls outside the coverage
-# (2023-10-18 onward) and the subset fails.
-PROBE_DATE = '2026-02-15'</div>
+# ~45 days back keeps us inside the rolling NRT window; in deep summer
+# bump this to a winter date (e.g. '2024-02-15') where SIT coverage is dense.
+PROBE_DATE = (dt.datetime.now(dt.UTC) - dt.timedelta(days=45)).strftime('%Y-%m-%d')</div>
 </div>
 </div>
 </div>
@@ -24807,10 +24832,10 @@ print(paths)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="open-and-inspect-the-field">Open and inspect the field<a class="anchor-link" href="#open-and-inspect-the-field">¶</a></h2><p>The subset comes back on a regular geographic grid — <code>latitude</code> / <code>longitude</code>
-in EPSG:4326, not the polar-stereographic <code>xc</code> / <code>yc</code> axes the native L4 product
-is distributed on, because the CMEMS subset service reprojects. We read the file
-through pyramids' <code>NetCDF</code> and close the handle when done.</p>
+<h2 id="open-and-inspect-the-field">Open and inspect the field<a class="anchor-link" href="#open-and-inspect-the-field">¶</a></h2><p>The L4 grid is a polar stereographic projection, so the array carries
+<code>xc</code> / <code>yc</code> projected axes (plus 2-D lat/lon). We read the file through
+pyramids' <code>NetCDF</code>, decode it into an <code>xarray</code> dataset, and close the
+handle.</p>
 </div>
 </div>
 </div>
@@ -24834,12 +24859,14 @@ through pyramids' <code>NetCDF</code> and close the handle when done.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'variables :'</span><span class="p">,</span> <span class="n">nc</span><span class="o">.</span><span class="n">variable_names</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'dimensions:'</span><span class="p">,</span> <span class="n">nc</span><span class="o">.</span><span class="n">dimension_sizes</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">decode_cf</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">())</span>
+<span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'dims:'</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">nc = NetCDF.read_file(paths[0], read_only=True)
-print('variables :', nc.variable_names)
-print('dimensions:', nc.dimension_sizes)</div>
+ds = xr.decode_cf(nc.to_xarray())
+nc.close()
+print('dims:', dict(ds.sizes))</div>
 </div>
 </div>
 </div>
@@ -24852,10 +24879,8 @@ print('dimensions:', nc.dimension_sizes)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>read_array</code> already collapses the single time step, so the thickness comes back
-as a 2-D <code>(rows, columns)</code> masked array — there is no leading time axis to index
-away. The variable is stored unpacked (<code>scale_factor</code> 1, <code>add_offset</code> 0), so the
-values are metres as they are read.</p>
+<p>Collapse the single time step to get the 2-D thickness field, then
+summarise the valid (non-NaN) cells.</p>
 </div>
 </div>
 </div>
@@ -24878,23 +24903,21 @@ values are metres as they are read.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sit_var</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s1">'sea_ice_thickness'</span><span class="p">)</span>
-<span class="n">sit</span> <span class="o">=</span> <span class="n">sit_var</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'grid </span><span class="si">{</span><span class="n">sit</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> x </span><span class="si">{</span><span class="n">sit</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">, epsg </span><span class="si">{</span><span class="n">sit_var</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'valid cells: </span><span class="si">{</span><span class="n">sit</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s1"> of </span><span class="si">{</span><span class="n">sit</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s1">'thickness min/mean/max: </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">sit</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> / '</span>
-    <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">sit</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">sit</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> m'</span>
-<span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sit</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'sea_ice_thickness'</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">valid</span> <span class="o">=</span> <span class="n">sit</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">sit</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'valid cells: </span><span class="si">{</span><span class="n">valid</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">valid</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'thickness min/mean/max: </span><span class="si">{</span><span class="n">valid</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">valid</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">valid</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> m'</span>
+    <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">sit_var = nc.get_variable('sea_ice_thickness')
-sit = sit_var.read_array(masked=True).astype('float64')
-print(f'grid {sit.shape[0]} x {sit.shape[1]}, epsg {sit_var.epsg}')
-print(f'valid cells: {sit.count()} of {sit.size}')
-print(
-    f'thickness min/mean/max: {float(sit.min()):.2f} / '
-    f'{float(sit.mean()):.2f} / {float(sit.max()):.2f} m'
-)</div>
+<div class="clipboard-copy-txt" id="cell-7">sit = ds['sea_ice_thickness'].isel(time=0)
+valid = sit.values[~np.isnan(sit.values)]
+print(f'valid cells: {valid.size}')
+if valid.size:
+    print(
+        f'thickness min/mean/max: {valid.min():.2f} / {valid.mean():.2f} / {valid.max():.2f} m'
+    )</div>
 </div>
 </div>
 </div>
@@ -24907,12 +24930,9 @@ print(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="map-the-thickness-field">Map the thickness field<a class="anchor-link" href="#map-the-thickness-field">¶</a></h2><p>The subset arrives on a lat/lon grid, which draws the Arctic basin as a 15:1
-strip. Reprojecting to <strong>EPSG:3413</strong> (NSIDC north polar stereographic) at the
-25 km cell size conventional for sea ice turns it back into a map: thicker
-multi-year ice banked against the Canadian Arctic Archipelago and northern
-Greenland, thinner first-year ice out toward the marginal seas. The hole at the
-pole is the 88°N edge of the bounding box requested above, not missing data.</p>
+<h2 id="map-the-thickness-field">Map the thickness field<a class="anchor-link" href="#map-the-thickness-field">¶</a></h2><p>A plain <code>pcolormesh</code> of the projected grid — thicker multi-year ice
+north of the Canadian Arctic Archipelago, thinner first-year ice toward
+the marginal seas.</p>
 </div>
 </div>
 </div>
@@ -24935,53 +24955,23 @@ pole is the 88°N edge of the bounding box requested above, not missing data.</p
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">field</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
-    <span class="n">sit</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span>
-    <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-    <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">sit_var</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">sit_var</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
-<span class="p">)</span>
-<span class="c1"># 25 km is the conventional sea-ice grid spacing, and it keeps the reprojected</span>
-<span class="c1"># raster small enough to plot -- a native-resolution warp is ~60 million cells.</span>
-<span class="n">polar</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="mi">3413</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="mi">25000</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'reprojected: </span><span class="si">{</span><span class="n">polar</span><span class="o">.</span><span class="n">rows</span><span class="si">}</span><span class="s1"> x </span><span class="si">{</span><span class="n">polar</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s1">, epsg </span><span class="si">{</span><span class="n">polar</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-
-<span class="n">glyph</span> <span class="o">=</span> <span class="n">polar</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues'</span><span class="p">,</span>
-    <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">vmax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-    <span class="n">colorbar</span><span class="o">=</span><span class="n">ColorBar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'sea-ice thickness (m)'</span><span class="p">),</span>
-    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Arctic sea-ice thickness (L4 NRT, </span><span class="si">{</span><span class="n">PROBE_DATE</span><span class="si">}</span><span class="s1">)'</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">'bottom'</span><span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_label_position</span><span class="p">(</span><span class="s1">'bottom'</span><span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'x (m, EPSG:3413)'</span><span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'y (m)'</span><span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">'#eef2f5'</span><span class="p">)</span>
-<span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">sit</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues'</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Sea-ice thickness (m)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Arctic sea-ice thickness (L4 NRT, </span><span class="si">{</span><span class="n">PROBE_DATE</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'grid x'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'grid y'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">'equal'</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">field = Dataset.from_array(
-    sit.filled(np.nan),
-    no_data_value=np.nan,
-    geo_ref=GeoReference(geo=sit_var.geotransform, epsg=sit_var.epsg),
-)
-# 25 km is the conventional sea-ice grid spacing, and it keeps the reprojected
-# raster small enough to plot -- a native-resolution warp is ~60 million cells.
-polar = field.to_crs(3413, cell_size=25000)
-print(f'reprojected: {polar.rows} x {polar.columns}, epsg {polar.epsg}')
-
-glyph = polar.plot(
-    cmap='Blues',
-    vmin=0,
-    vmax=5,
-    colorbar=ColorBar(label='sea-ice thickness (m)'),
-    title=f'Arctic sea-ice thickness (L4 NRT, {PROBE_DATE})',
-)
-glyph.ax.xaxis.set_ticks_position('bottom')
-glyph.ax.xaxis.set_label_position('bottom')
-glyph.ax.set_xlabel('x (m, EPSG:3413)')
-glyph.ax.set_ylabel('y (m)')
-glyph.ax.set_facecolor('#eef2f5')
-nc.close()</div>
+<div class="clipboard-copy-txt" id="cell-8">fig, ax = plt.subplots(figsize=(6, 5))
+mesh = ax.pcolormesh(sit.values, cmap='Blues', vmin=0, vmax=5)
+fig.colorbar(mesh, ax=ax, label='Sea-ice thickness (m)')
+ax.set_title(f'Arctic sea-ice thickness (L4 NRT, {PROBE_DATE})')
+ax.set_xlabel('grid x')
+ax.set_ylabel('grid y')
+ax.set_aspect('equal')
+fig.tight_layout()</div>
 </div>
 </div>
 </div>

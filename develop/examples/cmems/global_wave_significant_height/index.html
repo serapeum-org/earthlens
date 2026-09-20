@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,6 +12544,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    An ECMWF-style temperature animation over Europe — June → July 2026
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -13820,10 +13848,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#download-the-storm-window-over-the-north-atlantic" class="md-nav__link">
+  <a href="#download-three-days-over-the-north-atlantic" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download the storm window over the North Atlantic
+        Download three days over the North Atlantic
       
     </span>
   </a>
@@ -23741,10 +23769,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#download-the-storm-window-over-the-north-atlantic" class="md-nav__link">
+  <a href="#download-three-days-over-the-north-atlantic" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download the storm window over the North Atlantic
+        Download three days over the North Atlantic
       
     </span>
   </a>
@@ -24586,14 +24614,9 @@ fixed date works fine here.</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Consolidate the imports up front: pyramids' <code>NetCDF</code> for reading the
-downloaded field, <code>Dataset</code> for the snapshot map, and the <code>Basemap</code> /
-<code>Feature</code> / <code>Contour</code> / <code>ColorBar</code> style objects for the map's coastlines,
-banding and legend; cleopatra's <code>LineGlyph</code> for the time-series; plus the
-unified <code>EarthLens</code> entry point and the CMEMS <code>Catalog</code>. <code>matplotlib</code> is
-imported for the two-panel layout only — every mark on both panels is
-drawn by pyramids or cleopatra. We also pick an output directory for the
-download.</p>
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Consolidate the imports up front: <code>xarray</code> and pyramids' <code>NetCDF</code> for
+reading the downloaded field, plus the unified <code>EarthLens</code> entry point and
+the CMEMS <code>Catalog</code>. We also pick an output directory for the download.</p>
 </div>
 </div>
 </div>
@@ -24619,12 +24642,8 @@ download.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.primitives.line_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineGlyph</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">Basemap</span><span class="p">,</span> <span class="n">ColorBar</span><span class="p">,</span> <span class="n">Contour</span><span class="p">,</span> <span class="n">Feature</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cmems</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -24635,12 +24654,8 @@ download.</p>
 <div class="clipboard-copy-txt" id="cell-1">import os
 from pathlib import Path
 
-import matplotlib.pyplot as plt
-import numpy as np
-from cleopatra.glyphs.primitives.line_glyph import LineGlyph
-from pyramids.dataset import Dataset, GeoReference
+import xarray as xr
 from pyramids.netcdf import NetCDF
-from pyramids.plot import Basemap, ColorBar, Contour, Feature
 
 from earthlens.cmems import Catalog
 from earthlens.core import EarthLens
@@ -24711,12 +24726,9 @@ print(ds_meta.variables['VHM0'])</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="download-the-storm-window-over-the-north-atlantic">Download the storm window over the North Atlantic<a class="anchor-link" href="#download-the-storm-window-over-the-north-atlantic">¶</a></h2><p>3-hourly over three days = 25 time steps of a 2-D field on a ~25°×15° box.
-The window is centred on the storm rather than opening at its peak: at the
-probe point Hs climbs from ~4.5 m on 02-07, tops out on 02-08, and decays
-through 02-09, so the series covers the whole passage. We build the request
-first — source, date window, cadence, dataset, variable, bounding box,
-output path, and the Copernicus Marine credentials.</p>
+<h2 id="download-three-days-over-the-north-atlantic">Download three days over the North Atlantic<a class="anchor-link" href="#download-three-days-over-the-north-atlantic">¶</a></h2><p>3-hourly × 3 days = 24 time steps of a 2-D field over a ~25°×15° box. We
+build the request first — source, date window, cadence, dataset, variable,
+bounding box, output path, and the Copernicus Marine credentials.</p>
 </div>
 </div>
 </div>
@@ -24741,7 +24753,7 @@ output path, and the Copernicus Marine credentials.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'cmems'</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s1">'2014-02-07'</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s1">'2014-02-08'</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s1">'2014-02-10'</span><span class="p">,</span>
     <span class="n">cadence</span><span class="o">=</span><span class="s1">'hourly'</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET_ID</span><span class="p">,</span>
@@ -24754,7 +24766,7 @@ output path, and the Copernicus Marine credentials.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">el = EarthLens(
     data_source='cmems',
-    start='2014-02-07',
+    start='2014-02-08',
     end='2014-02-10',
     cadence='hourly',
     dataset=DATASET_ID,
@@ -24817,8 +24829,8 @@ print(paths)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="open-the-field-and-pull-a-point-series">Open the field and pull a point series<a class="anchor-link" href="#open-the-field-and-pull-a-point-series">¶</a></h2><p>Read the downloaded NetCDF with pyramids' <code>NetCDF</code>, which decodes the CF
-metadata itself, and report the variables and dimensions.</p>
+<h2 id="open-the-field-and-pull-a-point-series">Open the field and pull a point series<a class="anchor-link" href="#open-the-field-and-pull-a-point-series">¶</a></h2><p>Read the downloaded NetCDF with pyramids' <code>NetCDF</code>, hand it to <code>xarray</code> via
+<code>decode_cf</code>, and report the cube dimensions.</p>
 </div>
 </div>
 </div>
@@ -24842,12 +24854,14 @@ metadata itself, and report the variables and dimensions.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'variables :'</span><span class="p">,</span> <span class="n">nc</span><span class="o">.</span><span class="n">variable_names</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'dimensions:'</span><span class="p">,</span> <span class="n">nc</span><span class="o">.</span><span class="n">dimension_sizes</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">decode_cf</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">())</span>
+<span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'dims:'</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">nc = NetCDF.read_file(paths[0], read_only=True)
-print('variables :', nc.variable_names)
-print('dimensions:', nc.dimension_sizes)</div>
+ds = xr.decode_cf(nc.to_xarray())
+nc.close()
+print('dims:', dict(ds.sizes))</div>
 </div>
 </div>
 </div>
@@ -24884,51 +24898,15 @@ report the peak significant wave height as the storm passes.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">vhm0</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s1">'VHM0'</span><span class="p">)</span>
-
-<span class="c1"># get_time_variable defaults to a date-only format, which collapses all eight</span>
-<span class="c1"># steps of a day onto one label and throws away the 3-hourly cadence this</span>
-<span class="c1"># notebook is about, so ask for the hour and build a real datetime axis.</span>
-<span class="n">stamps</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_time_variable</span><span class="p">(</span><span class="n">time_format</span><span class="o">=</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M'</span><span class="p">)</span>
-<span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stamps</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'datetime64[m]'</span><span class="p">)</span>
-
-<span class="c1"># VHM0 is stored packed (int16 with a scale_factor), so apply the packing before</span>
-<span class="c1"># any number is reported -- pyramids returns the raw store (serapeum-org/pyramids#1124).</span>
-<span class="n">scale</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vhm0</span><span class="o">.</span><span class="n">scale</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vhm0</span><span class="o">.</span><span class="n">offset</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">cube</span> <span class="o">=</span> <span class="n">vhm0</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">offset</span>
-
-<span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">vhm0</span><span class="o">.</span><span class="n">rowcol</span><span class="p">(</span>
-    <span class="n">POINT_LON</span><span class="p">,</span> <span class="n">POINT_LAT</span>
-<span class="p">)</span>  <span class="c1"># nearest cell, from the variable's geotransform</span>
-<span class="n">point</span> <span class="o">=</span> <span class="n">cube</span><span class="p">[:,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
-<span class="n">peak_step</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">point</span><span class="p">))</span>
-<span class="n">step_hours</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">times</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'h'</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="si">}</span><span class="s1"> steps, </span><span class="si">{</span><span class="n">step_hours</span><span class="si">}</span><span class="s1"> h apart'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'peak Hs at (</span><span class="si">{</span><span class="n">POINT_LAT</span><span class="si">}</span><span class="s1">N, </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">POINT_LON</span><span class="p">)</span><span class="si">}</span><span class="s1">W): </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> m'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'peak step : </span><span class="si">{</span><span class="n">peak_step</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">stamps</span><span class="p">[</span><span class="n">peak_step</span><span class="p">]</span><span class="si">}</span><span class="s1"> UTC)'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">vhm0</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'VHM0'</span><span class="p">]</span>
+<span class="n">point</span> <span class="o">=</span> <span class="n">vhm0</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">POINT_LAT</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">POINT_LON</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'nearest'</span><span class="p">)</span>
+<span class="n">peak</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'peak Hs at (</span><span class="si">{</span><span class="n">POINT_LAT</span><span class="si">}</span><span class="s1">N, </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">POINT_LON</span><span class="p">)</span><span class="si">}</span><span class="s1">W): </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> m'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">vhm0 = nc.get_variable('VHM0')
-
-# get_time_variable defaults to a date-only format, which collapses all eight
-# steps of a day onto one label and throws away the 3-hourly cadence this
-# notebook is about, so ask for the hour and build a real datetime axis.
-stamps = nc.get_time_variable(time_format='%Y-%m-%d %H:%M')
-times = np.array(stamps, dtype='datetime64[m]')
-
-# VHM0 is stored packed (int16 with a scale_factor), so apply the packing before
-# any number is reported -- pyramids returns the raw store (serapeum-org/pyramids#1124).
-scale, offset = float(np.asarray(vhm0.scale)[0]), float(np.asarray(vhm0.offset)[0])
-cube = vhm0.read_array(masked=True).astype('float64') * scale + offset
-
-row, col = vhm0.rowcol(
-    POINT_LON, POINT_LAT
-)  # nearest cell, from the variable's geotransform
-point = cube[:, row, col]
-peak_step = int(np.ma.argmax(point))
-step_hours = int((times[1] - times[0]) / np.timedelta64(1, 'h'))
-print(f'{len(times)} steps, {step_hours} h apart')
-print(f'peak Hs at ({POINT_LAT}N, {abs(POINT_LON)}W): {float(point.max()):.1f} m')
-print(f'peak step : {peak_step} ({stamps[peak_step]} UTC)')</div>
+<div class="clipboard-copy-txt" id="cell-6">vhm0 = ds['VHM0']
+point = vhm0.sel(latitude=POINT_LAT, longitude=POINT_LON, method='nearest')
+peak = point.max()
+print(f'peak Hs at ({POINT_LAT}N, {abs(POINT_LON)}W): {float(peak):.1f} m')</div>
 </div>
 </div>
 </div>
@@ -24941,11 +24919,9 @@ print(f'peak step : {peak_step} ({stamps[peak_step]} UTC)')</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="snapshot-map-point-time-series">Snapshot map + point time-series<a class="anchor-link" href="#snapshot-map-point-time-series">¶</a></h2><p>Left: the wave field at the stormiest step, with Natural Earth land and
-coastlines under it so the domain reads as the North Atlantic, and the
-values banded at 1 m so the storm's structure is legible. Right: the
-3-hourly Hs series at the probe point through the whole passage. First
-slice the snapshot out of the cube at the peak step.</p>
+<h2 id="snapshot-map-point-time-series">Snapshot map + point time-series<a class="anchor-link" href="#snapshot-map-point-time-series">¶</a></h2><p>Left: the significant-wave-height field at the stormiest step. Right:
+the 3-hourly Hs series at the chosen point as the storm passes. First
+find the peak time step and slice out that snapshot.</p>
 </div>
 </div>
 </div>
@@ -24968,19 +24944,15 @@ slice the snapshot out of the cube at the peak step.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">snapshot</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span>
-    <span class="n">cube</span><span class="p">[</span><span class="n">peak_step</span><span class="p">]</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span>
-    <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-    <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">vhm0</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">vhm0</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'snapshot </span><span class="si">{</span><span class="n">snapshot</span><span class="o">.</span><span class="n">rows</span><span class="si">}</span><span class="s1"> x </span><span class="si">{</span><span class="n">snapshot</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s1">, epsg </span><span class="si">{</span><span class="n">snapshot</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">peak_step</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="s1">'time'</span><span class="p">))</span>
+<span class="n">snapshot</span> <span class="o">=</span> <span class="n">vhm0</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">peak_step</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">snapshot = Dataset.from_array(
-    cube[peak_step].filled(np.nan),
-    no_data_value=np.nan,
-    geo_ref=GeoReference(geo=vhm0.geotransform, epsg=vhm0.epsg),
-)
-print(f'snapshot {snapshot.rows} x {snapshot.columns}, epsg {snapshot.epsg}')</div>
+<div class="clipboard-copy-txt" id="cell-7">import matplotlib.pyplot as plt
+
+peak_step = int(point.argmax('time'))
+snapshot = vhm0.isel(time=peak_step)</div>
 </div>
 </div>
 </div>
@@ -24993,10 +24965,8 @@ print(f'snapshot {snapshot.rows} x {snapshot.columns}, epsg {snapshot.epsg}')</d
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="draw-the-two-panels">Draw the two panels<a class="anchor-link" href="#draw-the-two-panels">¶</a></h3><p><code>matplotlib</code> supplies the 1×2 grid and nothing else. pyramids draws the map
-into the left axes and cleopatra's <code>LineGlyph</code> draws the series into the
-right one; the probe point is a red star on the map and a dashed rule at the
-snapshot time on the series.</p>
+<h3 id="draw-the-two-panels">Draw the two panels<a class="anchor-link" href="#draw-the-two-panels">¶</a></h3><p>A <code>pcolormesh</code> map of the snapshot (with the point marked by a red star)
+alongside the 3-hourly Hs time-series at that point.</p>
 </div>
 </div>
 </div>
@@ -25019,111 +24989,49 @@ snapshot time on the series.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span> <span class="n">width_ratios</span><span class="o">=</span><span class="p">[</span><span class="mf">1.35</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.32</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.16</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.90</span><span class="p">)</span>
-
-<span class="n">map_glyph</span> <span class="o">=</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">axm</span><span class="p">,</span> <span class="n">axt</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">axm</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span>
+    <span class="n">snapshot</span><span class="p">[</span><span class="s1">'longitude'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">snapshot</span><span class="p">[</span><span class="s1">'latitude'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">snapshot</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
     <span class="n">cmap</span><span class="o">=</span><span class="s1">'viridis'</span><span class="p">,</span>
-    <span class="n">contour</span><span class="o">=</span><span class="n">Contour</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">15.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))),</span>
-    <span class="n">basemap</span><span class="o">=</span><span class="n">Basemap</span><span class="p">(</span>
-        <span class="n">relief</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">features</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">Feature</span><span class="p">(</span><span class="s1">'land'</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">'#e4ded2'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'none'</span><span class="p">),</span>
-            <span class="n">Feature</span><span class="p">(</span><span class="s1">'coastline'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'#3a3a3a'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.6</span><span class="p">),</span>
-        <span class="p">],</span>
-    <span class="p">),</span>
-    <span class="n">colorbar</span><span class="o">=</span><span class="n">ColorBar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'significant wave height (m)'</span><span class="p">),</span>
-    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">'MFWAM VHM0 — </span><span class="si">{</span><span class="n">stamps</span><span class="p">[</span><span class="n">peak_step</span><span class="p">]</span><span class="si">}</span><span class="s1"> UTC'</span><span class="p">,</span>
+    <span class="n">shading</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">map_glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="p">[</span><span class="n">POINT_LON</span><span class="p">],</span>
-    <span class="p">[</span><span class="n">POINT_LAT</span><span class="p">],</span>
-    <span class="s1">'r*'</span><span class="p">,</span>
-    <span class="n">markersize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
-    <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">'white'</span><span class="p">,</span>
-    <span class="n">markeredgewidth</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">map_glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">'bottom'</span><span class="p">)</span>
-<span class="n">map_glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_label_position</span><span class="p">(</span><span class="s1">'bottom'</span><span class="p">)</span>
-<span class="n">map_glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'longitude'</span><span class="p">)</span>
-<span class="n">map_glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'latitude'</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axm</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Hs (m)'</span><span class="p">)</span>
+<span class="n">axm</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">POINT_LON</span><span class="p">],</span> <span class="p">[</span><span class="n">POINT_LAT</span><span class="p">],</span> <span class="s1">'r*'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">axm</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'VHM0 snapshot </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">snapshot</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)[:</span><span class="mi">13</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">axm</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'lon'</span><span class="p">)</span>
+<span class="n">axm</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'lat'</span><span class="p">)</span>
 
-<span class="n">series</span> <span class="o">=</span> <span class="n">LineGlyph</span><span class="p">(</span>
-    <span class="n">times</span><span class="p">,</span>
-    <span class="n">point</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span>
-    <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-    <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">,</span>
-    <span class="n">line_width</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span>
-    <span class="n">color_1</span><span class="o">=</span><span class="s1">'#1f4e79'</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">_</span><span class="p">,</span> <span class="n">series_ax</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Hs at </span><span class="si">{</span><span class="n">POINT_LAT</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">N, </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">POINT_LON</span><span class="p">)</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">W'</span><span class="p">)</span>
-<span class="c1"># line() applies only the title; the axis labels and grid it declares as options</span>
-<span class="c1"># are ignored (serapeum-org/cleopatra#347), so they are set on the returned axes.</span>
-<span class="n">series_ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'time (UTC)'</span><span class="p">)</span>
-<span class="n">series_ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'significant wave height (m)'</span><span class="p">)</span>
-<span class="n">series_ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-<span class="n">series_ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="n">peak_step</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">'firebrick'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'--'</span><span class="p">)</span>
-<span class="n">series_ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">'x'</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">series_ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">():</span>
-    <span class="n">label</span><span class="o">.</span><span class="n">set_horizontalalignment</span><span class="p">(</span><span class="s1">'right'</span><span class="p">)</span>
-
-<span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">axt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="s1">'time'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">axt</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Significant wave height at 48N, 16W'</span><span class="p">)</span>
+<span class="n">axt</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Hs (m)'</span><span class="p">)</span>
+<span class="n">axt</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'time'</span><span class="p">)</span>
+<span class="n">axt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">fig, axes = plt.subplots(1, 2, figsize=(15, 5.0), width_ratios=[1.35, 1])
-fig.subplots_adjust(left=0.05, right=0.98, wspace=0.32, bottom=0.16, top=0.90)
-
-map_glyph = snapshot.plot(
-    fig=fig,
-    ax=axes[0],
+<div class="clipboard-copy-txt" id="cell-8">fig, (axm, axt) = plt.subplots(1, 2, figsize=(12, 4))
+mesh = axm.pcolormesh(
+    snapshot['longitude'].values,
+    snapshot['latitude'].values,
+    snapshot.values,
     cmap='viridis',
-    contour=Contour(levels=list(np.arange(0.0, 15.1, 1.0))),
-    basemap=Basemap(
-        relief=False,
-        features=[
-            Feature('land', facecolor='#e4ded2', edgecolor='none'),
-            Feature('coastline', edgecolor='#3a3a3a', linewidth=0.6),
-        ],
-    ),
-    colorbar=ColorBar(label='significant wave height (m)'),
-    title=f'MFWAM VHM0 — {stamps[peak_step]} UTC',
+    shading='auto',
 )
-map_glyph.ax.plot(
-    [POINT_LON],
-    [POINT_LAT],
-    'r*',
-    markersize=15,
-    markeredgecolor='white',
-    markeredgewidth=0.9,
-)
-map_glyph.ax.xaxis.set_ticks_position('bottom')
-map_glyph.ax.xaxis.set_label_position('bottom')
-map_glyph.ax.set_xlabel('longitude')
-map_glyph.ax.set_ylabel('latitude')
+fig.colorbar(mesh, ax=axm, label='Hs (m)')
+axm.plot([POINT_LON], [POINT_LAT], 'r*', markersize=12)
+axm.set_title(f'VHM0 snapshot {str(snapshot["time"].values)[:13]}')
+axm.set_xlabel('lon')
+axm.set_ylabel('lat')
 
-series = LineGlyph(
-    times,
-    point.filled(np.nan),
-    fig=fig,
-    ax=axes[1],
-    marker='o',
-    line_width=1.8,
-    color_1='#1f4e79',
-)
-_, series_ax, _ = series.line(title=f'Hs at {POINT_LAT:.0f}N, {abs(POINT_LON):.0f}W')
-# line() applies only the title; the axis labels and grid it declares as options
-# are ignored (serapeum-org/cleopatra#347), so they are set on the returned axes.
-series_ax.set_xlabel('time (UTC)')
-series_ax.set_ylabel('significant wave height (m)')
-series_ax.grid(alpha=0.3)
-series_ax.axvline(times[peak_step], color='firebrick', lw=1.0, ls='--')
-series_ax.tick_params(axis='x', rotation=30)
-for label in series_ax.get_xticklabels():
-    label.set_horizontalalignment('right')
-
-nc.close()</div>
+axt.plot(point['time'].values, point.values, marker='o', ms=3)
+axt.set_title('Significant wave height at 48N, 16W')
+axt.set_ylabel('Hs (m)')
+axt.set_xlabel('time')
+axt.grid(alpha=0.3)
+fig.autofmt_xdate()
+fig.tight_layout()</div>
 </div>
 </div>
 </div>
