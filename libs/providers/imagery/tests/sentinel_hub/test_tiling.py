@@ -76,7 +76,7 @@ class TestTiling:
     def test_merge_unsets_no_data_when_the_tiles_declare_nothing(
         self, fake_sh, recorded_merge, output_dir: Path, monkeypatch
     ):
-        """Tiles without a declared no-data send "none", not merge_rasters' 0."""
+        """Tiles without a declared no-data pass None through, not merge_rasters' 0."""
         closed: list[_UndeclaredHandle] = []
         # The backend imports Dataset inside the function, so patch the class
         # pyramids hands it rather than a module attribute.
@@ -88,7 +88,7 @@ class TestTiling:
 
         _tiling_backend(output_dir).download()
 
-        assert recorded_merge[-1][2]["no_data_value"] == "none", (
+        assert recorded_merge[-1][2]["no_data_value"] is None, (
             "undeclared tiles must unset the mosaic no-data rather than let "
             "merge_rasters stamp its 0 default"
         )
