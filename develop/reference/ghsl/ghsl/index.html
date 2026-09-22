@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -28781,47 +28781,47 @@ epochs).</p>
 <a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">        The pyramids-consuming core: `merge_rasters` mosaics the tiles **and**</span>
 <a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">        reprojects them to the output CRS in one call (skipped when the source</span>
 <a id="__codelineno-0-664" name="__codelineno-0-664"></a><span class="sd">        already matches the output CRS), then `Dataset.crop` clips to the AOI</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">        bbox. The mosaic inherits the source tiles&#39; declared no-data (JRC uses</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">        `-200`, or `65535` on the uint16 products) instead of `merge_rasters`&#39;</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">        `0` default, which would mask every zero-population / zero-built-up</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">        cell and promote the real sentinel to valid data. A tile that declares</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">        nothing sends `&quot;none&quot;`, leaving the mosaic without a no-data value</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">        rather than inheriting that `0`. Categorical products</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">        reproject with nearest-neighbour (so class codes are never blended);</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">        those with a curated legend also carry a</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">        colour table + a `.legend.json` sidecar, while a legend-less categorical</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">        product (e.g. `GHS_BUILT_C_VEG`) still gets the safe NN resampling but</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">        no colour table or sidecar.</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">            tifs: The downloaded source `.tif` tiles (Mollweide or WGS84).</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">            rp: The `RemoteProduct` (its `metadata` carries `product`,</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">                `epoch`, `resolution`, `categorical`).</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">            pathlib.Path: The AOI-cropped GeoTIFF written under `self.path`.</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">                Returned without re-running the GIS pipeline when it already</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">                exists (idempotent, like the tile-level cache).</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.merge</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_rasters</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rp</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">resolution</span><span class="si">}</span><span class="s2">_epsg</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_epsg</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_complete</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_force</span><span class="p">):</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>            <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>        <span class="n">categorical</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;categorical&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>        <span class="n">resampling</span> <span class="o">=</span> <span class="s2">&quot;nearest neighbor&quot;</span> <span class="k">if</span> <span class="n">categorical</span> <span class="k">else</span> <span class="s2">&quot;bilinear&quot;</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="n">source_is_wgs84</span> <span class="o">=</span> <span class="n">native_source_crs</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;4326&quot;</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>        <span class="n">reproject</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span><span class="n">source_is_wgs84</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_epsg</span> <span class="o">==</span> <span class="mi">4326</span><span class="p">)</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>        <span class="n">dst_crs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_epsg</span> <span class="k">if</span> <span class="n">reproject</span> <span class="k">else</span> <span class="kc">None</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rp</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_merged.tif&quot;</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="c1"># merge_rasters defaults no_data_value to 0, which is doubly wrong for</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>        <span class="c1"># GHSL: 0 is an ordinary value (no population, no built-up surface), and</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>        <span class="c1"># JRC&#39;s own sentinel (-200, or 65535 on the uint16 products) would be</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="c1"># demoted to valid data. Inherit what the source tiles declare.</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">        bbox. `no_data_value` is passed explicitly as the first tile&#39;s own</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">        marker (JRC uses `-200`, or `65535` on the uint16 products), so it</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">        carries over onto the mosaic. A tile that declares nothing passes</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">        Python `None` through, asking for no marker at all rather than</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">        stamping one. Categorical products</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">        reproject with nearest-neighbour (so class codes are never blended);</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">        those with a curated legend also carry a</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">        colour table + a `.legend.json` sidecar, while a legend-less categorical</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">        product (e.g. `GHS_BUILT_C_VEG`) still gets the safe NN resampling but</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">        no colour table or sidecar.</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">            tifs: The downloaded source `.tif` tiles (Mollweide or WGS84).</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">            rp: The `RemoteProduct` (its `metadata` carries `product`,</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">                `epoch`, `resolution`, `categorical`).</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">            pathlib.Path: The AOI-cropped GeoTIFF written under `self.path`.</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">                Returned without re-running the GIS pipeline when it already</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">                exists (idempotent, like the tile-level cache).</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.merge</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_rasters</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rp</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">resolution</span><span class="si">}</span><span class="s2">_epsg</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_epsg</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_complete</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_force</span><span class="p">):</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a>            <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>        <span class="n">categorical</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;categorical&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>        <span class="n">resampling</span> <span class="o">=</span> <span class="s2">&quot;nearest neighbor&quot;</span> <span class="k">if</span> <span class="n">categorical</span> <span class="k">else</span> <span class="s2">&quot;bilinear&quot;</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>        <span class="n">source_is_wgs84</span> <span class="o">=</span> <span class="n">native_source_crs</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;4326&quot;</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="n">reproject</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span><span class="n">source_is_wgs84</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_epsg</span> <span class="o">==</span> <span class="mi">4326</span><span class="p">)</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>        <span class="n">dst_crs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_epsg</span> <span class="k">if</span> <span class="n">reproject</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rp</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_merged.tif&quot;</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>        <span class="c1"># Carry the first tile&#39;s own no-data marker onto the mosaic</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="c1"># explicitly -- None when it declares none, asking for no marker at</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>        <span class="c1"># all rather than a stray literal like the string &quot;none&quot;. GHSL&#39;s 0</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>        <span class="c1"># is an ordinary value (no population, no built-up surface), so an</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="c1"># unstamped mosaic must never fall back to it.</span>
 <a id="__codelineno-0-706" name="__codelineno-0-706"></a>        <span class="n">first_tile</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">tifs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <a id="__codelineno-0-707" name="__codelineno-0-707"></a>        <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-708" name="__codelineno-0-708"></a>            <span class="n">source_no_data</span> <span class="o">=</span> <span class="n">first_tile</span><span class="o">.</span><span class="n">no_data_value</span>
@@ -28839,7 +28839,7 @@ epochs).</p>
 <a id="__codelineno-0-720" name="__codelineno-0-720"></a>            <span class="n">dst</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">merged</span><span class="p">),</span>
 <a id="__codelineno-0-721" name="__codelineno-0-721"></a>            <span class="n">dst_crs</span><span class="o">=</span><span class="n">dst_crs</span><span class="p">,</span>
 <a id="__codelineno-0-722" name="__codelineno-0-722"></a>            <span class="n">resampling</span><span class="o">=</span><span class="n">resampling</span><span class="p">,</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="n">fill</span> <span class="k">if</span> <span class="n">fill</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="n">fill</span><span class="p">,</span>
 <a id="__codelineno-0-724" name="__codelineno-0-724"></a>        <span class="p">)</span>
 <a id="__codelineno-0-725" name="__codelineno-0-725"></a>
 <a id="__codelineno-0-726" name="__codelineno-0-726"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">merged</span><span class="p">))</span>
@@ -32674,47 +32674,47 @@ epochs).</p>
 <a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">        The pyramids-consuming core: `merge_rasters` mosaics the tiles **and**</span>
 <a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">        reprojects them to the output CRS in one call (skipped when the source</span>
 <a id="__codelineno-0-664" name="__codelineno-0-664"></a><span class="sd">        already matches the output CRS), then `Dataset.crop` clips to the AOI</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">        bbox. The mosaic inherits the source tiles&#39; declared no-data (JRC uses</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">        `-200`, or `65535` on the uint16 products) instead of `merge_rasters`&#39;</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">        `0` default, which would mask every zero-population / zero-built-up</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">        cell and promote the real sentinel to valid data. A tile that declares</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">        nothing sends `&quot;none&quot;`, leaving the mosaic without a no-data value</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">        rather than inheriting that `0`. Categorical products</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">        reproject with nearest-neighbour (so class codes are never blended);</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">        those with a curated legend also carry a</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">        colour table + a `.legend.json` sidecar, while a legend-less categorical</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">        product (e.g. `GHS_BUILT_C_VEG`) still gets the safe NN resampling but</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">        no colour table or sidecar.</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">            tifs: The downloaded source `.tif` tiles (Mollweide or WGS84).</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">            rp: The `RemoteProduct` (its `metadata` carries `product`,</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">                `epoch`, `resolution`, `categorical`).</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">            pathlib.Path: The AOI-cropped GeoTIFF written under `self.path`.</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">                Returned without re-running the GIS pipeline when it already</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">                exists (idempotent, like the tile-level cache).</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.merge</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_rasters</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rp</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">resolution</span><span class="si">}</span><span class="s2">_epsg</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_epsg</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_complete</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_force</span><span class="p">):</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>            <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>        <span class="n">categorical</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;categorical&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>        <span class="n">resampling</span> <span class="o">=</span> <span class="s2">&quot;nearest neighbor&quot;</span> <span class="k">if</span> <span class="n">categorical</span> <span class="k">else</span> <span class="s2">&quot;bilinear&quot;</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="n">source_is_wgs84</span> <span class="o">=</span> <span class="n">native_source_crs</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;4326&quot;</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>        <span class="n">reproject</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span><span class="n">source_is_wgs84</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_epsg</span> <span class="o">==</span> <span class="mi">4326</span><span class="p">)</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>        <span class="n">dst_crs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_epsg</span> <span class="k">if</span> <span class="n">reproject</span> <span class="k">else</span> <span class="kc">None</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rp</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_merged.tif&quot;</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="c1"># merge_rasters defaults no_data_value to 0, which is doubly wrong for</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>        <span class="c1"># GHSL: 0 is an ordinary value (no population, no built-up surface), and</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>        <span class="c1"># JRC&#39;s own sentinel (-200, or 65535 on the uint16 products) would be</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="c1"># demoted to valid data. Inherit what the source tiles declare.</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">        bbox. `no_data_value` is passed explicitly as the first tile&#39;s own</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">        marker (JRC uses `-200`, or `65535` on the uint16 products), so it</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="sd">        carries over onto the mosaic. A tile that declares nothing passes</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">        Python `None` through, asking for no marker at all rather than</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a><span class="sd">        stamping one. Categorical products</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a><span class="sd">        reproject with nearest-neighbour (so class codes are never blended);</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="sd">        those with a curated legend also carry a</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="sd">        colour table + a `.legend.json` sidecar, while a legend-less categorical</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">        product (e.g. `GHS_BUILT_C_VEG`) still gets the safe NN resampling but</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">        no colour table or sidecar.</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">            tifs: The downloaded source `.tif` tiles (Mollweide or WGS84).</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">            rp: The `RemoteProduct` (its `metadata` carries `product`,</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">                `epoch`, `resolution`, `categorical`).</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">            pathlib.Path: The AOI-cropped GeoTIFF written under `self.path`.</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">                Returned without re-running the GIS pipeline when it already</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">                exists (idempotent, like the tile-level cache).</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.merge</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_rasters</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rp</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">resolution</span><span class="si">}</span><span class="s2">_epsg</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_epsg</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_complete</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_force</span><span class="p">):</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a>            <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>        <span class="n">categorical</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;categorical&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>        <span class="n">resampling</span> <span class="o">=</span> <span class="s2">&quot;nearest neighbor&quot;</span> <span class="k">if</span> <span class="n">categorical</span> <span class="k">else</span> <span class="s2">&quot;bilinear&quot;</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>        <span class="n">source_is_wgs84</span> <span class="o">=</span> <span class="n">native_source_crs</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;4326&quot;</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="n">reproject</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span><span class="n">source_is_wgs84</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_epsg</span> <span class="o">==</span> <span class="mi">4326</span><span class="p">)</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>        <span class="n">dst_crs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_epsg</span> <span class="k">if</span> <span class="n">reproject</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rp</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">_merged.tif&quot;</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>        <span class="c1"># Carry the first tile&#39;s own no-data marker onto the mosaic</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="c1"># explicitly -- None when it declares none, asking for no marker at</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>        <span class="c1"># all rather than a stray literal like the string &quot;none&quot;. GHSL&#39;s 0</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>        <span class="c1"># is an ordinary value (no population, no built-up surface), so an</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="c1"># unstamped mosaic must never fall back to it.</span>
 <a id="__codelineno-0-706" name="__codelineno-0-706"></a>        <span class="n">first_tile</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">tifs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <a id="__codelineno-0-707" name="__codelineno-0-707"></a>        <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-708" name="__codelineno-0-708"></a>            <span class="n">source_no_data</span> <span class="o">=</span> <span class="n">first_tile</span><span class="o">.</span><span class="n">no_data_value</span>
@@ -32732,7 +32732,7 @@ epochs).</p>
 <a id="__codelineno-0-720" name="__codelineno-0-720"></a>            <span class="n">dst</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">merged</span><span class="p">),</span>
 <a id="__codelineno-0-721" name="__codelineno-0-721"></a>            <span class="n">dst_crs</span><span class="o">=</span><span class="n">dst_crs</span><span class="p">,</span>
 <a id="__codelineno-0-722" name="__codelineno-0-722"></a>            <span class="n">resampling</span><span class="o">=</span><span class="n">resampling</span><span class="p">,</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="n">fill</span> <span class="k">if</span> <span class="n">fill</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="n">fill</span><span class="p">,</span>
 <a id="__codelineno-0-724" name="__codelineno-0-724"></a>        <span class="p">)</span>
 <a id="__codelineno-0-725" name="__codelineno-0-725"></a>
 <a id="__codelineno-0-726" name="__codelineno-0-726"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">merged</span><span class="p">))</span>
