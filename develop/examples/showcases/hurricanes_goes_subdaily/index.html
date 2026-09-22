@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24530,7 +24530,7 @@ the copy bundled with <code>imageio-ffmpeg</code> — so no separate install is 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">Animation</span><span class="p">,</span> <span class="n">FrameLabel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
@@ -24547,7 +24547,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from cleopatra.glyphs.gridded.array_glyph import FrameLabel
+from cleopatra.glyphs.gridded.array_glyph import Animation, FrameLabel
 from IPython.display import HTML
 from pyramids.dataset import Dataset, GeoReference
 from pyramids.dataset.collection import DatasetCollection
@@ -24793,8 +24793,9 @@ advances past frame 0 (see the code comment below).</p>
     <span class="n">label_location</span> <span class="o">=</span> <span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">north</span> <span class="o">+</span> <span class="mf">0.02</span> <span class="o">*</span> <span class="p">(</span><span class="n">north</span> <span class="o">-</span> <span class="n">south</span><span class="p">)]</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
         <span class="n">labels</span><span class="p">,</span>
-        <span class="n">interval</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
-        <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="n">label_location</span><span class="p">),</span>
+        <span class="n">playback</span><span class="o">=</span><span class="n">Animation</span><span class="p">(</span>
+            <span class="n">interval</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="n">label_location</span><span class="p">)</span>
+        <span class="p">),</span>
     <span class="p">)</span>
 
     <span class="c1"># Dress the frames as an ECMWF-style reference map in one call (cleopatra &gt;=0.22):</span>
@@ -24930,8 +24931,9 @@ for storm in STORMS:
     label_location = [west, north + 0.02 * (north - south)]
     glyph.animate(
         labels,
-        interval=250,
-        frame_label=FrameLabel(location=label_location),
+        playback=Animation(
+            interval=250, frame_label=FrameLabel(location=label_location)
+        ),
     )
 
     # Dress the frames as an ECMWF-style reference map in one call (cleopatra &gt;=0.22):

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24622,7 +24622,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleNamespace</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.patheffects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">patheffects</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -24631,7 +24630,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.primitives.line_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">LINE_DEFAULT_OPTIONS</span><span class="p">,</span> <span class="n">LineGlyph</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATA_STYLES</span><span class="p">,</span> <span class="n">resolve_colormap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_blank_canvas</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">stamp_mark</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
@@ -24665,7 +24663,6 @@ from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 
-import matplotlib.patheffects as patheffects
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -24674,7 +24671,6 @@ from cleopatra.glyphs.base.animation import gif_from_video
 from cleopatra.glyphs.primitives.line_glyph import LINE_DEFAULT_OPTIONS, LineGlyph
 from cleopatra.styling.colors import DATA_STYLES, resolve_colormap
 from cleopatra.styling.styles import apply_blank_canvas
-from cleopatra.styling.watermark import stamp_mark
 from IPython.display import HTML
 from loguru import logger
 from pyramids.dataset import Dataset, GeoReference
@@ -25004,47 +25000,6 @@ plt.show()</div>
     <span class="k">return</span> <span class="n">tif_paths</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">stamp_watermark</span><span class="p">(</span>
-    <span class="n">fig</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">"earthlens"</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">text_alpha</span><span class="o">=</span><span class="mf">0.65</span><span class="p">,</span> <span class="n">credit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">credit_alpha</span><span class="o">=</span><span class="mf">1.0</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">"""A soft, translucent diagonal 'earthlens' text watermark, plus a bottom credit line.</span>
-
-<span class="sd">    Plain semi-transparent white text with no outline -- an outline reads as a</span>
-<span class="sd">    solid caption rather than a watermark. The credit line keeps its stroke</span>
-<span class="sd">    since it has to stay legible as a small line of text against any frame</span>
-<span class="sd">    content. The corner brand mark from `stamp_mark` covers the logo itself.</span>
-<span class="sd">    """</span>
-    <span class="n">fig_w_in</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_size_inches</span><span class="p">()</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
-        <span class="mf">0.5</span><span class="p">,</span>
-        <span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">text</span><span class="p">,</span>
-        <span class="n">rotation</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span>
-        <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
-        <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
-        <span class="n">fontsize</span><span class="o">=</span><span class="n">fig_w_in</span> <span class="o">*</span> <span class="mi">6</span><span class="p">,</span>
-        <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span>
-        <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="o">=</span><span class="n">text_alpha</span><span class="p">,</span>
-        <span class="n">zorder</span><span class="o">=</span><span class="mi">1_000_000</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">credit</span><span class="p">:</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
-            <span class="mf">0.5</span><span class="p">,</span>
-            <span class="mf">0.014</span><span class="p">,</span>
-            <span class="n">credit</span><span class="p">,</span>
-            <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
-            <span class="n">va</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span>
-            <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span>
-            <span class="n">fontsize</span><span class="o">=</span><span class="mf">7.5</span><span class="p">,</span>
-            <span class="n">alpha</span><span class="o">=</span><span class="n">credit_alpha</span><span class="p">,</span>
-            <span class="n">zorder</span><span class="o">=</span><span class="mi">1_000_002</span><span class="p">,</span>
-            <span class="n">path_effects</span><span class="o">=</span><span class="p">[</span>
-                <span class="n">patheffects</span><span class="o">.</span><span class="n">withStroke</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">foreground</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
-            <span class="p">],</span>
-        <span class="p">)</span>
-
-
 <span class="k">def</span><span class="w"> </span><span class="nf">animate_sst_anomaly</span><span class="p">(</span><span class="n">tif_paths</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">extent</span><span class="p">,</span> <span class="n">gif_path</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Animate a temperature_anomaly-styled, dark-canvas map and save it as a GIF.</span>
 
@@ -25083,8 +25038,8 @@ plt.show()</div>
     <span class="c1"># Both bake their position from the figure's CURRENT size, so they must come</span>
     <span class="c1"># after set_dpi/layout and before save_animation, per stamp_mark's own docstring.</span>
     <span class="c1"># lower-left sits over open ocean, clear of the colorbar on the right edge.</span>
-    <span class="n">stamp_mark</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">LOGO</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.18</span><span class="p">,</span> <span class="n">corner</span><span class="o">=</span><span class="s2">"lower left"</span><span class="p">)</span>
-    <span class="n">stamp_watermark</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">credit</span><span class="o">=</span><span class="s2">"github.com/serapeum-org/earthlens"</span><span class="p">)</span>
+    <span class="n">glyph</span><span class="o">.</span><span class="n">stamp_mark</span><span class="p">(</span><span class="n">LOGO</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.18</span><span class="p">,</span> <span class="n">corner</span><span class="o">=</span><span class="s2">"lower left"</span><span class="p">)</span>
+    <span class="n">glyph</span><span class="o">.</span><span class="n">stamp_watermark</span><span class="p">(</span><span class="s2">"earthlens"</span><span class="p">,</span> <span class="n">credit</span><span class="o">=</span><span class="s2">"github.com/serapeum-org/earthlens"</span><span class="p">)</span>
     <span class="c1"># Render once to mp4 (yuv444p avoids the chroma subsampling that would</span>
     <span class="c1"># otherwise degrade a GIF derived from it) and derive the GIF from that file</span>
     <span class="c1"># rather than re-rendering the whole animation a second time -- exactly</span>
@@ -25230,47 +25185,6 @@ def pacific_mosaic_tifs(dates, west_bbox, east_bbox, out_dir, stride):
     return tif_paths
 
 
-def stamp_watermark(
-    fig, *, text="earthlens", angle=30, text_alpha=0.65, credit=None, credit_alpha=1.0
-):
-    """A soft, translucent diagonal 'earthlens' text watermark, plus a bottom credit line.
-
-    Plain semi-transparent white text with no outline -- an outline reads as a
-    solid caption rather than a watermark. The credit line keeps its stroke
-    since it has to stay legible as a small line of text against any frame
-    content. The corner brand mark from `stamp_mark` covers the logo itself.
-    """
-    fig_w_in, _ = fig.get_size_inches()
-    fig.text(
-        0.5,
-        0.5,
-        text,
-        rotation=angle,
-        ha="center",
-        va="center",
-        fontsize=fig_w_in * 6,
-        fontweight="bold",
-        color="white",
-        alpha=text_alpha,
-        zorder=1_000_000,
-    )
-    if credit:
-        fig.text(
-            0.5,
-            0.014,
-            credit,
-            ha="center",
-            va="bottom",
-            color="white",
-            fontsize=7.5,
-            alpha=credit_alpha,
-            zorder=1_000_002,
-            path_effects=[
-                patheffects.withStroke(linewidth=2, foreground="black", alpha=0.9)
-            ],
-        )
-
-
 def animate_sst_anomaly(tif_paths, labels, extent, gif_path, fps=5):
     """Animate a temperature_anomaly-styled, dark-canvas map and save it as a GIF.
 
@@ -25309,8 +25223,8 @@ def animate_sst_anomaly(tif_paths, labels, extent, gif_path, fps=5):
     # Both bake their position from the figure's CURRENT size, so they must come
     # after set_dpi/layout and before save_animation, per stamp_mark's own docstring.
     # lower-left sits over open ocean, clear of the colorbar on the right edge.
-    stamp_mark(glyph.fig, LOGO, frac=0.18, corner="lower left")
-    stamp_watermark(glyph.fig, credit="github.com/serapeum-org/earthlens")
+    glyph.stamp_mark(LOGO, frac=0.18, corner="lower left")
+    glyph.stamp_watermark("earthlens", credit="github.com/serapeum-org/earthlens")
     # Render once to mp4 (yuv444p avoids the chroma subsampling that would
     # otherwise degrade a GIF derived from it) and derive the GIF from that file
     # rather than re-rendering the whole animation a second time -- exactly

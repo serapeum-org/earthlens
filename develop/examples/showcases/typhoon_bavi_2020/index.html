@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24514,6 +24514,7 @@ embeds the GIF. Earth Engine needs a service account, read from the <code>GEE_SE
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">Animation</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -24532,6 +24533,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from IPython.display import HTML
+from cleopatra.glyphs.gridded.array_glyph import Animation
 from pyramids.dataset.collection import DatasetCollection
 
 from earthlens.core import EarthLens
@@ -24664,7 +24666,7 @@ GIF plays in any viewer with no JavaScript.</p>
 <span class="n">glyph</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">3200</span><span class="p">},</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">)</span>
 <span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>  <span class="c1"># stamp each frame with its date</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">playback</span><span class="o">=</span><span class="n">Animation</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">))</span>  <span class="c1"># stamp each frame with its date</span>
 
 <span class="n">gif_path</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"bavi_2020_timelapse.gif"</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span>
@@ -24679,7 +24681,7 @@ cube = DatasetCollection.from_files(paths)
 glyph = cube.plot(
     rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 3200}, figsize=(6, 5.5)
 )
-glyph.animate(labels, interval=350)  # stamp each frame with its date
+glyph.animate(labels, playback=Animation(interval=350))  # stamp each frame with its date
 
 gif_path = OUT / "bavi_2020_timelapse.gif"
 glyph.save_animation(

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24716,7 +24716,12 @@ sees at once.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.basemap.tiles</span><span class="w"> </span><span class="kn">import</span> <span class="n">world_texture</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.base.animation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gif_from_video</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.globe.textured_globe_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">TexturedGlobeGlyph</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">stamp_mark</span>
+
+<span class="c1"># stamp_mark moved to a glyph method in cleopatra 0.39, but this figure is</span>
+<span class="c1"># built entirely outside any cleopatra glyph (a hand-built matplotlib scene),</span>
+<span class="c1"># so there is no glyph to call .stamp_mark() on -- the private function is the</span>
+<span class="c1"># only route left until serapeum-org/cleopatra#371 lands.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">_stamp_mark</span> <span class="k">as</span> <span class="n">stamp_mark</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_rgba</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">MPath</span>  <span class="c1"># the glyph path; `Path` is pathlib's</span>
@@ -24774,7 +24779,12 @@ import numpy as np
 from cleopatra.basemap.tiles import world_texture
 from cleopatra.glyphs.base.animation import gif_from_video
 from cleopatra.glyphs.globe.textured_globe_glyph import TexturedGlobeGlyph
-from cleopatra.styling.watermark import stamp_mark
+
+# stamp_mark moved to a glyph method in cleopatra 0.39, but this figure is
+# built entirely outside any cleopatra glyph (a hand-built matplotlib scene),
+# so there is no glyph to call .stamp_mark() on -- the private function is the
+# only route left until serapeum-org/cleopatra#371 lands.
+from cleopatra.styling.watermark import _stamp_mark as stamp_mark
 from IPython.display import Image, display
 from matplotlib.colors import to_rgba
 from matplotlib.path import Path as MPath  # the glyph path; `Path` is pathlib's

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24591,8 +24591,7 @@ frames line up into an animation.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">stamp_mark</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">Animation</span><span class="p">,</span> <span class="n">FrameLabel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.patches</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circle</span><span class="p">,</span> <span class="n">FancyBboxPatch</span><span class="p">,</span> <span class="n">Wedge</span>
@@ -24615,8 +24614,7 @@ import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from cleopatra.glyphs.gridded.array_glyph import FrameLabel
-from cleopatra.styling.watermark import stamp_mark
+from cleopatra.glyphs.gridded.array_glyph import Animation, FrameLabel
 from IPython.display import Image, display
 from loguru import logger
 from matplotlib.patches import Circle, FancyBboxPatch, Wedge
@@ -25589,15 +25587,17 @@ _array_glyph.get_indices2 = _domain_cell_count</div>
 <span class="p">)</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
     <span class="n">labels</span><span class="p">,</span>
-    <span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>  <span class="c1"># slower playback</span>
-    <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">),</span>
+    <span class="c1"># slower playback</span>
+    <span class="n">playback</span><span class="o">=</span><span class="n">Animation</span><span class="p">(</span>
+        <span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="p">),</span>
     <span class="n">full_bleed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># `full_bleed` draws no title and no colorbar, so the frame label is the only text on the axes.</span>
 <span class="p">(</span><span class="n">label</span><span class="p">,)</span> <span class="o">=</span> <span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">texts</span>
 <span class="n">stamp_titles</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="s2">"GOES-19 · GOES-East"</span><span class="p">)</span>
-<span class="n">stamp_mark</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">BRAND_MARK</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="n">LOGO_MARGIN</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">))</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">stamp_mark</span><span class="p">(</span><span class="n">BRAND_MARK</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="n">LOGO_MARGIN</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">))</span>
 <span class="n">mp4</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_region.mp4"</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mp4</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">extra_args</span><span class="o">=</span><span class="p">[</span><span class="s2">"-vf"</span><span class="p">,</span> <span class="s2">"scale=1300:-2"</span><span class="p">])</span>
 <span class="n">gif</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_region.gif"</span><span class="p">)</span>
@@ -25619,15 +25619,17 @@ glyph = dc.plot(
 )
 glyph.animate(
     labels,
-    interval=350,  # slower playback
-    frame_label=FrameLabel(color="white", size=20),
+    # slower playback
+    playback=Animation(
+        interval=350, frame_label=FrameLabel(color="white", size=20)
+    ),
     full_bleed=True,
 )
 
 # `full_bleed` draws no title and no colorbar, so the frame label is the only text on the axes.
 (label,) = glyph.fig.axes[0].texts
 stamp_titles(glyph.fig, label, "GOES-19 · GOES-East")
-stamp_mark(glyph.fig, BRAND_MARK, frac=LOGO_FRAC, margin=(LOGO_MARGIN, LOGO_MARGIN_Y))
+glyph.stamp_mark(BRAND_MARK, frac=LOGO_FRAC, margin=(LOGO_MARGIN, LOGO_MARGIN_Y))
 mp4 = OUT / "eclipse_region.mp4"
 glyph.save_animation(str(mp4), fps=3, dpi=150, extra_args=["-vf", "scale=1300:-2"])
 gif = str(OUT / "eclipse_region.gif")
@@ -25693,15 +25695,16 @@ than the full globe can.</p>
 <span class="p">)</span>
 <span class="n">glyph_g</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
     <span class="n">labels_g</span><span class="p">,</span>
-    <span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
-    <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">18</span><span class="p">),</span>
+    <span class="n">playback</span><span class="o">=</span><span class="n">Animation</span><span class="p">(</span>
+        <span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+    <span class="p">),</span>
     <span class="n">full_bleed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># `full_bleed` draws no title and no colorbar, so the frame label is the only text on the axes.</span>
 <span class="p">(</span><span class="n">label_g</span><span class="p">,)</span> <span class="o">=</span> <span class="n">glyph_g</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">texts</span>
 <span class="n">stamp_titles</span><span class="p">(</span><span class="n">glyph_g</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">label_g</span><span class="p">,</span> <span class="s2">"GOES-19 · GOES-East"</span><span class="p">)</span>
-<span class="n">stamp_mark</span><span class="p">(</span><span class="n">glyph_g</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">BRAND_MARK</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="n">LOGO_MARGIN</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">))</span>
+<span class="n">glyph_g</span><span class="o">.</span><span class="n">stamp_mark</span><span class="p">(</span><span class="n">BRAND_MARK</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="n">LOGO_MARGIN</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">))</span>
 <span class="n">mp4g</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_globe.mp4"</span>
 <span class="n">glyph_g</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mp4g</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
 <span class="n">gif_g</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_globe.gif"</span><span class="p">)</span>
@@ -25721,15 +25724,16 @@ glyph_g = dcg.plot(
 )
 glyph_g.animate(
     labels_g,
-    interval=350,
-    frame_label=FrameLabel(color="white", size=18),
+    playback=Animation(
+        interval=350, frame_label=FrameLabel(color="white", size=18)
+    ),
     full_bleed=True,
 )
 
 # `full_bleed` draws no title and no colorbar, so the frame label is the only text on the axes.
 (label_g,) = glyph_g.fig.axes[0].texts
 stamp_titles(glyph_g.fig, label_g, "GOES-19 · GOES-East")
-stamp_mark(glyph_g.fig, BRAND_MARK, frac=LOGO_FRAC, margin=(LOGO_MARGIN, LOGO_MARGIN_Y))
+glyph_g.stamp_mark(BRAND_MARK, frac=LOGO_FRAC, margin=(LOGO_MARGIN, LOGO_MARGIN_Y))
 mp4g = OUT / "eclipse_globe.mp4"
 glyph_g.save_animation(str(mp4g), fps=3, dpi=150)
 gif_g = str(OUT / "eclipse_globe.gif")
