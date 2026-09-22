@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -13770,10 +13742,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#open-the-slab-as-labelled-xarray" class="md-nav__link">
+  <a href="#open-the-slab-as-labelled-pyramids" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Open the slab as labelled xarray
+        Open the slab as labelled pyramids
       
     </span>
   </a>
@@ -23808,10 +23780,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#open-the-slab-as-labelled-xarray" class="md-nav__link">
+  <a href="#open-the-slab-as-labelled-pyramids" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Open the slab as labelled xarray
+        Open the slab as labelled pyramids
       
     </span>
   </a>
@@ -24628,7 +24600,7 @@ client-side.</p>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Consolidate the imports up front. <code>pyramids</code> provides <code>NetCDF</code> (reading the
 downloaded slab); <code>earthlens</code> provides the unified <code>EarthLens</code> entry point and
-the CMEMS <code>Catalog</code>. <code>xarray</code> and <code>matplotlib</code> are used later for the
+the CMEMS <code>Catalog</code>. <code>pyramids</code> and <code>matplotlib</code> are used later for the
 depth-axis slicing and the plot.</p>
 </div>
 </div>
@@ -24656,7 +24628,8 @@ depth-axis slicing and the plot.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cmems</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
@@ -24666,7 +24639,8 @@ depth-axis slicing and the plot.</p>
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import xarray as xr
+import numpy as np
+import pandas as pd
 from pyramids.netcdf import NetCDF
 
 from earthlens.cmems import Catalog
@@ -24714,15 +24688,13 @@ it. These constants drive every cell below.</p>
 <span class="n">DATASET_ID</span> <span class="o">=</span> <span class="s1">'cmems_mod_glo_phy_my_0.083deg_P1D-m'</span>
 <span class="n">TARGET_DEPTHS_M</span> <span class="o">=</span> <span class="p">(</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">)</span>
 <span class="n">POINT_LAT</span><span class="p">,</span> <span class="n">POINT_LON</span> <span class="o">=</span> <span class="mf">35.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">25.0</span>  <span class="c1"># mid-Atlantic, off the Azores</span>
-<span class="n">BBOX</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">34.5</span><span class="p">,</span> <span class="mf">35.5</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">25.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">24.5</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">OUT_DIR = Path('data/cmems-glorys')
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 DATASET_ID = 'cmems_mod_glo_phy_my_0.083deg_P1D-m'
 TARGET_DEPTHS_M = (20.0, 100.0, 500.0)
-POINT_LAT, POINT_LON = 35.0, -25.0  # mid-Atlantic, off the Azores
-BBOX = dict(lat_lim=[34.5, 35.5], lon_lim=[-25.5, -24.5])</div>
+POINT_LAT, POINT_LON = 35.0, -25.0  # mid-Atlantic, off the Azores</div>
 </div>
 </div>
 </div>
@@ -24824,7 +24796,7 @@ credentials from the environment.</p>
     <span class="n">cadence</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET_ID</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'thetao'</span><span class="p">],</span>
-    <span class="o">**</span><span class="n">BBOX</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">25.5</span><span class="p">,</span> <span class="mf">34.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">24.5</span><span class="p">,</span> <span class="mf">35.5</span><span class="p">],</span>  <span class="c1"># 1-degree box on the Azores point (W, S, E, N)</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
     <span class="n">minimum_depth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
     <span class="n">maximum_depth</span><span class="o">=</span><span class="mf">500.0</span><span class="p">,</span>
@@ -24839,7 +24811,7 @@ credentials from the environment.</p>
     cadence='daily',
     dataset=DATASET_ID,
     variables=['thetao'],
-    **BBOX,
+    aoi=[-25.5, 34.5, -24.5, 35.5],  # 1-degree box on the Azores point (W, S, E, N)
     path=OUT_DIR,
     minimum_depth=0.0,
     maximum_depth=500.0,
@@ -24911,7 +24883,7 @@ central pixel.</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="open-the-slab-as-labelled-xarray">Open the slab as labelled xarray<a class="anchor-link" href="#open-the-slab-as-labelled-xarray">¶</a></h3><p>Read the NetCDF and convert it to an xarray dataset. <code>decode_cf</code> turns the CF
+<h3 id="open-the-slab-as-labelled-pyramids">Open the slab as labelled pyramids<a class="anchor-link" href="#open-the-slab-as-labelled-pyramids">¶</a></h3><p>Read the NetCDF and convert it to an pyramids dataset. <code>decode_cf</code> turns the CF
 "hours since 1950" time axis into <code>datetime64</code>, giving labelled
 <code>(time, depth, latitude, longitude)</code> axes.</p>
 </div>
@@ -24937,18 +24909,92 @@ central pixel.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="c1"># decode_cf turns the CF "hours since 1950" time axis into datetime64.</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">decode_cf</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">())</span>  <span class="c1"># labelled (time, depth, latitude, longitude)</span>
-<span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'dims:'</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'depth levels in slab:'</span><span class="p">,</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'depth'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'variables :'</span><span class="p">,</span> <span class="n">nc</span><span class="o">.</span><span class="n">variable_names</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'dimensions:'</span><span class="p">,</span> <span class="n">nc</span><span class="o">.</span><span class="n">dimension_sizes</span><span class="p">)</span>
+
+<span class="c1"># GLORYS12's 50-level grid, clipped here to the levels above 500 m. pyramids can</span>
+<span class="c1"># select a level positionally but cannot yet read a non-time coordinate's values,</span>
+<span class="c1"># so the slab's levels are named here (serapeum-org/pyramids#1125).</span>
+<span class="n">DEPTH_LEVELS_M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="mf">0.494</span><span class="p">,</span>
+        <span class="mf">1.541</span><span class="p">,</span>
+        <span class="mf">2.646</span><span class="p">,</span>
+        <span class="mf">3.819</span><span class="p">,</span>
+        <span class="mf">5.078</span><span class="p">,</span>
+        <span class="mf">6.441</span><span class="p">,</span>
+        <span class="mf">7.930</span><span class="p">,</span>
+        <span class="mf">9.573</span><span class="p">,</span>
+        <span class="mf">11.405</span><span class="p">,</span>
+        <span class="mf">13.467</span><span class="p">,</span>
+        <span class="mf">15.810</span><span class="p">,</span>
+        <span class="mf">18.496</span><span class="p">,</span>
+        <span class="mf">21.599</span><span class="p">,</span>
+        <span class="mf">25.211</span><span class="p">,</span>
+        <span class="mf">29.445</span><span class="p">,</span>
+        <span class="mf">34.434</span><span class="p">,</span>
+        <span class="mf">40.344</span><span class="p">,</span>
+        <span class="mf">47.374</span><span class="p">,</span>
+        <span class="mf">55.764</span><span class="p">,</span>
+        <span class="mf">65.807</span><span class="p">,</span>
+        <span class="mf">77.854</span><span class="p">,</span>
+        <span class="mf">92.326</span><span class="p">,</span>
+        <span class="mf">109.729</span><span class="p">,</span>
+        <span class="mf">130.666</span><span class="p">,</span>
+        <span class="mf">155.851</span><span class="p">,</span>
+        <span class="mf">186.126</span><span class="p">,</span>
+        <span class="mf">222.475</span><span class="p">,</span>
+        <span class="mf">266.040</span><span class="p">,</span>
+        <span class="mf">318.127</span><span class="p">,</span>
+        <span class="mf">380.213</span><span class="p">,</span>
+        <span class="mf">453.938</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'depth levels in slab:'</span><span class="p">,</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">DEPTH_LEVELS_M</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">nc = NetCDF.read_file(paths[0], read_only=True)
-# decode_cf turns the CF "hours since 1950" time axis into datetime64.
-ds = xr.decode_cf(nc.to_xarray())  # labelled (time, depth, latitude, longitude)
-nc.close()
-print('dims:', dict(ds.sizes))
-print('depth levels in slab:', [round(float(d), 1) for d in ds['depth'].values])</div>
+print('variables :', nc.variable_names)
+print('dimensions:', nc.dimension_sizes)
+
+# GLORYS12's 50-level grid, clipped here to the levels above 500 m. pyramids can
+# select a level positionally but cannot yet read a non-time coordinate's values,
+# so the slab's levels are named here (serapeum-org/pyramids#1125).
+DEPTH_LEVELS_M = np.array(
+    [
+        0.494,
+        1.541,
+        2.646,
+        3.819,
+        5.078,
+        6.441,
+        7.930,
+        9.573,
+        11.405,
+        13.467,
+        15.810,
+        18.496,
+        21.599,
+        25.211,
+        29.445,
+        34.434,
+        40.344,
+        47.374,
+        55.764,
+        65.807,
+        77.854,
+        92.326,
+        109.729,
+        130.666,
+        155.851,
+        186.126,
+        222.475,
+        266.040,
+        318.127,
+        380.213,
+        453.938,
+    ]
+)
+print('depth levels in slab:', [round(float(x), 1) for x in DEPTH_LEVELS_M])</div>
 </div>
 </div>
 </div>
@@ -24962,7 +25008,7 @@ print('depth levels in slab:', [round(float(d), 1) for d in ds['depth'].values])
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="select-the-point-and-the-three-nearest-levels">Select the point and the three nearest levels<a class="anchor-link" href="#select-the-point-and-the-three-nearest-levels">¶</a></h3><p>Take the nearest grid point to the target location, then the nearest model
-level to each target depth — xarray label-based selection handles the snapping.</p>
+level to each target depth — nearest-level selection handles the snapping.</p>
 </div>
 </div>
 </div>
@@ -24985,24 +25031,52 @@ level to each target depth — xarray label-based selection handles the snapping
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Nearest grid point to the target location, nearest model level to each</span>
-<span class="c1"># target depth — xarray label-based selection handles the snapping.</span>
-<span class="n">point</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'thetao'</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">POINT_LAT</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">POINT_LON</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'nearest'</span><span class="p">)</span>
-<span class="n">series</span> <span class="o">=</span> <span class="p">{</span><span class="n">d_m</span><span class="p">:</span> <span class="n">point</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">d_m</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'nearest'</span><span class="p">)</span> <span class="k">for</span> <span class="n">d_m</span> <span class="ow">in</span> <span class="n">TARGET_DEPTHS_M</span><span class="p">}</span>
-<span class="k">for</span> <span class="n">d_m</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># thetao is stored packed (int16 with a scale_factor and add_offset), so apply the</span>
+<span class="c1"># packing before any temperature is reported (serapeum-org/pyramids#1124).</span>
+<span class="n">thetao</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s1">'thetao'</span><span class="p">)</span>
+<span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">thetao</span><span class="o">.</span><span class="n">scale</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">thetao</span><span class="o">.</span><span class="n">offset</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">n_time</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">dimension_sizes</span><span class="p">[</span><span class="s1">'time'</span><span class="p">]</span>
+<span class="n">n_depth</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">dimension_sizes</span><span class="p">[</span><span class="s1">'depth'</span><span class="p">]</span>
+<span class="n">cube</span> <span class="o">=</span> <span class="n">thetao</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">offset</span>
+<span class="n">cube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_time</span><span class="p">,</span> <span class="n">n_depth</span><span class="p">,</span> <span class="n">thetao</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">thetao</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+<span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">thetao</span><span class="o">.</span><span class="n">rowcol</span><span class="p">(</span><span class="n">POINT_LON</span><span class="p">,</span> <span class="n">POINT_LAT</span><span class="p">)</span>  <span class="c1"># nearest cell from the geotransform</span>
+<span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">get_time_variable</span><span class="p">())</span>
+<span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="n">series</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">TARGET_DEPTHS_M</span><span class="p">:</span>
+    <span class="n">level</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">DEPTH_LEVELS_M</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">())</span>
+    <span class="n">series</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">=</span> <span class="n">cube</span><span class="p">[:,</span> <span class="n">level</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
     <span class="nb">print</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">d_m</span><span class="p">)</span><span class="si">:</span><span class="s1">&gt;4d</span><span class="si">}</span><span class="s1"> m -&gt; nearest level </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">"depth"</span><span class="p">])</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> m, '</span>
-        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">da</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s1"> daily values'</span>
+        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">:</span><span class="s1">&gt;4d</span><span class="si">}</span><span class="s1"> m -&gt; nearest level </span><span class="si">{</span><span class="n">DEPTH_LEVELS_M</span><span class="p">[</span><span class="n">level</span><span class="p">]</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> m, '</span>
+        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">series</span><span class="p">[</span><span class="n">target</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s1"> daily values'</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7"># Nearest grid point to the target location, nearest model level to each
-# target depth — xarray label-based selection handles the snapping.
-point = ds['thetao'].sel(latitude=POINT_LAT, longitude=POINT_LON, method='nearest')
-series = {d_m: point.sel(depth=d_m, method='nearest') for d_m in TARGET_DEPTHS_M}
-for d_m, da in series.items():
+<div class="clipboard-copy-txt" id="cell-7"># thetao is stored packed (int16 with a scale_factor and add_offset), so apply the
+# packing before any temperature is reported (serapeum-org/pyramids#1124).
+thetao = nc.get_variable('thetao')
+scale = float(np.asarray(thetao.scale)[0])
+offset = float(np.asarray(thetao.offset)[0])
+
+n_time = nc.dimension_sizes['time']
+n_depth = nc.dimension_sizes['depth']
+cube = thetao.read_array(masked=True).astype('float64') * scale + offset
+cube = cube.reshape(n_time, n_depth, thetao.rows, thetao.columns)
+
+row, col = thetao.rowcol(POINT_LON, POINT_LAT)  # nearest cell from the geotransform
+dates = pd.to_datetime(nc.get_time_variable())
+nc.close()
+
+series = {}
+for target in TARGET_DEPTHS_M:
+    level = int(np.abs(DEPTH_LEVELS_M - target).argmin())
+    series[target] = cube[:, level, row, col]
     print(
-        f'{int(d_m):&gt;4d} m -&gt; nearest level {float(da["depth"]):.1f} m, '
-        f'{da.size} daily values'
+        f'{int(target):&gt;4d} m -&gt; nearest level {DEPTH_LEVELS_M[level]:.1f} m, '
+        f'{series[target].count()} daily values'
     )</div>
 </div>
 </div>
@@ -25042,8 +25116,8 @@ is damped.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="k">for</span> <span class="n">d_m</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s1">'time'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">d_m</span><span class="p">)</span><span class="si">}</span><span class="s1"> m'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">d_m</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">series</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">d_m</span><span class="p">)</span><span class="si">}</span><span class="s1"> m'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Date (2020)'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Potential temperature (degrees_C)'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'GLORYS12 thetao at 35N, 25W (2020)'</span><span class="p">)</span>
@@ -25052,8 +25126,8 @@ is damped.</p>
 <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8">fig, ax = plt.subplots(figsize=(8, 4))
-for d_m, da in series.items():
-    ax.plot(da['time'].values, da.values, label=f'{int(d_m)} m')
+for d_m, values in series.items():
+    ax.plot(dates, values, label=f'{int(d_m)} m')
 ax.set_xlabel('Date (2020)')
 ax.set_ylabel('Potential temperature (degrees_C)')
 ax.set_title('GLORYS12 thetao at 35N, 25W (2020)')

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24455,15 +24427,21 @@ pop — exactly how a marine geologist would eyeball seafloor structure.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">colormaps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearSegmentedColormap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataStyle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColorBar</span><span class="p">,</span> <span class="n">ColorScaling</span><span class="p">,</span> <span class="n">DataStyle</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 
+import numpy as np
+from matplotlib import colormaps
+from matplotlib.colors import LinearSegmentedColormap
 from pyramids.dataset import Dataset
-from pyramids.plot import DataStyle
+from pyramids.plot import ColorBar, ColorScaling, DataStyle
 
 from earthlens.core import EarthLens</div>
 </div>
@@ -24568,13 +24546,19 @@ scaled rather than wildly exaggerated.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">source</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">'gist_earth'</span><span class="p">,</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">deep_blues</span> <span class="o">=</span> <span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span>
+    <span class="s1">'deep_blues'</span><span class="p">,</span> <span class="n">colormaps</span><span class="p">[</span><span class="s1">'Blues_r'</span><span class="p">](</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.82</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
+<span class="p">)</span>
+
+<span class="n">source</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="n">deep_blues</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="n">ColorScaling</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">gamma</span><span class="o">=</span><span class="mf">0.7</span><span class="p">),</span>
+    <span class="n">colorbar</span><span class="o">=</span><span class="n">ColorBar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'elevation (m relative to sea level)'</span><span class="p">),</span>
     <span class="n">data_style</span><span class="o">=</span><span class="n">DataStyle</span><span class="p">(</span>
         <span class="n">hillshade</span><span class="o">=</span><span class="p">{</span>
             <span class="s1">'azimuth'</span><span class="p">:</span> <span class="mi">315</span><span class="p">,</span>
             <span class="s1">'altitude'</span><span class="p">:</span> <span class="mi">45</span><span class="p">,</span>
-            <span class="s1">'vert_exag'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s1">'vert_exag'</span><span class="p">:</span> <span class="mf">30.0</span><span class="p">,</span>
             <span class="s1">'dx'</span><span class="p">:</span> <span class="mi">460</span><span class="p">,</span>
             <span class="s1">'dy'</span><span class="p">:</span> <span class="mi">460</span><span class="p">,</span>
             <span class="s1">'blend_mode'</span><span class="p">:</span> <span class="s1">'soft'</span><span class="p">,</span>
@@ -24583,13 +24567,19 @@ scaled rather than wildly exaggerated.</p>
     <span class="n">title</span><span class="o">=</span><span class="s1">'GEBCO 2020 shaded relief — Mid-Atlantic Ridge (Azores)'</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">source.plot(
-    cmap='gist_earth',
+<div class="clipboard-copy-txt" id="cell-3">deep_blues = LinearSegmentedColormap.from_list(
+    'deep_blues', colormaps['Blues_r'](np.linspace(0.0, 0.82, 256))
+)
+
+source.plot(
+    cmap=deep_blues,
+    color=ColorScaling.power(gamma=0.7),
+    colorbar=ColorBar(label='elevation (m relative to sea level)'),
     data_style=DataStyle(
         hillshade={
             'azimuth': 315,
             'altitude': 45,
-            'vert_exag': 1.0,
+            'vert_exag': 30.0,
             'dx': 460,
             'dy': 460,
             'blend_mode': 'soft',

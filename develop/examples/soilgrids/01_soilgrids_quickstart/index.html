@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24567,7 +24539,6 @@ written GeoTIFF; downloads go to a temporary directory next to this notebook.</p
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"soilgrids_"</span><span class="p">))</span>
-<span class="n">BBOX</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.0</span><span class="p">,</span> <span class="mf">51.5</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">])</span>  <span class="c1"># [south, north], [west, east]</span>
 <span class="n">NO_DATA</span> <span class="o">=</span> <span class="o">-</span><span class="mi">32768</span>  <span class="c1"># SoilGrids int16 no-data sentinel</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
@@ -24579,7 +24550,6 @@ from pyramids.dataset import Dataset, GeoReference
 from earthlens.core import EarthLens
 
 OUT_DIR = Path(tempfile.mkdtemp(prefix="soilgrids_"))
-BBOX = dict(lat_lim=[51.0, 51.5], lon_lim=[5.0, 5.5])  # [south, north], [west, east]
 NO_DATA = -32768  # SoilGrids int16 no-data sentinel</div>
 </div>
 </div>
@@ -24626,7 +24596,8 @@ GeoTIFF paths.</p>
     <span class="n">depths</span><span class="o">=</span><span class="p">[</span><span class="s2">"0-5cm"</span><span class="p">],</span>
     <span class="n">quantiles</span><span class="o">=</span><span class="p">[</span><span class="s2">"mean"</span><span class="p">],</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">BBOX</span><span class="p">,</span>
+    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.0</span><span class="p">,</span> <span class="mf">51.5</span><span class="p">],</span>  <span class="c1"># [south, north]</span>
+    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">],</span>  <span class="c1"># [west, east]</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 
 <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
@@ -24637,7 +24608,8 @@ GeoTIFF paths.</p>
     depths=["0-5cm"],
     quantiles=["mean"],
     path=OUT_DIR,
-    **BBOX,
+    lat_lim=[51.0, 51.5],  # [south, north]
+    lon_lim=[5.0, 5.5],  # [west, east]
 ).download()
 
 [p.name for p in paths]</div>

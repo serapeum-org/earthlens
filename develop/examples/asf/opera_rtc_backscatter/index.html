@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24834,13 +24806,36 @@ print(
     <span class="n">no_data_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
     <span class="n">geo_ref</span><span class="o">=</span><span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="p">),</span>
 <span class="p">)</span>
+
+<span class="c1"># The granule is a diagonal swath stored in a north-up grid, so most of the file is</span>
+<span class="c1"># nodata. Crop to the valid extent so the frame matches the acquisition.</span>
+<span class="n">band</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">db</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">db</span>
+<span class="n">rows_with_data</span><span class="p">,</span> <span class="n">cols_with_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">band</span><span class="p">))</span>
+<span class="n">x0</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">geotransform</span>
+<span class="n">valid_bbox</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">x0</span> <span class="o">+</span> <span class="n">cols_with_data</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span>
+    <span class="n">y0</span> <span class="o">+</span> <span class="p">(</span><span class="n">rows_with_data</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dy</span><span class="p">,</span>
+    <span class="n">x0</span> <span class="o">+</span> <span class="p">(</span><span class="n">cols_with_data</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span>
+    <span class="n">y0</span> <span class="o">+</span> <span class="n">rows_with_data</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">*</span> <span class="n">dy</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">backscatter</span> <span class="o">=</span> <span class="n">backscatter</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">valid_bbox</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'cropped to </span><span class="si">{</span><span class="n">backscatter</span><span class="o">.</span><span class="n">rows</span><span class="si">}</span><span class="s1"> x </span><span class="si">{</span><span class="n">backscatter</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s1"> over the valid swath'</span><span class="p">)</span>
+
+<span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">99.9</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'display range: </span><span class="si">{</span><span class="n">vmin</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> .. </span><span class="si">{</span><span class="n">vmax</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> dB'</span><span class="p">)</span>
+
 <span class="n">glyph</span> <span class="o">=</span> <span class="n">backscatter</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span>
-    <span class="n">vmin</span><span class="o">=-</span><span class="mi">25</span><span class="p">,</span>
-    <span class="n">vmax</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">'OPERA RTC-S1 VH backscatter</span><span class="se">\n</span><span class="si">{</span><span class="n">vh_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s1">'cividis'</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">'OPERA RTC-S1 VH backscatter — San Francisco Bay, June 2024'</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">'VH backscatter (dB)'</span><span class="p">)</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">'bottom'</span><span class="p">)</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_label_position</span><span class="p">(</span><span class="s1">'bottom'</span><span class="p">)</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">'easting (m, EPSG:</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'northing (m)'</span><span class="p">)</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">'#e8e8e8'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">arr = np.where(arr &gt; 0, arr, np.nan)  # mask non-positive samples
 db = 10 * np.log10(arr)
@@ -24850,13 +24845,36 @@ backscatter = Dataset.from_array(
     no_data_value=np.nan,
     geo_ref=GeoReference(geo=ds.geotransform, epsg=ds.epsg),
 )
+
+# The granule is a diagonal swath stored in a north-up grid, so most of the file is
+# nodata. Crop to the valid extent so the frame matches the acquisition.
+band = db[0] if db.ndim == 3 else db
+rows_with_data, cols_with_data = np.where(np.isfinite(band))
+x0, dx, _, y0, _, dy = ds.geotransform
+valid_bbox = [
+    x0 + cols_with_data.min() * dx,
+    y0 + (rows_with_data.max() + 1) * dy,
+    x0 + (cols_with_data.max() + 1) * dx,
+    y0 + rows_with_data.min() * dy,
+]
+backscatter = backscatter.crop(bbox=valid_bbox, epsg=ds.epsg)
+print(f'cropped to {backscatter.rows} x {backscatter.columns} over the valid swath')
+
+vmin, vmax = np.nanpercentile(db, [1, 99.9])
+print(f'display range: {vmin:.1f} .. {vmax:.1f} dB')
+
 glyph = backscatter.plot(
-    cmap='gray',
-    vmin=-25,
-    vmax=0,
-    title=f'OPERA RTC-S1 VH backscatter\n{vh_path.name}',
+    cmap='cividis',
+    vmin=vmin,
+    vmax=vmax,
+    title='OPERA RTC-S1 VH backscatter — San Francisco Bay, June 2024',
 )
-glyph.cbar.set_label('VH backscatter (dB)')</div>
+glyph.cbar.set_label('VH backscatter (dB)')
+glyph.ax.xaxis.set_ticks_position('bottom')
+glyph.ax.xaxis.set_label_position('bottom')
+glyph.ax.set_xlabel(f'easting (m, EPSG:{ds.epsg})')
+glyph.ax.set_ylabel('northing (m)')
+glyph.ax.set_facecolor('#e8e8e8')</div>
 </div>
 </div>
 </div>

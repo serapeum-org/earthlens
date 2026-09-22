@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24964,11 +24936,19 @@ a single cube of joules per square metre.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">agg</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aggregated"</span>
-<span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"surface_solar_radiation_downwards_1MS_*.tif"</span><span class="p">))</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+    <span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
+        <span class="s2">"surface_solar_radiation_downwards_reanalysis-era5-single-levels-monthly-means_1MS_*.tif"</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 <span class="n">joules_per_m2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">agg = OUT / "aggregated"
-paths = sorted(agg.glob("surface_solar_radiation_downwards_1MS_*.tif"))
+paths = sorted(
+    agg.glob(
+        "surface_solar_radiation_downwards_reanalysis-era5-single-levels-monthly-means_1MS_*.tif"
+    )
+)
 joules_per_m2 = np.stack([Dataset.read_file(p).read_array() for p in paths])</div>
 </div>
 </div>
