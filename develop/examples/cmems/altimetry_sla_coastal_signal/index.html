@@ -24854,8 +24854,9 @@ print(paths)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="box-averaged-sla-adt-time-series">Box-averaged SLA + ADT time-series<a class="anchor-link" href="#box-averaged-sla-adt-time-series">¶</a></h2><p>Read the downloaded cube with pyramids' <code>NetCDF</code>, then hand it to <code>pyramids</code>
-(via <code>decode_cf</code>) for labelled <code>(time, latitude, longitude)</code> access.</p>
+<h2 id="box-averaged-sla-adt-time-series">Box-averaged SLA + ADT time-series<a class="anchor-link" href="#box-averaged-sla-adt-time-series">¶</a></h2><p>Read the downloaded cube with pyramids' <code>NetCDF</code>, which reports the variable
+and dimension names; each variable's <code>(time, latitude, longitude)</code> array is
+then read out and averaged by hand in the next cell.</p>
 </div>
 </div>
 </div>
@@ -24922,14 +24923,14 @@ strong interannual signal.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># sla / adt are stored packed (int32 with a scale_factor); apply the packing before</span>
-<span class="c1"># averaging -- pyramids returns the raw store (serapeum-org/pyramids#1124).</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># sla / adt are stored packed (int32 with a scale_factor); NetCDF.read_array()</span>
+<span class="c1"># unpacks CF-packed data (scale_factor/add_offset) to physical units by default</span>
+<span class="c1"># as of pyramids 0.64.</span>
 <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">get_time_variable</span><span class="p">())</span>
 <span class="n">series</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">VARIABLES</span><span class="p">:</span>
     <span class="n">var</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">scale</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">offset</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">cube</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">offset</span>
+    <span class="n">cube</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)</span>
     <span class="n">series</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">cube</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
 <span class="n">sla_smoothed</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">series</span><span class="p">[</span><span class="s1">'sla'</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">dates</span><span class="p">)</span>
@@ -24941,14 +24942,14 @@ strong interannual signal.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span><span class="si">}</span><span class="s1"> daily values, </span><span class="si">{</span><span class="n">dates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">%Y-%m-%d</span><span class="si">}</span><span class="s1"> .. </span><span class="si">{</span><span class="n">dates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">%Y-%m-%d</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"SLA range: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">series</span><span class="p">[</span><span class="s1">'sla'</span><span class="p">])</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> .. </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">series</span><span class="p">[</span><span class="s1">'sla'</span><span class="p">])</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7"># sla / adt are stored packed (int32 with a scale_factor); apply the packing before
-# averaging -- pyramids returns the raw store (serapeum-org/pyramids#1124).
+<div class="clipboard-copy-txt" id="cell-7"># sla / adt are stored packed (int32 with a scale_factor); NetCDF.read_array()
+# unpacks CF-packed data (scale_factor/add_offset) to physical units by default
+# as of pyramids 0.64.
 dates = pd.to_datetime(nc.get_time_variable())
 series = {}
 for name in VARIABLES:
     var = nc.get_variable(name)
-    scale, offset = float(np.asarray(var.scale)[0]), float(np.asarray(var.offset)[0])
-    cube = var.read_array(masked=True).astype('float64') * scale + offset
+    cube = var.read_array(masked=True).astype('float64')
     series[name] = cube.reshape(cube.shape[0], -1).mean(axis=1).filled(np.nan)
 sla_smoothed = (
     pd.Series(series['sla'], index=dates)

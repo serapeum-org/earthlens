@@ -24522,8 +24522,13 @@ print(
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="hillshade">Hillshade<a class="anchor-link" href="#hillshade">¶</a></h2><p>Light from the NW (<code>azdeg=315</code>) at 45 degrees elevation; <code>dx</code>/<code>dy</code> are the
-approximate metres-per-pixel of a 15-arcsec grid so the relief is physically
-scaled rather than wildly exaggerated.</p>
+approximate metres-per-pixel of a 15-arcsec grid, giving the hillshade a
+physically correct horizontal scale. The vertical axis is a different story:
+<code>vert_exag=30.0</code> stretches depth 30x relative to that horizontal scale. This
+subset of the Mid-Atlantic Ridge is roughly 180 km across but only a few km
+deep (see the printed depth range above), so a literal <code>vert_exag=1.0</code> renders
+the seafloor as a nearly featureless plane — the 30x exaggeration is
+what makes the rift valley and transform faults read as relief at all.</p>
 </div>
 </div>
 </div>

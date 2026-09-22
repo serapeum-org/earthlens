@@ -24683,9 +24683,7 @@ GIF (which plays in any viewer — Jupyter, VS Code, GitHub, nbviewer — with n
 <span class="c1"># image's own top-left corner (baseline-anchored, so the glyphs render upward).</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
     <span class="n">timeline</span><span class="p">,</span>
-    <span class="n">playback</span><span class="o">=</span><span class="n">Animation</span><span class="p">(</span>
-        <span class="n">interval</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">])</span>
-    <span class="p">),</span>
+    <span class="n">playback</span><span class="o">=</span><span class="n">Animation</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">])),</span>
 <span class="p">)</span>
 
 <span class="n">gif_path</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"dubai_timelapse.gif"</span>
@@ -24707,9 +24705,7 @@ glyph = cube.plot(
 # image's own top-left corner (baseline-anchored, so the glyphs render upward).
 glyph.animate(
     timeline,
-    playback=Animation(
-        interval=500, frame_label=FrameLabel(location=[0, -10])
-    ),
+    playback=Animation(interval=500, frame_label=FrameLabel(location=[0, -10])),
 )
 
 gif_path = OUT / "dubai_timelapse.gif"

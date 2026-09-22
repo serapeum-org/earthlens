@@ -24596,8 +24596,8 @@ surface 0-10 m to keep the request small.</p>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Consolidate the imports up front. <code>pyramids</code> provides <code>NetCDF</code> (reading the
 downloaded file); <code>earthlens</code> provides the unified <code>EarthLens</code> entry point and
-the CMEMS <code>Catalog</code>. <code>pyramids</code> handles the calendar-aware monthly groupby and
-<code>matplotlib</code> the final plot.</p>
+the CMEMS <code>Catalog</code>. The monthly climatology below is a manual per-day/
+per-month average over <code>pandas</code>/<code>numpy</code>, and <code>matplotlib</code> draws the final plot.</p>
 </div>
 </div>
 </div>
@@ -24855,9 +24855,11 @@ print(paths)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="compute-the-box-averaged-monthly-climatology-for-each-variable">Compute the box-averaged monthly climatology for each variable<a class="anchor-link" href="#compute-the-box-averaged-monthly-climatology-for-each-variable">¶</a></h2><h3 id="read-the-netcdf-into-pyramids">Read the NetCDF into pyramids<a class="anchor-link" href="#read-the-netcdf-into-pyramids">¶</a></h3><p><code>decode_cf</code> turns the CF "hours since 1950" time axis into <code>datetime64</code> so
-pyramids's calendar-aware groupby works. The result is labelled
-<code>(time, depth, latitude, longitude)</code>.</p>
+<h2 id="compute-the-box-averaged-monthly-climatology-for-each-variable">Compute the box-averaged monthly climatology for each variable<a class="anchor-link" href="#compute-the-box-averaged-monthly-climatology-for-each-variable">¶</a></h2><h3 id="read-the-netcdf-into-pyramids">Read the NetCDF into pyramids<a class="anchor-link" href="#read-the-netcdf-into-pyramids">¶</a></h3><p><code>pd.to_datetime(nc.get_time_variable())</code> turns the CF "hours since 1950" time
+axis into <code>datetime64</code> timestamps, which the next cell groups into a monthly
+climatology with a manual per-day/per-month average (not a groupby). The
+cube itself is <code>(time, depth, latitude, longitude)</code>, reshaped by hand from
+the band-major layout <code>read_array</code> returns.</p>
 </div>
 </div>
 </div>

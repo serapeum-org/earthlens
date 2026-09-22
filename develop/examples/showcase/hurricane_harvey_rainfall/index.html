@@ -24779,8 +24779,11 @@ else:
         <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">total</span> <span class="o">=</span> <span class="n">values</span> <span class="k">if</span> <span class="n">total</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">total</span> <span class="o">+</span> <span class="n">values</span>
-        <span class="n">geo_ref</span> <span class="o">=</span> <span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">clipped</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">clipped</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
         <span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="c1"># Every granule shares the same crop box/grid, so the geo-reference only</span>
+    <span class="c1"># needs computing once -- from the last granule's clipped field, after</span>
+    <span class="c1"># the loop rather than on every iteration.</span>
+    <span class="n">geo_ref</span> <span class="o">=</span> <span class="n">GeoReference</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="n">clipped</span><span class="o">.</span><span class="n">geotransform</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">clipped</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">"storm-total rainfall: peak </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> mm "</span>
         <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">25.4</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> in) over the cropped box"</span>
@@ -24803,8 +24806,11 @@ if paths:
         if values.ndim == 3:
             values = values[0]
         total = values if total is None else total + values
-        geo_ref = GeoReference(geo=clipped.geotransform, epsg=clipped.epsg)
         nc.close()
+    # Every granule shares the same crop box/grid, so the geo-reference only
+    # needs computing once -- from the last granule's clipped field, after
+    # the loop rather than on every iteration.
+    geo_ref = GeoReference(geo=clipped.geotransform, epsg=clipped.epsg)
     print(
         f"storm-total rainfall: peak {float(total.max()):.0f} mm "
         f"({float(total.max()) / 25.4:.0f} in) over the cropped box"
@@ -24822,7 +24828,7 @@ if paths:
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="3-map-the-storm-total">3 · Map the storm total<a class="anchor-link" href="#3-map-the-storm-total">¶</a></h2><p>The heaviest accumulation sits over the Houston–Beaumont corridor, where Harvey's rainbands stalled for days.</p>
-<p>Note the scale. IMERG's 0.1° cells peak near <strong>860 mm</strong> over this box, while the figure usually quoted for Harvey — over 1.5 m — is a <em>point</em> total from rain gauges. A ~11 km grid cell averages that extreme away, so the two numbers are measuring different things rather than disagreeing.</p>
+<p>Note the scale. IMERG's 0.1° cells peak in the hundreds of mm over this box (re-verify against <code>float(total.max())</code>, printed above, on the next live run), while the figure usually quoted for Harvey — over 1.5 m — is a <em>point</em> total from rain gauges. A ~11 km grid cell averages that extreme away, so the two numbers are measuring different things rather than disagreeing.</p>
 </div>
 </div>
 </div>

@@ -13742,10 +13742,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#open-the-slab-as-labelled-pyramids" class="md-nav__link">
+  <a href="#open-the-slab-and-read-its-dimensions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Open the slab as labelled pyramids
+        Open the slab and read its dimensions
       
     </span>
   </a>
@@ -23780,10 +23780,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#open-the-slab-as-labelled-pyramids" class="md-nav__link">
+  <a href="#open-the-slab-and-read-its-dimensions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Open the slab as labelled pyramids
+        Open the slab and read its dimensions
       
     </span>
   </a>
@@ -24883,9 +24883,10 @@ central pixel.</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="open-the-slab-as-labelled-pyramids">Open the slab as labelled pyramids<a class="anchor-link" href="#open-the-slab-as-labelled-pyramids">¶</a></h3><p>Read the NetCDF and convert it to an pyramids dataset. <code>decode_cf</code> turns the CF
-"hours since 1950" time axis into <code>datetime64</code>, giving labelled
-<code>(time, depth, latitude, longitude)</code> axes.</p>
+<h3 id="open-the-slab-and-read-its-dimensions">Open the slab and read its dimensions<a class="anchor-link" href="#open-the-slab-and-read-its-dimensions">¶</a></h3><p>Read the NetCDF and inspect its variable and dimension names. The depth
+levels come from <code>NetCDF.get_dimension_values('depth')</code>; the
+<code>(time, depth, latitude, longitude)</code> cube itself is reshaped by hand from
+the band-major layout further down.</p>
 </div>
 </div>
 </div>
@@ -24912,88 +24913,20 @@ central pixel.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'variables :'</span><span class="p">,</span> <span class="n">nc</span><span class="o">.</span><span class="n">variable_names</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'dimensions:'</span><span class="p">,</span> <span class="n">nc</span><span class="o">.</span><span class="n">dimension_sizes</span><span class="p">)</span>
 
-<span class="c1"># GLORYS12's 50-level grid, clipped here to the levels above 500 m. pyramids can</span>
-<span class="c1"># select a level positionally but cannot yet read a non-time coordinate's values,</span>
-<span class="c1"># so the slab's levels are named here (serapeum-org/pyramids#1125).</span>
-<span class="n">DEPTH_LEVELS_M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-    <span class="p">[</span>
-        <span class="mf">0.494</span><span class="p">,</span>
-        <span class="mf">1.541</span><span class="p">,</span>
-        <span class="mf">2.646</span><span class="p">,</span>
-        <span class="mf">3.819</span><span class="p">,</span>
-        <span class="mf">5.078</span><span class="p">,</span>
-        <span class="mf">6.441</span><span class="p">,</span>
-        <span class="mf">7.930</span><span class="p">,</span>
-        <span class="mf">9.573</span><span class="p">,</span>
-        <span class="mf">11.405</span><span class="p">,</span>
-        <span class="mf">13.467</span><span class="p">,</span>
-        <span class="mf">15.810</span><span class="p">,</span>
-        <span class="mf">18.496</span><span class="p">,</span>
-        <span class="mf">21.599</span><span class="p">,</span>
-        <span class="mf">25.211</span><span class="p">,</span>
-        <span class="mf">29.445</span><span class="p">,</span>
-        <span class="mf">34.434</span><span class="p">,</span>
-        <span class="mf">40.344</span><span class="p">,</span>
-        <span class="mf">47.374</span><span class="p">,</span>
-        <span class="mf">55.764</span><span class="p">,</span>
-        <span class="mf">65.807</span><span class="p">,</span>
-        <span class="mf">77.854</span><span class="p">,</span>
-        <span class="mf">92.326</span><span class="p">,</span>
-        <span class="mf">109.729</span><span class="p">,</span>
-        <span class="mf">130.666</span><span class="p">,</span>
-        <span class="mf">155.851</span><span class="p">,</span>
-        <span class="mf">186.126</span><span class="p">,</span>
-        <span class="mf">222.475</span><span class="p">,</span>
-        <span class="mf">266.040</span><span class="p">,</span>
-        <span class="mf">318.127</span><span class="p">,</span>
-        <span class="mf">380.213</span><span class="p">,</span>
-        <span class="mf">453.938</span><span class="p">,</span>
-    <span class="p">]</span>
-<span class="p">)</span>
+<span class="c1"># GLORYS12's 50-level grid, clipped here to the levels above 500 m.</span>
+<span class="c1"># NetCDF.get_dimension_values reads any dimension's coordinate values directly</span>
+<span class="c1"># (added by pyramids serapeum-org/pyramids#1133, present since the 0.64.0 floor).</span>
+<span class="n">DEPTH_LEVELS_M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">get_dimension_values</span><span class="p">(</span><span class="s1">'depth'</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'depth levels in slab:'</span><span class="p">,</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">DEPTH_LEVELS_M</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">nc = NetCDF.read_file(paths[0], read_only=True)
 print('variables :', nc.variable_names)
 print('dimensions:', nc.dimension_sizes)
 
-# GLORYS12's 50-level grid, clipped here to the levels above 500 m. pyramids can
-# select a level positionally but cannot yet read a non-time coordinate's values,
-# so the slab's levels are named here (serapeum-org/pyramids#1125).
-DEPTH_LEVELS_M = np.array(
-    [
-        0.494,
-        1.541,
-        2.646,
-        3.819,
-        5.078,
-        6.441,
-        7.930,
-        9.573,
-        11.405,
-        13.467,
-        15.810,
-        18.496,
-        21.599,
-        25.211,
-        29.445,
-        34.434,
-        40.344,
-        47.374,
-        55.764,
-        65.807,
-        77.854,
-        92.326,
-        109.729,
-        130.666,
-        155.851,
-        186.126,
-        222.475,
-        266.040,
-        318.127,
-        380.213,
-        453.938,
-    ]
-)
+# GLORYS12's 50-level grid, clipped here to the levels above 500 m.
+# NetCDF.get_dimension_values reads any dimension's coordinate values directly
+# (added by pyramids serapeum-org/pyramids#1133, present since the 0.64.0 floor).
+DEPTH_LEVELS_M = np.asarray(nc.get_dimension_values('depth'))
 print('depth levels in slab:', [round(float(x), 1) for x in DEPTH_LEVELS_M])</div>
 </div>
 </div>
@@ -25031,15 +24964,13 @@ level to each target depth — nearest-level selection handles the snapping.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># thetao is stored packed (int16 with a scale_factor and add_offset), so apply the</span>
-<span class="c1"># packing before any temperature is reported (serapeum-org/pyramids#1124).</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># thetao is stored packed (int16 with a scale_factor and add_offset); NetCDF.read_array()</span>
+<span class="c1"># unpacks CF-packed data to physical units by default as of pyramids 0.64.</span>
 <span class="n">thetao</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s1">'thetao'</span><span class="p">)</span>
-<span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">thetao</span><span class="o">.</span><span class="n">scale</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">offset</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">thetao</span><span class="o">.</span><span class="n">offset</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
 
 <span class="n">n_time</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">dimension_sizes</span><span class="p">[</span><span class="s1">'time'</span><span class="p">]</span>
 <span class="n">n_depth</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">dimension_sizes</span><span class="p">[</span><span class="s1">'depth'</span><span class="p">]</span>
-<span class="n">cube</span> <span class="o">=</span> <span class="n">thetao</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">offset</span>
+<span class="n">cube</span> <span class="o">=</span> <span class="n">thetao</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)</span>
 <span class="n">cube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_time</span><span class="p">,</span> <span class="n">n_depth</span><span class="p">,</span> <span class="n">thetao</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">thetao</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
 
 <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">thetao</span><span class="o">.</span><span class="n">rowcol</span><span class="p">(</span><span class="n">POINT_LON</span><span class="p">,</span> <span class="n">POINT_LAT</span><span class="p">)</span>  <span class="c1"># nearest cell from the geotransform</span>
@@ -25055,15 +24986,13 @@ level to each target depth — nearest-level selection handles the snapping.</p>
         <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">series</span><span class="p">[</span><span class="n">target</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s1"> daily values'</span>
     <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7"># thetao is stored packed (int16 with a scale_factor and add_offset), so apply the
-# packing before any temperature is reported (serapeum-org/pyramids#1124).
+<div class="clipboard-copy-txt" id="cell-7"># thetao is stored packed (int16 with a scale_factor and add_offset); NetCDF.read_array()
+# unpacks CF-packed data to physical units by default as of pyramids 0.64.
 thetao = nc.get_variable('thetao')
-scale = float(np.asarray(thetao.scale)[0])
-offset = float(np.asarray(thetao.offset)[0])
 
 n_time = nc.dimension_sizes['time']
 n_depth = nc.dimension_sizes['depth']
-cube = thetao.read_array(masked=True).astype('float64') * scale + offset
+cube = thetao.read_array(masked=True).astype('float64')
 cube = cube.reshape(n_time, n_depth, thetao.rows, thetao.columns)
 
 row, col = thetao.rowcol(POINT_LON, POINT_LAT)  # nearest cell from the geotransform

@@ -24812,6 +24812,8 @@ print(
 <span class="n">band</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">db</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">db</span>
 <span class="n">rows_with_data</span><span class="p">,</span> <span class="n">cols_with_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">band</span><span class="p">))</span>
 <span class="n">x0</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">geotransform</span>
+<span class="c1"># Assumes a north-up geotransform (dy &lt; 0), true for this granule but not</span>
+<span class="c1"># safe to copy as a reusable helper without checking the sign of dy.</span>
 <span class="n">valid_bbox</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">x0</span> <span class="o">+</span> <span class="n">cols_with_data</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span>
     <span class="n">y0</span> <span class="o">+</span> <span class="p">(</span><span class="n">rows_with_data</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dy</span><span class="p">,</span>
@@ -24851,6 +24853,8 @@ backscatter = Dataset.from_array(
 band = db[0] if db.ndim == 3 else db
 rows_with_data, cols_with_data = np.where(np.isfinite(band))
 x0, dx, _, y0, _, dy = ds.geotransform
+# Assumes a north-up geotransform (dy &lt; 0), true for this granule but not
+# safe to copy as a reusable helper without checking the sign of dy.
 valid_bbox = [
     x0 + cols_with_data.min() * dx,
     y0 + (rows_with_data.max() + 1) * dy,

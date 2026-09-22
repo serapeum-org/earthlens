@@ -24892,10 +24892,9 @@ report the peak significant wave height as the storm passes.</p>
 <span class="n">stamps</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_time_variable</span><span class="p">(</span><span class="n">time_format</span><span class="o">=</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M'</span><span class="p">)</span>
 <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stamps</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'datetime64[m]'</span><span class="p">)</span>
 
-<span class="c1"># VHM0 is stored packed (int16 with a scale_factor), so apply the packing before</span>
-<span class="c1"># any number is reported -- pyramids returns the raw store (serapeum-org/pyramids#1124).</span>
-<span class="n">scale</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vhm0</span><span class="o">.</span><span class="n">scale</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vhm0</span><span class="o">.</span><span class="n">offset</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">cube</span> <span class="o">=</span> <span class="n">vhm0</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">offset</span>
+<span class="c1"># VHM0 is stored packed (int16 with a scale_factor); NetCDF.read_array() unpacks</span>
+<span class="c1"># CF-packed data to physical units by default as of pyramids 0.64.</span>
+<span class="n">cube</span> <span class="o">=</span> <span class="n">vhm0</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)</span>
 
 <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">vhm0</span><span class="o">.</span><span class="n">rowcol</span><span class="p">(</span>
     <span class="n">POINT_LON</span><span class="p">,</span> <span class="n">POINT_LAT</span>
@@ -24915,10 +24914,9 @@ report the peak significant wave height as the storm passes.</p>
 stamps = nc.get_time_variable(time_format='%Y-%m-%d %H:%M')
 times = np.array(stamps, dtype='datetime64[m]')
 
-# VHM0 is stored packed (int16 with a scale_factor), so apply the packing before
-# any number is reported -- pyramids returns the raw store (serapeum-org/pyramids#1124).
-scale, offset = float(np.asarray(vhm0.scale)[0]), float(np.asarray(vhm0.offset)[0])
-cube = vhm0.read_array(masked=True).astype('float64') * scale + offset
+# VHM0 is stored packed (int16 with a scale_factor); NetCDF.read_array() unpacks
+# CF-packed data to physical units by default as of pyramids 0.64.
+cube = vhm0.read_array(masked=True).astype('float64')
 
 row, col = vhm0.rowcol(
     POINT_LON, POINT_LAT
