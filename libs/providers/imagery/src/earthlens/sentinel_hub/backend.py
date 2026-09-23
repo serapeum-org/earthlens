@@ -652,11 +652,11 @@ class SentinelHub(AbstractDataSource):
 
         Splits the request bbox into ≤2500 px Process tiles, renders each tile,
         and mosaics them into one GeoTIFF per product with
-        `pyramids.dataset.merge.merge_rasters`. The mosaic inherits whatever
-        no-data the rendered tiles declare rather than `merge_rasters`' `0`
-        default, which would mask a legitimate zero (a dark pixel, a
-        zero-valued index); tiles that declare nothing send `"none"`, leaving
-        the mosaic without one. Tile temporaries are written under a
+        `pyramids.dataset.merge.merge_rasters`. `no_data_value` is passed
+        explicitly as the first tile's own marker, so a real value it
+        declares carries over; a tile that declares none passes Python
+        `None` through, which asks `merge_rasters` for no marker at all
+        rather than stamping one. Tile temporaries are written under a
         per-product subdirectory and removed after the merge.
 
         Args:
@@ -713,9 +713,9 @@ class SentinelHub(AbstractDataSource):
                 )
                 tile_paths.append(str(rendered))
             merged = Path(self.root_dir) / f"{safe_filename(product.id)}.tif"
-            # merge_rasters defaults no_data_value to 0, which would mask a
-            # legitimate zero (a dark pixel, a zero-valued index) and discard
-            # whatever the rendered tiles declare. Inherit theirs instead.
+            # Carry the first tile's own no-data marker onto the mosaic
+            # explicitly -- None when it declares none, asking for no marker
+            # at all rather than a stray literal like the string "none".
             first_tile = Dataset.read_file(tile_paths[0])
             try:
                 tile_no_data = first_tile.no_data_value
@@ -731,7 +731,7 @@ class SentinelHub(AbstractDataSource):
             merge_rasters(
                 tile_paths,
                 str(merged),
-                no_data_value=fill if fill is not None else "none",
+                no_data_value=fill,
             )
             shutil.rmtree(tile_dir, ignore_errors=True)
             out.append(merged)

@@ -467,51 +467,54 @@ class STAC(LazyClientMixin, AbstractDataSource):
         epsgs = {e for e in (_item_epsg(p.metadata["item"]) for p in group) if e}
         return sorted(epsgs)[0] if len(epsgs) > 1 else None
 
-    def _nodata_for(self, collection_key: str, assets: list[str]) -> float | int:
-        """Pick a dtype-safe no-data value for the mosaic/stack of a collection.
+    def _nodata_for(self, collection_key: str, assets: list[str]) -> Any:
+        """Pick the no-data marker for the mosaic/stack of a collection.
 
         Uses the catalog asset's `nodata` for the first requested asset that
-        declares one, else `0`. pyramids' default no-data (`-9999`) overflows
-        unsigned dtypes such as Sentinel-2's `uint16`, so a catalog-driven
-        (or `0`) value is passed to `merge_rasters` / `stack_bands` instead.
+        declares one. Otherwise returns pyramids' `INHERIT_NO_DATA`, so the
+        mosaic takes the marker the source rasters themselves declare. A
+        made-up `0` is wrong for a categorical band where `0` is a real class
+        (WOfS `water`: `0` is dry land), because a crop over an area that is
+        all `0` then finds no valid pixels. For a gap no source covers,
+        pyramids picks a marker that fits the band's dtype.
 
         Args:
             collection_key: The logical collection key.
             assets: The requested asset keys, in priority order.
 
         Returns:
-            The no-data value to write (catalog `nodata`, or `0`).
+            The catalog `nodata`, or pyramids' `INHERIT_NO_DATA` sentinel.
         """
+        from pyramids.dataset.merge import INHERIT_NO_DATA
+
         assert self._catalog is not None  # set in _initialize
         try:
             collection = self._catalog.get_collection(collection_key)
         except ValueError:
-            return 0
+            return INHERIT_NO_DATA
         for band in assets:
             asset = collection.assets.get(band)
             if asset is not None and asset.nodata is not None:
                 return asset.nodata
-        return 0
+        return INHERIT_NO_DATA
 
     def _stack_bands(
-        self, band_paths: list[Path], assets: list[str], nodata: float | int
+        self, band_paths: list[Path], assets: list[str], nodata: Any
     ) -> Any:
         """Stack per-band mosaics into one multiband `Dataset`.
 
         Delegates to pyramids' `stack_bands(align=True, no_data_value=…)`: same
         -resolution bands stack directly, and mixed-resolution bands (e.g.
         Sentinel-2 `red` 10 m + `swir16` 20 m) are resampled onto the **first**
-        requested band's grid. `no_data_value` is threaded through so the grid
-        template adopts a dtype-safe fill — pyramids' earlier `from_band_files`
-        default of -9999 overflowed unsigned dtypes such as `uint16`; that is
-        fixed upstream, so the previous `Dataset.align` + `from_array`
-        workaround is no longer needed.
+        requested band's grid. `no_data_value` is threaded through so the
+        output carries the marker chosen for the collection.
 
         Args:
             band_paths: One single-band mosaic per requested asset, in order.
             assets: The requested asset keys (used as band names); the first
                 also defines the output grid for mixed-resolution stacks.
-            nodata: The no-data value to stamp on the output.
+            nodata: The no-data marker: a catalog value, or the inherit
+                sentinel from :meth:`_nodata_for`.
 
         Returns:
             A pyramids `Dataset` with one band per `band_paths` entry.

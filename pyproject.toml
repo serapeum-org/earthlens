@@ -134,7 +134,7 @@ dev = [
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
     # runtime dep of earthlens itself.
-    "pyramids-gis[viz] >=0.59.0",
+    "pyramids-gis[viz] >=0.64.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -153,7 +153,7 @@ dev = [
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-gis[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
-    "cleopatra[tiles] >=0.35.0",
+    "cleopatra[tiles] >=0.39.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     # mypy: the `mypy` pre-commit hook and the lint.yml `static` job type-check src.
@@ -177,8 +177,10 @@ dev = [
     # out of the `all` extra (installing it activates engine="auto"), so it is
     # pulled in here instead -- otherwise the tests that pin its
     # `from_earthengine` signature would skip everywhere and a 0.x contract
-    # change would only surface on a live run.
-    "pyramids-eo >=0.8.0,<0.9",
+    # change would only surface on a live run. 0.8.1 is the floor because 0.8.0's
+    # tiled read passed no_data_value="none", which pyramids >= 0.61 rejects
+    # (pyramids-eo#111), so every tiled EEDAI read raised.
+    "pyramids-eo >=0.8.1,<0.9",
 ]
 # The eclipse showcase notebooks need the geostationary-imagery pieces of
 # pyramids-eo (read_fci_l1c, the composites, the viewing geometry) plus a few small
@@ -196,7 +198,7 @@ notebooks = [
     # reader still calls the removed `create_from_array`, so the EEDAI path raises
     # AttributeError against the pyramids floor this project now requires.
     # Also declared, at the same version, in `dev` -- see the comment there.
-    "pyramids-eo >=0.8.0,<0.9",
+    "pyramids-eo >=0.8.1,<0.9",
     # scipy: feathers the disc edge and softens the limb (ndimage.binary_erosion /
     # gaussian_filter).
     "scipy >=1.11",
@@ -223,12 +225,12 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.59.0",
+    "pyramids-gis[viz] >=0.64.0",
     # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-gis[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
-    "cleopatra[tiles] >=0.35.0",
+    "cleopatra[tiles] >=0.39.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
     # scipy: the satellite showcase blurs the logo's drop shadow with
