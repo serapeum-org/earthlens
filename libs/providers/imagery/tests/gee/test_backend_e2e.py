@@ -239,6 +239,12 @@ def test_live_srtm_eedai_matches_ee(tmp_path):
 @pytest.mark.skipif(
     not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
 )
+@pytest.mark.xfail(
+    strict=True,
+    raises=ValueError,
+    reason="pyramids-eo's _mosaic_tiles passes no_data_value='none', which "
+    "pyramids >= 0.61 rejects (serapeum-org/pyramids-eo#111)",
+)
 def test_live_srtm_tiled_read_matches_single_pass(tmp_path, monkeypatch):
     """A tiled EEDAI read returns the same raster as a single-pass one.
 
