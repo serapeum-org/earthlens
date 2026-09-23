@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "earthlens"
+abstract: "remote sensing package"
+authors:
+  - family-names: Farrag
+    given-names: Mostafa
+    email: moah.farag@gmail.com
+version: "0.24.0"
+date-released: 2026-09-08
+license: GPL-3.0
+repository-code: "https://github.com/serapeum-org/earthlens"
+url: "https://serapeum-org.github.io/earthlens/"
+keywords:
+  - "remote sensing"
+  - "ecmwf"
