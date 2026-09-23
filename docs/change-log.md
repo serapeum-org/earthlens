@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.25.0 (2026-09-23)
+
+### Feat
+
+- **base,providers**: adopt SummarisedLeaf in the remaining backend catalogs (#1187)
+
+### Fix
+
+- upgrade to pyramids 0.64 and cleopatra 0.39 and repair what the bump broke (#1197)
+
 ## 0.24.0 (2026-09-08)
 
 ### BREAKING CHANGE
