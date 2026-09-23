@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24566,12 +24538,7 @@ Copernicus (free, attribution — <a href="https://extwiki.eodc.eu/en/GFM">https
 
 <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <span class="n">gfm</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">COLLECTION</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="s2">"endpoint:"</span><span class="p">,</span>
-    <span class="n">cat</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="s2">"eodc"</span><span class="p">)</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
-    <span class="s2">"| signer:"</span><span class="p">,</span>
-    <span class="n">cat</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="s2">"eodc"</span><span class="p">)</span><span class="o">.</span><span class="n">signer</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"endpoint:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="s2">"eodc"</span><span class="p">),</span> <span class="s2">"|"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="s2">"eodc"</span><span class="p">)</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"resolves to:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">"eodc"</span><span class="p">,</span> <span class="n">COLLECTION</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"default asset:"</span><span class="p">,</span> <span class="n">gfm</span><span class="o">.</span><span class="n">default_assets</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"layers:"</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">gfm</span><span class="o">.</span><span class="n">assets</span><span class="p">))</span>
@@ -24583,12 +24550,7 @@ COLLECTION = "eodc/gfm"
 
 cat = Catalog()
 gfm = cat.get_collection(COLLECTION)
-print(
-    "endpoint:",
-    cat.get_endpoint("eodc").url,
-    "| signer:",
-    cat.get_endpoint("eodc").signer,
-)
+print("endpoint:", cat.get_endpoint("eodc"), "|", cat.get_endpoint("eodc").url)
 print("resolves to:", cat.resolve("eodc", COLLECTION))
 print("default asset:", gfm.default_assets)
 print("layers:", list(gfm.assets))</div>

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12615,34 +12615,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../examples/showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -23737,8 +23709,9 @@ NOAA WSR-88D network.</p>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">StationCatalog</span><span class="p">()</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>                       <span class="c1"># 210</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">cat</span><span class="o">.</span><span class="n">get_station</span><span class="p">(</span><span class="s2">&quot;KTLX&quot;</span><span class="p">)</span>                 <span class="c1"># Station(name=&#39;Oklahoma City&#39;, ...)</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">cat</span><span class="o">.</span><span class="n">in_bbox</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="o">-</span><span class="mi">95</span><span class="p">,</span> <span class="mi">37</span><span class="p">)</span>          <span class="c1"># [&#39;KFDR&#39;, &#39;KINX&#39;, &#39;KTLX&#39;, &#39;KVNX&#39;, ...]</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">cat</span><span class="o">.</span><span class="n">get_station</span><span class="p">(</span><span class="s2">&quot;KTLX&quot;</span><span class="p">)</span>                 <span class="c1"># Station(code=&#39;KTLX&#39;, name=&#39;Oklahoma City&#39;, ...)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nb">print</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">get_station</span><span class="p">(</span><span class="s2">&quot;KTLX&quot;</span><span class="p">))</span>          <span class="c1"># Station(KTLX, Oklahoma City, OK)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">cat</span><span class="o">.</span><span class="n">in_bbox</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="o">-</span><span class="mi">95</span><span class="p">,</span> <span class="mi">37</span><span class="p">)</span>          <span class="c1"># [&#39;KCRI&#39;, &#39;KFDR&#39;, &#39;KINX&#39;, &#39;KOUN&#39;, &#39;KTLX&#39;, ...]</span>
 </code></pre></div>
 <p><code>get_station</code> raises a <code>ValueError</code> with a did-you-mean hint for an
 unknown id, matching the other backends' catalogs.</p>

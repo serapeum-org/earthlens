@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24706,7 +24678,8 @@ band's units before issuing a download.</p>
 <span class="p">)</span>
 
 <span class="n">chirps</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'UCSB-CHG/CHIRPS/DAILY'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'CHIRPS: ee_type=</span><span class="si">{</span><span class="n">chirps</span><span class="o">.</span><span class="n">ee_type</span><span class="si">}</span><span class="s1">, cadence=</span><span class="si">{</span><span class="n">chirps</span><span class="o">.</span><span class="n">cadence</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">chirps</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  ee_type=</span><span class="si">{</span><span class="n">chirps</span><span class="o">.</span><span class="n">ee_type</span><span class="si">}</span><span class="s1">, cadence=</span><span class="si">{</span><span class="n">chirps</span><span class="o">.</span><span class="n">cadence</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  bands: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">chirps</span><span class="o">.</span><span class="n">bands</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">"  precipitation units: </span><span class="si">{</span><span class="n">catalog</span><span class="o">.</span><span class="n">get_band</span><span class="p">(</span><span class="s1">'UCSB-CHG/CHIRPS/DAILY'</span><span class="p">,</span><span class="w"> </span><span class="s1">'precipitation'</span><span class="p">)</span><span class="o">.</span><span class="n">units</span><span class="si">}</span><span class="s2">"</span>
@@ -24719,7 +24692,8 @@ print(
 )
 
 chirps = catalog.get_dataset('UCSB-CHG/CHIRPS/DAILY')
-print(f'CHIRPS: ee_type={chirps.ee_type}, cadence={chirps.cadence}')
+print(chirps)
+print(f'  ee_type={chirps.ee_type}, cadence={chirps.cadence}')
 print(f'  bands: {list(chirps.bands)}')
 print(
     f"  precipitation units: {catalog.get_band('UCSB-CHG/CHIRPS/DAILY', 'precipitation').units}"

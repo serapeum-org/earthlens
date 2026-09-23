@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24558,8 +24530,7 @@ abstraction — same request shape, different region, same <code>anonymous</code
 <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">ep</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"deafrica"</span><span class="p">,</span> <span class="s2">"dea"</span><span class="p">):</span>
     <span class="n">e</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">ep</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ep</span><span class="si">:</span><span class="s2">9</span><span class="si">}</span><span class="s2"> url=</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"          signer=</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">signer</span><span class="si">}</span><span class="s2">  region=</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">region</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n</span><span class="s2">          url=</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">"deafrica wofs default_assets:"</span><span class="p">,</span>
@@ -24574,8 +24545,7 @@ abstraction — same request shape, different region, same <code>anonymous</code
 cat = Catalog()
 for ep in ("deafrica", "dea"):
     e = cat.endpoints[ep]
-    print(f"{ep:9} url={e.url}")
-    print(f"          signer={e.signer}  region={e.region}")
+    print(f"{e}\n          url={e.url}")
 print()
 print(
     "deafrica wofs default_assets:",

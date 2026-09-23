@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12648,34 +12648,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24549,7 +24521,7 @@ series over this rainy reach produces.</p>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">Animation</span><span class="p">,</span> <span class="n">FrameLabel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATA_STYLES</span><span class="p">,</span> <span class="n">resolve_colormap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
@@ -24569,7 +24541,7 @@ import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
-from cleopatra.glyphs.gridded.array_glyph import FrameLabel
+from cleopatra.glyphs.gridded.array_glyph import Animation, FrameLabel
 from cleopatra.styling.colors import DATA_STYLES, resolve_colormap
 from IPython.display import Image, display
 from loguru import logger
@@ -24962,8 +24934,10 @@ else:
     <span class="p">)</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
         <span class="n">labels</span><span class="p">,</span>
-        <span class="n">interval</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
-        <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">72</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
+        <span class="n">playback</span><span class="o">=</span><span class="n">Animation</span><span class="p">(</span>
+            <span class="n">interval</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+            <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">72</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
+        <span class="p">),</span>
         <span class="n">full_bleed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">set_dpi</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span>  <span class="c1"># figsize*dpi -&gt; 1200 px</span>
@@ -24985,8 +24959,10 @@ else:
     )
     glyph.animate(
         labels,
-        interval=300,
-        frame_label=FrameLabel(location=[20, 72], color="white", size=30),
+        playback=Animation(
+            interval=300,
+            frame_label=FrameLabel(location=[20, 72], color="white", size=30),
+        ),
         full_bleed=True,
     )
     glyph.fig.set_dpi(150)  # figsize*dpi -&gt; 1200 px
@@ -25040,8 +25016,10 @@ else:
     <span class="n">glyph</span> <span class="o">=</span> <span class="n">dc_ndwi</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">water_cmap</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">full_bleed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
         <span class="n">labels</span><span class="p">,</span>
-        <span class="n">interval</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
-        <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">72</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
+        <span class="n">playback</span><span class="o">=</span><span class="n">Animation</span><span class="p">(</span>
+            <span class="n">interval</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+            <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">72</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
+        <span class="p">),</span>
         <span class="n">full_bleed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">set_dpi</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span>
@@ -25061,8 +25039,10 @@ else:
     glyph = dc_ndwi.plot(band=0, cmap=water_cmap, figsize=(8, 8), full_bleed=True)
     glyph.animate(
         labels,
-        interval=300,
-        frame_label=FrameLabel(location=[20, 72], color="white", size=30),
+        playback=Animation(
+            interval=300,
+            frame_label=FrameLabel(location=[20, 72], color="white", size=30),
+        ),
         full_bleed=True,
     )
     glyph.fig.set_dpi(150)

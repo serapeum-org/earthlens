@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24631,16 +24603,12 @@ a <code>flood_type=</code> request never has to guess. It also carries the pinne
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <span class="n">vocab</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span><span class="p">:</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_flood_type</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">description</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">flood_types</span><span class="p">()}</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s2">"HANZE </span><span class="si">{</span><span class="n">cat</span><span class="o">.</span><span class="n">record</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">  (Zenodo record </span><span class="si">{</span><span class="n">cat</span><span class="o">.</span><span class="n">record</span><span class="o">.</span><span class="n">record</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">cat</span><span class="o">.</span><span class="n">record</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2">)"</span>
-<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"HANZE </span><span class="si">{</span><span class="n">cat</span><span class="o">.</span><span class="n">record</span><span class="si">}</span><span class="s2">  (licence </span><span class="si">{</span><span class="n">cat</span><span class="o">.</span><span class="n">record</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">"flood_type"</span><span class="p">:</span> <span class="n">vocab</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">"description"</span><span class="p">:</span> <span class="n">vocab</span><span class="o">.</span><span class="n">values</span><span class="p">()})</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">cat = Catalog()
 vocab = {t: cat.get_flood_type(t).description for t in cat.flood_types()}
-print(
-    f"HANZE {cat.record.version}  (Zenodo record {cat.record.record}, {cat.record.license})"
-)
+print(f"HANZE {cat.record}  (licence {cat.record.license})")
 pd.DataFrame({"flood_type": vocab.keys(), "description": vocab.values()})</div>
 </div>
 </div>

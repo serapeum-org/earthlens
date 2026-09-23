@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12546,34 +12546,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24623,7 +24595,12 @@ even at half-scale the Sun barely fits.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.base.animation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gif_from_video</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">stamp_mark</span>
+
+<span class="c1"># stamp_mark moved to a glyph method in cleopatra 0.39, but this figure is</span>
+<span class="c1"># built entirely outside any cleopatra glyph (a hand-built matplotlib scene),</span>
+<span class="c1"># so there is no glyph to call .stamp_mark() on -- the private function is the</span>
+<span class="c1"># only route left until serapeum-org/cleopatra#371 lands.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">_stamp_mark</span> <span class="k">as</span> <span class="n">stamp_mark</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.patches</span><span class="w"> </span><span class="kn">import</span> <span class="n">FancyBboxPatch</span>
 
@@ -24670,7 +24647,12 @@ import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 import numpy as np
 from cleopatra.glyphs.base.animation import gif_from_video
-from cleopatra.styling.watermark import stamp_mark
+
+# stamp_mark moved to a glyph method in cleopatra 0.39, but this figure is
+# built entirely outside any cleopatra glyph (a hand-built matplotlib scene),
+# so there is no glyph to call .stamp_mark() on -- the private function is the
+# only route left until serapeum-org/cleopatra#371 lands.
+from cleopatra.styling.watermark import _stamp_mark as stamp_mark
 from IPython.display import Image, display
 from matplotlib.patches import FancyBboxPatch
 

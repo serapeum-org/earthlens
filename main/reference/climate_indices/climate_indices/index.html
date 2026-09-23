@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12938,34 +12938,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../examples/showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24498,13 +24470,7 @@ ids with :meth:<code>available</code>.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/climate_indices/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-157">157</a></span>
-<span class="normal"><a href="#__codelineno-0-158">158</a></span>
-<span class="normal"><a href="#__codelineno-0-159">159</a></span>
-<span class="normal"><a href="#__codelineno-0-160">160</a></span>
-<span class="normal"><a href="#__codelineno-0-161">161</a></span>
-<span class="normal"><a href="#__codelineno-0-162">162</a></span>
-<span class="normal"><a href="#__codelineno-0-163">163</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-163">163</a></span>
 <span class="normal"><a href="#__codelineno-0-164">164</a></span>
 <span class="normal"><a href="#__codelineno-0-165">165</a></span>
 <span class="normal"><a href="#__codelineno-0-166">166</a></span>
@@ -24593,102 +24559,108 @@ ids with :meth:<code>available</code>.</p>
 <span class="normal"><a href="#__codelineno-0-249">249</a></span>
 <span class="normal"><a href="#__codelineno-0-250">250</a></span>
 <span class="normal"><a href="#__codelineno-0-251">251</a></span>
-<span class="normal"><a href="#__codelineno-0-252">252</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Index</span><span class="p">]):</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Index catalogue for the climate-indices backend.</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    Reads the bundled `climate_indices_data_catalog.yaml` (shipped as</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    package data) and exposes its `datasets:` block as a map of</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">    :class:`Index` rows keyed by index id. Instantiate with no arguments</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">    (`Catalog()`). Resolve one row with :meth:`get`, or list the shipped</span>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">    ids with :meth:`available`.</span>
+<span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
+<span class="normal"><a href="#__codelineno-0-258">258</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Index</span><span class="p">]):</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Index catalogue for the climate-indices backend.</span>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">        datasets: Map from index id to its :class:`Index` row.</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">        - Resolve a row and read its dialect:</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">            &gt;&gt;&gt; from earthlens.climate_indices import Catalog</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            &gt;&gt;&gt; cat.get(&quot;oni&quot;).dialect in {&quot;psl&quot;, &quot;climexp&quot;}</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            True</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">            &gt;&gt;&gt; &quot;amo&quot; in cat.available()</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            True</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        - An unknown but close id raises with a did-you-mean hint:</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            &gt;&gt;&gt; from earthlens.climate_indices import Catalog</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;noo&quot;)</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">            ValueError: &#39;noo&#39; is not in the climate-indices catalog. Known indices: [...]. Did you mean &#39;nao&#39;?</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;climate-indices catalog&quot;</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;indices&quot;</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    Reads the bundled `climate_indices_data_catalog.yaml` (shipped as</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">    package data) and exposes its `datasets:` block as a map of</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    :class:`Index` rows keyed by index id. Instantiate with no arguments</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    (`Catalog()`). Resolve one row with :meth:`get`, or list the shipped</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    ids with :meth:`available`.</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        datasets: Map from index id to its :class:`Index` row.</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        - Resolve a row and read its dialect:</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            &gt;&gt;&gt; from earthlens.climate_indices import Catalog</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            &gt;&gt;&gt; cat.get(&quot;oni&quot;).dialect in {&quot;psl&quot;, &quot;climexp&quot;}</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            True</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            &gt;&gt;&gt; &quot;amo&quot; in cat.available()</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            True</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        - An unknown but close id raises with a did-you-mean hint:</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            &gt;&gt;&gt; from earthlens.climate_indices import Catalog</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;noo&quot;)</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            ValueError: &#39;noo&#39; is not in the climate-indices catalog. Known indices: [...]. Did you mean &#39;nao&#39;?</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a>    <span class="c1">#: The index rows live in the base :attr:`datasets` field so the</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a>    <span class="c1">#: inherited dict surface (`len`, `in`, `[]`, iteration) and</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="c1">#: :meth:`get_dataset`&#39;s did-you-mean hint work unchanged.</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Index</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_autoload</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the bundled catalog from disk.</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">            dict[str, Any]: The `datasets` read from</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">                the bundled catalog.</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span><span class="p">}</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;climate-indices catalog&quot;</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;indices&quot;</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="c1">#: The index rows live in the base :attr:`datasets` field so the</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="c1">#: inherited dict surface (`len`, `in`, `[]`, iteration) and</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="c1">#: :meth:`get_dataset`&#39;s did-you-mean hint work unchanged.</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Index</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_autoload</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the bundled catalog from disk.</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the climate-indices catalogue from disk.</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            ValueError: If the file has no `datasets:` block, or a row</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">                fails validation.</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its :class:`Index` row.</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown id.</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            dict[str, Any]: The `datasets` read from</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">                the bundled catalog.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span><span class="p">}</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the climate-indices catalogue from disk.</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">            ValueError: If the file has no `datasets:` block, or a row</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">                fails validation.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            index_id: A shipped index id (`&quot;oni&quot;`, `&quot;nao&quot;`, …).</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its :class:`Index` row.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">            Index: The matching catalogue row.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            ValueError: If `index_id` is not a known index; the message</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">                adds a did-you-mean hint.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">index_id</span><span class="p">))</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped index ids.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            list[str]: Every catalogue key, sorted.</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            index_id: A shipped index id (`&quot;oni&quot;`, `&quot;nao&quot;`, …).</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            Index: The matching catalogue row.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ValueError: If `index_id` is not a known index; the message</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">                adds a did-you-mean hint.</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">index_id</span><span class="p">))</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped index ids.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            list[str]: Every catalogue key, sorted.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24744,19 +24716,19 @@ ids with :meth:<code>available</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/climate_indices/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span>
-<span class="normal"><a href="#__codelineno-0-248">248</a></span>
-<span class="normal"><a href="#__codelineno-0-249">249</a></span>
-<span class="normal"><a href="#__codelineno-0-250">250</a></span>
-<span class="normal"><a href="#__codelineno-0-251">251</a></span>
-<span class="normal"><a href="#__codelineno-0-252">252</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped index ids.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        list[str]: Every catalogue key, sorted.</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
+<span class="normal"><a href="#__codelineno-0-258">258</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped index ids.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        list[str]: Every catalogue key, sorted.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24860,13 +24832,7 @@ adds a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/climate_indices/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-227">227</a></span>
-<span class="normal"><a href="#__codelineno-0-228">228</a></span>
-<span class="normal"><a href="#__codelineno-0-229">229</a></span>
-<span class="normal"><a href="#__codelineno-0-230">230</a></span>
-<span class="normal"><a href="#__codelineno-0-231">231</a></span>
-<span class="normal"><a href="#__codelineno-0-232">232</a></span>
-<span class="normal"><a href="#__codelineno-0-233">233</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
 <span class="normal"><a href="#__codelineno-0-235">235</a></span>
 <span class="normal"><a href="#__codelineno-0-236">236</a></span>
@@ -24877,24 +24843,30 @@ adds a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-241">241</a></span>
 <span class="normal"><a href="#__codelineno-0-242">242</a></span>
 <span class="normal"><a href="#__codelineno-0-243">243</a></span>
-<span class="normal"><a href="#__codelineno-0-244">244</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its :class:`Index` row.</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown id.</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        index_id: A shipped index id (`&quot;oni&quot;`, `&quot;nao&quot;`, …).</span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span>
+<span class="normal"><a href="#__codelineno-0-245">245</a></span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span>
+<span class="normal"><a href="#__codelineno-0-250">250</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its :class:`Index` row.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        Index: The matching catalogue row.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        ValueError: If `index_id` is not a known index; the message</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            adds a did-you-mean hint.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">index_id</span><span class="p">))</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        index_id: A shipped index id (`&quot;oni&quot;`, `&quot;nao&quot;`, …).</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        Index: The matching catalogue row.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        ValueError: If `index_id` is not a known index; the message</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            adds a did-you-mean hint.</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">index_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25000,13 +24972,7 @@ fails validation.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/climate_indices/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-209">209</a></span>
-<span class="normal"><a href="#__codelineno-0-210">210</a></span>
-<span class="normal"><a href="#__codelineno-0-211">211</a></span>
-<span class="normal"><a href="#__codelineno-0-212">212</a></span>
-<span class="normal"><a href="#__codelineno-0-213">213</a></span>
-<span class="normal"><a href="#__codelineno-0-214">214</a></span>
-<span class="normal"><a href="#__codelineno-0-215">215</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-215">215</a></span>
 <span class="normal"><a href="#__codelineno-0-216">216</a></span>
 <span class="normal"><a href="#__codelineno-0-217">217</a></span>
 <span class="normal"><a href="#__codelineno-0-218">218</a></span>
@@ -25016,23 +24982,29 @@ fails validation.</p>
 <span class="normal"><a href="#__codelineno-0-222">222</a></span>
 <span class="normal"><a href="#__codelineno-0-223">223</a></span>
 <span class="normal"><a href="#__codelineno-0-224">224</a></span>
-<span class="normal"><a href="#__codelineno-0-225">225</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the climate-indices catalogue from disk.</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        ValueError: If the file has no `datasets:` block, or a row</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">            fails validation.</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span>
+<span class="normal"><a href="#__codelineno-0-226">226</a></span>
+<span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the climate-indices catalogue from disk.</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        ValueError: If the file has no `datasets:` block, or a row</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            fails validation.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26434,7 +26406,7 @@ window; an empty (schema-only) frame when nothing matched.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.SummarisedLeaf&lt;/code&gt;" href="../../base/catalog-api/#earthlens.base.SummarisedLeaf">SummarisedLeaf</a></code></p>
 
 
 
@@ -26592,7 +26564,13 @@ joined with the per-row <code>file</code>).</p>
 <span class="normal"><a href="#__codelineno-0-151">151</a></span>
 <span class="normal"><a href="#__codelineno-0-152">152</a></span>
 <span class="normal"><a href="#__codelineno-0-153">153</a></span>
-<span class="normal"><a href="#__codelineno-0-154">154</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="k">class</span><span class="w"> </span><span class="nc">Index</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-154">154</a></span>
+<span class="normal"><a href="#__codelineno-0-155">155</a></span>
+<span class="normal"><a href="#__codelineno-0-156">156</a></span>
+<span class="normal"><a href="#__codelineno-0-157">157</a></span>
+<span class="normal"><a href="#__codelineno-0-158">158</a></span>
+<span class="normal"><a href="#__codelineno-0-159">159</a></span>
+<span class="normal"><a href="#__codelineno-0-160">160</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="k">class</span><span class="w"> </span><span class="nc">Index</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One climate-index catalogue row.</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    The index id is the parent key in :attr:`Catalog.datasets`; the row</span>
@@ -26626,14 +26604,20 @@ joined with the per-row <code>file</code>).</p>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a>    <span class="n">source</span><span class="p">:</span> <span class="n">Source</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a>    <span class="n">dialect</span><span class="p">:</span> <span class="n">Dialect</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="n">long_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a>    <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a>    <span class="n">citation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="n">_summary_fields</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a>        <span class="s2">&quot;long_name&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a>        <span class="s2">&quot;units&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a>        <span class="s2">&quot;source&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a>    <span class="p">)</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a>    <span class="n">source</span><span class="p">:</span> <span class="n">Source</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a>    <span class="n">dialect</span><span class="p">:</span> <span class="n">Dialect</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a>    <span class="n">long_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a>    <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a>    <span class="n">citation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -28595,13 +28579,7 @@ ids with :meth:<code>available</code>.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/climate_indices/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-157">157</a></span>
-<span class="normal"><a href="#__codelineno-0-158">158</a></span>
-<span class="normal"><a href="#__codelineno-0-159">159</a></span>
-<span class="normal"><a href="#__codelineno-0-160">160</a></span>
-<span class="normal"><a href="#__codelineno-0-161">161</a></span>
-<span class="normal"><a href="#__codelineno-0-162">162</a></span>
-<span class="normal"><a href="#__codelineno-0-163">163</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-163">163</a></span>
 <span class="normal"><a href="#__codelineno-0-164">164</a></span>
 <span class="normal"><a href="#__codelineno-0-165">165</a></span>
 <span class="normal"><a href="#__codelineno-0-166">166</a></span>
@@ -28690,102 +28668,108 @@ ids with :meth:<code>available</code>.</p>
 <span class="normal"><a href="#__codelineno-0-249">249</a></span>
 <span class="normal"><a href="#__codelineno-0-250">250</a></span>
 <span class="normal"><a href="#__codelineno-0-251">251</a></span>
-<span class="normal"><a href="#__codelineno-0-252">252</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Index</span><span class="p">]):</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Index catalogue for the climate-indices backend.</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    Reads the bundled `climate_indices_data_catalog.yaml` (shipped as</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    package data) and exposes its `datasets:` block as a map of</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">    :class:`Index` rows keyed by index id. Instantiate with no arguments</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">    (`Catalog()`). Resolve one row with :meth:`get`, or list the shipped</span>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">    ids with :meth:`available`.</span>
+<span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
+<span class="normal"><a href="#__codelineno-0-258">258</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Index</span><span class="p">]):</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Index catalogue for the climate-indices backend.</span>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">        datasets: Map from index id to its :class:`Index` row.</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">        - Resolve a row and read its dialect:</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">            &gt;&gt;&gt; from earthlens.climate_indices import Catalog</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            &gt;&gt;&gt; cat.get(&quot;oni&quot;).dialect in {&quot;psl&quot;, &quot;climexp&quot;}</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            True</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">            &gt;&gt;&gt; &quot;amo&quot; in cat.available()</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            True</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        - An unknown but close id raises with a did-you-mean hint:</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            &gt;&gt;&gt; from earthlens.climate_indices import Catalog</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;noo&quot;)</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">            ValueError: &#39;noo&#39; is not in the climate-indices catalog. Known indices: [...]. Did you mean &#39;nao&#39;?</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;climate-indices catalog&quot;</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;indices&quot;</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    Reads the bundled `climate_indices_data_catalog.yaml` (shipped as</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">    package data) and exposes its `datasets:` block as a map of</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    :class:`Index` rows keyed by index id. Instantiate with no arguments</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    (`Catalog()`). Resolve one row with :meth:`get`, or list the shipped</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    ids with :meth:`available`.</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        datasets: Map from index id to its :class:`Index` row.</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        - Resolve a row and read its dialect:</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            &gt;&gt;&gt; from earthlens.climate_indices import Catalog</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            &gt;&gt;&gt; cat.get(&quot;oni&quot;).dialect in {&quot;psl&quot;, &quot;climexp&quot;}</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            True</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            &gt;&gt;&gt; &quot;amo&quot; in cat.available()</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            True</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        - An unknown but close id raises with a did-you-mean hint:</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            &gt;&gt;&gt; from earthlens.climate_indices import Catalog</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;noo&quot;)</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            ValueError: &#39;noo&#39; is not in the climate-indices catalog. Known indices: [...]. Did you mean &#39;nao&#39;?</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a>    <span class="c1">#: The index rows live in the base :attr:`datasets` field so the</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a>    <span class="c1">#: inherited dict surface (`len`, `in`, `[]`, iteration) and</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="c1">#: :meth:`get_dataset`&#39;s did-you-mean hint work unchanged.</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Index</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_autoload</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the bundled catalog from disk.</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">            dict[str, Any]: The `datasets` read from</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">                the bundled catalog.</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span><span class="p">}</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;climate-indices catalog&quot;</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;indices&quot;</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="c1">#: The index rows live in the base :attr:`datasets` field so the</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="c1">#: inherited dict surface (`len`, `in`, `[]`, iteration) and</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="c1">#: :meth:`get_dataset`&#39;s did-you-mean hint work unchanged.</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Index</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_autoload</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the bundled catalog from disk.</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the climate-indices catalogue from disk.</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            ValueError: If the file has no `datasets:` block, or a row</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">                fails validation.</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its :class:`Index` row.</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown id.</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            dict[str, Any]: The `datasets` read from</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">                the bundled catalog.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span><span class="p">}</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the climate-indices catalogue from disk.</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">            ValueError: If the file has no `datasets:` block, or a row</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">                fails validation.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            index_id: A shipped index id (`&quot;oni&quot;`, `&quot;nao&quot;`, …).</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its :class:`Index` row.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">            Index: The matching catalogue row.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            ValueError: If `index_id` is not a known index; the message</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">                adds a did-you-mean hint.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">index_id</span><span class="p">))</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped index ids.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            list[str]: Every catalogue key, sorted.</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            index_id: A shipped index id (`&quot;oni&quot;`, `&quot;nao&quot;`, …).</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            Index: The matching catalogue row.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ValueError: If `index_id` is not a known index; the message</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">                adds a did-you-mean hint.</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">index_id</span><span class="p">))</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped index ids.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            list[str]: Every catalogue key, sorted.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -28841,19 +28825,19 @@ ids with :meth:<code>available</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/climate_indices/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span>
-<span class="normal"><a href="#__codelineno-0-248">248</a></span>
-<span class="normal"><a href="#__codelineno-0-249">249</a></span>
-<span class="normal"><a href="#__codelineno-0-250">250</a></span>
-<span class="normal"><a href="#__codelineno-0-251">251</a></span>
-<span class="normal"><a href="#__codelineno-0-252">252</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped index ids.</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        list[str]: Every catalogue key, sorted.</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
+<span class="normal"><a href="#__codelineno-0-258">258</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sorted list of shipped index ids.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        list[str]: Every catalogue key, sorted.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28957,13 +28941,7 @@ adds a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/climate_indices/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-227">227</a></span>
-<span class="normal"><a href="#__codelineno-0-228">228</a></span>
-<span class="normal"><a href="#__codelineno-0-229">229</a></span>
-<span class="normal"><a href="#__codelineno-0-230">230</a></span>
-<span class="normal"><a href="#__codelineno-0-231">231</a></span>
-<span class="normal"><a href="#__codelineno-0-232">232</a></span>
-<span class="normal"><a href="#__codelineno-0-233">233</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
 <span class="normal"><a href="#__codelineno-0-235">235</a></span>
 <span class="normal"><a href="#__codelineno-0-236">236</a></span>
@@ -28974,24 +28952,30 @@ adds a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-241">241</a></span>
 <span class="normal"><a href="#__codelineno-0-242">242</a></span>
 <span class="normal"><a href="#__codelineno-0-243">243</a></span>
-<span class="normal"><a href="#__codelineno-0-244">244</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its :class:`Index` row.</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown id.</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        index_id: A shipped index id (`&quot;oni&quot;`, `&quot;nao&quot;`, …).</span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span>
+<span class="normal"><a href="#__codelineno-0-245">245</a></span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span>
+<span class="normal"><a href="#__codelineno-0-250">250</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its :class:`Index` row.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        Index: The matching catalogue row.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        ValueError: If `index_id` is not a known index; the message</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            adds a did-you-mean hint.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">index_id</span><span class="p">))</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        index_id: A shipped index id (`&quot;oni&quot;`, `&quot;nao&quot;`, …).</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        Index: The matching catalogue row.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        ValueError: If `index_id` is not a known index; the message</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            adds a did-you-mean hint.</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">index_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29097,13 +29081,7 @@ fails validation.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/climate_indices/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-209">209</a></span>
-<span class="normal"><a href="#__codelineno-0-210">210</a></span>
-<span class="normal"><a href="#__codelineno-0-211">211</a></span>
-<span class="normal"><a href="#__codelineno-0-212">212</a></span>
-<span class="normal"><a href="#__codelineno-0-213">213</a></span>
-<span class="normal"><a href="#__codelineno-0-214">214</a></span>
-<span class="normal"><a href="#__codelineno-0-215">215</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-215">215</a></span>
 <span class="normal"><a href="#__codelineno-0-216">216</a></span>
 <span class="normal"><a href="#__codelineno-0-217">217</a></span>
 <span class="normal"><a href="#__codelineno-0-218">218</a></span>
@@ -29113,23 +29091,29 @@ fails validation.</p>
 <span class="normal"><a href="#__codelineno-0-222">222</a></span>
 <span class="normal"><a href="#__codelineno-0-223">223</a></span>
 <span class="normal"><a href="#__codelineno-0-224">224</a></span>
-<span class="normal"><a href="#__codelineno-0-225">225</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the climate-indices catalogue from disk.</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        ValueError: If the file has no `datasets:` block, or a row</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">            fails validation.</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span>
+<span class="normal"><a href="#__codelineno-0-226">226</a></span>
+<span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the climate-indices catalogue from disk.</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        ValueError: If the file has no `datasets:` block, or a row</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            fails validation.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29157,7 +29141,7 @@ fails validation.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.SummarisedLeaf&lt;/code&gt;" href="../../base/catalog-api/#earthlens.base.SummarisedLeaf">SummarisedLeaf</a></code></p>
 
 
 
@@ -29315,7 +29299,13 @@ joined with the per-row <code>file</code>).</p>
 <span class="normal"><a href="#__codelineno-0-151">151</a></span>
 <span class="normal"><a href="#__codelineno-0-152">152</a></span>
 <span class="normal"><a href="#__codelineno-0-153">153</a></span>
-<span class="normal"><a href="#__codelineno-0-154">154</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="k">class</span><span class="w"> </span><span class="nc">Index</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-154">154</a></span>
+<span class="normal"><a href="#__codelineno-0-155">155</a></span>
+<span class="normal"><a href="#__codelineno-0-156">156</a></span>
+<span class="normal"><a href="#__codelineno-0-157">157</a></span>
+<span class="normal"><a href="#__codelineno-0-158">158</a></span>
+<span class="normal"><a href="#__codelineno-0-159">159</a></span>
+<span class="normal"><a href="#__codelineno-0-160">160</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="k">class</span><span class="w"> </span><span class="nc">Index</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One climate-index catalogue row.</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    The index id is the parent key in :attr:`Catalog.datasets`; the row</span>
@@ -29349,14 +29339,20 @@ joined with the per-row <code>file</code>).</p>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a>    <span class="n">source</span><span class="p">:</span> <span class="n">Source</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a>    <span class="n">dialect</span><span class="p">:</span> <span class="n">Dialect</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="n">long_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a>    <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a>    <span class="n">citation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="n">_summary_fields</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a>        <span class="s2">&quot;long_name&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a>        <span class="s2">&quot;units&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a>        <span class="s2">&quot;source&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a>    <span class="p">)</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a>    <span class="n">source</span><span class="p">:</span> <span class="n">Source</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a>    <span class="n">dialect</span><span class="p">:</span> <span class="n">Dialect</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a>    <span class="n">long_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a>    <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a>    <span class="n">citation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 

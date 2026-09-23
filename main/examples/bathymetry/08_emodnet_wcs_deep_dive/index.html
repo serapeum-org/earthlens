@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24712,12 +24684,10 @@ from earthlens.core import EarthLens</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>We will fetch several small subsets, so a tiny helper keeps the teaching cells about the <em>feature</em> rather than
-the plumbing. It downloads one DEM subset and hands back the raster.</p>
-<p>The no-data handling is worth a sentence, because it differs by source: GEBCO declares its <code>32767</code> fill in the
-band, while the EMODnet products declare nothing at all. This helper serves both, so it declares the fill when
-the source has not — otherwise a land or edge pixel would count as +32767 m in every depth range and colour
-scale below. <code>aoi</code> is <code>[min_lon, min_lat, max_lon, max_lat]</code>.</p>
+<p>The no-data handling is worth a sentence up front, because it differs by source: <code>gebco_2020</code> declares its
+<code>32767</code> fill in the band, while the two EMODnet products declare nothing at all. Each fetch below therefore
+states which case it is in — otherwise a land or edge pixel would count as +32767 m in every depth range and
+colour scale on this page. <code>aoi</code> is <code>[min_lon, min_lat, max_lon, max_lat]</code>.</p>
 </div>
 </div>
 </div>
@@ -24740,33 +24710,15 @@ scale below. <code>aoi</code> is <code>[min_lon, min_lat, max_lon, max_lat]</cod
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">GEBCO_FILL</span> <span class="o">=</span> <span class="mi">32767</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">fetch_depth</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">aoi</span><span class="p">):</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
-    <span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s1">'bathymetry'</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="n">aoi</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">out</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">grid</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">grid</span><span class="o">.</span><span class="n">no_data_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">grid</span><span class="o">.</span><span class="n">no_data_value</span> <span class="o">=</span> <span class="p">[</span><span class="n">GEBCO_FILL</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s1">: no-data </span><span class="si">{</span><span class="n">grid</span><span class="o">.</span><span class="n">no_data_value</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">grid</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># EMODnet and GEBCO both use 32767 for land and grid edges, but only gebco_2020</span>
+<span class="c1"># declares it in the GeoTIFF; the two EMODnet products declare nothing, so the fill</span>
+<span class="c1"># would count as +32767 m in every depth range below unless the notebook declares it.</span>
+<span class="n">GEBCO_FILL</span> <span class="o">=</span> <span class="mi">32767</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">GEBCO_FILL = 32767
-
-
-def fetch_depth(dataset, aoi):
-    out = tempfile.mkdtemp()
-    paths = EarthLens(
-        data_source='bathymetry', dataset=dataset, aoi=aoi, path=out
-    ).download(progress_bar=False)
-    grid = Dataset.read_file(paths[0], read_only=False)
-    if grid.no_data_value[0] is None:
-        grid.no_data_value = [GEBCO_FILL]
-    print(f'{dataset}: no-data {grid.no_data_value}')
-    return grid</div>
+<div class="clipboard-copy-txt" id="cell-2"># EMODnet and GEBCO both use 32767 for land and grid edges, but only gebco_2020
+# declares it in the GeoTIFF; the two EMODnet products declare nothing, so the fill
+# would count as +32767 m in every depth range below unless the notebook declares it.
+GEBCO_FILL = 32767</div>
 </div>
 </div>
 </div>
@@ -24857,8 +24809,8 @@ below uses the WCS rows.</p>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="quickstart-an-emodnet-subset-over-the-north-sea">Quickstart — an EMODnet subset over the North Sea<a class="anchor-link" href="#quickstart-an-emodnet-subset-over-the-north-sea">¶</a></h2><p>The shortest end-to-end example: pick <code>dataset="emodnet"</code> and a small North Sea
 AOI. <code>download()</code> issues the WCS <code>GetCoverage</code>, crops to the AOI, and writes a
-GeoTIFF; <code>fetch_depth</code> reads it back as a pyramids <code>Dataset</code>. The latest EMODnet
-coverage stores elevation in metres, negative below sea level.</p>
+GeoTIFF, which <code>Dataset.read_file</code> reads back. The latest EMODnet coverage
+stores elevation in metres, negative below sea level.</p>
 </div>
 </div>
 </div>
@@ -24882,11 +24834,23 @@ coverage stores elevation in metres, negative below sea level.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">north_sea</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">55.0</span><span class="p">]</span>
-<span class="n">emodnet_depth</span> <span class="o">=</span> <span class="n">fetch_depth</span><span class="p">(</span><span class="s1">'emodnet'</span><span class="p">,</span> <span class="n">north_sea</span><span class="p">)</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'bathymetry'</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">'emodnet'</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="n">north_sea</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">emodnet_depth</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="c1"># emodnet declares nothing, so stamp the fill before anything reads the band.</span>
+<span class="n">emodnet_depth</span><span class="o">.</span><span class="n">no_data_value</span> <span class="o">=</span> <span class="p">[</span><span class="n">GEBCO_FILL</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'emodnet: no-data </span><span class="si">{</span><span class="n">emodnet_depth</span><span class="o">.</span><span class="n">no_data_value</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="n">emodnet_depth</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">north_sea = [2.0, 53.0, 4.0, 55.0]
-emodnet_depth = fetch_depth('emodnet', north_sea)
+paths = EarthLens(
+    data_source='bathymetry', dataset='emodnet', aoi=north_sea, path=tempfile.mkdtemp()
+).download(progress_bar=False)
+emodnet_depth = Dataset.read_file(paths[0], read_only=False)
+# emodnet declares nothing, so stamp the fill before anything reads the band.
+emodnet_depth.no_data_value = [GEBCO_FILL]
+print(f'emodnet: no-data {emodnet_depth.no_data_value}')
 emodnet_depth.shape</div>
 </div>
 </div>
@@ -25188,7 +25152,15 @@ pixel counts.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">gebco_depth</span> <span class="o">=</span> <span class="n">fetch_depth</span><span class="p">(</span><span class="s1">'gebco_2020'</span><span class="p">,</span> <span class="n">north_sea</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'bathymetry'</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'gebco_2020'</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="n">north_sea</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">gebco_depth</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="c1"># gebco_2020 declares the fill itself, so it is only read back here, never set.</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'gebco_2020: no-data </span><span class="si">{</span><span class="n">gebco_depth</span><span class="o">.</span><span class="n">no_data_value</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s1">'rows'</span><span class="p">:</span> <span class="p">[</span><span class="n">emodnet_depth</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">gebco_depth</span><span class="o">.</span><span class="n">rows</span><span class="p">],</span>
@@ -25197,7 +25169,15 @@ pixel counts.</p>
     <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">'emodnet (~3.75″)'</span><span class="p">,</span> <span class="s1">'gebco_2020 (15″)'</span><span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-9">gebco_depth = fetch_depth('gebco_2020', north_sea)
+<div class="clipboard-copy-txt" id="cell-9">paths = EarthLens(
+    data_source='bathymetry',
+    dataset='gebco_2020',
+    aoi=north_sea,
+    path=tempfile.mkdtemp(),
+).download(progress_bar=False)
+gebco_depth = Dataset.read_file(paths[0])
+# gebco_2020 declares the fill itself, so it is only read back here, never set.
+print(f'gebco_2020: no-data {gebco_depth.no_data_value}')
 pd.DataFrame(
     {
         'rows': [emodnet_depth.rows, gebco_depth.rows],
@@ -25290,44 +25270,68 @@ issue — so the table compares magnitudes:</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">emodnet2016_depth</span> <span class="o">=</span> <span class="n">fetch_depth</span><span class="p">(</span><span class="s1">'emodnet_2016'</span><span class="p">,</span> <span class="n">north_sea</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'bathymetry'</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'emodnet_2016'</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="n">north_sea</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">emodnet2016_depth</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">emodnet2016_depth</span><span class="o">.</span><span class="n">no_data_value</span> <span class="o">=</span> <span class="p">[</span><span class="n">GEBCO_FILL</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'emodnet_2016: no-data </span><span class="si">{</span><span class="n">emodnet2016_depth</span><span class="o">.</span><span class="n">no_data_value</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_depth_span</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
-    <span class="n">stats</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">stats</span><span class="p">(</span><span class="n">approx_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">edges</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'min'</span><span class="p">,</span> <span class="s1">'max'</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">edges</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edges</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s1">'mean'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-
-
-<span class="n">shallow_latest</span><span class="p">,</span> <span class="n">deep_latest</span><span class="p">,</span> <span class="n">mean_latest</span> <span class="o">=</span> <span class="n">_depth_span</span><span class="p">(</span><span class="n">emodnet_depth</span><span class="p">)</span>
-<span class="n">shallow_2016</span><span class="p">,</span> <span class="n">deep_2016</span><span class="p">,</span> <span class="n">mean_2016</span> <span class="o">=</span> <span class="n">_depth_span</span><span class="p">(</span><span class="n">emodnet2016_depth</span><span class="p">)</span>
+<span class="n">latest</span> <span class="o">=</span> <span class="n">emodnet_depth</span><span class="o">.</span><span class="n">stats</span><span class="p">(</span><span class="n">approx_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">older</span> <span class="o">=</span> <span class="n">emodnet2016_depth</span><span class="o">.</span><span class="n">stats</span><span class="p">(</span><span class="n">approx_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="c1"># Depth is negative below sea level, so the shallow and deep edges of each grid are</span>
+<span class="c1"># the smaller and larger absolute value of its min/max pair.</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s1">'grid_rows'</span><span class="p">:</span> <span class="p">[</span><span class="n">emodnet_depth</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">emodnet2016_depth</span><span class="o">.</span><span class="n">rows</span><span class="p">],</span>
-        <span class="s1">'shallowest (m)'</span><span class="p">:</span> <span class="p">[</span><span class="n">shallow_latest</span><span class="p">,</span> <span class="n">shallow_2016</span><span class="p">],</span>
-        <span class="s1">'deepest (m)'</span><span class="p">:</span> <span class="p">[</span><span class="n">deep_latest</span><span class="p">,</span> <span class="n">deep_2016</span><span class="p">],</span>
-        <span class="s1">'mean depth (m)'</span><span class="p">:</span> <span class="p">[</span><span class="n">mean_latest</span><span class="p">,</span> <span class="n">mean_2016</span><span class="p">],</span>
+        <span class="s1">'shallowest (m)'</span><span class="p">:</span> <span class="p">[</span>
+            <span class="nb">min</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">latest</span><span class="p">[</span><span class="s1">'min'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">latest</span><span class="p">[</span><span class="s1">'max'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span>
+            <span class="nb">min</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">older</span><span class="p">[</span><span class="s1">'min'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">older</span><span class="p">[</span><span class="s1">'max'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span>
+        <span class="p">],</span>
+        <span class="s1">'deepest (m)'</span><span class="p">:</span> <span class="p">[</span>
+            <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">latest</span><span class="p">[</span><span class="s1">'min'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">latest</span><span class="p">[</span><span class="s1">'max'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span>
+            <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">older</span><span class="p">[</span><span class="s1">'min'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">older</span><span class="p">[</span><span class="s1">'max'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span>
+        <span class="p">],</span>
+        <span class="s1">'mean depth (m)'</span><span class="p">:</span> <span class="p">[</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">latest</span><span class="p">[</span><span class="s1">'mean'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">older</span><span class="p">[</span><span class="s1">'mean'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+        <span class="p">],</span>
     <span class="p">},</span>
     <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">'emodnet (latest)'</span><span class="p">,</span> <span class="s1">'emodnet_2016'</span><span class="p">],</span>
 <span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-11">emodnet2016_depth = fetch_depth('emodnet_2016', north_sea)
+<div class="clipboard-copy-txt" id="cell-11">paths = EarthLens(
+    data_source='bathymetry',
+    dataset='emodnet_2016',
+    aoi=north_sea,
+    path=tempfile.mkdtemp(),
+).download(progress_bar=False)
+emodnet2016_depth = Dataset.read_file(paths[0], read_only=False)
+emodnet2016_depth.no_data_value = [GEBCO_FILL]
+print(f'emodnet_2016: no-data {emodnet2016_depth.no_data_value}')
 
-
-def _depth_span(dataset):
-    stats = dataset.stats(approx_ok=False)
-    edges = sorted(abs(float(stats[k].iloc[0])) for k in ('min', 'max'))
-    return edges[0], edges[1], abs(float(stats['mean'].iloc[0]))
-
-
-shallow_latest, deep_latest, mean_latest = _depth_span(emodnet_depth)
-shallow_2016, deep_2016, mean_2016 = _depth_span(emodnet2016_depth)
+latest = emodnet_depth.stats(approx_ok=False)
+older = emodnet2016_depth.stats(approx_ok=False)
+# Depth is negative below sea level, so the shallow and deep edges of each grid are
+# the smaller and larger absolute value of its min/max pair.
 pd.DataFrame(
     {
         'grid_rows': [emodnet_depth.rows, emodnet2016_depth.rows],
-        'shallowest (m)': [shallow_latest, shallow_2016],
-        'deepest (m)': [deep_latest, deep_2016],
-        'mean depth (m)': [mean_latest, mean_2016],
+        'shallowest (m)': [
+            min(abs(latest['min'].iloc[0]), abs(latest['max'].iloc[0])),
+            min(abs(older['min'].iloc[0]), abs(older['max'].iloc[0])),
+        ],
+        'deepest (m)': [
+            max(abs(latest['min'].iloc[0]), abs(latest['max'].iloc[0])),
+            max(abs(older['min'].iloc[0]), abs(older['max'].iloc[0])),
+        ],
+        'mean depth (m)': [
+            abs(latest['mean'].iloc[0]),
+            abs(older['mean'].iloc[0]),
+        ],
     },
     index=['emodnet (latest)', 'emodnet_2016'],
 ).round(1)</div>

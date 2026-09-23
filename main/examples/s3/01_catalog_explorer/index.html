@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24634,13 +24606,13 @@ format, and CRS alongside the variables it exposes.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <span class="n">era5</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s1">'era5'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'bucket:'</span><span class="p">,</span> <span class="n">era5</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="s1">'| format:'</span><span class="p">,</span> <span class="n">era5</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="s1">'| crs:'</span><span class="p">,</span> <span class="n">era5</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">era5</span><span class="p">,</span> <span class="s1">'| crs:'</span><span class="p">,</span> <span class="n">era5</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'default vars:'</span><span class="p">,</span> <span class="n">era5</span><span class="o">.</span><span class="n">default_variables</span><span class="p">)</span>
 <span class="nb">sorted</span><span class="p">(</span><span class="n">era5</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">cat = Catalog()
 era5 = cat.resolve('era5')
-print('bucket:', era5.bucket, '| format:', era5.format, '| crs:', era5.crs)
+print(era5, '| crs:', era5.crs)
 print('default vars:', era5.default_variables)
 sorted(era5.variables)</div>
 </div>

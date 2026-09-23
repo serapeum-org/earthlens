@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24641,6 +24613,7 @@ first-party direct-HTTPS row. Note the new <code>license</code>, <code>retention
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s1">'gdps'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'provider       : </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">provider</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'backend        : </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">backend</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'licence        : </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
@@ -24653,6 +24626,7 @@ first-party direct-HTTPS row. Note the new <code>license</code>, <code>retention
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'t2m token      : </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">bands</span><span class="p">[</span><span class="s2">"temperature_2m"</span><span class="p">]</span><span class="si">!r}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">model = Catalog().get_model('gdps')
+print(model)
 print(f'provider       : {model.provider}')
 print(f'backend        : {model.backend}')
 print(f'licence        : {model.license}')

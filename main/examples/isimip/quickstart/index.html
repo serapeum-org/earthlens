@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24659,20 +24631,16 @@ before any network call.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="s1">'variable :'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'pr'</span><span class="p">)</span><span class="o">.</span><span class="n">long_name</span><span class="p">,</span> <span class="s1">'('</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'pr'</span><span class="p">)</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="s1">')'</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'forcing  :'</span><span class="p">,</span> <span class="s1">'gfdl-esm4 -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_forcing</span><span class="p">(</span><span class="s1">'gfdl-esm4'</span><span class="p">)</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'scenario :'</span><span class="p">,</span> <span class="s1">'ssp585 -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_scenario</span><span class="p">(</span><span class="s1">'ssp585'</span><span class="p">)</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'variable :'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'pr'</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'forcing  :'</span><span class="p">,</span> <span class="s1">'gfdl-esm4 -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_forcing</span><span class="p">(</span><span class="s1">'gfdl-esm4'</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'scenario :'</span><span class="p">,</span> <span class="s1">'ssp585 -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_scenario</span><span class="p">(</span><span class="s1">'ssp585'</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'round    :'</span><span class="p">,</span> <span class="s1">'ISIMIP3b -&gt;'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_round</span><span class="p">(</span><span class="s1">'ISIMIP3b'</span><span class="p">)</span><span class="o">.</span><span class="n">default_license</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'API      :'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">data_url</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">cat = Catalog()
-print(
-    'variable :', cat.get_dataset('pr').long_name, '(', cat.get_dataset('pr').units, ')'
-)
-print('forcing  :', 'gfdl-esm4 -&gt;', cat.get_forcing('gfdl-esm4').description)
-print('scenario :', 'ssp585 -&gt;', cat.get_scenario('ssp585').description)
+print('variable :', cat.get_dataset('pr'))
+print('forcing  :', 'gfdl-esm4 -&gt;', cat.get_forcing('gfdl-esm4'))
+print('scenario :', 'ssp585 -&gt;', cat.get_scenario('ssp585'))
 print('round    :', 'ISIMIP3b -&gt;', cat.get_round('ISIMIP3b').default_license)
 print('API      :', cat.data_url)</div>
 </div>

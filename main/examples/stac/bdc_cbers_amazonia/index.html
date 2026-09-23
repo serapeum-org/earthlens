@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24559,8 +24531,8 @@ either.</p>
 
 <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <span class="n">e</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="s2">"bdc"</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"url   : </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"signer: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">signer</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="n">bdc_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"bdc/"</span><span class="p">)]</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"curated: </span><span class="si">{</span><span class="n">bdc_keys</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
@@ -24568,8 +24540,8 @@ either.</p>
 
 cat = Catalog()
 e = cat.endpoints["bdc"]
+print(e)
 print(f"url   : {e.url}")
-print(f"signer: {e.signer}")
 bdc_keys = [k for k in cat.datasets if k.startswith("bdc/")]
 print(f"curated: {bdc_keys}")</div>
 </div>

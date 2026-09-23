@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24642,15 +24614,13 @@ print('by organisation:', dict(orgs))</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">row</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s1">'kontur-population'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'hdx_id   :'</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">hdx_id</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'org      :'</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">org</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'formats  :'</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">formats</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'filter   :'</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">resource_filter</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'kinds    :'</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">output_kinds</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">row = catalog.resolve('kontur-population')
-print('hdx_id   :', row.hdx_id)
-print('org      :', row.org)
+print(row)
 print('formats  :', row.formats)
 print('filter   :', row.resource_filter)
 print('kinds    :', row.output_kinds)</div>

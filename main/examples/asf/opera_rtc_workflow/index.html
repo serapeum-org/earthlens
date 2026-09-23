@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24588,17 +24560,15 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.asf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 
 <span class="n">row</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_product</span><span class="p">(</span><span class="s1">'opera-rtc-s1'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s1">'platform=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">platform</span><span class="si">!r}</span><span class="s1">  dataset=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">dataset</span><span class="si">!r}</span><span class="s1">  product_type=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">product_type</span><span class="si">!r}</span><span class="s1">'</span>
-<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'dataset=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">dataset</span><span class="si">!r}</span><span class="s1">'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'stackable: </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">stackable</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from earthlens.asf import Catalog
 
 row = Catalog().get_product('opera-rtc-s1')
-print(
-    f'platform={row.platform!r}  dataset={row.dataset!r}  product_type={row.product_type!r}'
-)
+print(row)
+print(f'dataset={row.dataset!r}')
 print(f'stackable: {row.stackable}')</div>
 </div>
 </div>

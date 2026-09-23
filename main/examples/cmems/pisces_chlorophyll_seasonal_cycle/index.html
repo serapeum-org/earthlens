@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -13798,10 +13770,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#read-the-netcdf-into-xarray" class="md-nav__link">
+  <a href="#read-the-netcdf-into-pyramids" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Read the NetCDF into xarray
+        Read the NetCDF into pyramids
       
     </span>
   </a>
@@ -23808,10 +23780,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#read-the-netcdf-into-xarray" class="md-nav__link">
+  <a href="#read-the-netcdf-into-pyramids" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Read the NetCDF into xarray
+        Read the NetCDF into pyramids
       
     </span>
   </a>
@@ -24624,8 +24596,8 @@ surface 0-10 m to keep the request small.</p>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Consolidate the imports up front. <code>pyramids</code> provides <code>NetCDF</code> (reading the
 downloaded file); <code>earthlens</code> provides the unified <code>EarthLens</code> entry point and
-the CMEMS <code>Catalog</code>. <code>xarray</code> handles the calendar-aware monthly groupby and
-<code>matplotlib</code> the final plot.</p>
+the CMEMS <code>Catalog</code>. The monthly climatology below is a manual per-day/
+per-month average over <code>pandas</code>/<code>numpy</code>, and <code>matplotlib</code> draws the final plot.</p>
 </div>
 </div>
 </div>
@@ -24653,7 +24625,7 @@ the CMEMS <code>Catalog</code>. <code>xarray</code> handles the calendar-aware m
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.cmems</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
@@ -24664,7 +24636,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import xarray as xr
+import pandas as pd
 from pyramids.netcdf import NetCDF
 
 from earthlens.cmems import Catalog
@@ -24711,14 +24683,12 @@ a coastal box off Iberia, and create the output directory.</p>
 
 <span class="n">DATASET_ID</span> <span class="o">=</span> <span class="s1">'cmems_mod_glo_bgc_my_0.25deg_P1D-m'</span>
 <span class="n">VARIABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'chl'</span><span class="p">,</span> <span class="s1">'o2'</span><span class="p">]</span>
-<span class="n">BBOX</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">40.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">12.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">8.0</span><span class="p">])</span>  <span class="c1"># Iberian upwelling box</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">OUT_DIR = Path('data/cmems-pisces')
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 DATASET_ID = 'cmems_mod_glo_bgc_my_0.25deg_P1D-m'
-VARIABLES = ['chl', 'o2']
-BBOX = dict(lat_lim=[40.0, 44.0], lon_lim=[-12.0, -8.0])  # Iberian upwelling box</div>
+VARIABLES = ['chl', 'o2']</div>
 </div>
 </div>
 </div>
@@ -24756,18 +24726,16 @@ variable units / long names — a quick sanity check before downloading.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">DATASET_ID</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">DATASET_ID</span><span class="si">}</span><span class="s1">: cadence=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">cadence</span><span class="si">}</span><span class="s1">, domain=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">domain</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'domain: </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">domain</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">VARIABLES</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">: units=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="si">!r}</span><span class="s1">, long_name=</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">long_name</span><span class="si">!r}</span><span class="s1">'</span>
-    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">ds = Catalog().get_dataset(DATASET_ID)
-print(f'{DATASET_ID}: cadence={ds.cadence}, domain={ds.domain}')
+print(ds)
+print(f'domain: {ds.domain}')
 for v in VARIABLES:
-    print(
-        f'  {v}: units={ds.variables[v].units!r}, long_name={ds.variables[v].long_name!r}'
-    )</div>
+    print(f'  {ds.variables[v]}')</div>
 </div>
 </div>
 </div>
@@ -24812,7 +24780,7 @@ We build the <code>EarthLens</code> request first — variables are 4-D
     <span class="n">cadence</span><span class="o">=</span><span class="s1">'daily'</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET_ID</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="n">VARIABLES</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">BBOX</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">12.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">],</span>  <span class="c1"># Iberian upwelling box (W, S, E, N)</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
     <span class="n">minimum_depth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
     <span class="n">maximum_depth</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
@@ -24827,7 +24795,7 @@ We build the <code>EarthLens</code> request first — variables are 4-D
     cadence='daily',
     dataset=DATASET_ID,
     variables=VARIABLES,
-    **BBOX,
+    aoi=[-12.0, 40.0, -8.0, 44.0],  # Iberian upwelling box (W, S, E, N)
     path=OUT_DIR,
     minimum_depth=0.0,
     maximum_depth=10.0,
@@ -24887,9 +24855,11 @@ print(paths)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="compute-the-box-averaged-monthly-climatology-for-each-variable">Compute the box-averaged monthly climatology for each variable<a class="anchor-link" href="#compute-the-box-averaged-monthly-climatology-for-each-variable">¶</a></h2><h3 id="read-the-netcdf-into-xarray">Read the NetCDF into xarray<a class="anchor-link" href="#read-the-netcdf-into-xarray">¶</a></h3><p><code>decode_cf</code> turns the CF "hours since 1950" time axis into <code>datetime64</code> so
-xarray's calendar-aware groupby works. The result is labelled
-<code>(time, depth, latitude, longitude)</code>.</p>
+<h2 id="compute-the-box-averaged-monthly-climatology-for-each-variable">Compute the box-averaged monthly climatology for each variable<a class="anchor-link" href="#compute-the-box-averaged-monthly-climatology-for-each-variable">¶</a></h2><h3 id="read-the-netcdf-into-pyramids">Read the NetCDF into pyramids<a class="anchor-link" href="#read-the-netcdf-into-pyramids">¶</a></h3><p><code>pd.to_datetime(nc.get_time_variable())</code> turns the CF "hours since 1950" time
+axis into <code>datetime64</code> timestamps, which the next cell groups into a monthly
+climatology with a manual per-day/per-month average (not a groupby). The
+cube itself is <code>(time, depth, latitude, longitude)</code>, reshaped by hand from
+the band-major layout <code>read_array</code> returns.</p>
 </div>
 </div>
 </div>
@@ -24913,12 +24883,12 @@ xarray's calendar-aware groupby works. The result is labelled
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">decode_cf</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">())</span>
-<span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'variables :'</span><span class="p">,</span> <span class="n">nc</span><span class="o">.</span><span class="n">variable_names</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'dimensions:'</span><span class="p">,</span> <span class="n">nc</span><span class="o">.</span><span class="n">dimension_sizes</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">nc = NetCDF.read_file(paths[0], read_only=True)
-ds = xr.decode_cf(nc.to_xarray())
-nc.close()</div>
+print('variables :', nc.variable_names)
+print('dimensions:', nc.dimension_sizes)</div>
 </div>
 </div>
 </div>
@@ -24956,15 +24926,37 @@ the three years. Both arrays end up as 12-element vectors keyed on month-of-year
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">surface</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="s1">'depth'</span><span class="p">,</span> <span class="s1">'latitude'</span><span class="p">,</span> <span class="s1">'longitude'</span><span class="p">])</span>
-<span class="n">monthly</span> <span class="o">=</span> <span class="n">surface</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'time.month'</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<span class="n">climatology</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">monthly</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">VARIABLES</span><span class="p">}</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># A 4-D cube arrives as bands ordered time-major: band = time_index * n_depth + depth.</span>
+<span class="n">n_time</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">dimension_sizes</span><span class="p">[</span><span class="s1">'time'</span><span class="p">]</span>
+<span class="n">n_depth</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">dimension_sizes</span><span class="p">[</span><span class="s1">'depth'</span><span class="p">]</span>
+<span class="n">months</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">get_time_variable</span><span class="p">())</span><span class="o">.</span><span class="n">month</span>
+
+<span class="n">climatology</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">VARIABLES</span><span class="p">:</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">cube</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_time</span><span class="p">,</span> <span class="n">n_depth</span><span class="p">,</span> <span class="n">var</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">var</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">per_day</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>  <span class="c1"># surface box mean for each day</span>
+    <span class="n">climatology</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">per_day</span><span class="p">[</span><span class="n">months</span> <span class="o">==</span> <span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">13</span><span class="p">)]</span>
+    <span class="p">)</span>
+<span class="n">nc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">VARIABLES</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">climatology</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">surface = ds.mean(dim=['depth', 'latitude', 'longitude'])
-monthly = surface.groupby('time.month').mean()
-climatology = {v: monthly[v].values for v in VARIABLES}
+<div class="clipboard-copy-txt" id="cell-7"># A 4-D cube arrives as bands ordered time-major: band = time_index * n_depth + depth.
+n_time = nc.dimension_sizes['time']
+n_depth = nc.dimension_sizes['depth']
+months = pd.to_datetime(nc.get_time_variable()).month
+
+climatology = {}
+for name in VARIABLES:
+    var = nc.get_variable(name)
+    cube = var.read_array(masked=True).reshape(n_time, n_depth, var.rows, var.columns)
+    per_day = cube.mean(axis=(1, 2, 3))  # surface box mean for each day
+    climatology[name] = np.array(
+        [float(per_day[months == m].mean()) for m in range(1, 13)]
+    )
+nc.close()
 for v in VARIABLES:
     print(f'{v}: {climatology[v].round(4)}')</div>
 </div>

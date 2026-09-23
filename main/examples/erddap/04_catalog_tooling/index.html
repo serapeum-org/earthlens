@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24772,18 +24744,16 @@ print(json.dumps(seed.row, indent=2))</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.erddap.catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="o">**</span><span class="n">seed</span><span class="o">.</span><span class="n">row</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'protocol :'</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">protocol</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'dim_names:'</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">dim_names</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'variables:'</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'title    :'</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">title</span><span class="p">[:</span><span class="mi">70</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">from earthlens.erddap.catalog import Dataset
 
 ds = Dataset(**seed.row)
-print('protocol :', ds.protocol)
+print(ds)
 print('dim_names:', ds.dim_names)
-print('variables:', ds.variables)
-print('title    :', ds.title[:70])</div>
+print('variables:', ds.variables)</div>
 </div>
 </div>
 </div>

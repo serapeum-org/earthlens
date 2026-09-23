@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24706,10 +24678,10 @@ for g, n in sorted(groups.items()):
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">:</span><span class="s1">34s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span><span class="si">:</span><span class="s1">12s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">format</span><span class="si">:</span><span class="s1">8s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">collection_id</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">:</span><span class="s1">34s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">col</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">value</span><span class="si">:</span><span class="s1">12s</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">for key, col in sorted(cat.datasets.items()):
-    print(f'{key:34s} {col.group.value:12s} {col.format:8s} {col.collection_id}')</div>
+    print(f'{key:34s} {col.group.value:12s} {col}')</div>
 </div>
 </div>
 </div>

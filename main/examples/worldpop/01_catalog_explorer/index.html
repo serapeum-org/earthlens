@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24478,35 +24450,11 @@ print('global 1km -&gt;', cat.pick_subalias('pop', resolution='1km', scope='glob
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'pop'</span><span class="p">)</span><span class="o">.</span><span class="n">subaliases</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span>
-        <span class="n">s</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-        <span class="s1">'| constrained'</span><span class="p">,</span>
-        <span class="n">s</span><span class="o">.</span><span class="n">constrained</span><span class="p">,</span>
-        <span class="s1">'| res'</span><span class="p">,</span>
-        <span class="n">s</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span>
-        <span class="s1">'| scope'</span><span class="p">,</span>
-        <span class="n">s</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
-        <span class="s1">'| gen'</span><span class="p">,</span>
-        <span class="n">s</span><span class="o">.</span><span class="n">generation</span><span class="p">,</span>
-        <span class="s1">'| years'</span><span class="p">,</span>
-        <span class="n">s</span><span class="o">.</span><span class="n">years</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">'| constrained'</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">constrained</span><span class="p">,</span> <span class="s1">'| gen'</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">generation</span><span class="p">,</span> <span class="s1">'| years'</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">years</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'age_structures demographic:'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'age_structures'</span><span class="p">)</span><span class="o">.</span><span class="n">demographic</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">for s in cat.get('pop').subaliases:
-    print(
-        s.id,
-        '| constrained',
-        s.constrained,
-        '| res',
-        s.resolution,
-        '| scope',
-        s.scope,
-        '| gen',
-        s.generation,
-        '| years',
-        s.years,
-    )
+    print(s, '| constrained', s.constrained, '| gen', s.generation, '| years', s.years)
 print('age_structures demographic:', cat.get('age_structures').demographic)</div>
 </div>
 </div>

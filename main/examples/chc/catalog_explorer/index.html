@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24644,10 +24616,8 @@ for res, n in sorted(by_res.items(), key=lambda kv: -kv[1]):
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s1">'global-daily'</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'region            :'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">region</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="s1">'temporal_resolution:'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">temporal_resolution</span><span class="p">,</span> <span class="s1">'(pandas freq'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">pandas_freq</span> <span class="o">+</span> <span class="s1">')'</span>
-<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'pandas freq        :'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">pandas_freq</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'spatial_resolution :'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">spatial_resolution</span><span class="p">,</span> <span class="s1">'deg'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'lat boundaries     :'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">lat_boundaries</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'lon boundaries     :'</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">lon_boundaries</span><span class="p">)</span>
@@ -24656,10 +24626,8 @@ for res, n in sorted(by_res.items(), key=lambda kv: -kv[1]):
 <span class="nb">print</span><span class="p">(</span><span class="s1">'variables          :'</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">variables</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">d = cat.datasets['global-daily']
-print('region            :', d.region)
-print(
-    'temporal_resolution:', d.temporal_resolution, '(pandas freq', d.pandas_freq + ')'
-)
+print(d)
+print('pandas freq        :', d.pandas_freq)
 print('spatial_resolution :', d.spatial_resolution, 'deg')
 print('lat boundaries     :', d.lat_boundaries)
 print('lon boundaries     :', d.lon_boundaries)

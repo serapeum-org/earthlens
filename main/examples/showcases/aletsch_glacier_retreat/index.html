@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12637,34 +12637,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24541,7 +24513,7 @@ embeds the GIF. Earth Engine needs a service account, read from the <code>GEE_SE
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">Animation</span><span class="p">,</span> <span class="n">FrameLabel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
 
@@ -24551,14 +24523,13 @@ embeds the GIF. Earth Engine needs a service account, read from the <code>GEE_SE
 <span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"out"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"aletsch"</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">ALETSCH</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">46.38</span><span class="p">,</span> <span class="mf">46.58</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">7.95</span><span class="p">,</span> <span class="mf">8.15</span><span class="p">])</span>  <span class="c1"># the glacier + its tongue</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import base64
 import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from cleopatra.glyphs.gridded.array_glyph import FrameLabel
+from cleopatra.glyphs.gridded.array_glyph import Animation, FrameLabel
 from IPython.display import HTML
 from pyramids.dataset.collection import DatasetCollection
 
@@ -24567,8 +24538,7 @@ from earthlens.core import EarthLens
 SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]
 SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]
 OUT = Path("out") / "aletsch"
-OUT.mkdir(parents=True, exist_ok=True)
-ALETSCH = dict(lat_lim=[46.38, 46.58], lon_lim=[7.95, 8.15])  # the glacier + its tongue</div>
+OUT.mkdir(parents=True, exist_ok=True)</div>
 </div>
 </div>
 </div>
@@ -24627,7 +24597,8 @@ glacier ice and the freshly uncovered rock. The only branch is the sensor era: <
         <span class="n">scale</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span>
         <span class="n">export_via</span><span class="o">=</span><span class="s2">"url"</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">ALETSCH</span><span class="p">,</span>
+        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">46.38</span><span class="p">,</span> <span class="mf">46.58</span><span class="p">],</span>  <span class="c1"># the glacier + its tongue</span>
+        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">7.95</span><span class="p">,</span> <span class="mf">8.15</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="n">job</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -24653,7 +24624,8 @@ for year in range(1986, 2024):
         scale=60.0,
         path=OUT / str(year),
         export_via="url",
-        **ALETSCH,
+        lat_lim=[46.38, 46.58],  # the glacier + its tongue
+        lon_lim=[7.95, 8.15],
     )
     job.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
     paths = job.download(progress_bar=False)
@@ -24712,8 +24684,7 @@ sitting on the ice — and <code>glyph.save_animation(...)</code> writes a large
 <span class="c1"># image's own top-left corner (baseline-anchored, so the glyphs render upward).</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
     <span class="n">timeline</span><span class="p">,</span>
-    <span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
-    <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">]),</span>
+    <span class="n">playback</span><span class="o">=</span><span class="n">Animation</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">])),</span>
 <span class="p">)</span>
 
 <span class="n">gif_path</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aletsch_timelapse.gif"</span>
@@ -24735,8 +24706,7 @@ glyph = cube.plot(
 # image's own top-left corner (baseline-anchored, so the glyphs render upward).
 glyph.animate(
     timeline,
-    interval=350,
-    frame_label=FrameLabel(location=[0, -10]),
+    playback=Animation(interval=350, frame_label=FrameLabel(location=[0, -10])),
 )
 
 gif_path = OUT / "aletsch_timelapse.gif"

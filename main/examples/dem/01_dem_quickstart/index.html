@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24681,16 +24653,14 @@ Reading the catalog is offline.</p>
 <span class="k">for</span> <span class="n">dataset_id</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">datasets</span><span class="p">):</span>
     <span class="n">row</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">:</span><span class="s1">16</span><span class="si">}</span><span class="s1"> bucket=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">bucket</span><span class="si">:</span><span class="s1">22</span><span class="si">}</span><span class="s1"> '</span>
-        <span class="sa">f</span><span class="s1">'token=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">resolution_token</span><span class="si">}</span><span class="s1"> ≈</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">native_resolution_m</span><span class="si">}</span><span class="s1"> m'</span>
+        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">row</span><span class="si">}</span><span class="se">\n</span><span class="s1">                 bucket=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">bucket</span><span class="si">:</span><span class="s1">22</span><span class="si">}</span><span class="s1"> token=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">resolution_token</span><span class="si">}</span><span class="s1">'</span>
     <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">catalog = Catalog()
 for dataset_id in sorted(catalog.datasets):
     row = catalog.get_dataset(dataset_id)
     print(
-        f'{dataset_id:16} bucket={row.bucket:22} '
-        f'token={row.resolution_token} ≈{row.native_resolution_m} m'
+        f'{row}\n                 bucket={row.bucket:22} token={row.resolution_token}'
     )</div>
 </div>
 </div>

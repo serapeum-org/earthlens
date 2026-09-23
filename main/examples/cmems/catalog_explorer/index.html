@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24805,19 +24777,23 @@ long-name without ever touching the network.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'cmems_mod_glo_phy_my_0.083deg_P1D-m'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'product:  </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">product</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'title:    </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'cadence:  </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">cadence</span><span class="si">}</span><span class="s1">   domain: </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">domain</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'temporal: </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">temporal</span><span class="o">.</span><span class="n">start</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">temporal</span><span class="o">.</span><span class="n">end</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="c1"># The summary leads with the product and clips the title, so an explorer</span>
+<span class="c1"># still wants the untruncated title and the two fields it leaves out:</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'title (full): </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'domain:       </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">domain</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'temporal:     </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">temporal</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'variables:'</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">ds = cat.get_dataset('cmems_mod_glo_phy_my_0.083deg_P1D-m')
-print(f'product:  {ds.product}')
-print(f'title:    {ds.title}')
-print(f'cadence:  {ds.cadence}   domain: {ds.domain}')
-print(f'temporal: {ds.temporal.start} -&gt; {ds.temporal.end}')
+print(ds)
+# The summary leads with the product and clips the title, so an explorer
+# still wants the untruncated title and the two fields it leaves out:
+print(f'title (full): {ds.title}')
+print(f'domain:       {ds.domain}')
+print(f'temporal:     {ds.temporal}')
 print('variables:')
 for name, var in sorted(ds.variables.items()):
     print(f'  {var}')</div>

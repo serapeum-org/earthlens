@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24711,7 +24683,7 @@ for k in gportal_keys:
     <span class="s1">'gpm'</span><span class="p">,</span>
 <span class="p">]:</span>
     <span class="n">row</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">alias</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">alias</span><span class="si">:</span><span class="s1">18s</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">key</span><span class="si">:</span><span class="s1">25s</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">protocol</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">alias</span><span class="si">:</span><span class="s1">18s</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">row</span><span class="si">}</span><span class="s1">  (</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">protocol</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">for alias in [
     'elevation',
@@ -24724,7 +24696,7 @@ for k in gportal_keys:
     'gpm',
 ]:
     row = cat.get(alias)
-    print(f'{alias:18s} -&gt; {row.key:25s} ({row.protocol})')</div>
+    print(f'{alias:18s} -&gt; {row}  ({row.protocol})')</div>
 </div>
 </div>
 </div>

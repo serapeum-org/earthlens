@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24666,15 +24638,15 @@ print('configurations:', sorted(cat.configurations))</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cat</span><span class="o">.</span><span class="n">products</span><span class="p">():</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_product</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">key</span><span class="si">:</span><span class="s1">9s</span><span class="si">}</span><span class="s1"> kind=</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">output_kind</span><span class="si">:</span><span class="s1">8s</span><span class="si">}</span><span class="s1"> token=</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">s3_token</span><span class="si">:</span><span class="s1">11s</span><span class="si">}</span><span class="s1"> dims=</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'    - </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s1">14s</span><span class="si">}</span><span class="s1"> [</span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">units</span><span class="si">}</span><span class="s1">] </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">long_name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="se">\n</span><span class="s1">          token=</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">s3_token</span><span class="si">:</span><span class="s1">11s</span><span class="si">}</span><span class="s1"> dims=</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'    - </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">for key in cat.products():
     p = cat.get_product(key)
-    print(f'{key:9s} kind={p.output_kind:8s} token={p.s3_token:11s} dims={p.dims}')
-    for name, var in p.variables.items():
-        print(f'    - {name:14s} [{var.units}] {var.long_name}')</div>
+    print(f'{p}\n          token={p.s3_token:11s} dims={p.dims}')
+    for var in p.variables.values():
+        print(f'    - {var}')</div>
 </div>
 </div>
 </div>

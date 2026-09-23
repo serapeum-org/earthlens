@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24841,10 +24813,10 @@ from earthlens.core import EarthLens</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">facade</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_resolved</span><span class="p">[</span><span class="s1">'sentinel-3-olci-chlorophyll-monthly'</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'collection:'</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">collection_id</span><span class="p">,</span> <span class="s1">'| bands:'</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">bands</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'collection:'</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="s1">'| bands:'</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">bands</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">g = facade.datasource._resolved['sentinel-3-olci-chlorophyll-monthly']
-print('collection:', g.collection_id, '| bands:', g.bands)</div>
+print('collection:', g, '| bands:', g.bands)</div>
 </div>
 </div>
 </div>

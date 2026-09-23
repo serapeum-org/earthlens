@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24603,11 +24575,11 @@ pd.DataFrame(rows).set_index('id')</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">datasets</span><span class="p">):</span>
     <span class="n">row</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="se">\n</span><span class="s1">  </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s1">/griddap/</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">dataset_id</span><span class="si">}</span><span class="se">\n</span><span class="s1">  </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">license_note</span><span class="si">}</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">row</span><span class="si">}</span><span class="se">\n</span><span class="s1">  </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s1">/griddap/</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">dataset_id</span><span class="si">}</span><span class="se">\n</span><span class="s1">  </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">license_note</span><span class="si">}</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">for d in sorted(catalog.datasets):
     row = catalog.get(d)
-    print(f'{d}\n  {row.endpoint}/griddap/{row.dataset_id}\n  {row.license_note}\n')</div>
+    print(f'{row}\n  {row.endpoint}/griddap/{row.dataset_id}\n  {row.license_note}\n')</div>
 </div>
 </div>
 </div>

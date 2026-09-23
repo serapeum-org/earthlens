@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12544,34 +12544,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24848,20 +24820,20 @@ still work — pass any id that <code>copernicusmarine.describe()</code> recogni
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'curated datasets:   </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s1">'METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2:'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  cadence: </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">cadence</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  domain:  </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">domain</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  domain: </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">domain</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: units=</span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">units</span><span class="si">!r}</span><span class="s1">, long_name=</span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">long_name</span><span class="si">!r}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">cat = Catalog()
 print(f'available_datasets: {len(cat.available_datasets)}')
 print(f'curated datasets:   {len(cat.datasets)}')
 ds = cat.get_dataset('METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2')
 print('\nMETOFFICE-GLO-SST-L4-NRT-OBS-SST-V2:')
-print(f'  cadence: {ds.cadence}')
-print(f'  domain:  {ds.domain}')
+print(ds)
+print(f'  domain: {ds.domain}')
 for name, var in sorted(ds.variables.items()):
-    print(f'  {name}: units={var.units!r}, long_name={var.long_name!r}')</div>
+    print(f'  {var}')</div>
 </div>
 </div>
 </div>

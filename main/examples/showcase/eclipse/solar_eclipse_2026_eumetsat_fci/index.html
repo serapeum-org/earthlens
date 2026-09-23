@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12546,34 +12546,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../showcases/netherlands_drought_2026/" class="md-nav__link">
         
   
@@ -24666,8 +24638,7 @@ eclipse so much more dramatically.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">stamp_mark</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">Animation</span><span class="p">,</span> <span class="n">FrameLabel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_dotenv</span><span class="p">,</span> <span class="n">load_dotenv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
@@ -24710,8 +24681,7 @@ import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from cleopatra.glyphs.gridded.array_glyph import FrameLabel
-from cleopatra.styling.watermark import stamp_mark
+from cleopatra.glyphs.gridded.array_glyph import Animation, FrameLabel
 from dotenv import find_dotenv, load_dotenv
 from IPython.display import Image, display
 from loguru import logger
@@ -26445,15 +26415,14 @@ _array_glyph.get_indices2 = _domain_cell_count</div>
 <span class="p">)</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
     <span class="n">labels</span><span class="p">,</span>
-    <span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
-    <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">),</span>
+    <span class="n">playback</span><span class="o">=</span><span class="n">Animation</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">)),</span>
     <span class="n">full_bleed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># `full_bleed` draws no title and no colorbar, so the frame label is the only text on the axes.</span>
 <span class="p">(</span><span class="n">label</span><span class="p">,)</span> <span class="o">=</span> <span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">texts</span>
 <span class="n">stamp_titles</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="s2">"Meteosat-12 · MTG-I1 / FCI"</span><span class="p">)</span>
-<span class="n">stamp_mark</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">BRAND_MARK</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="n">LOGO_MARGIN</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">))</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">stamp_mark</span><span class="p">(</span><span class="n">BRAND_MARK</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="n">LOGO_MARGIN</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">))</span>
 <span class="n">mp4</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_fci_nsper.mp4"</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mp4</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
 <span class="n">gif</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_fci_nsper.gif"</span><span class="p">)</span>
@@ -26475,15 +26444,14 @@ glyph = dc.plot(
 )
 glyph.animate(
     labels,
-    interval=350,
-    frame_label=FrameLabel(color="white", size=20),
+    playback=Animation(interval=350, frame_label=FrameLabel(color="white", size=20)),
     full_bleed=True,
 )
 
 # `full_bleed` draws no title and no colorbar, so the frame label is the only text on the axes.
 (label,) = glyph.fig.axes[0].texts
 stamp_titles(glyph.fig, label, "Meteosat-12 · MTG-I1 / FCI")
-stamp_mark(glyph.fig, BRAND_MARK, frac=LOGO_FRAC, margin=(LOGO_MARGIN, LOGO_MARGIN_Y))
+glyph.stamp_mark(BRAND_MARK, frac=LOGO_FRAC, margin=(LOGO_MARGIN, LOGO_MARGIN_Y))
 mp4 = OUT / "eclipse_fci_nsper.mp4"
 glyph.save_animation(str(mp4), fps=3, dpi=150)
 gif = str(OUT / "eclipse_fci_nsper.gif")
@@ -26542,15 +26510,14 @@ are real, not a crop.</p>
 <span class="p">)</span>
 <span class="n">glyph2</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
     <span class="n">labels2</span><span class="p">,</span>
-    <span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
-    <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">18</span><span class="p">),</span>
+    <span class="n">playback</span><span class="o">=</span><span class="n">Animation</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">18</span><span class="p">)),</span>
     <span class="n">full_bleed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># `full_bleed` draws no title and no colorbar, so the frame label is the only text on the axes.</span>
 <span class="p">(</span><span class="n">label2</span><span class="p">,)</span> <span class="o">=</span> <span class="n">glyph2</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">texts</span>
 <span class="n">stamp_titles</span><span class="p">(</span><span class="n">glyph2</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">label2</span><span class="p">,</span> <span class="s2">"Meteosat-12 · MTG-I1 / FCI"</span><span class="p">)</span>
-<span class="n">stamp_mark</span><span class="p">(</span><span class="n">glyph2</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="n">BRAND_MARK</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="n">LOGO_MARGIN</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">))</span>
+<span class="n">glyph2</span><span class="o">.</span><span class="n">stamp_mark</span><span class="p">(</span><span class="n">BRAND_MARK</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">LOGO_FRAC</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="n">LOGO_MARGIN</span><span class="p">,</span> <span class="n">LOGO_MARGIN_Y</span><span class="p">))</span>
 <span class="n">mp4b</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_fci_tpers.mp4"</span>
 <span class="n">glyph2</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mp4b</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
 <span class="n">gif2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_fci_tpers.gif"</span><span class="p">)</span>
@@ -26572,15 +26539,14 @@ glyph2 = dc2.plot(
 )
 glyph2.animate(
     labels2,
-    interval=350,
-    frame_label=FrameLabel(color="white", size=18),
+    playback=Animation(interval=350, frame_label=FrameLabel(color="white", size=18)),
     full_bleed=True,
 )
 
 # `full_bleed` draws no title and no colorbar, so the frame label is the only text on the axes.
 (label2,) = glyph2.fig.axes[0].texts
 stamp_titles(glyph2.fig, label2, "Meteosat-12 · MTG-I1 / FCI")
-stamp_mark(glyph2.fig, BRAND_MARK, frac=LOGO_FRAC, margin=(LOGO_MARGIN, LOGO_MARGIN_Y))
+glyph2.stamp_mark(BRAND_MARK, frac=LOGO_FRAC, margin=(LOGO_MARGIN, LOGO_MARGIN_Y))
 mp4b = OUT / "eclipse_fci_tpers.mp4"
 glyph2.save_animation(str(mp4b), fps=3, dpi=150)
 gif2 = str(OUT / "eclipse_fci_tpers.gif")
