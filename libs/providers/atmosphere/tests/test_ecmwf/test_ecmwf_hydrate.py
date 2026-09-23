@@ -1046,7 +1046,9 @@ class TestAuditServeability:
             # already reports. Fixing them means finding the current name.
             "reanalysis-era5-single-levels": 1,
             "reanalysis-era5-single-levels-monthly-means": 5,
-            "reanalysis-pan-carra-means": 3,
+            # As of 2026-09-23 the store offers none of: wind direction (4
+            # rows), fog, surface roughness (2 rows). The count rose from 3.
+            "reanalysis-pan-carra-means": 7,
         }
         # A dataset the store could not answer for at all is reported as one
         # `<constraints unreadable>` row. That is the host's state on the day,
