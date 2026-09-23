@@ -177,8 +177,10 @@ dev = [
     # out of the `all` extra (installing it activates engine="auto"), so it is
     # pulled in here instead -- otherwise the tests that pin its
     # `from_earthengine` signature would skip everywhere and a 0.x contract
-    # change would only surface on a live run.
-    "pyramids-eo >=0.8.0,<0.9",
+    # change would only surface on a live run. 0.8.1 is the floor because 0.8.0's
+    # tiled read passed no_data_value="none", which pyramids >= 0.61 rejects
+    # (pyramids-eo#111), so every tiled EEDAI read raised.
+    "pyramids-eo >=0.8.1,<0.9",
 ]
 # The eclipse showcase notebooks need the geostationary-imagery pieces of
 # pyramids-eo (read_fci_l1c, the composites, the viewing geometry) plus a few small
@@ -196,7 +198,7 @@ notebooks = [
     # reader still calls the removed `create_from_array`, so the EEDAI path raises
     # AttributeError against the pyramids floor this project now requires.
     # Also declared, at the same version, in `dev` -- see the comment there.
-    "pyramids-eo >=0.8.0,<0.9",
+    "pyramids-eo >=0.8.1,<0.9",
     # scipy: feathers the disc edge and softens the limb (ndimage.binary_erosion /
     # gaussian_filter).
     "scipy >=1.11",
