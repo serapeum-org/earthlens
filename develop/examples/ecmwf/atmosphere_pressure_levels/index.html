@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -3174,34 +3174,6 @@
     
   
     Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/gee/server-side-compute/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Server-side computation
   
 
     
@@ -25210,22 +25182,24 @@ print(f"grid {celsius.rows} x {celsius.columns}, epsg {celsius.epsg}")</div>
     <span class="n">title</span><span class="o">=</span><span class="s2">"ERA5 500 hPa temperature + wind, 2022-01-01 — N. Atlantic / Europe"</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="c1"># The wind goes on as arrows. pyramids' own plot_vector_field would be the right</span>
-<span class="c1"># call, but it clears any axes cleopatra has already rendered into, destroying</span>
-<span class="c1"># the temperature layer (serapeum-org/cleopatra#346), so the arrows go on directly.</span>
-<span class="c1">#</span>
-<span class="c1"># The coordinates come from the raster's geotransform rather than pixel indices, so</span>
-<span class="c1"># `v` needs no sign flip: the y axis increases northward, which is what `v` measures.</span>
-<span class="n">step</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">celsius</span><span class="o">.</span><span class="n">x</span><span class="p">)[::</span><span class="n">step</span><span class="p">]</span>
-<span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">celsius</span><span class="o">.</span><span class="n">y</span><span class="p">)[::</span><span class="n">step</span><span class="p">]</span>
-<span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">)</span>
-<span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span>
-    <span class="n">xx</span><span class="p">,</span>
-    <span class="n">yy</span><span class="p">,</span>
-    <span class="n">u_wind</span><span class="p">[::</span><span class="n">step</span><span class="p">,</span> <span class="p">::</span><span class="n">step</span><span class="p">],</span>
-    <span class="n">v_wind</span><span class="p">[::</span><span class="n">step</span><span class="p">,</span> <span class="p">::</span><span class="n">step</span><span class="p">],</span>
-    <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span>
+<span class="c1"># The wind goes on as arrows through pyramids' own plot_vector_field, composed</span>
+<span class="c1"># onto the temperature axes with ax=, which draws on top of whatever the axes</span>
+<span class="c1"># already holds rather than clearing it -- so the temperature field survives</span>
+<span class="c1"># underneath. The arrows are a two-band Dataset (band 0 = u, band 1 = v) over</span>
+<span class="c1"># the same grid; plot_vector_field builds the cell-centre coordinates from the</span>
+<span class="c1"># geotransform itself, thins the field with thin=, and colours each arrow by</span>
+<span class="c1"># wind speed with its own (smaller) colour bar. `v` needs no sign flip -- it is</span>
+<span class="c1"># the northward (+y) component, and the facade orients the descending, north-up</span>
+<span class="c1"># y axis for us.</span>
+<span class="n">wind</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">u_wind</span><span class="p">,</span> <span class="n">v_wind</span><span class="p">]),</span> <span class="n">geo_ref</span><span class="o">=</span><span class="n">geo</span><span class="p">)</span>
+<span class="n">wind</span><span class="o">.</span><span class="n">plot_vector_field</span><span class="p">(</span>
+    <span class="n">u_band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">v_band</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">"quiver"</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span>
+    <span class="n">add_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">colorbar</span><span class="o">=</span><span class="n">ColorBar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">"500 hPa wind speed [m/s]"</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+    <span class="n">thin</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
     <span class="n">scale</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"longitude"</span><span class="p">)</span>
@@ -25239,22 +25213,24 @@ print(f"grid {celsius.rows} x {celsius.columns}, epsg {celsius.epsg}")</div>
     title="ERA5 500 hPa temperature + wind, 2022-01-01 — N. Atlantic / Europe",
 )
 
-# The wind goes on as arrows. pyramids' own plot_vector_field would be the right
-# call, but it clears any axes cleopatra has already rendered into, destroying
-# the temperature layer (serapeum-org/cleopatra#346), so the arrows go on directly.
-#
-# The coordinates come from the raster's geotransform rather than pixel indices, so
-# `v` needs no sign flip: the y axis increases northward, which is what `v` measures.
-step = 8
-lon = np.asarray(celsius.x)[::step]
-lat = np.asarray(celsius.y)[::step]
-xx, yy = np.meshgrid(lon, lat)
-glyph.ax.quiver(
-    xx,
-    yy,
-    u_wind[::step, ::step],
-    v_wind[::step, ::step],
-    color="black",
+# The wind goes on as arrows through pyramids' own plot_vector_field, composed
+# onto the temperature axes with ax=, which draws on top of whatever the axes
+# already holds rather than clearing it -- so the temperature field survives
+# underneath. The arrows are a two-band Dataset (band 0 = u, band 1 = v) over
+# the same grid; plot_vector_field builds the cell-centre coordinates from the
+# geotransform itself, thins the field with thin=, and colours each arrow by
+# wind speed with its own (smaller) colour bar. `v` needs no sign flip -- it is
+# the northward (+y) component, and the facade orients the descending, north-up
+# y axis for us.
+wind = Dataset.from_array(np.stack([u_wind, v_wind]), geo_ref=geo)
+wind.plot_vector_field(
+    u_band=0,
+    v_band=1,
+    kind="quiver",
+    ax=glyph.ax,
+    add_colorbar=True,
+    colorbar=ColorBar(label="500 hPa wind speed [m/s]", length=0.5),
+    thin=8,
     scale=600,
 )
 glyph.ax.set_xlabel("longitude")
