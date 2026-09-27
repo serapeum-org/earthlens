@@ -148,12 +148,15 @@ dev = [
     # move to grouped/typed render-parameter objects (glyphs/styling/basemap
     # subpackages), and 0.31.0 groups ArrayGlyph's loose rgb /
     # surface_reflectance / cutoff / percentile constructor keywords into an
-    # RgbBands object (pyramids 0.52.0's plot path builds on this).
+    # RgbBands object (pyramids 0.52.0's plot path builds on this). 0.40.0 adds
+    # the public `stamp_mark_on()` for a composite figure no single glyph owns,
+    # which the jrc / satellite / eclipse showcase notebooks now use instead of
+    # the private `_stamp_mark`.
     # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-gis[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
-    "cleopatra[tiles] >=0.39.0",
+    "cleopatra[tiles] >=0.40.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     # mypy: the `mypy` pre-commit hook and the lint.yml `static` job type-check src.
@@ -230,7 +233,7 @@ docs = [
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-gis[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
-    "cleopatra[tiles] >=0.39.0",
+    "cleopatra[tiles] >=0.40.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
     # scipy: the satellite showcase blurs the logo's drop shadow with
