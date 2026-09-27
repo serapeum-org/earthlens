@@ -248,6 +248,7 @@ nav:
       - Registering a project: reference/gee/registering-a-project.md
       - Service account setup: reference/gee/service-account-setup.md
       - Usage: reference/gee/usage.md
+      - Server-side computation: reference/gee/server-side-compute.md
       - Reference: reference/gee/gee.md
     - STAC (Sentinel / Landsat / cloud platforms):
       - Introduction: reference/stac/introduction.md
