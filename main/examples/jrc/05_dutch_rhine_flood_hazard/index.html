@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24689,15 +24689,13 @@ display(
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATA_STYLES</span>
 
-<span class="c1"># stamp_mark moved to a glyph method in cleopatra 0.39, but this figure is a</span>
-<span class="c1"># composite assembled from three separate glyphs' panels (each owning only</span>
-<span class="c1"># its own axes), so no single glyph owns the figure the mark goes on -- the</span>
-<span class="c1"># private function is the only route left until serapeum-org/cleopatra#371</span>
-<span class="c1"># lands.</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">_stamp_mark</span> <span class="k">as</span> <span class="n">stamp_mark</span>
+<span class="c1"># This figure is a composite -- several glyphs' panels assembled in one</span>
+<span class="c1"># plt.figure, so no single glyph owns it. cleopatra 0.40 added the public</span>
+<span class="c1"># stamp_mark_on() as the supported route for exactly that case</span>
+<span class="c1"># (serapeum-org/cleopatra#371); the local alias keeps the call sites unchanged.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.watermark</span><span class="w"> </span><span class="kn">import</span> <span class="n">stamp_mark_on</span> <span class="k">as</span> <span class="n">stamp_mark</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.patches</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rectangle</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataStyle</span>
@@ -24740,15 +24738,13 @@ import tempfile
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 from cleopatra.styling.colors import DATA_STYLES
 
-# stamp_mark moved to a glyph method in cleopatra 0.39, but this figure is a
-# composite assembled from three separate glyphs' panels (each owning only
-# its own axes), so no single glyph owns the figure the mark goes on -- the
-# private function is the only route left until serapeum-org/cleopatra#371
-# lands.
-from cleopatra.styling.watermark import _stamp_mark as stamp_mark
+# This figure is a composite -- several glyphs' panels assembled in one
+# plt.figure, so no single glyph owns it. cleopatra 0.40 added the public
+# stamp_mark_on() as the supported route for exactly that case
+# (serapeum-org/cleopatra#371); the local alias keeps the call sites unchanged.
+from cleopatra.styling.watermark import stamp_mark_on as stamp_mark
 from matplotlib.patches import Rectangle
 from pyramids.dataset import Dataset
 from pyramids.plot import DataStyle
@@ -25558,21 +25554,17 @@ left to take. The depth increase is real; watch what happens to the area curve.<
 <span class="c1"># nearly full caps its own growth no matter what the water does. Measured on the</span>
 <span class="c1"># same rasters, widening the box restores the whole-river figure -- which is what</span>
 <span class="c1"># tells you the flat curve belongs to the window, not to the dikes.</span>
-<span class="n">R_EARTH_KM</span> <span class="o">=</span> <span class="mf">6371.0088</span>
+<span class="c1">#</span>
+<span class="c1"># Per-cell ground area on a geographic grid is a pyramids primitive</span>
+<span class="c1"># (serapeum-org/pyramids#1085, in the 0.65 floor): `domain_area` sums the valid</span>
+<span class="c1"># (non-nodata) cells -- the flooded ones here -- and `cell_area` gives every</span>
+<span class="c1"># cell's area, so the whole box is their sum. Both integrate over the CRS's own</span>
+<span class="c1"># ellipsoid, so the notebook no longer hand-rolls the spherical maths.</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">box_coverage</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Return (flooded km2, whole-box km2), weighting each row by its latitude."""</span>
-    <span class="n">array</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">geotransform</span>
-    <span class="n">top</span> <span class="o">=</span> <span class="n">y0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">dy</span>
-    <span class="n">band</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="p">(</span><span class="n">R_EARTH_KM</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-        <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">))</span>
-        <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">top</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">top</span> <span class="o">+</span> <span class="n">dy</span><span class="p">)))</span>
-    <span class="p">)</span>
-    <span class="n">wet</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">getmaskarray</span><span class="p">(</span><span class="n">array</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">float</span><span class="p">((</span><span class="n">wet</span> <span class="o">*</span> <span class="n">band</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="nb">float</span><span class="p">((</span><span class="n">band</span> <span class="o">*</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+<span class="w">    </span><span class="sd">"""Return (flooded km2, whole-box km2), each cell weighted by its latitude."""</span>
+    <span class="k">return</span> <span class="n">grid</span><span class="o">.</span><span class="n">domain_area</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="s2">"km2"</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">cell_area</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="s2">"km2"</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
 
 
 <span class="n">WIDENING</span> <span class="o">=</span> <span class="p">{</span>
@@ -25598,21 +25590,17 @@ left to take. The depth increase is real; watch what happens to the area curve.<
 # nearly full caps its own growth no matter what the water does. Measured on the
 # same rasters, widening the box restores the whole-river figure -- which is what
 # tells you the flat curve belongs to the window, not to the dikes.
-R_EARTH_KM = 6371.0088
+#
+# Per-cell ground area on a geographic grid is a pyramids primitive
+# (serapeum-org/pyramids#1085, in the 0.65 floor): `domain_area` sums the valid
+# (non-nodata) cells -- the flooded ones here -- and `cell_area` gives every
+# cell's area, so the whole box is their sum. Both integrate over the CRS's own
+# ellipsoid, so the notebook no longer hand-rolls the spherical maths.
 
 
 def box_coverage(grid):
-    """Return (flooded km2, whole-box km2), weighting each row by its latitude."""
-    array = grid.read_array(masked=True)
-    _, dx, _, y0, _, dy = grid.geotransform
-    top = y0 + np.arange(array.shape[0]) * dy
-    band = (
-        (R_EARTH_KM**2)
-        * np.deg2rad(abs(dx))
-        * (np.sin(np.deg2rad(top)) - np.sin(np.deg2rad(top + dy)))
-    )
-    wet = (~np.ma.getmaskarray(array)).sum(axis=1)
-    return float((wet * band).sum()), float((band * array.shape[1]).sum())
+    """Return (flooded km2, whole-box km2), each cell weighted by its latitude."""
+    return grid.domain_area(unit="km2"), float(grid.cell_area(unit="km2").sum())
 
 
 WIDENING = {
