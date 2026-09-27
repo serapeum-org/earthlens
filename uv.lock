@@ -2353,7 +2353,7 @@ requires-dist = [
     { name = "herbie-data", marker = "extra == 'nwp'", specifier = ">=2026.3" },
     { name = "isimip-client", marker = "extra == 'isimip'", specifier = ">=2" },
     { name = "nest-asyncio", marker = "extra == 'eea-aq'", specifier = ">=1.5" },
-    { name = "tropycal", marker = "extra == 'tropycal'", specifier = ">=1.4" },
+    { name = "tropycal", marker = "extra == 'tropycal'", specifier = ">=1.5.2" },
 ]
 provides-extras = ["s3", "ecmwf", "ecmwf-modern", "cmip6", "isimip", "nwp", "radar", "goes", "tropycal", "eea-aq", "mswep"]
 
@@ -9397,7 +9397,7 @@ wheels = [
 
 [[package]]
 name = "tropycal"
-version = "1.4"
+version = "1.5.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "matplotlib" },
@@ -9412,7 +9412,10 @@ dependencies = [
     { name = "xarray", version = "2025.1.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
     { name = "xarray", version = "2025.9.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f3/92/b0242ae376a79e1954699c8e83af17ce6c82a069d4618e80daeb7c723ac5/tropycal-1.4.tar.gz", hash = "sha256:3ad0b3b5b5631ba6db8b24aae16b32baa7e43bba841468faa58355790720d12c", size = 10080794, upload-time = "2025-08-02T14:08:56.788Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e9/d2/fda4e62c0358a1c5fda3019e90e07cdd6e40554d4883c1ebd985f52410c0/tropycal-1.5.2.tar.gz", hash = "sha256:95e24604d4644e192a534126a512b8f063a98a35ea5ab659e83c21be24ca36a8", size = 10084306, upload-time = "2026-09-22T22:07:44.991Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b5/9b/241cb9d5215e343b67a56b8dc1f7b6a0c11b12b27fb2a1e90ef5a59ea730/tropycal-1.5.2-py3-none-any.whl", hash = "sha256:c733de00ebed986237270f9c34d20d923c2afe3cc46f6ad214ffc393d14a5ad1", size = 245724, upload-time = "2026-09-22T22:07:38.802Z" },
+]
 
 [[package]]
 name = "twine"

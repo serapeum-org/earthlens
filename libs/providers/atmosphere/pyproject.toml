@@ -45,7 +45,7 @@ isimip = ["isimip-client >=2"]
 nwp = ["herbie-data >=2026.3", "ecmwf-opendata >=0.3", "ecmwflibs; sys_platform == 'win32'"]
 radar = ["earthlens-core[s3]"]
 goes = ["earthlens-core[s3]"]
-tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
+tropycal = ["tropycal >=1.5.2", "cartopy >=0.22"]
 eea_aq = ["airbase >=1.0", "nest_asyncio >=1.5"]
 mswep = ["google-api-python-client >=2.0", "google-auth >=2.0"]
 
