@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24872,11 +24872,14 @@ raster.</p>
 That bbox intersects <strong>eight</strong> tiles. GLO-90 is used here rather than GLO-30:
 at 90 m the eight tiles are ~40 MB instead of ~380 MB, which is plenty to see
 the delta's shape.</p>
-<p><code>merge_rasters</code> defaults to <code>no_data_value="0"</code>, which is wrong for a DEM: the
-delta's water surfaces and its dead-flat farmland sit at exactly 0 m, so the
-default masks nearly half the scene — the lagoons, the coast and the
-sea-level parts of the delta all punch out as holes. Passing a sentinel the
-data cannot contain keeps every real 0 m cell.</p>
+<p><code>merge_rasters</code> inherits each source's own declared no-data by default
+(serapeum-org/pyramids#1086, in the 0.65 floor). The Copernicus DEM tiles
+declare none, so nothing is masked and every real 0 m cell survives — the
+delta's water surfaces and its dead-flat, sea-level farmland all sit at
+exactly 0 m and stay in the mosaic. An earlier default of <code>0</code> masked them,
+punching the lagoons, the coast and the sea-level delta out as holes, so the
+notebook used to pass an explicit sentinel; the fixed default makes that
+unnecessary.</p>
 <p>A linear colour ramp is useless here. Sixty percent of the delta lies below 10 m
 while the flanking desert reaches 744 m, so a straight scale spends almost all
 its colour on the margins and renders the delta as one flat wash. Explicit class
@@ -24959,7 +24962,7 @@ print(f'{len(delta_paths)} tiles fetched')</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.merge</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_rasters</span>
 
 <span class="n">mosaic_path</span> <span class="o">=</span> <span class="n">delta_out</span> <span class="o">/</span> <span class="s1">'nile_delta_mosaic.tif'</span>
-<span class="n">merge_rasters</span><span class="p">(</span><span class="n">delta_paths</span><span class="p">,</span> <span class="n">mosaic_path</span><span class="p">,</span> <span class="n">no_data_value</span><span class="o">=-</span><span class="mi">9999</span><span class="p">)</span>
+<span class="n">merge_rasters</span><span class="p">(</span><span class="n">delta_paths</span><span class="p">,</span> <span class="n">mosaic_path</span><span class="p">)</span>
 
 <span class="n">mosaic</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">mosaic_path</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'mosaic shape (y, x) : </span><span class="si">{</span><span class="n">mosaic</span><span class="o">.</span><span class="n">rows</span><span class="si">}</span><span class="s1"> x </span><span class="si">{</span><span class="n">mosaic</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
@@ -24979,7 +24982,7 @@ print(f'{len(delta_paths)} tiles fetched')</div>
 <div class="clipboard-copy-txt" id="cell-7">from pyramids.dataset.merge import merge_rasters
 
 mosaic_path = delta_out / 'nile_delta_mosaic.tif'
-merge_rasters(delta_paths, mosaic_path, no_data_value=-9999)
+merge_rasters(delta_paths, mosaic_path)
 
 mosaic = Dataset.read_file(mosaic_path)
 print(f'mosaic shape (y, x) : {mosaic.rows} x {mosaic.columns}')
