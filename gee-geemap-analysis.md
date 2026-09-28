@@ -206,9 +206,10 @@ wrapper without heavy new infrastructure.
 | **Basemaps & tile services** (xyz, WMS, QMS, TiTiler) | ❌ missing | companion viz tool | ❌ interactive-only |
 | **Multiple map backends** (folium, maplibre, kepler, deck, plotly, cartoee) | ❌ missing | `cartoee`-style static export → pyramids `plot`; rest → companion | ⚠️ static only |
 | **gdf / shapely → ee** | ✅ `features.create_feature` / `create_geometry` | — | — already present |
-| **shp / csv / geojson / kml / postgis → ee** | ❌ missing | earthlens `features.py` / `io.py`, via pyramids `FeatureCollection.from_file` → `create_feature` | ✅ no pyramids work — `FeatureCollection` reads every format already |
+| **shp / csv / geojson / kml / postgis → ee** | ❌ missing | earthlens — `FeatureCollection.from_file(...)` → existing `create_feature` | ✅ **≈free**: `FeatureCollection` **is a `GeoDataFrame` subclass**, and `create_feature(gdf)` already accepts any `GeoDataFrame`, so `FeatureCollection.from_file(p)` feeds straight in — a one-liner, not a converter |
 | **ee → df / gdf** (vector download) | ✅ `io.feature_collection_to_*` | — | — already present |
-| **ee → shp / kml / geojson file writers** | ❌ missing | earthlens `io.py`, via pyramids `FeatureCollection.to_file` | ✅ no pyramids work — `to_file`/`to_csv`/`to_json`/`to_parquet` exist |
+| **ee → shp / kml / geojson file writers** | ❌ missing | earthlens — `feature_collection_to_gdf` → `FeatureCollection(gdf).to_file(...)` | ✅ **≈free**: wrap the returned gdf in `FeatureCollection` and call `to_file`/`to_csv`/`to_json`/`to_parquet`/`to_postgis`/`to_mvt`/`to_pmtiles` |
+| **Vector geometry / analysis ops** (buffer, dissolve, sjoin, overlay, area, centroid, simplify, voronoi, to_h3…) | ✅ **free via FC** | pyramids `FeatureCollection` (GeoDataFrame) | — no earthlens code: call the 306 GeoDataFrame methods directly on any FC |
 | **ee → GeoTIFF** | ✅ `GEE.download()` | — | — already present |
 | **ee → numpy** | ❌ missing | earthlens `io.py` / EEDAI reader, via `Dataset.read_array` | ✅ no pyramids work |
 | **ee → xarray / NetCDF** | ❌ missing | **stays inside pyramids** — `DatasetCollection.to_netcdf`; no direct xarray/xee in earthlens (off-policy) | ⚠️ only if NetCDF output is wanted; do not add `xee`/rasterio |
@@ -247,13 +248,24 @@ Grouped by target and ordered by value/effort.
 3. **Vector/table export sinks** (Task C3) — a thin
    `ee.batch.Export.table.to{Drive,CloudStorage,Asset,BigQuery,FeatureView}`
    wrapper reusing the existing `TaskInfo` tracking.
-4. **Format → ee converters** — `shp/csv/geojson/kml → ee` in `features.py` /
-   `io.py`, via pyramids `FeatureCollection.from_file` → the existing
-   `create_feature` (gdf → ee already works). No new I/O dependency — all
-   reading goes through pyramids.
-5. **ee → file/array writers** — `ee → shp/kml/geojson` (via pyramids
-   `FeatureCollection.to_file`) and `ee → numpy` (via `Dataset.read_array`) in
-   `io.py`.
+4. **Format → ee converters** — **almost no work.** `FeatureCollection`
+   subclasses `GeoDataFrame`, and earthlens's existing
+   `create_feature(gdf: GeoDataFrame) -> ee.FeatureCollection` already accepts
+   any `GeoDataFrame`. So `shp/csv/geojson/kml/gpkg/parquet/postgis/wfs → ee` is
+   just `create_feature(FeatureCollection.from_file(path))` — a documented
+   one-liner (optionally a thin `from_file(path) -> ee.FeatureCollection`
+   convenience), not a converter to build.
+5. **ee → file/array writers** — also ≈free: `ee → numpy` via
+   `Dataset.read_array`; `ee → shp/kml/geojson/parquet/…` via
+   `FeatureCollection(feature_collection_to_gdf(fc)).to_file(...)` (the returned
+   gdf wraps into a `FeatureCollection` with zero conversion, since it is a
+   `GeoDataFrame`).
+
+> **Vector geometry / analysis ops are free.** Because `FeatureCollection` is a
+> `GeoDataFrame`, every geopandas operation geemap wraps (buffer, dissolve,
+> `sjoin`/`sjoin_nearest`, overlay, area, centroid, simplify, clip, voronoi,
+> `to_h3`, …) is already available on any FC earthlens produces — no earthlens
+> or pyramids code needed. Users call them directly on the returned object.
 6. **sklearn ↔ `ee.Classifier` ML bridge** (Task B4) — geemap's `ml` string
    conversion is pure Python and portable; pair with client-side classify via
    pyramids `apply`.
@@ -314,6 +326,13 @@ there.**
   `from_vectortileserver`, `from_arrow`; writes `to_file`, `to_csv`, `to_json`,
   `to_parquet`, `to_postgis`, `to_mvt`, `to_pmtiles`, `to_wkt`/`to_wkb`,
   `to_h3`. So every `shp/csv/kml/geojson ↔ ee` path needs no pyramids work.
+  **Key fact — `FeatureCollection` directly inherits `geopandas.GeoDataFrame`**
+  (MRO: `FeatureCollection → GeoDataFrame → … → DataFrame`; `FC(gdf)` works and
+  `isinstance(fc, GeoDataFrame)` is `True`). earthlens's existing
+  `create_feature(gdf: GeoDataFrame)` therefore accepts a `FeatureCollection`
+  unchanged, and any gdf earthlens returns wraps back into a `FeatureCollection`
+  for `to_file`. This makes every format ↔ ee conversion a one-liner and all
+  geopandas geometry ops available for free — no adapters, no new deps.
 - **Raster analysis.** `Dataset.zonal_stats`, `slope`/`aspect`/`hillshade`,
   `cluster`, `apply`/`combine`/`where`, `to_polygons`/`to_feature_collection`/
   `from_features`, `read_array`, `to_cog`, `proximity`, `focal_*`.
