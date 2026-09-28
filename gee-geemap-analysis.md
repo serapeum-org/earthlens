@@ -193,5 +193,100 @@ decision per task is worth recording before implementing the Tier C items.
 
 ---
 
+# geemap functionalities missing in earthlens
+
+Full mapping of each geemap functionality area to its status in the earthlens
+GEE backend, where it could be added, and whether it is feasible now.
+"Feasible now" means implementable client-side over `pyramids` / a thin `ee`
+wrapper without heavy new infrastructure.
+
+| geemap area | In earthlens? | Where to add | Feasible now |
+|---|---|---|---|
+| **Interactive map** (`Map`, `add_*` layers, inspector, draw, split-map, time slider) | ❌ missing | companion viz tool (not the headless core) | ❌ needs ipyleaflet stack |
+| **Basemaps & tile services** (xyz, WMS, QMS, TiTiler) | ❌ missing | companion viz tool | ❌ interactive-only |
+| **Multiple map backends** (folium, maplibre, kepler, deck, plotly, cartoee) | ❌ missing | `cartoee`-style static export → pyramids `plot`; rest → companion | ⚠️ static only |
+| **gdf / shapely → ee** | ✅ `features.create_feature` / `create_geometry` | — | — already present |
+| **shp / csv / geojson / kml / postgis → ee** | ❌ missing | earthlens `features.py` / `io.py` | ✅ thin converters over `create_feature` |
+| **ee → df / gdf** (vector download) | ✅ `io.feature_collection_to_*` | — | — already present |
+| **ee → shp / kml / geojson file writers** | ❌ missing | earthlens `io.py` | ✅ write from the existing gdf path |
+| **ee → GeoTIFF** | ✅ `GEE.download()` | — | — already present |
+| **ee → numpy** | ❌ missing | earthlens `io.py` / EEDAI reader | ✅ from a downloaded `Dataset.read_array` |
+| **ee → xarray** (`ee_to_xarray` via `xee`) | ❌ missing | earthlens new output kind, or pyramids-eo | ✅ adds an `xee` dep (evaluate) |
+| **JS (Code Editor) → Python** | ❌ missing | earthlens dev utility (optional) | ✅ pure-Python port; niche |
+| **Image export to Drive/GCS/Asset + URL tiling** | ✅ `export_via=` + `auto_split` | — | — already present |
+| **Vector / table export sinks** (`ee_export_vector_to_*`) | ❌ missing | earthlens (Task C3) | ✅ thin `ee.batch.Export.table` wrapper |
+| **Video / timelapse export** (`ee_export_video_*`) | ❌ missing | earthlens (Task C4) | ✅ thin `ee` wrapper (server-side) |
+| **download_ee_image (tiled)** | ✅ EEDAI + `auto_split` | — | — already present (different mechanism) |
+| **Point sampling** (`extract_values_to_points`) | ✅ `sampling.sample_points` | — | — already present |
+| **Polygon zonal statistics** (`zonal_stats`) | ❌ missing | earthlens (Task A1) → pyramids `zonal_stats` | ✅ client-side |
+| **Timeseries / transect extraction** (`extract_timeseries_to_point`, `extract_transect`, `random_sampling`) | ❌ missing | earthlens `sampling.py` | ✅ client-side / `ee` |
+| **Timelapse GIF/MP4 helpers** (landsat/s2/modis/goes…) | ❌ missing | pyramids-eo animation helper (from a DatasetCollection) | ⚠️ generic GIF yes; per-collection presets are geemap's value |
+| **Charting** (feature/image time-series, histograms) | ❌ missing (pyramids has static `plot`/`plot_histogram`) | pyramids plotting; interactive → companion | ⚠️ static only |
+| **ML: sklearn ↔ `ee.Classifier`** (`geemap.ml`) | ❌ missing | earthlens (Task B4); the string bridge is pure Python | ✅ portable |
+| **Client-side supervised/unsupervised classification** | ❌ missing | earthlens (Task B3/B4) → pyramids `cluster` / `apply` | ✅ client-side |
+| **COG utilities** (`cog_info`, `cog_validate`, `cog_stats`, `cog_pixel_value`) | ⚠️ partial (`to_cog`, `cog_info`, `validate_cog` in pyramids) | pyramids | ✅ mostly present |
+| **STAC utilities** (`stac_*`) | ⚠️ partial (earthlens has a separate STAC backend; pyramids `to_stac_item`) | pyramids / earthlens STAC backend | ✅ mostly present |
+| **Curated dataset shortcuts** (dynamic_world, NAIP, NWI, HUC, census, planet, goes, modis) | ⚠️ datasets in catalog; no preset helpers | earthlens catalog presets | ✅ low priority |
+| **Colormaps / legends / colorbars** | ❌ missing (pyramids has `set_color_ramp`) | pyramids plotting | ✅ minor |
+| **LiDAR** (read/write/view, 3DEP) | ❌ missing | out of scope (earthlens is imagery/raster) | ❌ out of scope |
+| **App integration** (Streamlit / Gradio / to_html) | ❌ missing | companion viz tool | ❌ out of scope for headless |
+| **Dataset search** (`ee_search`, `search_ee_data`) | ⚠️ offline `Catalog` instead (online search missing) | earthlens catalog | ✅ optional online search |
+
+## What can be added now
+
+Grouped by target and ordered by value/effort.
+
+### To earthlens directly — recommended now
+
+1. **Polygon zonal statistics** (already Task A1) — pyramids `zonal_stats`;
+   the biggest single gap vs. geemap's `zonal_stats`, and a natural extension
+   of the existing `sample_points`.
+2. **Extraction helpers** — `extract_timeseries_to_point`, `extract_transect`,
+   `random_sampling` in `sampling.py` (client-side on downloads, or `ee`
+   `reduceRegions` for archive scale).
+3. **Vector/table export sinks** (Task C3) — a thin
+   `ee.batch.Export.table.to{Drive,CloudStorage,Asset,BigQuery,FeatureView}`
+   wrapper reusing the existing `TaskInfo` tracking.
+4. **Format → ee converters** — `shp/csv/geojson/kml → ee` in `features.py` /
+   `io.py`, building on the existing `create_feature` (gdf → ee already works).
+5. **ee → file/array writers** — `ee → shp/kml/geojson` and `ee → numpy` in
+   `io.py`, reusing the existing gdf/`Dataset` paths.
+6. **sklearn ↔ `ee.Classifier` ML bridge** (Task B4) — geemap's `ml` string
+   conversion is pure Python and portable; pair with client-side classify via
+   pyramids `apply`.
+7. **Static quicklook thumbnails** (already Task A3) — pyramids `plot` /
+   `enhance.stretch` + `composites.true_color`.
+8. **ee → xarray output** — valuable for analysis workflows; evaluate adding an
+   `xee` dependency (behind an optional extra) before committing.
+
+### To pyramids / pyramids-eo — client-side raster/vector processing
+
+9. **Timelapse / animation** from a downloaded `DatasetCollection` — a generic
+   GIF/MP4 helper in pyramids-eo (the per-collection presets can stay a thin
+   earthlens layer on top).
+10. **cartoee-style static maps** — publication-quality Matplotlib/Cartopy
+    export as a pyramids plotting enhancement.
+11. **Colormap / legend / colorbar helpers** — extend pyramids plotting.
+12. **COG pixel-value / extra stats utilities** — round out pyramids' existing
+    `cog_info` / `validate_cog` / `to_cog`.
+
+### Better left to a companion tool or geemap itself — not the core
+
+- Interactive mapping (ipyleaflet), basemaps, draw tools, inspector, split-map,
+  time slider — these define geemap and require its heavy interactive stack.
+- Streamlit / Gradio app integration.
+- LiDAR read/write/view.
+- The many curated dataset preset shortcuts (the datasets are already in the
+  catalog; presets add convenience, not capability).
+
+**Guiding principle:** anything that runs **after pixels are downloaded** is a
+fit for earthlens/pyramids and mostly feasible now; anything **interactive or
+requiring the browser/notebook stack** belongs in geemap or a separate viz
+companion, not the headless acquisition core.
+
+---
+
 *Generated from introspection of `geemap==0.37.2` vs. the earthlens GEE backend
-source.*
+source (`features.create_feature`/`create_geometry`, `io`, `sampling`, and the
+`export_via`/EEDAI paths confirmed present; no xarray/xee, timelapse, zonal, or
+interactive-map surface present).*
