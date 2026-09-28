@@ -364,7 +364,70 @@ blocks the transect helper specifically.
 
 ---
 
+# Prerequisites in cleopatra (the matplotlib / basemap backend)
+
+`cleopatra` is the Matplotlib + basemap backend used by `pyramids-gis` and
+earthlens for all plotting/cartography. For the *viz* half of the geemap
+functionalities (static maps, timelapse, charts, colormaps, basemaps) it is the
+relevant layer. Introspecting **`cleopatra==0.40.0`**: it is the **most complete
+of the three layers — essentially not a blocker.**
+
+## Already present in cleopatra (wire up, no prerequisite work)
+
+- **Chart / plot glyphs** (`cleopatra.glyphs`): `LineGlyph` (time-series),
+  `ScatterGlyph`, `HistogramGlyph`, `KDEGlyph`, `HexbinGlyph`, `PolygonGlyph`,
+  `FlowGlyph`; raster `ArrayGlyph` / `MeshGlyph` / `VectorGlyph` (wind fields),
+  `CycloneOverlay`, and a 3-D `TexturedGlobeGlyph`.
+- **Animation** (geemap timelapse): `ArrayGlyph.animate` + `save_animation` —
+  **GIF/WebP via Pillow, MP4/MOV/AVI via FFmpeg** — with `FrameLabel`
+  (per-frame time labels), `PointOverlay` (sample markers), cell-value display,
+  and `FacetGrid`/`FacetLayout` for panels.
+- **Basemaps** (`cleopatra.basemap`): `Basemap`, XYZ `tiles`
+  (`add_tiles`/`get_provider`/`fetch_tiles`/`stitch_tiles`), `WMSProvider` /
+  `WMTSProvider`, Natural Earth features, shaded `relief`, `solar`
+  (nightshade / terminator / tissot), and projection **graticules/grids**
+  (orthographic etc.).
+- **Cartography furniture + styling** (`cleopatra.styling`): `NorthArrow`,
+  `ScaleBar`, `ColorBar`, perceptual/diverging/categorical `palettes`
+  (`get_palette` / `available_palettes`), log/midpoint norms, classification,
+  a full legend family (colorbar/histogram/swatch/size/width/hatch),
+  watermark/stamp — plus a one-call `publication_map(...)` (the cartoee
+  equivalent).
+
+So cartoee-style static maps, timelapse animation, colormaps/legends, RGB
+thumbnails, basemaps/tiles/WMS, and time-series line/scatter/histogram charts
+are all covered. Interactive maps (ipyleaflet) and Streamlit/Gradio are **out of
+scope** for cleopatra by design (static Matplotlib).
+
+## Genuinely missing in cleopatra (tiny, optional)
+
+### CV1 — Bar & Pie chart glyphs
+`Line`/`Scatter`/`Histogram`/`KDE`/`Hexbin` glyphs exist, but there is no
+`BarGlyph`/`PieGlyph` (geemap `bar_chart` / `pie_chart`). Low priority — the
+least geospatial charts.
+
+### CV2 — Progress-bar overlay on animations
+`FrameLabel` already stamps per-frame timestamps (covers geemap
+`add_text_to_gif`); a progress bar / scrubber (geemap `add_progress_bar_to_gif`)
+is a small addition on top of the existing `animate`. Optional.
+
+Everything else viz-related is **wiring existing cleopatra glyphs through
+pyramids / earthlens**, not new cleopatra code.
+
+## The three-layer picture
+
+| Layer | Role | Prerequisite work for the geemap features |
+|---|---|---|
+| **cleopatra** | Matplotlib + basemap viz | ≈ none — CV1 / CV2 optional & minor |
+| **pyramids** | data / IO / processing | **P1** temporal reducers (median/mode/percentile/trend) — real gap; **P2** transect (small) |
+| **earthlens** | GEE acquisition + wiring | the bulk — wire pyramids/cleopatra primitives into GEE helpers |
+
+The one true blocker remains **pyramids P1** (the `median`/`mosaic` reducer
+gap). cleopatra is ready.
+
+---
+
 *Generated from introspection of `geemap==0.37.2`, `pyramids-gis==0.65.0`, and
-`cleopatra` vs. the earthlens GEE backend source (`features.create_feature`/`create_geometry`, `io`, `sampling`, and the
+`cleopatra==0.40.0` vs. the earthlens GEE backend source (`features.create_feature`/`create_geometry`, `io`, `sampling`, and the
 `export_via`/EEDAI paths confirmed present; no xarray/xee, timelapse, zonal, or
 interactive-map surface present).*
