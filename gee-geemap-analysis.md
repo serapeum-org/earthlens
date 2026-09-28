@@ -206,12 +206,12 @@ wrapper without heavy new infrastructure.
 | **Basemaps & tile services** (xyz, WMS, QMS, TiTiler) | ❌ missing | companion viz tool | ❌ interactive-only |
 | **Multiple map backends** (folium, maplibre, kepler, deck, plotly, cartoee) | ❌ missing | `cartoee`-style static export → pyramids `plot`; rest → companion | ⚠️ static only |
 | **gdf / shapely → ee** | ✅ `features.create_feature` / `create_geometry` | — | — already present |
-| **shp / csv / geojson / kml / postgis → ee** | ❌ missing | earthlens `features.py` / `io.py` | ✅ thin converters over `create_feature` |
+| **shp / csv / geojson / kml / postgis → ee** | ❌ missing | earthlens `features.py` / `io.py`, via pyramids `FeatureCollection.from_file` → `create_feature` | ✅ no pyramids work — `FeatureCollection` reads every format already |
 | **ee → df / gdf** (vector download) | ✅ `io.feature_collection_to_*` | — | — already present |
-| **ee → shp / kml / geojson file writers** | ❌ missing | earthlens `io.py` | ✅ write from the existing gdf path |
+| **ee → shp / kml / geojson file writers** | ❌ missing | earthlens `io.py`, via pyramids `FeatureCollection.to_file` | ✅ no pyramids work — `to_file`/`to_csv`/`to_json`/`to_parquet` exist |
 | **ee → GeoTIFF** | ✅ `GEE.download()` | — | — already present |
-| **ee → numpy** | ❌ missing | earthlens `io.py` / EEDAI reader | ✅ from a downloaded `Dataset.read_array` |
-| **ee → xarray** (`ee_to_xarray` via `xee`) | ❌ missing | earthlens new output kind, or pyramids-eo | ✅ adds an `xee` dep (evaluate) |
+| **ee → numpy** | ❌ missing | earthlens `io.py` / EEDAI reader, via `Dataset.read_array` | ✅ no pyramids work |
+| **ee → xarray / NetCDF** | ❌ missing | **stays inside pyramids** — `DatasetCollection.to_netcdf`; no direct xarray/xee in earthlens (off-policy) | ⚠️ only if NetCDF output is wanted; do not add `xee`/rasterio |
 | **JS (Code Editor) → Python** | ❌ missing | earthlens dev utility (optional) | ✅ pure-Python port; niche |
 | **Image export to Drive/GCS/Asset + URL tiling** | ✅ `export_via=` + `auto_split` | — | — already present |
 | **Vector / table export sinks** (`ee_export_vector_to_*`) | ❌ missing | earthlens (Task C3) | ✅ thin `ee.batch.Export.table` wrapper |
@@ -248,16 +248,26 @@ Grouped by target and ordered by value/effort.
    `ee.batch.Export.table.to{Drive,CloudStorage,Asset,BigQuery,FeatureView}`
    wrapper reusing the existing `TaskInfo` tracking.
 4. **Format → ee converters** — `shp/csv/geojson/kml → ee` in `features.py` /
-   `io.py`, building on the existing `create_feature` (gdf → ee already works).
-5. **ee → file/array writers** — `ee → shp/kml/geojson` and `ee → numpy` in
-   `io.py`, reusing the existing gdf/`Dataset` paths.
+   `io.py`, via pyramids `FeatureCollection.from_file` → the existing
+   `create_feature` (gdf → ee already works). No new I/O dependency — all
+   reading goes through pyramids.
+5. **ee → file/array writers** — `ee → shp/kml/geojson` (via pyramids
+   `FeatureCollection.to_file`) and `ee → numpy` (via `Dataset.read_array`) in
+   `io.py`.
 6. **sklearn ↔ `ee.Classifier` ML bridge** (Task B4) — geemap's `ml` string
    conversion is pure Python and portable; pair with client-side classify via
    pyramids `apply`.
 7. **Static quicklook thumbnails** (already Task A3) — pyramids `plot` /
    `enhance.stretch` + `composites.true_color`.
-8. **ee → xarray output** — valuable for analysis workflows; evaluate adding an
-   `xee` dependency (behind an optional extra) before committing.
+8. **Timelapse / animation** — over `DatasetCollection.plot()` +
+   `cleopatra.ArrayGlyph.save_animation` (both already in the pyramids stack);
+   only the per-collection presets are new earthlens code. **Blocked for
+   `median`/`mosaic` datasets until pyramids prerequisite P1 lands** (below).
+
+> **Correction to the earlier plan:** `ee → xarray` via `xee` and any
+> standalone `rasterio`/`xarray` converters are **removed** — they violate the
+> "all GIS I/O through `pyramids-gis`" rule. NetCDF output, if ever needed,
+> stays inside pyramids via `DatasetCollection.to_netcdf`.
 
 ### To pyramids / pyramids-eo — client-side raster/vector processing
 
@@ -286,7 +296,75 @@ companion, not the headless acquisition core.
 
 ---
 
-*Generated from introspection of `geemap==0.37.2` vs. the earthlens GEE backend
-source (`features.create_feature`/`create_geometry`, `io`, `sampling`, and the
+# Prerequisites in pyramids (implement first)
+
+earthlens does **all** GIS I/O and format conversion through `pyramids-gis`
+(never `xarray`/`rasterio`/`fiona` directly). Given that rule, the question is
+which pyramids primitives must exist before the geemap-equivalent features can
+be built in earthlens. The answer, after introspecting `pyramids-gis==0.65.0`
+and its viz backend `cleopatra`, is: **very little — the foundation is already
+there.**
+
+## Already present in pyramids (no prerequisite work — wire up in earthlens now)
+
+- **Vector I/O — complete.** `pyramids.feature.FeatureCollection` is a full
+  **geopandas subclass** (306 methods): reads `from_file`/`read_file` (shp,
+  geojson, kml, gpkg), `read_parquet`, `read_gpx_layers`, `from_postgis`,
+  `from_wfs`, `from_ogc_features`, `from_featureserver`,
+  `from_vectortileserver`, `from_arrow`; writes `to_file`, `to_csv`, `to_json`,
+  `to_parquet`, `to_postgis`, `to_mvt`, `to_pmtiles`, `to_wkt`/`to_wkb`,
+  `to_h3`. So every `shp/csv/kml/geojson ↔ ee` path needs no pyramids work.
+- **Raster analysis.** `Dataset.zonal_stats`, `slope`/`aspect`/`hillshade`,
+  `cluster`, `apply`/`combine`/`where`, `to_polygons`/`to_feature_collection`/
+  `from_features`, `read_array`, `to_cog`, `proximity`, `focal_*`.
+- **Time-series container.** `DatasetCollection`: `from_files`/`from_stac`/
+  `from_archive`, per-pixel `mean/min/max/std/sum/var`, `reduce_time(times,
+  freq, op, skipna)` (calendar-bucketed compositing), `apply`, `groupby`, and an
+  **animated `plot()`** returning a `cleopatra.ArrayGlyph`.
+- **Animation + cartography.** `cleopatra.ArrayGlyph`: `animate` +
+  `save_animation` (GIF/MP4), `add_scale_bar`, `add_north_arrow`, `add_relief`,
+  `add_tiles`, `create_categorical_legend`, `create_color_bar`, `facet`,
+  `apply_colormap`, `scale_to_rgb`, `to_image` — geemap timelapse *and*
+  cartoee-style static maps.
+
+## Genuinely missing in pyramids (do these first)
+
+### P1 — Extra temporal reducers on `DatasetCollection` — **priority**
+`reduce_time`'s supported ops are hard-coded to
+`_OPS = ("mean", "sum", "min", "max", "std", "var")`
+(verified in `pyramids.dataset.collection`). **Missing: `median`,
+`mode`, `percentile(q)`, and ideally a per-pixel `linear_trend`/`sens_slope`.**
+
+This is not cosmetic — it is a **current consistency gap for earthlens**: the
+GEE catalog's `default_reducer` vocabulary is
+`mean/median/mosaic/min/max/mode/sum`, and cloud-screened optical and
+Sentinel-1 datasets default to **`median`**. The EEDAI client-side collection
+path reduces through pyramids, so any dataset whose reducer is
+`median`/`mosaic`/`mode` cannot be composited client-side by `reduce_time`
+today. Extending `_OPS` (and the reduce engine) with `median`, `mode`,
+`percentile`, and `linear_trend` unblocks accurate time-series composites, the
+timelapse feature for those datasets, and aligns pyramids with the reducer
+vocabulary earthlens already speaks. (`DatasetCollection.apply(ufunc)` is a
+stopgap, but named ops are cleaner and match the catalog.)
+
+### P2 — Line-transect / profile sampler on `Dataset` — small, optional
+`Dataset` has `sample`, `point`, `extract`, `get_cell_points`, but **no
+along-a-line transect sampler** (geemap `extract_transect`). Add
+`Dataset.transect(line, n)` (or accept a `LineString` in `extract`). Only
+blocks the transect helper specifically.
+
+## Recommended ordering
+
+1. **pyramids P1** — add `median`/`mode`/`percentile` (+ optional
+   `linear_trend`) to `DatasetCollection` reducers. Do this first: it is a real
+   gap and also fixes the current EEDAI `median`/`mosaic` limitation.
+2. **pyramids P2** — add a `Dataset` transect sampler (small, optional).
+3. **earthlens** — everything else, wiring the existing pyramids/cleopatra
+   primitives; no waiting required.
+
+---
+
+*Generated from introspection of `geemap==0.37.2`, `pyramids-gis==0.65.0`, and
+`cleopatra` vs. the earthlens GEE backend source (`features.create_feature`/`create_geometry`, `io`, `sampling`, and the
 `export_via`/EEDAI paths confirmed present; no xarray/xee, timelapse, zonal, or
 interactive-map surface present).*
