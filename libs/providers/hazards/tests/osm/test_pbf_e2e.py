@@ -49,6 +49,9 @@ class TestPbfLive:
     def test_malta_buildings_returns_features(self, tmp_path: Path):
         """pbf:buildings over the Malta extract returns >=1 polygon, EPSG:4326."""
         try:
+            # engine="pyrosm" explicitly: the facade default is now the streaming
+            # pyosmium engine, so this class must opt into pyrosm to exercise its
+            # rich per-layer output (the parsed tag columns asserted below).
             fc = EarthLens(
                 data_source="osm",
                 variables=["pbf:buildings"],
@@ -57,6 +60,7 @@ class TestPbfLive:
                 lon_lim=_LON_LIM,
                 path=str(tmp_path),
                 cache_dir=str(tmp_path / "geofabrik"),
+                engine="pyrosm",
             ).download(progress_bar=False)
         except Exception as exc:  # noqa: BLE001 - transport -> skip, else re-raise
             _skip_on_network(exc)
@@ -64,6 +68,8 @@ class TestPbfLive:
         assert fc.crs.to_epsg() == 4326
         # the identity column is normalised to `osm_id` (from pyrosm's `id`).
         assert {"osm_id", "osm_type"} <= set(fc.columns)
+        # pyrosm parses the layer's OSM tags into columns (unlike pyosmium's slim
+        # osm_id/osm_type/geometry schema), so the `building` tag column is present.
         assert "building" in fc.columns
 
 
