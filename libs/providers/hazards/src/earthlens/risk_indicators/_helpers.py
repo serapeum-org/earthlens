@@ -175,7 +175,7 @@ def _client(
         timeout=timeout,
         max_retries=_HTTP_RETRIES,
         backoff_factor=_HTTP_RETRY_BACKOFF,
-        status_forcelist=tuple(range(500, 600)) + tuple(extra_retry_statuses),
+        status_forcelist=tuple(range(500, 600)) + extra_retry_statuses,
         retry_on_exceptions=_TRANSIENT_ERRORS,
         raise_for_status=True,
         sleep=lambda seconds: time.sleep(seconds),
