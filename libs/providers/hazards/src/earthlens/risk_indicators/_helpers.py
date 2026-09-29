@@ -142,12 +142,14 @@ _TRANSIENT_ERRORS: tuple[type[requests.RequestException], ...] = (
 #: resource and still fails fast.
 #:
 #: Trade-off (accepted): a 404 shares the module's 5xx retry budget
-#: (`_HTTP_RETRIES` attempts, `[1s, 2s]` back-off), so a sustained ThinkHazard
-#: outage — or the rare truly-removed division code — degrades to a
-#: slow-but-bounded failure rather than a fast one, and `backend._fetch_one`
-#: pays it per requested single-hazard dataset. The error is always still
-#: raised; and because a division code is catalog-resolved before the request,
-#: a 404 here is in practice the flap, not a missing code.
+#: (`_HTTP_RETRIES` retries, `[1s, 2s]` back-off), so a sustained ThinkHazard
+#: outage — or a genuinely-removed / wrong division code — degrades to a
+#: slow-but-bounded failure rather than a fast one, paid per ThinkHazard
+#: request (single-hazard or all-hazards) in `backend._fetch_one`. The error
+#: is always still raised. On the common path the code comes from
+#: `resolve_admin`, so it exists in the catalog and a 404 is the flap; a wrong
+#: caller-supplied `admin_code=` bypasses that check and also pays the budget
+#: before failing.
 THINKHAZARD_RETRY_STATUSES: tuple[int, ...] = (404,)
 
 
