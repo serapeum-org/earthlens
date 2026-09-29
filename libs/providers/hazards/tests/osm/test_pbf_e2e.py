@@ -1,15 +1,16 @@
 """Live end-to-end test for the OpenStreetMap `pbf` protocol.
 
 Downloads the real (small, ~8.8 MB) Geofabrik **Malta** extract over anonymous
-HTTPS and reads its building footprints with `pyrosm` — no credentials. Gated
-behind the `e2e` + `osm_pbf` markers plus the `osm-pbf` extra (`pyrosm` /
-`osmium`): a default `pytest` run skips it, a missing SDK skips the module, and
-a transport failure skips rather than fails. The extract is cached under the
-test's `tmp_path` so the run is self-contained.
+HTTPS and reads its building footprints — no credentials. Gated behind the `e2e`
++ `osm_pbf` markers: the streaming `pyosmium` engine needs the `osm-pbf` extra
+(`osmium`), while the in-memory `pyrosm` engine needs the opt-in `pyrosm` SDK
+(CI injects it with `uv run --with pyrosm`). A default `pytest` run skips it, a
+missing SDK skips the module, and a transport failure skips rather than fails.
+The extract is cached under the test's `tmp_path` so the run is self-contained.
 
 Run with:
 
-    pixi run -e dev pytest -m "osm_pbf and e2e" tests/osm
+    uv run --with pyrosm pytest -m "osm_pbf and e2e" tests/osm
 """
 
 from __future__ import annotations
@@ -19,7 +20,9 @@ from pathlib import Path
 import pytest
 import requests
 
-pytest.importorskip("pyrosm", reason="the pbf e2e needs the osm-pbf extra (pyrosm)")
+pytest.importorskip(
+    "pyrosm", reason="the pbf e2e's pyrosm engine needs `pip install pyrosm`"
+)
 pytest.importorskip("osmium", reason="the pbf e2e needs the osm-pbf extra (osmium)")
 
 from earthlens.earthlens import EarthLens  # noqa: E402

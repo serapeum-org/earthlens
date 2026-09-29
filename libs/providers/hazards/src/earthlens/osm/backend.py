@@ -228,7 +228,7 @@ class OSM(AbstractDataSource):
         file_format: FileFormat = "geojson",
         max_bbox_deg2: float | None = None,
         region: str | None = None,
-        engine: Engine = "pyrosm",
+        engine: Engine = "pyosmium",
         cache_dir: Path | str | None = None,
     ):
         """Initialise an OSM backend instance.
@@ -283,9 +283,10 @@ class OSM(AbstractDataSource):
                 catalog's `regions:` table (`"malta"`, `"netherlands"`, …) or a
                 raw Geofabrik path (`"europe/andorra"`). Required when any
                 requested query is a `pbf:*` layer, ignored otherwise.
-            engine: The `pbf` read engine — `"pyrosm"` (in-memory, the default)
-                or `"pyosmium"` (streaming, for planet-scale extracts). Ignored
-                by the `overpass` / `ohsome` protocols.
+            engine: The `pbf` read engine — `"pyosmium"` (streaming, the default;
+                ships with `earthlens[osm-pbf]`) or `"pyrosm"` (in-memory, exact
+                tag filters + mixed geometry, opt-in via `pip install pyrosm`).
+                Ignored by the `overpass` / `ohsome` protocols.
             cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.
                 `None` uses `default_pbf_cache_dir()` (a cross-run user cache
                 under the shared earthlens cache directory).
@@ -839,8 +840,9 @@ class OSM(AbstractDataSource):
             FeatureCollection: The layer's features, CRS `EPSG:4326`.
 
         Raises:
-            ImportError: If the selected engine's SDK is not installed
-                (`earthlens[osm-pbf]`).
+            ImportError: If the selected engine's SDK is not installed — the
+                default `pyosmium` engine needs `earthlens[osm-pbf]`, the opt-in
+                `pyrosm` engine needs a manual `pip install pyrosm`.
             ValueError: If `self._region` is not a known region / raw path, or
                 a `pyrosm` read is attempted on an oversized extract.
         """

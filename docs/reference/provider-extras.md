@@ -41,7 +41,7 @@ it is bundled in `earthlens[all]`.
 | `obis` | ocean | `obis` | `pyobis` | ✅ |
 | `openeo` | imagery | `openeo` | `openeo` | ✅ |
 | `osm` | hazards | `osm` | `overpy`, `ohsome` | ✅ |
-| `osm` | hazards | `osm-pbf` | `pyrosm`, `osmium` | ❌ held out |
+| `osm` | hazards | `osm-pbf` | `osmium` (pyosmium; the `pyrosm` engine is opt-in) | ✅ |
 | `overture` | hazards | `overture` | `overturemaps`, `duckdb` | ✅ |
 | `radar` | atmosphere | `radar` | `earthlens-core[s3]` (boto3) | ✅ |
 | `s3` | atmosphere | `s3` | `earthlens-core[s3]` (boto3 / botocore) | ✅ |
@@ -76,14 +76,15 @@ with their thematic distribution and work out of the box.
 
 ## Notes
 
-- **`all` bundles 31 of the 34 extras.** Three are deliberately held out (still installable on their own):
+- **`all` bundles 32 of the 34 extras.** Two are deliberately held out (still installable on their own):
   - **`argo`** — `argopy` pins `xarray>=2025.7` while `openeo` pins `xarray<2025.1.2`; the two can't co-resolve
     (see `#789`).
-  - **`osm-pbf`** — `pyrosm`'s transitive `cykhash` dependency is **sdist-only** (no wheel), so it can't go in the
-    everything-install.
   - **`eedai`** — installing it flips the GEE backend's default `engine="auto"` onto the `pyramids-eo` EEDAI
     reader, which samples and grids differently from Earth Engine. It resolves cleanly; it is held out so an
     `all` upgrade never changes an existing user's pixels.
+- **`osm-pbf` is now in `all`** — its extra is just `osmium` (the wheel-clean `pyosmium` engine, the `pbf`
+  default), so it no longer pulls the sdist-only `cykhash`. The richer in-memory `pyrosm` engine is opt-in via a
+  manual `pip install pyrosm` (which builds `cykhash` from source); see `#1186`.
 - **Two empty extras** — `cmip6` and `ghsl` are declared (`= []`) but pull **no** dependency; the backend works
   without the extra. They exist for API/CLI symmetry.
 - **Extras that reuse the S3 client** — `s3`, `radar`, `goes`, `dem`, `nwm` pull `earthlens-core[s3]` (boto3) rather

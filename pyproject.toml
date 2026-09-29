@@ -78,13 +78,17 @@ usgs-water = ["earthlens-ocean[usgs-water]"]
 worldpop = ["earthlens-land[worldpop]"]
 
 # The self-referential "everything" extra: each entry re-activates one backend's
-# own extra on earthlens itself. `argo` (xarray clash with openeo -- see #789)
-# and `osm-pbf` (pyrosm's transitive cykhash dep is sdist-only) stay out; `osm`
-# is included because openeo already pins pandas<3, so ohsome's pandas<3 no
-# longer collides. `eedai` stays out deliberately: installing it flips the GEE
-# backend's default `engine="auto"` onto the pyramids-eo reader, which samples
-# and grids differently from Earth Engine, so it is opt-in rather than
-# something `all` turns on under an existing user.
+# own extra on earthlens itself. `argo` (xarray clash with openeo -- see #789) is
+# the only backend held out for a true conflict; `osm` is included because openeo
+# already pins pandas<3, so ohsome's pandas<3 no longer collides. `osm-pbf` is now
+# included too: its extra is just `osmium` (pyosmium, the default engine), which
+# ships wheels, so it no longer drags in pyrosm's transitive sdist-only `cykhash`
+# (see #1186). pyrosm (the in-memory pbf engine) is deliberately undeclared and
+# stays opt-in via a manual `pip install pyrosm` (see the hazards pyproject).
+# `eedai` stays out deliberately: installing it flips the GEE backend's default
+# `engine="auto"` onto the pyramids-eo reader, which samples and grids differently
+# from Earth Engine, so it is opt-in rather than something `all` turns on under an
+# existing user.
 all = [
     "earthlens[asf]",
     "earthlens[cmems]",
@@ -111,6 +115,7 @@ all = [
     "earthlens[obis]",
     "earthlens[openeo]",
     "earthlens[osm]",
+    "earthlens[osm-pbf]",
     "earthlens[overture]",
     "earthlens[radar]",
     "earthlens[s3]",
@@ -505,7 +510,7 @@ markers = [
     "nsi: tests for the NSI US flood exposure/loss backend (USACE National Structure Inventory + FEMA NFHL flood zones + FEMA NFIP claims v3; no extra SDK — core requests + pandas + pyramids; per-instance OUTPUT_KIND; all three keyless US public domain).",
     "glaciers: tests for the glaciers backend (RGI 7.0 per-region outlines via IHP-WINS + GLIMS WFS time-series outlines + WGMS Fluctuations of Glaciers tabular; no extra SDK — core requests + pandas + pyramids; mixed per-instance OUTPUT_KIND; all sources open, no auth).",
     "osm: tests for the OpenStreetMap backend (requires the `osm` extra: overpy + ohsome; two public keyless protocols — Overpass current-state via overpy, OSM history via ohsome; the non-e2e suite fakes both SDKs).",
-    "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; requires the `osm-pbf` extra: pyrosm + osmium/pyosmium; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract).",
+    "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; the `osm-pbf` extra ships the default streaming pyosmium engine (osmium), while the in-memory pyrosm engine is opt-in via a manual `pip install pyrosm`; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract and installs pyrosm to exercise its engine).",
     "admin: tests for the administrative-boundaries backend (geoBoundaries + CGAZ + Natural Earth + US Census TIGER/Line; no extra SDK — core requests + pyramids; all four public, GADM omitted for license).",
     "soilgrids: tests for the SoilGrids backend (ISRIC SoilGrids 2.0 soil properties via OGC WCS at maps.isric.org; no extra SDK — core requests + pyramids' Dataset.from_wcs; all public, CC-BY 4.0, no auth).",
     "drought: tests for the drought backend (US Drought Monitor / Copernicus EDO+GDO / CSIC SPEIbase; no extra SDK — core `requests` + pyramids; EDO/GDO fetched via the Copernicus GetCoverage REST endpoint, SPEIbase via direct NetCDF).",

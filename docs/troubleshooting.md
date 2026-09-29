@@ -42,10 +42,10 @@ Extras `openeo` and `argo` are incompatible with the declared conflicts
 extra instead:
 
 ```bash
-uv sync --extra all --group dev      # includes openeo and osm; omits argo / osm-pbf
+uv sync --extra all --group dev      # includes openeo, osm and osm-pbf; omits argo / eedai
 ```
 
-To work on the argo side, prune the other: `uv sync --all-extras --no-extra openeo --no-extra osm-pbf`.
+To work on the argo side, prune the conflicting extra: `uv sync --all-extras --no-extra openeo`.
 
 ## Request construction
 

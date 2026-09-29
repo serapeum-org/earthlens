@@ -78,9 +78,9 @@ class TestPbfConstruction:
             _osm(engine="bogus")
 
     def test_defaults(self, fake_pbf):
-        """Engine defaults to pyrosm and cache_dir to the user cache."""
+        """Engine defaults to pyosmium and cache_dir to the user cache."""
         osm = _osm()
-        assert osm._engine == "pyrosm"
+        assert osm._engine == "pyosmium"
         assert osm._cache_dir == backend.default_pbf_cache_dir()
 
 

@@ -116,8 +116,8 @@ you install the meta-package or a thematic distribution directly:
 | `argo` | [Argo Program](https://serapeum-org.github.io/earthlens/reference/argo/introduction/) | `argopy >=1.4` |
 | `erddap` | [NOAA ERDDAP](https://serapeum-org.github.io/earthlens/reference/erddap/introduction/) | `erddapy >=3.0` |
 | `osm` | [OpenStreetMap](https://serapeum-org.github.io/earthlens/reference/osm/introduction/) | `overpy >=0.7`, `ohsome >=0.4.0` |
-| `osm-pbf` | OpenStreetMap (bulk .osm.pbf extracts) | `pyrosm >=0.11.0`, `osmium >=4.3.1` |
-| `all` | every backend above except `argo`, `osm-pbf` (see [What `earthlens[all]` excludes](#what-earthlensall-excludes-and-why)) | — |
+| `osm-pbf` | OpenStreetMap (bulk .osm.pbf extracts) | `osmium >=4.3.1` (the `pyrosm` engine is opt-in — see below) |
+| `all` | every backend above except `argo` (see [What `earthlens[all]` excludes](#what-earthlensall-excludes-and-why)) | — |
 
 
 A bare `pip install earthlens` installs only the core dependencies (numpy, pandas, pyramids-gis,
@@ -170,23 +170,29 @@ one domain's dependencies without inheriting every other domain's constraints.
 ### What `earthlens[all]` excludes, and why
 
 `earthlens[all]` is the union of **every backend extra that can honestly share
-one environment** — that is every extra in the table above **except three**:
-`argo`, `osm-pbf` and `eedai`. Each is left out for a concrete reason:
+one environment** — that is every extra in the table above **except two**:
+`argo` and `eedai`. Each is left out for a concrete reason:
 
 | Excluded | SDK | Why it can't join `all` |
 |---|---|---|
 | `argo` | `argopy` | **Two** independent problems, either one disqualifying. **(1) `xarray` — a resolution conflict:** `argopy >=1.4` needs `xarray>=2025.7`, but `openeo` (in `all`) caps `xarray<2025.01.2` — disjoint ranges, which is what `[tool.uv] conflicts` declares. **(2) `erddapy` — a runtime break:** `argopy 1.4.0` still *resolves* (it does not cap `erddapy`) but fails at `import` — it imports `erddapy.erddapy._quote_string_constraints`, which `erddapy 3.3` removed — while the `erddap` extra (in `all`) requires `erddapy>=3.0`. |
-| `osm-pbf` | `pyrosm` | `pyrosm` (0.11) and `osmium` (4.3.1) both ship wheels, but `pyrosm` pulls the **sdist-only** `cykhash` (no wheels for any Python), so adding `osm-pbf` to `all` would make `pip install earthlens[all]` require a C compiler — it is kept out to keep `all` wheel-only. Tracked in [#783](https://github.com/serapeum-org/earthlens/issues/783). |
-
 | `eedai` | `pyramids-eo` | It resolves cleanly — this one is about *behaviour*, not packaging. Installing it activates the GEE backend's default `engine="auto"`, which serves raw single-asset reads through the EEDAI reader; that path samples and grids differently from Earth Engine (see the [GEE usage page](reference/gee/usage.md)). Holding it out of `all` means an upgrade never silently changes an existing user's pixels. |
 
-(`osm` itself **is** in `all` — see the resolution note below for why.)
+`osm-pbf` **is** in `all`: its extra is just `osmium` (the wheel-clean `pyosmium`
+streaming engine, which is the `pbf` default), so it no longer drags in the
+sdist-only `cykhash`. The richer in-memory `pyrosm` engine is **opt-in** — it
+pulls `cykhash`, which ships sdist-only (no wheels), so a plain `pip install
+pyrosm` needs a C compiler to build it. Selecting `engine="pyrosm"` without it
+raises a clear `ImportError` naming the command (tracked in
+[#1186](https://github.com/serapeum-org/earthlens/issues/1186)). (`osm` itself is
+also in `all` — see the resolution note below for why.)
 
 Each still installs **on its own**, in a separate environment:
 
 ```bash
 pip install earthlens[argo]      # its own env — pulls xarray>=2025.7
-pip install earthlens[osm-pbf]   # builds cykhash (a pyrosm dep) from source — needs a C compiler
+pip install earthlens[osm-pbf]   # wheel-only (pyosmium engine); joins earthlens[all]
+pip install pyrosm               # opt-in in-memory engine — builds cykhash from source (needs a C compiler)
 ```
 
 > **What an `all` install actually resolves to.** With `argo` out,
@@ -294,8 +300,8 @@ If you are planning to contribute to earthlens, install the whole workspace
 editable with the `[all]` extra so the full test suite (which exercises every
 backend) can run. [uv](https://docs.astral.sh/uv/) is the supported path — it
 installs every workspace member from one lockfile (`uv.lock`). `--extra all`
-pulls every backend SDK except the two extras excluded from `all`
-(`argo` / `osm-pbf` — see [What `earthlens[all]` excludes](#what-earthlensall-excludes-and-why)):
+pulls every backend SDK except the extras held out of `all`
+(`argo` / `eedai` — see [What `earthlens[all]` excludes](#what-earthlensall-excludes-and-why)):
 
 ```bash
 git clone https://github.com/serapeum-org/earthlens.git

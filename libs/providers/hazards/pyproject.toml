@@ -62,7 +62,18 @@ overture = ["overturemaps >=1.0.0", "duckdb >=1.0.0"]
 # them from class attributes), which cap a hostile `Retry-After` to match
 # HttpClient's 300 s ceiling.
 osm = ["overpy >=0.7", "ohsome >=0.4.0", "urllib3 >=2"]
-osm-pbf = ["pyrosm >=0.11.0", "osmium >=4.3.1"]
+# `pyosmium` (imported as `osmium`) is the wheel-clean, default `pbf` read engine
+# (`_pbf.py`'s `engine="pyosmium"`), so it is the whole extra. `pyrosm` (the
+# in-memory `engine="pyrosm"` path) is deliberately NOT declared here: it pulls
+# the transitive `cykhash`, which ships sdist-only on PyPI (no wheels), forcing a
+# Cython source build on every `pip install earthlens[all]` and every CI job.
+# Holding it out lets `osm-pbf` join the `all` extra (see the root pyproject and
+# #1186). The pyrosm engine stays available opt-in via a manual `pip install
+# pyrosm`; `_pbf._require_pyrosm` raises a descriptive error naming that command
+# when the engine is selected uninstalled. This is a sanctioned, single exception
+# to the repo's declared-dependency rule, confined to pyrosm here — do not
+# undeclare any other import.
+osm-pbf = ["osmium >=4.3.1"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
@@ -120,7 +131,7 @@ markers = [
     "jrc: tests for the JRC European Flood Hazard Map backend (river-flood water depth per return period, Europe + Mediterranean; open HTTPS from the JRC, no extra SDK — core requests + pyramids `/vsicurl` windowed reads; CC-BY 4.0).",
     "integration: exercises multiple modules together with mocked I/O.",
     "osm: tests for the OpenStreetMap backend (requires the `osm` extra: overpy + ohsome; two public keyless protocols — Overpass current-state via overpy, OSM history via ohsome; the non-e2e suite fakes both SDKs).",
-    "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; requires the `osm-pbf` extra: pyrosm + osmium/pyosmium; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract).",
+    "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; the `osm-pbf` extra ships the default streaming pyosmium engine (osmium), while the in-memory pyrosm engine is opt-in via a manual `pip install pyrosm`; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract and installs pyrosm to exercise its engine).",
     "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",
     "risk_indicators: tests for the risk-indicators backend (GFDRR ThinkHazard! + INFORM Risk + Global Forest Watch; no extra SDK — core requests + pandas + pyramids; GFW datasets need GFW_API_KEY, ThinkHazard/INFORM are public).",
     "nsi: tests for the NSI US flood exposure/loss backend (USACE National Structure Inventory + FEMA NFHL flood zones + FEMA NFIP claims v3; no extra SDK — core requests + pandas + pyramids; per-instance OUTPUT_KIND; all three keyless US public domain).",

@@ -21,6 +21,7 @@ from shapely.geometry import LineString, Point, Polygon, box
 
 from earthlens.osm import _pbf
 from earthlens.osm._pbf import (
+    _require_pyrosm,
     download_extract,
     geofabrik_url,
     read_pbf,
@@ -268,8 +269,43 @@ class TestReadPyrosm:
             read_pbf(pbf, pyrosm_method="get_buildings", engine="pyrosm")
 
 
+class TestRequirePyrosm:
+    """The opt-in `pyrosm` engine's install guard (`_require_pyrosm`)."""
+
+    def test_returns_osm_class_when_installed(self, fake_pyrosm):
+        """With `pyrosm` importable, the reader returns its `OSM` class."""
+        assert _require_pyrosm() is fake_pyrosm
+
+    def test_missing_pyrosm_raises_descriptive_error(self, monkeypatch):
+        """A missing `pyrosm` raises an ImportError naming `pip install pyrosm`."""
+        # A `None` entry makes `import pyrosm` raise ImportError (absent module).
+        monkeypatch.setitem(sys.modules, "pyrosm", None)
+        with pytest.raises(ImportError, match="pip install pyrosm") as exc:
+            _require_pyrosm()
+        # The hint points opt-in users at the default streaming engine too.
+        assert "pyosmium" in str(exc.value)
+
+    def test_read_pbf_pyrosm_engine_propagates_missing_sdk(self, tmp_path, monkeypatch):
+        """`read_pbf(engine='pyrosm')` surfaces the guard when pyrosm is absent."""
+        monkeypatch.setitem(sys.modules, "pyrosm", None)
+        pbf = tmp_path / "x.osm.pbf"
+        pbf.write_bytes(b"x")
+        with pytest.raises(ImportError, match="pip install pyrosm"):
+            read_pbf(pbf, pyrosm_method="get_buildings", engine="pyrosm")
+
+
 class TestReadEngineSelection:
     """Engine routing and validation."""
+
+    def test_default_engine_is_pyosmium(self, tmp_path, fake_osmium):
+        """Omitting `engine` routes through the streaming pyosmium engine."""
+        fake_osmium.objects = [FakeNode(1, 14.5, 35.9)]
+        pbf = tmp_path / "x.osm.pbf"
+        pbf.write_bytes(b"x")
+        # No engine= → the default. It resolves without pyrosm installed, and the
+        # fake osmium stream drives the read, proving pyosmium is the default.
+        fc = read_pbf(pbf, pyrosm_method="get_pois")
+        assert len(fc) == 1 and fc.geometry.iloc[0].geom_type == "Point"
 
     def test_unknown_engine_raises(self, tmp_path):
         """An unknown engine name is rejected."""
