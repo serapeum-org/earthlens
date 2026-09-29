@@ -140,6 +140,14 @@ _TRANSIENT_ERRORS: tuple[type[requests.RequestException], ...] = (
 #: definite answer, so it is retried *only* for ThinkHazard and never promoted
 #: into the shared 5xx forcelist — an INFORM or GFW `404` is a genuine missing
 #: resource and still fails fast.
+#:
+#: Trade-off (accepted): a 404 shares the module's 5xx retry budget
+#: (`_HTTP_RETRIES` attempts, `[1s, 2s]` back-off), so a sustained ThinkHazard
+#: outage — or the rare truly-removed division code — degrades to a
+#: slow-but-bounded failure rather than a fast one, and `backend._fetch_one`
+#: pays it per requested single-hazard dataset. The error is always still
+#: raised; and because a division code is catalog-resolved before the request,
+#: a 404 here is in practice the flap, not a missing code.
 THINKHAZARD_RETRY_STATUSES: tuple[int, ...] = (404,)
 
 
