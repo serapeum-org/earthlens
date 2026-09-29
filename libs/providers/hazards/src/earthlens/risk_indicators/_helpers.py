@@ -135,11 +135,11 @@ _TRANSIENT_ERRORS: tuple[type[requests.RequestException], ...] = (
 #: ThinkHazard!'s report endpoints intermittently answer `404` for a division
 #: code that exists and resolves to `200` seconds later — a server-side flap,
 #: not a real "not found". Observed live: the same `/report/{code}.json` URL
-#: returning `404` then `200` minutes apart, and one report id `404`ing while
-#: another `200`s in the very same test run. A `404` is normally a definite
-#: answer, so it is retried *only* for ThinkHazard and never promoted into the
-#: shared 5xx forcelist — an INFORM or GFW `404` is a genuine missing resource
-#: and still fails fast.
+#: returning `404` then `200` minutes apart, and one report id answering `404`
+#: while another answers `200` within the same minute. A `404` is normally a
+#: definite answer, so it is retried *only* for ThinkHazard and never promoted
+#: into the shared 5xx forcelist — an INFORM or GFW `404` is a genuine missing
+#: resource and still fails fast.
 THINKHAZARD_RETRY_STATUS: tuple[int, ...] = (404,)
 
 

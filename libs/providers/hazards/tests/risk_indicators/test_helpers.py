@@ -155,6 +155,61 @@ class TestRequestJsonRetry:
             _helpers.inform_query(503, "INFORM")
         assert returns_404.calls == 1
 
+    def test_thinkhazard_all_hazards_404_is_retried(self, monkeypatch):
+        """The all-hazards branch (no hazard mnemonic) also retries a 404.
+
+        Test scenario:
+            `test_thinkhazard_all_live` hits `/report/133.json` (hazard=None),
+            which is the endpoint most often seen flapping; a 404 then 200 there
+            must be retried the same way the single-hazard branch is.
+        """
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        responses = iter([_HttpError(404), _Resp([{"hazardtype": "FL"}])])
+        calls = {"n": 0}
+
+        def fake_get(url, **kwargs):
+            calls["n"] += 1
+            return next(responses)
+
+        monkeypatch.setattr(_helpers.requests, "get", fake_get)
+        assert _helpers.thinkhazard_query("133") == [{"hazardtype": "FL"}]
+        assert calls["n"] == 2, f"expected one retry, saw {calls['n']} call(s)"
+
+    def test_thinkhazard_404_succeeds_on_last_allowed_attempt(self, monkeypatch):
+        """Two 404s inside the retry budget still resolve on the third attempt.
+
+        Test scenario:
+            With `_HTTP_RETRIES == 2` the call gets three attempts; a 404 on the
+            first two and a 200 on the third returns the body, exercising the
+            full budget boundary rather than a single retry.
+        """
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        responses = iter([_HttpError(404), _HttpError(404), _Resp({"ok": True})])
+        calls = {"n": 0}
+
+        def fake_get(url, **kwargs):
+            calls["n"] += 1
+            return next(responses)
+
+        monkeypatch.setattr(_helpers.requests, "get", fake_get)
+        assert _helpers.thinkhazard_query("133", "FL") == {"ok": True}
+        assert calls["n"] == _helpers._HTTP_RETRIES + 1
+
+    def test_thinkhazard_non_404_4xx_fails_fast(self, monkeypatch):
+        """A non-404 4xx on ThinkHazard is not retried — only 404 opted in.
+
+        Test scenario:
+            The retry is scoped to `THINKHAZARD_RETRY_STATUS == (404,)`, so a
+            403 (a real permission answer, not the flap) must still fail fast on
+            the first attempt rather than being swept in as "any 4xx".
+        """
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        returns_403 = _ReturnsResponse(_HttpError(403))
+        monkeypatch.setattr(_helpers.requests, "get", returns_403)
+        with pytest.raises(_helpers.requests.HTTPError):
+            _helpers.thinkhazard_query("133", "FL")
+        assert returns_403.calls == 1, f"403 was retried {returns_403.calls} time(s)"
+
     def test_timeout_is_retried(self, monkeypatch):
         """A Timeout is transient and retried, then the next attempt succeeds."""
         monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
