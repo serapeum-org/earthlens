@@ -24388,9 +24388,9 @@ for everything. The <a href="../reference/providers/">provider matrix</a> lists 
 <p>(That one is uv's message, not earthlens'.)</p>
 <p><code>argopy</code> needs <code>xarray&gt;=2025.7</code> and <code>openeo</code> needs <code>xarray&lt;2025.1.2</code> — mutually unsatisfiable. Use the curated
 extra instead:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev<span class="w">      </span><span class="c1"># includes openeo and osm; omits argo / osm-pbf</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev<span class="w">      </span><span class="c1"># includes openeo, osm and osm-pbf; omits argo / eedai</span>
 </code></pre></div>
-<p>To work on the argo side, prune the other: <code>uv sync --all-extras --no-extra openeo --no-extra osm-pbf</code>.</p>
+<p>To work on the argo side, prune the conflicting extra: <code>uv sync --all-extras --no-extra openeo</code>.</p>
 <h2 id="request-construction"><a class="toclink" href="#request-construction">Request construction</a><a class="headerlink" href="#request-construction" title="Permanent link">#</a></h2>
 <h3 id="x-is-not-a-supported-data-source"><a class="toclink" href="#x-is-not-a-supported-data-source"><code>'x' is not a supported data source</code></a><a class="headerlink" href="#x-is-not-a-supported-data-source" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ValueError: &#39;not-a-provider&#39; is not a supported data source. Known: [&#39;admin&#39;, &#39;admin-boundaries&#39;, ...]

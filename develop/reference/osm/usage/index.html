@@ -23984,12 +23984,15 @@ rendered API is the <a href="../osm/">Reference</a> page.</p>
 <p>The protocol SDKs ship behind two extras (imported lazily — the base package
 imports without them):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm<span class="o">]</span><span class="w">      </span><span class="c1"># overpy + ohsome  (Overpass + ohsome protocols)</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm-pbf<span class="o">]</span><span class="w">  </span><span class="c1"># pyrosm + osmium  (the pbf protocol)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm-pbf<span class="o">]</span><span class="w">  </span><span class="c1"># osmium (pyosmium)  (the pbf protocol, default engine)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>pip<span class="w"> </span>install<span class="w"> </span>pyrosm<span class="w">              </span><span class="c1"># opt-in: the richer in-memory pbf engine</span>
 </code></pre></div>
-<p><code>[osm-pbf]</code> is <strong>not</strong> in <code>[all]</code> because <code>pyrosm</code> pulls the sdist-only <code>cykhash</code>
-(it would need a C compiler), so install it explicitly for bulk PBF work. Note
-<code>pyosmium</code> is published on PyPI as <code>osmium</code>. There are no credentials to
-configure — Overpass, ohsome, and Geofabrik are all public.</p>
+<p><code>[osm-pbf]</code> <strong>is</strong> in <code>[all]</code>: it ships only the wheel-clean <code>pyosmium</code> streaming
+engine (published on PyPI as <code>osmium</code>), which is the <code>pbf</code> default. The richer
+in-memory <code>pyrosm</code> engine is <strong>opt-in</strong> — <code>pip install pyrosm</code> builds the
+sdist-only <code>cykhash</code> from source (needs a C compiler) — so install it only when
+you want <code>engine="pyrosm"</code>. There are no credentials to configure — Overpass,
+ohsome, and Geofabrik are all public.</p>
 <h2 id="quickstart-current-state-hospitals-overpass"><a class="toclink" href="#quickstart-current-state-hospitals-overpass">Quickstart — current-state hospitals (Overpass)</a><a class="headerlink" href="#quickstart-current-state-hospitals-overpass" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
@@ -24023,7 +24026,8 @@ shared community infrastructure.</p>
 <h2 id="quickstart-every-building-in-a-region-pbf"><a class="toclink" href="#quickstart-every-building-in-a-region-pbf">Quickstart — every building in a region (pbf)</a><a class="headerlink" href="#quickstart-every-building-in-a-region-pbf" title="Permanent link">#</a></h2>
 <p>For a <strong>bulk</strong> ask — every building in a country — use the <code>pbf</code> protocol. It
 downloads a <a href="https://download.geofabrik.de/">Geofabrik</a> extract for <code>region=</code>
-(cached on disk), reads the layer with <code>pyrosm</code>, and clips to the request bbox:</p>
+(cached on disk), reads the layer with the default streaming <code>pyosmium</code> engine,
+and clips to the request bbox:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">buildings</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pbf:buildings&quot;</span><span class="p">],</span>
@@ -24042,18 +24046,20 @@ calls reuse it. List the region keys with <code>Catalog().region_ids()</code>, o
 raw Geofabrik path (any string with a <code>/</code>). Omit <code>lat_lim</code> / <code>lon_lim</code> to read
 the whole extract — the bbox-area cap does <strong>not</strong> apply to a <code>pbf</code> read.</p>
 <div class="admonition note">
-<p class="admonition-title">Engines — <code>pyrosm</code> (default) vs <code>pyosmium</code></p>
-<p><code>engine="pyrosm"</code> (the default) reads the whole extract in memory and gives
-the richest columns; it refuses a file over 4 GB. For a <strong>continent- or
-planet-scale</strong> extract, pass <code>engine="pyosmium"</code> to stream it with bounded
-memory. The backend warns before downloading a multi-GB extract. Never load
-<code>planet.osm</code> with <code>pyrosm</code>.</p>
-<p>The <code>pyosmium</code> engine is a <strong>coarser fallback</strong>: it returns a slimmer
-<code>osm_id</code> / <code>osm_type</code> / <code>geometry</code> schema and, per layer, a single geometry
-kind under one representative tag (so it under-reports a row's advertised
-<code>geometry_types</code> — e.g. <code>pbf:pois</code> yields only node points, <code>pbf:roads</code>
-approximates <code>network_type="driving"</code> rather than reproducing <code>pyrosm</code>'s
-exact filter). Use <code>pyrosm</code> when you need the full, exact per-layer output.</p>
+<p class="admonition-title">Engines — <code>pyosmium</code> (default) vs <code>pyrosm</code></p>
+<p><code>engine="pyosmium"</code> (the default) streams the extract with bounded memory and
+ships with <code>earthlens[osm-pbf]</code>, so it works out of the box and handles
+<strong>continent- or planet-scale</strong> extracts. It is the <strong>coarser</strong> reader: it
+returns a slimmer <code>osm_id</code> / <code>osm_type</code> / <code>geometry</code> schema and, per layer, a
+single geometry kind under one representative tag (so it under-reports a row's
+advertised <code>geometry_types</code> — e.g. <code>pbf:pois</code> yields only node points,
+<code>pbf:roads</code> approximates <code>network_type="driving"</code> rather than reproducing
+<code>pyrosm</code>'s exact filter).</p>
+<p><code>engine="pyrosm"</code> reads the whole extract in memory and gives the richest,
+exact per-layer columns and mixed geometry; it refuses a file over 4 GB, so
+never load <code>planet.osm</code> with it. It is <strong>opt-in</strong> (<code>pip install pyrosm</code> — see
+above); selecting it without pyrosm installed raises a clear <code>ImportError</code>
+naming the command. The backend warns before downloading a multi-GB extract.</p>
 </div>
 <h2 id="choosing-the-query-variables"><a class="toclink" href="#choosing-the-query-variables">Choosing the query — <code>variables</code></a><a class="headerlink" href="#choosing-the-query-variables" title="Permanent link">#</a></h2>
 <p>For this backend <code>variables</code> is the list of <strong>named-query ids</strong>, not
@@ -24160,8 +24166,8 @@ an <code>[out:xml]</code> / <code>[out:csv]</code> override will not parse.</p>
 </tr>
 <tr>
 <td><code>engine</code></td>
-<td><code>pbf</code> read engine: <code>"pyrosm"</code> (in-memory) or <code>"pyosmium"</code> (streaming)</td>
-<td><code>"pyrosm"</code></td>
+<td><code>pbf</code> read engine: <code>"pyosmium"</code> (streaming) or <code>"pyrosm"</code> (in-memory, opt-in)</td>
+<td><code>"pyosmium"</code></td>
 </tr>
 <tr>
 <td><code>cache_dir</code></td>

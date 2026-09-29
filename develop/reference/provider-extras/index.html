@@ -23945,8 +23945,8 @@ it is bundled in <code>earthlens[all]</code>.</p>
 <td><code>osm</code></td>
 <td>hazards</td>
 <td><code>osm-pbf</code></td>
-<td><code>pyrosm</code>, <code>osmium</code></td>
-<td style="text-align: center;">❌ held out</td>
+<td><code>osmium</code> (pyosmium; the <code>pyrosm</code> engine is opt-in)</td>
+<td style="text-align: center;">✅</td>
 </tr>
 <tr>
 <td><code>overture</code></td>
@@ -24113,14 +24113,15 @@ with their thematic distribution and work out of the box.</p>
 </table>
 <h2 id="notes"><a class="toclink" href="#notes">Notes</a><a class="headerlink" href="#notes" title="Permanent link">#</a></h2>
 <ul>
-<li><strong><code>all</code> bundles 31 of the 34 extras.</strong> Three are deliberately held out (still installable on their own):</li>
+<li><strong><code>all</code> bundles 32 of the 34 extras.</strong> Two are deliberately held out (still installable on their own):</li>
 <li><strong><code>argo</code></strong> — <code>argopy</code> pins <code>xarray&gt;=2025.7</code> while <code>openeo</code> pins <code>xarray&lt;2025.1.2</code>; the two can't co-resolve
     (see <code>#789</code>).</li>
-<li><strong><code>osm-pbf</code></strong> — <code>pyrosm</code>'s transitive <code>cykhash</code> dependency is <strong>sdist-only</strong> (no wheel), so it can't go in the
-    everything-install.</li>
 <li><strong><code>eedai</code></strong> — installing it flips the GEE backend's default <code>engine="auto"</code> onto the <code>pyramids-eo</code> EEDAI
     reader, which samples and grids differently from Earth Engine. It resolves cleanly; it is held out so an
     <code>all</code> upgrade never changes an existing user's pixels.</li>
+<li><strong><code>osm-pbf</code> is now in <code>all</code></strong> — its extra is just <code>osmium</code> (the wheel-clean <code>pyosmium</code> engine, the <code>pbf</code>
+  default), so it no longer pulls the sdist-only <code>cykhash</code>. The richer in-memory <code>pyrosm</code> engine is opt-in via a
+  manual <code>pip install pyrosm</code> (which builds <code>cykhash</code> from source); see <code>#1186</code>.</li>
 <li><strong>Two empty extras</strong> — <code>cmip6</code> and <code>ghsl</code> are declared (<code>= []</code>) but pull <strong>no</strong> dependency; the backend works
   without the extra. They exist for API/CLI symmetry.</li>
 <li><strong>Extras that reuse the S3 client</strong> — <code>s3</code>, <code>radar</code>, <code>goes</code>, <code>dem</code>, <code>nwm</code> pull <code>earthlens-core[s3]</code> (boto3) rather

@@ -23907,7 +23907,7 @@ as a <a href="https://github.com/serapeum-org/pyramids">pyramids</a> <code>Featu
 </tr>
 <tr>
 <td><strong>pbf</strong></td>
-<td><a href="https://pyrosm.readthedocs.io/"><code>pyrosm</code></a> / <a href="https://osmcode.org/pyosmium/"><code>pyosmium</code></a></td>
+<td><a href="https://osmcode.org/pyosmium/"><code>pyosmium</code></a> (default) / <a href="https://pyrosm.readthedocs.io/"><code>pyrosm</code></a> (opt-in)</td>
 <td><strong>bulk / regional</strong> reads from a Geofabrik <code>.osm.pbf</code> extract (a whole country's buildings, roads, …)</td>
 <td>points, lines, polygons</td>
 </tr>
@@ -24040,10 +24040,11 @@ token, no login, so there is no <code>authentication.md</code> page. The SDKs sh
 two extras and are imported lazily, so the package imports fine without them:</p>
 <ul>
 <li><code>pip install earthlens[osm]</code> → <code>overpy</code> + <code>ohsome</code> (the live protocols).</li>
-<li><code>pip install earthlens[osm-pbf]</code> → <code>pyrosm</code> + <code>osmium</code> (the <code>pbf</code> protocol).
-  Note <code>pyosmium</code> is published on PyPI as <code>osmium</code>. This extra is <strong>not</strong> part
-  of <code>[all]</code> because <code>pyrosm</code> pulls the sdist-only <code>cykhash</code> (it would need a C
-  compiler), so install it explicitly for bulk PBF work.</li>
+<li><code>pip install earthlens[osm-pbf]</code> → <code>osmium</code> (the wheel-clean <code>pyosmium</code>
+  streaming engine, the <code>pbf</code> default; <code>pyosmium</code> is published on PyPI as
+  <code>osmium</code>). This extra <strong>is</strong> part of <code>[all]</code>. The richer in-memory <code>pyrosm</code>
+  engine is opt-in: <code>pip install pyrosm</code> builds the sdist-only <code>cykhash</code> from
+  source (needs a C compiler), so install it only for <code>engine="pyrosm"</code>.</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Overpass needs a real User-Agent</p>
@@ -24063,10 +24064,10 @@ User-Agent, and the timeout are all constructor-overridable.</p>
 <li><strong>ohsome</strong> — the geometry plus ohsome's own columns, notably <code>@osmId</code> and
   <code>@snapshotTimestamp</code> (the history timestamp) and <code>@other_tags</code>.</li>
 <li><strong>pbf</strong> — an <code>osm_id</code> / <code>osm_type</code> identity (pyrosm's native <code>id</code> column is
-  normalised to <code>osm_id</code> so it matches the other paths) plus, with the default
-  <code>pyrosm</code> engine, the layer's key tags (e.g. <code>building</code>); the <code>pyosmium</code>
-  engine returns the slimmer <code>osm_id</code> / <code>osm_type</code> / <code>geometry</code> schema (see the
-  engine note in <a href="../usage/">Usage</a>).</li>
+  normalised to <code>osm_id</code> so it matches the other paths). The default <code>pyosmium</code>
+  engine returns the slimmer <code>osm_id</code> / <code>osm_type</code> / <code>geometry</code> schema; the
+  opt-in <code>pyrosm</code> engine adds the layer's key tags (e.g. <code>building</code>) and exact
+  per-layer columns (see the engine note in <a href="../usage/">Usage</a>).</li>
 </ul>
 <p>As a side effect, <code>download()</code> also writes the collection to one vector file in
 the output directory (GeoJSON by default, or GeoPackage).</p>
@@ -24084,13 +24085,12 @@ normally push a <em>generic format reader</em> to pyramids — but <code>pyrosm<
 is exactly the per-provider-SDK role <code>earthlens.osm</code> already plays for
 <code>overpy</code> / <code>ohsome</code>. By maintainer decision the whole OSM stack, PBF included,
 stays in earthlens; it is <strong>not</strong> ported to pyramids.</p>
-<p>The <code>pyrosm</code> (in-memory) engine reads a whole regional extract into memory and
-is the default. For a <strong>continent- or planet-scale</strong> extract too large to hold
-in memory, pass <code>engine="pyosmium"</code> to stream it with bounded memory; the
-backend also warns before downloading a multi-GB extract and refuses to load a</p>
-<blockquote>
-<p>4 GB file with <code>pyrosm</code>. Never load <code>planet.osm</code> with <code>pyrosm</code>.</p>
-</blockquote>
+<p>The default <code>pyosmium</code> (streaming) engine reads with bounded memory and ships
+with <code>earthlens[osm-pbf]</code>, so it handles a <strong>continent- or planet-scale</strong> extract
+out of the box. The opt-in <code>pyrosm</code> (in-memory) engine reads a whole regional
+extract into memory for the richest, exact output; the backend warns before
+downloading a multi-GB extract and refuses to load a &gt;4 GB file with <code>pyrosm</code>.
+Never load <code>planet.osm</code> with <code>pyrosm</code>.</p>
 <h2 id="out-of-scope-follow-ons"><a class="toclink" href="#out-of-scope-follow-ons">Out of scope (follow-ons)</a><a class="headerlink" href="#out-of-scope-follow-ons" title="Permanent link">#</a></h2>
 <ul>
 <li><strong>ohsome aggregation endpoints</strong> (counts / areas / lengths over time). The
