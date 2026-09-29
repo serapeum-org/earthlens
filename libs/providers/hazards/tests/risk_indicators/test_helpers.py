@@ -123,6 +123,38 @@ class TestRequestJsonRetry:
             _helpers.inform_query(503, "INFORM")
         assert returns_404.calls == 1
 
+    def test_thinkhazard_404_is_retried(self, monkeypatch):
+        """ThinkHazard's flapping 404 is retried, then the next body returned."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        responses = iter([_HttpError(404), _Resp({"hazard_category": "HIG"})])
+        calls = {"n": 0}
+
+        def fake_get(url, **kwargs):
+            calls["n"] += 1
+            return next(responses)
+
+        monkeypatch.setattr(_helpers.requests, "get", fake_get)
+        assert _helpers.thinkhazard_query("133", "FL") == {"hazard_category": "HIG"}
+        assert calls["n"] == 2
+
+    def test_thinkhazard_404_persisting_raises(self, monkeypatch):
+        """A ThinkHazard 404 that never clears still raises, after the retries."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        returns_404 = _ReturnsResponse(_HttpError(404))
+        monkeypatch.setattr(_helpers.requests, "get", returns_404)
+        with pytest.raises(_helpers.requests.HTTPError):
+            _helpers.thinkhazard_query("133", "FL")
+        assert returns_404.calls == _helpers._HTTP_RETRIES + 1
+
+    def test_inform_404_still_fails_fast(self, monkeypatch):
+        """The ThinkHazard 404 retry is scoped: INFORM's 404 is not retried."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        returns_404 = _ReturnsResponse(_HttpError(404))
+        monkeypatch.setattr(_helpers.requests, "get", returns_404)
+        with pytest.raises(_helpers.requests.HTTPError):
+            _helpers.inform_query(503, "INFORM")
+        assert returns_404.calls == 1
+
     def test_timeout_is_retried(self, monkeypatch):
         """A Timeout is transient and retried, then the next attempt succeeds."""
         monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
