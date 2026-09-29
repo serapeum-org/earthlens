@@ -140,7 +140,7 @@ _TRANSIENT_ERRORS: tuple[type[requests.RequestException], ...] = (
 #: definite answer, so it is retried *only* for ThinkHazard and never promoted
 #: into the shared 5xx forcelist — an INFORM or GFW `404` is a genuine missing
 #: resource and still fails fast.
-THINKHAZARD_RETRY_STATUS: tuple[int, ...] = (404,)
+THINKHAZARD_RETRY_STATUSES: tuple[int, ...] = (404,)
 
 
 def _client(
@@ -152,7 +152,7 @@ def _client(
         timeout: Per-request timeout in seconds.
         extra_retry_statuses: HTTP statuses to retry in addition to the 5xx
             range. Used only by ThinkHazard, whose report endpoints flap `404`
-            (see :data:`THINKHAZARD_RETRY_STATUS`); empty for every other
+            (see :data:`THINKHAZARD_RETRY_STATUSES`); empty for every other
             source, so an INFORM or GFW `404` still fails fast.
 
     Returns:
@@ -196,7 +196,7 @@ def _request_json(
         timeout: Per-request timeout in seconds.
         retry_statuses: Extra HTTP statuses to retry beyond the 5xx range.
             Only ThinkHazard passes one (`404`, see
-            :data:`THINKHAZARD_RETRY_STATUS`); left empty, a `404` fails fast.
+            :data:`THINKHAZARD_RETRY_STATUSES`); left empty, a `404` fails fast.
 
     Returns:
         The parsed JSON body.
@@ -281,7 +281,7 @@ def thinkhazard_query(
 
     Raises:
         requests.HTTPError: If the endpoint returns a non-2xx status after
-            retries. A `404` is retried (see :data:`THINKHAZARD_RETRY_STATUS`),
+            retries. A `404` is retried (see :data:`THINKHAZARD_RETRY_STATUSES`),
             because the report endpoints flap it, and raises only if it persists.
     """
     suffix = f"/{hazard}" if hazard else ""
@@ -291,7 +291,7 @@ def thinkhazard_query(
         params=None,
         headers=_headers(),
         timeout=timeout,
-        retry_statuses=THINKHAZARD_RETRY_STATUS,
+        retry_statuses=THINKHAZARD_RETRY_STATUSES,
     )
 
 
