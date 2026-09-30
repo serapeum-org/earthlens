@@ -24597,11 +24597,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <strong>bulk / regional</strong> OpenStreetMap features — every building or road in a country — from a
 <a href="https://download.geofabrik.de/">Geofabrik</a> <code>.osm.pbf</code> extract, rather than the small,
 targeted live queries the <code>overpass</code> / <code>ohsome</code> protocols serve.</p>
-<p>The backend downloads the regional extract once (cached on disk), reads a whole layer with
-<a href="https://pyrosm.readthedocs.io/"><code>pyrosm</code></a>, and clips it to your bbox. Like the other OSM
-protocols it returns a pyramids <code>FeatureCollection</code> (a <code>geopandas.GeoDataFrame</code> subclass,
-CRS <code>EPSG:4326</code>) and emits an <strong>ODbL</strong> <code>LicenseWarning</code> — credit
-'© OpenStreetMap contributors' when you redistribute.</p>
+<p>The backend downloads the regional extract once (cached on disk), reads a whole layer with the
+default streaming <a href="https://osmcode.org/pyosmium/"><code>pyosmium</code></a> engine, and clips it to your
+bbox. Like the other OSM protocols it returns a pyramids <code>FeatureCollection</code> (a
+<code>geopandas.GeoDataFrame</code> subclass, CRS <code>EPSG:4326</code>) and emits an <strong>ODbL</strong> <code>LicenseWarning</code> —
+credit '© OpenStreetMap contributors' when you redistribute.</p>
 </div>
 </div>
 </div>
@@ -24612,9 +24612,12 @@ CRS <code>EPSG:4326</code>) and emits an <strong>ODbL</strong> <code>LicenseWarn
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>The <code>pbf</code> protocol needs the <code>osm-pbf</code> extra (<code>pip install earthlens[osm-pbf]</code> — <code>pyrosm</code> +
-<code>osmium</code>), which is kept out of <code>[all]</code> because it is heavy. <code>EarthLens</code> is the unified entry
-point; <code>Catalog</code> lists the available Geofabrik regions; <code>matplotlib</code> draws the maps.</p>
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>The <code>pbf</code> protocol needs the <code>osm</code> extra (<code>pip install earthlens[osm]</code>), which ships
+the wheel-clean <code>pyosmium</code> engine (published on PyPI as <code>osmium</code>) and is part of <code>[all]</code>. The
+richer in-memory <code>pyrosm</code> engine is opt-in — <code>pip install pyrosm</code> (it builds the sdist-only
+<code>cykhash</code> from source) — and only needed when you pass <code>engine='pyrosm'</code>. <code>EarthLens</code> is the
+unified entry point; <code>Catalog</code> lists the available Geofabrik regions; <code>matplotlib</code> draws the
+maps.</p>
 </div>
 </div>
 </div>
@@ -24749,9 +24752,9 @@ LON_LIM = [14.48, 14.54]</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="every-building-in-the-area">Every building in the area<a class="anchor-link" href="#every-building-in-the-area">¶</a></h2><p><code>variables=['pbf:buildings']</code> maps to <code>pyrosm</code>'s building reader. The first call downloads
-the Malta extract into the cross-run cache (<code>osm_pbf/</code> under the shared earthlens cache directory); repeat calls
-reuse it.</p>
+<h2 id="every-building-in-the-area">Every building in the area<a class="anchor-link" href="#every-building-in-the-area">¶</a></h2><p><code>variables=['pbf:buildings']</code> reads the buildings layer (with the default <code>pyosmium</code> engine).
+The first call downloads the Malta extract into the cross-run cache (<code>osm_pbf/</code> under the
+shared earthlens cache directory); repeat calls reuse it.</p>
 </div>
 </div>
 </div>
@@ -24807,9 +24810,10 @@ len(buildings), type(buildings).__name__</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Each row is one building footprint. The <code>osm_id</code> / <code>osm_type</code> columns identify it (pyrosm's
-native <code>id</code> is normalised to <code>osm_id</code> so it matches the other OSM protocols), alongside the
-OSM tags pyrosm parsed.</p>
+<p>Each row is one building footprint. The <code>osm_id</code> / <code>osm_type</code> columns identify it (the native
+<code>id</code> is normalised to <code>osm_id</code> so it matches the other OSM protocols). The default <code>pyosmium</code>
+engine returns this slim <code>osm_id</code> / <code>osm_type</code> / <code>geometry</code> schema; the opt-in <code>pyrosm</code> engine
+(<code>engine='pyrosm'</code>) adds the parsed OSM tag columns (e.g. <code>building</code>, <code>name</code>).</p>
 </div>
 </div>
 </div>
@@ -24903,8 +24907,10 @@ plt.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="the-drivable-road-network">The drivable road network<a class="anchor-link" href="#the-drivable-road-network">¶</a></h2><p><code>pbf:roads</code> reads <code>pyrosm</code>'s road network with <code>network_type='driving'</code> (from the catalog
-row). The cached Malta extract is reused — no second download.</p>
+<h2 id="the-drivable-road-network">The drivable road network<a class="anchor-link" href="#the-drivable-road-network">¶</a></h2><p><code>pbf:roads</code> reads the road network with <code>network_type='driving'</code> (from the catalog row). The
+cached Malta extract is reused — no second download. With the default <code>pyosmium</code> engine the
+driving filter is approximate (a <code>highway</code>-value allow-list); <code>engine='pyrosm'</code> reproduces
+pyrosm's exact drivable subset.</p>
 </div>
 </div>
 </div>
@@ -24995,11 +25001,14 @@ plt.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="engines-pyrosm-default-vs-pyosmium">Engines — <code>pyrosm</code> (default) vs <code>pyosmium</code><a class="anchor-link" href="#engines-pyrosm-default-vs-pyosmium">¶</a></h2><p><code>engine='pyrosm'</code> (the default, used above) reads the whole extract in memory and gives the
-richest columns; it refuses a file over 4 GB. For a <strong>continent- or planet-scale</strong> extract
-too big to hold in memory, pass <code>engine='pyosmium'</code> to stream it with bounded memory — a
-coarser fallback (a slimmer <code>osm_id</code> / <code>osm_type</code> / <code>geometry</code> schema, one geometry kind per
-layer). Never load <code>planet.osm</code> with <code>pyrosm</code>.</p>
+<h2 id="engines-pyosmium-default-vs-pyrosm">Engines — <code>pyosmium</code> (default) vs <code>pyrosm</code><a class="anchor-link" href="#engines-pyosmium-default-vs-pyrosm">¶</a></h2><p><code>engine='pyosmium'</code> (the default, used above) streams the extract with bounded memory and
+ships with <code>earthlens[osm]</code>, so it works out of the box and handles <strong>continent- or
+planet-scale</strong> extracts. It is the coarser reader: a slimmer <code>osm_id</code> / <code>osm_type</code> /
+<code>geometry</code> schema, one geometry kind per layer.</p>
+<p><code>engine='pyrosm'</code> reads the whole extract in memory and gives the richest, exact per-layer
+columns and mixed geometry; it refuses a file over 4 GB, so never load <code>planet.osm</code> with it. It
+is opt-in (<code>pip install pyrosm</code>); selecting it without pyrosm installed raises a clear
+<code>ImportError</code> naming the command.</p>
 </div>
 </div>
 </div>
@@ -25016,7 +25025,8 @@ reads a whole layer from a cached Geofabrik extract — the right tool for bulk 
 blow past Overpass's size limits.</li>
 <li><code>region=</code> picks the extract (<code>Catalog().region_ids()</code>, or a raw <code>continent/region</code> path);
 the bbox clips the read; the extract is cached across runs.</li>
-<li>Use <code>engine='pyosmium'</code> for extracts too large for the in-memory <code>pyrosm</code> engine.</li>
+<li>The default <code>pyosmium</code> engine streams with bounded memory and ships with <code>[all]</code>; switch to
+the opt-in <code>engine='pyrosm'</code> (<code>pip install pyrosm</code>) for the richest, exact per-layer output.</li>
 <li>Honour the <strong>ODbL</strong> attribution / share-alike obligation when you redistribute.</li>
 </ul>
 </div>
