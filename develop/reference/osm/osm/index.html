@@ -25330,8 +25330,8 @@ warns about OSM's <strong>ODbL</strong> share-alike licence. A raw <code>query=<
 <p>This is a <code>vector</code> backend (<code>OUTPUT_KIND = "vector"</code>), so the
 <code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument. All
 three protocols are public — there is <strong>no auth class</strong>, and the SDKs are
-imported lazily, so the package imports without <code>earthlens[osm]</code> /
-<code>earthlens[osm-pbf]</code>. ohsome's aggregation endpoints remain out of scope.</p>
+imported lazily, so the package imports without <code>earthlens[osm]</code>. ohsome's
+aggregation endpoints remain out of scope.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
 <li><code>OSM</code> — the backend; instantiate with <code>variables=[query_id]</code> + a bbox, then
@@ -28134,7 +28134,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">                raw Geofabrik path (`&quot;europe/andorra&quot;`). Required when any</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">                requested query is a `pbf:*` layer, ignored otherwise.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            engine: The `pbf` read engine — `&quot;pyosmium&quot;` (streaming, the default;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">                ships with `earthlens[osm-pbf]`) or `&quot;pyrosm&quot;` (in-memory, exact</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">                ships with `earthlens[osm]`) or `&quot;pyrosm&quot;` (in-memory, exact</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">                tag filters + mixed geometry, opt-in via `pip install pyrosm`).</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">                Ignored by the `overpass` / `ohsome` protocols.</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.</span>
@@ -28691,7 +28691,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-841" name="__codelineno-0-841"></a>
 <a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">            ImportError: If the selected engine&#39;s SDK is not installed — the</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">                default `pyosmium` engine needs `earthlens[osm-pbf]`, the opt-in</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">                default `pyosmium` engine needs `earthlens[osm]`, the opt-in</span>
 <a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">                `pyrosm` engine needs a manual `pip install pyrosm`.</span>
 <a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">            ValueError: If `self._region` is not a known region / raw path, or</span>
 <a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">                a `pyrosm` read is attempted on an oversized extract.</span>
@@ -29184,7 +29184,7 @@ requested query is a <code>pbf:*</code> layer, ignored otherwise.</p>
             <td>
               <div class="doc-md-description">
                 <p>The <code>pbf</code> read engine — <code>"pyosmium"</code> (streaming, the default;
-ships with <code>earthlens[osm-pbf]</code>) or <code>"pyrosm"</code> (in-memory, exact
+ships with <code>earthlens[osm]</code>) or <code>"pyrosm"</code> (in-memory, exact
 tag filters + mixed geometry, opt-in via <code>pip install pyrosm</code>).
 Ignored by the <code>overpass</code> / <code>ohsome</code> protocols.</p>
               </div>
@@ -29464,7 +29464,7 @@ of named-query ids.</p>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            raw Geofabrik path (`&quot;europe/andorra&quot;`). Required when any</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            requested query is a `pbf:*` layer, ignored otherwise.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        engine: The `pbf` read engine — `&quot;pyosmium&quot;` (streaming, the default;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            ships with `earthlens[osm-pbf]`) or `&quot;pyrosm&quot;` (in-memory, exact</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            ships with `earthlens[osm]`) or `&quot;pyrosm&quot;` (in-memory, exact</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">            tag filters + mixed geometry, opt-in via `pip install pyrosm`).</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            Ignored by the `overpass` / `ohsome` protocols.</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.</span>
@@ -31995,7 +31995,7 @@ CRS <code>EPSG:4326</code>. Empty (schema-only) when nothing matched.</p>
 
         <p>Read one layer from a local <code>.osm.pbf</code> into a <code>FeatureCollection</code> (<code>G14</code>).</p>
 <p>Routes on <code>engine</code>: <code>"pyosmium"</code> (default) streams the file with bounded
-memory and needs only <code>earthlens[osm-pbf]</code>; <code>"pyrosm"</code> reads the whole extract
+memory and needs only <code>earthlens[osm]</code>; <code>"pyrosm"</code> reads the whole extract
 in memory and calls the named <code>pyrosm.OSM</code> method, giving exact tag filters
 and mixed geometry but requiring the opt-in <code>pyrosm</code> SDK (<code>pip install
 pyrosm</code>). Both return a WGS84
@@ -32141,7 +32141,7 @@ time; the <code>pyosmium</code> path clips the built geometry.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the selected engine's SDK is not installed — the default
-<code>pyosmium</code> engine needs <code>earthlens[osm-pbf]</code>, the <code>pyrosm</code> engine
+<code>pyosmium</code> engine needs <code>earthlens[osm]</code>, the <code>pyrosm</code> engine
 needs a manual <code>pip install pyrosm</code>.</p>
               </div>
             </td>
@@ -32218,7 +32218,7 @@ needs a manual <code>pip install pyrosm</code>.</p>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read one layer from a local `.osm.pbf` into a `FeatureCollection` (`G14`).</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    Routes on `engine`: `&quot;pyosmium&quot;` (default) streams the file with bounded</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    memory and needs only `earthlens[osm-pbf]`; `&quot;pyrosm&quot;` reads the whole extract</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    memory and needs only `earthlens[osm]`; `&quot;pyrosm&quot;` reads the whole extract</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    in memory and calls the named `pyrosm.OSM` method, giving exact tag filters</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    and mixed geometry but requiring the opt-in `pyrosm` SDK (`pip install</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    pyrosm`). Both return a WGS84</span>
@@ -32241,7 +32241,7 @@ needs a manual <code>pip install pyrosm</code>.</p>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        ImportError: If the selected engine&#39;s SDK is not installed — the default</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            `pyosmium` engine needs `earthlens[osm-pbf]`, the `pyrosm` engine</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            `pyosmium` engine needs `earthlens[osm]`, the `pyrosm` engine</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            needs a manual `pip install pyrosm`.</span>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        ValueError: If `engine=&quot;pyrosm&quot;` is used on a file larger than</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            `MAX_PYROSM_BYTES`, or `engine` is not a known value.</span>
@@ -32611,8 +32611,8 @@ OSM data is <strong>ODbL</strong> (share-alike), so every successful <code>downl
 <code>download(aggregate=...)</code> raises <code>NotImplementedError</code> (<code>G1</code>). All three
 protocols are public — there is no auth class (<code>G6</code>) — and the SDKs are
 imported lazily (Overpass/ohsome inside <code>_fetch</code>; pyrosm/pyosmium inside
-<code>read_pbf</code>), so the package imports without <code>earthlens[osm]</code> /
-<code>earthlens[osm-pbf]</code>. ohsome's aggregation endpoints remain out of scope.</p>
+<code>read_pbf</code>), so the package imports without <code>earthlens[osm]</code>. ohsome's
+aggregation endpoints remain out of scope.</p>
 
 
 
@@ -33659,7 +33659,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">                raw Geofabrik path (`&quot;europe/andorra&quot;`). Required when any</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">                requested query is a `pbf:*` layer, ignored otherwise.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            engine: The `pbf` read engine — `&quot;pyosmium&quot;` (streaming, the default;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">                ships with `earthlens[osm-pbf]`) or `&quot;pyrosm&quot;` (in-memory, exact</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">                ships with `earthlens[osm]`) or `&quot;pyrosm&quot;` (in-memory, exact</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">                tag filters + mixed geometry, opt-in via `pip install pyrosm`).</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">                Ignored by the `overpass` / `ohsome` protocols.</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.</span>
@@ -34216,7 +34216,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-841" name="__codelineno-0-841"></a>
 <a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">            ImportError: If the selected engine&#39;s SDK is not installed — the</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">                default `pyosmium` engine needs `earthlens[osm-pbf]`, the opt-in</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">                default `pyosmium` engine needs `earthlens[osm]`, the opt-in</span>
 <a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">                `pyrosm` engine needs a manual `pip install pyrosm`.</span>
 <a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">            ValueError: If `self._region` is not a known region / raw path, or</span>
 <a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">                a `pyrosm` read is attempted on an oversized extract.</span>
@@ -34709,7 +34709,7 @@ requested query is a <code>pbf:*</code> layer, ignored otherwise.</p>
             <td>
               <div class="doc-md-description">
                 <p>The <code>pbf</code> read engine — <code>"pyosmium"</code> (streaming, the default;
-ships with <code>earthlens[osm-pbf]</code>) or <code>"pyrosm"</code> (in-memory, exact
+ships with <code>earthlens[osm]</code>) or <code>"pyrosm"</code> (in-memory, exact
 tag filters + mixed geometry, opt-in via <code>pip install pyrosm</code>).
 Ignored by the <code>overpass</code> / <code>ohsome</code> protocols.</p>
               </div>
@@ -34989,7 +34989,7 @@ of named-query ids.</p>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            raw Geofabrik path (`&quot;europe/andorra&quot;`). Required when any</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            requested query is a `pbf:*` layer, ignored otherwise.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        engine: The `pbf` read engine — `&quot;pyosmium&quot;` (streaming, the default;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            ships with `earthlens[osm-pbf]`) or `&quot;pyrosm&quot;` (in-memory, exact</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            ships with `earthlens[osm]`) or `&quot;pyrosm&quot;` (in-memory, exact</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">            tag filters + mixed geometry, opt-in via `pip install pyrosm`).</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            Ignored by the `overpass` / `ohsome` protocols.</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.</span>
@@ -39435,7 +39435,7 @@ is reprojected.</p>
   <code>.osm.pbf</code> into a pyramids <code>~pyramids.feature.collection.FeatureCollection</code>
   (<code>G14</code>), wrapping the <strong>OSM-domain SDK</strong> (<code>G9</code>): <code>pyosmium</code>/<code>osmium</code> for the
   bounded-memory streaming path (<code>engine="pyosmium"</code>, the wheel-clean default,
-  installed by <code>earthlens[osm-pbf]</code>) or <code>pyrosm</code> for the regional in-memory path
+  installed by <code>earthlens[osm]</code>) or <code>pyrosm</code> for the regional in-memory path
   (<code>engine="pyrosm"</code>, exact tag filters + mixed geometry). <code>pyrosm</code> is <strong>not</strong> a
   declared dependency — its transitive <code>cykhash</code> ships sdist-only (no wheels), so
   it would force a source build on every install (<code>#1186</code>) — and is opt-in via a
@@ -39922,7 +39922,7 @@ sidecar.</p>
 
         <p>Read one layer from a local <code>.osm.pbf</code> into a <code>FeatureCollection</code> (<code>G14</code>).</p>
 <p>Routes on <code>engine</code>: <code>"pyosmium"</code> (default) streams the file with bounded
-memory and needs only <code>earthlens[osm-pbf]</code>; <code>"pyrosm"</code> reads the whole extract
+memory and needs only <code>earthlens[osm]</code>; <code>"pyrosm"</code> reads the whole extract
 in memory and calls the named <code>pyrosm.OSM</code> method, giving exact tag filters
 and mixed geometry but requiring the opt-in <code>pyrosm</code> SDK (<code>pip install
 pyrosm</code>). Both return a WGS84
@@ -40068,7 +40068,7 @@ time; the <code>pyosmium</code> path clips the built geometry.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the selected engine's SDK is not installed — the default
-<code>pyosmium</code> engine needs <code>earthlens[osm-pbf]</code>, the <code>pyrosm</code> engine
+<code>pyosmium</code> engine needs <code>earthlens[osm]</code>, the <code>pyrosm</code> engine
 needs a manual <code>pip install pyrosm</code>.</p>
               </div>
             </td>
@@ -40145,7 +40145,7 @@ needs a manual <code>pip install pyrosm</code>.</p>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read one layer from a local `.osm.pbf` into a `FeatureCollection` (`G14`).</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    Routes on `engine`: `&quot;pyosmium&quot;` (default) streams the file with bounded</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    memory and needs only `earthlens[osm-pbf]`; `&quot;pyrosm&quot;` reads the whole extract</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    memory and needs only `earthlens[osm]`; `&quot;pyrosm&quot;` reads the whole extract</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    in memory and calls the named `pyrosm.OSM` method, giving exact tag filters</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    and mixed geometry but requiring the opt-in `pyrosm` SDK (`pip install</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    pyrosm`). Both return a WGS84</span>
@@ -40168,7 +40168,7 @@ needs a manual <code>pip install pyrosm</code>.</p>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        ImportError: If the selected engine&#39;s SDK is not installed — the default</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            `pyosmium` engine needs `earthlens[osm-pbf]`, the `pyrosm` engine</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            `pyosmium` engine needs `earthlens[osm]`, the `pyrosm` engine</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            needs a manual `pip install pyrosm`.</span>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        ValueError: If `engine=&quot;pyrosm&quot;` is used on a file larger than</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            `MAX_PYROSM_BYTES`, or `engine` is not a known value.</span>

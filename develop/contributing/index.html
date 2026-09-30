@@ -23859,8 +23859,8 @@ in the repository root.</p>
 <p class="admonition-title">Use <code>--extra all</code>, not <code>--all-extras</code></p>
 <p><code>--all-extras</code> activates <em>every</em> extra, including both <code>argo</code> and <code>openeo</code>, which are mutually exclusive:
 <code>argopy</code> needs <code>xarray&gt;=2025.7</code> while <code>openeo</code> needs <code>xarray&lt;2025.1.2</code>. uv rejects the combination. The
-curated <code>all</code> extra includes <code>openeo</code>, <code>osm</code> and <code>osm-pbf</code>, and omits <code>argo</code> (which conflicts with <code>openeo</code>)
-and <code>eedai</code>, so it resolves.</p>
+curated <code>all</code> extra includes <code>openeo</code> and <code>osm</code> (which now also carries the bulk-pbf <code>osmium</code>), and omits
+<code>argo</code> (which conflicts with <code>openeo</code>) and <code>eedai</code>, so it resolves.</p>
 <p>To work on the argo side instead, prune the conflicting extra:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--all-extras<span class="w"> </span>--no-extra<span class="w"> </span>openeo
 </code></pre></div>

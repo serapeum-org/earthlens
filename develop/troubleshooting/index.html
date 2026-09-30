@@ -24388,7 +24388,7 @@ for everything. The <a href="../reference/providers/">provider matrix</a> lists 
 <p>(That one is uv's message, not earthlens'.)</p>
 <p><code>argopy</code> needs <code>xarray&gt;=2025.7</code> and <code>openeo</code> needs <code>xarray&lt;2025.1.2</code> — mutually unsatisfiable. Use the curated
 extra instead:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev<span class="w">      </span><span class="c1"># includes openeo, osm and osm-pbf; omits argo / eedai</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev<span class="w">      </span><span class="c1"># includes openeo and osm (with pbf/osmium); omits argo / eedai</span>
 </code></pre></div>
 <p>To work on the argo side, prune the conflicting extra: <code>uv sync --all-extras --no-extra openeo</code>.</p>
 <h2 id="request-construction"><a class="toclink" href="#request-construction">Request construction</a><a class="headerlink" href="#request-construction" title="Permanent link">#</a></h2>

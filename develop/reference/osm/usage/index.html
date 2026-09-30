@@ -23981,18 +23981,17 @@
 background and the named-query list see <a href="../introduction/">Introduction</a>; the
 rendered API is the <a href="../osm/">Reference</a> page.</p>
 <h2 id="install"><a class="toclink" href="#install">Install</a><a class="headerlink" href="#install" title="Permanent link">#</a></h2>
-<p>The protocol SDKs ship behind two extras (imported lazily — the base package
-imports without them):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm<span class="o">]</span><span class="w">      </span><span class="c1"># overpy + ohsome  (Overpass + ohsome protocols)</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm-pbf<span class="o">]</span><span class="w">  </span><span class="c1"># osmium (pyosmium)  (the pbf protocol, default engine)</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>pip<span class="w"> </span>install<span class="w"> </span>pyrosm<span class="w">              </span><span class="c1"># opt-in: the richer in-memory pbf engine</span>
+<p>The protocol SDKs ship behind one <code>osm</code> extra (imported lazily — the base package
+imports without it):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm<span class="o">]</span><span class="w">      </span><span class="c1"># overpy + ohsome + osmium  (all three protocols)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>pyrosm<span class="w">              </span><span class="c1"># opt-in: the richer in-memory pbf engine</span>
 </code></pre></div>
-<p><code>[osm-pbf]</code> <strong>is</strong> in <code>[all]</code>: it ships only the wheel-clean <code>pyosmium</code> streaming
-engine (published on PyPI as <code>osmium</code>), which is the <code>pbf</code> default. The richer
-in-memory <code>pyrosm</code> engine is <strong>opt-in</strong> — <code>pip install pyrosm</code> builds the
-sdist-only <code>cykhash</code> from source (needs a C compiler) — so install it only when
-you want <code>engine="pyrosm"</code>. There are no credentials to configure — Overpass,
-ohsome, and Geofabrik are all public.</p>
+<p><code>[osm]</code> <strong>is</strong> in <code>[all]</code>: it covers all three protocols — <code>overpy</code> + <code>ohsome</code> for
+the live queries and the wheel-clean <code>osmium</code> (pyosmium, published on PyPI as
+<code>osmium</code>) for the <code>pbf</code> default engine. The richer in-memory <code>pyrosm</code> pbf engine is
+<strong>opt-in</strong> — <code>pip install pyrosm</code> builds the sdist-only <code>cykhash</code> from source
+(needs a C compiler) — so install it only when you want <code>engine="pyrosm"</code>. There
+are no credentials to configure — Overpass, ohsome, and Geofabrik are all public.</p>
 <h2 id="quickstart-current-state-hospitals-overpass"><a class="toclink" href="#quickstart-current-state-hospitals-overpass">Quickstart — current-state hospitals (Overpass)</a><a class="headerlink" href="#quickstart-current-state-hospitals-overpass" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
@@ -24048,7 +24047,7 @@ the whole extract — the bbox-area cap does <strong>not</strong> apply to a <co
 <div class="admonition note">
 <p class="admonition-title">Engines — <code>pyosmium</code> (default) vs <code>pyrosm</code></p>
 <p><code>engine="pyosmium"</code> (the default) streams the extract with bounded memory and
-ships with <code>earthlens[osm-pbf]</code>, so it works out of the box and handles
+ships with <code>earthlens[osm]</code>, so it works out of the box and handles
 <strong>continent- or planet-scale</strong> extracts. It is the <strong>coarser</strong> reader: it
 returns a slimmer <code>osm_id</code> / <code>osm_type</code> / <code>geometry</code> schema and, per layer, a
 single geometry kind under one representative tag (so it under-reports a row's

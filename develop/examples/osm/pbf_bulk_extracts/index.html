@@ -24612,7 +24612,7 @@ credit '© OpenStreetMap contributors' when you redistribute.</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>The <code>pbf</code> protocol needs the <code>osm-pbf</code> extra (<code>pip install earthlens[osm-pbf]</code>), which ships
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>The <code>pbf</code> protocol needs the <code>osm</code> extra (<code>pip install earthlens[osm]</code>), which ships
 the wheel-clean <code>pyosmium</code> engine (published on PyPI as <code>osmium</code>) and is part of <code>[all]</code>. The
 richer in-memory <code>pyrosm</code> engine is opt-in — <code>pip install pyrosm</code> (it builds the sdist-only
 <code>cykhash</code> from source) — and only needed when you pass <code>engine='pyrosm'</code>. <code>EarthLens</code> is the
@@ -25002,7 +25002,7 @@ plt.show()</div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="engines-pyosmium-default-vs-pyrosm">Engines — <code>pyosmium</code> (default) vs <code>pyrosm</code><a class="anchor-link" href="#engines-pyosmium-default-vs-pyrosm">¶</a></h2><p><code>engine='pyosmium'</code> (the default, used above) streams the extract with bounded memory and
-ships with <code>earthlens[osm-pbf]</code>, so it works out of the box and handles <strong>continent- or
+ships with <code>earthlens[osm]</code>, so it works out of the box and handles <strong>continent- or
 planet-scale</strong> extracts. It is the coarser reader: a slimmer <code>osm_id</code> / <code>osm_type</code> /
 <code>geometry</code> schema, one geometry kind per layer.</p>
 <p><code>engine='pyrosm'</code> reads the whole extract in memory and gives the richest, exact per-layer

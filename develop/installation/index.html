@@ -24204,12 +24204,7 @@ you install the meta-package or a thematic distribution directly:
 <tr>
 <td><code>osm</code></td>
 <td><a href="https://serapeum-org.github.io/earthlens/reference/osm/introduction/">OpenStreetMap</a></td>
-<td><code>overpy &gt;=0.7</code>, <code>ohsome &gt;=0.4.0</code></td>
-</tr>
-<tr>
-<td><code>osm-pbf</code></td>
-<td>OpenStreetMap (bulk .osm.pbf extracts)</td>
-<td><code>osmium &gt;=4.3.1</code> (the <code>pyrosm</code> engine is opt-in — see below)</td>
+<td><code>overpy &gt;=0.7</code>, <code>ohsome &gt;=0.4.0</code>, <code>osmium &gt;=4.3.1</code> (bulk <code>.osm.pbf</code>; the <code>pyrosm</code> engine is opt-in — see below)</td>
 </tr>
 <tr>
 <td><code>all</code></td>
@@ -24313,18 +24308,17 @@ one environment</strong> — that is every extra in the table above <strong>exce
 </tr>
 </tbody>
 </table>
-<p><code>osm-pbf</code> <strong>is</strong> in <code>all</code>: its extra is just <code>osmium</code> (the wheel-clean <code>pyosmium</code>
-streaming engine, which is the <code>pbf</code> default), so it no longer drags in the
-sdist-only <code>cykhash</code>. The richer in-memory <code>pyrosm</code> engine is <strong>opt-in</strong> — it
-pulls <code>cykhash</code>, which ships sdist-only (no wheels), so a plain <code>pip install
-pyrosm</code> needs a C compiler to build it. Selecting <code>engine="pyrosm"</code> without it
-raises a clear <code>ImportError</code> naming the command (tracked in
-<a href="https://github.com/serapeum-org/earthlens/issues/1186">#1186</a>). (<code>osm</code> itself is
-also in <code>all</code> — see the resolution note below for why.)</p>
-<p>Each still installs <strong>on its own</strong>, in a separate environment:</p>
+<p><code>osm</code> <strong>is</strong> in <code>all</code> and covers all three OSM protocols: <code>overpy</code> + <code>ohsome</code> for
+the live queries, and <code>osmium</code> (the wheel-clean <code>pyosmium</code> streaming engine, the
+<code>pbf</code> default) for bulk <code>.osm.pbf</code> reads. The richer in-memory <code>pyrosm</code> pbf engine
+is <strong>opt-in</strong> — it pulls <code>cykhash</code>, which ships sdist-only (no wheels), so a plain
+<code>pip install pyrosm</code> needs a C compiler to build it. Selecting <code>engine="pyrosm"</code>
+without it raises a clear <code>ImportError</code> naming the command (tracked in
+<a href="https://github.com/serapeum-org/earthlens/issues/1186">#1186</a>).</p>
+<p>The held-out extra still installs <strong>on its own</strong>, in a separate environment, and
+the opt-in pbf engine is a plain package install:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>argo<span class="o">]</span><span class="w">      </span><span class="c1"># its own env — pulls xarray&gt;=2025.7</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm-pbf<span class="o">]</span><span class="w">   </span><span class="c1"># wheel-only (pyosmium engine); joins earthlens[all]</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>pip<span class="w"> </span>install<span class="w"> </span>pyrosm<span class="w">               </span><span class="c1"># opt-in in-memory engine — builds cykhash from source (needs a C compiler)</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>pip<span class="w"> </span>install<span class="w"> </span>pyrosm<span class="w">               </span><span class="c1"># opt-in in-memory pbf engine — builds cykhash from source (needs a C compiler)</span>
 </code></pre></div>
 <blockquote>
 <p><strong>What an <code>all</code> install actually resolves to.</strong> With <code>argo</code> out,
