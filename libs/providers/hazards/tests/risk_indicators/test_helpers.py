@@ -95,6 +95,18 @@ class _HttpError(_Resp):
         raise err
 
 
+class _SequenceGet:
+    """A requests.get stand-in that returns a fixed sequence of responses, counting calls."""
+
+    def __init__(self, responses):
+        self._responses = iter(responses)
+        self.calls = 0
+
+    def __call__(self, url, params=None, headers=None, timeout=None):
+        self.calls += 1
+        return next(self._responses)
+
+
 class TestRequestJsonRetry:
     """_request_json retries transient failures and fails fast on 4xx."""
 
@@ -122,6 +134,48 @@ class TestRequestJsonRetry:
         with pytest.raises(_helpers.requests.HTTPError):
             _helpers.inform_query(503, "INFORM")
         assert returns_404.calls == 1
+
+    def test_thinkhazard_404_is_retried(self, monkeypatch):
+        """A flapping ThinkHazard 404 is retried and the next attempt's body returned."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        seq = _SequenceGet([_HttpError(404), _Resp({"hazard_category": "HIG"})])
+        monkeypatch.setattr(_helpers.requests, "get", seq)
+        assert _helpers.thinkhazard_query("133", "FL") == {"hazard_category": "HIG"}
+        assert seq.calls == 2
+
+    def test_thinkhazard_404_persisting_raises(self, monkeypatch):
+        """A ThinkHazard 404 that never clears still raises, after the retries."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        returns_404 = _ReturnsResponse(_HttpError(404))
+        monkeypatch.setattr(_helpers.requests, "get", returns_404)
+        with pytest.raises(_helpers.requests.HTTPError):
+            _helpers.thinkhazard_query("133", "FL")
+        assert returns_404.calls == _helpers._HTTP_RETRIES + 1
+
+    def test_thinkhazard_all_hazards_404_is_retried(self, monkeypatch):
+        """The all-hazards branch (no hazard mnemonic) also retries a 404."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        seq = _SequenceGet([_HttpError(404), _Resp([{"hazardtype": "FL"}])])
+        monkeypatch.setattr(_helpers.requests, "get", seq)
+        assert _helpers.thinkhazard_query("133") == [{"hazardtype": "FL"}]
+        assert seq.calls == 2
+
+    def test_thinkhazard_404_succeeds_on_last_allowed_attempt(self, monkeypatch):
+        """Two 404s inside the retry budget still resolve on the third attempt."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        seq = _SequenceGet([_HttpError(404), _HttpError(404), _Resp({"ok": True})])
+        monkeypatch.setattr(_helpers.requests, "get", seq)
+        assert _helpers.thinkhazard_query("133", "FL") == {"ok": True}
+        assert seq.calls == _helpers._HTTP_RETRIES + 1
+
+    def test_thinkhazard_non_404_4xx_fails_fast(self, monkeypatch):
+        """A non-404 4xx on ThinkHazard still fails fast; only 404 opted in."""
+        monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
+        returns_403 = _ReturnsResponse(_HttpError(403))
+        monkeypatch.setattr(_helpers.requests, "get", returns_403)
+        with pytest.raises(_helpers.requests.HTTPError):
+            _helpers.thinkhazard_query("133", "FL")
+        assert returns_403.calls == 1
 
     def test_timeout_is_retried(self, monkeypatch):
         """A Timeout is transient and retried, then the next attempt succeeds."""
