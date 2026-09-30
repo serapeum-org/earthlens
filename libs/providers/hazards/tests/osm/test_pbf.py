@@ -305,7 +305,8 @@ class TestReadEngineSelection:
         # No engine= → the default. It resolves without pyrosm installed, and the
         # fake osmium stream drives the read, proving pyosmium is the default.
         fc = read_pbf(pbf, pyrosm_method="get_pois")
-        assert len(fc) == 1 and fc.geometry.iloc[0].geom_type == "Point"
+        assert len(fc) == 1
+        assert fc.geometry.iloc[0].geom_type == "Point"
 
     def test_unknown_engine_raises(self, tmp_path):
         """An unknown engine name is rejected."""
