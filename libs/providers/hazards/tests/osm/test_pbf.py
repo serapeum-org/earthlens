@@ -1,8 +1,8 @@
 """Offline unit tests for the OSM `pbf` fetch + read helpers (`earthlens.osm._pbf`).
 
-Both engines' SDKs (`pyrosm`, `osmium`) live in the `osm-pbf` extra, which is
-out of `[all]`, so these tests **fake** them (monkeypatched `sys.modules`) and
-fake the `HttpClient` — no network, no real PBF file. Coverage spans the
+The pbf engines' SDKs are optional — `osmium` ships in the `osm` extra and
+`pyrosm` is opt-in (in no extra) — so these tests **fake** them (monkeypatched
+`sys.modules`) and fake the `HttpClient` — no network, no real PBF file. Coverage spans the
 Geofabrik URL grammar, cache reuse + md5 verification, the large-file warning,
 the pyrosm layer dispatch + bbox clip + size guard, and the pyosmium streaming
 strategies.

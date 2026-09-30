@@ -22,8 +22,8 @@ That installs core plus the five providers as editable, every backend SDK, and t
 
     `--all-extras` activates *every* extra, including both `argo` and `openeo`, which are mutually exclusive:
     `argopy` needs `xarray>=2025.7` while `openeo` needs `xarray<2025.1.2`. uv rejects the combination. The
-    curated `all` extra includes `openeo`, `osm` and `osm-pbf`, and omits `argo` (which conflicts with `openeo`)
-    and `eedai`, so it resolves.
+    curated `all` extra includes `openeo` and `osm` (which now also carries the bulk-pbf `osmium`), and omits
+    `argo` (which conflicts with `openeo`) and `eedai`, so it resolves.
 
     To work on the argo side instead, prune the conflicting extra:
 

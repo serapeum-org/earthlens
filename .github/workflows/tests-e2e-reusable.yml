@@ -111,7 +111,7 @@ jobs:
             providers=(
             '{"name":"emdat","path":"libs/providers/hazards/(src/earthlens|tests)/emdat/","marker":"e2e and emdat and not gdis","groups":"groups: dev, extras: emdat","pkg":"libs/providers/hazards/tests/emdat"}'
             '{"name":"osm","path":"libs/providers/hazards/(src/earthlens|tests)/osm/","marker":"e2e and osm","groups":"groups: dev, extras: osm","pkg":"libs/providers/hazards/tests/osm"}'
-            '{"name":"osm-pbf","path":"libs/providers/hazards/(src/earthlens|tests)/osm/","marker":"e2e and osm_pbf","groups":"groups: dev, extras: osm-pbf","pkg":"libs/providers/hazards/tests/osm","with_pkg":"pyrosm>=0.11.0"}'
+            '{"name":"osm-pbf","path":"libs/providers/hazards/(src/earthlens|tests)/osm/","marker":"e2e and osm_pbf","groups":"groups: dev, extras: osm","pkg":"libs/providers/hazards/tests/osm","with_pkg":"pyrosm>=0.11.0"}'
             )
             catchall_marker="e2e and not emdat and not osm and not osm_pbf"
             catchall_deselect=""

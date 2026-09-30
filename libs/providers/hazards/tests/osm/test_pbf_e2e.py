@@ -2,7 +2,7 @@
 
 Downloads the real (small, ~8.8 MB) Geofabrik **Malta** extract over anonymous
 HTTPS and reads its building footprints — no credentials. Gated behind the `e2e`
-+ `osm_pbf` markers: the streaming `pyosmium` engine needs the `osm-pbf` extra
++ `osm_pbf` markers: the streaming `pyosmium` engine needs the `osm` extra
 (`osmium`), while the in-memory `pyrosm` engine needs the opt-in `pyrosm` SDK
 (CI injects it with `uv run --with pyrosm`). A default `pytest` run skips it, a
 missing engine SDK skips these tests (via `skipif`, not a collection-time
@@ -43,7 +43,7 @@ pytestmark = [
         bool(_MISSING_SDKS),
         reason=(
             "the pbf e2e needs " + " + ".join(_MISSING_SDKS) + " (pyrosm via "
-            "`pip install pyrosm`, osmium via the osm-pbf extra)"
+            "`pip install pyrosm`, osmium via the osm extra)"
         ),
     ),
 ]

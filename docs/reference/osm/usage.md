@@ -6,21 +6,20 @@ rendered API is the [Reference](osm.md) page.
 
 ## Install
 
-The protocol SDKs ship behind two extras (imported lazily — the base package
-imports without them):
+The protocol SDKs ship behind one `osm` extra (imported lazily — the base package
+imports without it):
 
 ```bash
-pip install earthlens[osm]      # overpy + ohsome  (Overpass + ohsome protocols)
-pip install earthlens[osm-pbf]  # osmium (pyosmium)  (the pbf protocol, default engine)
+pip install earthlens[osm]      # overpy + ohsome + osmium  (all three protocols)
 pip install pyrosm              # opt-in: the richer in-memory pbf engine
 ```
 
-`[osm-pbf]` **is** in `[all]`: it ships only the wheel-clean `pyosmium` streaming
-engine (published on PyPI as `osmium`), which is the `pbf` default. The richer
-in-memory `pyrosm` engine is **opt-in** — `pip install pyrosm` builds the
-sdist-only `cykhash` from source (needs a C compiler) — so install it only when
-you want `engine="pyrosm"`. There are no credentials to configure — Overpass,
-ohsome, and Geofabrik are all public.
+`[osm]` **is** in `[all]`: it covers all three protocols — `overpy` + `ohsome` for
+the live queries and the wheel-clean `osmium` (pyosmium, published on PyPI as
+`osmium`) for the `pbf` default engine. The richer in-memory `pyrosm` pbf engine is
+**opt-in** — `pip install pyrosm` builds the sdist-only `cykhash` from source
+(needs a C compiler) — so install it only when you want `engine="pyrosm"`. There
+are no credentials to configure — Overpass, ohsome, and Geofabrik are all public.
 
 ## Quickstart — current-state hospitals (Overpass)
 
@@ -88,7 +87,7 @@ the whole extract — the bbox-area cap does **not** apply to a `pbf` read.
 
 !!! note "Engines — `pyosmium` (default) vs `pyrosm`"
     `engine="pyosmium"` (the default) streams the extract with bounded memory and
-    ships with `earthlens[osm-pbf]`, so it works out of the box and handles
+    ships with `earthlens[osm]`, so it works out of the box and handles
     **continent- or planet-scale** extracts. It is the **coarser** reader: it
     returns a slimmer `osm_id` / `osm_type` / `geometry` schema and, per layer, a
     single geometry kind under one representative tag (so it under-reports a row's

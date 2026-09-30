@@ -115,8 +115,7 @@ you install the meta-package or a thematic distribution directly:
 | `jaxa` | [JAXA](https://serapeum-org.github.io/earthlens/reference/jaxa/introduction/) | `jaxa.earth >=0.1.6,<0.2`, `gportal >=0.4,<0.5` |
 | `argo` | [Argo Program](https://serapeum-org.github.io/earthlens/reference/argo/introduction/) | `argopy >=1.4` |
 | `erddap` | [NOAA ERDDAP](https://serapeum-org.github.io/earthlens/reference/erddap/introduction/) | `erddapy >=3.0` |
-| `osm` | [OpenStreetMap](https://serapeum-org.github.io/earthlens/reference/osm/introduction/) | `overpy >=0.7`, `ohsome >=0.4.0` |
-| `osm-pbf` | OpenStreetMap (bulk .osm.pbf extracts) | `osmium >=4.3.1` (the `pyrosm` engine is opt-in — see below) |
+| `osm` | [OpenStreetMap](https://serapeum-org.github.io/earthlens/reference/osm/introduction/) | `overpy >=0.7`, `ohsome >=0.4.0`, `osmium >=4.3.1` (bulk `.osm.pbf`; the `pyrosm` engine is opt-in — see below) |
 | `all` | every backend above except `argo` (see [What `earthlens[all]` excludes](#what-earthlensall-excludes-and-why)) | — |
 
 
@@ -178,21 +177,20 @@ one environment** — that is every extra in the table above **except two**:
 | `argo` | `argopy` | **Two** independent problems, either one disqualifying. **(1) `xarray` — a resolution conflict:** `argopy >=1.4` needs `xarray>=2025.7`, but `openeo` (in `all`) caps `xarray<2025.01.2` — disjoint ranges, which is what `[tool.uv] conflicts` declares. **(2) `erddapy` — a runtime break:** `argopy 1.4.0` still *resolves* (it does not cap `erddapy`) but fails at `import` — it imports `erddapy.erddapy._quote_string_constraints`, which `erddapy 3.3` removed — while the `erddap` extra (in `all`) requires `erddapy>=3.0`. |
 | `eedai` | `pyramids-eo` | It resolves cleanly — this one is about *behaviour*, not packaging. Installing it activates the GEE backend's default `engine="auto"`, which serves raw single-asset reads through the EEDAI reader; that path samples and grids differently from Earth Engine (see the [GEE usage page](reference/gee/usage.md)). Holding it out of `all` means an upgrade never silently changes an existing user's pixels. |
 
-`osm-pbf` **is** in `all`: its extra is just `osmium` (the wheel-clean `pyosmium`
-streaming engine, which is the `pbf` default), so it no longer drags in the
-sdist-only `cykhash`. The richer in-memory `pyrosm` engine is **opt-in** — it
-pulls `cykhash`, which ships sdist-only (no wheels), so a plain `pip install
-pyrosm` needs a C compiler to build it. Selecting `engine="pyrosm"` without it
-raises a clear `ImportError` naming the command (tracked in
-[#1186](https://github.com/serapeum-org/earthlens/issues/1186)). (`osm` itself is
-also in `all` — see the resolution note below for why.)
+`osm` **is** in `all` and covers all three OSM protocols: `overpy` + `ohsome` for
+the live queries, and `osmium` (the wheel-clean `pyosmium` streaming engine, the
+`pbf` default) for bulk `.osm.pbf` reads. The richer in-memory `pyrosm` pbf engine
+is **opt-in** — it pulls `cykhash`, which ships sdist-only (no wheels), so a plain
+`pip install pyrosm` needs a C compiler to build it. Selecting `engine="pyrosm"`
+without it raises a clear `ImportError` naming the command (tracked in
+[#1186](https://github.com/serapeum-org/earthlens/issues/1186)).
 
-Each still installs **on its own**, in a separate environment:
+The held-out extra still installs **on its own**, in a separate environment, and
+the opt-in pbf engine is a plain package install:
 
 ```bash
 pip install earthlens[argo]      # its own env — pulls xarray>=2025.7
-pip install earthlens[osm-pbf]   # wheel-only (pyosmium engine); joins earthlens[all]
-pip install pyrosm               # opt-in in-memory engine — builds cykhash from source (needs a C compiler)
+pip install pyrosm               # opt-in in-memory pbf engine — builds cykhash from source (needs a C compiler)
 ```
 
 > **What an `all` install actually resolves to.** With `argo` out,

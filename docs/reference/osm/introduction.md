@@ -79,14 +79,14 @@ download; the request bbox then clips the read.
 
 **None.** Overpass, ohsome, and Geofabrik are all fully public — no key, no
 token, no login, so there is no `authentication.md` page. The SDKs ship behind
-two extras and are imported lazily, so the package imports fine without them:
+one `osm` extra and are imported lazily, so the package imports fine without it:
 
-- `pip install earthlens[osm]` → `overpy` + `ohsome` (the live protocols).
-- `pip install earthlens[osm-pbf]` → `osmium` (the wheel-clean `pyosmium`
-  streaming engine, the `pbf` default; `pyosmium` is published on PyPI as
-  `osmium`). This extra **is** part of `[all]`. The richer in-memory `pyrosm`
-  engine is opt-in: `pip install pyrosm` builds the sdist-only `cykhash` from
-  source (needs a C compiler), so install it only for `engine="pyrosm"`.
+- `pip install earthlens[osm]` → `overpy` + `ohsome` (the live protocols) plus
+  `osmium` (the wheel-clean `pyosmium` streaming engine, the `pbf` default;
+  `pyosmium` is published on PyPI as `osmium`). This extra **is** part of `[all]`.
+  The richer in-memory `pyrosm` pbf engine is opt-in: `pip install pyrosm` builds
+  the sdist-only `cykhash` from source (needs a C compiler), so install it only
+  for `engine="pyrosm"`.
 
 !!! note "Overpass needs a real User-Agent"
     The canonical `overpass-api.de` endpoint returns HTTP 406 to requests with
@@ -133,7 +133,7 @@ is exactly the per-provider-SDK role `earthlens.osm` already plays for
 stays in earthlens; it is **not** ported to pyramids.
 
 The default `pyosmium` (streaming) engine reads with bounded memory and ships
-with `earthlens[osm-pbf]`, so it handles a **continent- or planet-scale** extract
+with `earthlens[osm]`, so it handles a **continent- or planet-scale** extract
 out of the box. The opt-in `pyrosm` (in-memory) engine reads a whole regional
 extract into memory for the richest, exact output; the backend warns before
 downloading a multi-GB extract and refuses to load a >4 GB file with `pyrosm`.

@@ -1975,7 +1975,7 @@ dependencies = [
 [package.optional-dependencies]
 all = [
     { name = "earthlens-atmosphere", extra = ["ecmwf", "ecmwf-modern", "eea-aq", "goes", "isimip", "mswep", "nwp", "radar", "s3", "tropycal"] },
-    { name = "earthlens-hazards", extra = ["emdat", "fdsn", "hdx", "osm", "osm-pbf", "overture"] },
+    { name = "earthlens-hazards", extra = ["emdat", "fdsn", "hdx", "osm", "overture"] },
     { name = "earthlens-imagery", extra = ["asf", "earthdata", "eumetsat", "gee", "jaxa", "sentinel-hub", "stac"] },
     { name = "earthlens-imagery", extra = ["openeo"], marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
     { name = "earthlens-land", extra = ["dem", "gbif", "worldpop"] },
@@ -2061,9 +2061,6 @@ openeo = [
 ]
 osm = [
     { name = "earthlens-hazards", extra = ["osm"] },
-]
-osm-pbf = [
-    { name = "earthlens-hazards", extra = ["osm-pbf"] },
 ]
 overture = [
     { name = "earthlens-hazards", extra = ["overture"] },
@@ -2176,7 +2173,6 @@ requires-dist = [
     { name = "earthlens", extras = ["obis"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["openeo"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["osm"], marker = "extra == 'all'" },
-    { name = "earthlens", extras = ["osm-pbf"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["overture"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["radar"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["s3"], marker = "extra == 'all'" },
@@ -2203,7 +2199,6 @@ requires-dist = [
     { name = "earthlens-hazards", extras = ["fdsn"], marker = "extra == 'fdsn'", editable = "libs/providers/hazards" },
     { name = "earthlens-hazards", extras = ["hdx"], marker = "extra == 'hdx'", editable = "libs/providers/hazards" },
     { name = "earthlens-hazards", extras = ["osm"], marker = "extra == 'osm'", editable = "libs/providers/hazards" },
-    { name = "earthlens-hazards", extras = ["osm-pbf"], marker = "extra == 'osm-pbf'", editable = "libs/providers/hazards" },
     { name = "earthlens-hazards", extras = ["overture"], marker = "extra == 'overture'", editable = "libs/providers/hazards" },
     { name = "earthlens-imagery", editable = "libs/providers/imagery" },
     { name = "earthlens-imagery", extras = ["asf"], marker = "extra == 'asf'", editable = "libs/providers/imagery" },
@@ -2228,7 +2223,7 @@ requires-dist = [
     { name = "earthlens-ocean", extras = ["obis"], marker = "extra == 'obis'", editable = "libs/providers/ocean" },
     { name = "earthlens-ocean", extras = ["usgs-water"], marker = "extra == 'usgs-water'", editable = "libs/providers/ocean" },
 ]
-provides-extras = ["argo", "asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf", "ecmwf-modern", "eea-aq", "eedai", "emdat", "erddap", "eumetsat", "fdsn", "gbif", "gee", "ghsl", "goes", "hdx", "isimip", "jaxa", "mswep", "nwm", "nwp", "obis", "openeo", "osm", "osm-pbf", "overture", "radar", "s3", "sentinel-hub", "stac", "tropycal", "usgs-water", "worldpop", "all"]
+provides-extras = ["argo", "asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf", "ecmwf-modern", "eea-aq", "eedai", "emdat", "erddap", "eumetsat", "fdsn", "gbif", "gee", "ghsl", "goes", "hdx", "isimip", "jaxa", "mswep", "nwm", "nwp", "obis", "openeo", "osm", "overture", "radar", "s3", "sentinel-hub", "stac", "tropycal", "usgs-water", "worldpop", "all"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2432,11 +2427,9 @@ hdx = [
 ]
 osm = [
     { name = "ohsome" },
+    { name = "osmium" },
     { name = "overpy" },
     { name = "urllib3" },
-]
-osm-pbf = [
-    { name = "osmium" },
 ]
 overture = [
     { name = "duckdb" },
@@ -2452,12 +2445,12 @@ requires-dist = [
     { name = "obspy", marker = "extra == 'fdsn'", specifier = ">=1.5.0" },
     { name = "ohsome", marker = "extra == 'osm'", specifier = ">=0.4.0" },
     { name = "openpyxl", specifier = ">=3.1" },
-    { name = "osmium", marker = "extra == 'osm-pbf'", specifier = ">=4.3.1" },
+    { name = "osmium", marker = "extra == 'osm'", specifier = ">=4.3.1" },
     { name = "overpy", marker = "extra == 'osm'", specifier = ">=0.7" },
     { name = "overturemaps", marker = "extra == 'overture'", specifier = ">=1.0.0" },
     { name = "urllib3", marker = "extra == 'osm'", specifier = ">=2" },
 ]
-provides-extras = ["emdat", "fdsn", "hdx", "overture", "osm", "osm-pbf"]
+provides-extras = ["emdat", "fdsn", "hdx", "overture", "osm"]
 
 [[package]]
 name = "earthlens-imagery"

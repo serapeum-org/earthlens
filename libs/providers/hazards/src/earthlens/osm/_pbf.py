@@ -15,7 +15,7 @@ Two concerns are factored here so `osm/backend.py` only routes:
   `.osm.pbf` into a pyramids `~pyramids.feature.collection.FeatureCollection`
   (`G14`), wrapping the **OSM-domain SDK** (`G9`): `pyosmium`/`osmium` for the
   bounded-memory streaming path (`engine="pyosmium"`, the wheel-clean default,
-  installed by `earthlens[osm-pbf]`) or `pyrosm` for the regional in-memory path
+  installed by `earthlens[osm]`) or `pyrosm` for the regional in-memory path
   (`engine="pyrosm"`, exact tag filters + mixed geometry). `pyrosm` is **not** a
   declared dependency — its transitive `cykhash` ships sdist-only (no wheels), so
   it would force a source build on every install (`#1186`) — and is opt-in via a
@@ -289,7 +289,7 @@ def read_pbf(
     """Read one layer from a local `.osm.pbf` into a `FeatureCollection` (`G14`).
 
     Routes on `engine`: `"pyosmium"` (default) streams the file with bounded
-    memory and needs only `earthlens[osm-pbf]`; `"pyrosm"` reads the whole extract
+    memory and needs only `earthlens[osm]`; `"pyrosm"` reads the whole extract
     in memory and calls the named `pyrosm.OSM` method, giving exact tag filters
     and mixed geometry but requiring the opt-in `pyrosm` SDK (`pip install
     pyrosm`). Both return a WGS84
@@ -312,7 +312,7 @@ def read_pbf(
 
     Raises:
         ImportError: If the selected engine's SDK is not installed — the default
-            `pyosmium` engine needs `earthlens[osm-pbf]`, the `pyrosm` engine
+            `pyosmium` engine needs `earthlens[osm]`, the `pyrosm` engine
             needs a manual `pip install pyrosm`.
         ValueError: If `engine="pyrosm"` is used on a file larger than
             `MAX_PYROSM_BYTES`, or `engine` is not a known value.
@@ -333,7 +333,7 @@ def _require_pyrosm() -> Any:
     `cykhash` ships sdist-only on PyPI (no wheels), which would force a Cython
     source build on every `earthlens[all]` install and every CI job (`#1186`). It
     is therefore opt-in. The wheel-clean streaming `pyosmium` engine
-    (`engine="pyosmium"`, the default) is installed by `earthlens[osm-pbf]` and
+    (`engine="pyosmium"`, the default) is installed by `earthlens[osm]` and
     needs no source build.
 
     Returns:
@@ -353,7 +353,7 @@ def _require_pyrosm() -> Any:
             "source build on every install (see #1186). Install it with "
             "`pip install pyrosm` (needs a C toolchain to build cykhash), or use "
             "the default streaming engine engine='pyosmium', which ships with "
-            "earthlens[osm-pbf]."
+            "earthlens[osm]."
         ) from exc
     return PyrosmOSM
 
@@ -454,7 +454,7 @@ def _read_pyosmium(
     except ImportError as exc:  # pragma: no cover - exercised via monkeypatch
         raise ImportError(
             "The OSM pbf protocol's pyosmium engine requires the `osmium` "
-            "(pyosmium) SDK. Install it with `pip install earthlens[osm-pbf]`."
+            "(pyosmium) SDK. Install it with `pip install earthlens[osm]`."
         ) from exc
 
     plan = _PYOSMIUM_LAYERS.get(pyrosm_method)

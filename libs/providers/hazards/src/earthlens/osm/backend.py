@@ -38,8 +38,8 @@ This is a `vector` backend (`OUTPUT_KIND = "vector"`), so the
 `download(aggregate=...)` raises `NotImplementedError` (`G1`). All three
 protocols are public — there is no auth class (`G6`) — and the SDKs are
 imported lazily (Overpass/ohsome inside `_fetch`; pyrosm/pyosmium inside
-`read_pbf`), so the package imports without `earthlens[osm]` /
-`earthlens[osm-pbf]`. ohsome's aggregation endpoints remain out of scope.
+`read_pbf`), so the package imports without `earthlens[osm]`. ohsome's
+aggregation endpoints remain out of scope.
 """
 
 from __future__ import annotations
@@ -284,7 +284,7 @@ class OSM(AbstractDataSource):
                 raw Geofabrik path (`"europe/andorra"`). Required when any
                 requested query is a `pbf:*` layer, ignored otherwise.
             engine: The `pbf` read engine — `"pyosmium"` (streaming, the default;
-                ships with `earthlens[osm-pbf]`) or `"pyrosm"` (in-memory, exact
+                ships with `earthlens[osm]`) or `"pyrosm"` (in-memory, exact
                 tag filters + mixed geometry, opt-in via `pip install pyrosm`).
                 Ignored by the `overpass` / `ohsome` protocols.
             cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.
@@ -841,7 +841,7 @@ class OSM(AbstractDataSource):
 
         Raises:
             ImportError: If the selected engine's SDK is not installed — the
-                default `pyosmium` engine needs `earthlens[osm-pbf]`, the opt-in
+                default `pyosmium` engine needs `earthlens[osm]`, the opt-in
                 `pyrosm` engine needs a manual `pip install pyrosm`.
             ValueError: If `self._region` is not a known region / raw path, or
                 a `pyrosm` read is attempted on an oversized extract.
