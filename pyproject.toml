@@ -541,6 +541,13 @@ conflicts = [
     ],
 ]
 
+# Security floor: pin the transitive `oauthlib` at/above 4.0.0, which fixes the
+# PKCE timing side-channel CVE-2026-49265. earthlens uses oauthlib only as an
+# OAuth *client* (earthengine-api -> requests-oauthlib, the Earth Engine auth
+# stack), so the server-side bug is not exploitable here; this satisfies the
+# pip-audit gate, whose policy is to upgrade rather than ignore when a fix exists.
+constraint-dependencies = ["oauthlib>=4.0.0"]
+
 [tool.uv.workspace]
 members = [
     "libs/core",
