@@ -12,7 +12,7 @@ as a [pyramids](https://github.com/serapeum-org/pyramids) `FeatureCollection`
 |---|---|---|---|
 | **Overpass** | [`overpy`](https://github.com/DinoTools/python-overpy) | small/targeted **current-state** features by bbox + tag filter | points, lines, polygons |
 | **ohsome** | [`ohsome`](https://github.com/GIScience/ohsome-py) | OSM **history + analytics** (features at a point in time / over a range) | points, lines, polygons |
-| **pbf** | [`pyrosm`](https://pyrosm.readthedocs.io/) / [`pyosmium`](https://osmcode.org/pyosmium/) | **bulk / regional** reads from a Geofabrik `.osm.pbf` extract (a whole country's buildings, roads, …) | points, lines, polygons |
+| **pbf** | [`pyosmium`](https://osmcode.org/pyosmium/) (default) / [`pyrosm`](https://pyrosm.readthedocs.io/) (opt-in) | **bulk / regional** reads from a Geofabrik `.osm.pbf` extract (a whole country's buildings, roads, …) | points, lines, polygons |
 
 The first two are **live-query** protocols (small, targeted asks against a
 shared public service). The `pbf` protocol is the **bulk** path: it downloads a
@@ -79,13 +79,14 @@ download; the request bbox then clips the read.
 
 **None.** Overpass, ohsome, and Geofabrik are all fully public — no key, no
 token, no login, so there is no `authentication.md` page. The SDKs ship behind
-two extras and are imported lazily, so the package imports fine without them:
+one `osm` extra and are imported lazily, so the package imports fine without it:
 
-- `pip install earthlens[osm]` → `overpy` + `ohsome` (the live protocols).
-- `pip install earthlens[osm-pbf]` → `pyrosm` + `osmium` (the `pbf` protocol).
-  Note `pyosmium` is published on PyPI as `osmium`. This extra is **not** part
-  of `[all]` because `pyrosm` pulls the sdist-only `cykhash` (it would need a C
-  compiler), so install it explicitly for bulk PBF work.
+- `pip install earthlens[osm]` → `overpy` + `ohsome` (the live protocols) plus
+  `osmium` (the wheel-clean `pyosmium` streaming engine, the `pbf` default;
+  `pyosmium` is published on PyPI as `osmium`). This extra **is** part of `[all]`.
+  The richer in-memory `pyrosm` pbf engine is opt-in: `pip install pyrosm` builds
+  the sdist-only `cykhash` from source (needs a C compiler), so install it only
+  for `engine="pyrosm"`.
 
 !!! note "Overpass needs a real User-Agent"
     The canonical `overpass-api.de` endpoint returns HTTP 406 to requests with
@@ -105,10 +106,10 @@ One `FeatureCollection` (CRS `EPSG:4326`):
 - **ohsome** — the geometry plus ohsome's own columns, notably `@osmId` and
   `@snapshotTimestamp` (the history timestamp) and `@other_tags`.
 - **pbf** — an `osm_id` / `osm_type` identity (pyrosm's native `id` column is
-  normalised to `osm_id` so it matches the other paths) plus, with the default
-  `pyrosm` engine, the layer's key tags (e.g. `building`); the `pyosmium`
-  engine returns the slimmer `osm_id` / `osm_type` / `geometry` schema (see the
-  engine note in [Usage](usage.md)).
+  normalised to `osm_id` so it matches the other paths). The default `pyosmium`
+  engine returns the slimmer `osm_id` / `osm_type` / `geometry` schema; the
+  opt-in `pyrosm` engine adds the layer's key tags (e.g. `building`) and exact
+  per-layer columns (see the engine note in [Usage](usage.md)).
 
 As a side effect, `download()` also writes the collection to one vector file in
 the output directory (GeoJSON by default, or GeoPackage).
@@ -131,11 +132,12 @@ is exactly the per-provider-SDK role `earthlens.osm` already plays for
 `overpy` / `ohsome`. By maintainer decision the whole OSM stack, PBF included,
 stays in earthlens; it is **not** ported to pyramids.
 
-The `pyrosm` (in-memory) engine reads a whole regional extract into memory and
-is the default. For a **continent- or planet-scale** extract too large to hold
-in memory, pass `engine="pyosmium"` to stream it with bounded memory; the
-backend also warns before downloading a multi-GB extract and refuses to load a
->4 GB file with `pyrosm`. Never load `planet.osm` with `pyrosm`.
+The default `pyosmium` (streaming) engine reads with bounded memory and ships
+with `earthlens[osm]`, so it handles a **continent- or planet-scale** extract
+out of the box. The opt-in `pyrosm` (in-memory) engine reads a whole regional
+extract into memory for the richest, exact output; the backend warns before
+downloading a multi-GB extract and refuses to load a >4 GB file with `pyrosm`.
+Never load `planet.osm` with `pyrosm`.
 
 ## Out of scope (follow-ons)
 

@@ -56,7 +56,7 @@ from pathlib import Path
 #: stands behind.
 _EXPECTED_EMPTY = {
     "wdpa": "WDPA_TOKEN not issued yet (awaiting UNEP-WCMC approval)",
-    "osm": "the osm-pbf extra is deliberately outside [all]",
+    "osm": "the in-memory pyrosm pbf engine is deliberately opt-in, outside [all]",
     "argo": "argopy pins xarray>=2025.7 and openeo pins <2025.1.2, so the argo "
     "extra cannot join [all] and its SDK is never installed",
     "mswep": "the GloH2O share is granted per person; CI cannot hold one",

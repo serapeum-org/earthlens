@@ -1,31 +1,52 @@
 """Live end-to-end test for the OpenStreetMap `pbf` protocol.
 
 Downloads the real (small, ~8.8 MB) Geofabrik **Malta** extract over anonymous
-HTTPS and reads its building footprints with `pyrosm` — no credentials. Gated
-behind the `e2e` + `osm_pbf` markers plus the `osm-pbf` extra (`pyrosm` /
-`osmium`): a default `pytest` run skips it, a missing SDK skips the module, and
-a transport failure skips rather than fails. The extract is cached under the
+HTTPS and reads its building footprints — no credentials. Gated behind the `e2e`
++ `osm_pbf` markers: the streaming `pyosmium` engine needs the `osm` extra
+(`osmium`), while the in-memory `pyrosm` engine needs the opt-in `pyrosm` SDK
+(CI injects it with `uv run --with pyrosm`). A default `pytest` run skips it, a
+missing engine SDK skips these tests (via `skipif`, not a collection-time
+`importorskip`, so the `osm` lane deselects them without a spurious skip line),
+and a transport failure skips rather than fails. The extract is cached under the
 test's `tmp_path` so the run is self-contained.
 
 Run with:
 
-    pixi run -e dev pytest -m "osm_pbf and e2e" tests/osm
+    uv run --with pyrosm pytest -m "osm_pbf and e2e" tests/osm
 """
 
 from __future__ import annotations
 
+import importlib.util
 from pathlib import Path
 
 import pytest
 import requests
 
-pytest.importorskip("pyrosm", reason="the pbf e2e needs the osm-pbf extra (pyrosm)")
-pytest.importorskip("osmium", reason="the pbf e2e needs the osm-pbf extra (osmium)")
+from earthlens.earthlens import EarthLens
+from earthlens.osm._pbf import download_extract, read_pbf
 
-from earthlens.earthlens import EarthLens  # noqa: E402
-from earthlens.osm._pbf import download_extract, read_pbf  # noqa: E402
+# Gate the SDK requirement as a per-test skipif, not a module-level
+# `importorskip`. A module-level importorskip reports a skip during *collection*,
+# so it surfaces even in the `osm` lane — where these `osm_pbf`-marked tests are
+# deselected and never run — printing a misleading "needs pip install pyrosm"
+# line. As a skipif it only reports for selected tests: the tests skip when an
+# engine SDK is absent (the base install), and deselect silently otherwise.
+_MISSING_SDKS = [
+    name for name in ("pyrosm", "osmium") if importlib.util.find_spec(name) is None
+]
 
-pytestmark = [pytest.mark.e2e, pytest.mark.osm_pbf]
+pytestmark = [
+    pytest.mark.e2e,
+    pytest.mark.osm_pbf,
+    pytest.mark.skipif(
+        bool(_MISSING_SDKS),
+        reason=(
+            "the pbf e2e needs " + " + ".join(_MISSING_SDKS) + " (pyrosm via "
+            "`pip install pyrosm`, osmium via the osm extra)"
+        ),
+    ),
+]
 
 # A dense bbox over Valletta / Sliema — stable, plentiful building coverage, so
 # the clip path returns features without reading the whole island.
@@ -46,6 +67,9 @@ class TestPbfLive:
     def test_malta_buildings_returns_features(self, tmp_path: Path):
         """pbf:buildings over the Malta extract returns >=1 polygon, EPSG:4326."""
         try:
+            # engine="pyrosm" explicitly: the facade default is now the streaming
+            # pyosmium engine, so this class must opt into pyrosm to exercise its
+            # rich per-layer output (the parsed tag columns asserted below).
             fc = EarthLens(
                 data_source="osm",
                 variables=["pbf:buildings"],
@@ -54,6 +78,7 @@ class TestPbfLive:
                 lon_lim=_LON_LIM,
                 path=str(tmp_path),
                 cache_dir=str(tmp_path / "geofabrik"),
+                engine="pyrosm",
             ).download(progress_bar=False)
         except Exception as exc:  # noqa: BLE001 - transport -> skip, else re-raise
             _skip_on_network(exc)
@@ -61,6 +86,8 @@ class TestPbfLive:
         assert fc.crs.to_epsg() == 4326
         # the identity column is normalised to `osm_id` (from pyrosm's `id`).
         assert {"osm_id", "osm_type"} <= set(fc.columns)
+        # pyrosm parses the layer's OSM tags into columns (unlike pyosmium's slim
+        # osm_id/osm_type/geometry schema), so the `building` tag column is present.
         assert "building" in fc.columns
 
 

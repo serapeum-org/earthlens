@@ -333,10 +333,11 @@ pip install earthlens[gee]     # earthengine-api
 pip install earthlens[all]     # every backend SDK
 ```
 
-`[all]` deliberately omits exactly two extras — `argo` and `osm-pbf`. `argopy` requires
-`xarray>=2025.7` while `openeo` (which *is* in `all`) caps `xarray<2025.1.2`, and `pyrosm`
-pulls the sdist-only `cykhash`, which would make `[all]` need a C compiler. `osm` itself
-**is** included. Both excluded extras install fine on their own — see
+`[all]` deliberately omits `argo` (and `eedai`): `argopy` requires `xarray>=2025.7`
+while `openeo` (which *is* in `all`) caps `xarray<2025.1.2`. `osm` **is** included and
+covers all three protocols — overpy/ohsome plus the wheel-clean `osmium` (pyosmium) for
+bulk `.osm.pbf` reads. The richer in-memory `pyrosm` pbf engine is opt-in (`pip install
+pyrosm`, which builds the sdist-only `cykhash` from source). See
 [what `[all]` excludes](https://serapeum-org.github.io/earthlens/installation/#what-earthlensall-excludes-and-why).
 
 For a development environment the repo is a [uv](https://docs.astral.sh/uv/)

@@ -6,18 +6,20 @@ rendered API is the [Reference](osm.md) page.
 
 ## Install
 
-The protocol SDKs ship behind two extras (imported lazily — the base package
-imports without them):
+The protocol SDKs ship behind one `osm` extra (imported lazily — the base package
+imports without it):
 
 ```bash
-pip install earthlens[osm]      # overpy + ohsome  (Overpass + ohsome protocols)
-pip install earthlens[osm-pbf]  # pyrosm + osmium  (the pbf protocol)
+pip install earthlens[osm]      # overpy + ohsome + osmium  (all three protocols)
+pip install pyrosm              # opt-in: the richer in-memory pbf engine
 ```
 
-`[osm-pbf]` is **not** in `[all]` because `pyrosm` pulls the sdist-only `cykhash`
-(it would need a C compiler), so install it explicitly for bulk PBF work. Note
-`pyosmium` is published on PyPI as `osmium`. There are no credentials to
-configure — Overpass, ohsome, and Geofabrik are all public.
+`[osm]` **is** in `[all]`: it covers all three protocols — `overpy` + `ohsome` for
+the live queries and the wheel-clean `osmium` (pyosmium, published on PyPI as
+`osmium`) for the `pbf` default engine. The richer in-memory `pyrosm` pbf engine is
+**opt-in** — `pip install pyrosm` builds the sdist-only `cykhash` from source
+(needs a C compiler) — so install it only when you want `engine="pyrosm"`. There
+are no credentials to configure — Overpass, ohsome, and Geofabrik are all public.
 
 ## Quickstart — current-state hospitals (Overpass)
 
@@ -60,7 +62,8 @@ print(buildings["@snapshotTimestamp"].iloc[0])   # the history timestamp
 
 For a **bulk** ask — every building in a country — use the `pbf` protocol. It
 downloads a [Geofabrik](https://download.geofabrik.de/) extract for `region=`
-(cached on disk), reads the layer with `pyrosm`, and clips to the request bbox:
+(cached on disk), reads the layer with the default streaming `pyosmium` engine,
+and clips to the request bbox:
 
 ```python
 buildings = EarthLens(
@@ -82,19 +85,21 @@ calls reuse it. List the region keys with `Catalog().region_ids()`, or pass a
 raw Geofabrik path (any string with a `/`). Omit `lat_lim` / `lon_lim` to read
 the whole extract — the bbox-area cap does **not** apply to a `pbf` read.
 
-!!! note "Engines — `pyrosm` (default) vs `pyosmium`"
-    `engine="pyrosm"` (the default) reads the whole extract in memory and gives
-    the richest columns; it refuses a file over 4 GB. For a **continent- or
-    planet-scale** extract, pass `engine="pyosmium"` to stream it with bounded
-    memory. The backend warns before downloading a multi-GB extract. Never load
-    `planet.osm` with `pyrosm`.
+!!! note "Engines — `pyosmium` (default) vs `pyrosm`"
+    `engine="pyosmium"` (the default) streams the extract with bounded memory and
+    ships with `earthlens[osm]`, so it works out of the box and handles
+    **continent- or planet-scale** extracts. It is the **coarser** reader: it
+    returns a slimmer `osm_id` / `osm_type` / `geometry` schema and, per layer, a
+    single geometry kind under one representative tag (so it under-reports a row's
+    advertised `geometry_types` — e.g. `pbf:pois` yields only node points,
+    `pbf:roads` approximates `network_type="driving"` rather than reproducing
+    `pyrosm`'s exact filter).
 
-    The `pyosmium` engine is a **coarser fallback**: it returns a slimmer
-    `osm_id` / `osm_type` / `geometry` schema and, per layer, a single geometry
-    kind under one representative tag (so it under-reports a row's advertised
-    `geometry_types` — e.g. `pbf:pois` yields only node points, `pbf:roads`
-    approximates `network_type="driving"` rather than reproducing `pyrosm`'s
-    exact filter). Use `pyrosm` when you need the full, exact per-layer output.
+    `engine="pyrosm"` reads the whole extract in memory and gives the richest,
+    exact per-layer columns and mixed geometry; it refuses a file over 4 GB, so
+    never load `planet.osm` with it. It is **opt-in** (`pip install pyrosm` — see
+    above); selecting it without pyrosm installed raises a clear `ImportError`
+    naming the command. The backend warns before downloading a multi-GB extract.
 
 ## Choosing the query — `variables`
 
@@ -182,7 +187,7 @@ an `[out:xml]` / `[out:csv]` override will not parse.
 | `file_format` | `"geojson"` or `"gpkg"` | `"geojson"` |
 | `max_bbox_deg2` | bbox-area cap (square degrees) — guards the planet-wide footgun (live protocols only) | `100.0` |
 | `region` | Geofabrik region key or raw path — **required** for a `pbf:*` query | `None` |
-| `engine` | `pbf` read engine: `"pyrosm"` (in-memory) or `"pyosmium"` (streaming) | `"pyrosm"` |
+| `engine` | `pbf` read engine: `"pyosmium"` (streaming) or `"pyrosm"` (in-memory, opt-in) | `"pyosmium"` |
 | `cache_dir` | directory for cached `.osm.pbf` extracts | `<cache_dir()>/osm_pbf` |
 
 !!! warning "Keep the bbox small (live protocols)"
