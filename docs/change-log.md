@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.26.0 (2026-09-30)
+
+### Fix
+
+- **osm**: ship bulk pbf reads in [all] by folding osmium into the osm extra (#1224)
+- **risk_indicators**: retry ThinkHazard's flapping 404 instead of failing the lane (#1223)
+
 ## 0.25.1 (2026-09-27)
 
 ## 0.25.0 (2026-09-23)
