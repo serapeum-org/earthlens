@@ -25323,7 +25323,7 @@ protocols and returns them as a pyramids
 </ul>
 <p>A request names a curated <strong>named query</strong> (<code>variables=["live:hospitals"]</code>,
 <code>variables=["history:buildings"]</code>, <code>variables=["bulk:buildings"]</code>) plus a bbox
-(and, for <code>pbf</code>, a <code>region=</code> Geofabrik key); the backend routes to the
+(and, for <code>bulk</code>, a <code>region=</code> Geofabrik key); the backend routes to the
 protocol, produces the features, converts them to a <code>FeatureCollection</code>, and
 warns about OSM's <strong>ODbL</strong> share-alike licence. A raw <code>query=</code> (Overpass QL) /
 <code>filter=</code> (ohsome) override is accepted for power users.</p>
@@ -28130,13 +28130,13 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">                the parent class if absent.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            fmt: `strptime` format for `start` / `end`.</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            query: Optional raw Overpass QL override applied to every</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">                requested `overpass` query (a `{bbox}` placeholder, if</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">                requested `live` query (a `{bbox}` placeholder, if</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">                present, is filled with the request bbox). It must request</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">                JSON output (`[out:json]`) — the response is parsed with</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">                `overpy.Overpass().parse_json`, so an `[out:xml]` / `[out:csv]`</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">                override would fail to parse. Power-user escape hatch (`G6`).</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            filter: Optional raw ohsome filter override applied to every</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">                requested `ohsome` query. Power-user escape hatch (`G6`).</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">                requested `history` query. Power-user escape hatch (`G6`).</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">            endpoint: Overpass API endpoint URL. Defaults to the canonical</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">                `overpass-api.de`.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            user_agent: `User-Agent` header sent on every Overpass POST.</span>
@@ -28152,16 +28152,16 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">                `lat_lim` / `lon_lim`). `None` uses the built-in</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">                `100.0`-square-degree default; pass a larger value for a</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">                genuinely larger area. The cap is **not** applied to a</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                `pbf` request (a local extract read is not a live-service</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                `bulk` request (a local extract read is not a live-service</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                footgun).</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            region: The Geofabrik region for a `pbf` request — a key from the</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            region: The Geofabrik region for a `bulk` request — a key from the</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">                catalog&#39;s `regions:` table (`&quot;malta&quot;`, `&quot;netherlands&quot;`, …) or a</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">                raw Geofabrik path (`&quot;europe/andorra&quot;`). Required when any</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">                requested query is a `bulk:*` layer, ignored otherwise.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            engine: The `pbf` read engine — `&quot;pyosmium&quot;` (streaming, the default;</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">                ships with `earthlens[osm]`) or `&quot;pyrosm&quot;` (in-memory, exact</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">                tag filters + mixed geometry, opt-in via `pip install pyrosm`).</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">                Ignored by the `overpass` / `ohsome` protocols.</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">                Ignored by the `live` / `history` download types.</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">                `None` uses `default_pbf_cache_dir()` (a cross-run user cache</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                under the shared earthlens cache directory).</span>
@@ -28300,7 +28300,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-425" name="__codelineno-0-425"></a>            <span class="k">for</span> <span class="n">query_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="p">]</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="n">protocols</span> <span class="o">=</span> <span class="p">{</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;dataset&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">protocol</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">}</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="c1"># The area cap guards the shared live services; a `pbf` read hits a</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="c1"># The area cap guards the shared live services; a `bulk` read hits a</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a>        <span class="c1"># local extract, so it is only applied when a live query is present.</span>
 <a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="k">if</span> <span class="n">protocols</span> <span class="o">&amp;</span> <span class="p">{</span><span class="s2">&quot;live&quot;</span><span class="p">,</span> <span class="s2">&quot;history&quot;</span><span class="p">}:</span>
 <a id="__codelineno-0-431" name="__codelineno-0-431"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_guard_bbox</span><span class="p">()</span>
@@ -28354,8 +28354,8 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-479" name="__codelineno-0-479"></a>
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a vector backend</span>
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        returns in-memory `FeatureCollection`s. Routes on the resolved</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        `Dataset.protocol` (`G2`, `G10`) — `overpass` via `_fetch_overpass`,</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        `ohsome` via `_fetch_ohsome`, `pbf` via `_fetch_pbf`. An HTTP / SDK</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        `Dataset.protocol` (`G2`, `G10`) — `live` via `_fetch_overpass`,</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        `history` via `_fetch_ohsome`, `bulk` via `_fetch_pbf`. An HTTP / SDK</span>
 <a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        error propagates rather than being silently swallowed.</span>
 <a id="__codelineno-0-485" name="__codelineno-0-485"></a>
 <a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        Args:</span>
@@ -28698,7 +28698,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-823" name="__codelineno-0-823"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <a id="__codelineno-0-824" name="__codelineno-0-824"></a>
 <a id="__codelineno-0-825" name="__codelineno-0-825"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_pbf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one `pbf` layer: resolve region, fetch-cache, read, bbox-clip.</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one `bulk` layer: resolve region, fetch-cache, read, bbox-clip.</span>
 <a id="__codelineno-0-827" name="__codelineno-0-827"></a>
 <a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">        Resolves `self._region` to a Geofabrik path, downloads the extract</span>
 <a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">        (cached, via :func:`~earthlens.osm._pbf.download_extract`), and reads</span>
@@ -28708,7 +28708,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-833" name="__codelineno-0-833"></a>
 <a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="sd">            query_id: The named-query id (for logging).</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">            dataset: The resolved `pbf` `Dataset` row (its `pyrosm_method` and,</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">            dataset: The resolved `bulk` `Dataset` row (its `pyrosm_method` and,</span>
 <a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="sd">                for the road network, `network_type`).</span>
 <a id="__codelineno-0-838" name="__codelineno-0-838"></a>
 <a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="sd">        Returns:</span>
@@ -28744,7 +28744,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-869" name="__codelineno-0-869"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_pbf_bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the request bbox as `(west, south, east, north)`, or `None`.</span>
 <a id="__codelineno-0-871" name="__codelineno-0-871"></a>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">        A `pbf` read clips to the request bbox, but the whole-Earth default a</span>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">        A `bulk` read clips to the request bbox, but the whole-Earth default a</span>
 <a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">        facade caller gets when they omit `lat_lim` / `lon_lim` means &quot;no clip&quot;</span>
 <a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">        (read the whole extract), so it maps to `None` rather than a redundant</span>
 <a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">        planet-sized clip.</span>
@@ -28774,7 +28774,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-899" name="__codelineno-0-899"></a>        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span>
 <a id="__codelineno-0-900" name="__codelineno-0-900"></a>        <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-901" name="__codelineno-0-901"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-902" name="__codelineno-0-902"></a>                <span class="s2">&quot;an ohsome query needs a time: pass start= (and optionally &quot;</span>
+<a id="__codelineno-0-902" name="__codelineno-0-902"></a>                <span class="s2">&quot;a history query needs a time: pass start= (and optionally &quot;</span>
 <a id="__codelineno-0-903" name="__codelineno-0-903"></a>                <span class="s2">&quot;end=), or time=, e.g. start=&#39;2020-01-01&#39;.&quot;</span>
 <a id="__codelineno-0-904" name="__codelineno-0-904"></a>            <span class="p">)</span>
 <a id="__codelineno-0-905" name="__codelineno-0-905"></a>        <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">==</span> <span class="n">start</span><span class="p">:</span>
@@ -29060,7 +29060,7 @@ the parent class if absent.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional raw Overpass QL override applied to every
-requested <code>overpass</code> query (a <code>{bbox}</code> placeholder, if
+requested <code>live</code> query (a <code>{bbox}</code> placeholder, if
 present, is filled with the request bbox). It must request
 JSON output (<code>[out:json]</code>) — the response is parsed with
 <code>overpy.Overpass().parse_json</code>, so an <code>[out:xml]</code> / <code>[out:csv]</code>
@@ -29081,7 +29081,7 @@ override would fail to parse. Power-user escape hatch (<code>G6</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional raw ohsome filter override applied to every
-requested <code>ohsome</code> query. Power-user escape hatch (<code>G6</code>).</p>
+requested <code>history</code> query. Power-user escape hatch (<code>G6</code>).</p>
               </div>
             </td>
             <td>
@@ -29172,7 +29172,7 @@ whole-Earth default a facade caller gets when they omit
 <code>lat_lim</code> / <code>lon_lim</code>). <code>None</code> uses the built-in
 <code>100.0</code>-square-degree default; pass a larger value for a
 genuinely larger area. The cap is <strong>not</strong> applied to a
-<code>pbf</code> request (a local extract read is not a live-service
+<code>bulk</code> request (a local extract read is not a live-service
 footgun).</p>
               </div>
             </td>
@@ -29189,7 +29189,7 @@ footgun).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The Geofabrik region for a <code>pbf</code> request — a key from the
+                <p>The Geofabrik region for a <code>bulk</code> request — a key from the
 catalog's <code>regions:</code> table (<code>"malta"</code>, <code>"netherlands"</code>, …) or a
 raw Geofabrik path (<code>"europe/andorra"</code>). Required when any
 requested query is a <code>bulk:*</code> layer, ignored otherwise.</p>
@@ -29211,7 +29211,7 @@ requested query is a <code>bulk:*</code> layer, ignored otherwise.</p>
                 <p>The <code>pbf</code> read engine — <code>"pyosmium"</code> (streaming, the default;
 ships with <code>earthlens[osm]</code>) or <code>"pyrosm"</code> (in-memory, exact
 tag filters + mixed geometry, opt-in via <code>pip install pyrosm</code>).
-Ignored by the <code>overpass</code> / <code>ohsome</code> protocols.</p>
+Ignored by the <code>live</code> / <code>history</code> download types.</p>
               </div>
             </td>
             <td>
@@ -29460,13 +29460,13 @@ of named-query ids.</p>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            the parent class if absent.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        fmt: `strptime` format for `start` / `end`.</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        query: Optional raw Overpass QL override applied to every</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            requested `overpass` query (a `{bbox}` placeholder, if</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            requested `live` query (a `{bbox}` placeholder, if</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            present, is filled with the request bbox). It must request</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            JSON output (`[out:json]`) — the response is parsed with</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            `overpy.Overpass().parse_json`, so an `[out:xml]` / `[out:csv]`</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            override would fail to parse. Power-user escape hatch (`G6`).</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        filter: Optional raw ohsome filter override applied to every</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            requested `ohsome` query. Power-user escape hatch (`G6`).</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            requested `history` query. Power-user escape hatch (`G6`).</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        endpoint: Overpass API endpoint URL. Defaults to the canonical</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            `overpass-api.de`.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        user_agent: `User-Agent` header sent on every Overpass POST.</span>
@@ -29482,16 +29482,16 @@ of named-query ids.</p>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            `lat_lim` / `lon_lim`). `None` uses the built-in</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">            `100.0`-square-degree default; pass a larger value for a</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            genuinely larger area. The cap is **not** applied to a</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            `pbf` request (a local extract read is not a live-service</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            `bulk` request (a local extract read is not a live-service</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            footgun).</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        region: The Geofabrik region for a `pbf` request — a key from the</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        region: The Geofabrik region for a `bulk` request — a key from the</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">            catalog&#39;s `regions:` table (`&quot;malta&quot;`, `&quot;netherlands&quot;`, …) or a</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            raw Geofabrik path (`&quot;europe/andorra&quot;`). Required when any</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            requested query is a `bulk:*` layer, ignored otherwise.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        engine: The `pbf` read engine — `&quot;pyosmium&quot;` (streaming, the default;</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            ships with `earthlens[osm]`) or `&quot;pyrosm&quot;` (in-memory, exact</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">            tag filters + mixed geometry, opt-in via `pip install pyrosm`).</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            Ignored by the `overpass` / `ohsome` protocols.</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            Ignored by the `live` / `history` download types.</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            `None` uses `default_pbf_cache_dir()` (a cross-run user cache</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            under the shared earthlens cache directory).</span>
@@ -33655,13 +33655,13 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">                the parent class if absent.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            fmt: `strptime` format for `start` / `end`.</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            query: Optional raw Overpass QL override applied to every</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">                requested `overpass` query (a `{bbox}` placeholder, if</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">                requested `live` query (a `{bbox}` placeholder, if</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">                present, is filled with the request bbox). It must request</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">                JSON output (`[out:json]`) — the response is parsed with</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">                `overpy.Overpass().parse_json`, so an `[out:xml]` / `[out:csv]`</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">                override would fail to parse. Power-user escape hatch (`G6`).</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            filter: Optional raw ohsome filter override applied to every</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">                requested `ohsome` query. Power-user escape hatch (`G6`).</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">                requested `history` query. Power-user escape hatch (`G6`).</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">            endpoint: Overpass API endpoint URL. Defaults to the canonical</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">                `overpass-api.de`.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            user_agent: `User-Agent` header sent on every Overpass POST.</span>
@@ -33677,16 +33677,16 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">                `lat_lim` / `lon_lim`). `None` uses the built-in</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">                `100.0`-square-degree default; pass a larger value for a</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">                genuinely larger area. The cap is **not** applied to a</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                `pbf` request (a local extract read is not a live-service</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                `bulk` request (a local extract read is not a live-service</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                footgun).</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            region: The Geofabrik region for a `pbf` request — a key from the</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            region: The Geofabrik region for a `bulk` request — a key from the</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">                catalog&#39;s `regions:` table (`&quot;malta&quot;`, `&quot;netherlands&quot;`, …) or a</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">                raw Geofabrik path (`&quot;europe/andorra&quot;`). Required when any</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">                requested query is a `bulk:*` layer, ignored otherwise.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            engine: The `pbf` read engine — `&quot;pyosmium&quot;` (streaming, the default;</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">                ships with `earthlens[osm]`) or `&quot;pyrosm&quot;` (in-memory, exact</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">                tag filters + mixed geometry, opt-in via `pip install pyrosm`).</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">                Ignored by the `overpass` / `ohsome` protocols.</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">                Ignored by the `live` / `history` download types.</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">                `None` uses `default_pbf_cache_dir()` (a cross-run user cache</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                under the shared earthlens cache directory).</span>
@@ -33825,7 +33825,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-425" name="__codelineno-0-425"></a>            <span class="k">for</span> <span class="n">query_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="p">]</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="n">protocols</span> <span class="o">=</span> <span class="p">{</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;dataset&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">protocol</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">}</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="c1"># The area cap guards the shared live services; a `pbf` read hits a</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="c1"># The area cap guards the shared live services; a `bulk` read hits a</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a>        <span class="c1"># local extract, so it is only applied when a live query is present.</span>
 <a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="k">if</span> <span class="n">protocols</span> <span class="o">&amp;</span> <span class="p">{</span><span class="s2">&quot;live&quot;</span><span class="p">,</span> <span class="s2">&quot;history&quot;</span><span class="p">}:</span>
 <a id="__codelineno-0-431" name="__codelineno-0-431"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_guard_bbox</span><span class="p">()</span>
@@ -33879,8 +33879,8 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-479" name="__codelineno-0-479"></a>
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a vector backend</span>
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        returns in-memory `FeatureCollection`s. Routes on the resolved</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        `Dataset.protocol` (`G2`, `G10`) — `overpass` via `_fetch_overpass`,</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        `ohsome` via `_fetch_ohsome`, `pbf` via `_fetch_pbf`. An HTTP / SDK</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        `Dataset.protocol` (`G2`, `G10`) — `live` via `_fetch_overpass`,</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        `history` via `_fetch_ohsome`, `bulk` via `_fetch_pbf`. An HTTP / SDK</span>
 <a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        error propagates rather than being silently swallowed.</span>
 <a id="__codelineno-0-485" name="__codelineno-0-485"></a>
 <a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        Args:</span>
@@ -34223,7 +34223,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-823" name="__codelineno-0-823"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <a id="__codelineno-0-824" name="__codelineno-0-824"></a>
 <a id="__codelineno-0-825" name="__codelineno-0-825"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_pbf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one `pbf` layer: resolve region, fetch-cache, read, bbox-clip.</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one `bulk` layer: resolve region, fetch-cache, read, bbox-clip.</span>
 <a id="__codelineno-0-827" name="__codelineno-0-827"></a>
 <a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">        Resolves `self._region` to a Geofabrik path, downloads the extract</span>
 <a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">        (cached, via :func:`~earthlens.osm._pbf.download_extract`), and reads</span>
@@ -34233,7 +34233,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-833" name="__codelineno-0-833"></a>
 <a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="sd">            query_id: The named-query id (for logging).</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">            dataset: The resolved `pbf` `Dataset` row (its `pyrosm_method` and,</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">            dataset: The resolved `bulk` `Dataset` row (its `pyrosm_method` and,</span>
 <a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="sd">                for the road network, `network_type`).</span>
 <a id="__codelineno-0-838" name="__codelineno-0-838"></a>
 <a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="sd">        Returns:</span>
@@ -34269,7 +34269,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-869" name="__codelineno-0-869"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_pbf_bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the request bbox as `(west, south, east, north)`, or `None`.</span>
 <a id="__codelineno-0-871" name="__codelineno-0-871"></a>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">        A `pbf` read clips to the request bbox, but the whole-Earth default a</span>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">        A `bulk` read clips to the request bbox, but the whole-Earth default a</span>
 <a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">        facade caller gets when they omit `lat_lim` / `lon_lim` means &quot;no clip&quot;</span>
 <a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">        (read the whole extract), so it maps to `None` rather than a redundant</span>
 <a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">        planet-sized clip.</span>
@@ -34299,7 +34299,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-899" name="__codelineno-0-899"></a>        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span>
 <a id="__codelineno-0-900" name="__codelineno-0-900"></a>        <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-901" name="__codelineno-0-901"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-902" name="__codelineno-0-902"></a>                <span class="s2">&quot;an ohsome query needs a time: pass start= (and optionally &quot;</span>
+<a id="__codelineno-0-902" name="__codelineno-0-902"></a>                <span class="s2">&quot;a history query needs a time: pass start= (and optionally &quot;</span>
 <a id="__codelineno-0-903" name="__codelineno-0-903"></a>                <span class="s2">&quot;end=), or time=, e.g. start=&#39;2020-01-01&#39;.&quot;</span>
 <a id="__codelineno-0-904" name="__codelineno-0-904"></a>            <span class="p">)</span>
 <a id="__codelineno-0-905" name="__codelineno-0-905"></a>        <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">==</span> <span class="n">start</span><span class="p">:</span>
@@ -34585,7 +34585,7 @@ the parent class if absent.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional raw Overpass QL override applied to every
-requested <code>overpass</code> query (a <code>{bbox}</code> placeholder, if
+requested <code>live</code> query (a <code>{bbox}</code> placeholder, if
 present, is filled with the request bbox). It must request
 JSON output (<code>[out:json]</code>) — the response is parsed with
 <code>overpy.Overpass().parse_json</code>, so an <code>[out:xml]</code> / <code>[out:csv]</code>
@@ -34606,7 +34606,7 @@ override would fail to parse. Power-user escape hatch (<code>G6</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional raw ohsome filter override applied to every
-requested <code>ohsome</code> query. Power-user escape hatch (<code>G6</code>).</p>
+requested <code>history</code> query. Power-user escape hatch (<code>G6</code>).</p>
               </div>
             </td>
             <td>
@@ -34697,7 +34697,7 @@ whole-Earth default a facade caller gets when they omit
 <code>lat_lim</code> / <code>lon_lim</code>). <code>None</code> uses the built-in
 <code>100.0</code>-square-degree default; pass a larger value for a
 genuinely larger area. The cap is <strong>not</strong> applied to a
-<code>pbf</code> request (a local extract read is not a live-service
+<code>bulk</code> request (a local extract read is not a live-service
 footgun).</p>
               </div>
             </td>
@@ -34714,7 +34714,7 @@ footgun).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The Geofabrik region for a <code>pbf</code> request — a key from the
+                <p>The Geofabrik region for a <code>bulk</code> request — a key from the
 catalog's <code>regions:</code> table (<code>"malta"</code>, <code>"netherlands"</code>, …) or a
 raw Geofabrik path (<code>"europe/andorra"</code>). Required when any
 requested query is a <code>bulk:*</code> layer, ignored otherwise.</p>
@@ -34736,7 +34736,7 @@ requested query is a <code>bulk:*</code> layer, ignored otherwise.</p>
                 <p>The <code>pbf</code> read engine — <code>"pyosmium"</code> (streaming, the default;
 ships with <code>earthlens[osm]</code>) or <code>"pyrosm"</code> (in-memory, exact
 tag filters + mixed geometry, opt-in via <code>pip install pyrosm</code>).
-Ignored by the <code>overpass</code> / <code>ohsome</code> protocols.</p>
+Ignored by the <code>live</code> / <code>history</code> download types.</p>
               </div>
             </td>
             <td>
@@ -34985,13 +34985,13 @@ of named-query ids.</p>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            the parent class if absent.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        fmt: `strptime` format for `start` / `end`.</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        query: Optional raw Overpass QL override applied to every</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            requested `overpass` query (a `{bbox}` placeholder, if</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            requested `live` query (a `{bbox}` placeholder, if</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            present, is filled with the request bbox). It must request</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            JSON output (`[out:json]`) — the response is parsed with</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            `overpy.Overpass().parse_json`, so an `[out:xml]` / `[out:csv]`</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            override would fail to parse. Power-user escape hatch (`G6`).</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        filter: Optional raw ohsome filter override applied to every</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            requested `ohsome` query. Power-user escape hatch (`G6`).</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            requested `history` query. Power-user escape hatch (`G6`).</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        endpoint: Overpass API endpoint URL. Defaults to the canonical</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            `overpass-api.de`.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        user_agent: `User-Agent` header sent on every Overpass POST.</span>
@@ -35007,16 +35007,16 @@ of named-query ids.</p>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            `lat_lim` / `lon_lim`). `None` uses the built-in</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">            `100.0`-square-degree default; pass a larger value for a</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            genuinely larger area. The cap is **not** applied to a</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            `pbf` request (a local extract read is not a live-service</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            `bulk` request (a local extract read is not a live-service</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            footgun).</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        region: The Geofabrik region for a `pbf` request — a key from the</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        region: The Geofabrik region for a `bulk` request — a key from the</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">            catalog&#39;s `regions:` table (`&quot;malta&quot;`, `&quot;netherlands&quot;`, …) or a</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            raw Geofabrik path (`&quot;europe/andorra&quot;`). Required when any</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            requested query is a `bulk:*` layer, ignored otherwise.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        engine: The `pbf` read engine — `&quot;pyosmium&quot;` (streaming, the default;</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            ships with `earthlens[osm]`) or `&quot;pyrosm&quot;` (in-memory, exact</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">            tag filters + mixed geometry, opt-in via `pip install pyrosm`).</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            Ignored by the `overpass` / `ohsome` protocols.</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            Ignored by the `live` / `history` download types.</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            `None` uses `default_pbf_cache_dir()` (a cross-run user cache</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            under the shared earthlens cache directory).</span>

@@ -6828,10 +6828,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#live-live-current-state-queries" class="md-nav__link">
+  <a href="#live-current-state-queries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        live: — live, current-state queries
+        live: — current-state queries
       
     </span>
   </a>
@@ -6850,10 +6850,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#bulk-bulk-regional-offline-reads" class="md-nav__link">
+  <a href="#bulk-regional-offline-reads" class="md-nav__link">
     <span class="md-ellipsis">
       
-        bulk: — bulk, regional, offline reads
+        bulk: — regional, offline reads
       
     </span>
   </a>
@@ -23796,10 +23796,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#live-live-current-state-queries" class="md-nav__link">
+  <a href="#live-current-state-queries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        live: — live, current-state queries
+        live: — current-state queries
       
     </span>
   </a>
@@ -23818,10 +23818,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#bulk-bulk-regional-offline-reads" class="md-nav__link">
+  <a href="#bulk-regional-offline-reads" class="md-nav__link">
     <span class="md-ellipsis">
       
-        bulk: — bulk, regional, offline reads
+        bulk: — regional, offline reads
       
     </span>
   </a>
@@ -24030,7 +24030,7 @@ fits how much of earthlens you want:</p>
 <code>&lt;type&gt;:</code> prefix of the named query. They answer different questions and have
 very different freshness and cost characteristics, so picking the right one
 matters more than with a single-source backend.</p>
-<h3 id="live-live-current-state-queries"><a class="toclink" href="#live-live-current-state-queries"><code>live:</code> — live, current-state queries</a><a class="headerlink" href="#live-live-current-state-queries" title="Permanent link">#</a></h3>
+<h3 id="live-current-state-queries"><a class="toclink" href="#live-current-state-queries"><code>live:</code> — current-state queries</a><a class="headerlink" href="#live-current-state-queries" title="Permanent link">#</a></h3>
 <p>Named queries: <code>live:hospitals</code> / <code>roads</code> / <code>buildings</code> / <code>cafes</code> /
 <code>schools</code>.</p>
 <p>A live query that returns <strong>what the map says right now</strong> — there is no time
@@ -24060,7 +24060,7 @@ public infrastructure (a transient throttle is retried automatically; a hard
 block surfaces as a clear, typed error). A raw filter goes through <code>filter=</code>.
 The <code>history:</code> aggregation queries (counts / areas / lengths over time) are out
 of scope for now.</p>
-<h3 id="bulk-bulk-regional-offline-reads"><a class="toclink" href="#bulk-bulk-regional-offline-reads"><code>bulk:</code> — bulk, regional, offline reads</a><a class="headerlink" href="#bulk-bulk-regional-offline-reads" title="Permanent link">#</a></h3>
+<h3 id="bulk-regional-offline-reads"><a class="toclink" href="#bulk-regional-offline-reads"><code>bulk:</code> — regional, offline reads</a><a class="headerlink" href="#bulk-regional-offline-reads" title="Permanent link">#</a></h3>
 <p>Named queries: <code>bulk:buildings</code> / <code>roads</code> / <code>pois</code> / <code>landuse</code> / <code>natural</code> /
 <code>boundaries</code>.</p>
 <p><code>pbf</code> is <strong>not a live query</strong>. It reads a regional <code>.osm.pbf</code> extract — a
