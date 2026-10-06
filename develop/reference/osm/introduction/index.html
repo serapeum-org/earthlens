@@ -6805,6 +6805,56 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#the-three-download-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The three download types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The three download types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overpass-live-current-state-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overpass — live, current-state queries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ohsome-history-and-change-over-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ohsome — history and change over time
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pbf-bulk-regional-offline-extracts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pbf — bulk, regional, offline extracts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#why-it-matters-here" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23745,6 +23795,56 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#the-three-download-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The three download types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The three download types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overpass-live-current-state-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overpass — live, current-state queries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ohsome-history-and-change-over-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ohsome — history and change over time
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pbf-bulk-regional-offline-extracts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pbf — bulk, regional, offline extracts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#why-it-matters-here" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23920,6 +24020,64 @@ and reads a whole layer locally — the right tool for "every building in Malta"
 which would blow past Overpass's size limits.</p>
 <p>This page orients the backend. For the hands-on download walkthrough see
 <a href="../usage/">Usage</a>; the rendered API is the <a href="../osm/">Reference</a> page.</p>
+<h2 id="the-three-download-types"><a class="toclink" href="#the-three-download-types">The three download types</a><a class="headerlink" href="#the-three-download-types" title="Permanent link">#</a></h2>
+<p>The <code>osm</code> backend is really three different ways to get OSM data, chosen by the
+<code>&lt;protocol&gt;:</code> prefix of the named query. They answer different questions and have
+very different freshness and cost characteristics, so picking the right one
+matters more than with a single-source backend.</p>
+<h3 id="overpass-live-current-state-queries"><a class="toclink" href="#overpass-live-current-state-queries">Overpass — live, current-state queries</a><a class="headerlink" href="#overpass-live-current-state-queries" title="Permanent link">#</a></h3>
+<p><a href="https://github.com/DinoTools/python-overpy"><code>overpy</code></a> · named queries
+<code>overpass:hospitals</code> / <code>roads</code> / <code>buildings</code> / <code>cafes</code> / <code>schools</code></p>
+<p>The <a href="https://wiki.openstreetmap.org/wiki/Overpass_API">Overpass API</a> is a
+read-only query engine running against a live mirror of the central OSM
+database, so it answers <strong>what the map says right now</strong> — there is no time axis.
+For each named query the backend fills the row's Overpass QL template with the
+request bbox (and the server-side <code>[timeout:N]</code>), POSTs it to <code>overpass-api.de</code>,
+and parses the JSON into geometry (see the User-Agent note below).</p>
+<p>Reach for Overpass when you want a <strong>small, targeted, up-to-the-minute</strong> slice —
+"the hospitals in this neighbourhood", "the café points in this bbox". It is the
+freshest source, but it is <strong>shared public infrastructure with hard usage
+limits</strong>: keep the bbox small (earthlens rejects a box larger than
+<code>max_bbox_deg2</code>, default 100 deg²), expect an HTTP 429 if you burst, and pause
+between queries. It has no history, and relations are skipped in the MVP. When
+the named queries are not enough, pass raw Overpass QL through <code>query=</code>.</p>
+<h3 id="ohsome-history-and-change-over-time"><a class="toclink" href="#ohsome-history-and-change-over-time">ohsome — history and change over time</a><a class="headerlink" href="#ohsome-history-and-change-over-time" title="Permanent link">#</a></h3>
+<p><a href="https://github.com/GIScience/ohsome-py"><code>ohsome</code></a> · named queries
+<code>ohsome:buildings</code> / <code>highways</code> / <code>amenities</code></p>
+<p>The <a href="https://docs.ohsome.org/ohsome-api/v1/">ohsome API</a> (run by HeiGIT) is built
+on the OpenStreetMap <strong>History</strong> Database, so unlike Overpass it knows the <em>full
+edit history</em> of every element. That makes it the tool for <strong>temporal
+questions</strong>: what a feature looked like at a past instant, or how an area was
+mapped across a span of time. The backend POSTs the bbox and a time window to
+ohsome's <code>elements/geometry</code> endpoint — a single date (<code>start=</code>) returns one
+<strong>snapshot</strong>, while <code>start=</code> + <code>end=</code> returns the <strong>range</strong> <code>start/end</code> (each
+feature at both boundary snapshots, carried in <code>@snapshotTimestamp</code>). An ohsome
+query therefore <strong>requires a time</strong> — it raises without <code>start=</code>.</p>
+<p>Reach for ohsome for change detection and "as-of" maps — "buildings as they
+existed on 2018-01-01", "how coverage grew from 2015 to 2023". Like Overpass it
+is a rate-limited public service (a 429 is retried with backoff; a 403 is a hard
+IP block, not a credential error). A raw ohsome filter goes through <code>filter=</code>.
+ohsome's <em>aggregation</em> endpoints (counts / areas / lengths over time) are a
+separate follow-on and are out of scope here.</p>
+<h3 id="pbf-bulk-regional-offline-extracts"><a class="toclink" href="#pbf-bulk-regional-offline-extracts">pbf — bulk, regional, offline extracts</a><a class="headerlink" href="#pbf-bulk-regional-offline-extracts" title="Permanent link">#</a></h3>
+<p><a href="https://osmcode.org/pyosmium/"><code>pyosmium</code></a> (default) /
+<a href="https://pyrosm.readthedocs.io/"><code>pyrosm</code></a> (opt-in) · named queries
+<code>pbf:buildings</code> / <code>roads</code> / <code>pois</code> / <code>landuse</code> / <code>natural</code> / <code>boundaries</code></p>
+<p><code>pbf</code> is <strong>not a live API</strong>. It reads a
+<a href="https://download.geofabrik.de/">Geofabrik</a> <code>.osm.pbf</code> extract — a compressed
+snapshot of a whole region's OSM data — which the backend downloads once, caches
+on disk, and then reads <strong>locally</strong>. Because the work is local it scales to asks
+that would blow past Overpass's limits outright: <em>every</em> building in a country, a
+whole national road network, or the same extract read repeatedly without touching
+a shared service.</p>
+<p>A <code>pbf:*</code> query therefore needs a <strong><code>region=</code></strong> (a Geofabrik key such as
+<code>"malta"</code>, or a raw <code>"continent/region"</code> path), which selects the extract; the
+request bbox then clips the read (omit it to read the whole extract). Two read
+engines trade memory against richness: the default <strong><code>pyosmium</code></strong> streams with
+bounded memory (slim <code>osm_id</code> / <code>osm_type</code> / <code>geometry</code> schema, continent- or
+planet-scale) and ships with <code>earthlens[osm]</code>; the opt-in <strong><code>pyrosm</code></strong> reads the
+whole extract into memory for the richest, exact per-layer columns and refuses a
+file over 4 GB. The first call pays the download; later calls reuse the cache.</p>
 <h2 id="why-it-matters-here"><a class="toclink" href="#why-it-matters-here">Why it matters here</a><a class="headerlink" href="#why-it-matters-here" title="Permanent link">#</a></h2>
 <p>Like the FDSN and GDACS backends, OSM departs from the gridded backends (CHC
 rainfall, ERA5, GEE imagery) in two ways:</p>
