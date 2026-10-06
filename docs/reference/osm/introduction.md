@@ -23,6 +23,78 @@ which would blow past Overpass's size limits.
 This page orients the backend. For the hands-on download walkthrough see
 [Usage](usage.md); the rendered API is the [Reference](osm.md) page.
 
+## The three download types
+
+The `osm` backend is really three different ways to get OSM data, chosen by the
+`<protocol>:` prefix of the named query. They answer different questions and have
+very different freshness and cost characteristics, so picking the right one
+matters more than with a single-source backend.
+
+### Overpass — live, current-state queries
+
+[`overpy`](https://github.com/DinoTools/python-overpy) · named queries
+`overpass:hospitals` / `roads` / `buildings` / `cafes` / `schools`
+
+The [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API) is a
+read-only query engine running against a live mirror of the central OSM
+database, so it answers **what the map says right now** — there is no time axis.
+For each named query the backend fills the row's Overpass QL template with the
+request bbox (and the server-side `[timeout:N]`), POSTs it to `overpass-api.de`,
+and parses the JSON into geometry (see the User-Agent note below).
+
+Reach for Overpass when you want a **small, targeted, up-to-the-minute** slice —
+"the hospitals in this neighbourhood", "the café points in this bbox". It is the
+freshest source, but it is **shared public infrastructure with hard usage
+limits**: keep the bbox small (earthlens rejects a box larger than
+`max_bbox_deg2`, default 100 deg²), expect an HTTP 429 if you burst, and pause
+between queries. It has no history, and relations are skipped in the MVP. When
+the named queries are not enough, pass raw Overpass QL through `query=`.
+
+### ohsome — history and change over time
+
+[`ohsome`](https://github.com/GIScience/ohsome-py) · named queries
+`ohsome:buildings` / `highways` / `amenities`
+
+The [ohsome API](https://docs.ohsome.org/ohsome-api/v1/) (run by HeiGIT) is built
+on the OpenStreetMap **History** Database, so unlike Overpass it knows the *full
+edit history* of every element. That makes it the tool for **temporal
+questions**: what a feature looked like at a past instant, or how an area was
+mapped across a span of time. The backend POSTs the bbox and a time window to
+ohsome's `elements/geometry` endpoint — a single date (`start=`) returns one
+**snapshot**, while `start=` + `end=` returns the **range** `start/end` (each
+feature at both boundary snapshots, carried in `@snapshotTimestamp`). An ohsome
+query therefore **requires a time** — it raises without `start=`.
+
+Reach for ohsome for change detection and "as-of" maps — "buildings as they
+existed on 2018-01-01", "how coverage grew from 2015 to 2023". Like Overpass it
+is a rate-limited public service (a 429 is retried with backoff; a 403 is a hard
+IP block, not a credential error). A raw ohsome filter goes through `filter=`.
+ohsome's *aggregation* endpoints (counts / areas / lengths over time) are a
+separate follow-on and are out of scope here.
+
+### pbf — bulk, regional, offline extracts
+
+[`pyosmium`](https://osmcode.org/pyosmium/) (default) /
+[`pyrosm`](https://pyrosm.readthedocs.io/) (opt-in) · named queries
+`pbf:buildings` / `roads` / `pois` / `landuse` / `natural` / `boundaries`
+
+`pbf` is **not a live API**. It reads a
+[Geofabrik](https://download.geofabrik.de/) `.osm.pbf` extract — a compressed
+snapshot of a whole region's OSM data — which the backend downloads once, caches
+on disk, and then reads **locally**. Because the work is local it scales to asks
+that would blow past Overpass's limits outright: *every* building in a country, a
+whole national road network, or the same extract read repeatedly without touching
+a shared service.
+
+A `pbf:*` query therefore needs a **`region=`** (a Geofabrik key such as
+`"malta"`, or a raw `"continent/region"` path), which selects the extract; the
+request bbox then clips the read (omit it to read the whole extract). Two read
+engines trade memory against richness: the default **`pyosmium`** streams with
+bounded memory (slim `osm_id` / `osm_type` / `geometry` schema, continent- or
+planet-scale) and ships with `earthlens[osm]`; the opt-in **`pyrosm`** reads the
+whole extract into memory for the richest, exact per-layer columns and refuses a
+file over 4 GB. The first call pays the download; later calls reuse the cache.
+
 ## Why it matters here
 
 Like the FDSN and GDACS backends, OSM departs from the gridded backends (CHC
