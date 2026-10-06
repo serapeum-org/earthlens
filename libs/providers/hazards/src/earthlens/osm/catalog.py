@@ -46,6 +46,34 @@ CATALOG_PATH: Path = Path(__file__).parent / "osm_data_catalog.yaml"
 #: The three query protocols a `Dataset` row can route to.
 Protocol = Literal["overpass", "ohsome", "pbf"]
 
+#: Intent-named aliases accepted in a query id's `<prefix>:` position, so a user
+#: can write `live:hospitals` / `history:buildings` / `bulk:roads` in place of
+#: the `overpass:` / `ohsome:` / `pbf:` prefixes. Additive — the canonical
+#: prefixes keep working and `query_ids()` still lists the canonical names.
+_PREFIX_ALIASES: dict[str, str] = {
+    "live": "overpass",
+    "history": "ohsome",
+    "bulk": "pbf",
+}
+
+
+def _canonical_query_id(query_id: str) -> str:
+    """Map an intent-aliased `<prefix>:name` id to its canonical form.
+
+    Args:
+        query_id: A named-query id whose prefix may be an alias (`live:` /
+            `history:` / `bulk:`) or already canonical.
+
+    Returns:
+        str: The id with the prefix rewritten to `overpass` / `ohsome` / `pbf`;
+            unchanged when the prefix is already canonical or unknown.
+    """
+    prefix, sep, name = query_id.partition(":")
+    if sep and prefix in _PREFIX_ALIASES:
+        return f"{_PREFIX_ALIASES[prefix]}{sep}{name}"
+    return query_id
+
+
 #: The `pyrosm.OSM` reader methods a `pbf` row's `pyrosm_method` may name.
 #: Validated at load so a typo in the catalog fails fast rather than at read.
 _PYROSM_METHODS: frozenset[str] = frozenset(
@@ -303,11 +331,13 @@ class Catalog(AbstractCatalog[Dataset]):
     def get(self, query_id: str) -> Dataset:
         """Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.
 
-        Thin alias over `AbstractCatalog.get_dataset`.
+        Thin alias over `AbstractCatalog.get_dataset`. An intent-aliased prefix
+        (`live:` / `history:` / `bulk:`) is mapped to its canonical `overpass:` /
+        `ohsome:` / `pbf:` form before lookup.
 
         Args:
             query_id: A named-query id (`"overpass:hospitals"`,
-                `"ohsome:buildings"`, …).
+                `"ohsome:buildings"`, …), or an alias form (`"live:hospitals"`).
 
         Returns:
             Dataset: The matching query row.
@@ -315,7 +345,7 @@ class Catalog(AbstractCatalog[Dataset]):
         Raises:
             ValueError: If `query_id` is not a registered named query.
         """
-        return cast("Dataset", self.get_dataset(query_id))
+        return cast("Dataset", self.get_dataset(_canonical_query_id(query_id)))
 
     def query_ids(self) -> list[str]:
         """Return the registered named-query ids, sorted.

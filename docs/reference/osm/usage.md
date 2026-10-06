@@ -121,8 +121,11 @@ The shipped named queries are `overpass:hospitals`, `overpass:roads`,
 them with `EarthLens.list_datasets("osm")`. An unknown id raises with a
 did-you-mean hint.
 
-The facade keys `"osm"`, `"openstreetmap"`, `"overpass"`, and `"ohsome"` all
-resolve to the same backend.
+The facade keys `"osm"`, `"openstreetmap"`, `"overpass"`, `"ohsome"`, and the
+intent aliases `"live"` / `"history"` / `"bulk"` all resolve to the same backend.
+Those same intent words also work as **prefixes** in `variables` — `live:` for
+`overpass:`, `history:` for `ohsome:`, `bulk:` for `pbf:` (so `live:hospitals`
+== `overpass:hospitals`). `list_datasets` lists the canonical names.
 
 ## The bbox and the time window
 

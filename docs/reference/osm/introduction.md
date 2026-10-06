@@ -166,6 +166,12 @@ The `<type>:` prefix is what tells the backend which download path to take. An
 unknown id raises with a did-you-mean hint
 (`Catalog().get("overpass:hospital")` → *Did you mean 'overpass:hospitals'?*).
 
+Each type also answers to an **intent alias** you can use in place of the
+prefix — `live:` for `overpass:`, `history:` for `ohsome:`, `bulk:` for `pbf:` —
+so `live:hospitals` and `overpass:hospitals` are equivalent. The same words work
+as a facade `data_source` (`EarthLens(data_source="live", …)`).
+`list_datasets("osm")` always lists the canonical names.
+
 A `pbf:*` query also needs a **`region=`** — a region key (`"malta"`,
 `"netherlands"`, …, listed by `Catalog().region_ids()`) or a raw
 `"continent/region"` path (`"europe/andorra"`). It picks which extract to

@@ -127,6 +127,16 @@ class TestCatalog:
         """pbf:buildings resolves to its get_buildings pyrosm method."""
         assert catalog.get("pbf:buildings").pyrosm_method == "get_buildings"
 
+    def test_prefix_aliases_resolve(self, catalog):
+        """The live/history/bulk prefix aliases map to overpass/ohsome/pbf."""
+        assert catalog.get("live:hospitals").protocol == "overpass"
+        assert catalog.get("history:buildings").protocol == "ohsome"
+        assert catalog.get("bulk:buildings").protocol == "pbf"
+
+    def test_canonical_prefix_still_resolves(self, catalog):
+        """An aliased id resolves to the same row as its canonical form."""
+        assert catalog.get("live:hospitals") is catalog.get("overpass:hospitals")
+
     def test_region_key_resolves(self, catalog):
         """A region key resolves to its Geofabrik path; a raw path passes through."""
         assert catalog.region_path("malta") == "europe/malta"

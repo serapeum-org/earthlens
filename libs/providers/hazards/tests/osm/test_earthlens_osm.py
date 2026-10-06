@@ -13,7 +13,15 @@ from earthlens.earthlens import EarthLens
 pytestmark = pytest.mark.osm
 
 #: Every facade key that must resolve to the OSM backend.
-OSM_KEYS = ["osm", "openstreetmap", "overpass", "ohsome"]
+OSM_KEYS = [
+    "osm",
+    "openstreetmap",
+    "overpass",
+    "ohsome",
+    "live",
+    "history",
+    "bulk",
+]
 
 
 def _make_facade(tmp_path: Path, **overrides) -> EarthLens:
