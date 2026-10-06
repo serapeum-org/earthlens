@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24188,6 +24188,11 @@ facade makes <code>variables</code> required on every call). Each id is <code>&l
 <p>The <code>&lt;type&gt;:</code> prefix is what tells the backend which download path to take. An
 unknown id raises with a did-you-mean hint
 (<code>Catalog().get("overpass:hospital")</code> → <em>Did you mean 'overpass:hospitals'?</em>).</p>
+<p>Each type also answers to an <strong>intent alias</strong> you can use in place of the
+prefix — <code>live:</code> for <code>overpass:</code>, <code>history:</code> for <code>ohsome:</code>, <code>bulk:</code> for <code>pbf:</code> —
+so <code>live:hospitals</code> and <code>overpass:hospitals</code> are equivalent. The same words work
+as a facade <code>data_source</code> (<code>EarthLens(data_source="live", …)</code>).
+<code>list_datasets("osm")</code> always lists the canonical names.</p>
 <p>A <code>pbf:*</code> query also needs a <strong><code>region=</code></strong> — a region key (<code>"malta"</code>,
 <code>"netherlands"</code>, …, listed by <code>Catalog().region_ids()</code>) or a raw
 <code>"continent/region"</code> path (<code>"europe/andorra"</code>). It picks which extract to

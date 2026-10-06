@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24075,8 +24075,11 @@ data-variable names. The <code>&lt;type&gt;:</code> prefix routes the request:</
 <code>pbf:roads</code>, <code>pbf:pois</code>, <code>pbf:landuse</code>, <code>pbf:natural</code>, <code>pbf:boundaries</code>). List
 them with <code>EarthLens.list_datasets("osm")</code>. An unknown id raises with a
 did-you-mean hint.</p>
-<p>The facade keys <code>"osm"</code>, <code>"openstreetmap"</code>, <code>"overpass"</code>, and <code>"ohsome"</code> all
-resolve to the same backend.</p>
+<p>The facade keys <code>"osm"</code>, <code>"openstreetmap"</code>, <code>"overpass"</code>, <code>"ohsome"</code>, and the
+intent aliases <code>"live"</code> / <code>"history"</code> / <code>"bulk"</code> all resolve to the same backend.
+Those same intent words also work as <strong>prefixes</strong> in <code>variables</code> — <code>live:</code> for
+<code>overpass:</code>, <code>history:</code> for <code>ohsome:</code>, <code>bulk:</code> for <code>pbf:</code> (so <code>live:hospitals</code>
+== <code>overpass:hospitals</code>). <code>list_datasets</code> lists the canonical names.</p>
 <h2 id="the-bbox-and-the-time-window"><a class="toclink" href="#the-bbox-and-the-time-window">The bbox and the time window</a><a class="headerlink" href="#the-bbox-and-the-time-window" title="Permanent link">#</a></h2>
 <ul>
 <li><strong>bbox</strong> — <code>lat_lim</code> / <code>lon_lim</code> (degrees). The backend hands the box to each
