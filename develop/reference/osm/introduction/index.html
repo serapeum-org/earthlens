@@ -6805,6 +6805,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-three-download-types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6870,17 +6881,6 @@
     <span class="md-ellipsis">
       
         The named queries
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#access" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Access
       
     </span>
   </a>
@@ -23773,6 +23773,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-three-download-types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23838,17 +23849,6 @@
     <span class="md-ellipsis">
       
         The named queries
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#access" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Access
       
     </span>
   </a>
@@ -23970,6 +23970,61 @@ layer locally — the right tool for "every building in Malta", which would blow
 past a live query's size limits.</p>
 <p>This page orients the backend. For the hands-on download walkthrough see
 <a href="../usage/">Usage</a>; the rendered API is the <a href="../osm/">Reference</a> page.</p>
+<h2 id="install"><a class="toclink" href="#install">Install</a><a class="headerlink" href="#install" title="Permanent link">#</a></h2>
+<p>The <code>osm</code> backend lives in the <strong><code>earthlens-hazards</code></strong> provider distribution. Its
+<code>osm</code> extra adds what the three download types need; install it in whichever way
+fits how much of earthlens you want:</p>
+<table>
+<thead>
+<tr>
+<th>You want…</th>
+<th>Install</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Just OSM, leanest</strong> — the hazards provider + core only</td>
+<td><code>pip install earthlens-hazards[osm]</code></td>
+</tr>
+<tr>
+<td><strong>OSM via the umbrella package</strong> — all providers' code, OSM switched on</td>
+<td><code>pip install earthlens[osm]</code></td>
+</tr>
+<tr>
+<td><strong>Everything, every SDK</strong></td>
+<td><code>pip install earthlens[all]</code></td>
+</tr>
+<tr>
+<td><strong>All providers' code, no optional SDKs</strong> (add extras later)</td>
+<td><code>pip install earthlens</code></td>
+</tr>
+<tr>
+<td><strong>The hazards provider's code, no optional SDKs</strong></td>
+<td><code>pip install earthlens-hazards</code></td>
+</tr>
+<tr>
+<td><strong>The opt-in in-memory pbf engine</strong>, on top of any of the above</td>
+<td><code>pip install pyrosm</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong><code>earthlens-hazards[osm]</code> is the smallest install that runs the backend</strong> — it
+  pulls <code>earthlens-core</code> + <code>earthlens-hazards</code> and the <code>osm</code> extra, and none of
+  the other four providers (atmosphere / ocean / imagery / land).</li>
+<li><strong><code>earthlens[osm]</code> is that same <code>osm</code> extra re-exported by the umbrella
+  <code>earthlens</code> package</strong> (<code>earthlens[osm]</code> → <code>earthlens-hazards[osm]</code>). The
+  umbrella pulls <em>every</em> provider's code as its base, so it is the heavier
+  install — use it when you want the whole toolkit with OSM switched on.</li>
+<li><strong>There is no <code>earthlens[hazards]</code> extra.</strong> Extras are per-backend (<code>[osm]</code>,
+  <code>[fdsn]</code>, <code>[overture]</code>, …) or the catch-all <code>[all]</code>; to get the whole hazards
+  <em>provider</em> (every hazards backend, SDKs off) install the distribution itself:
+  <code>pip install earthlens-hazards</code>.</li>
+<li>Plain <code>pip install earthlens</code> / <code>earthlens-hazards</code> installs the backend's
+  <em>code</em> but not its extra, so an OSM download raises a clear <code>ImportError</code> until
+  you add <code>[osm]</code>.</li>
+<li>No credentials to configure — every download type is public and keyless.</li>
+</ul>
 <h2 id="the-three-download-types"><a class="toclink" href="#the-three-download-types">The three download types</a><a class="headerlink" href="#the-three-download-types" title="Permanent link">#</a></h2>
 <p>The <code>osm</code> backend is really three different ways to get OSM data, chosen by the
 <code>&lt;type&gt;:</code> prefix of the named query. They answer different questions and have
@@ -24137,16 +24192,6 @@ unknown id raises with a did-you-mean hint
 <code>"netherlands"</code>, …, listed by <code>Catalog().region_ids()</code>) or a raw
 <code>"continent/region"</code> path (<code>"europe/andorra"</code>). It picks which extract to
 download; the request bbox then clips the read.</p>
-<h2 id="access"><a class="toclink" href="#access">Access</a><a class="headerlink" href="#access" title="Permanent link">#</a></h2>
-<p><strong>No credentials.</strong> All three download types use public, keyless infrastructure —
-no key, token, or login, so there is no <code>authentication.md</code> page. Install the
-backend with:</p>
-<ul>
-<li><code>pip install earthlens[osm]</code> — the two live types plus the default <code>pbf</code>
-  streaming engine. This extra <strong>is</strong> part of <code>[all]</code>.</li>
-<li><code>pip install pyrosm</code> — only if you want the opt-in <code>engine="pyrosm"</code> (it builds
-  a source dependency, so it needs a C compiler).</li>
-</ul>
 <h2 id="what-a-query-returns"><a class="toclink" href="#what-a-query-returns">What a query returns</a><a class="headerlink" href="#what-a-query-returns" title="Permanent link">#</a></h2>
 <p>One <code>FeatureCollection</code> (CRS <code>EPSG:4326</code>):</p>
 <ul>
