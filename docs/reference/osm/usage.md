@@ -27,7 +27,7 @@ from earthlens.core import EarthLens
 
 hospitals = EarthLens(
     data_source="osm",
-    variables=["overpass:hospitals"],   # a named query — see below
+    variables=["live:hospitals"],   # a named query — see below
     lat_lim=[49.40, 49.42],             # a small bbox (degrees)
     lon_lim=[8.67, 8.71],
     path="./out",
@@ -47,7 +47,7 @@ against shared public infrastructure.
 ```python
 buildings = EarthLens(
     data_source="osm",
-    variables=["ohsome:buildings"],
+    variables=["history:buildings"],
     lat_lim=[49.40, 49.42],
     lon_lim=[8.67, 8.71],
     start="2020-01-01",                 # ohsome needs a time (see below)
@@ -66,7 +66,7 @@ the default streaming engine, and clips to the request bbox:
 ```python
 buildings = EarthLens(
     data_source="osm",
-    variables=["pbf:buildings"],
+    variables=["bulk:buildings"],
     region="malta",                     # a region key (or a raw "europe/andorra" path)
     lat_lim=[35.88, 35.94],             # bbox clips the read; omit for the whole extract
     lon_lim=[14.48, 14.54],
@@ -90,8 +90,8 @@ raw `"continent/region"` path (any string with a `/`). Omit `lat_lim` /
     **continent- or planet-scale** extracts. It is the **coarser** reader: it
     returns a slimmer `osm_id` / `osm_type` / `geometry` schema and, per layer, a
     single geometry kind under one representative tag (so it under-reports a row's
-    advertised `geometry_types` — e.g. `pbf:pois` yields only node points, and
-    `pbf:roads` approximates `network_type="driving"` rather than reproducing the
+    advertised `geometry_types` — e.g. `bulk:pois` yields only node points, and
+    `bulk:roads` approximates `network_type="driving"` rather than reproducing the
     exact drivable filter).
 
     `engine="pyrosm"` reads the whole extract in memory and gives the richest,
@@ -108,24 +108,24 @@ data-variable names. The `<type>:` prefix routes the request:
 
 ```python
 # one named query
-EarthLens(data_source="osm", variables=["overpass:roads"], ...)
+EarthLens(data_source="osm", variables=["live:roads"], ...)
 
 # several at once — combined into one FeatureCollection
-EarthLens(data_source="osm", variables=["overpass:hospitals", "overpass:cafes"], ...)
+EarthLens(data_source="osm", variables=["live:hospitals", "live:cafes"], ...)
 ```
 
-The shipped named queries are `overpass:hospitals`, `overpass:roads`,
-`overpass:buildings`, `overpass:cafes`, `overpass:schools`, `ohsome:buildings`,
-`ohsome:highways`, `ohsome:amenities`, and the `pbf:*` layers (`pbf:buildings`,
-`pbf:roads`, `pbf:pois`, `pbf:landuse`, `pbf:natural`, `pbf:boundaries`). List
+The shipped named queries are `live:hospitals`, `live:roads`,
+`live:buildings`, `live:cafes`, `live:schools`, `history:buildings`,
+`history:highways`, `history:amenities`, and the `bulk:*` layers (`bulk:buildings`,
+`bulk:roads`, `bulk:pois`, `bulk:landuse`, `bulk:natural`, `bulk:boundaries`). List
 them with `EarthLens.list_datasets("osm")`. An unknown id raises with a
 did-you-mean hint.
 
-The facade keys `"osm"`, `"openstreetmap"`, `"overpass"`, `"ohsome"`, and the
-intent aliases `"live"` / `"history"` / `"bulk"` all resolve to the same backend.
-Those same intent words also work as **prefixes** in `variables` — `live:` for
-`overpass:`, `history:` for `ohsome:`, `bulk:` for `pbf:` (so `live:hospitals`
-== `overpass:hospitals`). `list_datasets` lists the canonical names.
+The facade keys `"osm"`, `"openstreetmap"`, `"live"`, `"history"`, `"bulk"`, and
+the back-compat aliases `"overpass"` / `"ohsome"` all resolve to the same
+backend. The `overpass:` / `ohsome:` / `pbf:` prefixes are likewise accepted as
+aliases of `live:` / `history:` / `bulk:` in `variables` (so `overpass:hospitals`
+== `live:hospitals`). `list_datasets` lists the canonical names.
 
 ## The bbox and the time window
 
@@ -143,7 +143,7 @@ Those same intent words also work as **prefixes** in `variables` — `live:` for
 # ohsome over a multi-year range
 EarthLens(
     data_source="osm",
-    variables=["ohsome:highways"],
+    variables=["history:highways"],
     lat_lim=[49.40, 49.42], lon_lim=[8.67, 8.71],
     start="2016-01-01", end="2022-01-01",
     path="./out",
@@ -158,7 +158,7 @@ When the named queries aren't enough, pass your own:
 # raw Overpass QL — {bbox} is filled with the request bbox (S,W,N,E)
 EarthLens(
     data_source="osm",
-    variables=["overpass:hospitals"],            # still needed to route
+    variables=["live:hospitals"],            # still needed to route
     lat_lim=[49.40, 49.42], lon_lim=[8.67, 8.71],
     query='[out:json][timeout:180];(node["tourism"="museum"]({bbox}););out geom;',
     path="./out",
@@ -167,7 +167,7 @@ EarthLens(
 # raw ohsome filter
 EarthLens(
     data_source="osm",
-    variables=["ohsome:buildings"],
+    variables=["history:buildings"],
     lat_lim=[49.40, 49.42], lon_lim=[8.67, 8.71],
     start="2020-01-01",
     filter="leisure=park and geometry:polygon",
@@ -184,17 +184,17 @@ override will not parse.
 
 | Keyword | Meaning | Default |
 |---|---|---|
-| `endpoint` | the `overpass:` request endpoint URL | `https://overpass-api.de/api/interpreter` |
-| `user_agent` | `User-Agent` sent on the `overpass:` request (a real one is required) | `earthlens (+…)` |
-| `timeout` | `overpass:` request timeout (s); also the QL `[timeout:N]` budget | `180.0` |
+| `endpoint` | the `live:` request endpoint URL | `https://overpass-api.de/api/interpreter` |
+| `user_agent` | `User-Agent` sent on the `live:` request (a real one is required) | `earthlens (+…)` |
+| `timeout` | `live:` request timeout (s); also the QL `[timeout:N]` budget | `180.0` |
 | `file_format` | `"geojson"` or `"gpkg"` | `"geojson"` |
 | `max_bbox_deg2` | bbox-area cap (square degrees) — guards the planet-wide footgun (live types only) | `100.0` |
-| `region` | region key or raw `"continent/region"` path — **required** for a `pbf:*` query | `None` |
+| `region` | region key or raw `"continent/region"` path — **required** for a `bulk:*` query | `None` |
 | `engine` | `pbf` read engine: `"pyosmium"` (streaming) or `"pyrosm"` (in-memory, opt-in) | `"pyosmium"` |
 | `cache_dir` | directory for cached `.osm.pbf` extracts | `<cache_dir()>/osm_pbf` |
 
 !!! warning "Keep the bbox small (live types)"
-    The `overpass:` and `ohsome:` types are for small/targeted queries. A box
+    The `live:` and `history:` types are for small/targeted queries. A box
     larger than
     `max_bbox_deg2` (the default `100` square degrees comfortably covers a large
     country) is rejected before any request — in particular the whole-Earth
@@ -242,7 +242,7 @@ redistribute under ODbL.
 OSM output is vector, so the `aggregate=` argument is rejected:
 
 ```python
-EarthLens(data_source="osm", variables=["overpass:roads"], ...).download(aggregate=cfg)
+EarthLens(data_source="osm", variables=["live:roads"], ...).download(aggregate=cfg)
 # NotImplementedError: OSM features are vector, not gridded ...
 ```
 
@@ -251,6 +251,6 @@ GeoDataFrame).
 
 ## Out of scope
 
-The `ohsome:` aggregation queries (counts / areas over time) are **not** part of
-this backend. For bulk asks, reach for the `pbf:` type (above) rather than tiling
+The `history:` aggregation queries (counts / areas over time) are **not** part of
+this backend. For bulk asks, reach for the `bulk:` type (above) rather than tiling
 many live queries.

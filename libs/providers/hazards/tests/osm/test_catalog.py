@@ -23,13 +23,13 @@ class TestDatasetModel:
     def test_overpass_row_needs_query_template(self):
         """An overpass row without a query_template fails validation."""
         with pytest.raises(ValidationError):
-            Dataset(protocol="overpass")
+            Dataset(protocol="live")
 
     def test_overpass_row_rejects_ohsome_filter(self):
         """An overpass row carrying an ohsome_filter fails validation."""
         with pytest.raises(ValidationError):
             Dataset(
-                protocol="overpass",
+                protocol="live",
                 query_template="[out:json];({bbox});out geom;",
                 ohsome_filter="building=*",
             )
@@ -37,13 +37,13 @@ class TestDatasetModel:
     def test_ohsome_row_needs_filter(self):
         """An ohsome row without an ohsome_filter fails validation."""
         with pytest.raises(ValidationError):
-            Dataset(protocol="ohsome")
+            Dataset(protocol="history")
 
     def test_ohsome_row_rejects_query_template(self):
         """An ohsome row carrying a query_template fails validation."""
         with pytest.raises(ValidationError):
             Dataset(
-                protocol="ohsome",
+                protocol="history",
                 ohsome_filter="building=*",
                 query_template="[out:json];out geom;",
             )
@@ -56,18 +56,18 @@ class TestDatasetModel:
     def test_pbf_row_needs_method(self):
         """A pbf row without a pyrosm_method fails validation."""
         with pytest.raises(ValidationError):
-            Dataset(protocol="pbf")
+            Dataset(protocol="bulk")
 
     def test_pbf_row_rejects_unknown_method(self):
         """A pbf row naming an unknown pyrosm_method fails validation."""
         with pytest.raises(ValidationError):
-            Dataset(protocol="pbf", pyrosm_method="get_bogus")
+            Dataset(protocol="bulk", pyrosm_method="get_bogus")
 
     def test_pbf_row_rejects_live_query_fields(self):
         """A pbf row carrying an overpass/ohsome query field fails validation."""
         with pytest.raises(ValidationError):
             Dataset(
-                protocol="pbf",
+                protocol="bulk",
                 pyrosm_method="get_buildings",
                 ohsome_filter="building=*",
             )
@@ -75,7 +75,7 @@ class TestDatasetModel:
     def test_pbf_row_resolves(self):
         """A well-formed pbf row exposes its method and network_type."""
         row = Dataset(
-            protocol="pbf", pyrosm_method="get_network", network_type="driving"
+            protocol="bulk", pyrosm_method="get_network", network_type="driving"
         )
         assert row.pyrosm_method == "get_network" and row.network_type == "driving"
 
@@ -84,36 +84,36 @@ class TestCatalog:
     """Loading and resolving the bundled named-query catalog."""
 
     def test_overpass_row_resolves(self, catalog):
-        """overpass:hospitals resolves to an overpass protocol."""
-        assert catalog.get("overpass:hospitals").protocol == "overpass"
+        """live:hospitals resolves to an overpass protocol."""
+        assert catalog.get("live:hospitals").protocol == "live"
 
     def test_ohsome_row_carries_filter(self, catalog):
         """An ohsome row exposes its ohsome_filter."""
-        assert catalog.get("ohsome:buildings").ohsome_filter
+        assert catalog.get("history:buildings").ohsome_filter
 
     def test_query_ids_sorted(self, catalog):
         """query_ids returns the registered ids, sorted."""
         ids = catalog.query_ids()
         assert ids == sorted(ids)
-        assert "overpass:roads" in ids and "ohsome:highways" in ids
+        assert "live:roads" in ids and "history:highways" in ids
 
     def test_dict_surface(self, catalog):
         """The catalog supports membership and len like a mapping."""
-        assert "overpass:hospitals" in catalog
+        assert "live:hospitals" in catalog
         assert len(catalog) >= 1
 
     def test_unknown_id_did_you_mean(self, catalog):
         """A near-miss id raises ValueError with a did-you-mean hint."""
-        with pytest.raises(ValueError, match="Did you mean 'overpass:hospitals'"):
-            catalog.get("overpass:hospital")
+        with pytest.raises(ValueError, match="Did you mean 'live:hospitals'"):
+            catalog.get("live:hospital")
 
     def test_every_row_has_protocol_and_query(self, catalog):
         """Catalog integrity: each row carries its protocol's query field."""
         for query_id, row in catalog.datasets.items():
-            assert row.protocol in ("overpass", "ohsome", "pbf")
-            if row.protocol == "overpass":
+            assert row.protocol in ("live", "history", "bulk")
+            if row.protocol == "live":
                 assert row.query_template and "{bbox}" in row.query_template
-            elif row.protocol == "ohsome":
+            elif row.protocol == "history":
                 assert row.ohsome_filter
             else:
                 assert row.pyrosm_method
@@ -124,18 +124,18 @@ class TestCatalog:
             assert query_id.split(":", 1)[0] == row.protocol
 
     def test_pbf_row_resolves(self, catalog):
-        """pbf:buildings resolves to its get_buildings pyrosm method."""
-        assert catalog.get("pbf:buildings").pyrosm_method == "get_buildings"
+        """bulk:buildings resolves to its get_buildings pyrosm method."""
+        assert catalog.get("bulk:buildings").pyrosm_method == "get_buildings"
 
     def test_prefix_aliases_resolve(self, catalog):
-        """The live/history/bulk prefix aliases map to overpass/ohsome/pbf."""
-        assert catalog.get("live:hospitals").protocol == "overpass"
-        assert catalog.get("history:buildings").protocol == "ohsome"
-        assert catalog.get("bulk:buildings").protocol == "pbf"
+        """The overpass/ohsome/pbf prefix aliases map to live/history/bulk."""
+        assert catalog.get("overpass:hospitals").protocol == "live"
+        assert catalog.get("ohsome:buildings").protocol == "history"
+        assert catalog.get("pbf:buildings").protocol == "bulk"
 
-    def test_canonical_prefix_still_resolves(self, catalog):
-        """An aliased id resolves to the same row as its canonical form."""
-        assert catalog.get("live:hospitals") is catalog.get("overpass:hospitals")
+    def test_alias_prefix_resolves_to_canonical_row(self, catalog):
+        """An aliased id resolves to the same row object as its canonical form."""
+        assert catalog.get("overpass:hospitals") is catalog.get("live:hospitals")
 
     def test_region_key_resolves(self, catalog):
         """A region key resolves to its Geofabrik path; a raw path passes through."""
@@ -166,10 +166,8 @@ class TestCatalogLoad:
     def test_malformed_row_raises(self, tmp_path):
         """A row that fails Dataset validation is reported with its id."""
         path = tmp_path / "bad.yaml"
-        path.write_text(
-            "datasets:\n  overpass:x:\n    protocol: overpass\n", encoding="utf-8"
-        )
-        with pytest.raises(ValueError, match="overpass:x"):
+        path.write_text("datasets:\n  live:x:\n    protocol: live\n", encoding="utf-8")
+        with pytest.raises(ValueError, match="live:x"):
             Catalog.load(path)
 
     def test_missing_file_raises(self, tmp_path):
@@ -182,12 +180,13 @@ class TestCatalogLoad:
         """A second load of the same file is served from the parse cache."""
         path = tmp_path / "ok.yaml"
         path.write_text(
-            "datasets:\n  ohsome:b:\n    protocol: ohsome\n    ohsome_filter: building=*\n",
+            "datasets:\n  history:b:\n    protocol: history\n    ohsome_filter: building=*\n",
             encoding="utf-8",
         )
         clear_catalog_cache()
         first = Catalog.load(path)
         second = Catalog.load(path)
         assert (
-            first.get("ohsome:b").ohsome_filter == second.get("ohsome:b").ohsome_filter
+            first.get("history:b").ohsome_filter
+            == second.get("history:b").ohsome_filter
         )

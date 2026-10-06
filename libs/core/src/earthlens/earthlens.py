@@ -663,7 +663,7 @@ class EarthLens:
             keyless protocols — `overpy` (Overpass, current-state) +
             `ohsome` (OSM history / analytics) — as a `vector`
             FeatureCollection with an ODbL `LicenseWarning`; named-query
-            catalog (`overpass:hospitals`, `ohsome:buildings`) + raw
+            catalog (`live:hospitals`, `history:buildings`) + raw
             `query=` / `filter=` override; keys `"osm"` /
             `"openstreetmap"` / `"overpass"` / `"ohsome"`.
 

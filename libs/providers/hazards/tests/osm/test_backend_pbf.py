@@ -59,7 +59,7 @@ def fake_pbf(monkeypatch):
 def _osm(tmp_path=None, **overrides):
     """Build an `OSM` for a pbf request over the Malta bbox by default."""
     kwargs: dict[str, Any] = {
-        "variables": ["pbf:buildings"],
+        "variables": ["bulk:buildings"],
         "lat_lim": [35.8, 36.0],
         "lon_lim": [14.4, 14.6],
         "region": "malta",
@@ -88,10 +88,10 @@ class TestPbfSearch:
     """Region requirement and the conditional bbox-area guard."""
 
     def test_region_required(self):
-        """A pbf:* query without region= raises a clear error."""
+        """A bulk:* query without region= raises a clear error."""
         with pytest.raises(ValueError, match="needs a Geofabrik region"):
             backend.OSM(
-                variables=["pbf:buildings"], lat_lim=[0, 1], lon_lim=[0, 1]
+                variables=["bulk:buildings"], lat_lim=[0, 1], lon_lim=[0, 1]
             )._api()
 
     def test_large_bbox_allowed_for_pbf(self, fake_pbf, tmp_path):
@@ -107,7 +107,7 @@ class TestPbfSearch:
     def test_large_bbox_still_guarded_for_live(self):
         """A mixed request keeps guarding the bbox for the live protocol."""
         osm = backend.OSM(
-            variables=["overpass:buildings"],
+            variables=["live:buildings"],
             lat_lim=[-90, 90],
             lon_lim=[-180, 180],
         )
@@ -136,7 +136,7 @@ class TestPbfFetch:
         """The row's pyrosm_method / network_type + engine reach read_pbf."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
-            _osm(tmp_path, variables=["pbf:roads"], engine="pyosmium").download(
+            _osm(tmp_path, variables=["bulk:roads"], engine="pyosmium").download(
                 progress_bar=False
             )
         assert fake_pbf.read_kwargs["pyrosm_method"] == "get_network"

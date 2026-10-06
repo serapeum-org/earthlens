@@ -27,7 +27,7 @@ query protocols and returns the result as a pyramids
   maintainer decision (`G9`).
 
 A request names one or more curated **named queries** (`variables=
-["overpass:hospitals"]`, `variables=["pbf:buildings"]`) plus a bbox; the
+["live:hospitals"]`, `variables=["bulk:buildings"]`) plus a bbox; the
 catalog row's `protocol` picks the branch (`G2`, `G10`). A raw `query=`
 (Overpass QL) / `filter=` (ohsome) override is accepted for power users (`G6`).
 OSM data is **ODbL** (share-alike), so every successful `download()` emits a
@@ -163,7 +163,7 @@ class OSM(AbstractDataSource):
     Wraps the public Overpass + ohsome services so a user can pull a
     bbox window of OSM features through the same `download()` shape every
     other earthlens backend uses. A named query (`variables=
-    ["overpass:hospitals"]`) selects the protocol and tag filter; the
+    ["live:hospitals"]`) selects the protocol and tag filter; the
     backend runs the live query, converts the result to a
     `~pyramids.feature.collection.FeatureCollection` (EPSG:4326), emits an
     ODbL `LicenseWarning`, optionally writes it to one vector file under
@@ -235,7 +235,7 @@ class OSM(AbstractDataSource):
 
         Args:
             variables: One or more named-query ids to fetch
-                (`["overpass:hospitals"]`, `["ohsome:buildings"]`, or
+                (`["live:hospitals"]`, `["history:buildings"]`, or
                 several at once). For this backend `variables` selects
                 *named queries*, not data variables. A bare string is
                 wrapped into a one-element list.
@@ -282,7 +282,7 @@ class OSM(AbstractDataSource):
             region: The Geofabrik region for a `pbf` request — a key from the
                 catalog's `regions:` table (`"malta"`, `"netherlands"`, …) or a
                 raw Geofabrik path (`"europe/andorra"`). Required when any
-                requested query is a `pbf:*` layer, ignored otherwise.
+                requested query is a `bulk:*` layer, ignored otherwise.
             engine: The `pbf` read engine — `"pyosmium"` (streaming, the default;
                 ships with `earthlens[osm]`) or `"pyrosm"` (in-memory, exact
                 tag filters + mixed geometry, opt-in via `pip install pyrosm`).
@@ -301,7 +301,7 @@ class OSM(AbstractDataSource):
         if isinstance(variables, dict):
             raise TypeError(
                 "OSM `variables` must be a list of named-query ids (e.g. "
-                "['overpass:hospitals']), not a mapping. For this backend "
+                "['live:hospitals']), not a mapping. For this backend "
                 "`variables` selects named queries; a raw query is the explicit "
                 "query= / filter= keyword argument."
             )
@@ -310,7 +310,7 @@ class OSM(AbstractDataSource):
         if not variables:
             raise ValueError(
                 "OSM `variables` is empty; supply at least one named-query id, "
-                "e.g. variables=['overpass:hospitals']."
+                "e.g. variables=['live:hospitals']."
             )
         if file_format not in _DRIVERS:
             raise ValueError(
@@ -415,7 +415,7 @@ class OSM(AbstractDataSource):
         Raises:
             ValueError: If an id in `self.vars` is not a registered named
                 query, the requested bbox exceeds the area cap (live protocols
-                only), or a `pbf:*` query was requested without a `region=`.
+                only), or a `bulk:*` query was requested without a `region=`.
         """
         products = [
             RemoteProduct(
@@ -427,12 +427,12 @@ class OSM(AbstractDataSource):
         protocols = {product.metadata["dataset"].protocol for product in products}
         # The area cap guards the shared live services; a `pbf` read hits a
         # local extract, so it is only applied when a live query is present.
-        if protocols & {"overpass", "ohsome"}:
+        if protocols & {"live", "history"}:
             self._guard_bbox()
-        if "pbf" in protocols and self._region is None:
+        if "bulk" in protocols and self._region is None:
             examples = ", ".join(self._catalog.region_ids()[:3])
             raise ValueError(
-                "a pbf:* query needs a Geofabrik region: pass region= (a key "
+                "a bulk:* query needs a Geofabrik region: pass region= (a key "
                 f"from the catalog, e.g. {examples}, or a raw 'continent/region' "
                 "path)."
             )
@@ -510,9 +510,9 @@ class OSM(AbstractDataSource):
                 matched).
         """
         dataset: Dataset = product.metadata["dataset"]
-        if dataset.protocol == "overpass":
+        if dataset.protocol == "live":
             collection = self._fetch_overpass(product.id, dataset)
-        elif dataset.protocol == "ohsome":
+        elif dataset.protocol == "history":
             collection = self._fetch_ohsome(product.id, dataset)
         else:
             collection = self._fetch_pbf(product.id, dataset)

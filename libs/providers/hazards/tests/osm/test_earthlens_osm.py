@@ -28,7 +28,7 @@ def _make_facade(tmp_path: Path, **overrides) -> EarthLens:
     """Construct an EarthLens facade bound to the OSM backend."""
     params: dict[str, object] = dict(
         data_source="osm",
-        variables=["overpass:hospitals"],
+        variables=["live:hospitals"],
         lat_lim=[49.40, 49.42],
         lon_lim=[8.67, 8.71],
         path=str(tmp_path),
@@ -67,7 +67,7 @@ class TestFacadeRouting:
         """region= / engine= / cache_dir= ride through to the pbf backend."""
         facade = _make_facade(
             tmp_path,
-            variables=["pbf:buildings"],
+            variables=["bulk:buildings"],
             region="malta",
             engine="pyosmium",
             cache_dir=str(tmp_path / "cache"),

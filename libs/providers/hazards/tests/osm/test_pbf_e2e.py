@@ -65,14 +65,14 @@ class TestPbfLive:
     """A live Geofabrik download + pyrosm read of the Malta extract."""
 
     def test_malta_buildings_returns_features(self, tmp_path: Path):
-        """pbf:buildings over the Malta extract returns >=1 polygon, EPSG:4326."""
+        """bulk:buildings over the Malta extract returns >=1 polygon, EPSG:4326."""
         try:
             # engine="pyrosm" explicitly: the facade default is now the streaming
             # pyosmium engine, so this class must opt into pyrosm to exercise its
             # rich per-layer output (the parsed tag columns asserted below).
             fc = EarthLens(
                 data_source="osm",
-                variables=["pbf:buildings"],
+                variables=["bulk:buildings"],
                 region="malta",
                 lat_lim=_LAT_LIM,
                 lon_lim=_LON_LIM,

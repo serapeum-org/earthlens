@@ -22,8 +22,8 @@ class TestValidator:
         """An overpass row without a query_template is flagged."""
         catalog = SimpleNamespace(
             datasets={
-                "overpass:x": SimpleNamespace(
-                    protocol="overpass", query_template="", geometry_types=["Point"]
+                "live:x": SimpleNamespace(
+                    protocol="live", query_template="", geometry_types=["Point"]
                 )
             }
         )
@@ -35,8 +35,8 @@ class TestValidator:
         """An ohsome row without an ohsome_filter is flagged."""
         catalog = SimpleNamespace(
             datasets={
-                "ohsome:x": SimpleNamespace(
-                    protocol="ohsome", ohsome_filter="", geometry_types=["Polygon"]
+                "history:x": SimpleNamespace(
+                    protocol="history", ohsome_filter="", geometry_types=["Polygon"]
                 )
             }
         )
@@ -47,8 +47,8 @@ class TestValidator:
         """A pbf row without a pyrosm_method is flagged."""
         catalog = SimpleNamespace(
             datasets={
-                "pbf:x": SimpleNamespace(
-                    protocol="pbf", pyrosm_method="", geometry_types=["Polygon"]
+                "bulk:x": SimpleNamespace(
+                    protocol="bulk", pyrosm_method="", geometry_types=["Polygon"]
                 )
             }
         )

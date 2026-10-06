@@ -3,16 +3,16 @@
 # Like the GDACS / FDSN backends, `earthlens.osm` has no large remote
 # dataset index to curate — OSM is queried live by tag filter. This file
 # is the entire "catalog": one row per named query, keyed by the
-# `<protocol>:<name>` id passed in `variables=[...]`. Two protocols share
+# `<type>:<name>` id passed in `variables=[...]`. Three download types share
 # the one table (`G2`):
 #
-#   * overpass — small/targeted current-state features via the Overpass
+#   * live — small/targeted current-state features via the Overpass
 #     API. Each row carries a `query_template`: an Overpass QL string with
 #     a single `{bbox}` placeholder the backend fills with the request's
 #     bounding box in Overpass order `S,W,N,E` (`bbox_swne`). Use
 #     `out geom;` so way coordinates ride inline (the backend reads them
 #     from `way.attributes["geometry"]`; see the A1 capture).
-#   * ohsome — OSM history + analytics via the ohsome API
+#   * history — OSM history + analytics via the ohsome API
 #     (`elements/geometry`). Each row carries an `ohsome_filter`: an ohsome
 #     filter string. The backend fills `bboxes` in ohsome order `W,S,E,N`
 #     (`bbox_wsen`) and a `time` from the request window.
@@ -20,7 +20,7 @@
 # A power user can bypass the catalogue entirely with a raw `query=`
 # (Overpass QL) / `filter=` (ohsome) override on the backend.
 #
-#   * pbf — bulk / regional OpenStreetMap read from a Geofabrik `.osm.pbf`
+#   * bulk — bulk / regional OpenStreetMap read from a Geofabrik `.osm.pbf`
 #     extract (`G9`..`G15`). Each row carries a `pyrosm_method`: the
 #     `pyrosm.OSM` reader method the layer maps to (`get_buildings`,
 #     `get_network`, `get_pois`, `get_landuse`, `get_natural`,
@@ -29,77 +29,80 @@
 #     backend's `region=` kwarg against the `regions:` table below and the
 #     request bbox clips the read; no live query, no `{bbox}` placeholder.
 #
+# The `overpass` / `ohsome` / `pbf` prefixes are accepted as back-compat
+# aliases of `live` / `history` / `bulk`.
+#
 # Seeded + verified in A1 (overpy 0.7 / ohsome 0.4.0; pyrosm 0.11.0 /
 # osmium 4.3.1 on cp314) — see the A1 gate captures.
 datasets:
-  overpass:hospitals:
-    protocol: overpass
+  live:hospitals:
+    protocol: live
     query_template: '[out:json][timeout:{timeout}];(node["amenity"="hospital"]({bbox});way["amenity"="hospital"]({bbox}););out geom;'
     geometry_types: [Point, Polygon]
     description: "Hospitals (current state) as points and building footprints."
-  overpass:roads:
-    protocol: overpass
+  live:roads:
+    protocol: live
     query_template: '[out:json][timeout:{timeout}];(way["highway"]({bbox}););out geom;'
     geometry_types: [LineString]
     description: "Road / path centrelines (any `highway` value) as lines."
-  overpass:buildings:
-    protocol: overpass
+  live:buildings:
+    protocol: live
     query_template: '[out:json][timeout:{timeout}];(way["building"]({bbox}););out geom;'
     geometry_types: [Polygon]
     description: "Building footprints (any `building` value) as polygons."
-  overpass:cafes:
-    protocol: overpass
+  live:cafes:
+    protocol: live
     query_template: '[out:json][timeout:{timeout}];(node["amenity"="cafe"]({bbox}););out geom;'
     geometry_types: [Point]
     description: "Cafes (current state) as points."
-  overpass:schools:
-    protocol: overpass
+  live:schools:
+    protocol: live
     query_template: '[out:json][timeout:{timeout}];(node["amenity"="school"]({bbox});way["amenity"="school"]({bbox}););out geom;'
     geometry_types: [Point, Polygon]
     description: "Schools (current state) as points and building footprints."
-  ohsome:buildings:
-    protocol: ohsome
+  history:buildings:
+    protocol: history
     ohsome_filter: "building=* and geometry:polygon"
     geometry_types: [Polygon]
     description: "Building footprints (history-aware snapshot) as polygons."
-  ohsome:highways:
-    protocol: ohsome
+  history:highways:
+    protocol: history
     ohsome_filter: "highway=* and geometry:line"
     geometry_types: [LineString]
     description: "Road / path centrelines (history-aware snapshot) as lines."
-  ohsome:amenities:
-    protocol: ohsome
+  history:amenities:
+    protocol: history
     ohsome_filter: "amenity=*"
     geometry_types: [Point, Polygon]
     description: "Tagged amenities (history-aware snapshot) as points and polygons."
-  pbf:buildings:
-    protocol: pbf
+  bulk:buildings:
+    protocol: bulk
     pyrosm_method: get_buildings
     geometry_types: [Polygon]
     description: "Building footprints from a Geofabrik extract as polygons."
-  pbf:roads:
-    protocol: pbf
+  bulk:roads:
+    protocol: bulk
     pyrosm_method: get_network
     network_type: driving
     geometry_types: [LineString]
     description: "Drivable road network from a Geofabrik extract as lines."
-  pbf:pois:
-    protocol: pbf
+  bulk:pois:
+    protocol: bulk
     pyrosm_method: get_pois
     geometry_types: [Point, Polygon]
     description: "Points of interest from a Geofabrik extract as points and polygons."
-  pbf:landuse:
-    protocol: pbf
+  bulk:landuse:
+    protocol: bulk
     pyrosm_method: get_landuse
     geometry_types: [Polygon]
     description: "Land-use polygons from a Geofabrik extract."
-  pbf:natural:
-    protocol: pbf
+  bulk:natural:
+    protocol: bulk
     pyrosm_method: get_natural
     geometry_types: [Point, Polygon]
     description: "Natural features from a Geofabrik extract as points and polygons."
-  pbf:boundaries:
-    protocol: pbf
+  bulk:boundaries:
+    protocol: bulk
     pyrosm_method: get_boundaries
     geometry_types: [LineString, Polygon]
     description: "Administrative boundaries from a Geofabrik extract as lines and polygons."

@@ -9,9 +9,9 @@ features through **three public, keyless download types** and returns them as a
 
 | Download type | What it answers | Geometry |
 |---|---|---|
-| **`overpass:`** | small/targeted **current-state** features by bbox + tag filter | points, lines, polygons |
-| **`ohsome:`** | OSM **history** — features at a point in time or over a range | points, lines, polygons |
-| **`pbf:`** | **bulk / regional** reads of a whole area (every building in a country, …) | points, lines, polygons |
+| **`live:`** | small/targeted **current-state** features by bbox + tag filter | points, lines, polygons |
+| **`history:`** | OSM **history** — features at a point in time or over a range | points, lines, polygons |
+| **`bulk:`** | **bulk / regional** reads of a whole area (every building in a country, …) | points, lines, polygons |
 
 The first two are **live queries** (small, targeted asks). The `pbf` type is the
 **bulk** path: it downloads a regional extract once, caches it, and reads a whole
@@ -59,9 +59,9 @@ The `osm` backend is really three different ways to get OSM data, chosen by the
 very different freshness and cost characteristics, so picking the right one
 matters more than with a single-source backend.
 
-### `overpass:` — live, current-state queries
+### `live:` — live, current-state queries
 
-Named queries: `overpass:hospitals` / `roads` / `buildings` / `cafes` /
+Named queries: `live:hospitals` / `roads` / `buildings` / `cafes` /
 `schools`.
 
 A live query that returns **what the map says right now** — there is no time
@@ -78,28 +78,28 @@ the named queries are not enough, pass a raw query through `query=`. The request
 endpoint, User-Agent, and timeout are all overridable (`endpoint=`,
 `user_agent=`, `timeout=`).
 
-### `ohsome:` — history and change over time
+### `history:` — history and change over time
 
-Named queries: `ohsome:buildings` / `highways` / `amenities`.
+Named queries: `history:buildings` / `highways` / `amenities`.
 
-Unlike `overpass:`, this type knows the **full edit history** of every OSM
+Unlike `live:`, this type knows the **full edit history** of every OSM
 element, so it answers **temporal questions**: what a feature looked like at a
 past instant, or how an area was mapped across a span of time. A single date
 (`start=`) returns one **snapshot**; `start=` + `end=` returns the **range**
 `start/end` — each feature at both boundary snapshots, carried in the
-`@snapshotTimestamp` column. An `ohsome:` query therefore **requires a time** —
+`@snapshotTimestamp` column. An `history:` query therefore **requires a time** —
 it raises without `start=`.
 
 Reach for it for change detection and "as-of" maps — "buildings as they existed
 on 2018-01-01", "how coverage grew from 2015 to 2023". It too is rate-limited
 public infrastructure (a transient throttle is retried automatically; a hard
 block surfaces as a clear, typed error). A raw filter goes through `filter=`.
-The `ohsome:` aggregation queries (counts / areas / lengths over time) are out
+The `history:` aggregation queries (counts / areas / lengths over time) are out
 of scope for now.
 
-### `pbf:` — bulk, regional, offline reads
+### `bulk:` — bulk, regional, offline reads
 
-Named queries: `pbf:buildings` / `roads` / `pois` / `landuse` / `natural` /
+Named queries: `bulk:buildings` / `roads` / `pois` / `landuse` / `natural` /
 `boundaries`.
 
 `pbf` is **not a live query**. It reads a regional `.osm.pbf` extract — a
@@ -109,7 +109,7 @@ scales to asks that would blow past a live query's limits outright: *every*
 building in a country, a whole national road network, or the same area read
 repeatedly without touching a shared service.
 
-A `pbf:` query needs a **`region=`** — a region key such as `"malta"` (listed by
+A `bulk:` query needs a **`region=`** — a region key such as `"malta"` (listed by
 `Catalog().region_ids()`) or a raw `"continent/region"` path such as
 `"europe/monaco"` — which selects the extract; the request bbox then clips the
 read (omit it to read the whole extract). Two read **engines** trade memory
@@ -135,7 +135,7 @@ rainfall, ERA5, GEE imagery) in two ways:
 
 - **There is no large dataset index to curate.** OSM is queried by tag filter,
   not chosen from an archive. The "catalog" is a small set of curated **named
-  queries** (`overpass:hospitals`, `ohsome:buildings`, …) so you don't have to
+  queries** (`live:hospitals`, `history:buildings`, …) so you don't have to
   write raw Overpass QL or ohsome filters by hand — and a raw `query=` /
   `filter=` override is there when you do.
 
@@ -147,32 +147,33 @@ facade makes `variables` required on every call). Each id is `<type>:<name>`:
 
 | Named query (`variables=[...]`) | Type | Returns |
 |---|---|---|
-| `overpass:hospitals` | `overpass:` | hospitals (points + footprints) |
-| `overpass:roads` | `overpass:` | road / path centrelines (lines) |
-| `overpass:buildings` | `overpass:` | building footprints (polygons) |
-| `overpass:cafes` | `overpass:` | cafes (points) |
-| `overpass:schools` | `overpass:` | schools (points + footprints) |
-| `ohsome:buildings` | `ohsome:` | building footprints at a snapshot/range |
-| `ohsome:highways` | `ohsome:` | road / path centrelines at a snapshot/range |
-| `ohsome:amenities` | `ohsome:` | tagged amenities at a snapshot/range |
-| `pbf:buildings` | `pbf:` | building footprints from a regional extract |
-| `pbf:roads` | `pbf:` | drivable road network from a regional extract |
-| `pbf:pois` | `pbf:` | points of interest from a regional extract |
-| `pbf:landuse` | `pbf:` | land-use polygons from a regional extract |
-| `pbf:natural` | `pbf:` | natural features from a regional extract |
-| `pbf:boundaries` | `pbf:` | administrative boundaries from a regional extract |
+| `live:hospitals` | `live:` | hospitals (points + footprints) |
+| `live:roads` | `live:` | road / path centrelines (lines) |
+| `live:buildings` | `live:` | building footprints (polygons) |
+| `live:cafes` | `live:` | cafes (points) |
+| `live:schools` | `live:` | schools (points + footprints) |
+| `history:buildings` | `history:` | building footprints at a snapshot/range |
+| `history:highways` | `history:` | road / path centrelines at a snapshot/range |
+| `history:amenities` | `history:` | tagged amenities at a snapshot/range |
+| `bulk:buildings` | `bulk:` | building footprints from a regional extract |
+| `bulk:roads` | `bulk:` | drivable road network from a regional extract |
+| `bulk:pois` | `bulk:` | points of interest from a regional extract |
+| `bulk:landuse` | `bulk:` | land-use polygons from a regional extract |
+| `bulk:natural` | `bulk:` | natural features from a regional extract |
+| `bulk:boundaries` | `bulk:` | administrative boundaries from a regional extract |
 
 The `<type>:` prefix is what tells the backend which download path to take. An
 unknown id raises with a did-you-mean hint
-(`Catalog().get("overpass:hospital")` → *Did you mean 'overpass:hospitals'?*).
+(`Catalog().get("live:hospital")` → *Did you mean 'live:hospitals'?*).
 
-Each type also answers to an **intent alias** you can use in place of the
-prefix — `live:` for `overpass:`, `history:` for `ohsome:`, `bulk:` for `pbf:` —
-so `live:hospitals` and `overpass:hospitals` are equivalent. The same words work
-as a facade `data_source` (`EarthLens(data_source="live", …)`).
+The canonical names map to the underlying tools: `live` is the Overpass API,
+`history` is ohsome, `bulk` is a `.osm.pbf` extract. The original prefixes still
+work as **back-compat aliases** — `overpass:hospitals` is accepted as
+`live:hospitals`, `ohsome:…` as `history:…`, and `pbf:…` as `bulk:…` — and
+`overpass` / `ohsome` also work as a facade `data_source`.
 `list_datasets("osm")` always lists the canonical names.
 
-A `pbf:*` query also needs a **`region=`** — a region key (`"malta"`,
+A `bulk:*` query also needs a **`region=`** — a region key (`"malta"`,
 `"netherlands"`, …, listed by `Catalog().region_ids()`) or a raw
 `"continent/region"` path (`"europe/andorra"`). It picks which extract to
 download; the request bbox then clips the read.
@@ -181,12 +182,12 @@ download; the request bbox then clips the read.
 
 One `FeatureCollection` (CRS `EPSG:4326`):
 
-- **`overpass:`** — `osm_id`, `osm_type` (`node` / `way`), each element's OSM
+- **`live:`** — `osm_id`, `osm_type` (`node` / `way`), each element's OSM
   tags as columns, and a `geometry`: a `Point` for a node, a `LineString` for an
   open way, a `Polygon` for a closed way. Relations are skipped in the MVP.
-- **`ohsome:`** — the geometry plus the history columns, notably `@osmId` and
+- **`history:`** — the geometry plus the history columns, notably `@osmId` and
   `@snapshotTimestamp` (the snapshot instant) and `@other_tags`.
-- **`pbf:`** — an `osm_id` / `osm_type` identity (normalised so it matches the
+- **`bulk:`** — an `osm_id` / `osm_type` identity (normalised so it matches the
   other types). The default `engine="pyosmium"` returns the slim `osm_id` /
   `osm_type` / `geometry` schema; the opt-in `engine="pyrosm"` adds the layer's
   key tags (e.g. `building`) and exact per-layer columns.
