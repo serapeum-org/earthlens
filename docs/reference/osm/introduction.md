@@ -21,6 +21,37 @@ past a live query's size limits.
 This page orients the backend. For the hands-on download walkthrough see
 [Usage](usage.md); the rendered API is the [Reference](osm.md) page.
 
+## Install
+
+The `osm` backend lives in the **`earthlens-hazards`** provider distribution. Its
+`osm` extra adds what the three download types need; install it in whichever way
+fits how much of earthlens you want:
+
+| You want… | Install |
+|---|---|
+| **Just OSM, leanest** — the hazards provider + core only | `pip install earthlens-hazards[osm]` |
+| **OSM via the umbrella package** — all providers' code, OSM switched on | `pip install earthlens[osm]` |
+| **Everything, every SDK** | `pip install earthlens[all]` |
+| **All providers' code, no optional SDKs** (add extras later) | `pip install earthlens` |
+| **The hazards provider's code, no optional SDKs** | `pip install earthlens-hazards` |
+| **The opt-in in-memory pbf engine**, on top of any of the above | `pip install pyrosm` |
+
+- **`earthlens-hazards[osm]` is the smallest install that runs the backend** — it
+  pulls `earthlens-core` + `earthlens-hazards` and the `osm` extra, and none of
+  the other four providers (atmosphere / ocean / imagery / land).
+- **`earthlens[osm]` is that same `osm` extra re-exported by the umbrella
+  `earthlens` package** (`earthlens[osm]` → `earthlens-hazards[osm]`). The
+  umbrella pulls *every* provider's code as its base, so it is the heavier
+  install — use it when you want the whole toolkit with OSM switched on.
+- **There is no `earthlens[hazards]` extra.** Extras are per-backend (`[osm]`,
+  `[fdsn]`, `[overture]`, …) or the catch-all `[all]`; to get the whole hazards
+  *provider* (every hazards backend, SDKs off) install the distribution itself:
+  `pip install earthlens-hazards`.
+- Plain `pip install earthlens` / `earthlens-hazards` installs the backend's
+  *code* but not its extra, so an OSM download raises a clear `ImportError` until
+  you add `[osm]`.
+- No credentials to configure — every download type is public and keyless.
+
 ## The three download types
 
 The `osm` backend is really three different ways to get OSM data, chosen by the
@@ -139,17 +170,6 @@ A `pbf:*` query also needs a **`region=`** — a region key (`"malta"`,
 `"netherlands"`, …, listed by `Catalog().region_ids()`) or a raw
 `"continent/region"` path (`"europe/andorra"`). It picks which extract to
 download; the request bbox then clips the read.
-
-## Access
-
-**No credentials.** All three download types use public, keyless infrastructure —
-no key, token, or login, so there is no `authentication.md` page. Install the
-backend with:
-
-- `pip install earthlens[osm]` — the two live types plus the default `pbf`
-  streaming engine. This extra **is** part of `[all]`.
-- `pip install pyrosm` — only if you want the opt-in `engine="pyrosm"` (it builds
-  a source dependency, so it needs a C compiler).
 
 ## What a query returns
 
