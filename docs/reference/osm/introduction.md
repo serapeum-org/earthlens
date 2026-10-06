@@ -13,9 +13,9 @@ features through **three public, keyless download types** and returns them as a
 | **`history:`** | OSM **history** — features at a point in time or over a range | points, lines, polygons |
 | **`bulk:`** | **bulk / regional** reads of a whole area (every building in a country, …) | points, lines, polygons |
 
-The first two are **live queries** (small, targeted asks). The `pbf` type is the
-**bulk** path: it downloads a regional extract once, caches it, and reads a whole
-layer locally — the right tool for "every building in Malta", which would blow
+The first two are **live queries** (small, targeted asks). The third, `bulk`,
+downloads a regional extract once, caches it, and reads a whole layer locally —
+the right tool for "every building in Malta", which would blow
 past a live query's size limits.
 
 This page orients the backend. For the hands-on download walkthrough see
@@ -34,7 +34,7 @@ fits how much of earthlens you want:
 | **Everything, every SDK** | `pip install earthlens[all]` |
 | **All providers' code, no optional SDKs** (add extras later) | `pip install earthlens` |
 | **The hazards provider's code, no optional SDKs** | `pip install earthlens-hazards` |
-| **The opt-in in-memory pbf engine**, on top of any of the above | `pip install pyrosm` |
+| **The opt-in in-memory read engine**, on top of any of the above | `pip install pyrosm` |
 
 - **`earthlens-hazards[osm]` is the smallest install that runs the backend** — it
   pulls `earthlens-core` + `earthlens-hazards` and the `osm` extra, and none of
@@ -102,7 +102,7 @@ of scope for now.
 Named queries: `bulk:buildings` / `roads` / `pois` / `landuse` / `natural` /
 `boundaries`.
 
-`pbf` is **not a live query**. It reads a regional `.osm.pbf` extract — a
+`bulk` is **not a live query**. It reads a regional `.osm.pbf` extract — a
 compressed snapshot of a whole area's OSM data — which the backend downloads
 once, caches on disk, and then reads **locally**. Because the work is local it
 scales to asks that would blow past a live query's limits outright: *every*
@@ -207,7 +207,7 @@ Honour it when you redistribute OSM-derived data.
 ## Cost
 
 **Free.** All three download types use public, keyless infrastructure. Query
-gently: keep the live-query bboxes small and time ranges focused, and for `pbf`
+gently: keep the live-query bboxes small and time ranges focused, and for `bulk`
 prefer the smallest regional extract that covers your area (a country, not a
 continent) and let the on-disk cache spare a re-download.
 
