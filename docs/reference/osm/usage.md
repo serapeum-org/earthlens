@@ -190,7 +190,7 @@ override will not parse.
 | `file_format` | `"geojson"` or `"gpkg"` | `"geojson"` |
 | `max_bbox_deg2` | bbox-area cap (square degrees) — guards the planet-wide footgun (live types only) | `100.0` |
 | `region` | region key or raw `"continent/region"` path — **required** for a `bulk:*` query | `None` |
-| `engine` | `pbf` read engine: `"pyosmium"` (streaming) or `"pyrosm"` (in-memory, opt-in) | `"pyosmium"` |
+| `engine` | regional-extract read engine: `"pyosmium"` (streaming) or `"pyrosm"` (in-memory, opt-in) | `"pyosmium"` |
 | `cache_dir` | directory for cached `.osm.pbf` extracts | `<cache_dir()>/osm_pbf` |
 
 !!! warning "Keep the bbox small (live types)"

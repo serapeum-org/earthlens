@@ -283,7 +283,7 @@ class OSM(AbstractDataSource):
                 catalog's `regions:` table (`"malta"`, `"netherlands"`, …) or a
                 raw Geofabrik path (`"europe/andorra"`). Required when any
                 requested query is a `bulk:*` layer, ignored otherwise.
-            engine: The `pbf` read engine — `"pyosmium"` (streaming, the default;
+            engine: The regional-extract read engine — `"pyosmium"` (streaming, the default;
                 ships with `earthlens[osm]`) or `"pyrosm"` (in-memory, exact
                 tag filters + mixed geometry, opt-in via `pip install pyrosm`).
                 Ignored by the `live` / `history` download types.
