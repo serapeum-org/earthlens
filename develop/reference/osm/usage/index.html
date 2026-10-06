@@ -23981,17 +23981,16 @@
 background and the named-query list see <a href="../introduction/">Introduction</a>; the
 rendered API is the <a href="../osm/">Reference</a> page.</p>
 <h2 id="install"><a class="toclink" href="#install">Install</a><a class="headerlink" href="#install" title="Permanent link">#</a></h2>
-<p>The protocol SDKs ship behind one <code>osm</code> extra (imported lazily — the base package
+<p>The backend is installed with one extra (imported lazily — the base package
 imports without it):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm<span class="o">]</span><span class="w">      </span><span class="c1"># overpy + ohsome + osmium  (all three protocols)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm<span class="o">]</span><span class="w">      </span><span class="c1"># all three download types</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>pyrosm<span class="w">              </span><span class="c1"># opt-in: the richer in-memory pbf engine</span>
 </code></pre></div>
-<p><code>[osm]</code> <strong>is</strong> in <code>[all]</code>: it covers all three protocols — <code>overpy</code> + <code>ohsome</code> for
-the live queries and the wheel-clean <code>osmium</code> (pyosmium, published on PyPI as
-<code>osmium</code>) for the <code>pbf</code> default engine. The richer in-memory <code>pyrosm</code> pbf engine is
-<strong>opt-in</strong> — <code>pip install pyrosm</code> builds the sdist-only <code>cykhash</code> from source
-(needs a C compiler) — so install it only when you want <code>engine="pyrosm"</code>. There
-are no credentials to configure — Overpass, ohsome, and Geofabrik are all public.</p>
+<p><code>[osm]</code> <strong>is</strong> part of <code>[all]</code> and covers all three download types — the two
+live types plus the default <code>pbf</code> streaming engine. The richer in-memory <code>pbf</code>
+engine is <strong>opt-in</strong>: <code>pip install pyrosm</code> builds a source dependency (needs a C
+compiler), so install it only when you want <code>engine="pyrosm"</code>. There are no
+credentials to configure — every download type is public and keyless.</p>
 <h2 id="quickstart-current-state-hospitals-overpass"><a class="toclink" href="#quickstart-current-state-hospitals-overpass">Quickstart — current-state hospitals (Overpass)</a><a class="headerlink" href="#quickstart-current-state-hospitals-overpass" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
@@ -24006,10 +24005,10 @@ are no credentials to configure — Overpass, ohsome, and Geofabrik are all publ
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hospitals</span><span class="p">),</span> <span class="s2">&quot;features&quot;</span><span class="p">)</span>
 <a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="nb">print</span><span class="p">(</span><span class="n">hospitals</span><span class="p">[[</span><span class="s2">&quot;osm_id&quot;</span><span class="p">,</span> <span class="s2">&quot;osm_type&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </code></pre></div>
-<p><code>download()</code> returns a pyramids <code>FeatureCollection</code> (a <code>geopandas.GeoDataFrame</code>
-subclass), so every pandas / geopandas method works on it directly. It also
-writes <code>out/osm_overpass-hospitals.geojson</code>. Keep the bbox small — Overpass is
-shared community infrastructure.</p>
+<p><code>download()</code> returns a <code>FeatureCollection</code> (a <code>geopandas.GeoDataFrame</code> subclass),
+so every pandas / geopandas method works on it directly. It also writes
+<code>out/osm_overpass-hospitals.geojson</code>. Keep the bbox small — the live types run
+against shared public infrastructure.</p>
 <h2 id="quickstart-building-history-at-a-snapshot-ohsome"><a class="toclink" href="#quickstart-building-history-at-a-snapshot-ohsome">Quickstart — building history at a snapshot (ohsome)</a><a class="headerlink" href="#quickstart-building-history-at-a-snapshot-ohsome" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">buildings</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span>
@@ -24023,14 +24022,13 @@ shared community infrastructure.</p>
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="nb">print</span><span class="p">(</span><span class="n">buildings</span><span class="p">[</span><span class="s2">&quot;@snapshotTimestamp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>   <span class="c1"># the history timestamp</span>
 </code></pre></div>
 <h2 id="quickstart-every-building-in-a-region-pbf"><a class="toclink" href="#quickstart-every-building-in-a-region-pbf">Quickstart — every building in a region (pbf)</a><a class="headerlink" href="#quickstart-every-building-in-a-region-pbf" title="Permanent link">#</a></h2>
-<p>For a <strong>bulk</strong> ask — every building in a country — use the <code>pbf</code> protocol. It
-downloads a <a href="https://download.geofabrik.de/">Geofabrik</a> extract for <code>region=</code>
-(cached on disk), reads the layer with the default streaming <code>pyosmium</code> engine,
-and clips to the request bbox:</p>
+<p>For a <strong>bulk</strong> ask — every building in a country — use the <code>pbf</code> type. It
+downloads a regional extract for <code>region=</code> (cached on disk), reads the layer with
+the default streaming engine, and clips to the request bbox:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">buildings</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pbf:buildings&quot;</span><span class="p">],</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">region</span><span class="o">=</span><span class="s2">&quot;malta&quot;</span><span class="p">,</span>                     <span class="c1"># a Geofabrik region key (or &quot;europe/andorra&quot;)</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">region</span><span class="o">=</span><span class="s2">&quot;malta&quot;</span><span class="p">,</span>                     <span class="c1"># a region key (or a raw &quot;europe/andorra&quot; path)</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.88</span><span class="p">,</span> <span class="mf">35.94</span><span class="p">],</span>             <span class="c1"># bbox clips the read; omit for the whole extract</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">14.48</span><span class="p">,</span> <span class="mf">14.54</span><span class="p">],</span>
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span>
@@ -24042,27 +24040,29 @@ and clips to the request bbox:</p>
 (<code>osm_pbf/</code> under the shared earthlens cache directory by default — see
 <a href="../../configuration/">Configuration</a> — override with <code>cache_dir=</code>); repeat
 calls reuse it. List the region keys with <code>Catalog().region_ids()</code>, or pass a
-raw Geofabrik path (any string with a <code>/</code>). Omit <code>lat_lim</code> / <code>lon_lim</code> to read
-the whole extract — the bbox-area cap does <strong>not</strong> apply to a <code>pbf</code> read.</p>
+raw <code>"continent/region"</code> path (any string with a <code>/</code>). Omit <code>lat_lim</code> /
+<code>lon_lim</code> to read the whole extract — the bbox-area cap does <strong>not</strong> apply to a
+<code>pbf</code> read.</p>
 <div class="admonition note">
-<p class="admonition-title">Engines — <code>pyosmium</code> (default) vs <code>pyrosm</code></p>
+<p class="admonition-title">Engines — <code>engine="pyosmium"</code> (default) vs <code>engine="pyrosm"</code></p>
 <p><code>engine="pyosmium"</code> (the default) streams the extract with bounded memory and
-ships with <code>earthlens[osm]</code>, so it works out of the box and handles
+is installed with the backend, so it works out of the box and handles
 <strong>continent- or planet-scale</strong> extracts. It is the <strong>coarser</strong> reader: it
 returns a slimmer <code>osm_id</code> / <code>osm_type</code> / <code>geometry</code> schema and, per layer, a
 single geometry kind under one representative tag (so it under-reports a row's
-advertised <code>geometry_types</code> — e.g. <code>pbf:pois</code> yields only node points,
-<code>pbf:roads</code> approximates <code>network_type="driving"</code> rather than reproducing
-<code>pyrosm</code>'s exact filter).</p>
+advertised <code>geometry_types</code> — e.g. <code>pbf:pois</code> yields only node points, and
+<code>pbf:roads</code> approximates <code>network_type="driving"</code> rather than reproducing the
+exact drivable filter).</p>
 <p><code>engine="pyrosm"</code> reads the whole extract in memory and gives the richest,
 exact per-layer columns and mixed geometry; it refuses a file over 4 GB, so
-never load <code>planet.osm</code> with it. It is <strong>opt-in</strong> (<code>pip install pyrosm</code> — see
-above); selecting it without pyrosm installed raises a clear <code>ImportError</code>
-naming the command. The backend warns before downloading a multi-GB extract.</p>
+never load a planet-wide extract with it. It is <strong>opt-in</strong>
+(<code>pip install pyrosm</code> — see above); selecting it without the engine installed
+raises a clear <code>ImportError</code> naming the command. The backend warns before
+downloading a multi-GB extract.</p>
 </div>
 <h2 id="choosing-the-query-variables"><a class="toclink" href="#choosing-the-query-variables">Choosing the query — <code>variables</code></a><a class="headerlink" href="#choosing-the-query-variables" title="Permanent link">#</a></h2>
 <p>For this backend <code>variables</code> is the list of <strong>named-query ids</strong>, not
-data-variable names. The <code>&lt;protocol&gt;:</code> prefix routes the request:</p>
+data-variable names. The <code>&lt;type&gt;:</code> prefix routes the request:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># one named query</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;overpass:roads&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
@@ -24121,8 +24121,8 @@ resolve to the same backend.</p>
 </code></pre></div>
 <p>A raw <code>query=</code> with no <code>{bbox}</code> placeholder is sent verbatim (you supply the
 bbox in the QL yourself). A raw Overpass <code>query=</code> <strong>must request JSON output</strong>
-(<code>[out:json]</code>) — the response is parsed with <code>overpy.Overpass().parse_json</code>, so
-an <code>[out:xml]</code> / <code>[out:csv]</code> override will not parse.</p>
+(<code>[out:json]</code>) — the response is parsed as JSON, so an <code>[out:xml]</code> / <code>[out:csv]</code>
+override will not parse.</p>
 <h2 id="other-knobs"><a class="toclink" href="#other-knobs">Other knobs</a><a class="headerlink" href="#other-knobs" title="Permanent link">#</a></h2>
 <table>
 <thead>
@@ -24135,17 +24135,17 @@ an <code>[out:xml]</code> / <code>[out:csv]</code> override will not parse.</p>
 <tbody>
 <tr>
 <td><code>endpoint</code></td>
-<td>Overpass API endpoint URL</td>
+<td>the <code>overpass:</code> request endpoint URL</td>
 <td><code>https://overpass-api.de/api/interpreter</code></td>
 </tr>
 <tr>
 <td><code>user_agent</code></td>
-<td><code>User-Agent</code> sent on the Overpass POST (a real one is required)</td>
+<td><code>User-Agent</code> sent on the <code>overpass:</code> request (a real one is required)</td>
 <td><code>earthlens (+…)</code></td>
 </tr>
 <tr>
 <td><code>timeout</code></td>
-<td>Overpass HTTP timeout (s); also the QL <code>[timeout:N]</code> budget</td>
+<td><code>overpass:</code> request timeout (s); also the QL <code>[timeout:N]</code> budget</td>
 <td><code>180.0</code></td>
 </tr>
 <tr>
@@ -24155,12 +24155,12 @@ an <code>[out:xml]</code> / <code>[out:csv]</code> override will not parse.</p>
 </tr>
 <tr>
 <td><code>max_bbox_deg2</code></td>
-<td>bbox-area cap (square degrees) — guards the planet-wide footgun (live protocols only)</td>
+<td>bbox-area cap (square degrees) — guards the planet-wide footgun (live types only)</td>
 <td><code>100.0</code></td>
 </tr>
 <tr>
 <td><code>region</code></td>
-<td>Geofabrik region key or raw path — <strong>required</strong> for a <code>pbf:*</code> query</td>
+<td>region key or raw <code>"continent/region"</code> path — <strong>required</strong> for a <code>pbf:*</code> query</td>
 <td><code>None</code></td>
 </tr>
 <tr>
@@ -24176,8 +24176,9 @@ an <code>[out:xml]</code> / <code>[out:csv]</code> override will not parse.</p>
 </tbody>
 </table>
 <div class="admonition warning">
-<p class="admonition-title">Keep the bbox small (live protocols)</p>
-<p>Overpass / ohsome are for small/targeted queries. A box larger than
+<p class="admonition-title">Keep the bbox small (live types)</p>
+<p>The <code>overpass:</code> and <code>ohsome:</code> types are for small/targeted queries. A box
+larger than
 <code>max_bbox_deg2</code> (the default <code>100</code> square degrees comfortably covers a large
 country) is rejected before any request — in particular the whole-Earth
 default you get if you omit <code>lat_lim</code> / <code>lon_lim</code> through the facade, which
@@ -24216,10 +24217,9 @@ redistribute under ODbL.</p>
 <p>Post-process the returned FeatureCollection directly instead (it is a
 GeoDataFrame).</p>
 <h2 id="out-of-scope"><a class="toclink" href="#out-of-scope">Out of scope</a><a class="headerlink" href="#out-of-scope" title="Permanent link">#</a></h2>
-<p>ohsome's aggregation endpoints (counts / areas over time) are <strong>not</strong> part of
-this backend — see
-<a href="../introduction/#out-of-scope-follow-ons">Introduction</a>. For bulk asks, reach
-for the <code>pbf</code> protocol (above) rather than tiling many live queries.</p>
+<p>The <code>ohsome:</code> aggregation queries (counts / areas over time) are <strong>not</strong> part of
+this backend. For bulk asks, reach for the <code>pbf:</code> type (above) rather than tiling
+many live queries.</p>
 
 
 
