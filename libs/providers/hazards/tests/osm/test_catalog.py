@@ -20,13 +20,13 @@ def catalog() -> Catalog:
 class TestDatasetModel:
     """The per-row Dataset model and its protocol validation."""
 
-    def test_overpass_row_needs_query_template(self):
-        """An overpass row without a query_template fails validation."""
+    def test_live_row_needs_query_template(self):
+        """A live row without a query_template fails validation."""
         with pytest.raises(ValidationError):
             Dataset(protocol="live")
 
-    def test_overpass_row_rejects_ohsome_filter(self):
-        """An overpass row carrying an ohsome_filter fails validation."""
+    def test_live_row_rejects_ohsome_filter(self):
+        """A live row carrying an ohsome_filter fails validation."""
         with pytest.raises(ValidationError):
             Dataset(
                 protocol="live",
@@ -34,13 +34,13 @@ class TestDatasetModel:
                 ohsome_filter="building=*",
             )
 
-    def test_ohsome_row_needs_filter(self):
-        """An ohsome row without an ohsome_filter fails validation."""
+    def test_history_row_needs_filter(self):
+        """A history row without an ohsome_filter fails validation."""
         with pytest.raises(ValidationError):
             Dataset(protocol="history")
 
-    def test_ohsome_row_rejects_query_template(self):
-        """An ohsome row carrying a query_template fails validation."""
+    def test_history_row_rejects_query_template(self):
+        """A history row carrying a query_template fails validation."""
         with pytest.raises(ValidationError):
             Dataset(
                 protocol="history",
@@ -53,18 +53,18 @@ class TestDatasetModel:
         with pytest.raises(ValidationError):
             Dataset(protocol="wfs", query_template="x")
 
-    def test_pbf_row_needs_method(self):
-        """A pbf row without a pyrosm_method fails validation."""
+    def test_bulk_row_needs_method(self):
+        """A bulk row without a pyrosm_method fails validation."""
         with pytest.raises(ValidationError):
             Dataset(protocol="bulk")
 
-    def test_pbf_row_rejects_unknown_method(self):
-        """A pbf row naming an unknown pyrosm_method fails validation."""
+    def test_bulk_row_rejects_unknown_method(self):
+        """A bulk row naming an unknown pyrosm_method fails validation."""
         with pytest.raises(ValidationError):
             Dataset(protocol="bulk", pyrosm_method="get_bogus")
 
-    def test_pbf_row_rejects_live_query_fields(self):
-        """A pbf row carrying an overpass/ohsome query field fails validation."""
+    def test_bulk_row_rejects_query_and_filter_fields(self):
+        """A bulk row carrying a query_template or ohsome_filter fails validation."""
         with pytest.raises(ValidationError):
             Dataset(
                 protocol="bulk",
@@ -72,8 +72,8 @@ class TestDatasetModel:
                 ohsome_filter="building=*",
             )
 
-    def test_pbf_row_resolves(self):
-        """A well-formed pbf row exposes its method and network_type."""
+    def test_bulk_row_resolves(self):
+        """A well-formed bulk row exposes its method and network_type."""
         row = Dataset(
             protocol="bulk", pyrosm_method="get_network", network_type="driving"
         )
@@ -83,12 +83,12 @@ class TestDatasetModel:
 class TestCatalog:
     """Loading and resolving the bundled named-query catalog."""
 
-    def test_overpass_row_resolves(self, catalog):
-        """live:hospitals resolves to an overpass protocol."""
+    def test_live_row_resolves(self, catalog):
+        """live:hospitals resolves to the live protocol."""
         assert catalog.get("live:hospitals").protocol == "live"
 
-    def test_ohsome_row_carries_filter(self, catalog):
-        """An ohsome row exposes its ohsome_filter."""
+    def test_history_row_carries_filter(self, catalog):
+        """A history row exposes its ohsome_filter."""
         assert catalog.get("history:buildings").ohsome_filter
 
     def test_query_ids_sorted(self, catalog):
@@ -123,7 +123,7 @@ class TestCatalog:
         for query_id, row in catalog.datasets.items():
             assert query_id.split(":", 1)[0] == row.protocol
 
-    def test_pbf_row_resolves(self, catalog):
+    def test_bulk_row_resolves(self, catalog):
         """bulk:buildings resolves to its get_buildings pyrosm method."""
         assert catalog.get("bulk:buildings").pyrosm_method == "get_buildings"
 

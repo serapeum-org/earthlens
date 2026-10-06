@@ -63,8 +63,8 @@ class TestFacadeRouting:
         facade = _make_facade(tmp_path, endpoint="https://example.org/api")
         assert facade.datasource._endpoint == "https://example.org/api"
 
-    def test_pbf_kwargs_forwarded(self, tmp_path: Path):
-        """region= / engine= / cache_dir= ride through to the pbf backend."""
+    def test_bulk_kwargs_forwarded(self, tmp_path: Path):
+        """region= / engine= / cache_dir= ride through to the bulk backend."""
         facade = _make_facade(
             tmp_path,
             variables=["bulk:buildings"],

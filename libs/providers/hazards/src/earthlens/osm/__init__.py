@@ -15,7 +15,7 @@ protocols and returns them as a pyramids
 
 A request names a curated **named query** (`variables=["live:hospitals"]`,
 `variables=["history:buildings"]`, `variables=["bulk:buildings"]`) plus a bbox
-(and, for `pbf`, a `region=` Geofabrik key); the backend routes to the
+(and, for `bulk`, a `region=` Geofabrik key); the backend routes to the
 protocol, produces the features, converts them to a `FeatureCollection`, and
 warns about OSM's **ODbL** share-alike licence. A raw `query=` (Overpass QL) /
 `filter=` (ohsome) override is accepted for power users.

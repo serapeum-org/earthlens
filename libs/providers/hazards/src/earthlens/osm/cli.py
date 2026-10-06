@@ -16,11 +16,11 @@ def _check_row(key: str, record: Any) -> list[str]:
     issues = require(key, record, ("protocol", "geometry_types"))
     protocol = getattr(record, "protocol", None)
     if protocol == "live" and not getattr(record, "query_template", None):
-        issues.append(f"{key}: overpass row missing query_template")
+        issues.append(f"{key}: live row missing query_template")
     if protocol == "history" and not getattr(record, "ohsome_filter", None):
-        issues.append(f"{key}: ohsome row missing ohsome_filter")
+        issues.append(f"{key}: history row missing ohsome_filter")
     if protocol == "bulk" and not getattr(record, "pyrosm_method", None):
-        issues.append(f"{key}: pbf row missing pyrosm_method")
+        issues.append(f"{key}: bulk row missing pyrosm_method")
     return issues
 
 

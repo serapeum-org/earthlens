@@ -173,7 +173,7 @@ class TestOhsomeRoute:
         assert fake_ohsome.post_kwargs["filter"] == "amenity=cafe"
 
     def test_missing_time_raises(self, osm_kwargs, fake_ohsome):
-        """An ohsome query without a start raises a helpful ValueError."""
+        """A history query without a start raises a helpful ValueError."""
         with pytest.raises(ValueError, match="needs a time"):
             OSM(**{**osm_kwargs(), "variables": ["history:buildings"]}).download()
 
@@ -769,10 +769,10 @@ class TestDownloadContract:
         # each query returns the same fixture result (3 features) -> 6 combined.
         assert len(fc) == 6
 
-    def test_overpass_and_ohsome_combined(
+    def test_live_and_history_combined(
         self, osm_kwargs, fake_overpy, fake_overpass_post, fake_ohsome
     ):
-        """An overpass + an ohsome query combine, unioning their disjoint columns."""
+        """A live + a history query combine, unioning their disjoint columns."""
         fc = OSM(
             **{
                 **osm_kwargs(),

@@ -1,4 +1,4 @@
-"""Offline unit tests for the OSM backend's `pbf` protocol branch.
+"""Offline unit tests for the OSM backend's `bulk` protocol branch.
 
 Fakes the module-level `download_extract` / `read_pbf` on `earthlens.osm.backend`
 so the branch is exercised end-to-end (region resolution, layer dispatch, bbox
@@ -57,7 +57,7 @@ def fake_pbf(monkeypatch):
 
 
 def _osm(tmp_path=None, **overrides):
-    """Build an `OSM` for a pbf request over the Malta bbox by default."""
+    """Build an `OSM` for a bulk request over the Malta bbox by default."""
     kwargs: dict[str, Any] = {
         "variables": ["bulk:buildings"],
         "lat_lim": [35.8, 36.0],
@@ -70,7 +70,7 @@ def _osm(tmp_path=None, **overrides):
 
 
 class TestPbfConstruction:
-    """Constructor validation for the pbf knobs."""
+    """Constructor validation for the bulk knobs."""
 
     def test_bad_engine_rejected(self):
         """An unknown engine is rejected at construction."""
@@ -94,8 +94,8 @@ class TestPbfSearch:
                 variables=["bulk:buildings"], lat_lim=[0, 1], lon_lim=[0, 1]
             )._api()
 
-    def test_large_bbox_allowed_for_pbf(self, fake_pbf, tmp_path):
-        """The area cap does not apply to a pbf read (whole-Earth is fine)."""
+    def test_large_bbox_allowed_for_bulk(self, fake_pbf, tmp_path):
+        """The area cap does not apply to a bulk read (whole-Earth is fine)."""
         osm = _osm(tmp_path, lat_lim=[-90, 90], lon_lim=[-180, 180])
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)

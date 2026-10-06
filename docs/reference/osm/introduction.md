@@ -59,7 +59,7 @@ The `osm` backend is really three different ways to get OSM data, chosen by the
 very different freshness and cost characteristics, so picking the right one
 matters more than with a single-source backend.
 
-### `live:` — live, current-state queries
+### `live:` — current-state queries
 
 Named queries: `live:hospitals` / `roads` / `buildings` / `cafes` /
 `schools`.
@@ -97,7 +97,7 @@ block surfaces as a clear, typed error). A raw filter goes through `filter=`.
 The `history:` aggregation queries (counts / areas / lengths over time) are out
 of scope for now.
 
-### `bulk:` — bulk, regional, offline reads
+### `bulk:` — regional, offline reads
 
 Named queries: `bulk:buildings` / `roads` / `pois` / `landuse` / `natural` /
 `boundaries`.
