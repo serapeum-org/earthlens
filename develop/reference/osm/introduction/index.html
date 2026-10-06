@@ -6828,10 +6828,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#overpass-live-current-state-queries" class="md-nav__link">
+  <a href="#live-live-current-state-queries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        overpass: — live, current-state queries
+        live: — live, current-state queries
       
     </span>
   </a>
@@ -6839,10 +6839,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ohsome-history-and-change-over-time" class="md-nav__link">
+  <a href="#history-history-and-change-over-time" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ohsome: — history and change over time
+        history: — history and change over time
       
     </span>
   </a>
@@ -6850,10 +6850,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pbf-bulk-regional-offline-reads" class="md-nav__link">
+  <a href="#bulk-bulk-regional-offline-reads" class="md-nav__link">
     <span class="md-ellipsis">
       
-        pbf: — bulk, regional, offline reads
+        bulk: — bulk, regional, offline reads
       
     </span>
   </a>
@@ -23796,10 +23796,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#overpass-live-current-state-queries" class="md-nav__link">
+  <a href="#live-live-current-state-queries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        overpass: — live, current-state queries
+        live: — live, current-state queries
       
     </span>
   </a>
@@ -23807,10 +23807,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ohsome-history-and-change-over-time" class="md-nav__link">
+  <a href="#history-history-and-change-over-time" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ohsome: — history and change over time
+        history: — history and change over time
       
     </span>
   </a>
@@ -23818,10 +23818,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pbf-bulk-regional-offline-reads" class="md-nav__link">
+  <a href="#bulk-bulk-regional-offline-reads" class="md-nav__link">
     <span class="md-ellipsis">
       
-        pbf: — bulk, regional, offline reads
+        bulk: — bulk, regional, offline reads
       
     </span>
   </a>
@@ -23948,17 +23948,17 @@ features through <strong>three public, keyless download types</strong> and retur
 </thead>
 <tbody>
 <tr>
-<td><strong><code>overpass:</code></strong></td>
+<td><strong><code>live:</code></strong></td>
 <td>small/targeted <strong>current-state</strong> features by bbox + tag filter</td>
 <td>points, lines, polygons</td>
 </tr>
 <tr>
-<td><strong><code>ohsome:</code></strong></td>
+<td><strong><code>history:</code></strong></td>
 <td>OSM <strong>history</strong> — features at a point in time or over a range</td>
 <td>points, lines, polygons</td>
 </tr>
 <tr>
-<td><strong><code>pbf:</code></strong></td>
+<td><strong><code>bulk:</code></strong></td>
 <td><strong>bulk / regional</strong> reads of a whole area (every building in a country, …)</td>
 <td>points, lines, polygons</td>
 </tr>
@@ -24030,8 +24030,8 @@ fits how much of earthlens you want:</p>
 <code>&lt;type&gt;:</code> prefix of the named query. They answer different questions and have
 very different freshness and cost characteristics, so picking the right one
 matters more than with a single-source backend.</p>
-<h3 id="overpass-live-current-state-queries"><a class="toclink" href="#overpass-live-current-state-queries"><code>overpass:</code> — live, current-state queries</a><a class="headerlink" href="#overpass-live-current-state-queries" title="Permanent link">#</a></h3>
-<p>Named queries: <code>overpass:hospitals</code> / <code>roads</code> / <code>buildings</code> / <code>cafes</code> /
+<h3 id="live-live-current-state-queries"><a class="toclink" href="#live-live-current-state-queries"><code>live:</code> — live, current-state queries</a><a class="headerlink" href="#live-live-current-state-queries" title="Permanent link">#</a></h3>
+<p>Named queries: <code>live:hospitals</code> / <code>roads</code> / <code>buildings</code> / <code>cafes</code> /
 <code>schools</code>.</p>
 <p>A live query that returns <strong>what the map says right now</strong> — there is no time
 axis. You give a bbox and a named query (a tag filter); the backend runs the
@@ -24045,23 +24045,23 @@ between queries. It has no history, and relations are skipped in the MVP. When
 the named queries are not enough, pass a raw query through <code>query=</code>. The request
 endpoint, User-Agent, and timeout are all overridable (<code>endpoint=</code>,
 <code>user_agent=</code>, <code>timeout=</code>).</p>
-<h3 id="ohsome-history-and-change-over-time"><a class="toclink" href="#ohsome-history-and-change-over-time"><code>ohsome:</code> — history and change over time</a><a class="headerlink" href="#ohsome-history-and-change-over-time" title="Permanent link">#</a></h3>
-<p>Named queries: <code>ohsome:buildings</code> / <code>highways</code> / <code>amenities</code>.</p>
-<p>Unlike <code>overpass:</code>, this type knows the <strong>full edit history</strong> of every OSM
+<h3 id="history-history-and-change-over-time"><a class="toclink" href="#history-history-and-change-over-time"><code>history:</code> — history and change over time</a><a class="headerlink" href="#history-history-and-change-over-time" title="Permanent link">#</a></h3>
+<p>Named queries: <code>history:buildings</code> / <code>highways</code> / <code>amenities</code>.</p>
+<p>Unlike <code>live:</code>, this type knows the <strong>full edit history</strong> of every OSM
 element, so it answers <strong>temporal questions</strong>: what a feature looked like at a
 past instant, or how an area was mapped across a span of time. A single date
 (<code>start=</code>) returns one <strong>snapshot</strong>; <code>start=</code> + <code>end=</code> returns the <strong>range</strong>
 <code>start/end</code> — each feature at both boundary snapshots, carried in the
-<code>@snapshotTimestamp</code> column. An <code>ohsome:</code> query therefore <strong>requires a time</strong> —
+<code>@snapshotTimestamp</code> column. An <code>history:</code> query therefore <strong>requires a time</strong> —
 it raises without <code>start=</code>.</p>
 <p>Reach for it for change detection and "as-of" maps — "buildings as they existed
 on 2018-01-01", "how coverage grew from 2015 to 2023". It too is rate-limited
 public infrastructure (a transient throttle is retried automatically; a hard
 block surfaces as a clear, typed error). A raw filter goes through <code>filter=</code>.
-The <code>ohsome:</code> aggregation queries (counts / areas / lengths over time) are out
+The <code>history:</code> aggregation queries (counts / areas / lengths over time) are out
 of scope for now.</p>
-<h3 id="pbf-bulk-regional-offline-reads"><a class="toclink" href="#pbf-bulk-regional-offline-reads"><code>pbf:</code> — bulk, regional, offline reads</a><a class="headerlink" href="#pbf-bulk-regional-offline-reads" title="Permanent link">#</a></h3>
-<p>Named queries: <code>pbf:buildings</code> / <code>roads</code> / <code>pois</code> / <code>landuse</code> / <code>natural</code> /
+<h3 id="bulk-bulk-regional-offline-reads"><a class="toclink" href="#bulk-bulk-regional-offline-reads"><code>bulk:</code> — bulk, regional, offline reads</a><a class="headerlink" href="#bulk-bulk-regional-offline-reads" title="Permanent link">#</a></h3>
+<p>Named queries: <code>bulk:buildings</code> / <code>roads</code> / <code>pois</code> / <code>landuse</code> / <code>natural</code> /
 <code>boundaries</code>.</p>
 <p><code>pbf</code> is <strong>not a live query</strong>. It reads a regional <code>.osm.pbf</code> extract — a
 compressed snapshot of a whole area's OSM data — which the backend downloads
@@ -24069,7 +24069,7 @@ once, caches on disk, and then reads <strong>locally</strong>. Because the work 
 scales to asks that would blow past a live query's limits outright: <em>every</em>
 building in a country, a whole national road network, or the same area read
 repeatedly without touching a shared service.</p>
-<p>A <code>pbf:</code> query needs a <strong><code>region=</code></strong> — a region key such as <code>"malta"</code> (listed by
+<p>A <code>bulk:</code> query needs a <strong><code>region=</code></strong> — a region key such as <code>"malta"</code> (listed by
 <code>Catalog().region_ids()</code>) or a raw <code>"continent/region"</code> path such as
 <code>"europe/monaco"</code> — which selects the extract; the request bbox then clips the
 read (omit it to read the whole extract). Two read <strong>engines</strong> trade memory
@@ -24095,7 +24095,7 @@ rainfall, ERA5, GEE imagery) in two ways:</p>
 <li>
 <p><strong>There is no large dataset index to curate.</strong> OSM is queried by tag filter,
   not chosen from an archive. The "catalog" is a small set of curated <strong>named
-  queries</strong> (<code>overpass:hospitals</code>, <code>ohsome:buildings</code>, …) so you don't have to
+  queries</strong> (<code>live:hospitals</code>, <code>history:buildings</code>, …) so you don't have to
   write raw Overpass QL or ohsome filters by hand — and a raw <code>query=</code> /
   <code>filter=</code> override is there when you do.</p>
 </li>
@@ -24114,98 +24114,99 @@ facade makes <code>variables</code> required on every call). Each id is <code>&l
 </thead>
 <tbody>
 <tr>
-<td><code>overpass:hospitals</code></td>
-<td><code>overpass:</code></td>
+<td><code>live:hospitals</code></td>
+<td><code>live:</code></td>
 <td>hospitals (points + footprints)</td>
 </tr>
 <tr>
-<td><code>overpass:roads</code></td>
-<td><code>overpass:</code></td>
+<td><code>live:roads</code></td>
+<td><code>live:</code></td>
 <td>road / path centrelines (lines)</td>
 </tr>
 <tr>
-<td><code>overpass:buildings</code></td>
-<td><code>overpass:</code></td>
+<td><code>live:buildings</code></td>
+<td><code>live:</code></td>
 <td>building footprints (polygons)</td>
 </tr>
 <tr>
-<td><code>overpass:cafes</code></td>
-<td><code>overpass:</code></td>
+<td><code>live:cafes</code></td>
+<td><code>live:</code></td>
 <td>cafes (points)</td>
 </tr>
 <tr>
-<td><code>overpass:schools</code></td>
-<td><code>overpass:</code></td>
+<td><code>live:schools</code></td>
+<td><code>live:</code></td>
 <td>schools (points + footprints)</td>
 </tr>
 <tr>
-<td><code>ohsome:buildings</code></td>
-<td><code>ohsome:</code></td>
+<td><code>history:buildings</code></td>
+<td><code>history:</code></td>
 <td>building footprints at a snapshot/range</td>
 </tr>
 <tr>
-<td><code>ohsome:highways</code></td>
-<td><code>ohsome:</code></td>
+<td><code>history:highways</code></td>
+<td><code>history:</code></td>
 <td>road / path centrelines at a snapshot/range</td>
 </tr>
 <tr>
-<td><code>ohsome:amenities</code></td>
-<td><code>ohsome:</code></td>
+<td><code>history:amenities</code></td>
+<td><code>history:</code></td>
 <td>tagged amenities at a snapshot/range</td>
 </tr>
 <tr>
-<td><code>pbf:buildings</code></td>
-<td><code>pbf:</code></td>
+<td><code>bulk:buildings</code></td>
+<td><code>bulk:</code></td>
 <td>building footprints from a regional extract</td>
 </tr>
 <tr>
-<td><code>pbf:roads</code></td>
-<td><code>pbf:</code></td>
+<td><code>bulk:roads</code></td>
+<td><code>bulk:</code></td>
 <td>drivable road network from a regional extract</td>
 </tr>
 <tr>
-<td><code>pbf:pois</code></td>
-<td><code>pbf:</code></td>
+<td><code>bulk:pois</code></td>
+<td><code>bulk:</code></td>
 <td>points of interest from a regional extract</td>
 </tr>
 <tr>
-<td><code>pbf:landuse</code></td>
-<td><code>pbf:</code></td>
+<td><code>bulk:landuse</code></td>
+<td><code>bulk:</code></td>
 <td>land-use polygons from a regional extract</td>
 </tr>
 <tr>
-<td><code>pbf:natural</code></td>
-<td><code>pbf:</code></td>
+<td><code>bulk:natural</code></td>
+<td><code>bulk:</code></td>
 <td>natural features from a regional extract</td>
 </tr>
 <tr>
-<td><code>pbf:boundaries</code></td>
-<td><code>pbf:</code></td>
+<td><code>bulk:boundaries</code></td>
+<td><code>bulk:</code></td>
 <td>administrative boundaries from a regional extract</td>
 </tr>
 </tbody>
 </table>
 <p>The <code>&lt;type&gt;:</code> prefix is what tells the backend which download path to take. An
 unknown id raises with a did-you-mean hint
-(<code>Catalog().get("overpass:hospital")</code> → <em>Did you mean 'overpass:hospitals'?</em>).</p>
-<p>Each type also answers to an <strong>intent alias</strong> you can use in place of the
-prefix — <code>live:</code> for <code>overpass:</code>, <code>history:</code> for <code>ohsome:</code>, <code>bulk:</code> for <code>pbf:</code> —
-so <code>live:hospitals</code> and <code>overpass:hospitals</code> are equivalent. The same words work
-as a facade <code>data_source</code> (<code>EarthLens(data_source="live", …)</code>).
+(<code>Catalog().get("live:hospital")</code> → <em>Did you mean 'live:hospitals'?</em>).</p>
+<p>The canonical names map to the underlying tools: <code>live</code> is the Overpass API,
+<code>history</code> is ohsome, <code>bulk</code> is a <code>.osm.pbf</code> extract. The original prefixes still
+work as <strong>back-compat aliases</strong> — <code>overpass:hospitals</code> is accepted as
+<code>live:hospitals</code>, <code>ohsome:…</code> as <code>history:…</code>, and <code>pbf:…</code> as <code>bulk:…</code> — and
+<code>overpass</code> / <code>ohsome</code> also work as a facade <code>data_source</code>.
 <code>list_datasets("osm")</code> always lists the canonical names.</p>
-<p>A <code>pbf:*</code> query also needs a <strong><code>region=</code></strong> — a region key (<code>"malta"</code>,
+<p>A <code>bulk:*</code> query also needs a <strong><code>region=</code></strong> — a region key (<code>"malta"</code>,
 <code>"netherlands"</code>, …, listed by <code>Catalog().region_ids()</code>) or a raw
 <code>"continent/region"</code> path (<code>"europe/andorra"</code>). It picks which extract to
 download; the request bbox then clips the read.</p>
 <h2 id="what-a-query-returns"><a class="toclink" href="#what-a-query-returns">What a query returns</a><a class="headerlink" href="#what-a-query-returns" title="Permanent link">#</a></h2>
 <p>One <code>FeatureCollection</code> (CRS <code>EPSG:4326</code>):</p>
 <ul>
-<li><strong><code>overpass:</code></strong> — <code>osm_id</code>, <code>osm_type</code> (<code>node</code> / <code>way</code>), each element's OSM
+<li><strong><code>live:</code></strong> — <code>osm_id</code>, <code>osm_type</code> (<code>node</code> / <code>way</code>), each element's OSM
   tags as columns, and a <code>geometry</code>: a <code>Point</code> for a node, a <code>LineString</code> for an
   open way, a <code>Polygon</code> for a closed way. Relations are skipped in the MVP.</li>
-<li><strong><code>ohsome:</code></strong> — the geometry plus the history columns, notably <code>@osmId</code> and
+<li><strong><code>history:</code></strong> — the geometry plus the history columns, notably <code>@osmId</code> and
   <code>@snapshotTimestamp</code> (the snapshot instant) and <code>@other_tags</code>.</li>
-<li><strong><code>pbf:</code></strong> — an <code>osm_id</code> / <code>osm_type</code> identity (normalised so it matches the
+<li><strong><code>bulk:</code></strong> — an <code>osm_id</code> / <code>osm_type</code> identity (normalised so it matches the
   other types). The default <code>engine="pyosmium"</code> returns the slim <code>osm_id</code> /
   <code>osm_type</code> / <code>geometry</code> schema; the opt-in <code>engine="pyrosm"</code> adds the layer's
   key tags (e.g. <code>building</code>) and exact per-layer columns.</li>

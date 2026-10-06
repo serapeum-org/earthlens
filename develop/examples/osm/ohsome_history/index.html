@@ -24664,7 +24664,7 @@ LON_LIM = [8.67, 8.71]</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="a-single-historical-snapshot">A single historical snapshot<a class="anchor-link" href="#a-single-historical-snapshot">¶</a></h2><p><code>ohsome:buildings</code> returns building footprints as they existed at the <code>start</code> date. ohsome's
+<h2 id="a-single-historical-snapshot">A single historical snapshot<a class="anchor-link" href="#a-single-historical-snapshot">¶</a></h2><p><code>history:buildings</code> returns building footprints as they existed at the <code>start</code> date. ohsome's
 own columns ride along: <code>@osmId</code> (the element id) and <code>@snapshotTimestamp</code> (the snapshot
 instant). Here we ask for the state on 1 January 2018.</p>
 </div>
@@ -24691,7 +24691,7 @@ instant). Here we ask for the state on 1 January 2018.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">buildings_2018</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'ohsome:buildings'</span><span class="p">],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'history:buildings'</span><span class="p">],</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2018-01-01'</span><span class="p">,</span>
@@ -24702,7 +24702,7 @@ instant). Here we ask for the state on 1 January 2018.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">buildings_2018 = EarthLens(
     data_source='osm',
-    variables=['ohsome:buildings'],
+    variables=['history:buildings'],
     lat_lim=LAT_LIM,
     lon_lim=LON_LIM,
     start='2018-01-01',
@@ -24799,7 +24799,7 @@ over time as contributors add detail.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">buildings_2023</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'ohsome:buildings'</span><span class="p">],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'history:buildings'</span><span class="p">],</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2023-01-01'</span><span class="p">,</span>
@@ -24811,7 +24811,7 @@ over time as contributors add detail.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">buildings_2023 = EarthLens(
     data_source='osm',
-    variables=['ohsome:buildings'],
+    variables=['history:buildings'],
     lat_lim=LAT_LIM,
     lon_lim=LON_LIM,
     start='2023-01-01',
@@ -24878,7 +24878,7 @@ plt.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="the-other-ohsome-named-queries">The other ohsome named queries<a class="anchor-link" href="#the-other-ohsome-named-queries">¶</a></h2><p>Beside <code>buildings</code>, the catalog ships <code>ohsome:amenities</code> (POI points) and <code>ohsome:highways</code> (road lines). Same call shape, at a single snapshot.</p>
+<h2 id="the-other-ohsome-named-queries">The other ohsome named queries<a class="anchor-link" href="#the-other-ohsome-named-queries">¶</a></h2><p>Beside <code>buildings</code>, the catalog ships <code>history:amenities</code> (POI points) and <code>history:highways</code> (road lines). Same call shape, at a single snapshot.</p>
 </div>
 </div>
 </div>
@@ -24902,7 +24902,7 @@ plt.show()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ohsome_other</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'ohsome:amenities'</span><span class="p">,</span> <span class="s1">'ohsome:highways'</span><span class="p">]:</span>
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'history:amenities'</span><span class="p">,</span> <span class="s1">'history:highways'</span><span class="p">]:</span>
     <span class="n">ohsome_other</span><span class="p">[</span><span class="n">q</span><span class="p">]</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">q</span><span class="p">],</span>
@@ -24915,7 +24915,7 @@ plt.show()</div>
 <span class="p">{</span><span class="n">q</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="k">for</span> <span class="n">q</span><span class="p">,</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">ohsome_other</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">ohsome_other = {}
-for q in ['ohsome:amenities', 'ohsome:highways']:
+for q in ['history:amenities', 'history:highways']:
     ohsome_other[q] = EarthLens(
         data_source='osm',
         variables=[q],
@@ -24963,7 +24963,7 @@ for q in ['ohsome:amenities', 'ohsome:highways']:
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">buildings_range</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'ohsome:buildings'</span><span class="p">],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'history:buildings'</span><span class="p">],</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2018-01-01'</span><span class="p">,</span>
@@ -24975,7 +24975,7 @@ for q in ['ohsome:amenities', 'ohsome:highways']:
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7">buildings_range = EarthLens(
     data_source='osm',
-    variables=['ohsome:buildings'],
+    variables=['history:buildings'],
     lat_lim=LAT_LIM,
     lon_lim=LON_LIM,
     start='2018-01-01',
@@ -25023,7 +25023,7 @@ sorted(buildings_range['@snapshotTimestamp'].unique())</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">parks</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'ohsome:buildings'</span><span class="p">],</span>  <span class="c1"># still required to route to ohsome</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'history:buildings'</span><span class="p">],</span>  <span class="c1"># still required to route to ohsome</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2023-01-01'</span><span class="p">,</span>
@@ -25035,7 +25035,7 @@ sorted(buildings_range['@snapshotTimestamp'].unique())</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8">parks = EarthLens(
     data_source='osm',
-    variables=['ohsome:buildings'],  # still required to route to ohsome
+    variables=['history:buildings'],  # still required to route to ohsome
     lat_lim=LAT_LIM,
     lon_lim=LON_LIM,
     start='2023-01-01',

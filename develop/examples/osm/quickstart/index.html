@@ -24755,7 +24755,7 @@ LON_LIM = [8.67, 8.71]</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="quickstart-hospitals-as-a-featurecollection">Quickstart — hospitals as a FeatureCollection<a class="anchor-link" href="#quickstart-hospitals-as-a-featurecollection">¶</a></h2><p>The shortest end-to-end example: pick the <code>overpass:hospitals</code> <strong>named query</strong> via
+<h2 id="quickstart-hospitals-as-a-featurecollection">Quickstart — hospitals as a FeatureCollection<a class="anchor-link" href="#quickstart-hospitals-as-a-featurecollection">¶</a></h2><p>The shortest end-to-end example: pick the <code>live:hospitals</code> <strong>named query</strong> via
 <code>variables=</code>, give it the bbox, and <code>download()</code>. The backend builds the Overpass QL, runs
 the live query, and returns the features. (The <code>LicenseWarning</code> you see is the ODbL notice —
 expected on every result.)</p>
@@ -24783,7 +24783,7 @@ expected on every result.)</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">hospitals</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'overpass:hospitals'</span><span class="p">],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'live:hospitals'</span><span class="p">],</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
@@ -24793,7 +24793,7 @@ expected on every result.)</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">hospitals = EarthLens(
     data_source='osm',
-    variables=['overpass:hospitals'],
+    variables=['live:hospitals'],
     lat_lim=LAT_LIM,
     lon_lim=LON_LIM,
     path=OUT_DIR,
@@ -24923,7 +24923,7 @@ plt.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="another-named-query-the-road-network">Another named query — the road network<a class="anchor-link" href="#another-named-query-the-road-network">¶</a></h2><p><code>overpass:roads</code> returns every <code>highway</code> way as a <code>LineString</code>. The named queries are listed
+<h2 id="another-named-query-the-road-network">Another named query — the road network<a class="anchor-link" href="#another-named-query-the-road-network">¶</a></h2><p><code>live:roads</code> returns every <code>highway</code> way as a <code>LineString</code>. The named queries are listed
 by <code>EarthLens.list_datasets('osm')</code>; the <code>&lt;protocol&gt;:</code> prefix selects Overpass vs ohsome.</p>
 </div>
 </div>
@@ -24977,14 +24977,14 @@ by <code>EarthLens.list_datasets('osm')</code>; the <code>&lt;protocol&gt;:</cod
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>  <span class="c1"># let the Overpass slots recover before the next query</span>
 <span class="n">roads</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'overpass:roads'</span><span class="p">],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'live:roads'</span><span class="p">],</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">roads</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#444'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">roads</span><span class="p">)</span><span class="si">}</span><span class="s1"> road segments (overpass:roads)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">roads</span><span class="p">)</span><span class="si">}</span><span class="s1"> road segments (live:roads)'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'longitude'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'latitude'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -24992,14 +24992,14 @@ by <code>EarthLens.list_datasets('osm')</code>; the <code>&lt;protocol&gt;:</cod
 <div class="clipboard-copy-txt" id="cell-7">time.sleep(12)  # let the Overpass slots recover before the next query
 roads = EarthLens(
     data_source='osm',
-    variables=['overpass:roads'],
+    variables=['live:roads'],
     lat_lim=LAT_LIM,
     lon_lim=LON_LIM,
     path=OUT_DIR,
 ).download()
 
 ax = roads.plot(linewidth=0.6, color='#444', figsize=(7, 6))
-ax.set_title(f'{len(roads)} road segments (overpass:roads)')
+ax.set_title(f'{len(roads)} road segments (live:roads)')
 ax.set_xlabel('longitude')
 ax.set_ylabel('latitude')
 plt.show()</div>
@@ -25015,7 +25015,7 @@ plt.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="the-rest-of-the-overpass-named-queries">The rest of the Overpass named queries<a class="anchor-link" href="#the-rest-of-the-overpass-named-queries">¶</a></h2><p><code>list_datasets('osm')</code> showed five <code>overpass:</code> queries. We mapped <code>hospitals</code> and <code>roads</code>; the other three are <code>buildings</code> (polygons), <code>cafes</code> (points), and <code>schools</code> (points + polygons). Each is the same call shape with a different tag filter. We fetch all three — pausing between them to respect Overpass's shared slots — and show them side by side.</p>
+<h2 id="the-rest-of-the-overpass-named-queries">The rest of the Overpass named queries<a class="anchor-link" href="#the-rest-of-the-overpass-named-queries">¶</a></h2><p><code>list_datasets('osm')</code> showed five <code>live:</code> queries. We mapped <code>hospitals</code> and <code>roads</code>; the other three are <code>buildings</code> (polygons), <code>cafes</code> (points), and <code>schools</code> (points + polygons). Each is the same call shape with a different tag filter. We fetch all three — pausing between them to respect Overpass's shared slots — and show them side by side.</p>
 </div>
 </div>
 </div>
@@ -25038,7 +25038,7 @@ plt.show()</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">overpass_queries</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'overpass:buildings'</span><span class="p">,</span> <span class="s1">'overpass:cafes'</span><span class="p">,</span> <span class="s1">'overpass:schools'</span><span class="p">]</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">overpass_queries</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'live:buildings'</span><span class="p">,</span> <span class="s1">'live:cafes'</span><span class="p">,</span> <span class="s1">'live:schools'</span><span class="p">]</span>
 <span class="n">overpass_results</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">overpass_queries</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>  <span class="c1"># respect the shared Overpass slots</span>
@@ -25052,7 +25052,7 @@ plt.show()</div>
 
 <span class="p">{</span><span class="n">q</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="k">for</span> <span class="n">q</span><span class="p">,</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">overpass_results</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">overpass_queries = ['overpass:buildings', 'overpass:cafes', 'overpass:schools']
+<div class="clipboard-copy-txt" id="cell-8">overpass_queries = ['live:buildings', 'live:cafes', 'live:schools']
 overpass_results = {}
 for q in overpass_queries:
     time.sleep(12)  # respect the shared Overpass slots
@@ -25148,7 +25148,7 @@ placeholder is filled with the request bbox; the query must request JSON output
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>  <span class="c1"># be gentle with the shared Overpass service</span>
 <span class="n">museums</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'overpass:hospitals'</span><span class="p">],</span>  <span class="c1"># still required to route to Overpass</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'live:hospitals'</span><span class="p">],</span>  <span class="c1"># still required to route to Overpass</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">query</span><span class="o">=</span><span class="s1">'[out:json][timeout:180];(node["tourism"="museum"](</span><span class="si">{bbox}</span><span class="s1">););out geom;'</span><span class="p">,</span>
@@ -25160,7 +25160,7 @@ placeholder is filled with the request bbox; the query must request JSON output
 <div class="clipboard-copy-txt" id="cell-10">time.sleep(12)  # be gentle with the shared Overpass service
 museums = EarthLens(
     data_source='osm',
-    variables=['overpass:hospitals'],  # still required to route to Overpass
+    variables=['live:hospitals'],  # still required to route to Overpass
     lat_lim=LAT_LIM,
     lon_lim=LON_LIM,
     query='[out:json][timeout:180];(node["tourism"="museum"]({bbox}););out geom;',
@@ -25181,7 +25181,7 @@ museums[[c for c in ['osm_id', 'name', 'geometry'] if c in museums.columns]].hea
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="takeaway">Takeaway<a class="anchor-link" href="#takeaway">¶</a></h2><ul>
-<li><code>EarthLens('osm', variables=['overpass:&lt;query&gt;'], lat_lim=…, lon_lim=…).download()</code> returns a
+<li><code>EarthLens('osm', variables=['live:&lt;query&gt;'], lat_lim=…, lon_lim=…).download()</code> returns a
 <code>FeatureCollection</code> of current-state OSM features.</li>
 <li>Named queries cover the common cases; a raw <code>query=</code> (JSON output) is the escape hatch.</li>
 <li>Keep the bbox small, and honour the <strong>ODbL</strong> attribution / share-alike obligation.</li>
