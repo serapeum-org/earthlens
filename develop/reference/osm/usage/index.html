@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -6844,10 +6844,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quickstart-current-state-hospitals-overpass" class="md-nav__link">
+  <a href="#quickstart-current-state-hospitals-live" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quickstart — current-state hospitals (Overpass)
+        Quickstart — current-state hospitals (live)
       
     </span>
   </a>
@@ -6855,10 +6855,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quickstart-building-history-at-a-snapshot-ohsome" class="md-nav__link">
+  <a href="#quickstart-building-history-at-a-snapshot-history" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quickstart — building history at a snapshot (ohsome)
+        Quickstart — building history at a snapshot (history)
       
     </span>
   </a>
@@ -6866,10 +6866,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quickstart-every-building-in-a-region-pbf" class="md-nav__link">
+  <a href="#quickstart-every-building-in-a-region-bulk" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quickstart — every building in a region (pbf)
+        Quickstart — every building in a region (bulk)
       
     </span>
   </a>
@@ -23806,10 +23806,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quickstart-current-state-hospitals-overpass" class="md-nav__link">
+  <a href="#quickstart-current-state-hospitals-live" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quickstart — current-state hospitals (Overpass)
+        Quickstart — current-state hospitals (live)
       
     </span>
   </a>
@@ -23817,10 +23817,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quickstart-building-history-at-a-snapshot-ohsome" class="md-nav__link">
+  <a href="#quickstart-building-history-at-a-snapshot-history" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quickstart — building history at a snapshot (ohsome)
+        Quickstart — building history at a snapshot (history)
       
     </span>
   </a>
@@ -23828,10 +23828,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quickstart-every-building-in-a-region-pbf" class="md-nav__link">
+  <a href="#quickstart-every-building-in-a-region-bulk" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quickstart — every building in a region (pbf)
+        Quickstart — every building in a region (bulk)
       
     </span>
   </a>
@@ -23984,14 +23984,14 @@ rendered API is the <a href="../osm/">Reference</a> page.</p>
 <p>The backend is installed with one extra (imported lazily — the base package
 imports without it):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>osm<span class="o">]</span><span class="w">      </span><span class="c1"># all three download types</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>pyrosm<span class="w">              </span><span class="c1"># opt-in: the richer in-memory pbf engine</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>pyrosm<span class="w">              </span><span class="c1"># opt-in: the richer in-memory read engine</span>
 </code></pre></div>
 <p><code>[osm]</code> <strong>is</strong> part of <code>[all]</code> and covers all three download types — the two
-live types plus the default <code>pbf</code> streaming engine. The richer in-memory <code>pbf</code>
+live types plus the default streaming read engine. The richer in-memory read
 engine is <strong>opt-in</strong>: <code>pip install pyrosm</code> builds a source dependency (needs a C
 compiler), so install it only when you want <code>engine="pyrosm"</code>. There are no
 credentials to configure — every download type is public and keyless.</p>
-<h2 id="quickstart-current-state-hospitals-overpass"><a class="toclink" href="#quickstart-current-state-hospitals-overpass">Quickstart — current-state hospitals (Overpass)</a><a class="headerlink" href="#quickstart-current-state-hospitals-overpass" title="Permanent link">#</a></h2>
+<h2 id="quickstart-current-state-hospitals-live"><a class="toclink" href="#quickstart-current-state-hospitals-live">Quickstart — current-state hospitals (live)</a><a class="headerlink" href="#quickstart-current-state-hospitals-live" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">hospitals</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
@@ -24007,22 +24007,22 @@ credentials to configure — every download type is public and keyless.</p>
 </code></pre></div>
 <p><code>download()</code> returns a <code>FeatureCollection</code> (a <code>geopandas.GeoDataFrame</code> subclass),
 so every pandas / geopandas method works on it directly. It also writes
-<code>out/osm_overpass-hospitals.geojson</code>. Keep the bbox small — the live types run
+<code>out/osm_live-hospitals.geojson</code>. Keep the bbox small — the live types run
 against shared public infrastructure.</p>
-<h2 id="quickstart-building-history-at-a-snapshot-ohsome"><a class="toclink" href="#quickstart-building-history-at-a-snapshot-ohsome">Quickstart — building history at a snapshot (ohsome)</a><a class="headerlink" href="#quickstart-building-history-at-a-snapshot-ohsome" title="Permanent link">#</a></h2>
+<h2 id="quickstart-building-history-at-a-snapshot-history"><a class="toclink" href="#quickstart-building-history-at-a-snapshot-history">Quickstart — building history at a snapshot (history)</a><a class="headerlink" href="#quickstart-building-history-at-a-snapshot-history" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">buildings</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;history:buildings&quot;</span><span class="p">],</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">49.40</span><span class="p">,</span> <span class="mf">49.42</span><span class="p">],</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">8.67</span><span class="p">,</span> <span class="mf">8.71</span><span class="p">],</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span>                 <span class="c1"># ohsome needs a time (see below)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span>                 <span class="c1"># history needs a time (see below)</span>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="nb">print</span><span class="p">(</span><span class="n">buildings</span><span class="p">[</span><span class="s2">&quot;@snapshotTimestamp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>   <span class="c1"># the history timestamp</span>
 </code></pre></div>
-<h2 id="quickstart-every-building-in-a-region-pbf"><a class="toclink" href="#quickstart-every-building-in-a-region-pbf">Quickstart — every building in a region (pbf)</a><a class="headerlink" href="#quickstart-every-building-in-a-region-pbf" title="Permanent link">#</a></h2>
-<p>For a <strong>bulk</strong> ask — every building in a country — use the <code>pbf</code> type. It
+<h2 id="quickstart-every-building-in-a-region-bulk"><a class="toclink" href="#quickstart-every-building-in-a-region-bulk">Quickstart — every building in a region (bulk)</a><a class="headerlink" href="#quickstart-every-building-in-a-region-bulk" title="Permanent link">#</a></h2>
+<p>For a <strong>bulk</strong> ask — every building in a country — use the <code>bulk</code> type. It
 downloads a regional extract for <code>region=</code> (cached on disk), reads the layer with
 the default streaming engine, and clips to the request bbox:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">buildings</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
@@ -24042,7 +24042,7 @@ the default streaming engine, and clips to the request bbox:</p>
 calls reuse it. List the region keys with <code>Catalog().region_ids()</code>, or pass a
 raw <code>"continent/region"</code> path (any string with a <code>/</code>). Omit <code>lat_lim</code> /
 <code>lon_lim</code> to read the whole extract — the bbox-area cap does <strong>not</strong> apply to a
-<code>pbf</code> read.</p>
+<code>bulk</code> read.</p>
 <div class="admonition note">
 <p class="admonition-title">Engines — <code>engine="pyosmium"</code> (default) vs <code>engine="pyrosm"</code></p>
 <p><code>engine="pyosmium"</code> (the default) streams the extract with bounded memory and
@@ -24083,16 +24083,16 @@ aliases of <code>live:</code> / <code>history:</code> / <code>bulk:</code> in <c
 <h2 id="the-bbox-and-the-time-window"><a class="toclink" href="#the-bbox-and-the-time-window">The bbox and the time window</a><a class="headerlink" href="#the-bbox-and-the-time-window" title="Permanent link">#</a></h2>
 <ul>
 <li><strong>bbox</strong> — <code>lat_lim</code> / <code>lon_lim</code> (degrees). The backend hands the box to each
-  protocol in the order it expects (Overpass <code>S,W,N,E</code>; ohsome <code>W,S,E,N</code>); you
+  type in the order it expects (Overpass <code>S,W,N,E</code>; ohsome <code>W,S,E,N</code>); you
   always pass plain <code>lat_lim</code> / <code>lon_lim</code>. You can also use the ergonomic
   <code>aoi=</code> channel (a bbox, a point + <code>buffer</code>, or a geometry).</li>
-<li><strong>time</strong> — Overpass returns <strong>current state</strong> and ignores <code>start</code> / <code>end</code>.
-  ohsome is <strong>history-aware</strong> and <em>requires</em> a time: pass <code>start=</code> for a single
-  snapshot, or <code>start=</code> + <code>end=</code> for a range (the backend builds the ohsome
-  <code>time</code> as <code>"start/end"</code>). An ohsome query with no <code>start</code> raises a helpful
-  <code>ValueError</code>.</li>
+<li><strong>time</strong> — the <code>live:</code> type returns <strong>current state</strong> and ignores <code>start</code> /
+  <code>end</code>. The <code>history:</code> type is <strong>history-aware</strong> and <em>requires</em> a time: pass
+  <code>start=</code> for a single snapshot, or <code>start=</code> + <code>end=</code> for a range (the backend
+  builds the ohsome <code>time</code> as <code>"start/end"</code>). A <code>history:</code> query with no <code>start</code>
+  raises a helpful <code>ValueError</code>.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># ohsome over a multi-year range</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># history over a multi-year range</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;osm&quot;</span><span class="p">,</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;history:highways&quot;</span><span class="p">],</span>
@@ -24186,15 +24186,15 @@ larger than
 country) is rejected before any request — in particular the whole-Earth
 default you get if you omit <code>lat_lim</code> / <code>lon_lim</code> through the facade, which
 would hammer the shared public services. Raise <code>max_bbox_deg2=</code> for a
-genuinely larger area. The cap does <strong>not</strong> apply to a <code>pbf</code> read (it hits a
-local extract, not a shared service), so a <code>pbf</code> request with no bbox simply
+genuinely larger area. The cap does <strong>not</strong> apply to a <code>bulk</code> read (it hits a
+local extract, not a shared service), so a <code>bulk</code> request with no bbox simply
 reads the whole downloaded extract.</p>
 </div>
 <h2 id="the-returned-featurecollection"><a class="toclink" href="#the-returned-featurecollection">The returned FeatureCollection</a><a class="headerlink" href="#the-returned-featurecollection" title="Permanent link">#</a></h2>
-<p>CRS <code>EPSG:4326</code>. Overpass features carry <code>osm_id</code>, <code>osm_type</code>, the element's OSM
+<p>CRS <code>EPSG:4326</code>. <code>live:</code> features carry <code>osm_id</code>, <code>osm_type</code>, the element's OSM
 tags as columns, and a <code>Point</code> / <code>LineString</code> / <code>Polygon</code> geometry (a node → a
 point, an open way → a line, a closed way → a polygon; relations are skipped in
-the MVP). ohsome features carry the geometry plus <code>@osmId</code>,
+the MVP). <code>history:</code> features carry the geometry plus <code>@osmId</code>,
 <code>@snapshotTimestamp</code>, and <code>@other_tags</code>. An empty result (a quiet box) comes
 back as an empty FeatureCollection with the <code>osm_id</code> / <code>osm_type</code> schema, not an
 error.</p>

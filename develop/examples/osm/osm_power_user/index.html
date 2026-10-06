@@ -96,7 +96,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24661,7 +24661,7 @@ len(combined), [c for c in ['osm_id', 'amenity', 'geometry'] if c in combined.co
     <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 
-<span class="nb">sorted</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">'osm_overpass-cafes.*'</span><span class="p">))</span>
+<span class="nb">sorted</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">'osm_live-cafes.*'</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">EarthLens(
     data_source='osm',
@@ -24672,7 +24672,7 @@ len(combined), [c for c in ['osm_id', 'amenity', 'geometry'] if c in combined.co
     path=OUT_DIR,
 ).download()
 
-sorted(p.name for p in OUT_DIR.glob('osm_overpass-cafes.*'))</div>
+sorted(p.name for p in OUT_DIR.glob('osm_live-cafes.*'))</div>
 </div>
 </div>
 </div>

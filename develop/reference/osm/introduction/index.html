@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23964,9 +23964,9 @@ features through <strong>three public, keyless download types</strong> and retur
 </tr>
 </tbody>
 </table>
-<p>The first two are <strong>live queries</strong> (small, targeted asks). The <code>pbf</code> type is the
-<strong>bulk</strong> path: it downloads a regional extract once, caches it, and reads a whole
-layer locally — the right tool for "every building in Malta", which would blow
+<p>The first two are <strong>live queries</strong> (small, targeted asks). The third, <code>bulk</code>,
+downloads a regional extract once, caches it, and reads a whole layer locally —
+the right tool for "every building in Malta", which would blow
 past a live query's size limits.</p>
 <p>This page orients the backend. For the hands-on download walkthrough see
 <a href="../usage/">Usage</a>; the rendered API is the <a href="../osm/">Reference</a> page.</p>
@@ -24003,7 +24003,7 @@ fits how much of earthlens you want:</p>
 <td><code>pip install earthlens-hazards</code></td>
 </tr>
 <tr>
-<td><strong>The opt-in in-memory pbf engine</strong>, on top of any of the above</td>
+<td><strong>The opt-in in-memory read engine</strong>, on top of any of the above</td>
 <td><code>pip install pyrosm</code></td>
 </tr>
 </tbody>
@@ -24063,7 +24063,7 @@ of scope for now.</p>
 <h3 id="bulk-regional-offline-reads"><a class="toclink" href="#bulk-regional-offline-reads"><code>bulk:</code> — regional, offline reads</a><a class="headerlink" href="#bulk-regional-offline-reads" title="Permanent link">#</a></h3>
 <p>Named queries: <code>bulk:buildings</code> / <code>roads</code> / <code>pois</code> / <code>landuse</code> / <code>natural</code> /
 <code>boundaries</code>.</p>
-<p><code>pbf</code> is <strong>not a live query</strong>. It reads a regional <code>.osm.pbf</code> extract — a
+<p><code>bulk</code> is <strong>not a live query</strong>. It reads a regional <code>.osm.pbf</code> extract — a
 compressed snapshot of a whole area's OSM data — which the backend downloads
 once, caches on disk, and then reads <strong>locally</strong>. Because the work is local it
 scales to asks that would blow past a live query's limits outright: <em>every</em>
@@ -24222,7 +24222,7 @@ emits a <code>LicenseWarning</code> naming the obligation — it is not optional
 Honour it when you redistribute OSM-derived data.</p>
 <h2 id="cost"><a class="toclink" href="#cost">Cost</a><a class="headerlink" href="#cost" title="Permanent link">#</a></h2>
 <p><strong>Free.</strong> All three download types use public, keyless infrastructure. Query
-gently: keep the live-query bboxes small and time ranges focused, and for <code>pbf</code>
+gently: keep the live-query bboxes small and time ranges focused, and for <code>bulk</code>
 prefer the smallest regional extract that covers your area (a country, not a
 continent) and let the on-disk cache spare a re-download.</p>
 <h2 id="references"><a class="toclink" href="#references">References</a><a class="headerlink" href="#references" title="Permanent link">#</a></h2>
