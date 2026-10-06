@@ -4,21 +4,19 @@
 
 [OpenStreetMap](https://www.openstreetmap.org/) (OSM) is a global, crowd-sourced
 map of the world. earthlens ships a single `osm` backend that fetches OSM
-features through **three public, keyless query protocols** and returns them
-as a [pyramids](https://github.com/serapeum-org/pyramids) `FeatureCollection`
-(a `geopandas.GeoDataFrame` subclass, CRS `EPSG:4326`):
+features through **three public, keyless download types** and returns them as a
+`FeatureCollection` (a `geopandas.GeoDataFrame` subclass, CRS `EPSG:4326`):
 
-| Protocol | SDK | What it answers | Geometry |
-|---|---|---|---|
-| **Overpass** | [`overpy`](https://github.com/DinoTools/python-overpy) | small/targeted **current-state** features by bbox + tag filter | points, lines, polygons |
-| **ohsome** | [`ohsome`](https://github.com/GIScience/ohsome-py) | OSM **history + analytics** (features at a point in time / over a range) | points, lines, polygons |
-| **pbf** | [`pyosmium`](https://osmcode.org/pyosmium/) (default) / [`pyrosm`](https://pyrosm.readthedocs.io/) (opt-in) | **bulk / regional** reads from a Geofabrik `.osm.pbf` extract (a whole country's buildings, roads, …) | points, lines, polygons |
+| Download type | What it answers | Geometry |
+|---|---|---|
+| **`overpass:`** | small/targeted **current-state** features by bbox + tag filter | points, lines, polygons |
+| **`ohsome:`** | OSM **history** — features at a point in time or over a range | points, lines, polygons |
+| **`pbf:`** | **bulk / regional** reads of a whole area (every building in a country, …) | points, lines, polygons |
 
-The first two are **live-query** protocols (small, targeted asks against a
-shared public service). The `pbf` protocol is the **bulk** path: it downloads a
-[Geofabrik](https://download.geofabrik.de/) regional extract once, caches it,
-and reads a whole layer locally — the right tool for "every building in Malta",
-which would blow past Overpass's size limits.
+The first two are **live queries** (small, targeted asks). The `pbf` type is the
+**bulk** path: it downloads a regional extract once, caches it, and reads a whole
+layer locally — the right tool for "every building in Malta", which would blow
+past a live query's size limits.
 
 This page orients the backend. For the hands-on download walkthrough see
 [Usage](usage.md); the rendered API is the [Reference](osm.md) page.
@@ -26,74 +24,70 @@ This page orients the backend. For the hands-on download walkthrough see
 ## The three download types
 
 The `osm` backend is really three different ways to get OSM data, chosen by the
-`<protocol>:` prefix of the named query. They answer different questions and have
+`<type>:` prefix of the named query. They answer different questions and have
 very different freshness and cost characteristics, so picking the right one
 matters more than with a single-source backend.
 
-### Overpass — live, current-state queries
+### `overpass:` — live, current-state queries
 
-[`overpy`](https://github.com/DinoTools/python-overpy) · named queries
-`overpass:hospitals` / `roads` / `buildings` / `cafes` / `schools`
+Named queries: `overpass:hospitals` / `roads` / `buildings` / `cafes` /
+`schools`.
 
-The [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API) is a
-read-only query engine running against a live mirror of the central OSM
-database, so it answers **what the map says right now** — there is no time axis.
-For each named query the backend fills the row's Overpass QL template with the
-request bbox (and the server-side `[timeout:N]`), POSTs it to `overpass-api.de`,
-and parses the JSON into geometry (see the User-Agent note below).
+A live query that returns **what the map says right now** — there is no time
+axis. You give a bbox and a named query (a tag filter); the backend runs the
+query and hands back the matching features.
 
-Reach for Overpass when you want a **small, targeted, up-to-the-minute** slice —
-"the hospitals in this neighbourhood", "the café points in this bbox". It is the
-freshest source, but it is **shared public infrastructure with hard usage
-limits**: keep the bbox small (earthlens rejects a box larger than
-`max_bbox_deg2`, default 100 deg²), expect an HTTP 429 if you burst, and pause
+Reach for it when you want a **small, targeted, up-to-the-minute** slice — "the
+hospitals in this neighbourhood", "the café points in this bbox". It is the
+freshest source, but it runs against **shared public infrastructure with hard
+usage limits**: keep the bbox small (earthlens rejects a box larger than
+`max_bbox_deg2`, default 100 deg²), expect throttling if you burst, and pause
 between queries. It has no history, and relations are skipped in the MVP. When
-the named queries are not enough, pass raw Overpass QL through `query=`.
+the named queries are not enough, pass a raw query through `query=`. The request
+endpoint, User-Agent, and timeout are all overridable (`endpoint=`,
+`user_agent=`, `timeout=`).
 
-### ohsome — history and change over time
+### `ohsome:` — history and change over time
 
-[`ohsome`](https://github.com/GIScience/ohsome-py) · named queries
-`ohsome:buildings` / `highways` / `amenities`
+Named queries: `ohsome:buildings` / `highways` / `amenities`.
 
-The [ohsome API](https://docs.ohsome.org/ohsome-api/v1/) (run by HeiGIT) is built
-on the OpenStreetMap **History** Database, so unlike Overpass it knows the *full
-edit history* of every element. That makes it the tool for **temporal
-questions**: what a feature looked like at a past instant, or how an area was
-mapped across a span of time. The backend POSTs the bbox and a time window to
-ohsome's `elements/geometry` endpoint — a single date (`start=`) returns one
-**snapshot**, while `start=` + `end=` returns the **range** `start/end` (each
-feature at both boundary snapshots, carried in `@snapshotTimestamp`). An ohsome
-query therefore **requires a time** — it raises without `start=`.
+Unlike `overpass:`, this type knows the **full edit history** of every OSM
+element, so it answers **temporal questions**: what a feature looked like at a
+past instant, or how an area was mapped across a span of time. A single date
+(`start=`) returns one **snapshot**; `start=` + `end=` returns the **range**
+`start/end` — each feature at both boundary snapshots, carried in the
+`@snapshotTimestamp` column. An `ohsome:` query therefore **requires a time** —
+it raises without `start=`.
 
-Reach for ohsome for change detection and "as-of" maps — "buildings as they
-existed on 2018-01-01", "how coverage grew from 2015 to 2023". Like Overpass it
-is a rate-limited public service (a 429 is retried with backoff; a 403 is a hard
-IP block, not a credential error). A raw ohsome filter goes through `filter=`.
-ohsome's *aggregation* endpoints (counts / areas / lengths over time) are a
-separate follow-on and are out of scope here.
+Reach for it for change detection and "as-of" maps — "buildings as they existed
+on 2018-01-01", "how coverage grew from 2015 to 2023". It too is rate-limited
+public infrastructure (a transient throttle is retried automatically; a hard
+block surfaces as a clear, typed error). A raw filter goes through `filter=`.
+The `ohsome:` aggregation queries (counts / areas / lengths over time) are out
+of scope for now.
 
-### pbf — bulk, regional, offline extracts
+### `pbf:` — bulk, regional, offline reads
 
-[`pyosmium`](https://osmcode.org/pyosmium/) (default) /
-[`pyrosm`](https://pyrosm.readthedocs.io/) (opt-in) · named queries
-`pbf:buildings` / `roads` / `pois` / `landuse` / `natural` / `boundaries`
+Named queries: `pbf:buildings` / `roads` / `pois` / `landuse` / `natural` /
+`boundaries`.
 
-`pbf` is **not a live API**. It reads a
-[Geofabrik](https://download.geofabrik.de/) `.osm.pbf` extract — a compressed
-snapshot of a whole region's OSM data — which the backend downloads once, caches
-on disk, and then reads **locally**. Because the work is local it scales to asks
-that would blow past Overpass's limits outright: *every* building in a country, a
-whole national road network, or the same extract read repeatedly without touching
-a shared service.
+`pbf` is **not a live query**. It reads a regional `.osm.pbf` extract — a
+compressed snapshot of a whole area's OSM data — which the backend downloads
+once, caches on disk, and then reads **locally**. Because the work is local it
+scales to asks that would blow past a live query's limits outright: *every*
+building in a country, a whole national road network, or the same area read
+repeatedly without touching a shared service.
 
-A `pbf:*` query therefore needs a **`region=`** (a Geofabrik key such as
-`"malta"`, or a raw `"continent/region"` path), which selects the extract; the
-request bbox then clips the read (omit it to read the whole extract). Two read
-engines trade memory against richness: the default **`pyosmium`** streams with
-bounded memory (slim `osm_id` / `osm_type` / `geometry` schema, continent- or
-planet-scale) and ships with `earthlens[osm]`; the opt-in **`pyrosm`** reads the
-whole extract into memory for the richest, exact per-layer columns and refuses a
-file over 4 GB. The first call pays the download; later calls reuse the cache.
+A `pbf:` query needs a **`region=`** — a region key such as `"malta"` (listed by
+`Catalog().region_ids()`) or a raw `"continent/region"` path such as
+`"europe/monaco"` — which selects the extract; the request bbox then clips the
+read (omit it to read the whole extract). Two read **engines** trade memory
+against richness: the default **`engine="pyosmium"`** streams with bounded memory
+(slim `osm_id` / `osm_type` / `geometry` schema, scales to a continent or the
+whole planet) and is installed with the backend; the opt-in
+**`engine="pyrosm"`** reads the whole extract into memory for the richest, exact
+per-layer columns and refuses a file over 4 GB. The first call pays the
+download; later calls reuse the cache.
 
 ## Why it matters here
 
@@ -118,73 +112,61 @@ rainfall, ERA5, GEE imagery) in two ways:
 
 For this backend `variables` is the list of **named-query ids**, not
 data-variable names (an intentional, documented overload — the `EarthLens`
-facade makes `variables` required on every call). Each id is
-`<protocol>:<name>`:
+facade makes `variables` required on every call). Each id is `<type>:<name>`:
 
-| Named query (`variables=[...]`) | Protocol | Returns |
+| Named query (`variables=[...]`) | Type | Returns |
 |---|---|---|
-| `overpass:hospitals` | Overpass | hospitals (points + footprints) |
-| `overpass:roads` | Overpass | road / path centrelines (lines) |
-| `overpass:buildings` | Overpass | building footprints (polygons) |
-| `overpass:cafes` | Overpass | cafes (points) |
-| `overpass:schools` | Overpass | schools (points + footprints) |
-| `ohsome:buildings` | ohsome | building footprints at a snapshot/range |
-| `ohsome:highways` | ohsome | road / path centrelines at a snapshot/range |
-| `ohsome:amenities` | ohsome | tagged amenities at a snapshot/range |
-| `pbf:buildings` | pbf | building footprints from a Geofabrik extract |
-| `pbf:roads` | pbf | drivable road network from a Geofabrik extract |
-| `pbf:pois` | pbf | points of interest from a Geofabrik extract |
-| `pbf:landuse` | pbf | land-use polygons from a Geofabrik extract |
-| `pbf:natural` | pbf | natural features from a Geofabrik extract |
-| `pbf:boundaries` | pbf | administrative boundaries from a Geofabrik extract |
+| `overpass:hospitals` | `overpass:` | hospitals (points + footprints) |
+| `overpass:roads` | `overpass:` | road / path centrelines (lines) |
+| `overpass:buildings` | `overpass:` | building footprints (polygons) |
+| `overpass:cafes` | `overpass:` | cafes (points) |
+| `overpass:schools` | `overpass:` | schools (points + footprints) |
+| `ohsome:buildings` | `ohsome:` | building footprints at a snapshot/range |
+| `ohsome:highways` | `ohsome:` | road / path centrelines at a snapshot/range |
+| `ohsome:amenities` | `ohsome:` | tagged amenities at a snapshot/range |
+| `pbf:buildings` | `pbf:` | building footprints from a regional extract |
+| `pbf:roads` | `pbf:` | drivable road network from a regional extract |
+| `pbf:pois` | `pbf:` | points of interest from a regional extract |
+| `pbf:landuse` | `pbf:` | land-use polygons from a regional extract |
+| `pbf:natural` | `pbf:` | natural features from a regional extract |
+| `pbf:boundaries` | `pbf:` | administrative boundaries from a regional extract |
 
-The `<protocol>:` prefix is what tells the backend which API to call. An unknown
-id raises with a did-you-mean hint
+The `<type>:` prefix is what tells the backend which download path to take. An
+unknown id raises with a did-you-mean hint
 (`Catalog().get("overpass:hospital")` → *Did you mean 'overpass:hospitals'?*).
 
-A `pbf:*` query also needs a **`region=`** — a Geofabrik region key
-(`"malta"`, `"netherlands"`, …, listed by `Catalog().region_ids()`) or a raw
-Geofabrik path (`"europe/andorra"`). It picks which `.osm.pbf` extract to
+A `pbf:*` query also needs a **`region=`** — a region key (`"malta"`,
+`"netherlands"`, …, listed by `Catalog().region_ids()`) or a raw
+`"continent/region"` path (`"europe/andorra"`). It picks which extract to
 download; the request bbox then clips the read.
 
-## Authentication
+## Access
 
-**None.** Overpass, ohsome, and Geofabrik are all fully public — no key, no
-token, no login, so there is no `authentication.md` page. The SDKs ship behind
-one `osm` extra and are imported lazily, so the package imports fine without it:
+**No credentials.** All three download types use public, keyless infrastructure —
+no key, token, or login, so there is no `authentication.md` page. Install the
+backend with:
 
-- `pip install earthlens[osm]` → `overpy` + `ohsome` (the live protocols) plus
-  `osmium` (the wheel-clean `pyosmium` streaming engine, the `pbf` default;
-  `pyosmium` is published on PyPI as `osmium`). This extra **is** part of `[all]`.
-  The richer in-memory `pyrosm` pbf engine is opt-in: `pip install pyrosm` builds
-  the sdist-only `cykhash` from source (needs a C compiler), so install it only
-  for `engine="pyrosm"`.
-
-!!! note "Overpass needs a real User-Agent"
-    The canonical `overpass-api.de` endpoint returns HTTP 406 to requests with
-    no / a default `User-Agent`. The backend therefore POSTs the Overpass QL
-    itself with a descriptive `User-Agent` (and parses the response with
-    `overpy`), rather than using `overpy`'s built-in HTTP. The endpoint, the
-    User-Agent, and the timeout are all constructor-overridable.
+- `pip install earthlens[osm]` — the two live types plus the default `pbf`
+  streaming engine. This extra **is** part of `[all]`.
+- `pip install pyrosm` — only if you want the opt-in `engine="pyrosm"` (it builds
+  a source dependency, so it needs a C compiler).
 
 ## What a query returns
 
 One `FeatureCollection` (CRS `EPSG:4326`):
 
-- **Overpass** — `osm_id`, `osm_type` (`node` / `way`), each element's OSM
-  `tags` as columns, and a `geometry`: a `Point` for a node, a `LineString`
-  for an open way, a `Polygon` for a closed way. Relations are skipped in the
-  MVP.
-- **ohsome** — the geometry plus ohsome's own columns, notably `@osmId` and
-  `@snapshotTimestamp` (the history timestamp) and `@other_tags`.
-- **pbf** — an `osm_id` / `osm_type` identity (pyrosm's native `id` column is
-  normalised to `osm_id` so it matches the other paths). The default `pyosmium`
-  engine returns the slimmer `osm_id` / `osm_type` / `geometry` schema; the
-  opt-in `pyrosm` engine adds the layer's key tags (e.g. `building`) and exact
-  per-layer columns (see the engine note in [Usage](usage.md)).
+- **`overpass:`** — `osm_id`, `osm_type` (`node` / `way`), each element's OSM
+  tags as columns, and a `geometry`: a `Point` for a node, a `LineString` for an
+  open way, a `Polygon` for a closed way. Relations are skipped in the MVP.
+- **`ohsome:`** — the geometry plus the history columns, notably `@osmId` and
+  `@snapshotTimestamp` (the snapshot instant) and `@other_tags`.
+- **`pbf:`** — an `osm_id` / `osm_type` identity (normalised so it matches the
+  other types). The default `engine="pyosmium"` returns the slim `osm_id` /
+  `osm_type` / `geometry` schema; the opt-in `engine="pyrosm"` adds the layer's
+  key tags (e.g. `building`) and exact per-layer columns.
 
 As a side effect, `download()` also writes the collection to one vector file in
-the output directory (GeoJSON by default, or GeoPackage).
+the output directory (GeoJSON by default, or GeoPackage via `file_format=`).
 
 ## Licensing — ODbL share-alike
 
@@ -195,43 +177,16 @@ database* you redistribute under ODbL. So **every** successful `download()`
 emits a `LicenseWarning` naming the obligation — it is not optional metadata.
 Honour it when you redistribute OSM-derived data.
 
-## Bulk PBF lives in earthlens by design
-
-The `pbf` reader wraps `pyrosm` / `pyosmium`. The pyramids porting policy would
-normally push a *generic format reader* to pyramids — but `pyrosm` and
-`pyosmium` are **OSM-domain SDKs**, not generic GIS libraries, so wrapping them
-is exactly the per-provider-SDK role `earthlens.osm` already plays for
-`overpy` / `ohsome`. By maintainer decision the whole OSM stack, PBF included,
-stays in earthlens; it is **not** ported to pyramids.
-
-The default `pyosmium` (streaming) engine reads with bounded memory and ships
-with `earthlens[osm]`, so it handles a **continent- or planet-scale** extract
-out of the box. The opt-in `pyrosm` (in-memory) engine reads a whole regional
-extract into memory for the richest, exact output; the backend warns before
-downloading a multi-GB extract and refuses to load a >4 GB file with `pyrosm`.
-Never load `planet.osm` with `pyrosm`.
-
-## Out of scope (follow-ons)
-
-- **ohsome aggregation endpoints** (counts / areas / lengths over time). The
-  MVP ships ohsome's `elements/geometry` *feature* path; the *aggregation* API
-  is a separate follow-on (and is **not** earthlens `aggregate=`).
-
 ## Cost
 
-**Free.** All three services are public infrastructure (Overpass mirrors; the
-ohsome API run by HeiGIT; Geofabrik's extract server). Query gently: keep
-Overpass / ohsome bboxes small and time ranges focused, and for `pbf` prefer
-the smallest regional extract that covers your area (a country, not a
+**Free.** All three download types use public, keyless infrastructure. Query
+gently: keep the live-query bboxes small and time ranges focused, and for `pbf`
+prefer the smallest regional extract that covers your area (a country, not a
 continent) and let the on-disk cache spare a re-download.
 
 ## References
 
 - OpenStreetMap: <https://www.openstreetmap.org/>
-- Overpass API: <https://wiki.openstreetmap.org/wiki/Overpass_API>
-- ohsome API: <https://docs.ohsome.org/ohsome-api/v1/>
-- Geofabrik extracts: <https://download.geofabrik.de/>
-- pyrosm: <https://pyrosm.readthedocs.io/> · pyosmium: <https://osmcode.org/pyosmium/>
 - ODbL: <https://opendatacommons.org/licenses/odbl/>
 - earthlens OSM usage: [Usage](usage.md)
 - earthlens OSM API: [Reference](osm.md)
