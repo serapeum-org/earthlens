@@ -148,6 +148,10 @@ class TestCatalog:
         with pytest.raises(ValueError, match="overpass:hospital"):
             catalog.get("overpass:hospital")
 
+    def test_contains_non_str_is_false(self, catalog):
+        """A non-string membership check returns False rather than erroring."""
+        assert 123 not in catalog
+
     def test_region_key_resolves(self, catalog):
         """A region key resolves to its Geofabrik path; a raw path passes through."""
         assert catalog.region_path("malta") == "europe/malta"
