@@ -36,7 +36,7 @@ from __future__ import annotations
 
 from difflib import get_close_matches
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, Literal
 
 from pydantic import ConfigDict, Field, ValidationError
 
@@ -278,11 +278,16 @@ class Catalog(AbstractCatalog[Dataset]):
             'europe/malta'
 
             ```
-        - The original prefixes still work as aliases:
+        - The original prefixes still work as aliases, through every accessor:
             ```python
             >>> from earthlens.osm import Catalog
-            >>> Catalog().get("overpass:hospitals").protocol
+            >>> cat = Catalog()
+            >>> cat.get("overpass:hospitals").protocol
             'live'
+            >>> "overpass:hospitals" in cat
+            True
+            >>> cat["overpass:hospitals"] is cat["live:hospitals"]
+            True
 
             ```
         - An unknown id raises with a did-you-mean hint:
@@ -340,9 +345,9 @@ class Catalog(AbstractCatalog[Dataset]):
     def get(self, query_id: str) -> Dataset:
         """Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.
 
-        Thin alias over `AbstractCatalog.get_dataset`. A back-compat-aliased
-        prefix (`overpass:` / `ohsome:` / `pbf:`) is mapped to its canonical
-        `live:` / `history:` / `bulk:` form before lookup.
+        Thin alias over `get_dataset`, which maps a back-compat-aliased prefix
+        (`overpass:` / `ohsome:` / `pbf:`) to its canonical `live:` / `history:`
+        / `bulk:` form before lookup.
 
         Args:
             query_id: A named-query id (`"live:hospitals"`,
@@ -354,7 +359,41 @@ class Catalog(AbstractCatalog[Dataset]):
         Raises:
             ValueError: If `query_id` is not a registered named query.
         """
-        return cast("Dataset", self.get_dataset(_canonical_query_id(query_id)))
+        return self.get_dataset(query_id)
+
+    def get_dataset(self, name: str) -> Dataset:
+        """Resolve `name` (canonical or back-compat alias) to its `Dataset`.
+
+        Canonicalizes an aliased prefix (`overpass:` / `ohsome:` / `pbf:`) before
+        the `datasets` lookup, so every accessor built on `get_dataset` — `get`
+        and `cat[...]` — accepts the old ids too, not only `get`. The
+        did-you-mean error echoes the id the caller actually typed (not the
+        rewritten canonical one) while still suggesting the closest canonical id.
+
+        Args:
+            name: A named-query id, canonical or aliased.
+
+        Returns:
+            Dataset: The matching query row.
+
+        Raises:
+            ValueError: If `name` resolves to no registered named query.
+        """
+        canonical = _canonical_query_id(name)
+        if canonical in self.datasets:
+            return self.datasets[canonical]
+        close = get_close_matches(canonical, self.datasets, n=1)
+        hint = f" Did you mean {close[0]!r}?" if close else ""
+        raise ValueError(
+            f"{name!r} is not in the {self._catalog_kind}. "
+            f"Known {self._entry_noun}: {sorted(self.datasets)}.{hint}"
+        )
+
+    def __contains__(self, name: object) -> bool:
+        """`name in cat` — True for a canonical id or a back-compat alias."""
+        if isinstance(name, str):
+            return _canonical_query_id(name) in self.datasets
+        return name in self.datasets
 
     def query_ids(self) -> list[str]:
         """Return the registered named-query ids, sorted.

@@ -137,6 +137,17 @@ class TestCatalog:
         """An aliased id resolves to the same row object as its canonical form."""
         assert catalog.get("overpass:hospitals") is catalog.get("live:hospitals")
 
+    def test_alias_works_through_dict_surface(self, catalog):
+        """An alias id resolves through `in` / `[]` / get_dataset, not just get()."""
+        assert "overpass:hospitals" in catalog
+        assert catalog["overpass:hospitals"] is catalog["live:hospitals"]
+        assert catalog.get_dataset("ohsome:buildings").protocol == "history"
+
+    def test_alias_did_you_mean_echoes_typed_id(self, catalog):
+        """A typo on an alias prefix echoes the id the user typed, not the canonical."""
+        with pytest.raises(ValueError, match="overpass:hospital"):
+            catalog.get("overpass:hospital")
+
     def test_region_key_resolves(self, catalog):
         """A region key resolves to its Geofabrik path; a raw path passes through."""
         assert catalog.region_path("malta") == "europe/malta"
