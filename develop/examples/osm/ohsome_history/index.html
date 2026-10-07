@@ -27,7 +27,7 @@
     
     
       
-        <title>OpenStreetMap history — building footprints over time (ohsome) - earthlens</title>
+        <title>OpenStreetMap history — building footprints over time (history) - earthlens</title>
       
     
     
@@ -87,13 +87,13 @@
     
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="earthlens">
-    <meta property="og:title" content="OpenStreetMap history — building footprints over time (ohsome)">
+    <meta property="og:title" content="OpenStreetMap history — building footprints over time (history)">
     <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
     <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/examples/osm/ohsome_history/">
     <meta property="og:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="OpenStreetMap history — building footprints over time (ohsome)">
+    <meta name="twitter:title" content="OpenStreetMap history — building footprints over time (history)">
     <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
     <meta name="twitter:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/announcement-card.png">
@@ -119,7 +119,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#openstreetmap-history-building-footprints-over-time-ohsome" class="md-skip">
+        <a href="#openstreetmap-history-building-footprints-over-time-history" class="md-skip">
           Skip to content
         </a>
       
@@ -158,7 +158,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              OpenStreetMap history — building footprints over time (ohsome)
+              OpenStreetMap history — building footprints over time (history)
             
           </span>
         </div>
@@ -16769,7 +16769,7 @@
   <span class="md-ellipsis">
     
   
-    OpenStreetMap quickstart — current-state features (Overpass)
+    OpenStreetMap quickstart — current-state features (live)
   
 
     
@@ -16806,7 +16806,7 @@
   <span class="md-ellipsis">
     
   
-    OpenStreetMap history — building footprints over time (ohsome)
+    OpenStreetMap history — building footprints over time (history)
   
 
     
@@ -16824,7 +16824,7 @@
   <span class="md-ellipsis">
     
   
-    OpenStreetMap history — building footprints over time (ohsome)
+    OpenStreetMap history — building footprints over time (history)
   
 
     
@@ -16900,10 +16900,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-other-ohsome-named-queries" class="md-nav__link">
+  <a href="#the-other-named-queries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The other ohsome named queries
+        The other named queries
       
     </span>
   </a>
@@ -16966,7 +16966,7 @@
   <span class="md-ellipsis">
     
   
-    OpenStreetMap in bulk — Geofabrik extracts (pbf)
+    OpenStreetMap in bulk — Geofabrik extracts (bulk)
   
 
     
@@ -23818,10 +23818,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-other-ohsome-named-queries" class="md-nav__link">
+  <a href="#the-other-named-queries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The other ohsome named queries
+        The other named queries
       
     </span>
   </a>
@@ -24621,11 +24621,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="openstreetmap-history-building-footprints-over-time-ohsome">OpenStreetMap history — building footprints over time (ohsome)<a class="anchor-link" href="#openstreetmap-history-building-footprints-over-time-ohsome">¶</a></h1><p>This notebook teaches the <strong>ohsome</strong> half of the <code>earthlens.osm</code> backend: OSM is
+<h1 id="openstreetmap-history-building-footprints-over-time-history">OpenStreetMap history — building footprints over time (history)<a class="anchor-link" href="#openstreetmap-history-building-footprints-over-time-history">¶</a></h1><p>This notebook teaches the <strong><code>history</code></strong> half of the <code>earthlens.osm</code> backend: OSM is
 <em>history-aware</em>, so you can ask what the map looked like at a point in time. We pull building
 footprints for two yearly snapshots of the same area and compare them.</p>
-<p>Like the Overpass path, ohsome returns a vector <code>FeatureCollection</code> (EPSG:4326) and emits the
-ODbL <code>LicenseWarning</code>. Unlike Overpass, an ohsome query <strong>needs a time</strong> (<code>start=</code> / <code>end=</code>).</p>
+<p>Like the <code>live</code> path, the <code>history</code> type returns a vector <code>FeatureCollection</code> (EPSG:4326) and emits the
+ODbL <code>LicenseWarning</code>. Unlike <code>live</code>, a <code>history</code> query <strong>needs a time</strong> (<code>start=</code> / <code>end=</code>).</p>
 </div>
 </div>
 </div>
@@ -24906,7 +24906,7 @@ plt.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="the-other-ohsome-named-queries">The other ohsome named queries<a class="anchor-link" href="#the-other-ohsome-named-queries">¶</a></h2><p>Beside <code>buildings</code>, the catalog ships <code>history:amenities</code> (POI points) and <code>history:highways</code> (road lines). Same call shape, at a single snapshot.</p>
+<h2 id="the-other-history-named-queries">The other <code>history</code> named queries<a class="anchor-link" href="#the-other-history-named-queries">¶</a></h2><p>Beside <code>buildings</code>, the catalog ships <code>history:amenities</code> (POI points) and <code>history:highways</code> (road lines). Same call shape, at a single snapshot.</p>
 </div>
 </div>
 </div>
@@ -24929,9 +24929,9 @@ plt.show()</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ohsome_other</span> <span class="o">=</span> <span class="p">{}</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">history_other</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'history:amenities'</span><span class="p">,</span> <span class="s1">'history:highways'</span><span class="p">]:</span>
-    <span class="n">ohsome_other</span><span class="p">[</span><span class="n">q</span><span class="p">]</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">history_other</span><span class="p">[</span><span class="n">q</span><span class="p">]</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
         <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">q</span><span class="p">],</span>
         <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
@@ -24940,11 +24940,11 @@ plt.show()</div>
         <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 
-<span class="p">{</span><span class="n">q</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="k">for</span> <span class="n">q</span><span class="p">,</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">ohsome_other</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="p">{</span><span class="n">q</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="k">for</span> <span class="n">q</span><span class="p">,</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">history_other</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">ohsome_other = {}
+<div class="clipboard-copy-txt" id="cell-6">history_other = {}
 for q in ['history:amenities', 'history:highways']:
-    ohsome_other[q] = EarthLens(
+    history_other[q] = EarthLens(
         data_source='osm',
         variables=[q],
         lat_lim=LAT_LIM,
@@ -24953,7 +24953,7 @@ for q in ['history:amenities', 'history:highways']:
         path=OUT_DIR,
     ).download()
 
-{q: len(fc) for q, fc in ohsome_other.items()}</div>
+{q: len(fc) for q, fc in history_other.items()}</div>
 </div>
 </div>
 </div>
@@ -25085,13 +25085,13 @@ len(parks)</div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="takeaway">Takeaway<a class="anchor-link" href="#takeaway">¶</a></h2><ul>
-<li>ohsome adds a <strong>time axis</strong> to OSM: pass <code>start=</code> (and optionally <code>end=</code>) to get the map as
+<li>the <code>history</code> type adds a <strong>time axis</strong> to OSM: pass <code>start=</code> (and optionally <code>end=</code>) to get the map as
 it was, or a range.</li>
 <li>The result carries <code>@osmId</code> / <code>@snapshotTimestamp</code> so you can track features across time.</li>
 <li>A raw <code>filter=</code> queries any tag combination; the <strong>ODbL</strong> obligation applies to ohsome data
 too.</li>
 </ul>
-<p>See <code>quickstart.ipynb</code> for the current-state Overpass protocol.</p>
+<p>See <code>quickstart.ipynb</code> for the current-state <code>live</code> type.</p>
 </div>
 </div>
 </div>
@@ -25138,7 +25138,7 @@ too.</li>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../quickstart/" class="md-footer__link md-footer__link--prev" aria-label="Previous: OpenStreetMap quickstart — current-state features (Overpass)">
+          <a href="../quickstart/" class="md-footer__link md-footer__link--prev" aria-label="Previous: OpenStreetMap quickstart — current-state features (live)">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -25148,20 +25148,20 @@ too.</li>
                 Previous
               </span>
               <div class="md-ellipsis">
-                OpenStreetMap quickstart — current-state features (Overpass)
+                OpenStreetMap quickstart — current-state features (live)
               </div>
             </div>
           </a>
         
         
           
-          <a href="../pbf_bulk_extracts/" class="md-footer__link md-footer__link--next" aria-label="Next: OpenStreetMap in bulk — Geofabrik extracts (pbf)">
+          <a href="../pbf_bulk_extracts/" class="md-footer__link md-footer__link--next" aria-label="Next: OpenStreetMap in bulk — Geofabrik extracts (bulk)">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                OpenStreetMap in bulk — Geofabrik extracts (pbf)
+                OpenStreetMap in bulk — Geofabrik extracts (bulk)
               </div>
             </div>
             <div class="md-footer__button md-icon">
