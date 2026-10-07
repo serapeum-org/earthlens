@@ -659,13 +659,15 @@ class EarthLens:
             parameters) via `argopy` as a `tabular` long-format
             `DataFrame`; region / `float:` / `profile:` selectors, open
             data (no auth); keys `"argo"` / `"argo-floats"` / `"argopy"`.
-        :class:`earthlens.osm.OSM`: OpenStreetMap features over two public,
-            keyless protocols — `overpy` (Overpass, current-state) +
-            `ohsome` (OSM history / analytics) — as a `vector`
-            FeatureCollection with an ODbL `LicenseWarning`; named-query
-            catalog (`live:hospitals`, `history:buildings`) + raw
-            `query=` / `filter=` override; keys `"osm"` /
-            `"openstreetmap"` / `"overpass"` / `"ohsome"`.
+        :class:`earthlens.osm.OSM`: OpenStreetMap features over three public,
+            keyless download types — `live` (current-state, via Overpass),
+            `history` (OSM history / analytics, via ohsome), and `bulk`
+            (regional `.osm.pbf` extracts) — as a `vector` FeatureCollection
+            with an ODbL `LicenseWarning`; named-query catalog
+            (`live:hospitals`, `history:buildings`, `bulk:buildings`) + raw
+            `query=` / `filter=` override; keys `"osm"` / `"openstreetmap"` /
+            `"live"` / `"history"` / `"bulk"` (with `"overpass"` / `"ohsome"`
+            as back-compat aliases).
 
     """
 
