@@ -482,7 +482,7 @@ class EarthLens:
             ['admin', 'admin-boundaries', 'airnow', 'alaska-satellite-facility',
              'amazon-s3', 'aqueduct', 'aqueduct-flood-risk', 'aqueduct-floods', 'argo',
              'argo-floats', 'argopy', 'asf', 'asf:insar', 'bathymetry', 'bdc',
-             'brazil-data-cube', 'caravan', 'caravan-grdc', 'catrare', 'cdse', 'chc',
+             'brazil-data-cube', 'bulk', 'caravan', 'caravan-grdc', 'catrare', 'cdse', 'chc',
              'chirps', 'climate-indices', 'climate-indices:teleconnections',
              'climate_indices', 'cmems', 'cmip6', 'cmip6:climate-projections', 'cop-dem',
              'copernicus-dem', 'dea', 'deafrica', 'dem', 'dem:elevation',
@@ -493,11 +493,12 @@ class EarthLens:
              'gebco', 'gee', 'geoboundaries', 'gfw', 'ghs', 'ghsl', 'ghsl:human-settlement',
              'glaciers', 'glims', 'global-forest-watch', 'global-solar-atlas',
              'global-wind-atlas', 'gloh2o', 'goes', 'google-earth-engine', 'grdc-caravan',
-             'gsa', 'gwa', 'hanze', 'hdx', 'himawari', 'inform', 'ioos', 'isimip', 'isric',
+             'gsa', 'gwa', 'hanze', 'hdx', 'himawari', 'history', 'inform', 'ioos', 'isimip',
+             'isric',
              'iucn', 'jaxa', 'jaxa-earth', 'jrc', 'jrc-flood', 'jrc-flood-hazard',
              'jrc-sea-level',
              'jrc:coastal-forecast', 'jrc:european-flood-hazard', 'jrc:sea-level-forecast',
-             'jrc:twl-forecast', 'landsat', 'mswep', 'mswx', 'national-water-model',
+             'jrc:twl-forecast', 'landsat', 'live', 'mswep', 'mswx', 'national-water-model',
              'natural-earth', 'nexrad', 'nfhl', 'nfip', 'nrel', 'nsi', 'nsrdb', 'nwis',
              'nwm', 'nwp', 'obis', 'ohsome', 'openaq', 'openeo', 'openstreetmap', 'osm',
              'overpass', 'overture', 'pangeo-cmip6', 'planetary-computer',
@@ -658,13 +659,15 @@ class EarthLens:
             parameters) via `argopy` as a `tabular` long-format
             `DataFrame`; region / `float:` / `profile:` selectors, open
             data (no auth); keys `"argo"` / `"argo-floats"` / `"argopy"`.
-        :class:`earthlens.osm.OSM`: OpenStreetMap features over two public,
-            keyless protocols — `overpy` (Overpass, current-state) +
-            `ohsome` (OSM history / analytics) — as a `vector`
-            FeatureCollection with an ODbL `LicenseWarning`; named-query
-            catalog (`overpass:hospitals`, `ohsome:buildings`) + raw
-            `query=` / `filter=` override; keys `"osm"` /
-            `"openstreetmap"` / `"overpass"` / `"ohsome"`.
+        :class:`earthlens.osm.OSM`: OpenStreetMap features over three public,
+            keyless download types — `live` (current-state, via Overpass),
+            `history` (OSM history / analytics, via ohsome), and `bulk`
+            (regional `.osm.pbf` extracts) — as a `vector` FeatureCollection
+            with an ODbL `LicenseWarning`; named-query catalog
+            (`live:hospitals`, `history:buildings`, `bulk:buildings`) + raw
+            `query=` / `filter=` override; keys `"osm"` / `"openstreetmap"` /
+            `"live"` / `"history"` / `"bulk"` (with `"overpass"` / `"ohsome"`
+            as back-compat aliases).
 
     """
 

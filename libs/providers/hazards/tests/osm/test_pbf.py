@@ -220,7 +220,7 @@ class TestReadPyrosm:
     """The in-memory `pyrosm` engine path."""
 
     def test_get_buildings_dispatch(self, tmp_path, fake_pyrosm):
-        """`pbf:buildings` maps to `get_buildings`, wraps + normalises `id`."""
+        """`bulk:buildings` maps to `get_buildings`, wraps + normalises `id`."""
         fake_pyrosm.frame = _buildings_frame()
         pbf = tmp_path / "x.osm.pbf"
         pbf.write_bytes(b"x")

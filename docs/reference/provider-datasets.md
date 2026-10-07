@@ -85,7 +85,7 @@ or station — not a dataset id), noted as such.
 | `gdacs` | Live GDACS disaster alerts by hazard type | `EQ`, `TC`, `FL`, `WF` | 6 hazard types *(query service)* |
 | `fdsn` | Earthquake events across FDSN networks (USGS / EMSC / INGV / …) | `USGS`, `EMSC`, `INGV`, `EARTHSCOPE` | 6 networks *(query service)* |
 | `firms` | NASA FIRMS active-fire detections by sensor | `VIIRS_SNPP_NRT`, `MODIS_SP`, `VIIRS_NOAA20_NRT`, `LANDSAT_NRT` | 9 sensors *(query service)* |
-| `osm` | OpenStreetMap features — Overpass (current-state), ohsome (history), PBF extracts | `overpass:hospitals`, `ohsome:buildings`, `pbf:roads` | 14 queries + 9 regions |
+| `osm` | OpenStreetMap features — live (current-state), history (over time), bulk (regional extracts); old `overpass:`/`ohsome:`/`pbf:` prefixes still resolve | `live:hospitals`, `history:buildings`, `bulk:roads` | 14 queries + 9 regions |
 | `overture` | Overture Maps themes | `buildings`, `places`, `transportation`, `divisions` | 6 themes / 15 types |
 | `admin` | Administrative boundaries — geoBoundaries, CGAZ, Natural Earth, TIGER | `geoboundaries:adm1`, `cgaz:adm0`, `natural_earth:countries`, `tiger:county` | 15 |
 | `hdx` | HDX / CKAN humanitarian data — population, boundaries, HOTOSM, WFP, UNHCR, ACLED, + any CKAN id | `kontur-population`, `wfp-food-prices`, `acled-political-violence` | 49 curated / 41,289 addressable |

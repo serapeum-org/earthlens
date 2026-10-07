@@ -1,30 +1,33 @@
 """Named-query dispatch table for the OpenStreetMap backend.
 
-`earthlens.osm` queries OSM live by tag filter over two protocols, so this
+`earthlens.osm` queries OSM live by tag filter over three download types, so this
 "catalog" is not a large remote dataset index but a small curated map of
-**named queries** — one row per `<protocol>:<name>` id passed in
-`variables=[...]` (`overpass:hospitals`, `ohsome:buildings`, …). It mirrors
+**named queries** — one row per `<type>:<name>` id passed in
+`variables=[...]` (`live:hospitals`, `history:buildings`, …). It mirrors
 `gdacs_data_catalog.yaml` / `overture_data_catalog.yaml`: one curated block,
 no `available_*` index (the named queries *are* the curated universe), and no
 refresh / probe / audit tooling.
 
-Three protocols share the one table (`G2`, `G10`):
+Three download types share the one table (`G2`, `G10`):
 
-* `overpass` rows carry a `query_template` — an Overpass QL string with a
-  single `{bbox}` placeholder (filled with the bounding box in Overpass order
+* `live` rows carry a `query_template` — an Overpass QL string with a single
+  `{bbox}` placeholder (filled with the bounding box in Overpass order
   `S,W,N,E`) and a `{timeout}` placeholder (the server-side QL timeout).
-* `ohsome` rows carry an `ohsome_filter` — an ohsome filter string; the
-  backend supplies `bboxes` (order `W,S,E,N`) and a `time` window itself.
-* `pbf` rows carry a `pyrosm_method` — the `pyrosm.OSM` reader method the
-  layer maps to (`get_buildings`, `get_network`, …) — and, for `get_network`,
-  an optional `network_type`. The extract itself is picked by the backend's
-  `region=` kwarg against the `regions:` block (`G12`), which this loader
-  exposes as `Catalog.regions` (key → Geofabrik path).
+* `history` rows carry an `ohsome_filter` — an ohsome filter string; the backend
+  supplies `bboxes` (order `W,S,E,N`) and a `time` window itself.
+* `bulk` rows carry a `pyrosm_method` — the `pyrosm.OSM` reader method the layer
+  maps to (`get_buildings`, `get_network`, …) — and, for `get_network`, an
+  optional `network_type`. The extract itself is picked by the backend's
+  `region=` kwarg against the `regions:` block (`G12`), which this loader exposes
+  as `Catalog.regions` (key → Geofabrik path).
+
+The `overpass` / `ohsome` / `pbf` prefixes are accepted as back-compat aliases of
+`live` / `history` / `bulk`.
 
 `Catalog` is a thin `earthlens.base.AbstractCatalog` subclass that loads the
 bundled `osm_data_catalog.yaml` and exposes each row as a `Dataset`, keyed by
 query id under the inherited `datasets` field — which gives it the
-`cat["overpass:hospitals"]` / `"ohsome:buildings" in cat` / `len(cat)`
+`cat["live:hospitals"]` / `"history:buildings" in cat` / `len(cat)`
 dict-like surface and the did-you-mean error for free. `CATALOG_PATH` is the
 path to the bundled YAML and is monkey-patchable in tests.
 """
@@ -33,7 +36,7 @@ from __future__ import annotations
 
 from difflib import get_close_matches
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, Literal
 
 from pydantic import ConfigDict, Field, ValidationError
 
@@ -43,10 +46,38 @@ from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "osm_data_catalog.yaml"
 
-#: The three query protocols a `Dataset` row can route to.
-Protocol = Literal["overpass", "ohsome", "pbf"]
+#: The three download types a `Dataset` row can route to.
+Protocol = Literal["live", "history", "bulk"]
 
-#: The `pyrosm.OSM` reader methods a `pbf` row's `pyrosm_method` may name.
+#: Back-compat aliases accepted in a query id's `<prefix>:` position, so the
+#: original names keep working: `overpass:hospitals` / `ohsome:buildings` /
+#: `pbf:roads` map to the canonical `live:` / `history:` / `bulk:` prefixes.
+#: `query_ids()` lists only the canonical names.
+_PREFIX_ALIASES: dict[str, str] = {
+    "overpass": "live",
+    "ohsome": "history",
+    "pbf": "bulk",
+}
+
+
+def _canonical_query_id(query_id: str) -> str:
+    """Map a back-compat-aliased `<prefix>:name` id to its canonical form.
+
+    Args:
+        query_id: A named-query id whose prefix may be an alias (`overpass:` /
+            `ohsome:` / `pbf:`) or already canonical.
+
+    Returns:
+        str: The id with the prefix rewritten to `live` / `history` / `bulk`;
+            unchanged when the prefix is already canonical or unknown.
+    """
+    prefix, sep, name = query_id.partition(":")
+    if sep and prefix in _PREFIX_ALIASES:
+        return f"{_PREFIX_ALIASES[prefix]}{sep}{name}"
+    return query_id
+
+
+#: The `pyrosm.OSM` reader methods a `bulk` row's `pyrosm_method` may name.
 #: Validated at load so a typo in the catalog fails fast rather than at read.
 _PYROSM_METHODS: frozenset[str] = frozenset(
     {
@@ -74,28 +105,28 @@ def clear_catalog_cache() -> None:
 class Dataset(SummarisedLeaf):
     """One OSM named query's dispatch row.
 
-    The `<protocol>:<name>` query id is the parent key in
+    The `<type>:<name>` query id is the parent key in
     `Catalog.datasets` and is not stored on the row.
 
     Attributes:
-        protocol: Which query protocol routes this row — `"overpass"`
-            (current-state features via Overpass QL), `"ohsome"` (OSM
+        protocol: Which download type routes this row — `"live"`
+            (current-state features via the Overpass API), `"history"` (OSM
             history + analytics via the ohsome `elements/geometry`
-            endpoint), or `"pbf"` (bulk read from a Geofabrik `.osm.pbf`
+            endpoint), or `"bulk"` (bulk read from a Geofabrik `.osm.pbf`
             extract via `pyrosm`).
         query_template: Overpass QL string with a `{bbox}` placeholder (and
-            an optional `{timeout}` placeholder). Required for `overpass`
-            rows, must be absent for `ohsome` / `pbf` rows.
+            an optional `{timeout}` placeholder). Required for `live`
+            rows, must be absent for `history` / `bulk` rows.
         ohsome_filter: ohsome filter string (e.g. `"building=* and
-            geometry:polygon"`). Required for `ohsome` rows, must be absent
-            for `overpass` / `pbf` rows.
+            geometry:polygon"`). Required for `history` rows, must be absent
+            for `live` / `bulk` rows.
         pyrosm_method: The `pyrosm.OSM` reader method this layer maps to —
             one of `get_buildings`, `get_network`, `get_pois`,
             `get_landuse`, `get_natural`, `get_boundaries`. Required for
-            `pbf` rows, must be absent for `overpass` / `ohsome` rows.
+            `bulk` rows, must be absent for `live` / `history` rows.
         network_type: The `pyrosm` `get_network(network_type=...)` argument
             (e.g. `"driving"`, `"walking"`, `"all"`); only meaningful on a
-            `pbf` row whose `pyrosm_method` is `get_network`, ignored
+            `bulk` row whose `pyrosm_method` is `get_network`, ignored
             otherwise.
         geometry_types: The geometry kinds the query is expected to yield
             (`["Point"]`, `["Polygon"]`, `["Point", "Polygon"]`, …) —
@@ -103,22 +134,22 @@ class Dataset(SummarisedLeaf):
         description: Short human-readable note on what the query returns.
 
     Examples:
-        - Build an Overpass row directly:
+        - Build a live (Overpass) row directly:
             ```python
             >>> from earthlens.osm import Dataset
             >>> row = Dataset(
-            ...     protocol="overpass",
+            ...     protocol="live",
             ...     query_template="[out:json];(node({bbox}););out geom;",
             ... )
             >>> row.protocol
-            'overpass'
+            'live'
 
             ```
-        - A row must carry the field its protocol needs:
+        - A row must carry the field its download type needs:
             ```python
             >>> from earthlens.osm import Dataset
             >>> try:
-            ...     Dataset(protocol="overpass")
+            ...     Dataset(protocol="live")
             ... except Exception as exc:  # pydantic ValidationError
             ...     print(type(exc).__name__)
             ValidationError
@@ -142,41 +173,40 @@ class Dataset(SummarisedLeaf):
     description: str = ""
 
     def model_post_init(self, __context: Any) -> None:
-        """Validate the protocol carries (only) its required query field.
+        """Validate the download type carries (only) its required query field.
 
         Raises:
-            ValueError: If an `overpass` row has no `query_template`, an
-                `ohsome` row has no `ohsome_filter`, or a `pbf` row has no
+            ValueError: If a `live` row has no `query_template`, a
+                `history` row has no `ohsome_filter`, or a `bulk` row has no
                 (or an unknown) `pyrosm_method` — or a row carries a field
-                belonging to a different protocol.
+                belonging to a different download type.
         """
-        if self.protocol == "overpass":
+        if self.protocol == "live":
             if not self.query_template:
-                raise ValueError("an 'overpass' row requires a 'query_template'")
+                raise ValueError("a 'live' row requires a 'query_template'")
             if self.ohsome_filter is not None or self.pyrosm_method is not None:
                 raise ValueError(
-                    "an 'overpass' row must not carry an 'ohsome_filter' or "
-                    "'pyrosm_method'"
+                    "a 'live' row must not carry an 'ohsome_filter' or 'pyrosm_method'"
                 )
-        elif self.protocol == "ohsome":
+        elif self.protocol == "history":
             if not self.ohsome_filter:
-                raise ValueError("an 'ohsome' row requires an 'ohsome_filter'")
+                raise ValueError("a 'history' row requires an 'ohsome_filter'")
             if self.query_template is not None or self.pyrosm_method is not None:
                 raise ValueError(
-                    "an 'ohsome' row must not carry a 'query_template' or "
+                    "a 'history' row must not carry a 'query_template' or "
                     "'pyrosm_method'"
                 )
-        else:  # pbf
+        else:  # bulk
             if not self.pyrosm_method:
-                raise ValueError("a 'pbf' row requires a 'pyrosm_method'")
+                raise ValueError("a 'bulk' row requires a 'pyrosm_method'")
             if self.pyrosm_method not in _PYROSM_METHODS:
                 raise ValueError(
-                    f"a 'pbf' row's 'pyrosm_method' must be one of "
+                    f"a 'bulk' row's 'pyrosm_method' must be one of "
                     f"{sorted(_PYROSM_METHODS)}, got {self.pyrosm_method!r}"
                 )
             if self.query_template is not None or self.ohsome_filter is not None:
                 raise ValueError(
-                    "a 'pbf' row must not carry a 'query_template' or 'ohsome_filter'"
+                    "a 'bulk' row must not carry a 'query_template' or 'ohsome_filter'"
                 )
 
 
@@ -220,7 +250,7 @@ class Catalog(AbstractCatalog[Dataset]):
 
     Reads the bundled `osm_data_catalog.yaml` (shipped as package data) and
     exposes its `datasets:` block as a map of `Dataset` rows, keyed by
-    `<protocol>:<name>` query id under the inherited `datasets` field.
+    `<type>:<name>` query id under the inherited `datasets` field.
     Instantiate with no arguments (`Catalog()`); `model_post_init` loads and
     validates the YAML in one pass. Resolve a query with `get` (a thin alias
     over `AbstractCatalog.get_dataset`).
@@ -229,32 +259,44 @@ class Catalog(AbstractCatalog[Dataset]):
         datasets: Map from the query id to its `Dataset` row.
         regions: Map from a Geofabrik region key (`"malta"`, …) to its
             Geofabrik path segment (`"europe/malta"`), read from the YAML's
-            `regions:` block. Used by the `pbf` protocol (`G12`).
+            `regions:` block. Used by the `bulk` download type (`G12`).
 
     Examples:
         - List query ids and resolve one:
             ```python
             >>> from earthlens.osm import Catalog
             >>> cat = Catalog()
-            >>> "overpass:hospitals" in cat
+            >>> "live:hospitals" in cat
             True
-            >>> cat.get("overpass:hospitals").protocol
-            'overpass'
-            >>> cat.get("ohsome:buildings").ohsome_filter
+            >>> cat.get("live:hospitals").protocol
+            'live'
+            >>> cat.get("history:buildings").ohsome_filter
             'building=* and geometry:polygon'
-            >>> cat.get("pbf:buildings").pyrosm_method
+            >>> cat.get("bulk:buildings").pyrosm_method
             'get_buildings'
             >>> cat.region_path("malta")
             'europe/malta'
 
             ```
+        - The original prefixes still work as aliases, through every accessor:
+            ```python
+            >>> from earthlens.osm import Catalog
+            >>> cat = Catalog()
+            >>> cat.get("overpass:hospitals").protocol
+            'live'
+            >>> "overpass:hospitals" in cat
+            True
+            >>> cat["overpass:hospitals"] is cat["live:hospitals"]
+            True
+
+            ```
         - An unknown id raises with a did-you-mean hint:
             ```python
             >>> from earthlens.osm import Catalog
-            >>> Catalog().get("overpass:hospital")
+            >>> Catalog().get("live:hospital")
             Traceback (most recent call last):
                 ...
-            ValueError: 'overpass:hospital' is not in the OSM query catalog. Known queries: [...]. Did you mean 'overpass:hospitals'?
+            ValueError: 'live:hospital' is not in the OSM query catalog. Known queries: [...]. Did you mean 'live:hospitals'?
 
             ```
     """
@@ -303,11 +345,13 @@ class Catalog(AbstractCatalog[Dataset]):
     def get(self, query_id: str) -> Dataset:
         """Return the `Dataset` for `query_id`, with a did-you-mean hint on miss.
 
-        Thin alias over `AbstractCatalog.get_dataset`.
+        Thin alias over `get_dataset`, which maps a back-compat-aliased prefix
+        (`overpass:` / `ohsome:` / `pbf:`) to its canonical `live:` / `history:`
+        / `bulk:` form before lookup.
 
         Args:
-            query_id: A named-query id (`"overpass:hospitals"`,
-                `"ohsome:buildings"`, …).
+            query_id: A named-query id (`"live:hospitals"`,
+                `"history:buildings"`, …), or an alias form (`"overpass:hospitals"`).
 
         Returns:
             Dataset: The matching query row.
@@ -315,19 +359,53 @@ class Catalog(AbstractCatalog[Dataset]):
         Raises:
             ValueError: If `query_id` is not a registered named query.
         """
-        return cast("Dataset", self.get_dataset(query_id))
+        return self.get_dataset(query_id)
+
+    def get_dataset(self, name: str) -> Dataset:
+        """Resolve `name` (canonical or back-compat alias) to its `Dataset`.
+
+        Canonicalizes an aliased prefix (`overpass:` / `ohsome:` / `pbf:`) before
+        the `datasets` lookup, so every accessor built on `get_dataset` — `get`
+        and `cat[...]` — accepts the old ids too, not only `get`. The
+        did-you-mean error echoes the id the caller actually typed (not the
+        rewritten canonical one) while still suggesting the closest canonical id.
+
+        Args:
+            name: A named-query id, canonical or aliased.
+
+        Returns:
+            Dataset: The matching query row.
+
+        Raises:
+            ValueError: If `name` resolves to no registered named query.
+        """
+        canonical = _canonical_query_id(name)
+        if canonical in self.datasets:
+            return self.datasets[canonical]
+        close = get_close_matches(canonical, self.datasets, n=1)
+        hint = f" Did you mean {close[0]!r}?" if close else ""
+        raise ValueError(
+            f"{name!r} is not in the {self._catalog_kind}. "
+            f"Known {self._entry_noun}: {sorted(self.datasets)}.{hint}"
+        )
+
+    def __contains__(self, name: object) -> bool:
+        """`name in cat` — True for a canonical id or a back-compat alias."""
+        if isinstance(name, str):
+            return _canonical_query_id(name) in self.datasets
+        return name in self.datasets
 
     def query_ids(self) -> list[str]:
         """Return the registered named-query ids, sorted.
 
         Returns:
-            list[str]: The query ids (`["ohsome:amenities", ...]`).
+            list[str]: The query ids (`["bulk:boundaries", ...]`).
 
         Examples:
             - List the curated named queries:
                 ```python
                 >>> from earthlens.osm import Catalog
-                >>> "overpass:roads" in Catalog().query_ids()
+                >>> "live:roads" in Catalog().query_ids()
                 True
 
                 ```

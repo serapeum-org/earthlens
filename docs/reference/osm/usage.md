@@ -6,29 +6,28 @@ rendered API is the [Reference](osm.md) page.
 
 ## Install
 
-The protocol SDKs ship behind one `osm` extra (imported lazily — the base package
+The backend is installed with one extra (imported lazily — the base package
 imports without it):
 
 ```bash
-pip install earthlens[osm]      # overpy + ohsome + osmium  (all three protocols)
-pip install pyrosm              # opt-in: the richer in-memory pbf engine
+pip install earthlens[osm]      # all three download types
+pip install pyrosm              # opt-in: the richer in-memory read engine
 ```
 
-`[osm]` **is** in `[all]`: it covers all three protocols — `overpy` + `ohsome` for
-the live queries and the wheel-clean `osmium` (pyosmium, published on PyPI as
-`osmium`) for the `pbf` default engine. The richer in-memory `pyrosm` pbf engine is
-**opt-in** — `pip install pyrosm` builds the sdist-only `cykhash` from source
-(needs a C compiler) — so install it only when you want `engine="pyrosm"`. There
-are no credentials to configure — Overpass, ohsome, and Geofabrik are all public.
+`[osm]` **is** part of `[all]` and covers all three download types — the two
+live types plus the default streaming read engine. The richer in-memory read
+engine is **opt-in**: `pip install pyrosm` builds a source dependency (needs a C
+compiler), so install it only when you want `engine="pyrosm"`. There are no
+credentials to configure — every download type is public and keyless.
 
-## Quickstart — current-state hospitals (Overpass)
+## Quickstart — current-state hospitals (live)
 
 ```python
 from earthlens.core import EarthLens
 
 hospitals = EarthLens(
     data_source="osm",
-    variables=["overpass:hospitals"],   # a named query — see below
+    variables=["live:hospitals"],   # a named query — see below
     lat_lim=[49.40, 49.42],             # a small bbox (degrees)
     lon_lim=[8.67, 8.71],
     path="./out",
@@ -38,38 +37,37 @@ print(len(hospitals), "features")
 print(hospitals[["osm_id", "osm_type", "geometry"]].head())
 ```
 
-`download()` returns a pyramids `FeatureCollection` (a `geopandas.GeoDataFrame`
-subclass), so every pandas / geopandas method works on it directly. It also
-writes `out/osm_overpass-hospitals.geojson`. Keep the bbox small — Overpass is
-shared community infrastructure.
+`download()` returns a `FeatureCollection` (a `geopandas.GeoDataFrame` subclass),
+so every pandas / geopandas method works on it directly. It also writes
+`out/osm_live-hospitals.geojson`. Keep the bbox small — the live types run
+against shared public infrastructure.
 
-## Quickstart — building history at a snapshot (ohsome)
+## Quickstart — building history at a snapshot (history)
 
 ```python
 buildings = EarthLens(
     data_source="osm",
-    variables=["ohsome:buildings"],
+    variables=["history:buildings"],
     lat_lim=[49.40, 49.42],
     lon_lim=[8.67, 8.71],
-    start="2020-01-01",                 # ohsome needs a time (see below)
+    start="2020-01-01",                 # history needs a time (see below)
     path="./out",
 ).download()
 
 print(buildings["@snapshotTimestamp"].iloc[0])   # the history timestamp
 ```
 
-## Quickstart — every building in a region (pbf)
+## Quickstart — every building in a region (bulk)
 
-For a **bulk** ask — every building in a country — use the `pbf` protocol. It
-downloads a [Geofabrik](https://download.geofabrik.de/) extract for `region=`
-(cached on disk), reads the layer with the default streaming `pyosmium` engine,
-and clips to the request bbox:
+For a **bulk** ask — every building in a country — use the `bulk` type. It
+downloads a regional extract for `region=` (cached on disk), reads the layer with
+the default streaming engine, and clips to the request bbox:
 
 ```python
 buildings = EarthLens(
     data_source="osm",
-    variables=["pbf:buildings"],
-    region="malta",                     # a Geofabrik region key (or "europe/andorra")
+    variables=["bulk:buildings"],
+    region="malta",                     # a region key (or a raw "europe/andorra" path)
     lat_lim=[35.88, 35.94],             # bbox clips the read; omit for the whole extract
     lon_lim=[14.48, 14.54],
     path="./out",
@@ -82,65 +80,70 @@ The first call downloads the extract (Malta is ~8.8 MB) to a cross-run cache
 (`osm_pbf/` under the shared earthlens cache directory by default — see
 [Configuration](../configuration.md) — override with `cache_dir=`); repeat
 calls reuse it. List the region keys with `Catalog().region_ids()`, or pass a
-raw Geofabrik path (any string with a `/`). Omit `lat_lim` / `lon_lim` to read
-the whole extract — the bbox-area cap does **not** apply to a `pbf` read.
+raw `"continent/region"` path (any string with a `/`). Omit `lat_lim` /
+`lon_lim` to read the whole extract — the bbox-area cap does **not** apply to a
+`bulk` read.
 
-!!! note "Engines — `pyosmium` (default) vs `pyrosm`"
+!!! note "Engines — `engine="pyosmium"` (default) vs `engine="pyrosm"`"
     `engine="pyosmium"` (the default) streams the extract with bounded memory and
-    ships with `earthlens[osm]`, so it works out of the box and handles
+    is installed with the backend, so it works out of the box and handles
     **continent- or planet-scale** extracts. It is the **coarser** reader: it
     returns a slimmer `osm_id` / `osm_type` / `geometry` schema and, per layer, a
     single geometry kind under one representative tag (so it under-reports a row's
-    advertised `geometry_types` — e.g. `pbf:pois` yields only node points,
-    `pbf:roads` approximates `network_type="driving"` rather than reproducing
-    `pyrosm`'s exact filter).
+    advertised `geometry_types` — e.g. `bulk:pois` yields only node points, and
+    `bulk:roads` approximates `network_type="driving"` rather than reproducing the
+    exact drivable filter).
 
     `engine="pyrosm"` reads the whole extract in memory and gives the richest,
     exact per-layer columns and mixed geometry; it refuses a file over 4 GB, so
-    never load `planet.osm` with it. It is **opt-in** (`pip install pyrosm` — see
-    above); selecting it without pyrosm installed raises a clear `ImportError`
-    naming the command. The backend warns before downloading a multi-GB extract.
+    never load a planet-wide extract with it. It is **opt-in**
+    (`pip install pyrosm` — see above); selecting it without the engine installed
+    raises a clear `ImportError` naming the command. The backend warns before
+    downloading a multi-GB extract.
 
 ## Choosing the query — `variables`
 
 For this backend `variables` is the list of **named-query ids**, not
-data-variable names. The `<protocol>:` prefix routes the request:
+data-variable names. The `<type>:` prefix routes the request:
 
 ```python
 # one named query
-EarthLens(data_source="osm", variables=["overpass:roads"], ...)
+EarthLens(data_source="osm", variables=["live:roads"], ...)
 
 # several at once — combined into one FeatureCollection
-EarthLens(data_source="osm", variables=["overpass:hospitals", "overpass:cafes"], ...)
+EarthLens(data_source="osm", variables=["live:hospitals", "live:cafes"], ...)
 ```
 
-The shipped named queries are `overpass:hospitals`, `overpass:roads`,
-`overpass:buildings`, `overpass:cafes`, `overpass:schools`, `ohsome:buildings`,
-`ohsome:highways`, `ohsome:amenities`, and the `pbf:*` layers (`pbf:buildings`,
-`pbf:roads`, `pbf:pois`, `pbf:landuse`, `pbf:natural`, `pbf:boundaries`). List
+The shipped named queries are `live:hospitals`, `live:roads`,
+`live:buildings`, `live:cafes`, `live:schools`, `history:buildings`,
+`history:highways`, `history:amenities`, and the `bulk:*` layers (`bulk:buildings`,
+`bulk:roads`, `bulk:pois`, `bulk:landuse`, `bulk:natural`, `bulk:boundaries`). List
 them with `EarthLens.list_datasets("osm")`. An unknown id raises with a
 did-you-mean hint.
 
-The facade keys `"osm"`, `"openstreetmap"`, `"overpass"`, and `"ohsome"` all
-resolve to the same backend.
+The facade keys `"osm"`, `"openstreetmap"`, `"live"`, `"history"`, `"bulk"`, and
+the back-compat aliases `"overpass"` / `"ohsome"` all resolve to the same
+backend. The `overpass:` / `ohsome:` / `pbf:` prefixes are likewise accepted as
+aliases of `live:` / `history:` / `bulk:` in `variables` (so `overpass:hospitals`
+== `live:hospitals`). `list_datasets` lists the canonical names.
 
 ## The bbox and the time window
 
 - **bbox** — `lat_lim` / `lon_lim` (degrees). The backend hands the box to each
-  protocol in the order it expects (Overpass `S,W,N,E`; ohsome `W,S,E,N`); you
+  type in the order it expects (Overpass `S,W,N,E`; ohsome `W,S,E,N`); you
   always pass plain `lat_lim` / `lon_lim`. You can also use the ergonomic
   `aoi=` channel (a bbox, a point + `buffer`, or a geometry).
-- **time** — Overpass returns **current state** and ignores `start` / `end`.
-  ohsome is **history-aware** and *requires* a time: pass `start=` for a single
-  snapshot, or `start=` + `end=` for a range (the backend builds the ohsome
-  `time` as `"start/end"`). An ohsome query with no `start` raises a helpful
-  `ValueError`.
+- **time** — the `live:` type returns **current state** and ignores `start` /
+  `end`. The `history:` type is **history-aware** and *requires* a time: pass
+  `start=` for a single snapshot, or `start=` + `end=` for a range (the backend
+  builds the ohsome `time` as `"start/end"`). A `history:` query with no `start`
+  raises a helpful `ValueError`.
 
 ```python
-# ohsome over a multi-year range
+# history over a multi-year range
 EarthLens(
     data_source="osm",
-    variables=["ohsome:highways"],
+    variables=["history:highways"],
     lat_lim=[49.40, 49.42], lon_lim=[8.67, 8.71],
     start="2016-01-01", end="2022-01-01",
     path="./out",
@@ -155,7 +158,7 @@ When the named queries aren't enough, pass your own:
 # raw Overpass QL — {bbox} is filled with the request bbox (S,W,N,E)
 EarthLens(
     data_source="osm",
-    variables=["overpass:hospitals"],            # still needed to route
+    variables=["live:hospitals"],            # still needed to route
     lat_lim=[49.40, 49.42], lon_lim=[8.67, 8.71],
     query='[out:json][timeout:180];(node["tourism"="museum"]({bbox}););out geom;',
     path="./out",
@@ -164,7 +167,7 @@ EarthLens(
 # raw ohsome filter
 EarthLens(
     data_source="osm",
-    variables=["ohsome:buildings"],
+    variables=["history:buildings"],
     lat_lim=[49.40, 49.42], lon_lim=[8.67, 8.71],
     start="2020-01-01",
     filter="leisure=park and geometry:polygon",
@@ -174,38 +177,39 @@ EarthLens(
 
 A raw `query=` with no `{bbox}` placeholder is sent verbatim (you supply the
 bbox in the QL yourself). A raw Overpass `query=` **must request JSON output**
-(`[out:json]`) — the response is parsed with `overpy.Overpass().parse_json`, so
-an `[out:xml]` / `[out:csv]` override will not parse.
+(`[out:json]`) — the response is parsed as JSON, so an `[out:xml]` / `[out:csv]`
+override will not parse.
 
 ## Other knobs
 
 | Keyword | Meaning | Default |
 |---|---|---|
-| `endpoint` | Overpass API endpoint URL | `https://overpass-api.de/api/interpreter` |
-| `user_agent` | `User-Agent` sent on the Overpass POST (a real one is required) | `earthlens (+…)` |
-| `timeout` | Overpass HTTP timeout (s); also the QL `[timeout:N]` budget | `180.0` |
+| `endpoint` | the `live:` request endpoint URL | `https://overpass-api.de/api/interpreter` |
+| `user_agent` | `User-Agent` sent on the `live:` request (a real one is required) | `earthlens (+…)` |
+| `timeout` | `live:` request timeout (s); also the QL `[timeout:N]` budget | `180.0` |
 | `file_format` | `"geojson"` or `"gpkg"` | `"geojson"` |
-| `max_bbox_deg2` | bbox-area cap (square degrees) — guards the planet-wide footgun (live protocols only) | `100.0` |
-| `region` | Geofabrik region key or raw path — **required** for a `pbf:*` query | `None` |
-| `engine` | `pbf` read engine: `"pyosmium"` (streaming) or `"pyrosm"` (in-memory, opt-in) | `"pyosmium"` |
+| `max_bbox_deg2` | bbox-area cap (square degrees) — guards the planet-wide footgun (live types only) | `100.0` |
+| `region` | region key or raw `"continent/region"` path — **required** for a `bulk:*` query | `None` |
+| `engine` | regional-extract read engine: `"pyosmium"` (streaming) or `"pyrosm"` (in-memory, opt-in) | `"pyosmium"` |
 | `cache_dir` | directory for cached `.osm.pbf` extracts | `<cache_dir()>/osm_pbf` |
 
-!!! warning "Keep the bbox small (live protocols)"
-    Overpass / ohsome are for small/targeted queries. A box larger than
+!!! warning "Keep the bbox small (live types)"
+    The `live:` and `history:` types are for small/targeted queries. A box
+    larger than
     `max_bbox_deg2` (the default `100` square degrees comfortably covers a large
     country) is rejected before any request — in particular the whole-Earth
     default you get if you omit `lat_lim` / `lon_lim` through the facade, which
     would hammer the shared public services. Raise `max_bbox_deg2=` for a
-    genuinely larger area. The cap does **not** apply to a `pbf` read (it hits a
-    local extract, not a shared service), so a `pbf` request with no bbox simply
+    genuinely larger area. The cap does **not** apply to a `bulk` read (it hits a
+    local extract, not a shared service), so a `bulk` request with no bbox simply
     reads the whole downloaded extract.
 
 ## The returned FeatureCollection
 
-CRS `EPSG:4326`. Overpass features carry `osm_id`, `osm_type`, the element's OSM
+CRS `EPSG:4326`. `live:` features carry `osm_id`, `osm_type`, the element's OSM
 tags as columns, and a `Point` / `LineString` / `Polygon` geometry (a node → a
 point, an open way → a line, a closed way → a polygon; relations are skipped in
-the MVP). ohsome features carry the geometry plus `@osmId`,
+the MVP). `history:` features carry the geometry plus `@osmId`,
 `@snapshotTimestamp`, and `@other_tags`. An empty result (a quiet box) comes
 back as an empty FeatureCollection with the `osm_id` / `osm_type` schema, not an
 error.
@@ -238,7 +242,7 @@ redistribute under ODbL.
 OSM output is vector, so the `aggregate=` argument is rejected:
 
 ```python
-EarthLens(data_source="osm", variables=["overpass:roads"], ...).download(aggregate=cfg)
+EarthLens(data_source="osm", variables=["live:roads"], ...).download(aggregate=cfg)
 # NotImplementedError: OSM features are vector, not gridded ...
 ```
 
@@ -247,7 +251,6 @@ GeoDataFrame).
 
 ## Out of scope
 
-ohsome's aggregation endpoints (counts / areas over time) are **not** part of
-this backend — see
-[Introduction](introduction.md#out-of-scope-follow-ons). For bulk asks, reach
-for the `pbf` protocol (above) rather than tiling many live queries.
+The `history:` aggregation queries (counts / areas over time) are **not** part of
+this backend. For bulk asks, reach for the `bulk:` type (above) rather than tiling
+many live queries.

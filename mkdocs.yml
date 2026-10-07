@@ -350,7 +350,7 @@ nav:
       - Usage: reference/soilgrids/usage.md
       - Available properties: reference/soilgrids/datasets.md
       - Reference: reference/soilgrids/soilgrids.md
-    - OpenStreetMap (Overpass / ohsome):
+    - OpenStreetMap (live / history / bulk):
       - Introduction: reference/osm/introduction.md
       - Usage: reference/osm/usage.md
       - Reference: reference/osm/osm.md
@@ -651,10 +651,11 @@ nav:
       - Quickstart — riverine flood risk: examples/aqueduct/quickstart.ipynb
     - Heavy-rainfall events (CatRaRE):
       - Quickstart — radar rainfall events: examples/catrare/quickstart.ipynb
-    - OpenStreetMap (Overpass / ohsome):
-      - Quickstart — current-state features (Overpass): examples/osm/quickstart.ipynb
-      - History — building footprints over time (ohsome): examples/osm/ohsome_history.ipynb
-      - Bulk extracts — buildings & roads from Geofabrik (pbf): examples/osm/pbf_bulk_extracts.ipynb
+    - OpenStreetMap (live / history / bulk):
+      - Quickstart — current-state features (live): examples/osm/quickstart.ipynb
+      - History — building footprints over time (history): examples/osm/ohsome_history.ipynb
+      - Bulk extracts — buildings & roads (bulk): examples/osm/pbf_bulk_extracts.ipynb
+      - Power user — all the knobs: examples/osm/osm_power_user.ipynb
     - JAXA (Earth-observation archive):
       - Catalog explorer (no network): examples/jaxa/01_catalog_explorer.ipynb
       - AW3D30 elevation quickstart (live): examples/jaxa/02_aw3d30_quickstart.ipynb

@@ -19,13 +19,13 @@ class TestConstruction:
 
     def test_string_variables_wrapped(self, osm_kwargs):
         """A bare string `variables` is wrapped into a one-element list."""
-        osm = OSM(**{**osm_kwargs(), "variables": "overpass:hospitals"})
-        assert osm.vars == ["overpass:hospitals"]
+        osm = OSM(**{**osm_kwargs(), "variables": "live:hospitals"})
+        assert osm.vars == ["live:hospitals"]
 
     def test_mapping_variables_rejected(self, osm_kwargs):
         """A mapping `variables` raises TypeError (this backend takes a list)."""
         with pytest.raises(TypeError, match="must be a list"):
-            OSM(**{**osm_kwargs(), "variables": {"overpass:hospitals": []}})
+            OSM(**{**osm_kwargs(), "variables": {"live:hospitals": []}})
 
     def test_empty_variables_rejected(self, osm_kwargs):
         """An empty `variables` raises ValueError."""
@@ -116,7 +116,7 @@ class TestOhsomeRoute:
         OSM(
             **{
                 **osm_kwargs(),
-                "variables": ["ohsome:buildings"],
+                "variables": ["history:buildings"],
                 "start": "2020-01-01",
                 "end": "2021-01-01",
             }
@@ -130,7 +130,7 @@ class TestOhsomeRoute:
         OSM(
             **{
                 **osm_kwargs(),
-                "variables": ["ohsome:buildings"],
+                "variables": ["history:buildings"],
                 "start": "2018-01-01",
                 "end": "2020-01-01",
             }
@@ -140,14 +140,22 @@ class TestOhsomeRoute:
     def test_single_snapshot_time(self, osm_kwargs, fake_ohsome):
         """A start with no end becomes a single-snapshot ohsome time."""
         OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-06-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-06-01",
+            }
         ).download()
         assert fake_ohsome.post_kwargs["time"] == "2020-06-01"
 
     def test_history_index_reset_into_columns(self, osm_kwargs, fake_ohsome):
         """The (@osmId, @snapshotTimestamp) index becomes ordinary columns."""
         fc = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         ).download()
         assert {"@osmId", "@snapshotTimestamp"} <= set(fc.columns)
         assert fc.crs.to_epsg() == 4326
@@ -157,7 +165,7 @@ class TestOhsomeRoute:
         OSM(
             **{
                 **osm_kwargs(),
-                "variables": ["ohsome:buildings"],
+                "variables": ["history:buildings"],
                 "start": "2020-01-01",
                 "filter": "amenity=cafe",
             }
@@ -165,9 +173,9 @@ class TestOhsomeRoute:
         assert fake_ohsome.post_kwargs["filter"] == "amenity=cafe"
 
     def test_missing_time_raises(self, osm_kwargs, fake_ohsome):
-        """An ohsome query without a start raises a helpful ValueError."""
+        """A history query without a start raises a helpful ValueError."""
         with pytest.raises(ValueError, match="needs a time"):
-            OSM(**{**osm_kwargs(), "variables": ["ohsome:buildings"]}).download()
+            OSM(**{**osm_kwargs(), "variables": ["history:buildings"]}).download()
 
     def test_plain_index_frame_not_reset(self, osm_kwargs, fake_ohsome):
         """A response frame with a plain index is wrapped without reset."""
@@ -178,7 +186,11 @@ class TestOhsomeRoute:
             {"@other_tags": ["{}"]}, geometry=[Point(8.69, 49.41)], crs="EPSG:4326"
         )
         fc = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         ).download()
         assert "index" not in fc.columns
         assert len(fc) == 1
@@ -186,7 +198,11 @@ class TestOhsomeRoute:
     def test_request_targets_elements_geometry_endpoint(self, osm_kwargs, fake_ohsome):
         """The request goes through the root client's post(endpoint=...) form."""
         OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         ).download()
         assert fake_ohsome.post_kwargs["endpoint"] == "elements/geometry"
 
@@ -195,7 +211,11 @@ class TestOhsomeRoute:
         from earthlens.osm.backend import USER_AGENT
 
         OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         ).download()
         client_kwargs = fake_ohsome.client_kwargs
         assert client_kwargs["user_agent"] == USER_AGENT
@@ -228,7 +248,11 @@ class TestOhsomeRoute:
         fake_ohsome.error = leaked
 
         backend = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         )
         with pytest.raises(OhsomeUnavailableError) as excinfo:
             backend.download()
@@ -249,7 +273,11 @@ class TestOhsomeRoute:
         fake_ohsome.error = ohsome_error
 
         backend = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         )
         with pytest.raises(OhsomeUnavailableError) as excinfo:
             backend.download()
@@ -264,7 +292,11 @@ class TestOhsomeRoute:
         fake_ohsome.error = ohsome_error
 
         backend = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         )
         with pytest.raises(RuntimeError, match="Unauthorized") as excinfo:
             backend.download()
@@ -279,7 +311,11 @@ class TestOhsomeRoute:
         fake_ohsome.error = ohsome_error
 
         backend = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         )
         with pytest.raises(OhsomeUnavailableError) as excinfo:
             backend.download()
@@ -289,7 +325,11 @@ class TestOhsomeRoute:
         """An error with no throttle status propagates as-is (not masked)."""
         fake_ohsome.error = RuntimeError("some genuine bug")
         backend = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         )
         with pytest.raises(RuntimeError, match="some genuine bug"):
             backend.download()
@@ -310,7 +350,11 @@ class TestOhsomeRoute:
         fake_ohsome.error = decode_error
 
         backend = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         )
         with pytest.raises(OhsomeResponseError) as excinfo:
             backend.download()
@@ -331,7 +375,11 @@ class TestOhsomeRoute:
 
         fake_ohsome.error = json.JSONDecodeError("Expecting value", "", 0)
         backend = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         )
         with pytest.raises(OhsomeResponseError) as excinfo:
             backend.download()
@@ -348,7 +396,11 @@ class TestOhsomeRoute:
         ohsome_error.error_code = 400  # recovered status, but no JSONDecodeError
         fake_ohsome.error = ohsome_error
         backend = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         )
         with pytest.raises(RuntimeError, match="bad request") as excinfo:
             backend.download()
@@ -362,7 +414,11 @@ class TestOhsomeRoute:
 
         fake_ohsome.error = requests.ConnectionError("connection reset")
         backend = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         )
         with pytest.raises(
             requests.ConnectionError, match="connection reset"
@@ -395,7 +451,7 @@ class TestOhsomeRoute:
             backend = OSM(
                 **{
                     **osm_kwargs(),
-                    "variables": ["ohsome:buildings"],
+                    "variables": ["history:buildings"],
                     "start": "2020-01-01",
                 }
             )
@@ -431,7 +487,7 @@ class TestOhsomeRoute:
             backend = OSM(
                 **{
                     **osm_kwargs(),
-                    "variables": ["ohsome:buildings"],
+                    "variables": ["history:buildings"],
                     "start": "2020-01-01",
                 }
             )
@@ -461,7 +517,7 @@ class TestOhsomeRoute:
             backend = OSM(
                 **{
                     **osm_kwargs(),
-                    "variables": ["ohsome:buildings"],
+                    "variables": ["history:buildings"],
                     "start": "2020-01-01",
                 }
             )
@@ -489,7 +545,11 @@ class TestOhsomeRoute:
         fake_ohsome.error = key_error
 
         backend = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         )
         with pytest.raises(OhsomeUnavailableError) as excinfo:
             backend.download()
@@ -514,7 +574,11 @@ class TestOhsomeRoute:
         fake_ohsome.error = ohsome_error
 
         backend = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         )
         with pytest.raises(OhsomeUnavailableError) as excinfo:
             backend.download()
@@ -541,7 +605,11 @@ class TestOhsomeRoute:
         fake_ohsome.error = decode_error
 
         backend = OSM(
-            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+            **{
+                **osm_kwargs(),
+                "variables": ["history:buildings"],
+                "start": "2020-01-01",
+            }
         )
         with pytest.raises(OhsomeUnavailableError) as excinfo:
             backend.download()
@@ -696,19 +764,19 @@ class TestDownloadContract:
     ):
         """Several overpass queries combine into one collection."""
         fc = OSM(
-            **{**osm_kwargs(), "variables": ["overpass:hospitals", "overpass:roads"]}
+            **{**osm_kwargs(), "variables": ["live:hospitals", "live:roads"]}
         ).download()
         # each query returns the same fixture result (3 features) -> 6 combined.
         assert len(fc) == 6
 
-    def test_overpass_and_ohsome_combined(
+    def test_live_and_history_combined(
         self, osm_kwargs, fake_overpy, fake_overpass_post, fake_ohsome
     ):
-        """An overpass + an ohsome query combine, unioning their disjoint columns."""
+        """A live + a history query combine, unioning their disjoint columns."""
         fc = OSM(
             **{
                 **osm_kwargs(),
-                "variables": ["overpass:hospitals", "ohsome:buildings"],
+                "variables": ["live:hospitals", "history:buildings"],
                 "start": "2020-01-01",
             }
         ).download()
@@ -719,7 +787,7 @@ class TestDownloadContract:
     def test_unknown_query_id_raises(self, osm_kwargs):
         """An unknown named-query id raises ValueError before any fetch."""
         with pytest.raises(ValueError, match="not in the OSM query catalog"):
-            OSM(**{**osm_kwargs(), "variables": ["overpass:nope"]}).download()
+            OSM(**{**osm_kwargs(), "variables": ["live:nope"]}).download()
 
     def test_whole_earth_bbox_rejected(self, osm_kwargs):
         """A whole-Earth bbox exceeds the area cap and is rejected before fetch."""
@@ -775,7 +843,7 @@ class TestLazyImports:
             OSM(
                 **{
                     **osm_kwargs(),
-                    "variables": ["ohsome:buildings"],
+                    "variables": ["history:buildings"],
                     "start": "2020-01-01",
                 }
             ).download()
@@ -822,7 +890,7 @@ class TestLimitStopsTheWork:
         backend = OSM(
             **{
                 **osm_kwargs(),
-                "variables": ["overpass:hospitals", "overpass:schools"],
+                "variables": ["live:hospitals", "live:schools"],
             }
         )
         fetched: list[str] = []
@@ -831,7 +899,7 @@ class TestLimitStopsTheWork:
         backend._limit = 2
         collections = backend._fetch(backend._search())
 
-        assert fetched == ["overpass:hospitals"], (
+        assert fetched == ["live:hospitals"], (
             f"issued {fetched}; the second query was run even though the cap "
             f"was already met"
         )
@@ -842,7 +910,7 @@ class TestLimitStopsTheWork:
         backend = OSM(
             **{
                 **osm_kwargs(),
-                "variables": ["overpass:hospitals", "overpass:schools"],
+                "variables": ["live:hospitals", "live:schools"],
             }
         )
         fetched: list[str] = []
@@ -851,7 +919,7 @@ class TestLimitStopsTheWork:
         backend._limit = None
         backend._fetch(backend._search())
 
-        assert fetched == ["overpass:hospitals", "overpass:schools"]
+        assert fetched == ["live:hospitals", "live:schools"]
 
     def test_a_zero_limit_is_refused_before_any_query(self, osm_kwargs, monkeypatch):
         """`limit=0` is caught before the first request goes out."""
