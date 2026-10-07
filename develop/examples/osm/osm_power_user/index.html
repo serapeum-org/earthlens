@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -6709,7 +6709,7 @@
   <span class="md-ellipsis">
     
   
-    OpenStreetMap (Overpass / ohsome)
+    OpenStreetMap (live / history / bulk)
   
 
     
@@ -6725,7 +6725,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    OpenStreetMap (Overpass / ohsome)
+    OpenStreetMap (live / history / bulk)
   
 
           </label>
@@ -16733,7 +16733,7 @@
   <span class="md-ellipsis">
     
   
-    OpenStreetMap (Overpass / ohsome)
+    OpenStreetMap (live / history / bulk)
   
 
     
@@ -16749,7 +16749,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    OpenStreetMap (Overpass / ohsome)
+    OpenStreetMap (live / history / bulk)
   
 
           </label>
@@ -16961,10 +16961,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-two-pbf-engines-compared" class="md-nav__link">
+  <a href="#the-two-read-engines-compared" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The two pbf engines, compared
+        The two read engines, compared
       
     </span>
   </a>
@@ -23806,10 +23806,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-two-pbf-engines-compared" class="md-nav__link">
+  <a href="#the-two-read-engines-compared" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The two pbf engines, compared
+        The two read engines, compared
       
     </span>
   </a>
@@ -24587,7 +24587,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="osm-power-user-all-the-knobs">OSM — power user &amp; all the knobs<a class="anchor-link" href="#osm-power-user-all-the-knobs">¶</a></h1><p>The three protocol notebooks (<code>quickstart</code>, <code>ohsome_history</code>, <code>pbf_bulk_extracts</code>) cover the common path. This one gathers the <strong>cross-cutting</strong> capabilities of the <code>earthlens.osm</code> backend: exploring the named-query catalog, requesting several queries at once, choosing the output format, the bounding-box safety guard, and the two pbf read engines compared side by side.</p>
+<h1 id="osm-power-user-all-the-knobs">OSM — power user &amp; all the knobs<a class="anchor-link" href="#osm-power-user-all-the-knobs">¶</a></h1><p>The three download-type notebooks (<code>quickstart</code>, <code>ohsome_history</code>, <code>pbf_bulk_extracts</code>) cover the common path. This one gathers the <strong>cross-cutting</strong> capabilities of the <code>earthlens.osm</code> backend: exploring the named-query catalog, requesting several queries at once, choosing the output format, the bounding-box safety guard, and the two read engines compared side by side.</p>
 <p>Every result is the same vector <code>FeatureCollection</code> (EPSG:4326) and emits the ODbL <code>LicenseWarning</code>.</p>
 </div>
 </div>
@@ -24657,7 +24657,7 @@ LON_LIM = [8.67, 8.71]</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="exploring-the-named-query-catalog">Exploring the named-query catalog<a class="anchor-link" href="#exploring-the-named-query-catalog">¶</a></h2><p>The OSM backend is driven by a small curated catalog of <code>&lt;protocol&gt;:&lt;name&gt;</code> named queries. <code>EarthLens.list_datasets('osm')</code> lists them; the <code>Catalog</code> object exposes each row's dispatch detail — the Overpass QL template, the ohsome filter, or the pyrosm layer method.</p>
+<h2 id="exploring-the-named-query-catalog">Exploring the named-query catalog<a class="anchor-link" href="#exploring-the-named-query-catalog">¶</a></h2><p>The OSM backend is driven by a small curated catalog of <code>&lt;type&gt;:&lt;name&gt;</code> named queries. <code>EarthLens.list_datasets('osm')</code> lists them; the <code>Catalog</code> object exposes each row's dispatch detail — the Overpass QL template, the ohsome filter, or the pyrosm layer method.</p>
 </div>
 </div>
 </div>
@@ -24716,7 +24716,7 @@ LON_LIM = [8.67, 8.71]</div>
     <span class="s1">'| network_type:'</span><span class="p">,</span>
     <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'bulk:roads'</span><span class="p">)</span><span class="o">.</span><span class="n">network_type</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'pbf region keys        :'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">region_ids</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'bulk region keys        :'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">region_ids</span><span class="p">())</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">cat = Catalog()
 print('live:hospitals QL  :', cat.get('live:hospitals').query_template)
@@ -24727,7 +24727,7 @@ print(
     '| network_type:',
     cat.get('bulk:roads').network_type,
 )
-print('pbf region keys        :', cat.region_ids())</div>
+print('bulk region keys        :', cat.region_ids())</div>
 </div>
 </div>
 </div>
@@ -24908,7 +24908,7 @@ except ValueError as exc:
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="the-two-pbf-engines-compared">The two pbf engines, compared<a class="anchor-link" href="#the-two-pbf-engines-compared">¶</a></h2><p>The <code>pbf</code> protocol reads a Geofabrik extract with one of two engines. <strong><code>pyosmium</code></strong> (the default) streams with bounded memory and ships with <code>earthlens[osm]</code>; it returns a slim <code>osm_id</code> / <code>osm_type</code> / <code>geometry</code> schema. <strong><code>pyrosm</code></strong> reads the whole extract in memory and returns the richer, exact per-layer schema (parsed tag columns), but is <strong>opt-in</strong> — it is in no earthlens extra, so it is installed on demand (it builds the sdist-only <code>cykhash</code> from source, which needs a C compiler).</p>
+<h2 id="the-two-read-engines-compared">The two read engines, compared<a class="anchor-link" href="#the-two-read-engines-compared">¶</a></h2><p>The <code>bulk</code> type reads a <code>.osm.pbf</code> extract with one of two engines. <strong><code>pyosmium</code></strong> (the default) streams with bounded memory and ships with <code>earthlens[osm]</code>; it returns a slim <code>osm_id</code> / <code>osm_type</code> / <code>geometry</code> schema. <strong><code>pyrosm</code></strong> reads the whole extract in memory and returns the richer, exact per-layer schema (parsed tag columns), but is <strong>opt-in</strong> — it is in no earthlens extra, so it is installed on demand (it builds the sdist-only <code>cykhash</code> from source, which needs a C compiler).</p>
 <p>The cell below installs it live, then reads Malta's buildings with each engine so you can compare the schemas.</p>
 </div>
 </div>
@@ -24960,9 +24960,12 @@ except ValueError as exc:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># pbf reads a Geofabrik region; compare the engines on Malta's Valletta core</span>
-<span class="n">malta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-    <span class="n">region</span><span class="o">=</span><span class="s1">'malta'</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.88</span><span class="p">,</span> <span class="mf">35.94</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">14.49</span><span class="p">,</span> <span class="mf">14.55</span><span class="p">],</span> <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span>
-<span class="p">)</span>
+<span class="n">malta</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'region'</span><span class="p">:</span> <span class="s1">'malta'</span><span class="p">,</span>
+    <span class="s1">'lat_lim'</span><span class="p">:</span> <span class="p">[</span><span class="mf">35.88</span><span class="p">,</span> <span class="mf">35.94</span><span class="p">],</span>
+    <span class="s1">'lon_lim'</span><span class="p">:</span> <span class="p">[</span><span class="mf">14.49</span><span class="p">,</span> <span class="mf">14.55</span><span class="p">],</span>
+    <span class="s1">'path'</span><span class="p">:</span> <span class="n">OUT_DIR</span><span class="p">,</span>
+<span class="p">}</span>
 
 <span class="n">pyosmium_fc</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'bulk:buildings'</span><span class="p">],</span> <span class="n">engine</span><span class="o">=</span><span class="s1">'pyosmium'</span><span class="p">,</span> <span class="o">**</span><span class="n">malta</span>
@@ -24975,9 +24978,12 @@ except ValueError as exc:
 <span class="nb">print</span><span class="p">(</span><span class="s1">'pyrosm  :'</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pyrosm_fc</span><span class="p">),</span> <span class="s1">'features | columns:'</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">pyrosm_fc</span><span class="o">.</span><span class="n">columns</span><span class="p">)[:</span><span class="mi">12</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8"># pbf reads a Geofabrik region; compare the engines on Malta's Valletta core
-malta = dict(
-    region='malta', lat_lim=[35.88, 35.94], lon_lim=[14.49, 14.55], path=OUT_DIR
-)
+malta = {
+    'region': 'malta',
+    'lat_lim': [35.88, 35.94],
+    'lon_lim': [14.49, 14.55],
+    'path': OUT_DIR,
+}
 
 pyosmium_fc = EarthLens(
     data_source='osm', variables=['bulk:buildings'], engine='pyosmium', **malta
@@ -25057,7 +25063,7 @@ plt.show()</div>
 <li>The named-query catalog is introspectable: <code>EarthLens.list_datasets('osm')</code> and the <code>Catalog</code> rows (<code>query_template</code> / <code>ohsome_filter</code> / <code>pyrosm_method</code>).</li>
 <li><code>variables=[...]</code> runs several queries in one <code>download()</code>, combined into a single <code>FeatureCollection</code>.</li>
 <li><code>file_format='gpkg'</code> switches the written file to GeoPackage; <code>max_bbox_deg2=</code> tunes the live-query size guard.</li>
-<li><code>engine='pyosmium'</code> (default, bounded memory) vs <code>engine='pyrosm'</code> (opt-in, richer schema) for pbf reads.</li>
+<li><code>engine='pyosmium'</code> (default, bounded memory) vs <code>engine='pyrosm'</code> (opt-in, richer schema) for <code>bulk</code> reads.</li>
 <li>Every result is ODbL — honour the attribution / share-alike obligation.</li>
 </ul>
 </div>
