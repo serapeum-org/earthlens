@@ -87,7 +87,7 @@ element, so it answers **temporal questions**: what a feature looked like at a
 past instant, or how an area was mapped across a span of time. A single date
 (`start=`) returns one **snapshot**; `start=` + `end=` returns the **range**
 `start/end` — each feature at both boundary snapshots, carried in the
-`@snapshotTimestamp` column. An `history:` query therefore **requires a time** —
+`@snapshotTimestamp` column. A `history:` query therefore **requires a time** —
 it raises without `start=`.
 
 Reach for it for change detection and "as-of" maps — "buildings as they existed
