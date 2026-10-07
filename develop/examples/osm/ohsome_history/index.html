@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24669,6 +24669,7 @@ ODbL <code>LicenseWarning</code>. Unlike <code>live</code>, a <code>history</cod
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">LAT_LIM</span> <span class="o">=</span> <span class="p">[</span><span class="mf">49.40</span><span class="p">,</span> <span class="mf">49.42</span><span class="p">]</span>
 <span class="n">LON_LIM</span> <span class="o">=</span> <span class="p">[</span><span class="mf">8.67</span><span class="p">,</span> <span class="mf">8.71</span><span class="p">]</span>
+<span class="n">BUILDINGS</span> <span class="o">=</span> <span class="s2">"history:buildings"</span>  <span class="c1"># the named query reused across the snapshot / range examples below</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
@@ -24679,7 +24680,8 @@ from earthlens.core import EarthLens
 OUT_DIR = Path('osm_output')
 OUT_DIR.mkdir(exist_ok=True)
 LAT_LIM = [49.40, 49.42]
-LON_LIM = [8.67, 8.71]</div>
+LON_LIM = [8.67, 8.71]
+BUILDINGS = "history:buildings"  # the named query reused across the snapshot / range examples below</div>
 </div>
 </div>
 </div>
@@ -24719,7 +24721,7 @@ instant). Here we ask for the state on 1 January 2018.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">buildings_2018</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'history:buildings'</span><span class="p">],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">BUILDINGS</span><span class="p">],</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2018-01-01'</span><span class="p">,</span>
@@ -24730,7 +24732,7 @@ instant). Here we ask for the state on 1 January 2018.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">buildings_2018 = EarthLens(
     data_source='osm',
-    variables=['history:buildings'],
+    variables=[BUILDINGS],
     lat_lim=LAT_LIM,
     lon_lim=LON_LIM,
     start='2018-01-01',
@@ -24827,7 +24829,7 @@ over time as contributors add detail.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">buildings_2023</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'history:buildings'</span><span class="p">],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">BUILDINGS</span><span class="p">],</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2023-01-01'</span><span class="p">,</span>
@@ -24839,7 +24841,7 @@ over time as contributors add detail.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">buildings_2023 = EarthLens(
     data_source='osm',
-    variables=['history:buildings'],
+    variables=[BUILDINGS],
     lat_lim=LAT_LIM,
     lon_lim=LON_LIM,
     start='2023-01-01',
@@ -24991,7 +24993,7 @@ for q in ['history:amenities', 'history:highways']:
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">buildings_range</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'history:buildings'</span><span class="p">],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">BUILDINGS</span><span class="p">],</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2018-01-01'</span><span class="p">,</span>
@@ -25003,7 +25005,7 @@ for q in ['history:amenities', 'history:highways']:
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7">buildings_range = EarthLens(
     data_source='osm',
-    variables=['history:buildings'],
+    variables=[BUILDINGS],
     lat_lim=LAT_LIM,
     lon_lim=LON_LIM,
     start='2018-01-01',
@@ -25051,7 +25053,7 @@ sorted(buildings_range['@snapshotTimestamp'].unique())</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">parks</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'history:buildings'</span><span class="p">],</span>  <span class="c1"># still required to route to ohsome</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">BUILDINGS</span><span class="p">],</span>  <span class="c1"># still required to route to ohsome</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">start</span><span class="o">=</span><span class="s1">'2023-01-01'</span><span class="p">,</span>
@@ -25063,7 +25065,7 @@ sorted(buildings_range['@snapshotTimestamp'].unique())</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8">parks = EarthLens(
     data_source='osm',
-    variables=['history:buildings'],  # still required to route to ohsome
+    variables=[BUILDINGS],  # still required to route to ohsome
     lat_lim=LAT_LIM,
     lon_lim=LON_LIM,
     start='2023-01-01',

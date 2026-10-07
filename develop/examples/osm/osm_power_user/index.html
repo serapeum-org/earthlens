@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24633,6 +24633,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">LAT_LIM</span> <span class="o">=</span> <span class="p">[</span><span class="mf">49.40</span><span class="p">,</span> <span class="mf">49.42</span><span class="p">]</span>
 <span class="n">LON_LIM</span> <span class="o">=</span> <span class="p">[</span><span class="mf">8.67</span><span class="p">,</span> <span class="mf">8.71</span><span class="p">]</span>
+<span class="n">HOSPITALS</span> <span class="o">=</span> <span class="s2">"live:hospitals"</span>  <span class="c1"># the named query reused across the examples below</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
@@ -24644,7 +24645,8 @@ from earthlens.osm import Catalog
 OUT_DIR = Path('osm_output')
 OUT_DIR.mkdir(exist_ok=True)
 LAT_LIM = [49.40, 49.42]
-LON_LIM = [8.67, 8.71]</div>
+LON_LIM = [8.67, 8.71]
+HOSPITALS = "live:hospitals"  # the named query reused across the examples below</div>
 </div>
 </div>
 </div>
@@ -24708,7 +24710,7 @@ LON_LIM = [8.67, 8.71]</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'live:hospitals QL  :'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'live:hospitals'</span><span class="p">)</span><span class="o">.</span><span class="n">query_template</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'live:hospitals QL  :'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">HOSPITALS</span><span class="p">)</span><span class="o">.</span><span class="n">query_template</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'history:buildings filter:'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'history:buildings'</span><span class="p">)</span><span class="o">.</span><span class="n">ohsome_filter</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s1">'bulk:roads method       :'</span><span class="p">,</span>
@@ -24719,7 +24721,7 @@ LON_LIM = [8.67, 8.71]</div>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'bulk region keys        :'</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">region_ids</span><span class="p">())</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">cat = Catalog()
-print('live:hospitals QL  :', cat.get('live:hospitals').query_template)
+print('live:hospitals QL  :', cat.get(HOSPITALS).query_template)
 print('history:buildings filter:', cat.get('history:buildings').ohsome_filter)
 print(
     'bulk:roads method       :',
@@ -24765,7 +24767,7 @@ print('bulk region keys        :', cat.region_ids())</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">combined</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'live:hospitals'</span><span class="p">,</span> <span class="s1">'live:schools'</span><span class="p">],</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">HOSPITALS</span><span class="p">,</span> <span class="s1">'live:schools'</span><span class="p">],</span>
     <span class="n">lat_lim</span><span class="o">=</span><span class="n">LAT_LIM</span><span class="p">,</span>
     <span class="n">lon_lim</span><span class="o">=</span><span class="n">LON_LIM</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
@@ -24775,7 +24777,7 @@ print('bulk region keys        :', cat.region_ids())</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">combined = EarthLens(
     data_source='osm',
-    variables=['live:hospitals', 'live:schools'],
+    variables=[HOSPITALS, 'live:schools'],
     lat_lim=LAT_LIM,
     lon_lim=LON_LIM,
     path=OUT_DIR,
@@ -24877,7 +24879,7 @@ sorted(p.name for p in OUT_DIR.glob('osm_live-cafes.*'))</div>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s1">'osm'</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'live:hospitals'</span><span class="p">],</span>
+        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">HOSPITALS</span><span class="p">],</span>
         <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">40</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span>
         <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>  <span class="c1"># 80 x 200 deg = 16000 deg^2, far over the 100 cap</span>
         <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
@@ -24889,7 +24891,7 @@ sorted(p.name for p in OUT_DIR.glob('osm_live-cafes.*'))</div>
 try:
     EarthLens(
         data_source='osm',
-        variables=['live:hospitals'],
+        variables=[HOSPITALS],
         lat_lim=[-40, 40],
         lon_lim=[-100, 100],  # 80 x 200 deg = 16000 deg^2, far over the 100 cap
         path=OUT_DIR,
