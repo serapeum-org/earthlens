@@ -21,7 +21,10 @@ It writes, relative to the repo, to:
 
 The fetch is unauthenticated (constraints documents are public) and visits one
 `constraints.json` per curated dataset. A dataset whose fetch fails is recorded
-as an empty block list, exactly as the live audit treats an unreadable store.
+as an empty block list, which the offline audit treats as nothing to judge.
+(The live audit instead flags an unreachable store as a distinct
+`<constraints unreadable>` finding, but `_counts` in the test drops that
+marker, so the two agree on the count either way.)
 """
 
 from __future__ import annotations
@@ -55,16 +58,32 @@ def capture(out: Path) -> None:
             continue
         try:
             blocks = _ecmwf_constraints(name) or []
-        except Exception as exc:  # noqa: BLE001 - record the outage as the live audit does
+        except Exception as exc:  # noqa: BLE001 - a failed fetch is recorded as []
             print(f"  !! {name}: fetch failed ({exc}); recording []", file=sys.stderr)
             blocks = []
         snapshot[name] = blocks
         print(f"  {len(blocks):5} blocks  {name}", file=sys.stderr)
 
     out.parent.mkdir(parents=True, exist_ok=True)
-    payload = json.dumps(snapshot, sort_keys=True, separators=(",", ":")).encode()
-    # mtime=0 so the artifact is byte-reproducible across refreshes - an
-    # unchanged store yields an unchanged file, and git shows nothing to commit.
+    # Canonicalise: sort each block's list values. The audit reads them as sets
+    # (`variable` membership, offered-value comparisons), so order is never
+    # semantic - sorting makes a non-semantic upstream reordering leave the
+    # committed bytes unchanged, rather than churning the snapshot.
+    canonical = {
+        name: [
+            {
+                key: sorted(value) if isinstance(value, list) else value
+                for key, value in block.items()
+            }
+            for block in blocks
+        ]
+        for name, blocks in snapshot.items()
+    }
+    payload = json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode()
+    # mtime=0 drops the gzip timestamp, so - given the same zlib build and the
+    # canonicalisation above - an unchanged store yields identical bytes and git
+    # shows nothing to commit. The compressed bytes are not guaranteed identical
+    # across zlib versions, so a refresh on a different toolchain may still diff.
     with out.open("wb") as raw:
         with gzip.GzipFile(fileobj=raw, mode="wb", mtime=0) as fh:
             fh.write(payload)
