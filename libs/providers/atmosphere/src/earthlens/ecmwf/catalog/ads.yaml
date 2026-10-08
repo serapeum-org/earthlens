@@ -52,6 +52,12 @@ datasets:
         cds_variable: wildfire_flux_of_carbon_dioxide
         nc_variable: co2fire
         units: kg m-2 s-1
+        extras:
+          # GFAS 1.4.2 (on the ADS from 2026-10-05) partitions the store by a
+          # new `temporal_aggregation` dimension; every block now requires it,
+          # so a row naming none matches nothing. `daily` keeps the full
+          # 2003-present record; `hourly` exists only for 1.4.2 (2026 onward).
+          temporal_aggregation: [daily]
 
   cams-global-greenhouse-gas-inversion:
     endpoint: ads
