@@ -1084,7 +1084,11 @@ class TestAuditServeability:
         snapshot of every dataset's `constraints.json` (see
         `fixtures/serveability_constraints.json.gz`) rather than the live
         stores, so it runs on every PR without the network and a hand edit to
-        a shard that makes a row unserveable fails here, not weeks later.
+        an already-captured dataset's shard that makes a row unserveable fails
+        here, not weeks later. A row in a dataset absent from the snapshot - a
+        brand-new dataset - is judged by nothing offline, which
+        `test_fixture_covers_every_audited_dataset` turns into its own failure
+        so the snapshot cannot silently fall behind the catalog.
 
         Upstream drift is deliberately out of scope - the live stores move on
         their own schedule and would redden unrelated PRs - so the live
@@ -1109,6 +1113,36 @@ class TestAuditServeability:
             f"{ {k: (self._KNOWN_UNSERVEABLE.get(k), counted.get(k)) for k in set(self._KNOWN_UNSERVEABLE) | set(counted) if self._KNOWN_UNSERVEABLE.get(k) != counted.get(k)} }"
             " - if the live stores changed, refresh the fixture; otherwise a "
             "catalog edit broke a row."
+        )
+
+    @pytest.mark.integration
+    def test_fixture_covers_every_audited_dataset(self):
+        """The snapshot must hold every dataset the audit would visit.
+
+        The recorded-store test looks each dataset up in the fixture and treats
+        a miss as nothing to judge, so a dataset absent from the snapshot - one
+        added to the catalog after the last refresh - would be silently
+        unjudged offline. Asserting the snapshot's dataset set equals the set
+        the audit visits (those with a row that `_promises_data`) turns that
+        into a failure here, forcing a `capture_serveability_fixture.py` refresh
+        in the same change rather than leaving a gap for the weekly e2e.
+        """
+        from earthlens.ecmwf import Catalog
+
+        audited = {
+            name
+            for name, dataset in Catalog().datasets.items()
+            if any(
+                hydrate_mod._promises_data(row) for row in dataset.variables.values()
+            )
+        }
+        recorded = set(_load_serveability_fixture())
+
+        assert recorded == audited, (
+            "the serveability fixture is out of step with the catalog: "
+            f"audited but not captured {sorted(audited - recorded)}; "
+            f"captured but no longer audited {sorted(recorded - audited)}. "
+            "Refresh it with tools/ecmwf/capture_serveability_fixture.py."
         )
 
     @pytest.mark.e2e
