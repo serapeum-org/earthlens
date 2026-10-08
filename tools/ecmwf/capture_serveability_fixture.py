@@ -74,7 +74,9 @@ def capture(out: Path) -> None:
             # strict=True so a failed fetch RAISES rather than degrading to `[]`;
             # that is the only way to tell "unreachable" from "constrains nothing".
             blocks = _ecmwf_constraints(name, strict=True) or []
-        except Exception as exc:  # noqa: BLE001 - recorded as unreachable, not empty
+        # Any fetch failure is recorded as unreachable (None), not empty, so
+        # catching broadly is deliberate here.
+        except Exception as exc:  # noqa: BLE001
             print(
                 f"  !! {name}: fetch failed ({exc}); recording as unreachable",
                 file=sys.stderr,
