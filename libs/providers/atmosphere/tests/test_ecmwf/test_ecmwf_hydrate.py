@@ -1176,14 +1176,19 @@ class TestAuditServeability:
         counted = self._counts(findings)
         new, worse = self._live_regressions(counted, self._KNOWN_UNSERVEABLE)
 
-        assert not new and not worse, (
-            f"serveability regressed live: new unserveable datasets {new}; "
-            f"datasets with more unserveable rows than the baseline {worse} "
-            f"(counts { {k: counted[k] for k in worse} } vs baseline "
-            f"{ {k: self._KNOWN_UNSERVEABLE[k] for k in worse} }). Either a "
-            "shipped row's selectors no longer match what the store offers "
-            "(fix the catalog), or the store legitimately changed (refresh the "
-            "fixture and move the count into the recorded-store test)."
+        hint = (
+            " Either a shipped row's selectors no longer match what the store "
+            "offers (fix the catalog), or the store legitimately changed "
+            "(refresh the fixture and move the count into the recorded-store "
+            "test)."
+        )
+        assert not new, (
+            f"serveability regressed live: new unserveable datasets {new}.{hint}"
+        )
+        assert not worse, (
+            "serveability regressed live: datasets with more unserveable rows "
+            f"than the baseline {worse} (counts { {k: counted[k] for k in worse} } "
+            f"vs baseline { {k: self._KNOWN_UNSERVEABLE[k] for k in worse} }).{hint}"
         )
 
     @staticmethod
