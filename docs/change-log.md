@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.27.0 (2026-10-08)
+
+### Feat
+
+- **osm**: canonical live/history/bulk download types with back-compat aliases (#1236)
+
+### Fix
+
+- **ecmwf**: stop live CDS drift from reddening the serveability test lane (#1242)
+
 ## 0.26.0 (2026-09-30)
 
 ### Fix
