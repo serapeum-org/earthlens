@@ -1058,6 +1058,15 @@ class TestAuditServeability:
         "reanalysis-pan-carra-means": 7,
     }
 
+    #: Datasets whose store was unreachable when the fixture was last captured,
+    #: recorded as `null` (unreachable) rather than `[]`. Their rows cannot be
+    #: judged by either lane until the store recovers and the fixture is
+    #: refreshed, so each is listed knowingly: a NEW unreachable dataset - a
+    #: transient outage during a refresh silently erasing coverage - fails
+    #: `test_only_documented_datasets_were_unreachable_at_capture` and is caught
+    #: in review. `cems-glofas-historical-intermediate`'s CEMS store answers 500.
+    _UNREACHABLE_AT_CAPTURE = frozenset({"cems-glofas-historical-intermediate"})
+
     @staticmethod
     def _counts(findings):
         """Unserveable rows per dataset, dropping the unreadable-store marker.
@@ -1100,7 +1109,15 @@ class TestAuditServeability:
         fixture = _load_serveability_fixture()
 
         def blocks_for(name):
-            return _FixtureBlocks(fixture.get(name, []))
+            if name not in fixture:
+                # Not captured; the coverage guard catches a genuine gap.
+                return _FixtureBlocks([])
+            recorded = fixture[name]
+            if recorded is None:
+                # Unreachable at capture time - surface it as the live audit
+                # would, not as an empty (and so serveable) store.
+                return _UnreachableBlocks()
+            return _FixtureBlocks(recorded)
 
         findings = hydrate_mod.audit_serveability(blocks_for=blocks_for)
         counted = self._counts(findings)
@@ -1148,6 +1165,29 @@ class TestAuditServeability:
             f"audited but not captured {sorted(audited - recorded)}; "
             f"captured but no longer audited {sorted(recorded - audited)}. "
             "Refresh it with tools/ecmwf/capture_serveability_fixture.py."
+        )
+
+    @pytest.mark.integration
+    def test_only_documented_datasets_were_unreachable_at_capture(self):
+        """A dataset recorded as unreachable must be one we listed knowingly.
+
+        A `null` entry means the store was down when the fixture was captured,
+        so neither lane can judge that dataset's rows. An entry that appears
+        without being in `_UNREACHABLE_AT_CAPTURE` is almost always a transient
+        outage caught mid-refresh, silently erasing a dataset's coverage -
+        failing here forces that to be a reviewed decision rather than a quiet
+        regression.
+        """
+        fixture = _load_serveability_fixture()
+        unreachable = {name for name, blocks in fixture.items() if blocks is None}
+
+        assert unreachable == self._UNREACHABLE_AT_CAPTURE, (
+            "unreachable-at-capture datasets drifted from the documented set: "
+            f"newly unreachable {sorted(unreachable - self._UNREACHABLE_AT_CAPTURE)} "
+            "(a refresh likely hit a transient outage - recapture, or add it to "
+            "_UNREACHABLE_AT_CAPTURE if the store is genuinely gone); recovered "
+            f"{sorted(self._UNREACHABLE_AT_CAPTURE - unreachable)} (drop it from "
+            "the documented set)."
         )
 
     @pytest.mark.e2e

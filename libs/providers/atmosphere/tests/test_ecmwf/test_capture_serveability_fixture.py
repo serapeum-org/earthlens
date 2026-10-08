@@ -65,8 +65,16 @@ def _patch_catalog(monkeypatch, datasets) -> None:
 
 
 def _patch_constraints(monkeypatch, responder) -> None:
-    """Replace the tool's `_ecmwf_constraints` with a callable fake."""
-    monkeypatch.setattr(capture_mod, "_ecmwf_constraints", responder)
+    """Replace the tool's `_ecmwf_constraints` with a callable fake.
+
+    `capture` calls it as `_ecmwf_constraints(name, strict=True)`, so the fake
+    absorbs `strict` and the test responders need only take `name`.
+    """
+    monkeypatch.setattr(
+        capture_mod,
+        "_ecmwf_constraints",
+        lambda name, strict=False: responder(name),
+    )
 
 
 def _read_snapshot(path: Path) -> dict:
@@ -134,13 +142,11 @@ class TestCapture:
         assert snapshot == {}, f"a non-promising dataset was captured: {snapshot}"
         assert fetched == [], f"a skipped dataset was still fetched: {fetched}"
 
-    def test_a_failed_fetch_is_recorded_as_empty_blocks(self, monkeypatch, tmp_path):
-        """A dataset whose fetch raises is recorded as `[]`, not dropped.
+    def test_a_failed_fetch_is_recorded_as_unreachable(self, monkeypatch, tmp_path):
+        """A dataset whose fetch raises is recorded as null (unreachable).
 
-        Test scenario:
-            `_ecmwf_constraints` raises for the one audited dataset; `capture`
-            must swallow the exception and store an empty block list so the
-            offline audit treats it as nothing to judge.
+        It must stay distinct from a store that genuinely constrains nothing
+        (`[]`), so the loader can flag it rather than judge its rows serveable.
         """
         _patch_catalog(monkeypatch, {"broken": _dataset(t2m=_row())})
 
@@ -153,8 +159,8 @@ class TestCapture:
         capture_mod.capture(out)
 
         snapshot = _read_snapshot(out)
-        assert snapshot == {"broken": []}, (
-            f"a failed fetch was not recorded as []: {snapshot}"
+        assert snapshot == {"broken": None}, (
+            f"a failed fetch was not recorded as unreachable (null): {snapshot}"
         )
 
     def test_a_none_fetch_result_becomes_empty_blocks(self, monkeypatch, tmp_path):

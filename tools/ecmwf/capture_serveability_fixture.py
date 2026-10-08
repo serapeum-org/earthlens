@@ -22,11 +22,12 @@ It writes, relative to the repo, to:
 The fetch is unauthenticated (constraints documents are public) and visits one
 `constraints.json` per curated dataset that promises data; a dataset whose rows
 are all placeholders is skipped, since the audit has no row to judge for it. A
-dataset whose fetch fails is recorded as an empty block list, which the offline
-audit treats as nothing to judge.
-(The live audit instead flags an unreachable store as a distinct
-`<constraints unreadable>` finding, but `_counts` in the test drops that
-marker, so the two agree on the count either way.)
+dataset whose fetch fails is recorded as `null` (unreachable), kept distinct
+from a store that genuinely constrains nothing (`[]`): the loader surfaces
+`null` as an unreachable lookup, so the offline audit flags it as
+`<constraints unreadable>` exactly as the live audit does, rather than silently
+judging its rows serveable. `_counts` in the test drops that marker, so the two
+lanes agree on the count either way.
 """
 
 from __future__ import annotations
@@ -59,15 +60,27 @@ def capture(out: Path) -> None:
         out: The `.json.gz` path to write. Parent directories are created.
     """
     datasets = Catalog().datasets
-    snapshot: dict[str, list[dict]] = {}
+    # `None` marks a dataset whose store was unreachable at capture time, which
+    # is NOT the same as a store that genuinely constrains nothing (`[]`).
+    # Recording both as `[]` would let the offline audit judge an unreachable
+    # dataset's rows serveable, since empty blocks read as "nothing to judge" -
+    # a standing blind spot. `None` is surfaced by the loader as an unreachable
+    # lookup instead, so the offline audit flags it exactly as the live one does.
+    snapshot: dict[str, list[dict] | None] = {}
     for name, dataset in datasets.items():
         if not any(_promises_data(row) for row in dataset.variables.values()):
             continue
         try:
-            blocks = _ecmwf_constraints(name) or []
-        except Exception as exc:  # noqa: BLE001 - a failed fetch is recorded as []
-            print(f"  !! {name}: fetch failed ({exc}); recording []", file=sys.stderr)
-            blocks = []
+            # strict=True so a failed fetch RAISES rather than degrading to `[]`;
+            # that is the only way to tell "unreachable" from "constrains nothing".
+            blocks = _ecmwf_constraints(name, strict=True) or []
+        except Exception as exc:  # noqa: BLE001 - recorded as unreachable, not empty
+            print(
+                f"  !! {name}: fetch failed ({exc}); recording as unreachable",
+                file=sys.stderr,
+            )
+            snapshot[name] = None
+            continue
         snapshot[name] = blocks
         print(f"  {len(blocks):5} blocks  {name}", file=sys.stderr)
 
@@ -75,15 +88,20 @@ def capture(out: Path) -> None:
     # Canonicalise: sort each block's list values. The audit reads them as sets
     # (`variable` membership, offered-value comparisons), so order is never
     # semantic - sorting makes a non-semantic upstream reordering leave the
-    # committed bytes unchanged, rather than churning the snapshot.
+    # committed bytes unchanged, rather than churning the snapshot. An
+    # unreachable dataset (`None`) is passed through untouched.
     canonical = {
-        name: [
-            {
-                key: sorted(value) if isinstance(value, list) else value
-                for key, value in block.items()
-            }
-            for block in blocks
-        ]
+        name: (
+            None
+            if blocks is None
+            else [
+                {
+                    key: sorted(value) if isinstance(value, list) else value
+                    for key, value in block.items()
+                }
+                for block in blocks
+            ]
+        )
         for name, blocks in snapshot.items()
     }
     payload = json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode()
