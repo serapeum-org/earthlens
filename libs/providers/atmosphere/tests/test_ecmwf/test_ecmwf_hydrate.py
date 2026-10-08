@@ -1135,15 +1135,47 @@ class TestAuditServeability:
             pytest.xfail(f"the store could not be read, so nothing was checked: {exc}")
 
         counted = self._counts(findings)
-        newly_unserveable = sorted(set(counted) - set(self._KNOWN_UNSERVEABLE))
+        new, worse = self._live_regressions(counted, self._KNOWN_UNSERVEABLE)
 
-        assert not newly_unserveable, (
-            "datasets unserveable live but not in the known baseline: "
-            f"{newly_unserveable}. Either a shipped row's selectors no longer "
-            "match what the store offers (fix the catalog), or the store "
-            "legitimately changed (refresh the fixture and move the count into "
-            "the recorded-store test)."
+        assert not new and not worse, (
+            f"serveability regressed live: new unserveable datasets {new}; "
+            f"datasets with more unserveable rows than the baseline {worse} "
+            f"(counts { {k: counted[k] for k in worse} } vs baseline "
+            f"{ {k: self._KNOWN_UNSERVEABLE[k] for k in worse} }). Either a "
+            "shipped row's selectors no longer match what the store offers "
+            "(fix the catalog), or the store legitimately changed (refresh the "
+            "fixture and move the count into the recorded-store test)."
         )
+
+    @staticmethod
+    def _live_regressions(counted, known):
+        """Datasets unserveable beyond the known-and-tolerated baseline.
+
+        Two kinds of regression, because a bare set membership misses the
+        second: a dataset with no tolerated findings that starts reporting
+        (`new`), and a dataset already in the baseline whose count of
+        unserveable rows has risen above it (`worse`) - a fresh GFAS-style
+        break inside an already-flawed dataset, which set membership alone
+        would let pass. A count that falls is benign and ignored.
+
+        Args:
+            counted: Live unserveable-row counts per dataset.
+            known: The tolerated baseline, `_KNOWN_UNSERVEABLE`.
+
+        Returns:
+            A `(new, worse)` pair of sorted dataset-id lists.
+        """
+        new = sorted(set(counted) - set(known))
+        worse = sorted(k for k in known if counted.get(k, 0) > known[k])
+        return new, worse
+
+    def test_live_regression_check_flags_new_and_worsened_datasets(self):
+        """A new dataset *and* a count rise within a known one both regress."""
+        known = {"a": 1, "b": 2}
+        assert self._live_regressions({"a": 1, "b": 2}, known) == ([], [])
+        assert self._live_regressions({"a": 1, "b": 1}, known) == ([], [])
+        assert self._live_regressions({"a": 1, "b": 2, "c": 1}, known) == (["c"], [])
+        assert self._live_regressions({"a": 3, "b": 2}, known) == ([], ["a"])
 
 
 class TestRedactionCoversTheCommonShapes:
