@@ -96,7 +96,11 @@ def capture(out: Path) -> None:
             if blocks is None
             else [
                 {
-                    key: sorted(value) if isinstance(value, list) else value
+                    # `key=str` so a future constraints shape with a mixed-type
+                    # or nested list value sorts deterministically instead of
+                    # raising `TypeError` mid-refresh; identical to a plain sort
+                    # for the flat string lists the store returns today.
+                    key: sorted(value, key=str) if isinstance(value, list) else value
                     for key, value in block.items()
                 }
                 for block in blocks
