@@ -87,13 +87,7 @@ class TestCapture:
     """Tests for `capture`, the sole function in the operator script."""
 
     def test_normal_dataset_records_canonicalised_blocks(self, monkeypatch, tmp_path):
-        """A promising dataset's blocks are recorded with list values sorted.
-
-        Test scenario:
-            One dataset has a filled row, so it is audited; its single block
-            mixes an unsorted list selector with a scalar one. The written
-            snapshot must sort the list and leave the scalar untouched.
-        """
+        """A promising dataset's blocks are recorded with list values sorted and scalars left untouched."""
         _patch_catalog(monkeypatch, {"normal": _dataset(t2m=_row())})
         block = {"variable": ["b", "a", "c"], "data_format": "netcdf"}
         _patch_constraints(monkeypatch, lambda name: [dict(block)])
@@ -107,12 +101,7 @@ class TestCapture:
         }, f"blocks not canonicalised as expected: {snapshot}"
 
     def test_parent_directories_are_created(self, monkeypatch, tmp_path):
-        """A non-existent parent of `out` is created before the write.
-
-        Test scenario:
-            `out` points two levels below `tmp_path`; `capture` must `mkdir`
-            the parents rather than failing, and the file must exist after.
-        """
+        """A missing parent directory of `out` is created before the snapshot is written."""
         _patch_catalog(monkeypatch, {"normal": _dataset(t2m=_row())})
         _patch_constraints(monkeypatch, lambda name: [{"variable": ["x"]}])
 
@@ -122,13 +111,7 @@ class TestCapture:
         assert out.exists(), "capture did not create the output file and its parents"
 
     def test_dataset_with_no_promising_row_is_skipped(self, monkeypatch, tmp_path):
-        """A dataset whose every row is a placeholder is not audited at all.
-
-        Test scenario:
-            The only row carries `units='unknown'`, so `_promises_data` is
-            False for it; the dataset must be absent from the snapshot and no
-            constraints fetch must be issued for it.
-        """
+        """A dataset whose rows are all placeholders is skipped and never fetched."""
         _patch_catalog(monkeypatch, {"placeholder": _dataset(x=_row(units="unknown"))})
         fetched = []
         _patch_constraints(
@@ -143,11 +126,7 @@ class TestCapture:
         assert fetched == [], f"a skipped dataset was still fetched: {fetched}"
 
     def test_a_failed_fetch_is_recorded_as_unreachable(self, monkeypatch, tmp_path):
-        """A dataset whose fetch raises is recorded as null (unreachable).
-
-        It must stay distinct from a store that genuinely constrains nothing
-        (`[]`), so the loader can flag it rather than judge its rows serveable.
-        """
+        """A dataset whose fetch raises is recorded as null (unreachable), distinct from an empty store."""
         _patch_catalog(monkeypatch, {"broken": _dataset(t2m=_row())})
 
         def boom(name):
@@ -164,12 +143,7 @@ class TestCapture:
         )
 
     def test_a_none_fetch_result_becomes_empty_blocks(self, monkeypatch, tmp_path):
-        """A fetch returning `None` is coerced to `[]` by the `or []` guard.
-
-        Test scenario:
-            `_ecmwf_constraints` returns None (no constraints document); the
-            `blocks = ... or []` branch must store an empty list for the row.
-        """
+        """A fetch returning `None` is coerced to an empty block list by the `or []` guard."""
         _patch_catalog(monkeypatch, {"empty": _dataset(t2m=_row())})
         _patch_constraints(monkeypatch, lambda name: None)
 
@@ -181,14 +155,7 @@ class TestCapture:
     def test_mixed_datasets_capture_only_the_promising_ones(
         self, monkeypatch, tmp_path
     ):
-        """Across a mix, skipped, failing and normal datasets land correctly.
-
-        Test scenario:
-            Three datasets — a placeholder (skipped), a normal one (recorded),
-            and a dataset with one placeholder plus one filled row (audited) —
-            exercise both sides of the `any(_promises_data(...))` branch in one
-            run.
-        """
+        """Across a mix of skipped, normal and partly-placeholder datasets, only the promising ones are captured."""
         datasets = {
             "skip": _dataset(x=_row(units="unknown")),
             "normal": _dataset(t2m=_row()),
@@ -207,15 +174,7 @@ class TestCapture:
         assert snapshot["mixed"] == [{"variable": ["mixed"]}]
 
     def test_two_runs_are_byte_identical(self, monkeypatch, tmp_path):
-        """mtime=0 plus canonicalisation make an unchanged store write identical bytes.
-
-        Test scenario:
-            Re-capturing the same catalog and constraints to the same filename
-            (two runs of the refresh, modelled as the same basename in two
-            directories so both survive) must yield byte-for-byte identical
-            gzip output, so an unchanged refresh shows git nothing to commit.
-            The basename is kept equal because gzip records it in the header.
-        """
+        """Two captures of the same inputs produce byte-identical gzip output."""
         _patch_catalog(monkeypatch, {"normal": _dataset(t2m=_row())})
         _patch_constraints(
             monkeypatch, lambda name: [{"variable": ["b", "a"], "product_type": ["f"]}]
