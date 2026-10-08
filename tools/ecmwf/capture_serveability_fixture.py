@@ -20,8 +20,10 @@ It writes, relative to the repo, to:
     libs/providers/atmosphere/tests/test_ecmwf/fixtures/serveability_constraints.json.gz
 
 The fetch is unauthenticated (constraints documents are public) and visits one
-`constraints.json` per curated dataset. A dataset whose fetch fails is recorded
-as an empty block list, which the offline audit treats as nothing to judge.
+`constraints.json` per curated dataset that promises data; a dataset whose rows
+are all placeholders is skipped, since the audit has no row to judge for it. A
+dataset whose fetch fails is recorded as an empty block list, which the offline
+audit treats as nothing to judge.
 (The live audit instead flags an unreachable store as a distinct
 `<constraints unreadable>` finding, but `_counts` in the test drops that
 marker, so the two agree on the count either way.)
@@ -46,7 +48,12 @@ _FIXTURE = (
 
 
 def capture(out: Path) -> None:
-    """Fetch every curated dataset's constraints and write the gzipped snapshot.
+    """Fetch each data-promising dataset's constraints and write the snapshot.
+
+    Walks the curated ECMWF catalog, skipping any dataset whose rows are all
+    placeholders (so the audit has no row to judge for it), fetches each
+    remaining dataset's public `constraints.json`, canonicalises the blocks,
+    and writes them as a single gzipped, deterministically ordered JSON file.
 
     Args:
         out: The `.json.gz` path to write. Parent directories are created.
