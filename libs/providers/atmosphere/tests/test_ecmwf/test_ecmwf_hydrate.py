@@ -1256,8 +1256,13 @@ class TestAuditServeability:
     def test_live_regression_check_flags_new_and_worsened_datasets(self):
         """A new dataset *and* a count rise within a known one both regress."""
         known = {"a": 1, "b": 2}
+        # benign: exactly the baseline, a count fall, a known dataset fully
+        # fixed (absent from counted), and nothing unserveable at all
         assert self._live_regressions({"a": 1, "b": 2}, known) == ([], [])
         assert self._live_regressions({"a": 1, "b": 1}, known) == ([], [])
+        assert self._live_regressions({"a": 1}, known) == ([], [])
+        assert self._live_regressions({}, known) == ([], [])
+        # regressions: a new dataset, and a count rise within a known one
         assert self._live_regressions({"a": 1, "b": 2, "c": 1}, known) == (["c"], [])
         assert self._live_regressions({"a": 3, "b": 2}, known) == ([], ["a"])
 
