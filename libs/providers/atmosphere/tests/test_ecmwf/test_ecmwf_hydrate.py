@@ -1105,14 +1105,19 @@ class TestAuditServeability:
         findings = hydrate_mod.audit_serveability(blocks_for=blocks_for)
         counted = self._counts(findings)
 
-        assert counted == self._KNOWN_UNSERVEABLE, (
-            "the recorded serveability baseline moved: "
-            f"newly reporting {sorted(set(counted) - set(self._KNOWN_UNSERVEABLE))}, "
-            f"no longer reporting {sorted(set(self._KNOWN_UNSERVEABLE) - set(counted))}, "
-            "changed counts "
-            f"{ {k: (self._KNOWN_UNSERVEABLE.get(k), counted.get(k)) for k in set(self._KNOWN_UNSERVEABLE) | set(counted) if self._KNOWN_UNSERVEABLE.get(k) != counted.get(k)} }"
-            " - if the live stores changed, refresh the fixture; otherwise a "
-            "catalog edit broke a row."
+        known = self._KNOWN_UNSERVEABLE
+        newly = sorted(set(counted) - set(known))
+        gone = sorted(set(known) - set(counted))
+        changed = {
+            k: (known.get(k), counted.get(k))
+            for k in set(known) | set(counted)
+            if known.get(k) != counted.get(k)
+        }
+        assert counted == known, (
+            f"the recorded serveability baseline moved: newly reporting {newly}, "
+            f"no longer reporting {gone}, changed counts {changed} - if the live "
+            "stores changed, refresh the fixture; otherwise a catalog edit broke "
+            "a row."
         )
 
     @pytest.mark.integration
