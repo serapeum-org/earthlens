@@ -84,9 +84,11 @@ def capture(out: Path) -> None:
     # canonicalisation above - an unchanged store yields identical bytes and git
     # shows nothing to commit. The compressed bytes are not guaranteed identical
     # across zlib versions, so a refresh on a different toolchain may still diff.
-    with out.open("wb") as raw:
-        with gzip.GzipFile(fileobj=raw, mode="wb", mtime=0) as fh:
-            fh.write(payload)
+    with (
+        out.open("wb") as raw,
+        gzip.GzipFile(fileobj=raw, mode="wb", mtime=0) as fh,
+    ):
+        fh.write(payload)
     print(
         f"\nwrote {len(snapshot)} dataset(s) to {out} ({out.stat().st_size} gz bytes)",
         file=sys.stderr,
