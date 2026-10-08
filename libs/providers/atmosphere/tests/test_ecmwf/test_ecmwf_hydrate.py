@@ -1216,19 +1216,26 @@ class TestAuditServeability:
         counted = self._counts(findings)
         new, worse = self._live_regressions(counted, self._KNOWN_UNSERVEABLE)
 
-        hint = (
-            " Either a shipped row's selectors no longer match what the store "
-            "offers (fix the catalog), or the store legitimately changed "
-            "(refresh the fixture and move the count into the recorded-store "
-            "test)."
-        )
-        assert not new, (
-            f"serveability regressed live: new unserveable datasets {new}.{hint}"
-        )
-        assert not worse, (
-            "serveability regressed live: datasets with more unserveable rows "
-            f"than the baseline {worse} (counts { {k: counted[k] for k in worse} } "
-            f"vs baseline { {k: self._KNOWN_UNSERVEABLE[k] for k in worse} }).{hint}"
+        # Gather both kinds into one report rather than two sequential asserts:
+        # a single `assert not problems` keeps the composite-assertion smell
+        # (python:S9073) away while still surfacing a new dataset AND a count
+        # rise in the same run, instead of hiding the second until the first is
+        # fixed.
+        problems = []
+        if new:
+            problems.append(f"new unserveable datasets {new}")
+        if worse:
+            problems.append(
+                f"datasets with more unserveable rows than the baseline {worse} "
+                f"(counts { {k: counted[k] for k in worse} } vs baseline "
+                f"{ {k: self._KNOWN_UNSERVEABLE[k] for k in worse} })"
+            )
+        assert not problems, (
+            "serveability regressed live: "
+            + "; ".join(problems)
+            + ". Either a shipped row's selectors no longer match what the store "
+            "offers (fix the catalog), or the store legitimately changed (refresh "
+            "the fixture and move the count into the recorded-store test)."
         )
 
     @staticmethod
