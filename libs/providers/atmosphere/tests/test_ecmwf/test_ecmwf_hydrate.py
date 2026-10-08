@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import collections
+import functools
+import gzip
+import json
 import re
 import textwrap
 import time
@@ -392,6 +395,23 @@ class _FixtureBlocks:
     def __call__(self, cds_variable):
         """Return the fixture blocks that list `cds_variable`."""
         return [r for r in self._rows if cds_variable in (r.get("variable") or [])]
+
+
+_SERVEABILITY_FIXTURE = (
+    Path(__file__).parent / "fixtures" / "serveability_constraints.json.gz"
+)
+
+
+@functools.lru_cache(maxsize=1)
+def _load_serveability_fixture():
+    """Load the frozen per-dataset constraints snapshot.
+
+    Returns:
+        A mapping of dataset id to its recorded `constraints.json` blocks,
+        read once and cached for the process.
+    """
+    with gzip.open(_SERVEABILITY_FIXTURE, "rb") as fh:
+        return json.loads(fh.read())
 
 
 def _audit_catalog(monkeypatch, datasets):
@@ -1013,57 +1033,116 @@ class TestAuditServeability:
 
         assert hydrate_mod.audit_serveability(lambda name: _FixtureBlocks([])) == []
 
-    @pytest.mark.integration
-    def test_no_shipped_row_is_unserveable_against_the_live_store(self):
-        """The invariant on the real catalog, re-derivable rather than asserted.
+    # Each number is the count of unserveable rows the frozen fixture reports
+    # for that dataset. Repairing any of them means choosing which data
+    # version, period, ensemble member or model a caller gets - a curation
+    # decision, tracked on a pull request rather than guessed at here - so the
+    # catalog ships them knowingly and the baseline tolerates exactly them.
+    # Counts, not just names: a bare allow-list hides a regression inside a
+    # dataset that already reports, which is how a whole batch of rows slipped
+    # past an earlier round of this work.
+    _KNOWN_UNSERVEABLE = {
+        "derived-near-surface-meteorological-variables": 8,
+        "insitu-gridded-observations-global-and-regional": 1,
+        "projections-cmip5-monthly-single-levels": 3,
+        "sis-ecde-climate-indicators": 4,
+        "sis-european-risk-extreme-precipitation-indicators": 2,
+        "sis-tourism-fire-danger-indicators": 1,
+        # These name a variable the store does not offer at all, which the
+        # repo's own RequestValidator already reports. Fixing them means
+        # finding the current name.
+        "reanalysis-era5-single-levels": 1,
+        "reanalysis-era5-single-levels-monthly-means": 5,
+        # As of 2026-09-23 the store offers none of: wind direction (4 rows),
+        # fog, surface roughness (2 rows).
+        "reanalysis-pan-carra-means": 7,
+    }
 
-        Not `e2e`: the audit issues unauthenticated `constraints.json` GETs and
-        no retrieve, so gating it behind the weekly credentialed job would let a
-        hand edit to a shard land unchallenged on every PR.
+    @staticmethod
+    def _counts(findings):
+        """Unserveable rows per dataset, dropping the unreadable-store marker.
+
+        A dataset the store could not answer for at all is reported as one
+        `<constraints unreadable>` row - host state on the day, not a property
+        of the catalog - so it is excluded rather than counted.
+
+        Args:
+            findings: The `(dataset, slug, selectors)` triples an audit returns.
+
+        Returns:
+            A `Counter` of unserveable-row counts keyed by dataset id.
+        """
+        return collections.Counter(
+            dataset for dataset, slug, _ in findings if slug != _UNREADABLE
+        )
+
+    @pytest.mark.integration
+    def test_no_shipped_row_is_unserveable_against_the_recorded_store(self):
+        """The #1147 invariant judged against a frozen constraints snapshot.
+
+        Offline and deterministic: it feeds `audit_serveability` a recorded
+        snapshot of every dataset's `constraints.json` (see
+        `fixtures/serveability_constraints.json.gz`) rather than the live
+        stores, so it runs on every PR without the network and a hand edit to
+        a shard that makes a row unserveable fails here, not weeks later.
+
+        Upstream drift is deliberately out of scope - the live stores move on
+        their own schedule and would redden unrelated PRs - so the live
+        re-derivation lives in `..._against_the_live_store` (`e2e`). Refresh
+        the snapshot with `tools/ecmwf/capture_serveability_fixture.py` when
+        the stores legitimately change, and move its count here in the same
+        commit.
+        """
+        fixture = _load_serveability_fixture()
+
+        def blocks_for(name):
+            return _FixtureBlocks(fixture.get(name, []))
+
+        findings = hydrate_mod.audit_serveability(blocks_for=blocks_for)
+        counted = self._counts(findings)
+
+        assert counted == self._KNOWN_UNSERVEABLE, (
+            "the recorded serveability baseline moved: "
+            f"newly reporting {sorted(set(counted) - set(self._KNOWN_UNSERVEABLE))}, "
+            f"no longer reporting {sorted(set(self._KNOWN_UNSERVEABLE) - set(counted))}, "
+            "changed counts "
+            f"{ {k: (self._KNOWN_UNSERVEABLE.get(k), counted.get(k)) for k in set(self._KNOWN_UNSERVEABLE) | set(counted) if self._KNOWN_UNSERVEABLE.get(k) != counted.get(k)} }"
+            " - if the live stores changed, refresh the fixture; otherwise a "
+            "catalog edit broke a row."
+        )
+
+    @pytest.mark.e2e
+    @pytest.mark.ecmwf
+    def test_no_shipped_row_is_unserveable_against_the_live_store(self):
+        """No shipped row is newly unserveable against the live stores.
+
+        The live counterpart of the recorded-store test, so benign upstream
+        drift cannot redden an ordinary PR. It runs only under `-m e2e`, the
+        weekly job.
+
+        Drift-tolerant by design: it asserts the live findings name no dataset
+        beyond the known-and-tolerated set, rather than an exact count. A
+        dataset that becomes serveable (a count that falls) is benign and does
+        not fail; a dataset that becomes *un*serveable - as
+        `cams-global-fire-emissions-gfas` did when GFAS 1.4.2 added a
+        `temporal_aggregation` dimension - is a genuine catalog defect and
+        does. A total outage raises `ConstraintsUnavailable`, which is an
+        xfail, not a red lane.
         """
         try:
             findings = hydrate_mod.audit_serveability()
         except hydrate_mod.ConstraintsUnavailable as exc:
             pytest.xfail(f"the store could not be read, so nothing was checked: {exc}")
 
-        # Counts, not just names: a bare allow-list hides a regression inside
-        # a dataset that already reports, which is how a whole batch of rows
-        # slipped past an earlier round of this work. Each number is the live
-        # finding count for that dataset, so the assertion fails if a row is
-        # broken *or* if one is quietly fixed and the entry goes stale.
-        known = {
-            # Repairing these means choosing which data version, period,
-            # ensemble member or model a caller gets - a curation decision,
-            # tracked on the pull request rather than guessed at here.
-            "derived-near-surface-meteorological-variables": 8,
-            "insitu-gridded-observations-global-and-regional": 1,
-            "projections-cmip5-monthly-single-levels": 3,
-            "sis-ecde-climate-indicators": 4,
-            "sis-european-risk-extreme-precipitation-indicators": 2,
-            "sis-tourism-fire-danger-indicators": 1,
-            # A different defect, also pre-existing: these name a variable the
-            # store does not offer at all, which the repo's own RequestValidator
-            # already reports. Fixing them means finding the current name.
-            "reanalysis-era5-single-levels": 1,
-            "reanalysis-era5-single-levels-monthly-means": 5,
-            # As of 2026-09-23 the store offers none of: wind direction (4
-            # rows), fog, surface roughness (2 rows). The count rose from 3.
-            "reanalysis-pan-carra-means": 7,
-        }
-        # A dataset the store could not answer for at all is reported as one
-        # `<constraints unreadable>` row. That is the host's state on the day,
-        # not the catalog's, so it is excluded rather than counted -
-        # `cems-glofas-historical-intermediate` answers 500 as of writing.
-        counted = collections.Counter(
-            dataset for dataset, slug, _ in findings if slug != _UNREADABLE
-        )
+        counted = self._counts(findings)
+        newly_unserveable = sorted(set(counted) - set(self._KNOWN_UNSERVEABLE))
 
-        assert counted == known, (
-            "the live serveability baseline moved: "
-            f"newly reporting {sorted(set(counted) - set(known))}, "
-            f"no longer reporting {sorted(set(known) - set(counted))}, "
-            "changed counts "
-            f"{ {k: (known.get(k), counted.get(k)) for k in set(known) | set(counted) if known.get(k) != counted.get(k)} }"
+        assert not newly_unserveable, (
+            "datasets unserveable live but not in the known baseline: "
+            f"{newly_unserveable}. Either a shipped row's selectors no longer "
+            "match what the store offers (fix the catalog), or the store "
+            "legitimately changed (refresh the fixture and move the count into "
+            "the recorded-store test)."
         )
 
 
