@@ -167,14 +167,20 @@ dev = [
     # notebooks stop hand-rolling matplotlib around pyramids' own plot(). Not a
     # runtime dep of earthlens itself.
     #
-    # FLOOR IS STALE ON PURPOSE: the showcase notebooks call
-    # `Map.animate(kind="rgb_composite", ...)` and hand `animate` a
-    # DatasetCollection, neither of which 0.9.0 supports -- 0.9.0 rejects the
-    # composite kind outright, and a collection iterates to numpy arrays there.
-    # Tracked as Digital-Earth issues #150 / #154 / #155. Raise this to `>=0.10.0`
-    # and re-lock as soon as a release carrying them is cut; until then those
-    # notebooks' true-colour animation cells do not run.
-    "digitalearth >=0.9.0",
+    # 0.13.0 is a hard floor, not a convenience. It is the release that accepts
+    # `Map.animate(kind="rgb_composite", ...)` over a DatasetCollection and freezes
+    # one contrast stretch across the whole stack, so a true-colour timelapse does
+    # not re-derive its percentiles per frame; the per-channel bounds are `limits=`,
+    # renamed from `stretch_limits`. It also gives `TexturedGlobe` its own
+    # `coastlines()` and a `spin=` on `points()`, both of which the globe notebooks
+    # used to hand-roll. Two import paths moved with it -- `digitalearth.animation`
+    # -> `digitalearth.static.animation`, and `get_source` up to the top level --
+    # so 0.9 and 0.13 are not interchangeable in either direction.
+    #
+    # Still absent upstream: a globe counterpart to `Map.animate` that takes a raster
+    # stack (Digital-Earth#173), which is why the El Nino notebook drives the globe
+    # animation through its own FuncAnimation loop.
+    "digitalearth >=0.13.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     # mypy: the `mypy` pre-commit hook and the lint.yml `static` job type-check src.
@@ -237,7 +243,7 @@ notebooks = [
     # here rather than in `dev` because they are a heavy stack -- geoviews,
     # datashader, pyvista, trame, geovista, maplibre, lonboard -- that only four
     # notebooks need, and `dev` is synced for every test run.
-    "digitalearth[interactive,3d,web] >=0.9.0",
+    "digitalearth[interactive,3d,web] >=0.13.0",
 ]
 docs = [
     "mkdocs >=1.5.3",
@@ -262,7 +268,7 @@ docs = [
     "cleopatra[tiles] >=0.40.0",
     # digitalearth: mkdocs-jupyter renders the example notebooks, which import it
     # for their maps, charts and animations. Also in `dev` -- see the comment there.
-    "digitalearth >=0.9.0",
+    "digitalearth >=0.13.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
     # scipy: the satellite showcase blurs the logo's drop shadow with
