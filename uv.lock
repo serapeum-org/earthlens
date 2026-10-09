@@ -2,26 +2,16 @@ version = 1
 revision = 3
 requires-python = ">=3.11, <4"
 resolution-markers = [
-    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version >= '3.15' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version >= '3.15' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "(python_full_version == '3.14.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.14.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.13.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.13.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.12.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.12.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version < '3.12' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version < '3.12' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version >= '3.15' and platform_machine != 'ARM64') or (python_full_version >= '3.15' and sys_platform != 'win32')",
+    "(python_full_version == '3.14.*' and platform_machine != 'ARM64') or (python_full_version == '3.14.*' and sys_platform != 'win32')",
+    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.13.*' and platform_machine != 'ARM64') or (python_full_version == '3.13.*' and sys_platform != 'win32')",
+    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.12.*' and platform_machine != 'ARM64') or (python_full_version == '3.12.*' and sys_platform != 'win32')",
+    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
 ]
 conflicts = [[
     { package = "earthlens-imagery", extra = "openeo" },
@@ -255,6 +245,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/61/cc/a381afa6efea9f496eff839d4a6a1aed3bfafc7b3ab4b0d1b243a12573dd/anyio-4.14.2.tar.gz", hash = "sha256:cfa139f3ed1a23ee8f88a145ddb5ac7605b8bbfd8592baacd7ce3d8bb4313c7f", size = 260176, upload-time = "2026-07-12T20:29:07.082Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/da/35/f2287558c17e29fafc8ef3daf819bb9834061cfa43bff8014f7df7f63bdc/anyio-4.14.2-py3-none-any.whl", hash = "sha256:9f505dda5ac9f0c8309b5e8bd445a8c2bf7246f3ce950121e45ea15bc41d1494", size = 125813, upload-time = "2026-07-12T20:29:05.763Z" },
+]
+
+[[package]]
+name = "anywidget"
+version = "0.11.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "ipywidgets" },
+    { name = "psygnal" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/79/31/0491d707c674b34267f55d96d6a7148e55e7b6718a271686232cf295fbe2/anywidget-0.11.0.tar.gz", hash = "sha256:6695fbef9449cf8c27f421b96c5837aa37f909ec1f60cfa33add333e1b70b169", size = 426999, upload-time = "2026-04-27T23:42:09.576Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8e/c2/8fec8e8e2eb920cc2280f569144080cd58622a2eda83bfa4c0c354a63264/anywidget-0.11.0-py3-none-any.whl", hash = "sha256:c574d9acc6503ad27b37a9acea48f957a8ba7c9c9876cfcb37898931c098ce9d", size = 317341, upload-time = "2026-04-27T23:42:08.356Z" },
 ]
 
 [[package]]
@@ -688,6 +692,27 @@ css = [
 ]
 
 [[package]]
+name = "bokeh"
+version = "3.9.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "contourpy" },
+    { name = "jinja2" },
+    { name = "narwhals" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "packaging" },
+    { name = "pillow" },
+    { name = "pyyaml" },
+    { name = "tornado", marker = "sys_platform != 'emscripten' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "xyzservices" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/dd/6f/262b649ad2fdd5ed23341452eebfa669a73b0e0c739a369204d02ee2e201/bokeh-3.9.2.tar.gz", hash = "sha256:5be30d105b329d7d2ab1cb92f51e6bd44e23f0fe21ab8d49594b220b2ab11632", size = 5751825, upload-time = "2026-07-25T16:57:56.207Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ca/0c/06a99ee998b1babf95074376cbf6ede5a86af726b12cbf47c4b84fa2803a/bokeh-3.9.2-py3-none-any.whl", hash = "sha256:448e07d5ee78231f5bdece3be020024bb98696c0d6b127e0e2df0b8ba8fa9765", size = 6409477, upload-time = "2026-07-25T16:57:54.62Z" },
+]
+
+[[package]]
 name = "boto3"
 version = "1.43.46"
 source = { registry = "https://pypi.org/simple" }
@@ -776,6 +801,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/23/f1/e34501c1228415e9fbcac8cb9c81098900e78331b30eeee1816176324bab/bounded_pool_executor-0.0.3.tar.gz", hash = "sha256:e092221bc38ade555e1064831f9ed800580fa34a4b6d8e9dd3cd961549627f6e", size = 2238, upload-time = "2019-06-04T19:29:06.672Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/bc/23/72ecfe284a1da711257ff310b29c6667d0187a608322d58bf1c7a927c7b2/bounded_pool_executor-0.0.3-py3-none-any.whl", hash = "sha256:6f164d64919db1e6a5c187cce281f62bc559a5fed4ce064942e650c227aef190", size = 3371, upload-time = "2019-06-04T19:29:05.152Z" },
+]
+
+[[package]]
+name = "branca"
+version = "0.8.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "jinja2" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/32/14/9d409124bda3f4ab7af3802aba07181d1fd56aa96cc4b999faea6a27a0d2/branca-0.8.2.tar.gz", hash = "sha256:e5040f4c286e973658c27de9225c1a5a7356dd0702a7c8d84c0f0dfbde388fe7", size = 27890, upload-time = "2025-10-06T10:28:20.305Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7e/50/fc9680058e63161f2f63165b84c957a0df1415431104c408e8104a3a18ef/branca-0.8.2-py3-none-any.whl", hash = "sha256:2ebaef3983e3312733c1ae2b793b0a8ba3e1c4edeb7598e10328505280cf2f7c", size = 26193, upload-time = "2025-10-06T10:28:19.255Z" },
 ]
 
 [[package]]
@@ -1262,6 +1299,18 @@ wheels = [
 ]
 
 [[package]]
+name = "click-default-group"
+version = "1.2.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1d/ce/edb087fb53de63dad3b36408ca30368f438738098e668b78c87f93cd41df/click_default_group-1.2.4.tar.gz", hash = "sha256:eb3f3c99ec0d456ca6cd2a7f08f7d4e91771bef51b01bdd9580cc6450fe1251e", size = 3505, upload-time = "2023-08-04T07:54:58.425Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2c/1a/aff8bb287a4b1400f69e09a53bd65de96aa5cee5691925b38731c67fc695/click_default_group-1.2.4-py2.py3-none-any.whl", hash = "sha256:9b60486923720e7fc61731bdb32b617039aba820e22e1c88766b1125592eaa5f", size = 4123, upload-time = "2023-08-04T07:54:56.875Z" },
+]
+
+[[package]]
 name = "click-plugins"
 version = "1.1.1.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1295,12 +1344,36 @@ wheels = [
 ]
 
 [[package]]
+name = "cmocean"
+version = "4.0.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "matplotlib" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "packaging" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0e/93/6ce32a2749968071b5239c96c54a229f9cb666d1c2d2cead7246ef28282c/cmocean-4.0.3.tar.gz", hash = "sha256:37868399fb5f41b4eac596e69803f9bfaea49946514dfb2e7f48886854250d7c", size = 7145175, upload-time = "2024-04-06T01:05:26.398Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/86/7b/97754548e9da3d41d7334e375b2cd712e9406a3f48823a5f0a166f42d63d/cmocean-4.0.3-py3-none-any.whl", hash = "sha256:f2fc1d5e349db122ee0c9eac80bba969aa92dd2806548fce58dc8bef962f309e", size = 421873, upload-time = "2024-04-06T01:05:24.069Z" },
+]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/d8/53/6f443c9a4a8358a93a6792e2acffb9d9d5cb0a5cfd8802644b7b1c9a02e4/colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44", size = 27697, upload-time = "2022-10-25T02:36:22.414Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6", size = 25335, upload-time = "2022-10-25T02:36:20.889Z" },
+]
+
+[[package]]
+name = "colorcet"
+version = "3.2.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/3f/af/b969f541242b84cbbacabdf20862e487689e352bf0f02f90df2795d29da5/colorcet-3.2.1.tar.gz", hash = "sha256:48d9a67e6e59dc5c0a965aa1b46fe5d59cdc95cc36a95949f29313f950ac59f7", size = 2202958, upload-time = "2026-04-28T16:25:37.43Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1b/24/e95471ae93c08d3606c9c7343cf65d490f154daa88b50581957a0aa780f4/colorcet-3.2.1-py3-none-any.whl", hash = "sha256:3f6fde13cef2169222dd5fe2a2bf847c02d644470fdf167ed566f6421df470f7", size = 262291, upload-time = "2026-04-28T16:25:35.365Z" },
 ]
 
 [[package]]
@@ -1609,6 +1682,21 @@ wheels = [
 ]
 
 [[package]]
+name = "cyclopts"
+version = "5.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "attrs" },
+    { name = "docstring-parser" },
+    { name = "rich" },
+    { name = "rich-rst" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/28/c1/3debeeb6e0eb74a51d6f8cf1f273ed7c479e3321631cbf89fb9700e65e28/cyclopts-5.2.0.tar.gz", hash = "sha256:b63c1b1beaadf3ead19214385a0f90b990f152c4107c174e1724c45dc71e9541", size = 246542, upload-time = "2026-10-06T15:02:39.212Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d4/dd/3f73d04c95f6acc6a54700011637e49362e337139b518be895edf4786f87/cyclopts-5.2.0-py3-none-any.whl", hash = "sha256:5da2a5d65164e03008621fc4795946b88a722b881398b5dfa58afa6218342cff", size = 289196, upload-time = "2026-10-06T15:02:37.57Z" },
+]
+
+[[package]]
 name = "dask"
 version = "2026.7.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1675,6 +1763,32 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/29/1d/4aac06c1664d1a595dfdb3ec94b32c2147ec2e2806bbf15b17b58a448a7e/dataretrieval-1.2.0.tar.gz", hash = "sha256:30c720a71adcd632a61690ed1634a5e3a9fc00c5737f490e538d1995b461c791", size = 4004138, upload-time = "2026-06-24T21:25:23.247Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b4/f2/2f81557ef90966ab983fe2c38ccd59cc1723c93214fc86436bf07239ae4a/dataretrieval-1.2.0-py3-none-any.whl", hash = "sha256:71940a1d889a9c39637d8ef0efd68ebaf542500edf6d959d935852148a570be3", size = 164840, upload-time = "2026-06-24T21:25:21.902Z" },
+]
+
+[[package]]
+name = "datashader"
+version = "0.19.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorcet" },
+    { name = "multipledispatch" },
+    { name = "numba" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "packaging" },
+    { name = "pandas" },
+    { name = "param" },
+    { name = "pyct" },
+    { name = "requests" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "toolz" },
+    { name = "xarray", version = "2025.1.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
+    { name = "xarray", version = "2025.9.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/53/4b/a9141f286f0c01685e9715ba3404769a6138e74575c4d5ccbaa95a22c3bd/datashader-0.19.1.tar.gz", hash = "sha256:f62d880a4a431813f9bb3959e565feda79c1634f889aaadcf948cb0d0c114cdd", size = 10581968, upload-time = "2026-05-19T07:53:06.574Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/41/247627c8b9fef5c605d00546b85771a8fe42975b9616a557cead5468789b/datashader-0.19.1-py3-none-any.whl", hash = "sha256:7ce7154ff3ed070607f429355f57002fee5a17964e47c0b6447eeafe8cef9c82", size = 10715897, upload-time = "2026-05-19T07:53:03.431Z" },
 ]
 
 [[package]]
@@ -1771,6 +1885,45 @@ wheels = [
 ]
 
 [[package]]
+name = "digitalearth"
+version = "0.13.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cleopatra", extra = ["tiles"] },
+    { name = "geopandas" },
+    { name = "loguru" },
+    { name = "matplotlib" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "pandas" },
+    { name = "pyramids-gis" },
+    { name = "pyyaml" },
+    { name = "xyzservices" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e4/8f/144cbe17287e20e15daaa31e8fe26a593f3c6c68f35636447f711ec163f9/digitalearth-0.13.0.tar.gz", hash = "sha256:ffb08dc7920b4453751835dad6cc931664eab417793e794ab81596a3cc33d46c", size = 1356544, upload-time = "2026-10-08T21:06:56.424Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/f9/50ecbf3a2b03ef1bdd30f8824448254aecc613e86d899938bdeeb7c3586e/digitalearth-0.13.0-py3-none-any.whl", hash = "sha256:e56374b664092dc561531599f043ca046e73e8c425f7ec513a56771f1a76cbac", size = 1321919, upload-time = "2026-10-08T21:06:54.811Z" },
+]
+
+[package.optional-dependencies]
+3d = [
+    { name = "geovista" },
+    { name = "imageio" },
+    { name = "imageio-ffmpeg" },
+    { name = "pyvista", extra = ["jupyter"] },
+]
+interactive = [
+    { name = "datashader" },
+    { name = "geoviews" },
+    { name = "holoviews" },
+    { name = "hvplot" },
+    { name = "panel" },
+]
+web = [
+    { name = "maplibre", extra = ["ipywidget"] },
+]
+
+[[package]]
 name = "distlib"
 version = "0.4.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1818,6 +1971,15 @@ name = "docopt"
 version = "0.6.2"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a2/55/8f8cab2afd404cf578136ef2cc5dfb50baa1761b68c9da1fb1e4eed343c9/docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491", size = 25901, upload-time = "2014-06-16T11:18:57.406Z" }
+
+[[package]]
+name = "docstring-parser"
+version = "0.18.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e0/4d/f332313098c1de1b2d2ff91cf2674415cc7cddab2ca1b01ae29774bd5fdf/docstring_parser-0.18.0.tar.gz", hash = "sha256:292510982205c12b1248696f44959db3cdd1740237a968ea1e2e7a900eeb2015", size = 29341, upload-time = "2026-04-14T04:09:19.867Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a7/5f/ed01f9a3cdffbd5a008556fc7b2a08ddb1cc6ace7effa7340604b1d16699/docstring_parser-0.18.0-py3-none-any.whl", hash = "sha256:b3fcbed555c47d8479be0796ef7e19c2670d428d72e96da63f3a40122860374b", size = 22484, upload-time = "2026-04-14T04:09:18.638Z" },
+]
 
 [[package]]
 name = "docutils"
@@ -1881,10 +2043,8 @@ name = "earthaccess"
 version = "0.17.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version < '3.12' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version < '3.12' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "fsspec", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -1908,22 +2068,14 @@ name = "earthaccess"
 version = "0.18.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version >= '3.15' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version >= '3.15' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "(python_full_version == '3.14.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.14.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.13.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.13.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.12.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.12.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version >= '3.15' and platform_machine != 'ARM64') or (python_full_version >= '3.15' and sys_platform != 'win32')",
+    "(python_full_version == '3.14.*' and platform_machine != 'ARM64') or (python_full_version == '3.14.*' and sys_platform != 'win32')",
+    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.13.*' and platform_machine != 'ARM64') or (python_full_version == '3.13.*' and sys_platform != 'win32')",
+    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.12.*' and platform_machine != 'ARM64') or (python_full_version == '3.12.*' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "fsspec", marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -2093,6 +2245,7 @@ dev = [
     { name = "cleopatra", extra = ["tiles"] },
     { name = "commitizen" },
     { name = "coverage" },
+    { name = "digitalearth" },
     { name = "hypothesis" },
     { name = "jupyter" },
     { name = "jupyterlab" },
@@ -2112,6 +2265,7 @@ dev = [
 ]
 docs = [
     { name = "cleopatra", extra = ["tiles"] },
+    { name = "digitalearth" },
     { name = "imageio-ffmpeg" },
     { name = "matplotlib" },
     { name = "mike" },
@@ -2139,6 +2293,7 @@ notebook = [
     { name = "python-dotenv" },
 ]
 notebooks = [
+    { name = "digitalearth", extra = ["3d", "interactive", "web"] },
     { name = "imageio-ffmpeg" },
     { name = "pyramids-eo" },
     { name = "python-dotenv" },
@@ -2231,6 +2386,7 @@ dev = [
     { name = "cleopatra", extras = ["tiles"], specifier = ">=0.40.0" },
     { name = "commitizen", specifier = ">=4.8.4" },
     { name = "coverage" },
+    { name = "digitalearth", specifier = ">=0.13.0" },
     { name = "hypothesis", specifier = ">=6.100" },
     { name = "jupyter" },
     { name = "jupyterlab", specifier = ">=4.6.2" },
@@ -2250,6 +2406,7 @@ dev = [
 ]
 docs = [
     { name = "cleopatra", extras = ["tiles"], specifier = ">=0.40.0" },
+    { name = "digitalearth", specifier = ">=0.13.0" },
     { name = "imageio-ffmpeg", specifier = ">=0.5" },
     { name = "matplotlib", specifier = ">=3.5" },
     { name = "mike", specifier = ">=2.1.3" },
@@ -2276,6 +2433,7 @@ notebook = [
     { name = "python-dotenv", specifier = ">=1.0" },
 ]
 notebooks = [
+    { name = "digitalearth", extras = ["interactive", "3d", "web"], specifier = ">=0.13.0" },
     { name = "imageio-ffmpeg", specifier = ">=0.5" },
     { name = "pyramids-eo", specifier = ">=0.8.1,<0.9" },
     { name = "python-dotenv", specifier = ">=1.0" },
@@ -2614,7 +2772,7 @@ name = "eccodeslib"
 version = "2.48.0.26"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "eckitlib", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or extra != 'extra-15-earthlens-ocean-argo' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "eckitlib", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/88/a9/670a1e84381324c167b339a130e22f50a18528b9d7d09cfbd4e88aa1a7b2/eccodeslib-2.48.0.26-cp311-cp311-macosx_13_0_arm64.whl", hash = "sha256:8a9bfdf8a7d081c108150c769a0fdb349d917ea1333fcf627460505ce594765a", size = 9097184, upload-time = "2026-07-17T13:27:21.841Z" },
@@ -2764,6 +2922,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/bb/24/33a8c11edcd468629efeae4638e0acec5742560a5a112e255c8de066c075/eumdac-3.1.1.tar.gz", hash = "sha256:85359c42422815a0f2780bc988a95b3b7126f3ccdc98a9605d385b783044c2a7", size = 113025, upload-time = "2025-12-11T10:21:52.854Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f2/50/19f18fb17dc7bad32070fbca54d40f6fe8e5711deb1c744c84ac9d13ec10/eumdac-3.1.1-py3-none-any.whl", hash = "sha256:881705c7678bd3ea9a67fbb89f9e68d00de65dac02a4990c1d42df7dd5cb6fde", size = 101425, upload-time = "2025-12-11T10:21:51.471Z" },
+]
+
+[[package]]
+name = "eval-type-backport"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/1c/15/273a4baf8248d6d76220723c3caf039d283774b31a7c46ba686120145b76/eval_type_backport-0.4.0.tar.gz", hash = "sha256:8397d25e6524c2e67b9576bb0636be27dea2192017711220c534ec2de921e9b0", size = 10260, upload-time = "2026-06-02T13:22:06.059Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/50/a7/bb99bf5e6f78736ddb53480f2c3ff3702ffe2196a7c5e1661c03081d398e/eval_type_backport-0.4.0-py3-none-any.whl", hash = "sha256:ad5e2a8db71b6696a56eafb938b0f5a337d3217f256b8e158b469422b4772b20", size = 6432, upload-time = "2026-06-02T13:22:04.827Z" },
 ]
 
 [[package]]
@@ -3062,6 +3229,52 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/da/0c/b4e42a0495293f6c94364baba4c657c68bc8d8efec784259cc943f4ba28b/geopy-2.5.0.tar.gz", hash = "sha256:7b6c849f18108dcce4faa3d614e2801107b465f7b05fd3c1db9db12e225ae950", size = 122254, upload-time = "2026-07-12T19:50:06.051Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/66/e5/de8b557b279e31cdfb2070ac83eb45dc7e29bd93cd544128756f658e52c7/geopy-2.5.0-py3-none-any.whl", hash = "sha256:8ad8cc226b505ca4d272ae9a2eeba08b8a2c565fc9a04eaefc33ad49c32b51aa", size = 114619, upload-time = "2026-07-12T19:50:04.839Z" },
+]
+
+[[package]]
+name = "geoviews"
+version = "1.15.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "bokeh" },
+    { name = "cartopy" },
+    { name = "holoviews" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "packaging" },
+    { name = "panel" },
+    { name = "param" },
+    { name = "pyproj" },
+    { name = "shapely" },
+    { name = "xyzservices" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/76/dc/e74f5997e41933aa30aea5786c407a10e1cf169bfdceeb4173111c02d5de/geoviews-1.15.1.tar.gz", hash = "sha256:c72097ef4f24895c46f95834e5c19ac185ea1c34fd610f0f956421ba515d4aad", size = 507037, upload-time = "2026-01-13T17:34:38.197Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/63/90/d0323acc02966204035bb5bcaf7385d5a1f2b5359410eb6a09f2ce380f94/geoviews-1.15.1-py3-none-any.whl", hash = "sha256:f369eb94907476e9233abe77bdd6b92340872a20845df7da0341f9a4a13309c8", size = 574718, upload-time = "2026-01-13T17:34:36.562Z" },
+]
+
+[[package]]
+name = "geovista"
+version = "0.5.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cartopy" },
+    { name = "click" },
+    { name = "click-default-group" },
+    { name = "cmocean" },
+    { name = "lazy-loader" },
+    { name = "netcdf4" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "platformdirs" },
+    { name = "pooch" },
+    { name = "pykdtree" },
+    { name = "pyproj" },
+    { name = "pyvista" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/16/7b/f61d5aab215868bb641abc3c29737086809c77474a2bc11dc2bdc61c11fd/geovista-0.5.3.tar.gz", hash = "sha256:15a200887766179b5d4ffacddc2c4247e9499fce79e38e604c59b7e6793190b8", size = 171299, upload-time = "2024-10-21T20:51:56.057Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b0/3a/0bde36e8a304aa21d0538231e17b9f8d88886f3d571524c0c79c6c5db108/geovista-0.5.3-py3-none-any.whl", hash = "sha256:2e0797f94999a41ca5f62bc8b0bf91b5de440ea420504642858892741b862663", size = 166106, upload-time = "2024-10-21T20:51:54.121Z" },
 ]
 
 [[package]]
@@ -3485,6 +3698,27 @@ wheels = [
 ]
 
 [[package]]
+name = "holoviews"
+version = "1.23.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "bokeh" },
+    { name = "colorcet" },
+    { name = "narwhals" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "pandas" },
+    { name = "panel" },
+    { name = "param" },
+    { name = "python-dateutil" },
+    { name = "pyviz-comms" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b7/f3/34e286709566b7cae1d698c718db7d4f6b8d91f3838a4d3bf42fae73f56e/holoviews-1.23.2.tar.gz", hash = "sha256:e0c511e6d4db4f370f2550d363c23b70d7ee4f2310f1c7995b0f89cacf1eb107", size = 5550868, upload-time = "2026-08-24T11:14:24.63Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7a/ac/ff11421409f976932dc058e89f7c885006a4b8904942186cebf0c7b9b052/holoviews-1.23.2-py3-none-any.whl", hash = "sha256:0742d9d1dbc645611f04f8b948558febf556f712872a1e5bc96c37790722e6ca", size = 5996936, upload-time = "2026-08-24T11:14:22.644Z" },
+]
+
+[[package]]
 name = "hpc-utils"
 version = "0.1.5"
 source = { registry = "https://pypi.org/simple" }
@@ -3544,6 +3778,26 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/0a/ea/13a1ef3c12d12662905801495283530251918b70d62d368f1d2e0272c70d/humanize-4.16.0.tar.gz", hash = "sha256:7dc2244a2f84a4bfb1d36c37bac80cd78e35cdc5c119206d87b018e1445f3a3f", size = 89515, upload-time = "2026-06-30T16:17:29.859Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b0/aa/0b7365d30fed43e7a3449aba1fe20a0a7174d9cf13e282af4e69ac825441/humanize-4.16.0-py3-none-any.whl", hash = "sha256:353eb2f34c09d098b2880eee8bef21832eae6d174f48c5762fff7e5fcb74d01d", size = 137209, upload-time = "2026-06-30T16:17:28.36Z" },
+]
+
+[[package]]
+name = "hvplot"
+version = "0.12.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "bokeh" },
+    { name = "colorcet" },
+    { name = "holoviews" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "packaging" },
+    { name = "pandas" },
+    { name = "panel" },
+    { name = "param" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f5/b4/ce73a568fc263efe84cab8de04673949c8f6596f6aeb1531ca2b75b80903/hvplot-0.12.2.tar.gz", hash = "sha256:9e29bbe65f94937d4eeaeccf33566540df936c8f9aeadfa12ea9f306d5237938", size = 7084556, upload-time = "2025-12-18T11:15:37.736Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/11/cd/ec193e471780dfad60e44ded5526c123695c1354910edd537d7aa1d22094/hvplot-0.12.2-py3-none-any.whl", hash = "sha256:0687e2e4d2eeb035c437af0011922abff856054299c121914d903a02b1bb1b22", size = 180626, upload-time = "2025-12-18T11:15:35.091Z" },
 ]
 
 [[package]]
@@ -3732,6 +3986,20 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/2e/3e/0248fd00746731074ca01365a25d8aa3c4d54642c8a14490d94f7550bda9/ijson-3.5.1-pp311-pypy311_pp73-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:aa7a2c94e43c02e0482088e6ff997e2bd7b9a76e6f1d0fd70891b4b5ff51318f", size = 71335, upload-time = "2026-07-06T17:37:39.965Z" },
     { url = "https://files.pythonhosted.org/packages/7a/b9/1f1259546cc875adad240c468515f428d3a79b3def3ced17be3cdfe29146/ijson-3.5.1-pp311-pypy311_pp73-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:69b5eef70240e9734c5a2fb5cc3742cae411fc833a66b9a50722b9eedb1e27de", size = 68728, upload-time = "2026-07-06T17:37:40.928Z" },
     { url = "https://files.pythonhosted.org/packages/ea/02/aafbf0c3e1468c7c0f607065363b49c381de7e4bb43ae6674684a3fafe92/ijson-3.5.1-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:4b75b6bf4b0dbb0df24947db6722cd5723ce8d6e6b13fddbfc98db312ba82237", size = 54922, upload-time = "2026-07-06T17:37:41.879Z" },
+]
+
+[[package]]
+name = "imageio"
+version = "2.38.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "pillow" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f3/cd/69e4ac55b6dafdd2b5f32075236841a3945dea7323d0232d80f28c37cea8/imageio-2.38.1.tar.gz", hash = "sha256:6769f1f01c4dd46448307863a787c9a22fa4dbe11c0c88f525c6e410fdfd7983", size = 403667, upload-time = "2026-10-08T14:35:32.961Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7d/8a/3b7f62b9df56460959f1b9bef094248d2a4d7f393c5b0d2da8efcdf0e40e/imageio-2.38.1-py3-none-any.whl", hash = "sha256:36d23eb7423d2fb63f637098758edb3d2df3687f7125e0a5ce8596572022dcf9", size = 328389, upload-time = "2026-10-08T14:35:31.075Z" },
 ]
 
 [[package]]
@@ -4510,6 +4778,18 @@ wheels = [
 ]
 
 [[package]]
+name = "lazy-loader"
+version = "0.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/19/8c/0f2ff2a8b7513e68871a74740c17a504b0488c679b379e6445ebb7bd78dc/lazy_loader-0.6.tar.gz", hash = "sha256:2f4b7824d6401958639008a0cae20c776b61dff619accd6890693e2de8260167", size = 18438, upload-time = "2026-09-21T21:31:32.982Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/23/93/4e45e37f26c820216704b36b8e67cc55c490a7abd287a78a26a2c0e21386/lazy_loader-0.6-py3-none-any.whl", hash = "sha256:77253be3391b06124a0e16105bd663b6c54470af1a9ca8e1cf026f38d58ed056", size = 8791, upload-time = "2026-09-21T21:31:31.632Z" },
+]
+
+[[package]]
 name = "librt"
 version = "0.13.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4582,6 +4862,54 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/0c/99/6203ce619dee940d6bfbe099ec3fe4be00a68e9d60f70abf906cf124fe66/librt-0.13.0-cp314-cp314t-win32.whl", hash = "sha256:5fdcf34f86de8fb66d7dc7589f96ba91c4aa46671200d400e6fd6f109a483f18", size = 104357, upload-time = "2026-07-08T12:26:09.828Z" },
     { url = "https://files.pythonhosted.org/packages/52/dd/843b6314087c41657c7036d7914d8f294bdf9b580aa8513ea0588c8e9a3d/librt-0.13.0-cp314-cp314t-win_amd64.whl", hash = "sha256:260c33e92263fa629b4f6d3c51967a1c2158fe6c33237aaa3ebeac586b085259", size = 126998, upload-time = "2026-07-08T12:26:10.975Z" },
     { url = "https://files.pythonhosted.org/packages/5f/5d/3dcec2884ba1b0806d1408612555c38dd5d68e90156b59f75f6e36435c3a/librt-0.13.0-cp314-cp314t-win_arm64.whl", hash = "sha256:2f281549a4c52ac7bb97997f14353f8bd0e53a34ca0dad1c905cfd0b4a58ae99", size = 110771, upload-time = "2026-07-08T12:26:12.303Z" },
+]
+
+[[package]]
+name = "linkify-it-py"
+version = "2.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/45/98/7a1a5f31fd5c7ba93e963b168e244b8e3dd705b3d2a718e3c3307583bf57/linkify_it_py-2.2.0.tar.gz", hash = "sha256:907acd2d17ac1fbb9ddb62c8957ccbd6158cac602231a15c3b0cd1e215f03cee", size = 32939, upload-time = "2026-08-29T07:07:08.305Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/13/d4/1152d1c7ab42d8b908be64fd200ddc870dc9d4925e951198702084aa1a7d/linkify_it_py-2.2.0-py3-none-any.whl", hash = "sha256:3adc40eb5af300b2605fcfdb968c24e1d780a90f1f2221af7c15e5111e94d443", size = 21971, upload-time = "2026-08-29T07:07:07.164Z" },
+]
+
+[[package]]
+name = "llvmlite"
+version = "0.50.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/11/c5/907cec40688a34eb489cded74d555e1ee4af8cf49d83e03dba2c2d4cfe27/llvmlite-0.50.0.tar.gz", hash = "sha256:f2a2cd6ec9ffcc1b7147dea0d7a49efebf17a2b434e0c2844fe175999d571eb4", size = 194522, upload-time = "2026-09-29T18:44:46.782Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fc/ae/9c41313563a860a69d5c67fb4098ce9b40a09c00b68a177407b7c10950fb/llvmlite-0.50.0-cp311-cp311-macosx_12_0_arm64.whl", hash = "sha256:818b3d4845ac8e126e23cb500867570d0602a42a43e67b14acec31f046e03130", size = 40534276, upload-time = "2026-09-29T18:42:40.983Z" },
+    { url = "https://files.pythonhosted.org/packages/f5/60/99c692a447cb6e148d4ecc30067d5f4ba8a980f1081472103ed0c79b4890/llvmlite-0.50.0-cp311-cp311-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:0225351ad77ea30501fc5b4c09ff6868169fde50c5a576cdfda1645091157616", size = 58344485, upload-time = "2026-09-29T18:42:44.679Z" },
+    { url = "https://files.pythonhosted.org/packages/59/b2/a5234f59ccf69cc90d29c62e01cacd1d60403fc5dfac77b38e019237d301/llvmlite-0.50.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a6ffde00d4be8772a24e3e8b3af6bf86a79e7cf066d944ef56136b3957d707dc", size = 59696588, upload-time = "2026-09-29T18:42:48.871Z" },
+    { url = "https://files.pythonhosted.org/packages/6b/15/db28c1cb84314bdc416f7dbe7688aa9565d36d76c8244a1c8fbf6adf37bf/llvmlite-0.50.0-cp311-cp311-win_amd64.whl", hash = "sha256:ffe46ef508df226e54b5fe1f7bf11122e5297bcdbb3902cc5b670a429d56ff47", size = 41865266, upload-time = "2026-09-29T18:42:52.699Z" },
+    { url = "https://files.pythonhosted.org/packages/d9/1f/2576416b3e9b73f77b8331b7f2e41ce5ae7bbff0489eb16d98099a71693c/llvmlite-0.50.0-cp312-cp312-macosx_12_0_arm64.whl", hash = "sha256:55f50a6b7c0b8de88b05d6bc407d70a60486ce024013997dc97e202bd187c75b", size = 40534277, upload-time = "2026-09-29T18:42:56.244Z" },
+    { url = "https://files.pythonhosted.org/packages/7a/c4/e86f30b2b09c310c02ffdd8afd00f7e127d365131d163c926c98fc3ece22/llvmlite-0.50.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:6e8df54380110ea5e9127386e739d2b0829cc6dfa4a24a9195226336c91b06d5", size = 58344485, upload-time = "2026-09-29T18:43:00.67Z" },
+    { url = "https://files.pythonhosted.org/packages/4c/72/22b6449e15bec4cc86c62b659e6c625ab777d01e87aaec717ecef440f87a/llvmlite-0.50.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:d501e5103076b9a14be885d2574dc2f6793171aa54a853d1244e011d476f1399", size = 59696588, upload-time = "2026-09-29T18:43:04.763Z" },
+    { url = "https://files.pythonhosted.org/packages/64/70/f395702c20b514363061055b5bdebe3513e544139e6d412a5c86e8ea0b30/llvmlite-0.50.0-cp312-cp312-win_amd64.whl", hash = "sha256:c20595cc3a76e3c85140fdafbf9246c732ddf8e0e646ba2f4e4881f87567300d", size = 41865553, upload-time = "2026-09-29T18:43:08.29Z" },
+    { url = "https://files.pythonhosted.org/packages/a6/86/9cde7ac29e183e994dd2d67c998752c66ff6d714ca61837428e1896c3cc9/llvmlite-0.50.0-cp312-cp312-win_arm64.whl", hash = "sha256:4b78a8b669eda09ca1ff4c1a75003023912092974d3e771d1da0777f1b383bdf", size = 37441845, upload-time = "2026-09-29T18:43:12.054Z" },
+    { url = "https://files.pythonhosted.org/packages/b8/1f/1d585b2122bcc9fe1615c0097730baebdef1b80e6acd07fe921ee501576b/llvmlite-0.50.0-cp313-cp313-macosx_12_0_arm64.whl", hash = "sha256:a32980e3d727b0e56974ad89d0764920048602a75805b8917cc0298e798b0ced", size = 40534276, upload-time = "2026-09-29T18:43:16.012Z" },
+    { url = "https://files.pythonhosted.org/packages/21/3e/d5dbbc80bd87c3530bae1127cefce56b36434cc8a7fbbac281309e2af435/llvmlite-0.50.0-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:7dde9836d144c446a303b57b2dd906c35308411eb07f1279c1db581d3d774048", size = 58344486, upload-time = "2026-09-29T18:43:20.663Z" },
+    { url = "https://files.pythonhosted.org/packages/ed/c2/5e9d0773f1589397a3ea3dcfa4bbee36e2855ad938d738dd6ff9f505a59b/llvmlite-0.50.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:425845f415a06dc50db08db033c6b568e0d85c4937e932c605a4d49e1514b2da", size = 59696589, upload-time = "2026-09-29T18:43:25.605Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/17/894321d44cf94fa5cf921eff4e7ff24c7732c3d702236d40d6055b68a693/llvmlite-0.50.0-cp313-cp313-win_amd64.whl", hash = "sha256:266a6a29be71c3e3a22960ddcedf66b4e0388e5abb6cc4991cc093d6df402ad7", size = 41865552, upload-time = "2026-09-29T18:43:29.755Z" },
+    { url = "https://files.pythonhosted.org/packages/b1/d7/c3c3a70f057c18313515af3bd970c1faa348121e2545d6074f22011feca9/llvmlite-0.50.0-cp313-cp313-win_arm64.whl", hash = "sha256:1cb21c420a47dcfa56223228d013c6f9d234e05e06e6819a41638d78bbd78e6c", size = 37441843, upload-time = "2026-09-29T18:43:33.292Z" },
+    { url = "https://files.pythonhosted.org/packages/b8/08/eecfccb51bc016de4c1fb69da815738076a186158fa61d3cae1458b8f44a/llvmlite-0.50.0-cp314-cp314-macosx_12_0_arm64.whl", hash = "sha256:ecdc9fae295da8ac793578a27020515e24d970513143efa227e696582aeb16e6", size = 40534277, upload-time = "2026-09-29T18:43:37.013Z" },
+    { url = "https://files.pythonhosted.org/packages/9a/96/011ae57fb82e326a79da1c4767b8206502dbac041068b37f1fbe73893a55/llvmlite-0.50.0-cp314-cp314-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:987600ce6f7bd6d808f4bb0ea61a8eff2fd17cf32355691e801eb0a65a7304f0", size = 58344485, upload-time = "2026-09-29T18:43:41.242Z" },
+    { url = "https://files.pythonhosted.org/packages/5c/ed/54107648386edf3da7def03d42721c72279f6bc2e17b5274c18955dc5833/llvmlite-0.50.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:33ddf12b1e12d7e551e1c1e6ca8087d0aacc931f480019eb33ef2ab77681da4d", size = 59696587, upload-time = "2026-09-29T18:43:46.132Z" },
+    { url = "https://files.pythonhosted.org/packages/d1/af/b2e5f9ee84f05a794e62626d83a934e6fccc7a83740918a90cec85df2d6f/llvmlite-0.50.0-cp314-cp314-win_amd64.whl", hash = "sha256:7ae211012c6849528a5f7cd17a78d8b2421a2813c7b4184d6c0b2ffa89a7d296", size = 42986708, upload-time = "2026-09-29T18:43:51.123Z" },
+    { url = "https://files.pythonhosted.org/packages/3b/df/6d9ac4237f78bc81e6778d87ec711c6e5ec0fac73f00907b149c414b48b5/llvmlite-0.50.0-cp314-cp314-win_arm64.whl", hash = "sha256:e94f9066f1257a9cef6c832e6c9de0f140e2bb150de2db39f657b2a5996e0f6b", size = 37441844, upload-time = "2026-09-29T18:43:55.097Z" },
+    { url = "https://files.pythonhosted.org/packages/d6/23/0f9d73a3603fee0d32a0f66996e00964154f07681c0b0f9c7212e896cb2d/llvmlite-0.50.0-cp314-cp314t-macosx_12_0_arm64.whl", hash = "sha256:423c8d89d13f7eb4488933d5a86b0fa952927956298cfd0087f6753b5123b5df", size = 40534276, upload-time = "2026-09-29T18:43:59.379Z" },
+    { url = "https://files.pythonhosted.org/packages/34/14/45f56e4cf192284ba6cb3020ed775d47dd9c69e7fb605f7523047ab16d7f/llvmlite-0.50.0-cp314-cp314t-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:944133e9621d1dfbfdaf0fed3234b99f85e6ba27c38f4045acc8f8a5e699a5c0", size = 58344486, upload-time = "2026-09-29T18:44:03.923Z" },
+    { url = "https://files.pythonhosted.org/packages/82/f8/45f08fe27bd96fa38a7199024d842d6ef502054f1f824b531d55cd533c81/llvmlite-0.50.0-cp314-cp314t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a1d5b6eac064f201b4aa091030282e6f240d8d322dddd7381840731455c3e664", size = 59696589, upload-time = "2026-09-29T18:44:09.376Z" },
+    { url = "https://files.pythonhosted.org/packages/90/68/e00620b48cd6fd71369877ddbfa000854450b843c3631be41226e8b8f7b1/llvmlite-0.50.0-cp314-cp314t-win_amd64.whl", hash = "sha256:d88c9b325f5fbefc79d95b1daa8fb96018c40bd2958103eea7334e6c8f17fb40", size = 42986716, upload-time = "2026-09-29T18:44:13.366Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/97/78e51381def071781a5ec9ead92e2a55562da5b78043566865e20f30be77/llvmlite-0.50.0-cp315-cp315-macosx_12_0_arm64.whl", hash = "sha256:3f490c0f4800c8ddeee6a607acd037497bf6508586804f4e2f11f53a1ee7fe2d", size = 40534277, upload-time = "2026-09-29T18:44:17.301Z" },
+    { url = "https://files.pythonhosted.org/packages/61/83/1beb6169126cd1a8199bae88eb3a79e3be3dd609eb42896d8fa8c38b10c0/llvmlite-0.50.0-cp315-cp315-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:d5447a6c39171368edfe28a71f605e6e3edd40a1dc31f5e5c9d50585718ae6d0", size = 58344486, upload-time = "2026-09-29T18:44:21.407Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/81/334b11c9ebc52ee5339fe401342b2dc856804996fec3abc5ad70ad053901/llvmlite-0.50.0-cp315-cp315-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:f1ac2b9f699c46219fbbd66b304105f5e1b218f05ffac6fe03cd851f93718e58", size = 59696588, upload-time = "2026-09-29T18:44:25.755Z" },
+    { url = "https://files.pythonhosted.org/packages/4f/c7/f06fe5d262f0cf0f0c85a85b0a4aaa07cbd85a56192861299fd659af4eb7/llvmlite-0.50.0-cp315-cp315-win_amd64.whl", hash = "sha256:51a4a716db98591f0a1bea34c6548cdb4017731ee5e678ded8cf842dca8af3c5", size = 42986709, upload-time = "2026-09-29T18:44:29.203Z" },
+    { url = "https://files.pythonhosted.org/packages/be/f9/670bcb2a7214dcf35c48da581ac8d2949ff50255deb83e13c9cbbef46c05/llvmlite-0.50.0-cp315-cp315t-macosx_12_0_arm64.whl", hash = "sha256:e8cc203c1fd509131cd72b7554413d4a3e5527cc5558c5a7ebe19840018c57c1", size = 40534277, upload-time = "2026-09-29T18:44:32.967Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/21/3d108d6c9a87142927073fbc3d82d161f2dbfdeb046063a51edb196d1132/llvmlite-0.50.0-cp315-cp315t-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:c7d4e2bbb29a860a6e85e22afdb96696241263942a5b214cac3e4b704e1d3abf", size = 58344488, upload-time = "2026-09-29T18:44:36.859Z" },
+    { url = "https://files.pythonhosted.org/packages/6e/de/496d19b7a54acc487266ac7fa39d902cddf24998f5266b3aa499c8eacbd6/llvmlite-0.50.0-cp315-cp315t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:afd7b438c60e0f60c4368ec603bb9f20d938a203b5f59b80bbe50c749b4b2f16", size = 59696591, upload-time = "2026-09-29T18:44:40.642Z" },
+    { url = "https://files.pythonhosted.org/packages/93/73/72553170eada174775d9a738c471c7be4ab3dc2c06368beeee89e002345c/llvmlite-0.50.0-cp315-cp315t-win_amd64.whl", hash = "sha256:4da0e8c6e6f144b433672a632f75d6b4da7bd4fdb5c3e9981d6ea6741319aeae", size = 42986722, upload-time = "2026-09-29T18:44:44.491Z" },
 ]
 
 [[package]]
@@ -4715,6 +5043,27 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7b/cf/6780ab8bc3b84a1cce3e4400aed3d64b6db7d5e227a2f75b6ded5674701a/makefun-1.16.0.tar.gz", hash = "sha256:e14601831570bff1f6d7e68828bcd30d2f5856f24bad5de0ccb22921ceebc947", size = 73565, upload-time = "2025-05-09T15:00:42.313Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/c0/4bc973defd1270b89ccaae04cef0d5fa3ea85b59b108ad2c08aeea9afb76/makefun-1.16.0-py2.py3-none-any.whl", hash = "sha256:43baa4c3e7ae2b17de9ceac20b669e9a67ceeadff31581007cca20a07bbe42c4", size = 22923, upload-time = "2025-05-09T15:00:41.042Z" },
+]
+
+[[package]]
+name = "maplibre"
+version = "0.3.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "branca" },
+    { name = "eval-type-backport" },
+    { name = "jinja2" },
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d0/33/68e9378eef4feda7666af71c169ac598e405d30df03489c3544953a52b79/maplibre-0.3.6.tar.gz", hash = "sha256:10d3b80e15a71a029ac152a4094b699ef5b256155ca09d4a0fd2cfb2a8d8dbb1", size = 1359517, upload-time = "2025-12-13T17:45:39.33Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cd/e8/d0e506ebf78554e6d6670101ccb562448fd959d70527a11cb380f6c3de77/maplibre-0.3.6-py3-none-any.whl", hash = "sha256:eeafab617d4a1b71c0c174c71405f67c4b4e494fe1b27968d4d2359bc160e277", size = 1374309, upload-time = "2025-12-13T17:45:37.297Z" },
+]
+
+[package.optional-dependencies]
+ipywidget = [
+    { name = "anywidget" },
+    { name = "traitlets" },
 ]
 
 [[package]]
@@ -5402,6 +5751,15 @@ wheels = [
 ]
 
 [[package]]
+name = "multipledispatch"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fe/3e/a62c3b824c7dec33c4a1578bcc842e6c30300051033a4e5975ed86cc2536/multipledispatch-1.0.0.tar.gz", hash = "sha256:5c839915465c68206c3e9c473357908216c28383b425361e5d144594bf85a7e0", size = 12385, upload-time = "2023-06-27T16:45:11.074Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/51/c0/00c9809d8b9346eb238a6bbd5f83e846a4ce4503da94a4c08cb7284c325b/multipledispatch-1.0.0-py3-none-any.whl", hash = "sha256:0c53cd8b077546da4e48869f49b13164bebafd0c2a5afceb6bb6a316e7fb46e4", size = 12818, upload-time = "2023-06-27T16:45:09.418Z" },
+]
+
+[[package]]
 name = "multiurl"
 version = "0.3.9"
 source = { registry = "https://pypi.org/simple" }
@@ -5484,6 +5842,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a2/6e/371856a3fb9d31ca8dac321cda606860fa4548858c0cc45d9d1d4ca2628b/mypy_extensions-1.1.0.tar.gz", hash = "sha256:52e68efc3284861e772bbcd66823fde5ae21fd2fdb51c62a211403730b916558", size = 6343, upload-time = "2025-04-22T14:54:24.164Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/79/7b/2c79738432f5c924bef5071f933bcc9efd0473bac3b4aa584a6f7c1c8df8/mypy_extensions-1.1.0-py3-none-any.whl", hash = "sha256:1be4cccdb0f2482337c4743e60421de3a356cd97508abadd57d47403e94f5505", size = 4963, upload-time = "2025-04-22T14:54:22.983Z" },
+]
+
+[[package]]
+name = "narwhals"
+version = "2.26.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/35/68/5351e34623d253423240ea7de3f8fc74fa8ab14b1ab3c0ec4ac8997413c9/narwhals-2.26.0.tar.gz", hash = "sha256:6b9cadca82f375c7e4cf584fdc86ca25da54827307a9c58f94547ee6104b82dd", size = 686970, upload-time = "2026-09-08T13:32:08.964Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/40/b5/1b84b2c784db76d69442334bc8b8748c840f13ca53be086f4f250ad4a0bc/narwhals-2.26.0-py3-none-any.whl", hash = "sha256:29326d74f107c347fd1009bd58e38d9f7c7c5b51e6de97bc93dbc325d9038b54", size = 474034, upload-time = "2026-09-08T13:32:07.159Z" },
 ]
 
 [[package]]
@@ -5582,8 +5949,8 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
     { name = "cftime" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra == 'extra-15-earthlens-ocean-argo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
-    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and extra == 'extra-15-earthlens-ocean-argo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/34/b6/0370bb3af66a12098da06dc5843f3b349b7c83ccbdf7306e7afa6248b533/netcdf4-1.7.4.tar.gz", hash = "sha256:cdbfdc92d6f4d7192ca8506c9b3d4c1d9892969ff28d8e8e1fc97ca08bf12164", size = 838352, upload-time = "2026-01-05T02:27:38.593Z" }
 wheels = [
@@ -5687,6 +6054,46 @@ wheels = [
 ]
 
 [[package]]
+name = "numba"
+version = "0.68.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "llvmlite" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4e/cd/e8280f9ffa30fea9fabc5341223701231fcc5d53a31f51419d42d4bec3a6/numba-0.68.0.tar.gz", hash = "sha256:8a781de54b980b98f43bff7f1093701b5f07c80d031c7cfa8a87493d8bf73f2d", size = 2855363, upload-time = "2026-09-30T15:05:44.721Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/54/fc/57b1ce7b92cadbb4084a2ca30d9cfc8937a45ece9a64bc6050e527cbc14b/numba-0.68.0-cp311-cp311-macosx_12_0_arm64.whl", hash = "sha256:50399af9d3799a4677044294861169c614bd7e1d8bbfc9479f78a67ab28ff427", size = 2759814, upload-time = "2026-09-30T15:04:44.039Z" },
+    { url = "https://files.pythonhosted.org/packages/42/14/2ecbe9a046c611077b7b9ac267e9829aec473cf4f4314d181bd043c76fcf/numba-0.68.0-cp311-cp311-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:954e2684bca3ea11235272df28e8ef40f18a682c1c635a2398032b404675d8fa", size = 3547920, upload-time = "2026-09-30T15:04:46.364Z" },
+    { url = "https://files.pythonhosted.org/packages/33/dc/ba4eaf844972bf9647314079f3a4cad79f63614b388b667103a2e7f521df/numba-0.68.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:68f92839637a2aaca8ae124c3abf91f648d2fade50953ea8e81ec604ac05a771", size = 3834537, upload-time = "2026-09-30T15:04:48.61Z" },
+    { url = "https://files.pythonhosted.org/packages/41/0e/369fc577564e07820d5f8ddddf9648cf3e31415313c323cbd611f7905101/numba-0.68.0-cp311-cp311-win_amd64.whl", hash = "sha256:d36f7c6a07c27fa175f5a4683083c6a830f7791fbda592a8676ce47a444965f7", size = 2830973, upload-time = "2026-09-30T15:04:50.863Z" },
+    { url = "https://files.pythonhosted.org/packages/c5/cb/b6a39189f1f342baa04ad1055bb5f63ec4061ec1f80f6b34e90c68fe1e7f/numba-0.68.0-cp312-cp312-macosx_12_0_arm64.whl", hash = "sha256:0fdaa2f0256862ebbcd9632ef01ba2a4b94e6d116029e5051a92340d4050a501", size = 2760509, upload-time = "2026-09-30T15:04:53.181Z" },
+    { url = "https://files.pythonhosted.org/packages/af/4d/aa2cefeef784c5695790931938944f76ee66d3c7c640f62326f64642f1c6/numba-0.68.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:e3ee1f49b62efbbb804f731f2bd602bd1f8b8d3cc13009f25d69955675f82407", size = 3600404, upload-time = "2026-09-30T15:04:55.11Z" },
+    { url = "https://files.pythonhosted.org/packages/6f/40/2211b4ff48cccfb21d4c38fb56788d7a975189883efb8d549be9d51aba7d/numba-0.68.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:51fe913a70fe9a7a0b193757ff977a9e96c82ae936ae388aec8990814fffdf9d", size = 3888027, upload-time = "2026-09-30T15:04:57.698Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/2b/1b1f8b118cec28513665d8a53ff4f037d6c05720bd9e6f32f947c93c367f/numba-0.68.0-cp312-cp312-win_amd64.whl", hash = "sha256:530961dc7e41ee358eca2b828baf7b645ce6fa466d778bb9dc73855dd103c4f7", size = 2830891, upload-time = "2026-09-30T15:04:59.747Z" },
+    { url = "https://files.pythonhosted.org/packages/97/0b/02626d27333ce1f67516a059e22d65f8f2309f227d3b828d2599183d5dc9/numba-0.68.0-cp312-cp312-win_arm64.whl", hash = "sha256:25aa7021e163701f9b3e8e77be81836a4b399500eef073d75bc906ad5eff46e9", size = 2812331, upload-time = "2026-09-30T15:05:01.802Z" },
+    { url = "https://files.pythonhosted.org/packages/a2/4d/42754c94f8f909b9981fd44d28292a93bca6429d93f3e1ae58ac7de9b08b/numba-0.68.0-cp313-cp313-macosx_12_0_arm64.whl", hash = "sha256:b8b29602f57df06c724fc53b1740887bc4332f202206771d46e47b25b485e904", size = 2760360, upload-time = "2026-09-30T15:05:04.386Z" },
+    { url = "https://files.pythonhosted.org/packages/b3/1c/8bae32109a826a49666a9645012b98d6e09ad496932a877c97a2c39dde50/numba-0.68.0-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:df6f881c5695f472873d0979bab54261959b3174b6c98a71f6f8a43c3e088985", size = 3560908, upload-time = "2026-09-30T15:05:06.832Z" },
+    { url = "https://files.pythonhosted.org/packages/aa/b1/0b504ae34d1b79a6482a0ffcbfd1b103dde02329c11525033e02633f7984/numba-0.68.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:be647fbc60c18c0323b34479f80173879654894eec58ad061f4b1901e294d854", size = 3848615, upload-time = "2026-09-30T15:05:08.976Z" },
+    { url = "https://files.pythonhosted.org/packages/8d/a5/06d1dd4553dcc71a3a18defe9e6e26e3c011b566bc9060d4f6e4bca0e0ed/numba-0.68.0-cp313-cp313-win_amd64.whl", hash = "sha256:bf7435c81912e271a28a19c348ada5b3986e2409f95a067533c5f4aab8709295", size = 2830730, upload-time = "2026-09-30T15:05:11.232Z" },
+    { url = "https://files.pythonhosted.org/packages/93/d8/6b01de5fa7b4c3866c0fb680833fd58b4fc48d1e7febb46e992f0b0f0e7b/numba-0.68.0-cp313-cp313-win_arm64.whl", hash = "sha256:50e3c81d8bf6956c7d7330a985bf1468efaa9e4c4539c9fa0ac6c7866ea6e369", size = 2812090, upload-time = "2026-09-30T15:05:13.455Z" },
+    { url = "https://files.pythonhosted.org/packages/6e/71/a9031907dd0fba6cfce34004398a05f090b692be811dd1f38fdd874dd4e1/numba-0.68.0-cp314-cp314-macosx_12_0_arm64.whl", hash = "sha256:bfc890c9ca517823dfae0444595ef50d883ade9d3e17759d9a7650e5d128d950", size = 2760551, upload-time = "2026-09-30T15:05:15.753Z" },
+    { url = "https://files.pythonhosted.org/packages/74/70/c03aebc576ded2204e5bde9b86b215f0590a81261af333d4239b9f0aed0f/numba-0.68.0-cp314-cp314-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:34ccf54fd9c1d5f4ba00073b81bc492a681f5437c62917fe29813f457564e312", size = 3561561, upload-time = "2026-09-30T15:05:18.266Z" },
+    { url = "https://files.pythonhosted.org/packages/3d/5f/2bd2fd4b99b0b5e76fea2f1fe149e05a7ec19a9a177758688bb82c7e3126/numba-0.68.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:ea11c865265e39a6019e2f0fe62743825127b3b7bc4815916f5d5121fd9b262b", size = 3848766, upload-time = "2026-09-30T15:05:20.541Z" },
+    { url = "https://files.pythonhosted.org/packages/0c/41/3e3528f3b0f9ffae69310d2e71f81ff74d272ee3b6c0600c4f4abaa31a80/numba-0.68.0-cp314-cp314-win_amd64.whl", hash = "sha256:9c03de7085f08ba11ab2444f252e822c14cee5fa02b73e84d5afd5e28b2bce0f", size = 2832584, upload-time = "2026-09-30T15:05:22.621Z" },
+    { url = "https://files.pythonhosted.org/packages/8a/9d/1fe8be8f3a43d339222a4aed59be0b8f4920f10465d4606c0428250c63f7/numba-0.68.0-cp314-cp314-win_arm64.whl", hash = "sha256:f58c13a6e9bfef062311cb0d3c19f6c159b901213daa325e1db473946010cec7", size = 2812334, upload-time = "2026-09-30T15:05:24.848Z" },
+    { url = "https://files.pythonhosted.org/packages/89/3b/e0e31617568553ca2b18bdf43844c44893dfb6620bde9a88296c257c5a81/numba-0.68.0-cp314-cp314t-macosx_12_0_arm64.whl", hash = "sha256:79160dc2a3ff0e02aaada2c385faa6de73d71a11f06419d29bb0a90042d243a3", size = 2763380, upload-time = "2026-09-30T15:05:27.064Z" },
+    { url = "https://files.pythonhosted.org/packages/20/92/405b416800424b005c179c5b6417eee2aac1933839257ca50c855397774f/numba-0.68.0-cp314-cp314t-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:1a3aa5558ba1c316020a0c2f6042be6ae063cfc6eb0c7badb3a0c77d2b5308b7", size = 3604721, upload-time = "2026-09-30T15:05:29.164Z" },
+    { url = "https://files.pythonhosted.org/packages/e1/52/fc100dc163e12ba6a8df4c4f6e34f55d24dc6e97095f935996406d8cc946/numba-0.68.0-cp314-cp314t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a08750c81fd5c2d9f2c169a73114efb907159401dde9ef4a3b629fa45e097cb7", size = 3887891, upload-time = "2026-09-30T15:05:31.234Z" },
+    { url = "https://files.pythonhosted.org/packages/e1/e0/f2e074c5bf26f236c34075d390e77ed2a787c7350791b39b099b151e2033/numba-0.68.0-cp314-cp314t-win_amd64.whl", hash = "sha256:cad7d5f6fe8eb42a69c500d36c94a61d094f3b91a7a5581a31d1df2eb925d33a", size = 2838113, upload-time = "2026-09-30T15:05:33.274Z" },
+    { url = "https://files.pythonhosted.org/packages/a5/85/d7cee7a6c65634bd25cb0109585785e5c8338f44db4b191c30291d9c7968/numba-0.68.0-cp315-cp315-macosx_12_0_arm64.whl", hash = "sha256:39f935bc854be87784675d9674f5503e56df5a501c95c95bdfb6b3c0b4b9ed1b", size = 2760868, upload-time = "2026-09-30T15:05:35.662Z" },
+    { url = "https://files.pythonhosted.org/packages/d6/79/312e0cf6e835f700d42a223c1bd4a24b232892bded1ddf5e40bb3a329f55/numba-0.68.0-cp315-cp315-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:7cec6809fe93824e243a8a8c93966b0bb5874a3b7c24c1194c3bafee0ab11f39", size = 3568127, upload-time = "2026-09-30T15:05:37.967Z" },
+    { url = "https://files.pythonhosted.org/packages/5e/05/f31cd9e40f6d4ec6de38959e4736a917aa9d115fecc4a1979aceedcc083b/numba-0.68.0-cp315-cp315-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c1f1180e0332ad5143905288325485b52ac76102330811dc6f2c10088cf4cedc", size = 3853913, upload-time = "2026-09-30T15:05:40.247Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/28/059b2d1ea5616a5712fd722b2ec8e8278d14e4e4eb8845d36fe1658e6be8/numba-0.68.0-cp315-cp315-win_amd64.whl", hash = "sha256:a2d21bb9c4b4818a1e71721ebd19172f488591d548f08453593348b7048ba1fb", size = 2831865, upload-time = "2026-09-30T15:05:42.306Z" },
+]
+
+[[package]]
 name = "numcodecs"
 version = "0.16.5"
 source = { registry = "https://pypi.org/simple" }
@@ -5724,10 +6131,8 @@ name = "numpy"
 version = "2.4.6"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version < '3.12' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version < '3.12' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/d0/ad/fed0499ce6a338d2a03ebae59cd15093910c8875328855781952abf6c2fe/numpy-2.4.6.tar.gz", hash = "sha256:f3a3570c4a2a16746ac2c31a7c7c7b0c186b95ce902e33db6f28094ed7387dda", size = 20735807, upload-time = "2026-05-18T23:37:14.07Z" }
 wheels = [
@@ -5809,22 +6214,14 @@ name = "numpy"
 version = "2.5.1"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version >= '3.15' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version >= '3.15' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "(python_full_version == '3.14.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.14.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.13.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.13.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.12.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.12.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version >= '3.15' and platform_machine != 'ARM64') or (python_full_version >= '3.15' and sys_platform != 'win32')",
+    "(python_full_version == '3.14.*' and platform_machine != 'ARM64') or (python_full_version == '3.14.*' and sys_platform != 'win32')",
+    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.13.*' and platform_machine != 'ARM64') or (python_full_version == '3.13.*' and sys_platform != 'win32')",
+    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.12.*' and platform_machine != 'ARM64') or (python_full_version == '3.12.*' and sys_platform != 'win32')",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/22/fd/89965aa4ac08c74998539fcbf24fa3540f3e15237fbeb6bcf9c908f4aade/numpy-2.5.1.tar.gz", hash = "sha256:a48a113e6afea91f5608793bafa7ef2ad481fefbda87ec5069f483de61cb9fa3", size = 20755553, upload-time = "2026-07-04T17:08:00.933Z" }
 wheels = [
@@ -6222,6 +6619,55 @@ wheels = [
 ]
 
 [[package]]
+name = "panel"
+version = "1.9.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "bokeh" },
+    { name = "linkify-it-py" },
+    { name = "markdown" },
+    { name = "markdown-it-py" },
+    { name = "mdit-py-plugins" },
+    { name = "narwhals" },
+    { name = "nh3" },
+    { name = "packaging" },
+    { name = "pandas" },
+    { name = "panel-material-ui" },
+    { name = "param" },
+    { name = "pyviz-comms" },
+    { name = "requests" },
+    { name = "tqdm" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/aa/cf/146a8c9e2bd262580e0cb328ca9526698eb164788526622495fef5efe422/panel-1.9.4.tar.gz", hash = "sha256:373bdb124c1b33c3dd4c112f348f4cfb2a7f1634b36a51e6ab01a4b5b6ec833c", size = 32246159, upload-time = "2026-08-17T12:33:33.342Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8f/f5/e7baaa238f7f5b8790a27d1174f38e50e77c2d4860207dffac32ef1c0409/panel-1.9.4-py3-none-any.whl", hash = "sha256:c89c4c1e728297daf0628ea5070fb0da8ad77781e2a3142d302479537c1de6a4", size = 30334484, upload-time = "2026-08-17T12:33:30.519Z" },
+]
+
+[[package]]
+name = "panel-material-ui"
+version = "0.16.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "bokeh" },
+    { name = "packaging" },
+    { name = "panel" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9e/f2/a75ac3e7de355a52096a2d7951032ff0103b9773b34312159ccc28d7fbc0/panel_material_ui-0.16.1.tar.gz", hash = "sha256:3b40c766f5062153b929256b39f6054170ef50f8b49cbde6df66db637d86c5ae", size = 4094532, upload-time = "2026-10-06T13:43:46.172Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e7/3c/7f4ba17037338436e8e54777f97db8febedb81fc5b2dd3769053d754bcc4/panel_material_ui-0.16.1-py3-none-any.whl", hash = "sha256:24c9cbfdfa83e14bc10ea84be2791e7b97c539be3cb26db2d33c06083fbb4239", size = 1789001, upload-time = "2026-10-06T13:43:44.05Z" },
+]
+
+[[package]]
+name = "param"
+version = "2.4.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/17/fc/ec34c6fa440c9b5491ee1820874b8776489756820bba16d55b885d07655a/param-2.4.2.tar.gz", hash = "sha256:40ca94b72c97bf1998325738e002d589ce31a7cfb4cc56549f05daa6ccf98043", size = 225945, upload-time = "2026-09-03T11:02:01.717Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/35/94/ff5ad5b758c61c1b33755e02c3a653d1d41c36891329e76a8e6b6e69e8b1/param-2.4.2-py3-none-any.whl", hash = "sha256:56f56e991d11cdf9fa8248ca3b1c7d5badfd6b4da3b3886b764b95823d270b07", size = 155563, upload-time = "2026-09-03T11:02:00.069Z" },
+]
+
+[[package]]
 name = "paramiko"
 version = "3.5.1"
 source = { registry = "https://pypi.org/simple" }
@@ -6280,7 +6726,7 @@ name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or extra != 'extra-15-earthlens-ocean-argo' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "ptyprocess", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [
@@ -6409,6 +6855,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/df/8e/0601097cfcce2e8c2297db5080e9719f549c2bd4b94420ddc8d3f848bbca/pockets-0.9.1.tar.gz", hash = "sha256:9320f1a3c6f7a9133fe3b571f283bcf3353cd70249025ae8d618e40e9f7e92b3", size = 24993, upload-time = "2019-11-02T14:46:19.433Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e9/2f/a4583c70fbd8cd04910e2884bcc2bdd670e884061f7b4d70bc13e632a993/pockets-0.9.1-py2.py3-none-any.whl", hash = "sha256:68597934193c08a08eb2bf6a1d85593f627c22f9b065cc727a4f03f669d96d86", size = 26263, upload-time = "2019-11-02T14:46:17.814Z" },
+]
+
+[[package]]
+name = "pooch"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "platformdirs" },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/83/43/85ef45e8b36c6a48546af7b266592dc32d7f67837a6514d111bced6d7d75/pooch-1.9.0.tar.gz", hash = "sha256:de46729579b9857ffd3e741987a2f6d5e0e03219892c167c6578c0091fb511ed", size = 61788, upload-time = "2026-01-30T19:15:09.649Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2a/2d/d4bf65e47cea8ff2c794a600c4fd1273a7902f268757c531e0ee9f18aa58/pooch-1.9.0-py3-none-any.whl", hash = "sha256:f265597baa9f760d25ceb29d0beb8186c243d6607b0f60b83ecf14078dbc703b", size = 67175, upload-time = "2026-01-30T19:15:08.36Z" },
 ]
 
 [[package]]
@@ -6641,6 +7101,40 @@ wheels = [
 ]
 
 [[package]]
+name = "psygnal"
+version = "0.16.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/75/df/2a94607af05d91638646339acfc02d7c865821c21356ddcfef3d6b4c7fb6/psygnal-0.16.1.tar.gz", hash = "sha256:8e30df5e8f2a927191afacd22653924ba5ec54ca00f965f4af3ed38e37b727a9", size = 129789, upload-time = "2026-09-11T08:30:17.813Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/df/87/1edf89048d8b13f65a5186b5b5d600c1e08bdad5f2f37d7f182ac82ccd25/psygnal-0.16.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:483a3ab1780ce1eda66ed35929a9ec9e5f4bd348b052b612ce7c92302d96d9fe", size = 546088, upload-time = "2026-09-11T08:29:35.687Z" },
+    { url = "https://files.pythonhosted.org/packages/ae/35/ab79b0a719af3b6b8da44bb9ac70d414c696eb58aa0d7f657a48ad681c98/psygnal-0.16.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:9fe09145e3508086e0233e67ab45c19df2b280dea9293bbdedd198b0afe6be3d", size = 500423, upload-time = "2026-09-11T08:29:37.179Z" },
+    { url = "https://files.pythonhosted.org/packages/00/86/566160885cb535ca88041e467cfcde29e42800f6b0dba92ad6b8f47ba44d/psygnal-0.16.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:becf3f710c7880a2fda82df22e5156594e862d6291183c83bc0af0464f786cd2", size = 541341, upload-time = "2026-09-11T08:29:38.703Z" },
+    { url = "https://files.pythonhosted.org/packages/42/99/de30e95ad1d9cb6febcad3b7a970e24878223b7be7fd4f7c976015b6a1e7/psygnal-0.16.1-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:e332a247e8dc64e749bb922f0193287ed531807c7ee1dc2d52a91408edd3a2f2", size = 546822, upload-time = "2026-09-11T08:29:40.44Z" },
+    { url = "https://files.pythonhosted.org/packages/0d/1c/dfe7496ee4c4a6a3cee151c06552bf27cbf93f8bcc78c277ec9dbbc9e60d/psygnal-0.16.1-cp311-cp311-win_amd64.whl", hash = "sha256:a83647146a550b2c1754ebf80bec8529b7031eab77b81be8264b513d4f6606d8", size = 421894, upload-time = "2026-09-11T08:29:41.907Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/f9/058cd6dbdc2dee03e9ea65e81e8265244daa3e46536063de24cd58efff67/psygnal-0.16.1-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:15fb2069443504e7f3ddca007e9d4d58706811c843965f3b865cfa7a60e07d65", size = 565014, upload-time = "2026-09-11T08:29:43.612Z" },
+    { url = "https://files.pythonhosted.org/packages/5c/78/dfda45dd3a3d29f1917f5143127d60f53b4015c7aa6ec9e54cf87a978b44/psygnal-0.16.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:0b6c468e5e3fc99b910f0f2cfa2e644bb2f0ec5e95cfc44cbf8ca155ae8bedea", size = 503350, upload-time = "2026-09-11T08:29:45.03Z" },
+    { url = "https://files.pythonhosted.org/packages/2d/82/bcca742df84341658bc1051722cd346cd9a85f3bd87e83fc2b18c636e3a2/psygnal-0.16.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c48c6d80a34653e65d0da6a15aac44a59a39e28851c15304c4a8dc7d213948b2", size = 548696, upload-time = "2026-09-11T08:29:46.864Z" },
+    { url = "https://files.pythonhosted.org/packages/88/32/ecb78d7520cdd2ec115beb7ec997a3f5018b420b4086e70b9103daa5fee1/psygnal-0.16.1-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:4b06f5374ac4802a886ff8c614a155f55672bb42d51f8dcd72cbc3adb245e077", size = 553639, upload-time = "2026-09-11T08:29:48.466Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/9d/82203a352e7185c18c0103fd7fa1c5ba2d7b86f752e1e44b9d03ac60e553/psygnal-0.16.1-cp312-cp312-win_amd64.whl", hash = "sha256:b89dfb659f746c42f1bfd1005d3c2b11f7b15a4b42442213d84b15c728cd27c0", size = 424646, upload-time = "2026-09-11T08:29:49.895Z" },
+    { url = "https://files.pythonhosted.org/packages/ae/6f/4608e35fcbee07704fd93d5495d225757a37a81407382a0bcbc19c2c3939/psygnal-0.16.1-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:cd57312ea899500387a1af0c21c7a4f081a8c00b9852b5bae84b0dad3c2ed5d2", size = 559668, upload-time = "2026-09-11T08:29:51.593Z" },
+    { url = "https://files.pythonhosted.org/packages/d0/a9/2c190dbec5e2459606748a968069ef2d11960f10ebfa0987766ffd112e1b/psygnal-0.16.1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:5a6891674cd53d8879b311b59ec9379c7b4847693212e78063950c4e5a18942b", size = 500377, upload-time = "2026-09-11T08:29:53.198Z" },
+    { url = "https://files.pythonhosted.org/packages/6a/28/f0cb8aca8111f6d4568f3f63600f55e54626bdb4e33a0f51b9b1a7b37cfb/psygnal-0.16.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:eac55c333241d657f697a1adc9aa984eef47950fba798ba0cbbee5afba0b0cfc", size = 547102, upload-time = "2026-09-11T08:29:54.916Z" },
+    { url = "https://files.pythonhosted.org/packages/77/64/e9c1082ca3ae11c461b5f6b693382b30359253e7cb8fbe449405be52232f/psygnal-0.16.1-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:915fe95c386ea849de48c4261d87a8542dd5418d99bcb2fa9486e5b859829058", size = 552030, upload-time = "2026-09-11T08:29:56.687Z" },
+    { url = "https://files.pythonhosted.org/packages/cb/62/e46f6db7d2f503f59a1d52444417b45d2e6444eb00831f0cc9770ee7eeee/psygnal-0.16.1-cp313-cp313-win_amd64.whl", hash = "sha256:fc377954e9ef40b1a2869e90ac62bb12e8ae910ae7db1393a0b8b3c3da4bbb4d", size = 425578, upload-time = "2026-09-11T08:29:58.447Z" },
+    { url = "https://files.pythonhosted.org/packages/4c/c1/e32d236ff4a92f2246172785fc763131db72c0c9b57d6f5a6e4a301d55ac/psygnal-0.16.1-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:1a1f602f53e0c276657225dd93e833baa60f3984182ff7beb82a29f2668f9b4d", size = 559095, upload-time = "2026-09-11T08:30:00.232Z" },
+    { url = "https://files.pythonhosted.org/packages/43/c1/81cfaf385b60ab578b6d57eed0d7a99c6b3aad508f805ca93b7bebb51267/psygnal-0.16.1-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:5ad286847ef8ba2d4fc0326c9bdba5e5a2896afa35cc7dd42bd66320068d1dd1", size = 499091, upload-time = "2026-09-11T08:30:02.061Z" },
+    { url = "https://files.pythonhosted.org/packages/12/7c/4142e20ba33f6bc799d7e80a5136fefbbfc4643089b6b9638b074346bed7/psygnal-0.16.1-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:bf3dfebad343b13765f43d1f9cff97de4b2d456568a9abcea405703896a7a154", size = 547378, upload-time = "2026-09-11T08:30:03.549Z" },
+    { url = "https://files.pythonhosted.org/packages/99/da/ff8047cf2c5ff575d01f5b404c4921b62dcd5395b87889b8e25cddf0b9e5/psygnal-0.16.1-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:035f8f92dd1ba00da86319f2d4397bb385b9e1ceaed152305230163d776dff3e", size = 552778, upload-time = "2026-09-11T08:30:05.095Z" },
+    { url = "https://files.pythonhosted.org/packages/95/ad/24f151762f8fd8b8bb34c218946b14b5f253ed1a7374d5fc4b1e3c40c999/psygnal-0.16.1-cp314-cp314-win_amd64.whl", hash = "sha256:c45b4086b929b86ad6f6cea2e4adbfca82b2ef7bf64a6872dc21696d054c0e73", size = 430639, upload-time = "2026-09-11T08:30:06.495Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/76/c0b9d5850e917394b2b90728dd1b1c495423abe16a3d4ae4d08db204a4f1/psygnal-0.16.1-cp315-cp315-macosx_10_15_x86_64.whl", hash = "sha256:d5f2a2a7f21876480e03e6982d11be097948bfb1616830493a4fd591bfdb050d", size = 559125, upload-time = "2026-09-11T08:30:08.052Z" },
+    { url = "https://files.pythonhosted.org/packages/28/50/6f6be1f1d3a754b2cc74fbb67a5720e4a2da9d0520c49280104c4ca9d65b/psygnal-0.16.1-cp315-cp315-macosx_11_0_arm64.whl", hash = "sha256:fae892bf624a7bfb7d4d713422aee4fd32f97edcaf6ef7309845f4b91ec5cdce", size = 498657, upload-time = "2026-09-11T08:30:09.533Z" },
+    { url = "https://files.pythonhosted.org/packages/98/42/b7c36bcd6b4cda6bce2726a71d32e0592dec336ffa14243ca4ecfc52014c/psygnal-0.16.1-cp315-cp315-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:44e39bfb4c1e6d31a9289baae454c55857aa3f1e2cb0066d01cdb971d7fb92b1", size = 548104, upload-time = "2026-09-11T08:30:11.002Z" },
+    { url = "https://files.pythonhosted.org/packages/46/70/54b7cb0599dc1801157dc50f2846c8fb86583e56123022b1a9dc338eb0b0/psygnal-0.16.1-cp315-cp315-musllinux_1_2_x86_64.whl", hash = "sha256:6c0c0083f5d1fda072432c48f4ebc9c13e48c9bb3fbf9fb63789ab397a39b0a2", size = 553481, upload-time = "2026-09-11T08:30:12.656Z" },
+    { url = "https://files.pythonhosted.org/packages/5a/58/11a9f98db54a6f27183db831a9f8fcde778f1cbb988e16e8374de70c8208/psygnal-0.16.1-cp315-cp315-win_amd64.whl", hash = "sha256:bfb351f35c6c35dcd6d9ea3971ac295e9f40f00822a66638239aaa1e207cf0ea", size = 430505, upload-time = "2026-09-11T08:30:14.488Z" },
+    { url = "https://files.pythonhosted.org/packages/be/f2/973c1280f035cd825af70582bbee776c69545e24534b324cf135eabef57e/psygnal-0.16.1-py3-none-any.whl", hash = "sha256:93b96894d8c46f0a3c0bfaaf8abe73f0d6db2c20cc6d303624cf08f85abc3c92", size = 94049, upload-time = "2026-09-11T08:30:16.039Z" },
+]
+
+[[package]]
 name = "ptyprocess"
 version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -6836,6 +7330,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pyct"
+version = "0.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "param" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/78/c3/78eeacf7cbf478db6bd41de0ee2221cc6769d81e0c10f6c1616c82a25e06/pyct-0.6.0.tar.gz", hash = "sha256:d4e513b2cf35b6165605ae5fce5f2a49985bc67473c579de85134b8c71d374a8", size = 14586, upload-time = "2025-09-26T08:26:19.987Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8c/b2/23f4032cd1c9744aa8e9ecda43cd4d755fcb209f7f40fae035248f31a679/pyct-0.6.0-py3-none-any.whl", hash = "sha256:cfaded7289fca72ddf6579b81459e3ec8db323a508e61c49aa318ee3cd6ff160", size = 16630, upload-time = "2025-09-26T08:26:19.092Z" },
+]
+
+[[package]]
 name = "pydantic"
 version = "2.13.4"
 source = { registry = "https://pypi.org/simple" }
@@ -6988,6 +7494,53 @@ wheels = [
 ]
 
 [[package]]
+name = "pykdtree"
+version = "1.4.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/12/8d/ab32411372d016404e8cf0a30ff955c4420717a88c9df4ab0bd3dc4740be/pykdtree-1.4.3.tar.gz", hash = "sha256:d9187930ffb8c822c52595b64948b47346694ee2a49e2702420b58f743d786f5", size = 30472, upload-time = "2025-08-06T11:11:38.915Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1b/db/f8e30f61891c3455eda8f89691f200ac422258c2ae1c26f98dea1819d31b/pykdtree-1.4.3-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:bf1c863b97dec6ef9eda5f8c22e2513c1679b513a95f7bb49da90b49d8584223", size = 352572, upload-time = "2025-08-06T11:10:53.813Z" },
+    { url = "https://files.pythonhosted.org/packages/06/fb/4e6b8478d4121780f4c19f16676cc1745ae9665c6ebce5c4b860b21bf57d/pykdtree-1.4.3-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:ffe8ec795142793f927879dd8b058066b4f3613e91a2639cc57b8d9eae5e49a0", size = 315617, upload-time = "2025-08-06T11:10:54.974Z" },
+    { url = "https://files.pythonhosted.org/packages/26/69/cf40c90c488676701c5d088fbc3380d3d884eeef9ba87ef079442bcab847/pykdtree-1.4.3-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:bd3a4454b8f86ce22f7b92b4bc53e309817b0d3602afff8c9a17fde1bd6dd3f0", size = 441507, upload-time = "2025-08-06T11:10:56.865Z" },
+    { url = "https://files.pythonhosted.org/packages/46/aa/ad48cc40d15c6c12d64d06768db96bde01e8f72dbfbbcebf391bcc1682fb/pykdtree-1.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:44d2e1b6a3d02b5cf9646bf754931fdacb869cefd328242766e1dc0be909cca1", size = 456475, upload-time = "2025-08-06T11:10:57.858Z" },
+    { url = "https://files.pythonhosted.org/packages/62/d2/439860d63d40501e33370694a66de439696039a613ab31156040454e633a/pykdtree-1.4.3-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:3b3899ae553d63e351a2fd98f1656affb7923bda02e066ea4703aa5ca1879582", size = 493800, upload-time = "2025-08-06T11:10:59.228Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/0c/f2bbc770d16b76a1a0d0967121796be4bbdece358c736b5fbc07327df82d/pykdtree-1.4.3-cp311-cp311-win_amd64.whl", hash = "sha256:bb3367a325278a218fd22b321f1ef485445a0f19c23e1aa7bd6e34e0f4ff4d03", size = 67916, upload-time = "2025-08-06T11:11:00.681Z" },
+    { url = "https://files.pythonhosted.org/packages/1a/95/8ea06124b9f2880b645532703cacee062bce45ec67c0c05314686415fc31/pykdtree-1.4.3-cp311-cp311-win_arm64.whl", hash = "sha256:b6630c10c5b05535b0045d7a00a95e5e53a7a44319069ff3054d69b52be3e81c", size = 55430, upload-time = "2025-08-06T11:11:01.625Z" },
+    { url = "https://files.pythonhosted.org/packages/0b/f8/6cf164851d7d72b9bb7bc0ef4206ab191bfdfa9b6f017473ae69a1043e38/pykdtree-1.4.3-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:e0421694c5522911eb892eb916f1bcd08d70b72a69d5226d76bfa7706a2d9c74", size = 350280, upload-time = "2025-08-06T11:11:02.749Z" },
+    { url = "https://files.pythonhosted.org/packages/8c/93/4842213b45a588efbbfc4ad2a0773efd7c03038a3c727c47a3ab40589ffa/pykdtree-1.4.3-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:c656c5c0caa0be582bcf3b662578db4d898d652fcb1de0586eae854a0f1ece5b", size = 314622, upload-time = "2025-08-06T11:11:03.669Z" },
+    { url = "https://files.pythonhosted.org/packages/84/ed/a3978e5457d838945f1023240b12e72be71a53c8d3d0c0857f2063cc085d/pykdtree-1.4.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:8ace71f89edb21dc24c5d6c9e952638c7f2d229d75701a39e633f30b08668b63", size = 471736, upload-time = "2025-08-06T11:11:04.618Z" },
+    { url = "https://files.pythonhosted.org/packages/1d/3f/6e51e96d2aa9101646742ff7429b628580ab59a9dbbf9540b9c3fe5fd1ab/pykdtree-1.4.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:08d63ee594b5cd7524bfa37ab857304a775ed04b7431ed4b48169ad664d694d8", size = 484828, upload-time = "2025-08-06T11:11:05.622Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/88/2a278de28b3958599ad75de198a039ba0b5b371d5cad809563cb522e03e6/pykdtree-1.4.3-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:6c1fa063c2c7387dccd7553b1b677c05f7e762e9a7cfda35f5bb053ee6acea59", size = 521655, upload-time = "2025-08-06T11:11:06.532Z" },
+    { url = "https://files.pythonhosted.org/packages/27/52/555bdec183897687015b736bc852201386125d196b3a7b5c57da8118b106/pykdtree-1.4.3-cp312-cp312-win_amd64.whl", hash = "sha256:6d102ed37a54067e75485afb676c9c4bd723033a6e5661b47c059aa83ae6253e", size = 66371, upload-time = "2025-08-06T11:11:07.499Z" },
+    { url = "https://files.pythonhosted.org/packages/ae/54/e51d88b7c2e9d7e8ab75461d96b21f54ffa639ff2515da5344e9a96b66b1/pykdtree-1.4.3-cp312-cp312-win_arm64.whl", hash = "sha256:49ea28ecd75e0d450c1e9f54c8bc35eb1b677bb7fa0df2c341b83e782a976576", size = 54381, upload-time = "2025-08-06T11:11:08.583Z" },
+    { url = "https://files.pythonhosted.org/packages/ba/4b/76a3ee5a14053a7e7f7584ac6f8fd0e01959919773b6c6aad95aaf041288/pykdtree-1.4.3-cp313-cp313-macosx_13_0_x86_64.whl", hash = "sha256:8e1c1fff9f3893a82bf5b5f09be8d6ee83b05ed9d577e30eb50e6d729e15e455", size = 349780, upload-time = "2025-08-06T11:11:09.454Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/87/205f0a5c0fe687c10d1e8d1869146a7e20e4549a7cea12ae0ee4968a5a73/pykdtree-1.4.3-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:165bfa54a1a98609bfa1f52ea739f6347a01f5da418512bf8f7fa360cfca979f", size = 314048, upload-time = "2025-08-06T11:11:10.321Z" },
+    { url = "https://files.pythonhosted.org/packages/19/1f/caf7fd20d7dc9ca065e6fdd4f0fc6c9631e87dea2866121df2cca591c387/pykdtree-1.4.3-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:2a73001e203ea2aa4415ffb251fe9f71de1e0cb935a6cd014d4a4610f7ca7bbb", size = 450018, upload-time = "2025-08-06T11:11:11.19Z" },
+    { url = "https://files.pythonhosted.org/packages/a4/3e/dc89d0757452d1d0207b558f6a40bf2af1770a664b56d2c14f9ccd8ec75d/pykdtree-1.4.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:0726995df7f62bee5beabc867ba86ffab96cc38c4cf59dd92cb92eab64c51b91", size = 464481, upload-time = "2025-08-06T11:11:12.184Z" },
+    { url = "https://files.pythonhosted.org/packages/32/84/6ea33dc76a667aba7fc77591028b853d600e335953deac3e9b2f13cff951/pykdtree-1.4.3-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:f9a51e58446f60bb572701179c21191c1a8fdd233c79a79133eff85bf7349362", size = 499285, upload-time = "2025-08-06T11:11:13.673Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/59/7e738300a6d733235ef641398dd7eb297c9a575140ca7e89fcf1c608f42e/pykdtree-1.4.3-cp313-cp313-win_amd64.whl", hash = "sha256:32af4eaf44326b68f0f1a1ec0813b7b134477dd91fee2ce699a7891aec833c6f", size = 66772, upload-time = "2025-08-06T11:11:14.596Z" },
+    { url = "https://files.pythonhosted.org/packages/1e/6d/adc34737c527e606e12da525e530c2c05d80f405b0ddc24f9322a7a39b31/pykdtree-1.4.3-cp313-cp313-win_arm64.whl", hash = "sha256:77eaf63d25ab10f980bc516e1864fb4181e717d4005ef0249dd7119d7601ef6d", size = 54426, upload-time = "2025-08-06T11:11:15.368Z" },
+    { url = "https://files.pythonhosted.org/packages/cd/57/74552a627d3a84b2974ab3a6b8f0eb16dca4de7e707e803da500a89c90cb/pykdtree-1.4.3-cp314-cp314-macosx_13_0_x86_64.whl", hash = "sha256:62d1422df5c79d270e15f298eb34b84556dc8142c1cb9f9d90d7cc138eed68df", size = 349950, upload-time = "2025-08-06T11:11:16.122Z" },
+    { url = "https://files.pythonhosted.org/packages/5d/e1/33314e89bc9a7ec14607e17dbae463e04cf4eb4ada5f2e4663fb4e6510b5/pykdtree-1.4.3-cp314-cp314-macosx_14_0_arm64.whl", hash = "sha256:b53a9d473d0e5ddeb7608b2b364fb40e8312c6eb3cd81acd095989b7bce6880d", size = 314326, upload-time = "2025-08-06T11:11:16.953Z" },
+    { url = "https://files.pythonhosted.org/packages/48/43/a7ae1c28cdb2f3ee7b9890cb06b7f8df2a4ece0ce2812a5aefc69863fe95/pykdtree-1.4.3-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:089e30a1c249cacb5a36db8ddbe9c450e65df65c9fa7e6294a004ea9acefa59a", size = 448863, upload-time = "2025-08-06T11:11:17.819Z" },
+    { url = "https://files.pythonhosted.org/packages/94/d4/48cd5cec4a1c56a7f5dc5eec734a82d07012f2d1d1b01ff8afa52ded3c62/pykdtree-1.4.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:7c8b4ecaf2d9737508eaf342ba8baae969bfff8011521e3ac1b656a70a5a5f32", size = 461634, upload-time = "2025-08-06T11:11:18.804Z" },
+    { url = "https://files.pythonhosted.org/packages/0b/18/c3ee105e02aeea6ae6535f486f659c21011ac306a3a62a3139ad9558b688/pykdtree-1.4.3-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:7a582474f5c504a6e3ac1576d876fc7fdc620882e74eaa554bba660f6d927da8", size = 496965, upload-time = "2025-08-06T11:11:19.733Z" },
+    { url = "https://files.pythonhosted.org/packages/27/b8/75727565956edd9b458f835b6fee3ceeaafc4d7c78bd7fb1a2d274c54944/pykdtree-1.4.3-cp314-cp314-win_amd64.whl", hash = "sha256:9beb58ff9d77c80a6860d536f0100964fb3b191939d2b68a1165027a5993d413", size = 68062, upload-time = "2025-08-06T11:11:21.423Z" },
+    { url = "https://files.pythonhosted.org/packages/f0/33/b6eff9bdc395f5bec8cba7d1a4947e4780ca4f6cca7b5e80ad02152af62b/pykdtree-1.4.3-cp314-cp314-win_arm64.whl", hash = "sha256:658d02283bd53d92653cc033023eb22fad016b294763bbe751fd985bedc595f3", size = 55916, upload-time = "2025-08-06T11:11:22.175Z" },
+    { url = "https://files.pythonhosted.org/packages/0a/88/480bdfb3052859de1e9d6a208e0d5d743f5e5f094777afb32d918fa2e0eb/pykdtree-1.4.3-cp314-cp314t-macosx_13_0_x86_64.whl", hash = "sha256:7c843167ea246ad1a5ece27a38a6f6d3f40484a2a21dcbea902d0d550c355f57", size = 353657, upload-time = "2025-08-06T11:11:23.013Z" },
+    { url = "https://files.pythonhosted.org/packages/dd/28/dcff6150f951600b9194a648d28c4106aca5738e1765077fda7d913c687c/pykdtree-1.4.3-cp314-cp314t-macosx_14_0_arm64.whl", hash = "sha256:76cdc90fa164846ac8e3c2b6a3370dfec7161b3357b24aa68bdcd25bbcaf669f", size = 317584, upload-time = "2025-08-06T11:11:24.398Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/98/f5ce0042ec442ba57c8b7cad08ac1596c34c21f9b02f9ebca46104a19121/pykdtree-1.4.3-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:537efd8b17e2b9dd36254d70d425debe9dbb20a29fc2eb83c7005e212505c517", size = 466553, upload-time = "2025-08-06T11:11:26.038Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/9f/d7faecdd48f4eccc98180ba74dce08384a12117ca73e556cc4fcff83ffd0/pykdtree-1.4.3-cp314-cp314t-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:00cc35d95b9c822580af01619f11800cae24b1888b881195b7eb546c998ffff2", size = 464043, upload-time = "2025-08-06T11:11:27.486Z" },
+    { url = "https://files.pythonhosted.org/packages/0e/5b/a16dcf152140400752c9232edaaac5d3079a58ac3ac1c2672edbfddf0e35/pykdtree-1.4.3-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:a332bd906347e0769363051ff4f67d9aa985b30a8ad4f25ff9538247cd0dda03", size = 498328, upload-time = "2025-08-06T11:11:28.47Z" },
+    { url = "https://files.pythonhosted.org/packages/5d/2a/7729c6cdd3af4fa336b89eb4f4428409be8e8b97b1682dfd68efe674b977/pykdtree-1.4.3-cp314-cp314t-win_amd64.whl", hash = "sha256:bee5fa72ba2b37a731465d6b7e933701af438ce0c72de471bd6a4f9b76c68e33", size = 74061, upload-time = "2025-08-06T11:11:29.371Z" },
+    { url = "https://files.pythonhosted.org/packages/a0/50/cfc0d7d0385168ba7888c28696028670e86d4d2346be52c99bf1ea643c61/pykdtree-1.4.3-cp314-cp314t-win_arm64.whl", hash = "sha256:74f042f39ac8ba599d4b767c8e9162e5e34b108f217a68e9f89f059620f62253", size = 58909, upload-time = "2025-08-06T11:11:30.238Z" },
+]
+
+[[package]]
 name = "pymdown-extensions"
 version = "11.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -7047,6 +7600,41 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b2/41/b9d88d5537bfc132326d2c03464cde705a0d10e50af83321e2bebbc1af28/pyobis-1.6.1.tar.gz", hash = "sha256:b050798f80d254fa4b762974634e33e0652c7af352af9accc962692bcfd62b11", size = 8687961, upload-time = "2025-09-10T18:00:22.855Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/82/dd/57784a075faa653ba9231e0a20ce8809acac26f1a4ae5964473c601744d9/pyobis-1.6.1-py3-none-any.whl", hash = "sha256:9ca14e4016334fd93c1dfbb6a93d6da499b41b53d5c705b17133504863217220", size = 29476, upload-time = "2025-09-10T18:00:20.947Z" },
+]
+
+[[package]]
+name = "pyobjc-core"
+version = "12.2.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a5/78/abc4ce5920305780aeb36b4067a86253378b36e29ba96673a3deb02eb03a/pyobjc_core-12.2.2.tar.gz", hash = "sha256:3906452339cd06a3bb07df103c2511d4cb0f7a22d8771c0b802eba15d9a642b6", size = 1067701, upload-time = "2026-08-11T19:43:39.059Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ce/8e/18284fec7913ef78b25a1c97f9689ebef98bc14038386191491516abeb25/pyobjc_core-12.2.2-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:b9cdd686e32db8e451feb19f8a85bc4cd52c2893103881d04aca51e1f35371d1", size = 6481574, upload-time = "2026-08-11T14:13:27.153Z" },
+    { url = "https://files.pythonhosted.org/packages/86/b2/bbf7f049880ab40d110e66f25122342a1f6c98d6fe3c59bb98985503c660/pyobjc_core-12.2.2-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:122e6ad302a2abf5d4d4adb0156db751600ddf2768441696cba17b31323085e7", size = 6427637, upload-time = "2026-08-11T14:51:36.038Z" },
+    { url = "https://files.pythonhosted.org/packages/1b/ed/a8bf040caf3704023d74086b7fb96cf4ed2e844e24bd94e5248ba214b700/pyobjc_core-12.2.2-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:950bd2d9c74634398c4e3d24ef2f213d4e23d705083697464fa67afedc53c1ad", size = 6427113, upload-time = "2026-08-11T15:04:39.424Z" },
+    { url = "https://files.pythonhosted.org/packages/e7/5a/760f8b9e116edd43c57e33844dc17619158fbdd311250d4209910192d72d/pyobjc_core-12.2.2-cp313-cp313t-macosx_10_13_universal2.whl", hash = "sha256:3772b406edb3ff78171530a17cda1c4a7817f87b87ded0d8715b3fa664df16db", size = 6666817, upload-time = "2026-08-11T19:30:17.01Z" },
+    { url = "https://files.pythonhosted.org/packages/13/37/486d38a173b0b8dce973a3e13c74cf402ed1b8621586b5963bc9efd49a48/pyobjc_core-12.2.2-cp314-cp314-macosx_10_15_universal2.whl", hash = "sha256:2062e8ad30a310441cd022544a897553408bebeaa7820d5edba3c96fd7fd693b", size = 6421184, upload-time = "2026-08-11T19:30:21.081Z" },
+    { url = "https://files.pythonhosted.org/packages/04/f1/d138fd9b9a66ea8db56a8138b77d3413b85da3defe13363a19f364f85529/pyobjc_core-12.2.2-cp314-cp314t-macosx_10_15_universal2.whl", hash = "sha256:2c7ef3d2f865b4b3ebb14ec3556f7a3e8abb6d130c67275cd9daa08dbd6e4e4e", size = 6671824, upload-time = "2026-08-11T19:30:25.005Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/85/577e2265cccf59daf48c460f0a8deeaf7dbe2991227a8859ab1eeab4945e/pyobjc_core-12.2.2-cp315-cp315-macosx_10_15_universal2.whl", hash = "sha256:89acc6bc13aaa6e3f52b0ce652ede7e201edb6bf062741b246b0c5a44582f25f", size = 6477694, upload-time = "2026-08-11T19:30:28.821Z" },
+    { url = "https://files.pythonhosted.org/packages/77/0a/bd9f830c64c6f334530831e75c01bfe0a770a3fbb00fddc70329223118b3/pyobjc_core-12.2.2-cp315-cp315t-macosx_10_15_universal2.whl", hash = "sha256:59a77038ebe0ab1240f61c341e7fb67b8674f2b4cd41bc71a6472511a12b50f7", size = 6712233, upload-time = "2026-08-11T19:30:33.032Z" },
+]
+
+[[package]]
+name = "pyobjc-framework-cocoa"
+version = "12.2.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyobjc-core", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/75/76/49c6da2c6a831020b4854ba20079d5a1030474bffc776b7b73c2eeff8c15/pyobjc_framework_cocoa-12.2.2.tar.gz", hash = "sha256:c96c0ef69a71afbbb0e6a7d594b455c5fe47d62e0db376ee7a2b4b828c16ace9", size = 3132831, upload-time = "2026-08-11T19:44:02.288Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f6/a7/370f12143661dff66f2c68a735938afab6530aa3b153f6a7a6f12b5eabab/pyobjc_framework_cocoa-12.2.2-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:851dca4c16e70b405e5cd5a8c166cf7c445ae54a4cdd95ce9a523803172f32d1", size = 387300, upload-time = "2026-08-11T19:32:42.043Z" },
+    { url = "https://files.pythonhosted.org/packages/fd/2f/b67e73d8bc367e03fe7861cd9c49fff9dcfa6db83bc0630c0adcfb25b7fa/pyobjc_framework_cocoa-12.2.2-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:e106f395531e67694376b0f1184612cbeea3ec8b9bf56b55ef41d026171d2a2d", size = 388117, upload-time = "2026-08-11T19:32:43.161Z" },
+    { url = "https://files.pythonhosted.org/packages/db/e1/5d9b04ebb60042b9cb49adc2d33115e2f2c2e4ff7d548017bfaff8b7f536/pyobjc_framework_cocoa-12.2.2-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:600b1723184ca094931330e79355274949965460e23de38628d601b5a967baf9", size = 388181, upload-time = "2026-08-11T19:32:44.537Z" },
+    { url = "https://files.pythonhosted.org/packages/b4/25/2a343357d5fe09bbe9c0e294dc03450866a0d6c1792fad36b6bcc00174c0/pyobjc_framework_cocoa-12.2.2-cp313-cp313t-macosx_10_13_universal2.whl", hash = "sha256:875f2aad73963faa81a6b36ae674fd494a4658d6d999e1075e0e2aca3d2391df", size = 392275, upload-time = "2026-08-11T19:32:45.631Z" },
+    { url = "https://files.pythonhosted.org/packages/1f/1a/b99521999b9f54b89aad928ddff0faad507abfe33bc46599454bfa48a4b2/pyobjc_framework_cocoa-12.2.2-cp314-cp314-macosx_10_15_universal2.whl", hash = "sha256:889d7bbd4ba2d4941078bfbbfb882138e51dbead27df006abfe0f2e0d49b5b2e", size = 388368, upload-time = "2026-08-11T19:32:46.781Z" },
+    { url = "https://files.pythonhosted.org/packages/6d/26/0c697dbc73dcc76bc0f68ea5aeed25bf7b05217df5102659e878501b2d5f/pyobjc_framework_cocoa-12.2.2-cp314-cp314t-macosx_10_15_universal2.whl", hash = "sha256:de69c5933750f3a4599ed962eccd92b6a71914c7e4318dacc7895738a8ae60d7", size = 392404, upload-time = "2026-08-11T19:32:47.918Z" },
+    { url = "https://files.pythonhosted.org/packages/df/82/502f740fd8f4e9ef741c9d40ba67467ab2c8196f2c09dcba12936d28a4fd/pyobjc_framework_cocoa-12.2.2-cp315-cp315-macosx_10_15_universal2.whl", hash = "sha256:0e8ace0d44a00d281281a723d17fcd05eea7544a38a6a512e1fd018ddb7aece2", size = 388585, upload-time = "2026-08-11T19:32:49.171Z" },
+    { url = "https://files.pythonhosted.org/packages/7d/3b/07ce3c0ab8d1e9e1bed74fea1bf1cce73527a365a7a23c755051d3be9865/pyobjc_framework_cocoa-12.2.2-cp315-cp315t-macosx_10_15_universal2.whl", hash = "sha256:8fe5b2e79c9530f667b4e58a87a3a15ea62f86a5d19eec405517ecbd4f454868", size = 392693, upload-time = "2026-08-11T19:32:50.283Z" },
 ]
 
 [[package]]
@@ -7764,6 +8352,68 @@ wheels = [
 ]
 
 [[package]]
+name = "pyvista"
+version = "0.49.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cyclopts" },
+    { name = "matplotlib" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "pillow" },
+    { name = "pooch" },
+    { name = "pyobjc-framework-cocoa", marker = "sys_platform == 'darwin' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "pyvista-validation" },
+    { name = "scooby" },
+    { name = "typing-extensions" },
+    { name = "vtk" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/99/8f/fc7f2662d989d489d4b9048fdc030f6960ad5a0d09dd00016abc64ffa02d/pyvista-0.49.0.tar.gz", hash = "sha256:5bc914769dfa9baeedb3b761c81e3326bd4c7a3aeed475c25f164c798806dba2", size = 2704091, upload-time = "2026-09-08T03:50:50.682Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/13/28/10413555dd9cbd410c2762c8e6172ce9bd88c8c7997f7290f173969614dc/pyvista-0.49.0-py3-none-any.whl", hash = "sha256:8528b753baf9a32dd7a44f4e88912fe5c8771f7d921c813e1cbac35fc5a37996", size = 2732156, upload-time = "2026-09-08T03:50:48.933Z" },
+]
+
+[package.optional-dependencies]
+jupyter = [
+    { name = "ipywidgets" },
+    { name = "nest-asyncio2" },
+    { name = "trame-pyvista" },
+]
+
+[[package]]
+name = "pyvista-validation"
+version = "0.2.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b5/c5/d800d91bae144a71fbae31fcb6b3279c55179acf93639e3443ae87373782/pyvista_validation-0.2.2.tar.gz", hash = "sha256:af234130a3b34b3e1af49584d75b41fafc694752b2958b36e9dbfd9f188e6a0c", size = 554920, upload-time = "2026-09-06T08:42:14.076Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4c/9f/6371ab13987d3655f11e1feef0fd3f8729dd3c1322a814e40e81e4a03d76/pyvista_validation-0.2.2-cp310-abi3-macosx_10_9_x86_64.whl", hash = "sha256:4ae9af24e888e4ffc941fc01529cc3a4668bd0de7066f98e41aa1d02a5e23d58", size = 83841, upload-time = "2026-09-06T08:42:03.68Z" },
+    { url = "https://files.pythonhosted.org/packages/17/a0/a71388af7e416ff100b3e6498e71b9c6d8f0b1f0576536e8ea27158bffc9/pyvista_validation-0.2.2-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:8b7156dec1699d65501df65578d759dbab6ddfccd803213fc837fff0c2e41a92", size = 87934, upload-time = "2026-09-06T08:42:04.954Z" },
+    { url = "https://files.pythonhosted.org/packages/9e/38/84e7eba0dace65cc68edb0e2c18f7bd8363cf9de449290dc6e4420eebf22/pyvista_validation-0.2.2-cp310-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:1be12fb7dbc05035a58a3245a0fac018a6be41837be9ec90a0796db700bd7dfa", size = 293409, upload-time = "2026-09-06T08:42:06.153Z" },
+    { url = "https://files.pythonhosted.org/packages/75/e7/24d49960620aa770fc1fb527a019ec5a860e27c73bcd69c4bdfcc510c7a7/pyvista_validation-0.2.2-cp310-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a45b633b89d843329db1608ba2bbed75d075ab63c5a7427c8dfa9ad9c23eadb4", size = 261436, upload-time = "2026-09-06T08:42:07.546Z" },
+    { url = "https://files.pythonhosted.org/packages/81/b8/c6d1c79a293a7c6927995ed77af01a1c77d16ad1b71bfbfd47922104ec6b/pyvista_validation-0.2.2-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:aba7a1fc01ba9c762f14d1418329b2a462c881aa7a42b65b2088b6ab9fe8e530", size = 291065, upload-time = "2026-09-06T08:42:08.876Z" },
+    { url = "https://files.pythonhosted.org/packages/51/c9/1dd3831f373dfc0b3ba8fe3a8de0b17f4b8610df9f262f6904f20f7d507b/pyvista_validation-0.2.2-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:672991acf11588de5ce4042cf4f1cc59d0f2b0e84bca792c3358fac6b07e2b38", size = 259212, upload-time = "2026-09-06T08:42:10.297Z" },
+    { url = "https://files.pythonhosted.org/packages/5b/8a/fe3dd14c804dc8bfade2d247f33fedaa3ebebf916f12cdd002203440b82b/pyvista_validation-0.2.2-cp310-abi3-win32.whl", hash = "sha256:6ba8b5f39a9c4e1f75c4dd9adc037cfeb5a50be9fdb93d787a34e98245bba51a", size = 68929, upload-time = "2026-09-06T08:42:11.649Z" },
+    { url = "https://files.pythonhosted.org/packages/21/fc/b98d6dbbd458eeb197b63486c64eb8ed3ef1216d4bf17c353d1153edca97/pyvista_validation-0.2.2-cp310-abi3-win_amd64.whl", hash = "sha256:9ee46b4177e6b8fcc5d750d9c471d30fa05f1384668a67cef0b19a700a797659", size = 74885, upload-time = "2026-09-06T08:42:12.861Z" },
+]
+
+[[package]]
+name = "pyviz-comms"
+version = "3.0.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "param" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/da/ee/2b5367b911bab506662abffe6f342101a9b3edacee91ff9afe62db5fe9a7/pyviz_comms-3.0.6.tar.gz", hash = "sha256:73d66b620390d97959b2c4d8a2c0778d41fe20581be4717f01e46b8fae8c5695", size = 197772, upload-time = "2025-06-20T16:50:30.97Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/13/5a/f8c0868199bbb231a02616286ce8a4ccb85f5387b9215510297dcfedd214/pyviz_comms-3.0.6-py3-none-any.whl", hash = "sha256:4eba6238cd4a7f4add2d11879ce55411785b7d38a7c5dba42c7a0826ca53e6c2", size = 84275, upload-time = "2025-06-20T16:50:28.826Z" },
+]
+
+[[package]]
 name = "pywin32"
 version = "312"
 source = { registry = "https://pypi.org/simple" }
@@ -7956,10 +8606,8 @@ name = "rasterio"
 version = "1.4.4"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version < '3.12' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version < '3.12' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "affine", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -8016,22 +8664,14 @@ name = "rasterio"
 version = "1.5.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version >= '3.15' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version >= '3.15' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "(python_full_version == '3.14.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.14.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.13.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.13.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.12.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.12.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version >= '3.15' and platform_machine != 'ARM64') or (python_full_version >= '3.15' and sys_platform != 'win32')",
+    "(python_full_version == '3.14.*' and platform_machine != 'ARM64') or (python_full_version == '3.14.*' and sys_platform != 'win32')",
+    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.13.*' and platform_machine != 'ARM64') or (python_full_version == '3.13.*' and sys_platform != 'win32')",
+    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.12.*' and platform_machine != 'ARM64') or (python_full_version == '3.12.*' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "affine", marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -8339,14 +8979,25 @@ wheels = [
 ]
 
 [[package]]
+name = "rich-rst"
+version = "2.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pygments" },
+    { name = "rich" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cf/0e/faf7c7e36630561e3e9611730c47510cd972dd5fde8f95941ff78f76accd/rich_rst-2.2.0.tar.gz", hash = "sha256:b1e6a67f8f694a6f36035624bf73e2b1a0a4be13edaf3ba5e654d9758b61073a", size = 326270, upload-time = "2026-09-27T19:12:42.163Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d1/4e/716b42bf066e180c1235783b46f095a5d871d05dca7006d2295aac29c491/rich_rst-2.2.0-py3-none-any.whl", hash = "sha256:1ea1c43813dc4a8d86475fce27ffb74e0ada3d4656c9f8130ba2a59868055fe9", size = 279274, upload-time = "2026-09-27T19:12:40.548Z" },
+]
+
+[[package]]
 name = "rioxarray"
 version = "0.19.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version < '3.12' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version < '3.12' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -8366,22 +9017,14 @@ name = "rioxarray"
 version = "0.21.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version >= '3.15' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version >= '3.15' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "(python_full_version == '3.14.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.14.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.13.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.13.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.12.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.12.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version >= '3.15' and platform_machine != 'ARM64') or (python_full_version >= '3.15' and sys_platform != 'win32')",
+    "(python_full_version == '3.14.*' and platform_machine != 'ARM64') or (python_full_version == '3.14.*' and sys_platform != 'win32')",
+    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.13.*' and platform_machine != 'ARM64') or (python_full_version == '3.13.*' and sys_platform != 'win32')",
+    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.12.*' and platform_machine != 'ARM64') or (python_full_version == '3.12.*' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -8575,10 +9218,8 @@ name = "scipy"
 version = "1.17.1"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version < '3.12' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version < '3.12' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -8652,22 +9293,14 @@ name = "scipy"
 version = "1.18.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version >= '3.15' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version >= '3.15' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "(python_full_version == '3.14.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.14.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.13.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.13.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.12.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.12.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version >= '3.15' and platform_machine != 'ARM64') or (python_full_version >= '3.15' and sys_platform != 'win32')",
+    "(python_full_version == '3.14.*' and platform_machine != 'ARM64') or (python_full_version == '3.14.*' and sys_platform != 'win32')",
+    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.13.*' and platform_machine != 'ARM64') or (python_full_version == '3.13.*' and sys_platform != 'win32')",
+    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.12.*' and platform_machine != 'ARM64') or (python_full_version == '3.12.*' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -8717,12 +9350,21 @@ wheels = [
 ]
 
 [[package]]
+name = "scooby"
+version = "0.12.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/71/43/945c26345e126b96488d52afa7e40e6ea4997129ba6c0ffe9223e7c85c3f/scooby-0.12.0.tar.gz", hash = "sha256:e1eff64727b60b68634719326e220cd1ddbb299f8c073421c2abaa4f59ca5f20", size = 246208, upload-time = "2026-09-11T03:38:11.726Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5b/32/e263e888bec1c30b40dd834ca8ea6227a9ca9d5c8091986ea0c8746f0305/scooby-0.12.0-py3-none-any.whl", hash = "sha256:65dea5b32006ef554aea9e945032c0c448eaacada96078187681e24f0a2fe8fa", size = 21732, upload-time = "2026-09-11T03:38:10.246Z" },
+]
+
+[[package]]
 name = "secretstorage"
 version = "3.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cryptography", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or extra != 'extra-15-earthlens-ocean-argo' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
-    { name = "jeepney", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or extra != 'extra-15-earthlens-ocean-argo' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "cryptography", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "jeepney", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/1c/03/e834bcd866f2f8a49a85eaff47340affa3bfa391ee9912a952a1faa68c7b/secretstorage-3.5.0.tar.gz", hash = "sha256:f04b8e4689cbce351744d5537bf6b1329c6fc68f91fa666f60a380edddcd11be", size = 19884, upload-time = "2025-11-23T19:02:53.191Z" }
 wheels = [
@@ -9148,10 +9790,8 @@ name = "tifffile"
 version = "2026.3.3"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version < '3.12' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version < '3.12' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -9166,22 +9806,14 @@ name = "tifffile"
 version = "2026.7.14"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version >= '3.15' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version >= '3.15' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "(python_full_version == '3.14.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.14.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.13.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.13.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.12.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.12.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version >= '3.15' and platform_machine != 'ARM64') or (python_full_version >= '3.15' and sys_platform != 'win32')",
+    "(python_full_version == '3.14.*' and platform_machine != 'ARM64') or (python_full_version == '3.14.*' and sys_platform != 'win32')",
+    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.13.*' and platform_machine != 'ARM64') or (python_full_version == '3.13.*' and sys_platform != 'win32')",
+    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.12.*' and platform_machine != 'ARM64') or (python_full_version == '3.12.*' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -9329,6 +9961,149 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/57/a9/a2584b8313b89f94869ddb3c4074617a691de1812a614d2d50e32ca5a7a6/traitlets-5.15.1.tar.gz", hash = "sha256:7b1c07854fe25acb39e009bae49f11b79ff6cbb2f27999104e9110e7a6b53722", size = 163344, upload-time = "2026-06-03T12:26:06.181Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/96/8d/1080ee4c231f361b6ce4470d556c8c435b67c7e0753aaa641497ee92f88b/traitlets-5.15.1-py3-none-any.whl", hash = "sha256:770a53705f84b81ac107e83a1b3328ff2dae16094d8fc3cfc004e4b22dfd8e92", size = 85858, upload-time = "2026-06-03T12:26:04.395Z" },
+]
+
+[[package]]
+name = "trame"
+version = "4.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyyaml" },
+    { name = "trame-client" },
+    { name = "trame-common" },
+    { name = "trame-server" },
+    { name = "wslink" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/08/1e/d76411adb59829773619a788cce2f4a09645c44bed09f180079369096033/trame-4.0.0.tar.gz", hash = "sha256:148cdd10b4636539e375a898c16df139d7a03f3cf8a186cbd5a23c42d763a6b3", size = 19091, upload-time = "2026-09-09T16:53:40.646Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4c/a8/137edd4bd17081244dbafd3ebcb35612d791b605eaf9a0c57e47200abd24/trame-4.0.0-py3-none-any.whl", hash = "sha256:e3c8a89f7a209fea7a595bd877301c851cd0db18cc7620f11b08d4d7966e5dcc", size = 27303, upload-time = "2026-09-09T16:53:39.12Z" },
+]
+
+[[package]]
+name = "trame-client"
+version = "4.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "trame-common" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/31/38/8ebc00a78a29b1bea9285866bb16f0af61c7922517f70398cdb5453ada1f/trame_client-4.1.0.tar.gz", hash = "sha256:63fbf128090ab334d432d0661a09a6b738027b26ac9be03f4497559fb839c70c", size = 552102, upload-time = "2026-09-14T06:56:49.199Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e5/32/d40b06ab592b73c68c1551108917c298f050676fb56735d83f155995318c/trame_client-4.1.0-py3-none-any.whl", hash = "sha256:b4cb4411d4cade529591650d9d2439c7aa7e64235159b3ff57a7943202841113", size = 567283, upload-time = "2026-09-14T06:56:47.519Z" },
+]
+
+[[package]]
+name = "trame-common"
+version = "1.2.7"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/75/70/2ed0995946cf18213bc7b944cc41800e0384192f18bdefae1b4cbe48a1b5/trame_common-1.2.7.tar.gz", hash = "sha256:bf31b565f78fb4628e5d2f4cca99041e34f0e31ebe44781c7d015589826e4e0d", size = 20352, upload-time = "2026-08-07T00:08:52.346Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f2/ce/ffe6e768887536aff8dcddf5da3080a51243fe933c95dd8958c8bfda6a27/trame_common-1.2.7-py3-none-any.whl", hash = "sha256:14d50c651505c41f9144261b67bc0c7b3524bf72893d56ad544e255cfa1c1ba1", size = 23924, upload-time = "2026-08-07T00:08:51.026Z" },
+]
+
+[[package]]
+name = "trame-dataclass"
+version = "2.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "loguru" },
+    { name = "trame-client" },
+    { name = "typing-extensions", marker = "python_full_version == '3.13.*' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cf/58/3ae2c43dfac6be96baf0d20426b9b4c3399f03d4cc7172f7fe4818b96bfb/trame_dataclass-2.2.1.tar.gz", hash = "sha256:98b88a7fcc9265cdaf47d4a0ec7d759765fb983a941ccb4885f21ea037b239bf", size = 25020, upload-time = "2026-09-22T20:25:24.159Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b9/6c/51413cac1bfd06a048641b3be60a3855fe8a769445d84d6d5ebd4b83fdbe/trame_dataclass-2.2.1-py3-none-any.whl", hash = "sha256:cd6b914d87c3288ac29f6f9d0851be3e8ced1affb403133829a07e31d270576d", size = 32797, upload-time = "2026-09-22T20:25:22.903Z" },
+]
+
+[[package]]
+name = "trame-pyvista"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyvista" },
+    { name = "trame" },
+    { name = "trame-client" },
+    { name = "trame-common" },
+    { name = "trame-dataclass" },
+    { name = "trame-rca" },
+    { name = "trame-server" },
+    { name = "trame-vtk" },
+    { name = "trame-vtklocal" },
+    { name = "trame-vuetify" },
+    { name = "wslink" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f5/5e/50b7fc0d98500943c531e7f05f377677cbb0f2f028819334ba1d10ab434c/trame_pyvista-0.2.0.tar.gz", hash = "sha256:05f912651e8f97a2454c8e5650eed930c46317b61597c2a3613e6bcd2aa8c7f8", size = 116059, upload-time = "2026-10-09T02:30:46.268Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7a/dc/57f3682bea184ac9f871c12fc4805c429c2f5eba40e04beb6a3ca4ce0ce4/trame_pyvista-0.2.0-py3-none-any.whl", hash = "sha256:880074f5aa67c47f24c24075e7486eda131ba8e85f161f1fa989c1444e022796", size = 37963, upload-time = "2026-10-09T02:30:45.022Z" },
+]
+
+[[package]]
+name = "trame-rca"
+version = "2.11.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "packaging" },
+    { name = "pillow" },
+    { name = "trame-client" },
+    { name = "trame-common" },
+    { name = "wslink" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2a/17/31e22dbda93451c9fe84fe1d1e15079679566115ca2d79fcc0a42d9bcf67/trame_rca-2.11.8.tar.gz", hash = "sha256:4018b5afcad7e85efb401cc819e53c23b00045343e34de7a369b589cb02949cb", size = 69535, upload-time = "2026-10-09T06:25:00.667Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8f/ae/1c9aa48198c9bb824766a6bc3b0527db9831d67c1faf1e3f1927b18afa92/trame_rca-2.11.8-py3-none-any.whl", hash = "sha256:59fd897ff8ac42147dcf067f08fd42cdc1b7ecdd357681c5295806209fc2815a", size = 79199, upload-time = "2026-10-09T06:24:59.296Z" },
+]
+
+[[package]]
+name = "trame-server"
+version = "4.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "more-itertools" },
+    { name = "trame-common" },
+    { name = "wslink" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8c/2f/252efbbcd58053219b10d5fcfad797798191cc5a8251a82acc8d94e189f3/trame_server-4.0.0.tar.gz", hash = "sha256:0bcf91816a1f43d497b7ad8bce774d5e9cceab13ee844369df17f66da1245e83", size = 39174, upload-time = "2026-09-09T15:59:52.777Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d9/de/066195b00ebd5e0914987464359428826286527c4feff9b090f13d0c4436/trame_server-4.0.0-py3-none-any.whl", hash = "sha256:04984722a4b989da8c77c368212c82ebfcdd7ec9d7954564a36c94bd05b47614", size = 45632, upload-time = "2026-09-09T15:59:51.335Z" },
+]
+
+[[package]]
+name = "trame-vtk"
+version = "2.11.17"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "trame-client" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c2/53/17db0dbc4483533db6b6de079b24d2c7071faf0aa18a22f23874bb5b5f5b/trame_vtk-2.11.17.tar.gz", hash = "sha256:367ef96505f27d6a01c03cdc4a8fe3f8894998d2b6b623512ef07c1fe716caba", size = 829777, upload-time = "2026-09-22T14:40:15.687Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c8/f1/d9b1119bad9c3018b2cc801032447e0f5cf942859845a1eaf03aff9c0905/trame_vtk-2.11.17-py3-none-any.whl", hash = "sha256:8fe2adbe3b6888ad41cb4311421fbd850cece75a801bf8b5f7af5bdc6473bee4", size = 851988, upload-time = "2026-09-22T14:40:13.893Z" },
+]
+
+[[package]]
+name = "trame-vtklocal"
+version = "1.7.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "trame" },
+    { name = "trame-common" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6e/de/d9942323ee873a52fe490e4ed5314b4e7beb81a170e7220065bc7efbfd8a/trame_vtklocal-1.7.1.tar.gz", hash = "sha256:ef7b5ce301126989715e7d3aefcb09df0a2335d463c12abcf8b717d8eeb46cc8", size = 88958, upload-time = "2026-09-27T00:07:04.27Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a1/66/616114472b3c4f27171b8466e6d9f02d66ac12289a47290df149ee1a6acf/trame_vtklocal-1.7.1-py3-none-any.whl", hash = "sha256:13ddf194149fbacaf3c842864e214b6b1916a5a1dd55cf47f8e8077f14ce4724", size = 94738, upload-time = "2026-09-27T00:07:02.793Z" },
+]
+
+[[package]]
+name = "trame-vuetify"
+version = "3.2.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "trame-client" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a9/cb/178864dd57b081790434ed1c922489d89c9f4e2c1b55381342dd2a55663a/trame_vuetify-3.2.6.tar.gz", hash = "sha256:186be158d2f4fc40eb2abe7c42bac3df9e34fb0db29320d281c256e85f604d2b", size = 5130163, upload-time = "2026-09-10T14:33:54.088Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5a/b8/6d6524b25091472e2ded6eb9542fc2156744fa28fe1d7cdab69f732f92bf/trame_vuetify-3.2.6-py3-none-any.whl", hash = "sha256:dab371192bcc30208005aa7d85b6689cc916375061e8339bf107bcf00122fd89", size = 5160277, upload-time = "2026-09-10T14:33:52.123Z" },
 ]
 
 [[package]]
@@ -9622,6 +10397,38 @@ wheels = [
 ]
 
 [[package]]
+name = "vtk"
+version = "9.7.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "matplotlib" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ab/80/3d24368364e49e3c83766fb88f099e6a8d76d2f61d4f627ba72cc77c6348/vtk-9.7.1-cp311-cp311-macosx_10_10_x86_64.whl", hash = "sha256:b0172db8ba38030fbcd0d381d92beb462ad86aba8e6bc2d3024ca7e69c7f90bf", size = 110884500, upload-time = "2026-09-28T09:48:28.169Z" },
+    { url = "https://files.pythonhosted.org/packages/91/55/5f0326152ca80423e5522eab8e9a2bb06c1d2f79e2dec56ca4bcbe70aed4/vtk-9.7.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:7d52b50a0da720e1c58236ea13164eb878ca12239fdb412ed3ae6c07d2bc69a1", size = 102945196, upload-time = "2026-09-28T09:48:52.4Z" },
+    { url = "https://files.pythonhosted.org/packages/c8/d5/e3f59e5ac9b980419830743a92b283320da2595bab75a67a4ea8076dbc2d/vtk-9.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:d5d642e5f0cdb213e2eff5d6de93d0b783a0a05ecd968c15805fde65f6df9926", size = 139619172, upload-time = "2026-09-28T09:49:18.56Z" },
+    { url = "https://files.pythonhosted.org/packages/47/5f/e9a35b8f80b1978da80bcbc2d608ef96a961c8f7a394af314f657a2280f7/vtk-9.7.1-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:c760e6f7a2cff2236fe4b4b58ce0c6433a7421c0e3443bd30586fd58a27a0268", size = 129393715, upload-time = "2026-09-28T09:49:52.233Z" },
+    { url = "https://files.pythonhosted.org/packages/95/f4/371ec61f9d231f450db01a594b229a168ca350ec400799f07a48e7560693/vtk-9.7.1-cp311-cp311-win_amd64.whl", hash = "sha256:ef4d99933652b708e7a6f0830c6705977313986bbe719bf8d4636bb15a2eb27f", size = 80411253, upload-time = "2026-09-28T09:50:08.615Z" },
+    { url = "https://files.pythonhosted.org/packages/07/5d/15683d1a19f38ddfda59303b407dfc5bbfd7f7a2eb96bc3a568b76119f7f/vtk-9.7.1-cp312-cp312-macosx_10_10_x86_64.whl", hash = "sha256:bac36fd483cc5ff51d49c347a551933232a6788be2f7dd1604540e6fdb717e40", size = 111058702, upload-time = "2026-09-28T09:50:25.665Z" },
+    { url = "https://files.pythonhosted.org/packages/82/be/5b94620ddea029a4613272730046ce8183d11be8ff19a710f500e46f3de6/vtk-9.7.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:ce93d04e363b26955b661e482c02b5ddd38c11af1b6c7af4395c2ef6baab6b0d", size = 102999179, upload-time = "2026-09-28T09:50:36.639Z" },
+    { url = "https://files.pythonhosted.org/packages/2c/98/4bf4bc0146f7342f987a48d796100a018867049711a56cf3ad13e448bb17/vtk-9.7.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:04740a3bc2d492327d650fb9c4a9ff54e80f3a064d5ce677ef48c3b08fa96bcd", size = 139655538, upload-time = "2026-09-28T09:50:58.3Z" },
+    { url = "https://files.pythonhosted.org/packages/85/74/ece0d5ef56c833f841c306138c32be8f6c09aee2e5c9cebd66b6a048744d/vtk-9.7.1-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:830f3e3042d381fed96a7f013645f5b667700d63f843133260c8f5ec2915bdb3", size = 129446174, upload-time = "2026-09-28T09:51:11.701Z" },
+    { url = "https://files.pythonhosted.org/packages/f6/b2/fe8fbc4e80db34b9dd1209b2238b6348096cac17a61ba826f4ec5c4e0a48/vtk-9.7.1-cp312-cp312-win_amd64.whl", hash = "sha256:64a50b972240f477c864a0d16dfc247e7f540b007ec4016b76cb8f112f62a66b", size = 80426613, upload-time = "2026-09-28T09:51:26.406Z" },
+    { url = "https://files.pythonhosted.org/packages/07/82/50bc4f6ce093b05a710c5543c60364073c1223b0f512873c93dd3dc4b97e/vtk-9.7.1-cp313-cp313-macosx_10_10_x86_64.whl", hash = "sha256:3b54251c92e9a78766f5aec3d423c53e94991f9c34307a97c560e9c94eccad81", size = 111072707, upload-time = "2026-09-28T09:51:47.295Z" },
+    { url = "https://files.pythonhosted.org/packages/0d/90/a186c0695360e03cc76a14a262ae25964899b323e140154c63036794907c/vtk-9.7.1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:a634727aab72ee68d8f231e9004823a928ef7583810e90a7add7fcbec157ef65", size = 103002079, upload-time = "2026-09-28T09:52:03.519Z" },
+    { url = "https://files.pythonhosted.org/packages/60/0e/6f4b0112778cc69baf2942fe77173705554c0ec077f96cba0d0a15a61d15/vtk-9.7.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:22e4912ee5fc36c212baf8c179c7cdc16aef6540ace3ca8eb0669395f2791fc0", size = 139655952, upload-time = "2026-09-28T09:52:26.709Z" },
+    { url = "https://files.pythonhosted.org/packages/57/3a/796d62e86c977d4cc333e05a763916d668af79ce88ef080e4be707a27f8b/vtk-9.7.1-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:74c92cecb9b1bf78b569cb013f2e4d76087415734e01ac91328619b8a6395fcc", size = 129446920, upload-time = "2026-09-28T09:52:47.458Z" },
+    { url = "https://files.pythonhosted.org/packages/cd/6e/2f01c1ef5528c42cd372ee6c35cd8dc816340e704d32f2a99c9c7b04719e/vtk-9.7.1-cp313-cp313-win_amd64.whl", hash = "sha256:997589ce7cfffaae539c4a6c35ce1852d902bde35c2928fb74cb994e261916a7", size = 80426626, upload-time = "2026-09-28T09:52:58.603Z" },
+    { url = "https://files.pythonhosted.org/packages/f5/78/977510f76326e8a6275156be4ca945987fecf84cb919be0b3accdfa264c5/vtk-9.7.1-cp314-cp314-macosx_10_10_x86_64.whl", hash = "sha256:1af433e675fbfb40776f75f1bfc36cd4ef4c8a53c412df8ad941df181d78fd94", size = 110719247, upload-time = "2026-09-28T09:53:17.366Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/e2/bd6f12a9415f120eaca43e0021292d746f12171057658150d2430761b1ef/vtk-9.7.1-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:121c3e7d7cde330d590cf879b1c536eabeb127f71f6d402c8e61324cb5100e98", size = 103008238, upload-time = "2026-09-28T09:53:40.501Z" },
+    { url = "https://files.pythonhosted.org/packages/28/13/25bd7a3d47a9f6e63b572eb246dd4f8d9afc6bbcbb549c39201ee64b56ce/vtk-9.7.1-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:5125ec5516d6017c8ebaa2defb1ade83736aba870d740346fa7abd1f1f98b6ef", size = 139664564, upload-time = "2026-09-28T09:54:01.525Z" },
+    { url = "https://files.pythonhosted.org/packages/9c/ec/ec701c656092bee21c34c25391730a730dd2cef70a4fe91e5a3baf0d31b4/vtk-9.7.1-cp314-cp314-manylinux_2_28_aarch64.whl", hash = "sha256:4fe1f1f67cc4ebd98a1dbf413fa7956f0e95c1690e132c4fd48aff97f852b9d0", size = 129477156, upload-time = "2026-09-28T09:54:18.256Z" },
+    { url = "https://files.pythonhosted.org/packages/66/4f/736843a363251d2d4d471a79f731075b76a4dfd6b77f453b420f9233d83a/vtk-9.7.1-cp314-cp314-win_amd64.whl", hash = "sha256:9e62a104551929676e40e21dcb4b1dca1f5e9bf882913b8864aabcb4834f535c", size = 82363569, upload-time = "2026-09-28T09:54:31.564Z" },
+    { url = "https://files.pythonhosted.org/packages/00/8a/c99feb99af366306406d33b1ab791902a1ac719a3f68e3f12fd65deb528d/vtk-9.7.1-cp314-cp314t-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:54858d15dc5d42a85285e3e79993c93439f414c694f8466f9c3522af083ef1e9", size = 139378526, upload-time = "2026-09-28T09:54:52.543Z" },
+    { url = "https://files.pythonhosted.org/packages/be/f0/de7dc58728e96d2bb25262ea47893c2b318edffc8464c1e8fc5dfbc46b6d/vtk-9.7.1-cp314-cp314t-manylinux_2_28_aarch64.whl", hash = "sha256:06511e9b82056babea5277e6c7af5f61fe5105fd2957b8321b1ef6b264977ceb", size = 129371581, upload-time = "2026-09-28T09:55:04.525Z" },
+]
+
+[[package]]
 name = "watchdog"
 version = "6.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -9812,15 +10619,33 @@ wheels = [
 ]
 
 [[package]]
+name = "wslink"
+version = "2.5.7"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "msgpack" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/74/12/c23927be89cf75c24d774a8ee5bf83e368d0feb39fb361462f03ae8efd26/wslink-2.5.7.tar.gz", hash = "sha256:ed14c2b4749ea231a105a23334d2e0c7783204b2033f46104972a189ea235818", size = 29958, upload-time = "2026-05-15T02:57:36.299Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0c/3c/571e00719a5ce5b295d6bbed62841c51222687530871d8e92a0e64e19acb/wslink-2.5.7-py3-none-any.whl", hash = "sha256:47d729f654d1ee0bb42b6f05b068c48d5fdacd3216e827c1e80ea09eca0fe287", size = 37353, upload-time = "2026-05-15T02:57:35.135Z" },
+]
+
+[[package]]
 name = "xarray"
 version = "2025.1.1"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.15'",
-    "python_full_version == '3.14.*'",
-    "python_full_version == '3.13.*'",
-    "python_full_version == '3.12.*'",
-    "python_full_version < '3.12'",
+    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version >= '3.15' and platform_machine != 'ARM64') or (python_full_version >= '3.15' and sys_platform != 'win32')",
+    "(python_full_version == '3.14.*' and platform_machine != 'ARM64') or (python_full_version == '3.14.*' and sys_platform != 'win32')",
+    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.13.*' and platform_machine != 'ARM64') or (python_full_version == '3.13.*' and sys_platform != 'win32')",
+    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.12.*' and platform_machine != 'ARM64') or (python_full_version == '3.12.*' and sys_platform != 'win32')",
+    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra == 'extra-17-earthlens-imagery-openeo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -9838,21 +10663,16 @@ name = "xarray"
 version = "2025.9.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version >= '3.15' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version >= '3.15' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "(python_full_version == '3.14.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.14.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.13.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.13.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.12.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.12.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version < '3.12' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version < '3.12' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version >= '3.15' and platform_machine != 'ARM64') or (python_full_version >= '3.15' and sys_platform != 'win32')",
+    "(python_full_version == '3.14.*' and platform_machine != 'ARM64') or (python_full_version == '3.14.*' and sys_platform != 'win32')",
+    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.13.*' and platform_machine != 'ARM64') or (python_full_version == '3.13.*' and sys_platform != 'win32')",
+    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.12.*' and platform_machine != 'ARM64') or (python_full_version == '3.12.*' and sys_platform != 'win32')",
+    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra == 'extra-15-earthlens-ocean-argo') or (python_full_version < '3.12' and extra != 'extra-17-earthlens-imagery-openeo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -10014,10 +10834,8 @@ name = "zarr"
 version = "3.1.6"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version < '3.12' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version < '3.12' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "donfig", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -10037,22 +10855,14 @@ name = "zarr"
 version = "3.2.1"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version >= '3.15' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version >= '3.15' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "(python_full_version == '3.14.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.14.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.13.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.13.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "(python_full_version == '3.12.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.12.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
-    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version >= '3.15' and platform_machine != 'ARM64') or (python_full_version >= '3.15' and sys_platform != 'win32')",
+    "(python_full_version == '3.14.*' and platform_machine != 'ARM64') or (python_full_version == '3.14.*' and sys_platform != 'win32')",
+    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.13.*' and platform_machine != 'ARM64') or (python_full_version == '3.13.*' and sys_platform != 'win32')",
+    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
+    "(python_full_version == '3.12.*' and platform_machine != 'ARM64') or (python_full_version == '3.12.*' and sys_platform != 'win32')",
 ]
 dependencies = [
     { name = "donfig", marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
