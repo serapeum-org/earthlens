@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24603,6 +24603,7 @@ the copy bundled with <code>imageio-ffmpeg</code> — so no separate install is 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">digitalearth</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">de</span>
@@ -24617,14 +24618,13 @@ the copy bundled with <code>imageio-ffmpeg</code> — so no separate install is 
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-
 <span class="c1"># Granules and clips go to the cache root, never the system drive. Override with</span>
 <span class="c1"># EARTHLENS_CACHE if your cache lives elsewhere.</span>
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"EARTHLENS_CACHE"</span><span class="p">,</span> <span class="s2">"D:/earthlens-cache"</span><span class="p">))</span> <span class="o">/</span> <span class="s2">"hurricanes"</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import base64
+import os
 from pathlib import Path
 
 import digitalearth as de
@@ -24638,8 +24638,6 @@ from pyramids.dataset.collection import DatasetCollection
 from pyramids.netcdf import NetCDF
 
 from earthlens.core import EarthLens
-
-import os
 
 # Granules and clips go to the cache root, never the system drive. Override with
 # EARTHLENS_CACHE if your cache lives elsewhere.
@@ -25082,7 +25080,7 @@ list(videos)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7d9e5ac3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7fb27b941602401d91542211134fc71a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -25094,13 +25092,13 @@ re-fetching anything.</p>
 by hand, then a crop rectangle computed from the axes' rendered position and rounded to even pixels for the
 encoder. <code>Map</code> owns its figure, so the framing is the map's own — no crop filter to keep in step with
 whatever margins the next cleopatra release produces. The stretch is left exactly as the loop set it:
-<code>surface_reflectance=255</code> is passed through as <code>stretch_limits</code>, so the two clips are comparable and only
+<code>surface_reflectance=255</code> is passed through as <code>limits</code>, so the two clips are comparable and only
 the framing differs.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1d4e8c5b">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=acae54e37e7d407bbb7b55eff062a284">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -25125,7 +25123,7 @@ the framing differs.</p>
     <span class="c1"># Keep this notebook's own reflectance divisor rather than letting the</span>
     <span class="c1"># renderer derive 2-98 percentiles: these bands have a long bright tail, and</span>
     <span class="c1"># a percentile stretch spends its range there and flattens the colour.</span>
-    <span class="n">stretch_limits</span><span class="o">=</span><span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">limits</span><span class="o">=</span><span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
     <span class="n">bands</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
     <span class="n">titles</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
     <span class="n">coastlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -25136,7 +25134,11 @@ the framing differs.</p>
     <span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">storm_stem</span><span class="si">}</span><span class="s2">.mp4"</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gif</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">storm_stem</span><span class="si">}</span><span class="s2">.gif"</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
-<span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s1">'&lt;img src="data:image/gif;base64,</span><span class="si">{</span><span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">de_gif</span><span class="p">,</span><span class="w"> </span><span class="s2">"rb"</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="si">}</span><span class="s1">" /&gt;'</span><span class="p">))</span>
+<span class="n">display</span><span class="p">(</span>
+    <span class="n">HTML</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'&lt;img src="data:image/gif;base64,</span><span class="si">{</span><span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">de_gif</span><span class="p">,</span><span class="w"> </span><span class="s2">"rb"</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="si">}</span><span class="s1">" /&gt;'</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">scene = de.Map(crs=cube.datasets[0].epsg, figsize=(8, 7))
 scene.animate(
@@ -25145,7 +25147,7 @@ scene.animate(
     # Keep this notebook's own reflectance divisor rather than letting the
     # renderer derive 2-98 percentiles: these bands have a long bright tail, and
     # a percentile stretch spends its range there and flattens the colour.
-    stretch_limits=[(0.0, 255)] * 3,
+    limits=[(0.0, 255)] * 3,
     bands=(1, 2, 3),
     titles=labels,
     coastlines=True,
@@ -25156,7 +25158,11 @@ de_mp4, de_gif = scene.save_animation(
     str(out_dir / f"{storm_stem}.mp4"), fps=2, gif=str(out_dir / f"{storm_stem}.gif")
 )
 plt.close("all")
-display(HTML(f'&lt;img src="data:image/gif;base64,{base64.b64encode(open(de_gif, "rb").read()).decode()}" /&gt;'))</div>
+display(
+    HTML(
+        f'&lt;img src="data:image/gif;base64,{base64.b64encode(open(de_gif, "rb").read()).decode()}" /&gt;'
+    )
+)</div>
 </div>
 </div>
 </div>

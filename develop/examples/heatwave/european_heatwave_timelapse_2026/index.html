@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24568,8 +24568,8 @@ embeds it as an in-browser player. Earth Engine needs a service account, read fr
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.animation</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">animation</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">digitalearth</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">de</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.animation</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">animation</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.animation</span><span class="w"> </span><span class="kn">import</span> <span class="n">PillowWriter</span>
@@ -24588,8 +24588,8 @@ embeds it as an in-browser player. Earth Engine needs a service account, read fr
 import os
 from pathlib import Path
 
-import matplotlib.animation as animation
 import digitalearth as de
+import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 from IPython.display import HTML, Image, display
 from matplotlib.animation import PillowWriter
@@ -24772,7 +24772,7 @@ plt.close(fig)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=41e07de8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7fb27b941602401d91542211134fc71a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -24783,7 +24783,7 @@ axes and re-plots member <em>i</em>, wire it into a <code>FuncAnimation</code>, 
 the loop <code>Map.animate</code> exists to replace — the whole thing collapses into one call that takes the stack,
 the titles and the frame rate.</p>
 <p>The rendering is deliberately unchanged: the loop's <code>surface_reflectance=3200</code> is handed straight to
-<code>Map.animate</code> as <code>stretch_limits</code>, so both clips show the same thing. Letting the renderer derive its own
+<code>Map.animate</code> as <code>limits</code>, so both clips show the same thing. Letting the renderer derive its own
 2-98 percentiles instead was measured on this stack and is worse — MODIS' bright cloud tail eats the range
 and colour separation falls from 28% of pixels to 18%. And <code>save_animation(..., gif=)</code> writes the MP4 and
 derives the GIF from it, where <code>PillowWriter</code> gives you the GIF alone.</p>
@@ -24791,7 +24791,7 @@ derives the GIF from it, where <code>PillowWriter</code> gives you the GIF alone
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9aea5d2a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=acae54e37e7d407bbb7b55eff062a284">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -24816,13 +24816,15 @@ derives the GIF from it, where <code>PillowWriter</code> gives you the GIF alone
     <span class="c1"># Keep this notebook's own reflectance divisor rather than letting the</span>
     <span class="c1"># renderer derive 2-98 percentiles: these bands have a long bright tail, and</span>
     <span class="c1"># a percentile stretch spends its range there and flattens the colour.</span>
-    <span class="n">stretch_limits</span><span class="o">=</span><span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">3200</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">limits</span><span class="o">=</span><span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">3200</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
     <span class="n">bands</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
     <span class="n">titles</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">"MODIS true colour - </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">],</span>
     <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">de_mp4</span><span class="p">,</span> <span class="n">de_gif</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span>
-    <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"heatwave_digitalearth.mp4"</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gif</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"heatwave_digitalearth.gif"</span><span class="p">)</span>
+    <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"heatwave_digitalearth.mp4"</span><span class="p">),</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">gif</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"heatwave_digitalearth.gif"</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
 <span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">de_gif</span><span class="p">))</span>
@@ -24834,13 +24836,15 @@ scene.animate(
     # Keep this notebook's own reflectance divisor rather than letting the
     # renderer derive 2-98 percentiles: these bands have a long bright tail, and
     # a percentile stretch spends its range there and flattens the colour.
-    stretch_limits=[(0.0, 3200)] * 3,
+    limits=[(0.0, 3200)] * 3,
     bands=(1, 2, 3),
     titles=[f"MODIS true colour - {d}" for d in dates],
     fps=2,
 )
 de_mp4, de_gif = scene.save_animation(
-    str(OUT / "heatwave_digitalearth.mp4"), fps=2, gif=str(OUT / "heatwave_digitalearth.gif")
+    str(OUT / "heatwave_digitalearth.mp4"),
+    fps=2,
+    gif=str(OUT / "heatwave_digitalearth.gif"),
 )
 plt.close("all")
 display(Image(filename=de_gif))</div>

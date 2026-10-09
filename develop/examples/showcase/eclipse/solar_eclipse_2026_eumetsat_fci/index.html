@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -26553,7 +26553,7 @@ display(Image(filename=gif))</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1822c28d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7fb27b941602401d91542211134fc71a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -26563,14 +26563,14 @@ display(Image(filename=gif))</div>
 MP4, once again for the GIF. On full-disc geostationary frames that is the expensive half of the cell.
 <code>save_animation(..., gif=...)</code> draws them once and reads the frames back off the written video to build
 the GIF.</p>
-<p>The sweep's <code>surface_reflectance=255</code> is carried over as <code>stretch_limits</code> rather than replaced — it is
+<p>The sweep's <code>surface_reflectance=255</code> is carried over as <code>limits</code> rather than replaced — it is
 already the right scale for these 8-bit composites, and pinning it across the sweep keeps the umbral
 darkening a property of the scene rather than of the renderer.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=37ba180a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=acae54e37e7d407bbb7b55eff062a284">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -26600,13 +26600,15 @@ darkening a property of the scene rather than of the renderer.</p>
     <span class="c1"># Keep this notebook's own reflectance divisor rather than letting the</span>
     <span class="c1"># renderer derive 2-98 percentiles: these bands have a long bright tail, and</span>
     <span class="c1"># a percentile stretch spends its range there and flattens the colour.</span>
-    <span class="n">stretch_limits</span><span class="o">=</span><span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">limits</span><span class="o">=</span><span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
     <span class="n">bands</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
     <span class="n">titles</span><span class="o">=</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%H:%M UTC"</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">dc_de</span><span class="o">.</span><span class="n">time</span><span class="p">],</span>
     <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">de_mp4</span><span class="p">,</span> <span class="n">de_gif</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span>
-    <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_fci_digitalearth.mp4"</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">gif</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_fci_digitalearth.gif"</span><span class="p">)</span>
+    <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_fci_digitalearth.mp4"</span><span class="p">),</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">gif</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"eclipse_fci_digitalearth.gif"</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
 <span class="k">del</span> <span class="n">dc_de</span><span class="p">,</span> <span class="n">scene</span>
@@ -26625,13 +26627,15 @@ scene.animate(
     # Keep this notebook's own reflectance divisor rather than letting the
     # renderer derive 2-98 percentiles: these bands have a long bright tail, and
     # a percentile stretch spends its range there and flattens the colour.
-    stretch_limits=[(0.0, 255)] * 3,
+    limits=[(0.0, 255)] * 3,
     bands=(1, 2, 3),
     titles=[t.strftime("%H:%M UTC") for t in dc_de.time],
     fps=3,
 )
 de_mp4, de_gif = scene.save_animation(
-    str(OUT / "eclipse_fci_digitalearth.mp4"), fps=3, gif=str(OUT / "eclipse_fci_digitalearth.gif")
+    str(OUT / "eclipse_fci_digitalearth.mp4"),
+    fps=3,
+    gif=str(OUT / "eclipse_fci_digitalearth.gif"),
 )
 plt.close("all")
 del dc_de, scene

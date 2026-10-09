@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24509,7 +24509,7 @@ pop — exactly how a marine geologist would eyeball seafloor structure.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">digitalearth.sources</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_source</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">digitalearth</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_source</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">digitalearth.three_d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scene3D</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">colormaps</span>
@@ -24530,7 +24530,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
-from digitalearth.sources import get_source
+from digitalearth import get_source
 from digitalearth.three_d import Scene3D
 from IPython.display import Image, display
 from matplotlib import colormaps
@@ -24797,7 +24797,7 @@ from that angle rather than guessed — the orbit radius is <code>factor * max(x
 <span class="n">ridge_gif</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">orbit</span><span class="p">(</span>
     <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">/</span> <span class="s1">'azores_ridge_orbit.gif'</span><span class="p">),</span>
     <span class="n">n_frames</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span>  <span class="c1"># 48 frames at 8 fps is one revolution in six seconds</span>
-    <span class="n">framerate</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
     <span class="n">factor</span><span class="o">=</span><span class="n">FACTOR</span><span class="p">,</span>
     <span class="n">shift</span><span class="o">=</span><span class="n">shift</span><span class="p">,</span>
 <span class="p">)</span>
@@ -24820,7 +24820,7 @@ scene.terrain(src, z_exaggeration=8.0, cmap='gist_earth')
 ridge_gif = scene.orbit(
     str(Path(out) / 'azores_ridge_orbit.gif'),
     n_frames=48,  # 48 frames at 8 fps is one revolution in six seconds
-    framerate=8,
+    fps=8,
     factor=FACTOR,
     shift=shift,
 )

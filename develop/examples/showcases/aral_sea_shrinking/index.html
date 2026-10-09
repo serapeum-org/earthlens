@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24872,7 +24872,7 @@ plt.close("all")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=663e9df6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=715cb51f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -24884,7 +24884,7 @@ the whole scene — so the identical 38 frames can be rebuilt with three things 
 <li><strong>The same tuned stretch, applied through one call.</strong> These bands carry a long bright tail (cloud tops,
 snow), and a 2-98 percentile stretch spends most of its range on it — measured on this stack it drops the
 colour separation from 68% to 47% of pixels. So the notebook's own <code>surface_reflectance=26000</code> is kept and
-handed to <code>Map.animate</code> as <code>stretch_limits</code>, which pins it across every frame rather than re-deriving
+handed to <code>Map.animate</code> as <code>limits</code>, which pins it across every frame rather than re-deriving
 anything. Measured beats hand-tuned only when the measurement suits the scene; here it does not.</li>
 <li><strong>Per-frame titles as data.</strong> The years ride along as <code>titles=</code>, drawn as real axes titles rather than
 stamped into the image, and the map keeps its lon/lat axes instead of going full-bleed.</li>
@@ -24896,7 +24896,7 @@ all 38 frames twice — once per format.</li>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5236ab1e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d6530c1c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -24922,7 +24922,7 @@ all 38 frames twice — once per format.</li>
     <span class="c1"># Keep this notebook's own reflectance divisor rather than letting the</span>
     <span class="c1"># renderer derive 2-98 percentiles: these bands have a long bright tail, and</span>
     <span class="c1"># a percentile stretch spends its range there and flattens the colour.</span>
-    <span class="n">stretch_limits</span><span class="o">=</span><span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">26000</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">limits</span><span class="o">=</span><span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">26000</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
     <span class="n">bands</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
     <span class="n">titles</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">timeline</span><span class="p">],</span>
     <span class="n">fps</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
@@ -24941,7 +24941,7 @@ scene.animate(
     # Keep this notebook's own reflectance divisor rather than letting the
     # renderer derive 2-98 percentiles: these bands have a long bright tail, and
     # a percentile stretch spends its range there and flattens the colour.
-    stretch_limits=[(0.0, 26000)] * 3,
+    limits=[(0.0, 26000)] * 3,
     bands=(1, 2, 3),
     titles=[str(year) for year in timeline],
     fps=4,

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24689,7 +24689,9 @@ drought. MODIS bands <code>sur_refl_b01/b04/b03</code> are red/green/blue.</p>
 <span class="n">MODIS</span> <span class="o">=</span> <span class="s2">"MODIS/061/MOD09GA"</span>
 <span class="c1"># Satellite granules are big, so they are cached off the system drive. Override with</span>
 <span class="c1"># EARTHLENS_CACHE if your cache lives elsewhere.</span>
-<span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"EARTHLENS_CACHE"</span><span class="p">,</span> <span class="s2">"D:/earthlens-cache"</span><span class="p">))</span> <span class="o">/</span> <span class="s2">"tc5_modis_corridor"</span>
+<span class="n">OUT</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"EARTHLENS_CACHE"</span><span class="p">,</span> <span class="s2">"D:/earthlens-cache"</span><span class="p">))</span> <span class="o">/</span> <span class="s2">"tc5_modis_corridor"</span>
+<span class="p">)</span>
 <span class="n">raw</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"daily"</span>
 <span class="n">raw</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -24697,7 +24699,9 @@ drought. MODIS bands <code>sur_refl_b01/b04/b03</code> are red/green/blue.</p>
 MODIS = "MODIS/061/MOD09GA"
 # Satellite granules are big, so they are cached off the system drive. Override with
 # EARTHLENS_CACHE if your cache lives elsewhere.
-OUT = Path(os.environ.get("EARTHLENS_CACHE", "D:/earthlens-cache")) / "tc5_modis_corridor"
+OUT = (
+    Path(os.environ.get("EARTHLENS_CACHE", "D:/earthlens-cache")) / "tc5_modis_corridor"
+)
 raw = OUT / "daily"
 raw.mkdir(parents=True, exist_ok=True)</div>
 </div>
@@ -24850,7 +24854,7 @@ display(Image(filename=str(gif)))</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f687c415">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7fb27b941602401d91542211134fc71a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -24862,7 +24866,7 @@ the whole scene — so the identical frames can be rebuilt with things the cell 
 <li><strong>The same tuned stretch, applied through one call.</strong> These bands carry a long bright tail (cloud tops,
 snow), and a 2-98 percentile stretch spends most of its range on it — measured on this stack it drops the
 colour separation from 86% to 7% of pixels. So the notebook's own <code>surface_reflectance=3200</code> is kept and
-handed to <code>Map.animate</code> as <code>stretch_limits</code>, which pins it across every frame rather than re-deriving
+handed to <code>Map.animate</code> as <code>limits</code>, which pins it across every frame rather than re-deriving
 anything. Measured beats hand-tuned only when the measurement suits the scene; here it does not.</li>
 <li><strong>One render, two files.</strong> <code>save_animation(..., gif=...)</code> encodes the MP4 and derives the GIF <em>from that
 file</em> rather than redrawing every frame.</li>
@@ -24871,7 +24875,7 @@ file</em> rather than redrawing every frame.</li>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c4834075">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=acae54e37e7d407bbb7b55eff062a284">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -24896,12 +24900,14 @@ file</em> rather than redrawing every frame.</li>
     <span class="c1"># Keep this notebook's own reflectance divisor rather than letting the</span>
     <span class="c1"># renderer derive 2-98 percentiles: these bands have a long bright tail, and</span>
     <span class="c1"># a percentile stretch spends its range there and flattens the colour.</span>
-    <span class="n">stretch_limits</span><span class="o">=</span><span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">3200</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">limits</span><span class="o">=</span><span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">3200</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
     <span class="n">bands</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
     <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">de_mp4</span><span class="p">,</span> <span class="n">de_gif</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span>
-    <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"modis_corridor_digitalearth.mp4"</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">gif</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"modis_corridor_digitalearth.gif"</span><span class="p">)</span>
+    <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"modis_corridor_digitalearth.mp4"</span><span class="p">),</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">gif</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"modis_corridor_digitalearth.gif"</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
 <span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">de_gif</span><span class="p">))</span>
@@ -24913,12 +24919,14 @@ scene.animate(
     # Keep this notebook's own reflectance divisor rather than letting the
     # renderer derive 2-98 percentiles: these bands have a long bright tail, and
     # a percentile stretch spends its range there and flattens the colour.
-    stretch_limits=[(0.0, 3200)] * 3,
+    limits=[(0.0, 3200)] * 3,
     bands=(1, 2, 3),
     fps=3,
 )
 de_mp4, de_gif = scene.save_animation(
-    str(OUT / "modis_corridor_digitalearth.mp4"), fps=3, gif=str(OUT / "modis_corridor_digitalearth.gif")
+    str(OUT / "modis_corridor_digitalearth.mp4"),
+    fps=3,
+    gif=str(OUT / "modis_corridor_digitalearth.gif"),
 )
 plt.close("all")
 display(Image(filename=de_gif))</div>
