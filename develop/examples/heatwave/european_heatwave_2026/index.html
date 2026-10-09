@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -13161,6 +13161,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-same-frames-through-digital-earth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The same frames, through Digital-Earth
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#step-4-let-the-data-choose-the-cities" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23916,6 +23927,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-same-frames-through-digital-earth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The same frames, through Digital-Earth
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#step-4-let-the-data-choose-the-cities" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24872,13 +24894,14 @@ facade. No helper functions: every cell reads top-to-bottom.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">digitalearth</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">de</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">Animation</span><span class="p">,</span> <span class="n">FrameLabel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATA_STYLES</span><span class="p">,</span> <span class="n">resolve_colormap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_blank_canvas</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColorBar</span>
@@ -24888,13 +24911,14 @@ facade. No helper functions: every cell reads top-to-bottom.</p>
 <div class="clipboard-copy-txt" id="cell-1">import base64
 from pathlib import Path
 
+import digitalearth as de
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from cleopatra.glyphs.gridded.array_glyph import Animation, FrameLabel
 from cleopatra.styling.colors import DATA_STYLES, resolve_colormap
 from cleopatra.styling.styles import apply_blank_canvas
-from IPython.display import HTML
+from IPython.display import HTML, Image, display
 from pyramids.dataset import Dataset
 from pyramids.dataset.collection import DatasetCollection
 from pyramids.plot import ColorBar
@@ -24968,7 +24992,11 @@ cities — so the whole notebook is deterministic.</p>
     <span class="s2">"Rotterdam"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">51.87</span><span class="p">,</span> <span class="mf">51.97</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.40</span><span class="p">,</span> <span class="mf">4.55</span><span class="p">]),</span>
     <span class="s2">"Utrecht"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">52.05</span><span class="p">,</span> <span class="mf">52.15</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">5.05</span><span class="p">,</span> <span class="mf">5.20</span><span class="p">]),</span>
 <span class="p">}</span>
-<span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"out"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"heatwave"</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="c1"># Granules and clips go to the cache root, never the system drive. Override with</span>
+<span class="c1"># EARTHLENS_CACHE if your cache lives elsewhere.</span>
+<span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"EARTHLENS_CACHE"</span><span class="p">,</span> <span class="s2">"D:/earthlens-cache"</span><span class="p">))</span> <span class="o">/</span> <span class="s2">"heatwave"</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">START</span><span class="p">,</span> <span class="n">END</span>
 </pre></div>
@@ -25003,7 +25031,11 @@ DUTCH_BOXES = {
     "Rotterdam": dict(lat_lim=[51.87, 51.97], lon_lim=[4.40, 4.55]),
     "Utrecht": dict(lat_lim=[52.05, 52.15], lon_lim=[5.05, 5.20]),
 }
-OUT = Path("out") / "heatwave"
+import os
+
+# Granules and clips go to the cache root, never the system drive. Override with
+# EARTHLENS_CACHE if your cache lives elsewhere.
+OUT = Path(os.environ.get("EARTHLENS_CACHE", "D:/earthlens-cache")) / "heatwave"
 OUT.mkdir(parents=True, exist_ok=True)
 START, END</div>
 </div>
@@ -25489,6 +25521,82 @@ HTML(
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bbc35aa0">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="the-same-frames-through-digital-earth">The same frames, through Digital-Earth<a class="anchor-link" href="#the-same-frames-through-digital-earth">¶</a></h2><p>The cell above pins <code>vmin=-10</code> / <code>vmax=50</code> by hand so the palette does not re-scale per frame.
+<code>Map.animate</code> derives that shared scale from the stack itself when you do not supply one — and here it is
+still worth pinning the meteorological range, so both are shown: the scale is explicit, but the <strong>static
+colorbar</strong> is something the animation above has no way to attach. The dates ride along as <code>titles=</code>, and
+one render writes both the MP4 and the GIF instead of encoding each from its own pass over the frames.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8868cbab">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-10">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <span class="n">de</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">crs</span><span class="o">=</span><span class="n">cube</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">epsg</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">7.6</span><span class="p">))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
+    <span class="n">cube</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">"imshow"</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="n">t2m_cmap</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">titles</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+    <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"2 m temperature (degC)"</span><span class="p">,</span>
+    <span class="n">coastlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">de_mp4</span><span class="p">,</span> <span class="n">de_gif</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span>
+    <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"heat_dome_digitalearth.mp4"</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gif</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"heat_dome_digitalearth.gif"</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">de_gif</span><span class="p">))</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-10">scene = de.Map(crs=cube.datasets[0].epsg, figsize=(8, 7.6))
+scene.animate(
+    cube,
+    kind="imshow",
+    cmap=t2m_cmap,
+    vmin=-10,
+    vmax=50,
+    titles=labels,
+    colorbar=True,
+    cbar_label="2 m temperature (degC)",
+    coastlines=True,
+    fps=2,
+)
+de_mp4, de_gif = scene.save_animation(
+    str(OUT / "heat_dome_digitalearth.mp4"), fps=2, gif=str(OUT / "heat_dome_digitalearth.gif")
+)
+plt.close("all")
+display(Image(filename=de_gif))</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=21">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -25523,7 +25631,7 @@ take each city's hottest day in the window. The ranking picks the focus cities f
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-10">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-11">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -25553,7 +25661,7 @@ take each city's hottest day in the window. The ranking picks the focus cities f
 <span class="n">peaks</span> <span class="o">=</span> <span class="n">city_temps</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"city"</span><span class="p">)[</span><span class="s2">"t2m_C"</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">peaks</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-10">cities = pd.DataFrame(
+<div class="clipboard-copy-txt" id="cell-11">cities = pd.DataFrame(
     {
         "x": [lon for lat, lon in CANDIDATES.values()],
         "y": [lat for lat, lon in CANDIDATES.values()],
@@ -25586,7 +25694,7 @@ peaks.round(1)</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-11">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-12">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -25605,7 +25713,7 @@ peaks.round(1)</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-11">ax = peaks.plot.bar(figsize=(9, 4), color="#c1440e")
+<div class="clipboard-copy-txt" id="cell-12">ax = peaks.plot.bar(figsize=(9, 4), color="#c1440e")
 ax.set_title("Window-peak daily-mean 2 m air temperature by city — 17–26 Jun 2026")
 ax.set_ylabel("peak T2m (°C)")
 ax.set_xlabel("")
@@ -25654,7 +25762,7 @@ air.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-12">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-13">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -25684,7 +25792,7 @@ air.</p>
     <span class="n">city_rgb</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">city_rgb</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-12">city_rgb = {}
+<div class="clipboard-copy-txt" id="cell-13">city_rgb = {}
 for name, box in CITY_BOXES.items():
     job = EarthLens(
         data_source="gee",
@@ -25717,7 +25825,7 @@ for name, box in CITY_BOXES.items():
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-13">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-14">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -25747,7 +25855,7 @@ for name, box in CITY_BOXES.items():
     <span class="n">city_lst</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">city_lst</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-13">city_lst = {}
+<div class="clipboard-copy-txt" id="cell-14">city_lst = {}
 for name, box in CITY_BOXES.items():
     job = EarthLens(
         data_source="gee",
@@ -25791,7 +25899,7 @@ for name, box in CITY_BOXES.items():
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-14">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-15">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -25827,7 +25935,7 @@ for name, box in CITY_BOXES.items():
     <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-14">fig, axes = plt.subplots(2, 3, figsize=(15, 9), constrained_layout=True)
+<div class="clipboard-copy-txt" id="cell-15">fig, axes = plt.subplots(2, 3, figsize=(15, 9), constrained_layout=True)
 for col, name in enumerate(CITY_BOXES):
     true_colour = Dataset.read_file(city_rgb[name])
     true_colour.plot(
@@ -25893,7 +26001,7 @@ poleward.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-15">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-16">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -25915,7 +26023,7 @@ poleward.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-15">transect = ["Madrid", "Paris", "Amsterdam"]
+<div class="clipboard-copy-txt" id="cell-16">transect = ["Madrid", "Paris", "Amsterdam"]
 wide = city_temps[city_temps.city.isin(transect)].pivot(
     index="date", columns="city", values="t2m_C"
 )
@@ -25966,7 +26074,7 @@ Rotterdam and Utrecht</strong> with the same peak-heat MODIS LST composite.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-16">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-17">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -25996,7 +26104,7 @@ Rotterdam and Utrecht</strong> with the same peak-heat MODIS LST composite.</p>
     <span class="n">dutch_lst</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dutch_lst</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-16">dutch_lst = {}
+<div class="clipboard-copy-txt" id="cell-17">dutch_lst = {}
 for name, box in DUTCH_BOXES.items():
     job = EarthLens(
         data_source="gee",
@@ -26029,7 +26137,7 @@ for name, box in DUTCH_BOXES.items():
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-17">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-18">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -26056,7 +26164,7 @@ for name, box in DUTCH_BOXES.items():
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lat"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-17">fig, axes = plt.subplots(1, 3, figsize=(15, 4.6), constrained_layout=True)
+<div class="clipboard-copy-txt" id="cell-18">fig, axes = plt.subplots(1, 3, figsize=(15, 4.6), constrained_layout=True)
 for ax, (name, path) in zip(axes, dutch_lst.items()):
     lst = Dataset.read_file(path)
     lst = lst.apply(lambda dn: np.where(dn &gt;= 7500, dn * 0.02 - 273.15, np.nan))
@@ -26116,7 +26224,7 @@ free key, read from the <code>OPENAQ_API_KEY</code> environment variable.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-18">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-19">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -26140,7 +26248,7 @@ free key, read from the <code>OPENAQ_API_KEY</code> environment variable.</p>
 <span class="n">ozone</span> <span class="o">=</span> <span class="n">ozone_request</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ozone</span><span class="o">.</span><span class="n">station_id</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> stations, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ozone</span><span class="p">)</span><span class="si">}</span><span class="s2"> daily ozone readings"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-18">ozone_request = EarthLens(
+<div class="clipboard-copy-txt" id="cell-19">ozone_request = EarthLens(
     data_source="openaq",
     variables=["o3"],
     temporal_resolution="daily",
@@ -26178,7 +26286,7 @@ print(f"{ozone.station_id.nunique()} stations, {len(ozone)} daily ozone readings
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-19">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-20">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -26199,7 +26307,7 @@ print(f"{ozone.station_id.nunique()} stations, {len(ozone)} daily ozone readings
 <span class="p">)</span>
 <span class="n">o3_daily</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-19">ozone["date"] = (
+<div class="clipboard-copy-txt" id="cell-20">ozone["date"] = (
     pd.to_datetime(ozone["datetime_utc"]).dt.tz_localize(None).dt.normalize()
 )
 o3_daily = ozone.groupby("date")["value"].mean()
@@ -26223,7 +26331,7 @@ o3_daily.round(0)</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-20">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-21">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -26247,7 +26355,7 @@ o3_daily.round(0)</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-20">fig, ax1 = plt.subplots(figsize=(9, 4.5))
+<div class="clipboard-copy-txt" id="cell-21">fig, ax1 = plt.subplots(figsize=(9, 4.5))
 ax1.bar(o3_daily.index, o3_daily.values, color="#8c6bb1", alpha=0.85)
 ax1.axhline(100, color="#555", ls="--", lw=1)
 ax1.set_ylabel("daily-mean O$_3$ (µg/m³)")
@@ -26305,7 +26413,7 @@ over Iberia for two windows: the <strong>winter before</strong> the event and th
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-21">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-22">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -26334,7 +26442,7 @@ over Iberia for two windows: the <strong>winter before</strong> the event and th
     <span class="n">spi</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">spi</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-21">spi = {}
+<div class="clipboard-copy-txt" id="cell-22">spi = {}
 for tag, (s, e) in {
     "Feb 2026": ("2026-02-01", "2026-02-12"),
     "Jun 2026": ("2026-06-01", "2026-06-12"),
@@ -26377,7 +26485,7 @@ for tag, (s, e) in {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-22">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-23">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -26409,7 +26517,7 @@ for tag, (s, e) in {
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-22">fig, axes = plt.subplots(1, 2, figsize=(11, 5))
+<div class="clipboard-copy-txt" id="cell-23">fig, axes = plt.subplots(1, 2, figsize=(11, 5))
 for i, (ax, (tag, path)) in enumerate(zip(axes, spi.items())):
     # SPI is already in class units (no conversion), so plot the raster straight.
     spi_map = Dataset.read_file(path)
@@ -26474,7 +26582,7 @@ temperature maps.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-23">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-24">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -26489,7 +26597,7 @@ temperature maps.</p>
     <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">EarthLens</span><span class="o">.</span><span class="n">DataSources</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">exposure</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"backend_class"</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-23">exposure = ["worldpop", "ghsl", "admin"]
+<div class="clipboard-copy-txt" id="cell-24">exposure = ["worldpop", "ghsl", "admin"]
 pd.Series(
     {k: EarthLens.DataSources[k].__name__ for k in exposure}, name="backend_class"
 )</div>

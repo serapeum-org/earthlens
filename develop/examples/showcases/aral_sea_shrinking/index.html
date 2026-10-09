@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12555,6 +12555,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-same-stack-through-digital-earth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The same stack, through Digital-Earth
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-you-are-watching" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23751,6 +23762,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-same-stack-through-digital-earth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The same stack, through Digital-Earth
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-you-are-watching" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24567,6 +24589,7 @@ embeds the GIF. Earth Engine needs a service account, read from the <code>GEE_SE
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">digitalearth</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">de</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">Animation</span><span class="p">,</span> <span class="n">FrameLabel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
@@ -24576,12 +24599,16 @@ embeds the GIF. Earth Engine needs a service account, read from the <code>GEE_SE
 
 <span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>
 <span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>
-<span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"out"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"aral"</span>
+<span class="c1"># Satellite granules are big, so they are cached off the system drive. Override with</span>
+<span class="c1"># EARTHLENS_CACHE if your cache lives elsewhere.</span>
+<span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"EARTHLENS_CACHE"</span><span class="p">,</span> <span class="s2">"D:/earthlens-cache"</span><span class="p">))</span> <span class="o">/</span> <span class="s2">"aral"</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ARAL</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">43.4</span><span class="p">,</span> <span class="mf">46.8</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">58.2</span><span class="p">,</span> <span class="mf">61.6</span><span class="p">])</span>  <span class="c1"># the whole Aral basin</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
 from pathlib import Path
 
+import digitalearth as de
 import matplotlib.pyplot as plt
 from cleopatra.glyphs.gridded.array_glyph import Animation, FrameLabel
 from IPython.display import Image, display
@@ -24591,8 +24618,11 @@ from earthlens.core import EarthLens
 
 SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]
 SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]
-OUT = Path("out") / "aral"
-OUT.mkdir(parents=True, exist_ok=True)</div>
+# Satellite granules are big, so they are cached off the system drive. Override with
+# EARTHLENS_CACHE if your cache lives elsewhere.
+OUT = Path(os.environ.get("EARTHLENS_CACHE", "D:/earthlens-cache")) / "aral"
+OUT.mkdir(parents=True, exist_ok=True)
+ARAL = dict(lat_lim=[43.4, 46.8], lon_lim=[58.2, 61.6])  # the whole Aral basin</div>
 </div>
 </div>
 </div>
@@ -24657,8 +24687,7 @@ true-colour bands <code>SR_B3</code> / <code>SR_B2</code> / <code>SR_B1</code>, 
         <span class="n">scale</span><span class="o">=</span><span class="mf">400.0</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="n">OUT</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span>
         <span class="n">export_via</span><span class="o">=</span><span class="s2">"url"</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">43.4</span><span class="p">,</span> <span class="mf">46.8</span><span class="p">],</span>  <span class="c1"># the whole Aral basin</span>
-        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">58.2</span><span class="p">,</span> <span class="mf">61.6</span><span class="p">],</span>
+        <span class="o">**</span><span class="n">ARAL</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">job</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -24691,8 +24720,7 @@ for year in range(1986, 2024):
         scale=400.0,
         path=OUT / str(year),
         export_via="url",
-        lat_lim=[43.4, 46.8],  # the whole Aral basin
-        lon_lim=[58.2, 61.6],
+        **ARAL,
     )
     job.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
     paths = job.download(progress_bar=False)
@@ -24838,6 +24866,91 @@ plt.close("all")</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">gif_path</span><span class="p">)))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">display(Image(filename=str(gif_path)))</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=663e9df6">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="the-same-stack-through-digital-earth">The same stack, through Digital-Earth<a class="anchor-link" href="#the-same-stack-through-digital-earth">¶</a></h2><p><code>digitalearth</code> composes the same pyramids rasters and cleopatra glyphs, but hands back a <code>Map</code> that owns
+the whole scene — so the identical 38 frames can be rebuilt with three things the cell above cannot do:</p>
+<ul>
+<li><strong>The same tuned stretch, applied through one call.</strong> These bands carry a long bright tail (cloud tops,
+snow), and a 2-98 percentile stretch spends most of its range on it — measured on this stack it drops the
+colour separation from 68% to 47% of pixels. So the notebook's own <code>surface_reflectance=26000</code> is kept and
+handed to <code>Map.animate</code> as <code>stretch_limits</code>, which pins it across every frame rather than re-deriving
+anything. Measured beats hand-tuned only when the measurement suits the scene; here it does not.</li>
+<li><strong>Per-frame titles as data.</strong> The years ride along as <code>titles=</code>, drawn as real axes titles rather than
+stamped into the image, and the map keeps its lon/lat axes instead of going full-bleed.</li>
+<li><strong>One render, two files.</strong> <code>save_animation(..., gif=...)</code> encodes the MP4 and then derives the GIF <em>from
+that file</em> rather than redrawing every frame. The cell above calls <code>save_animation</code> twice, which renders
+all 38 frames twice — once per format.</li>
+</ul>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5236ab1e">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># `cube` is a DatasetCollection; Map.animate unwraps its members itself.</span>
+<span class="n">scene</span> <span class="o">=</span> <span class="n">de</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">crs</span><span class="o">=</span><span class="n">cube</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">epsg</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
+    <span class="n">cube</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">"rgb_composite"</span><span class="p">,</span>
+    <span class="c1"># Keep this notebook's own reflectance divisor rather than letting the</span>
+    <span class="c1"># renderer derive 2-98 percentiles: these bands have a long bright tail, and</span>
+    <span class="c1"># a percentile stretch spends its range there and flattens the colour.</span>
+    <span class="n">stretch_limits</span><span class="o">=</span><span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">26000</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">bands</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="n">titles</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">timeline</span><span class="p">],</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">de_mp4</span><span class="p">,</span> <span class="n">de_gif</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span>
+    <span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aral_digitalearth.mp4"</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">gif</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aral_digitalearth.gif"</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">de_gif</span><span class="p">))</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-5"># `cube` is a DatasetCollection; Map.animate unwraps its members itself.
+scene = de.Map(crs=cube.datasets[0].epsg, figsize=(8, 8))
+scene.animate(
+    cube,
+    kind="rgb_composite",
+    # Keep this notebook's own reflectance divisor rather than letting the
+    # renderer derive 2-98 percentiles: these bands have a long bright tail, and
+    # a percentile stretch spends its range there and flattens the colour.
+    stretch_limits=[(0.0, 26000)] * 3,
+    bands=(1, 2, 3),
+    titles=[str(year) for year in timeline],
+    fps=4,
+)
+de_mp4, de_gif = scene.save_animation(
+    str(OUT / "aral_digitalearth.mp4"), fps=4, gif=str(OUT / "aral_digitalearth.gif")
+)
+plt.close("all")
+display(Image(filename=de_gif))</div>
 </div>
 </div>
 </div>
