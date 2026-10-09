@@ -229,7 +229,7 @@ def osm_kwargs(tmp_path) -> Callable[..., dict[str, Any]]:
 
     def _make(**overrides: Any) -> dict[str, Any]:
         base: dict[str, Any] = {
-            "variables": ["overpass:hospitals"],
+            "variables": ["live:hospitals"],
             "lat_lim": [49.40, 49.42],
             "lon_lim": [8.67, 8.71],
             "path": str(tmp_path),

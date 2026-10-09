@@ -186,6 +186,7 @@ class FakePyramids:
         self.dataset_epsgs: dict[str, int] = {}
         self.dataset_shapes: dict[str, tuple] = {}
         self.create_calls: list[dict[str, Any]] = []
+        self.inherit_no_data = object()
 
 
 class _AnonymousSigner:
@@ -290,6 +291,7 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
 
     merge_mod.merge_rasters = _merge_rasters
     merge_mod.stack_bands = _stack_bands
+    merge_mod.INHERIT_NO_DATA = fp.inherit_no_data
     monkeypatch.setitem(sys.modules, "pyramids.dataset.merge", merge_mod)
 
     cog_mod = types.ModuleType("pyramids.dataset.cog")

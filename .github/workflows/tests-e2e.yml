@@ -1,17 +1,19 @@
 name: Tests - E2E (live CDS + GEE + STAC)
 
 # Live e2e against external, rate/quota-limited services (CDS, GEE, EUMETSAT,
-# STAC, …). Triggers: every non-docs merge to `main` (docs-only merges skipped
-# below), the weekly cron, and manual dispatch. Jobs run only on the main repo
-# (forks have no secrets) and self-skip when a credential is absent.
+# STAC, …). This is the full cross-provider sweep; per-PR e2e on a changed
+# provider's files lives in the tests-e2e-<theme>.yml callers, so this workflow
+# only needs to run the whole matrix on merges. Triggers: every non-docs merge to
+# `main` (docs-only merges skipped below) and manual dispatch. Jobs run only on
+# the main repo (forks have no secrets) and self-skip when a credential is absent.
 
 permissions:
   contents: read
 
-# No pull_request trigger here, so key the group on the run id: every run (a
-# merge to `main`, the cron, a dispatch) gets its own group and runs to the end -
-# a later merge never cancels an earlier one. Overlapping live runs are the
-# accepted cost of never dropping a merge's run.
+# No pull_request trigger here (per-PR e2e is the tests-e2e-<theme>.yml callers),
+# so key the group on the run id: every run (a merge to `main` or a dispatch) gets
+# its own group and runs to the end - a later merge never cancels an earlier one.
+# Overlapping live runs are the accepted cost of never dropping a merge's run.
 concurrency:
   group: ${{ github.workflow }}-${{ github.run_id }}
   cancel-in-progress: false
@@ -23,8 +25,6 @@ on:
       - 'docs/**'
       - '**/*.md'
       - 'mkdocs.yml'
-  schedule:
-    - cron: '0 4 * * 0'
   workflow_dispatch:
 
 jobs:

@@ -4,8 +4,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
 import pytest
+from pyramids.dataset import Dataset, GeoReference
+from pyramids.dataset.merge import merge_rasters
 
+from earthlens.base.spatial import crop_to_aoi
 from earthlens.stac.backend import (
     STAC,
     _acq_date,
@@ -428,13 +432,32 @@ class TestFetch:
         assert fake_pyramids.stack_calls[0]["no_data_value"] == 0
         assert fake_pyramids.merge_calls[0][2]["no_data_value"] == 0
 
-    def test_nodata_for_reads_catalog_else_zero(self, fake_pyramids, tmp_path):
-        """_nodata_for returns the catalog asset nodata, else 0 (dtype-safe)."""
+    def test_nodata_for_reads_catalog_else_inherits(self, fake_pyramids, tmp_path):
+        """A declared catalog nodata is used; otherwise the source's is inherited."""
         stac = _build_stac(
             tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
         )
         assert stac._nodata_for("sentinel-2-l2a", ["B04"]) == 0
-        assert stac._nodata_for("no-such-collection", ["x"]) == 0
+        assert (
+            stac._nodata_for("no-such-collection", ["x"])
+            is fake_pyramids.inherit_no_data
+        )
+
+    def test_a_collection_without_declared_nodata_inherits_not_zero(
+        self, fake_pyramids, tmp_path
+    ):
+        """WOfS `water` declares no nodata, and `0` there is dry land, a real class."""
+        fake_pyramids.items_by_collection["wofs_ls"] = [
+            make_item("a", "2024-01-05", {"water": "https://h/a_water.tif"})
+        ]
+        stac = _build_stac(
+            tmp_path, endpoint="deafrica", variables={"deafrica/wofs_ls": ["water"]}
+        )
+        stac._fetch(stac._search())
+        merged = fake_pyramids.merge_calls[0][2]["no_data_value"]
+        stacked = fake_pyramids.stack_calls[0]["no_data_value"]
+        assert merged is fake_pyramids.inherit_no_data, f"merge got {merged!r}"
+        assert stacked is fake_pyramids.inherit_no_data, f"stack got {stacked!r}"
 
     def test_api_composes_search_and_fetch(self, fake_pyramids, tmp_path):
         """_api() runs the search/fetch pipeline and returns the COG paths."""
@@ -679,3 +702,38 @@ class TestModuleHelpers:
         groups = dict(_group_products(products))
         assert len(groups[("c", "2024-01-05", bx)]) == 2
         assert len(groups[("c", "2024-01-06", bx)]) == 1
+
+
+@pytest.mark.stac
+class TestNodataOnRealPyramids:
+    """The no-data marker survives a real merge, stack and crop over dry land."""
+
+    def test_an_all_dry_aoi_crops_when_the_source_declares_its_own_nodata(
+        self, tmp_path
+    ):
+        """WOfS `water` is 0 over dry land and declares nodata 1; a 0 fallback erased it."""
+        tile = Dataset.from_array(
+            np.zeros((1500, 1500), dtype="uint8"),
+            geo_ref=GeoReference(
+                geo=(600000.0, 30.0, 0.0, 7120000.0, 0.0, -30.0), epsg=32735
+            ),
+            no_data_value=1,
+        )
+        source = str(tmp_path / "tile.tif")
+        tile.to_file(source)
+        tile.close()
+        stac = _build_stac(
+            tmp_path, endpoint="deafrica", variables={"deafrica/wofs_ls": ["water"]}
+        )
+        nodata = stac._nodata_for("deafrica/wofs_ls", ["water"])
+        mosaic = str(tmp_path / "mosaic.tif")
+        merge_rasters([source], mosaic, method="last", no_data_value=nodata)
+        stacked = stac._stack_bands([Path(mosaic)], ["water"], nodata)
+
+        cropped = crop_to_aoi(
+            stacked, stac.space, bbox=[28.0, -26.5, 28.5, -26.0], touch=True
+        )
+
+        values = np.asarray(cropped.read_array())
+        assert values.size > 0, "the crop came back empty"
+        assert (values == 0).any(), "dry-land zeros were dropped as no-data"

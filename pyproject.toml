@@ -1,6 +1,6 @@
 [project]
 name = "earthlens"
-version = "0.24.0"
+version = "0.27.0"
 description = "remote sensing package"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -30,12 +30,12 @@ requires-python = ">=3.11,<4"
 # five is conflict-free — the irreconcilable pins only meet if a user asks for
 # two conflicting extras at once, exactly as before the split.
 dependencies = [
-    "earthlens-core ==0.24.0",
-    "earthlens-atmosphere ==0.24.0",
-    "earthlens-ocean ==0.24.0",
-    "earthlens-imagery ==0.24.0",
-    "earthlens-land ==0.24.0",
-    "earthlens-hazards ==0.24.0",
+    "earthlens-core ==0.27.0",
+    "earthlens-atmosphere ==0.27.0",
+    "earthlens-ocean ==0.27.0",
+    "earthlens-imagery ==0.27.0",
+    "earthlens-land ==0.27.0",
+    "earthlens-hazards ==0.27.0",
 ]
 
 
@@ -67,7 +67,6 @@ nwp = ["earthlens-atmosphere[nwp]"]
 obis = ["earthlens-ocean[obis]"]
 openeo = ["earthlens-imagery[openeo]"]
 osm = ["earthlens-hazards[osm]"]
-osm-pbf = ["earthlens-hazards[osm-pbf]"]
 overture = ["earthlens-hazards[overture]"]
 radar = ["earthlens-atmosphere[radar]"]
 s3 = ["earthlens-atmosphere[s3]"]
@@ -78,13 +77,16 @@ usgs-water = ["earthlens-ocean[usgs-water]"]
 worldpop = ["earthlens-land[worldpop]"]
 
 # The self-referential "everything" extra: each entry re-activates one backend's
-# own extra on earthlens itself. `argo` (xarray clash with openeo -- see #789)
-# and `osm-pbf` (pyrosm's transitive cykhash dep is sdist-only) stay out; `osm`
-# is included because openeo already pins pandas<3, so ohsome's pandas<3 no
-# longer collides. `eedai` stays out deliberately: installing it flips the GEE
-# backend's default `engine="auto"` onto the pyramids-eo reader, which samples
-# and grids differently from Earth Engine, so it is opt-in rather than
-# something `all` turns on under an existing user.
+# own extra on earthlens itself. `argo` (xarray clash with openeo -- see #789) is
+# the only backend held out for a true conflict; `osm` is included because openeo
+# already pins pandas<3, so ohsome's pandas<3 no longer collides. `osm` now also
+# carries the bulk-pbf SDK (`osmium`), all wheels, so the whole OSM backend is in
+# `all` with no source build (see #1186). pyrosm (the in-memory pbf engine) is
+# deliberately undeclared and stays opt-in via a manual `pip install pyrosm` (see
+# the hazards pyproject). `eedai` stays out deliberately: installing it flips the
+# GEE backend's default `engine="auto"` onto the pyramids-eo reader, which samples
+# and grids differently from Earth Engine, so it is opt-in rather than something
+# `all` turns on under an existing user.
 all = [
     "earthlens[asf]",
     "earthlens[cmems]",
@@ -134,7 +136,7 @@ dev = [
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
     # runtime dep of earthlens itself.
-    "pyramids-gis[viz] >=0.59.0",
+    "pyramids-gis[viz] >=0.65.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -148,12 +150,15 @@ dev = [
     # move to grouped/typed render-parameter objects (glyphs/styling/basemap
     # subpackages), and 0.31.0 groups ArrayGlyph's loose rgb /
     # surface_reflectance / cutoff / percentile constructor keywords into an
-    # RgbBands object (pyramids 0.52.0's plot path builds on this).
+    # RgbBands object (pyramids 0.52.0's plot path builds on this). 0.40.0 adds
+    # the public `stamp_mark_on()` for a composite figure no single glyph owns,
+    # which the jrc / satellite / eclipse showcase notebooks now use instead of
+    # the private `_stamp_mark`.
     # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-gis[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
-    "cleopatra[tiles] >=0.35.0",
+    "cleopatra[tiles] >=0.40.0",
     # digitalearth: the visualisation layer the example notebooks compose their
     # maps, charts and animations with. It sits on top of pyramids + cleopatra --
     # `quickmap` auto-styles a pyramids Dataset/FeatureCollection into a finished
@@ -166,9 +171,9 @@ dev = [
     # `Map.animate(kind="rgb_composite", ...)` and hand `animate` a
     # DatasetCollection, neither of which 0.9.0 supports -- 0.9.0 rejects the
     # composite kind outright, and a collection iterates to numpy arrays there.
-    # Both land in Digital-Earth#153 (issues #150 / #154 / #155). Raise this to
-    # `>=0.10.0` and re-lock as soon as that release is cut; until then the true
-    # colour notebooks only run against a source install of that branch.
+    # Tracked as Digital-Earth issues #150 / #154 / #155. Raise this to `>=0.10.0`
+    # and re-lock as soon as a release carrying them is cut; until then those
+    # notebooks' true-colour animation cells do not run.
     "digitalearth >=0.9.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
@@ -193,8 +198,10 @@ dev = [
     # out of the `all` extra (installing it activates engine="auto"), so it is
     # pulled in here instead -- otherwise the tests that pin its
     # `from_earthengine` signature would skip everywhere and a 0.x contract
-    # change would only surface on a live run.
-    "pyramids-eo >=0.8.0,<0.9",
+    # change would only surface on a live run. 0.8.1 is the floor because 0.8.0's
+    # tiled read passed no_data_value="none", which pyramids >= 0.61 rejects
+    # (pyramids-eo#111), so every tiled EEDAI read raised.
+    "pyramids-eo >=0.8.1,<0.9",
 ]
 # The eclipse showcase notebooks need the geostationary-imagery pieces of
 # pyramids-eo (read_fci_l1c, the composites, the viewing geometry) plus a few small
@@ -212,7 +219,7 @@ notebooks = [
     # reader still calls the removed `create_from_array`, so the EEDAI path raises
     # AttributeError against the pyramids floor this project now requires.
     # Also declared, at the same version, in `dev` -- see the comment there.
-    "pyramids-eo >=0.8.0,<0.9",
+    "pyramids-eo >=0.8.1,<0.9",
     # scipy: feathers the disc edge and softens the limb (ndimage.binary_erosion /
     # gaussian_filter).
     "scipy >=1.11",
@@ -247,12 +254,12 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.59.0",
+    "pyramids-gis[viz] >=0.65.0",
     # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-gis[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
-    "cleopatra[tiles] >=0.35.0",
+    "cleopatra[tiles] >=0.40.0",
     # digitalearth: mkdocs-jupyter renders the example notebooks, which import it
     # for their maps, charts and animations. Also in `dev` -- see the comment there.
     "digitalearth >=0.9.0",
@@ -527,7 +534,7 @@ markers = [
     "nsi: tests for the NSI US flood exposure/loss backend (USACE National Structure Inventory + FEMA NFHL flood zones + FEMA NFIP claims v3; no extra SDK — core requests + pandas + pyramids; per-instance OUTPUT_KIND; all three keyless US public domain).",
     "glaciers: tests for the glaciers backend (RGI 7.0 per-region outlines via IHP-WINS + GLIMS WFS time-series outlines + WGMS Fluctuations of Glaciers tabular; no extra SDK — core requests + pandas + pyramids; mixed per-instance OUTPUT_KIND; all sources open, no auth).",
     "osm: tests for the OpenStreetMap backend (requires the `osm` extra: overpy + ohsome; two public keyless protocols — Overpass current-state via overpy, OSM history via ohsome; the non-e2e suite fakes both SDKs).",
-    "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; requires the `osm-pbf` extra: pyrosm + osmium/pyosmium; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract).",
+    "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; the `osm` extra ships the default streaming pyosmium engine (osmium), while the in-memory pyrosm engine is opt-in via a manual `pip install pyrosm`; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract and installs pyrosm to exercise its engine).",
     "admin: tests for the administrative-boundaries backend (geoBoundaries + CGAZ + Natural Earth + US Census TIGER/Line; no extra SDK — core requests + pyramids; all four public, GADM omitted for license).",
     "soilgrids: tests for the SoilGrids backend (ISRIC SoilGrids 2.0 soil properties via OGC WCS at maps.isric.org; no extra SDK — core requests + pyramids' Dataset.from_wcs; all public, CC-BY 4.0, no auth).",
     "drought: tests for the drought backend (US Drought Monitor / Copernicus EDO+GDO / CSIC SPEIbase; no extra SDK — core `requests` + pyramids; EDO/GDO fetched via the Copernicus GetCoverage REST endpoint, SPEIbase via direct NetCDF).",
@@ -557,6 +564,13 @@ conflicts = [
         { package = "earthlens-imagery", extra = "openeo" },
     ],
 ]
+
+# Security floor: pin the transitive `oauthlib` at/above 4.0.0, which fixes the
+# PKCE timing side-channel CVE-2026-49265. earthlens uses oauthlib only as an
+# OAuth *client* (earthengine-api -> requests-oauthlib, the Earth Engine auth
+# stack), so the server-side bug is not exploitable here; this satisfies the
+# pip-audit gate, whose policy is to upgrade rather than ignore when a fix exists.
+constraint-dependencies = ["oauthlib>=4.0.0"]
 
 [tool.uv.workspace]
 members = [

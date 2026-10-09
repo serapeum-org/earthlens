@@ -111,6 +111,7 @@ jobs:
             providers=(
             '{"name":"emdat","path":"libs/providers/hazards/(src/earthlens|tests)/emdat/","marker":"e2e and emdat and not gdis","groups":"groups: dev, extras: emdat","pkg":"libs/providers/hazards/tests/emdat"}'
             '{"name":"osm","path":"libs/providers/hazards/(src/earthlens|tests)/osm/","marker":"e2e and osm","groups":"groups: dev, extras: osm","pkg":"libs/providers/hazards/tests/osm"}'
+            '{"name":"osm-pbf","path":"libs/providers/hazards/(src/earthlens|tests)/osm/","marker":"e2e and osm_pbf","groups":"groups: dev, extras: osm","pkg":"libs/providers/hazards/tests/osm","with_pkg":"pyrosm>=0.11.0"}'
             )
             catchall_marker="e2e and not emdat and not osm and not osm_pbf"
             catchall_deselect=""
@@ -157,7 +158,7 @@ jobs:
           for row in "${providers[@]}"; do
             path_re="$(jq -r '.path' <<< "$row")"
             if [ "$run_all" -eq 1 ] || echo "$changed" | grep -Eq "$path_re"; then
-              includes+=("$(jq -c '{name, marker, groups, pkg, deselect: "", allow_empty: false, allow_all_skipped: (.allow_all_skipped // false)}' <<< "$row")")
+              includes+=("$(jq -c '{name, marker, groups, pkg, deselect: "", allow_empty: false, allow_all_skipped: (.allow_all_skipped // false), with_pkg: (.with_pkg // "")}' <<< "$row")")
             fi
           done
 
@@ -178,7 +179,7 @@ jobs:
               --arg name "rest-of-$THEME" --arg marker "$catchall_marker" \
               --arg groups "groups: dev, extras: all" --arg deselect "$catchall_deselect" \
               --arg pkg "libs/providers/$THEME" --argjson allow_empty true \
-              '{name:$name, marker:$marker, groups:$groups, pkg:$pkg, deselect:$deselect, allow_empty:$allow_empty, allow_all_skipped:false}')")
+              '{name:$name, marker:$marker, groups:$groups, pkg:$pkg, deselect:$deselect, allow_empty:$allow_empty, allow_all_skipped:false, with_pkg:""}')")
           fi
 
           if [ "${#includes[@]}" -eq 0 ]; then
@@ -262,6 +263,12 @@ jobs:
           ALLOW_EMPTY: ${{ matrix.allow_empty }}
           ALLOW_ALL_SKIPPED: ${{ matrix.allow_all_skipped }}
           LANE: ${{ matrix.name }}
+          # Opt-in SDKs to layer on top of the locked env for this lane only, via
+          # `uv run --with`. The osm_pbf lane uses it to install `pyrosm` (an
+          # undeclared, opt-in dependency whose transitive cykhash is sdist-only,
+          # so it is not in any extra) so the in-memory pbf engine is genuinely
+          # exercised. Empty for every other lane. See #1186.
+          WITH_PKG: ${{ matrix.with_pkg }}
         run: |
           # A dedicated lane targets only its backend's test dir; collecting the
           # whole package would import sibling backends' test modules (some
@@ -279,11 +286,19 @@ jobs:
           esac
           pkg="$PKG"
           report="$RUNNER_TEMP/e2e-$LANE.xml"
+          # A lane may layer opt-in, undeclared SDKs on top of the locked env with
+          # `uv run --with` (e.g. osm_pbf installs pyrosm, whose transitive cykhash
+          # is sdist-only, so it is in no extra). --with coexists with --locked: the
+          # base env stays lock-pinned, the extra package is added on top.
+          with_args=()
+          if [ -n "$WITH_PKG" ]; then
+            with_args=(--with "$WITH_PKG")
+          fi
           set +e
           if [ -n "$DESELECT" ]; then
-            uv run --locked pytest "$pkg" -m "$MARKER" --deselect "$DESELECT" -rs -v               --junitxml="$report"
+            uv run "${with_args[@]}" --locked pytest "$pkg" -m "$MARKER" --deselect "$DESELECT" -rs -v --junitxml="$report"
           else
-            uv run --locked pytest "$pkg" -m "$MARKER" -rs -v --junitxml="$report"
+            uv run "${with_args[@]}" --locked pytest "$pkg" -m "$MARKER" -rs -v --junitxml="$report"
           fi
           code=$?
           set -e

@@ -1663,7 +1663,7 @@ class TestAutoSplit:
 
         assert len(merge_calls) == 1
         assert merge_calls[0]["dst"] == str(target)
-        assert merge_calls[0]["kwargs"]["no_data_value"] == "none"
+        assert merge_calls[0]["kwargs"]["no_data_value"] is None
         assert len(merge_calls[0]["src"]) > 1
         for tile_path in merge_calls[0]["src"]:
             assert tile_path.endswith(".tif")

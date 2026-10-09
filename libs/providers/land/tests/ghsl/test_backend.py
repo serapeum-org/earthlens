@@ -435,7 +435,7 @@ class TestReviewFixes:
         )
         g.download(progress_bar=False)
 
-        assert records[-1]["no_data_value"] == "none", (
+        assert records[-1]["no_data_value"] is None, (
             "an undeclared tile must unset the mosaic no-data rather than "
             f"inherit merge_rasters' 0 default; got {records[-1]['no_data_value']!r}"
         )

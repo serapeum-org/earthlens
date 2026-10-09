@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-hazards"
-version = "0.24.0"
+version = "0.27.0"
 description = "hazard, humanitarian and vector-basemap backends for earthlens"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -33,7 +33,7 @@ requires-python = ">=3.11,<4"
 # this distribution brings the backends' code without their dependencies —
 # `pip install earthlens-hazards[<backend>]` adds exactly one backend's SDK.
 dependencies = [
-    "earthlens-core ==0.24.0",
+    "earthlens-core ==0.27.0",
     # Two backends read `.xlsx` with `pandas.read_excel`, which needs openpyxl:
     # `emdat:events` reads the EM-DAT archive workbook, and the `inform:*` rows
     # read JRC's published INFORM Risk release workbook (their default source).
@@ -54,15 +54,26 @@ emdat = ["earthaccess >=0.17.0"]
 fdsn = ["obspy >=1.5.0"]
 hdx = ["hdx-python-api >=6,<7"]
 overture = ["overturemaps >=1.0.0", "duckdb >=1.0.0"]
+# One OSM extra covers all three protocols: `overpy` + `ohsome` for the live
+# overpass/ohsome queries, and `osmium` (pyosmium) for the bulk `pbf` reads.
 # `urllib3` is imported directly by the ohsome path (backend.py builds a
 # `urllib3.util.retry.Retry` to give the SDK's transport a repo-standard
 # 429/5xx retry policy), so it is a declared direct dependency here — never
 # relied on transitively — per the repository's hard dependency rule. `>=2` for
 # the `backoff_max` / `retry_after_max` Retry constructor args (2.0 promoted
 # them from class attributes), which cap a hostile `Retry-After` to match
-# HttpClient's 300 s ceiling.
-osm = ["overpy >=0.7", "ohsome >=0.4.0", "urllib3 >=2"]
-osm-pbf = ["pyrosm >=0.11.0", "osmium >=4.3.1"]
+# HttpClient's 300 s ceiling. All four ship wheels, so `osm` joins the `all`
+# extra with no source build.
+#
+# `pyrosm` (the in-memory `engine="pyrosm"` pbf path) is deliberately NOT declared
+# here: it pulls the transitive `cykhash`, which ships sdist-only on PyPI (no
+# wheels), which would force a Cython source build on every `pip install
+# earthlens[all]` and every CI job. It stays opt-in via a manual `pip install
+# pyrosm`; `_pbf._require_pyrosm` raises a descriptive error naming that command
+# when the engine is selected uninstalled. This is a sanctioned, single exception
+# to the repo's declared-dependency rule, confined to pyrosm here — do not
+# undeclare any other import.
+osm = ["overpy >=0.7", "ohsome >=0.4.0", "urllib3 >=2", "osmium >=4.3.1"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
@@ -107,6 +118,7 @@ addopts = "--import-mode=importlib"
 markers = [
     "admin: tests for the administrative-boundaries backend (geoBoundaries + CGAZ + Natural Earth + US Census TIGER/Line; no extra SDK — core requests + pyramids; all four public, GADM omitted for license).",
     "aqueduct: tests for the WRI Aqueduct riverine flood-risk backend (files.wri.org 2015 Analyzer, CC-BY-4.0; no extra SDK — core requests + pyramids; country/state/basin exposure shapefiles).",
+    "cli: tests for the `earthlens` console script / federated catalog-query CLI (typer and rich are core dependencies; no extra needed).",
     "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
     "emdat: tests for the EM-DAT disaster backend (the UCLouvain Dataverse archive is anonymous and needs no extra; the GDIS sources need the `emdat` extra: earthaccess, plus an Earthdata Login).",
     "gdis: tests for the GDIS half of the EM-DAT backend (needs an Earthdata Login plus acceptance of the SEDAC data-use agreement); deselect with `-m \"not gdis\"` on a machine without credentials.",
@@ -120,7 +132,7 @@ markers = [
     "jrc: tests for the JRC European Flood Hazard Map backend (river-flood water depth per return period, Europe + Mediterranean; open HTTPS from the JRC, no extra SDK — core requests + pyramids `/vsicurl` windowed reads; CC-BY 4.0).",
     "integration: exercises multiple modules together with mocked I/O.",
     "osm: tests for the OpenStreetMap backend (requires the `osm` extra: overpy + ohsome; two public keyless protocols — Overpass current-state via overpy, OSM history via ohsome; the non-e2e suite fakes both SDKs).",
-    "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; requires the `osm-pbf` extra: pyrosm + osmium/pyosmium; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract).",
+    "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; the `osm` extra ships the default streaming pyosmium engine (osmium), while the in-memory pyrosm engine is opt-in via a manual `pip install pyrosm`; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract and installs pyrosm to exercise its engine).",
     "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",
     "risk_indicators: tests for the risk-indicators backend (GFDRR ThinkHazard! + INFORM Risk + Global Forest Watch; no extra SDK — core requests + pandas + pyramids; GFW datasets need GFW_API_KEY, ThinkHazard/INFORM are public).",
     "nsi: tests for the NSI US flood exposure/loss backend (USACE National Structure Inventory + FEMA NFHL flood zones + FEMA NFIP claims v3; no extra SDK — core requests + pandas + pyramids; per-instance OUTPUT_KIND; all three keyless US public domain).",

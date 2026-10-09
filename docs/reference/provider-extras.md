@@ -10,9 +10,9 @@ it is bundled in `earthlens[all]`.
 - **SDK-free backend** → nothing extra: `pip install earthlens` (or just the theme, e.g. `pip install
   earthlens-atmosphere`).
 - The extra **name** is what you type in `pip install "earthlens[<name>]"`; note the casing (`eea_aq`,
-  `sentinel-hub`, `usgs-water`, `ecmwf-modern`, `osm-pbf`).
+  `sentinel-hub`, `usgs-water`, `ecmwf-modern`).
 
-## Backends with an extra (31 backends, 34 extras)
+## Backends with an extra (31 backends, 33 extras)
 
 | Backend | Distribution | Extra (`pip install "earthlens[…]"`) | SDK / dependency it adds | In `all`? |
 |---|---|---|---|:---:|
@@ -40,8 +40,7 @@ it is bundled in `earthlens[all]`.
 | `nwp` | atmosphere | `nwp` | `herbie-data`, `ecmwf-opendata`, `ecmwflibs` (win) | ✅ |
 | `obis` | ocean | `obis` | `pyobis` | ✅ |
 | `openeo` | imagery | `openeo` | `openeo` | ✅ |
-| `osm` | hazards | `osm` | `overpy`, `ohsome` | ✅ |
-| `osm` | hazards | `osm-pbf` | `pyrosm`, `osmium` | ❌ held out |
+| `osm` | hazards | `osm` | `overpy`, `ohsome`, `osmium` (pyosmium; the `pyrosm` engine is opt-in) | ✅ |
 | `overture` | hazards | `overture` | `overturemaps`, `duckdb` | ✅ |
 | `radar` | atmosphere | `radar` | `earthlens-core[s3]` (boto3) | ✅ |
 | `s3` | atmosphere | `s3` | `earthlens-core[s3]` (boto3 / botocore) | ✅ |
@@ -76,20 +75,21 @@ with their thematic distribution and work out of the box.
 
 ## Notes
 
-- **`all` bundles 31 of the 34 extras.** Three are deliberately held out (still installable on their own):
+- **`all` bundles 31 of the 33 extras.** Two are deliberately held out (still installable on their own):
   - **`argo`** — `argopy` pins `xarray>=2025.7` while `openeo` pins `xarray<2025.1.2`; the two can't co-resolve
     (see `#789`).
-  - **`osm-pbf`** — `pyrosm`'s transitive `cykhash` dependency is **sdist-only** (no wheel), so it can't go in the
-    everything-install.
   - **`eedai`** — installing it flips the GEE backend's default `engine="auto"` onto the `pyramids-eo` EEDAI
     reader, which samples and grids differently from Earth Engine. It resolves cleanly; it is held out so an
     `all` upgrade never changes an existing user's pixels.
+- **The `osm` extra covers all three OSM protocols and is in `all`** — `overpy` + `ohsome` (live queries) plus
+  `osmium` (the wheel-clean `pyosmium` engine, the `pbf` default), all wheels. The richer in-memory `pyrosm` pbf
+  engine is opt-in via a manual `pip install pyrosm` (which builds the sdist-only `cykhash` from source); see `#1186`.
 - **Two empty extras** — `cmip6` and `ghsl` are declared (`= []`) but pull **no** dependency; the backend works
   without the extra. They exist for API/CLI symmetry.
 - **Extras that reuse the S3 client** — `s3`, `radar`, `goes`, `dem`, `nwm` pull `earthlens-core[s3]` (boto3) rather
   than a bespoke SDK.
-- **`ecmwf`, `osm` and `gee` each have more than one extra** — a base one and a variant (`ecmwf-modern`,
-  `osm-pbf`, `eedai`) — which is why 34 extras cover 31 backends.
+- **`ecmwf` and `gee` each have more than one extra** — a base one and a variant (`ecmwf-modern`, `eedai`) —
+  which is why 33 extras cover 31 backends.
 - **Distributions:** `earthlens-atmosphere`, `-ocean`, `-imagery`, `-land`, `-hazards`. The meta-package
   `earthlens` depends on all five; installing a single distribution gives you that theme's backends (SDK-free ones
   usable immediately; SDK-bearing ones after their extra).

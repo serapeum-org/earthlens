@@ -132,23 +132,50 @@ _TRANSIENT_ERRORS: tuple[type[requests.RequestException], ...] = (
     requests.exceptions.ContentDecodingError,
 )
 
+#: ThinkHazard!'s report endpoints intermittently answer `404` for a division
+#: code that exists and resolves to `200` seconds later — a server-side flap,
+#: not a real "not found". Observed live: the same `/report/{code}.json` URL
+#: returning `404` then `200` minutes apart, and one report id answering `404`
+#: while another answers `200` within the same minute. A `404` is normally a
+#: definite answer, so it is retried *only* for ThinkHazard and never promoted
+#: into the shared 5xx forcelist — an INFORM or GFW `404` is a genuine missing
+#: resource and still fails fast.
+#:
+#: Trade-off (accepted): a 404 shares the module's 5xx retry budget
+#: (`_HTTP_RETRIES` retries, `[1s, 2s]` back-off), so a sustained ThinkHazard
+#: outage — or a genuinely-removed / wrong division code — degrades to a
+#: slow-but-bounded failure rather than a fast one, paid per ThinkHazard
+#: request (single-hazard or all-hazards) in `backend._fetch_one`. The error
+#: is always still raised. On the common path the code comes from
+#: `resolve_admin`, so it exists in the catalog and a 404 is the flap; a wrong
+#: caller-supplied `admin_code=` bypasses that check and also pays the budget
+#: before failing.
+THINKHAZARD_RETRY_STATUSES: tuple[int, ...] = (404,)
 
-def _client(timeout: float) -> HttpClient:
+
+def _client(
+    timeout: float, *, extra_retry_statuses: tuple[int, ...] = ()
+) -> HttpClient:
     """Build the retrying HTTP client every request in this module shares.
 
     Args:
         timeout: Per-request timeout in seconds.
+        extra_retry_statuses: HTTP statuses to retry in addition to the 5xx
+            range. Used only by ThinkHazard, whose report endpoints flap `404`
+            (see :data:`THINKHAZARD_RETRY_STATUSES`); empty for every other
+            source, so an INFORM or GFW `404` still fails fast.
 
     Returns:
-        HttpClient: Configured to retry 5xx and transient transport errors with
-            exponential back-off, and to raise on a 4xx.
+        HttpClient: Configured to retry 5xx (plus any `extra_retry_statuses`)
+            and transient transport errors with exponential back-off, and to
+            raise on any other 4xx.
     """
     return HttpClient(
         user_agent=_USER_AGENT,
         timeout=timeout,
         max_retries=_HTTP_RETRIES,
         backoff_factor=_HTTP_RETRY_BACKOFF,
-        status_forcelist=tuple(range(500, 600)),
+        status_forcelist=tuple(range(500, 600)) + extra_retry_statuses,
         retry_on_exceptions=_TRANSIENT_ERRORS,
         raise_for_status=True,
         sleep=lambda seconds: time.sleep(seconds),
@@ -161,13 +188,15 @@ def _request_json(
     params: dict | None,
     headers: dict[str, str],
     timeout: float,
+    retry_statuses: tuple[int, ...] = (),
 ) -> dict | list:
     """GET `url` and return parsed JSON, retrying transient failures.
 
     Retries are delegated to :class:`~earthlens.base.http.HttpClient`: a 5xx
-    response or a transient transport error (see :data:`_TRANSIENT_ERRORS`)
-    is retried up to :data:`_HTTP_RETRIES` times with exponential back-off
-    (`1s`, `2s`); a 4xx (including 429) fails fast.
+    response (plus any `retry_statuses`) or a transient transport error (see
+    :data:`_TRANSIENT_ERRORS`) is retried up to :data:`_HTTP_RETRIES` times
+    with exponential back-off (`1s`, `2s`); any other 4xx (including 429)
+    fails fast.
 
     Args:
         url: The request URL.
@@ -175,15 +204,18 @@ def _request_json(
         headers: Extra request headers (e.g. the GFW `x-api-key` on the
             keyed sources; the `User-Agent` is a client-level default).
         timeout: Per-request timeout in seconds.
+        retry_statuses: Extra HTTP statuses to retry beyond the 5xx range.
+            Only ThinkHazard passes one (`404`, see
+            :data:`THINKHAZARD_RETRY_STATUSES`); left empty, a `404` fails fast.
 
     Returns:
         The parsed JSON body.
 
     Raises:
         requests.RequestException: When the GET still fails after the retries
-            (the last error is re-raised; a 4xx fails fast without retrying).
+            (the last error is re-raised; a non-retried 4xx fails fast).
     """
-    client = _client(timeout)
+    client = _client(timeout, extra_retry_statuses=retry_statuses)
     return cast("dict | list", client.get_json(url, params=params, headers=headers))
 
 
@@ -258,11 +290,19 @@ def thinkhazard_query(
         hazard.
 
     Raises:
-        requests.HTTPError: If the endpoint returns a non-2xx status.
+        requests.HTTPError: If the endpoint returns a non-2xx status after
+            retries. A `404` is retried (see :data:`THINKHAZARD_RETRY_STATUSES`),
+            because the report endpoints flap it, and raises only if it persists.
     """
     suffix = f"/{hazard}" if hazard else ""
     url = f"{base}/report/{admin_code}{suffix}.json"
-    return _request_json(url, params=None, headers=_headers(), timeout=timeout)
+    return _request_json(
+        url,
+        params=None,
+        headers=_headers(),
+        timeout=timeout,
+        retry_statuses=THINKHAZARD_RETRY_STATUSES,
+    )
 
 
 def inform_query(

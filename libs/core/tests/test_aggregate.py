@@ -29,6 +29,7 @@ import psutil
 import pytest
 from pydantic import ValidationError
 from pyramids.dataset import Dataset, DatasetCollection, GeoReference
+from pyramids.netcdf import NetCDF
 
 from earthlens.aggregate import (
     _LEVEL_DIM_CANDIDATES,
@@ -39,6 +40,7 @@ from earthlens.aggregate import (
     _find_level_dim,
     _output_stem,
     _read_time_axis,
+    _read_window,
     _resolve_op,
     _resolve_pressure_level,
     aggregate_netcdf,
@@ -2199,3 +2201,127 @@ class TestAggregateAgainstARealNetCDF:
         assert len(written) == 2
         first = np.asarray(Dataset.read_file(str(written[0])).read_array())
         np.testing.assert_allclose(np.squeeze(first), data[0:3].mean(axis=0), rtol=1e-5)
+
+
+_PACK_SCALE = 0.01
+_PACK_OFFSET = 250.0
+
+
+def _write_packed_nc(path, *, periods=6, rows=2, cols=3):
+    """Write a CF-packed int16 cube and return its stored counts and physical values.
+
+    Built through pyramids alone: each timestep is an int16 raster declaring a scale
+    and offset, and `to_netcdf` writes those as the variable's `scale_factor` and
+    `add_offset`. The physical values are computed here in numpy, independently of
+    anything pyramids decodes, so they can referee its read.
+    """
+    frames = Path(path).parent / f"{Path(path).stem}_frames"
+    frames.mkdir(parents=True, exist_ok=True)
+    counts = (
+        np.arange(periods * rows * cols, dtype="int16").reshape(periods, rows, cols) * 7
+        + 500
+    ).astype("int16")
+    days = pd.date_range("2020-01-01", periods=periods, freq="D")
+    for index, day in enumerate(days):
+        raster = Dataset.from_array(
+            arr=counts[index],
+            geo_ref=GeoReference(top_left_corner=(0.0, 2.0), cell_size=1.0, epsg=4326),
+            no_data_value=-32768,
+        )
+        raster.scale = [_PACK_SCALE]
+        raster.offset = [_PACK_OFFSET]
+        raster.to_file(str(frames / f"t2m_{day:%Y.%m.%d}.tif"))
+        del raster
+    gc.collect()
+    collection = DatasetCollection.from_files(
+        str(frames), glob="*.tif", date_format="%Y.%m.%d"
+    )
+    collection.to_netcdf(str(path))
+    del collection
+    gc.collect()
+    physical = counts.astype("float64") * _PACK_SCALE + _PACK_OFFSET
+    return counts, physical
+
+
+class TestAggregatePackedNetCDF:
+    """A CF-packed cube is aggregated in physical units, not in stored counts."""
+
+    @pytest.fixture
+    def packed_cube(self, tmp_path):
+        """A packed cube on disk with the counts and physical values behind it."""
+        path = tmp_path / "packed.nc"
+        counts, physical = _write_packed_nc(path)
+        return SimpleNamespace(path=path, counts=counts, physical=physical)
+
+    def test_the_fixture_is_packed_on_disk(self, packed_cube):
+        """The file stores int16 counts, so the tests below cannot pass vacuously."""
+        nc = NetCDF.read_file(str(packed_cube.path))
+        var = nc.get_variable("Band_1")
+        try:
+            stored = np.asarray(var.read_array(unpack=False))
+            assert stored.dtype == np.int16, f"stored dtype is {stored.dtype}"
+            np.testing.assert_array_equal(
+                stored.reshape(packed_cube.counts.shape), packed_cube.counts
+            )
+            assert float(np.asarray(var.scale)[0]) == pytest.approx(_PACK_SCALE), (
+                f"scale_factor not on disk: {var.scale}"
+            )
+            assert float(np.asarray(var.offset)[0]) == pytest.approx(_PACK_OFFSET), (
+                f"add_offset not on disk: {var.offset}"
+            )
+        finally:
+            var.close()
+            nc.close()
+
+    def test_a_default_read_is_in_physical_units(self, packed_cube):
+        """The read earthlens relies on unpacks by default and answers in float64."""
+        nc = NetCDF.read_file(str(packed_cube.path))
+        var = nc.get_variable("Band_1")
+        try:
+            values = np.asarray(var.read_array())
+        finally:
+            var.close()
+            nc.close()
+        assert values.dtype == np.float64, f"read dtype is {values.dtype}"
+        np.testing.assert_allclose(
+            values.reshape(packed_cube.physical.shape), packed_cube.physical
+        )
+
+    @pytest.mark.parametrize(
+        ("op", "reducer"),
+        [("mean", np.mean), ("sum", np.sum), ("min", np.min), ("max", np.max)],
+    )
+    def test_each_op_reduces_the_physical_values(self, packed_cube, op, reducer):
+        """Every reducer is checked against numpy on the independently computed values."""
+        result = aggregate_netcdf(
+            packed_cube.path, _single_level_var(), AggregationConfig(freq="3D", op=op)
+        )
+        assert len(result) == 2, f"expected two windows, got {len(result)}"
+        for index, window in enumerate((slice(0, 3), slice(3, 6))):
+            np.testing.assert_allclose(
+                result[index][1], reducer(packed_cube.physical[window], axis=0)
+            )
+
+    def test_the_aggregate_is_not_the_stored_counts(self, packed_cube):
+        """Physical values sit near 255 and the stored counts start at 500."""
+        result = aggregate_netcdf(
+            packed_cube.path,
+            _single_level_var(),
+            AggregationConfig(freq="3D", op="mean"),
+        )
+        peak = max(float(np.max(window[1])) for window in result)
+        assert peak < float(packed_cube.counts.min()), (
+            f"aggregated peak {peak} is in the range of the stored counts"
+        )
+
+    def test_a_streamed_window_read_is_in_physical_units(self, packed_cube):
+        """The band-by-band window read stacks physical values, not counts."""
+        mask = np.array([False, True, True, False, True, False])
+        nc = NetCDF.read_file(str(packed_cube.path))
+        var = nc.get_variable("Band_1")
+        try:
+            window = _read_window(var, mask)
+        finally:
+            var.close()
+            nc.close()
+        np.testing.assert_allclose(window, packed_cube.physical[mask])

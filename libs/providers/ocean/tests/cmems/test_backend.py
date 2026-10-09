@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gc
 import sys
 import types
 from pathlib import Path
@@ -10,6 +11,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import pytest
+from pyramids.dataset import Dataset, DatasetCollection, GeoReference
 
 from earthlens.aggregate import AggregationConfig
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent, safe_filename
@@ -650,3 +652,68 @@ class TestUniqueOutputNames:
     def test_empty_input(self):
         """No dataset ids yields an empty map."""
         assert _unique_output_names([], "nc") == {}, "empty input should map to {}"
+
+
+_PACK_SCALE = 0.01
+_PACK_OFFSET = 250.0
+
+
+def _write_packed_nc(path: Path) -> tuple[np.ndarray, np.ndarray]:
+    """Write a CF-packed int16 time cube and return its counts and physical values.
+
+    Built through pyramids alone: each timestep is an int16 raster declaring a scale
+    and offset, and `to_netcdf` writes those as `scale_factor` and `add_offset`. The
+    physical values are computed in numpy, independently of anything pyramids decodes.
+    """
+    frames = path.parent / f"{path.stem}_frames"
+    frames.mkdir(parents=True, exist_ok=True)
+    counts = (np.arange(36, dtype="int16").reshape(6, 2, 3) * 7 + 500).astype("int16")
+    for index, day in enumerate(pd.date_range("2020-01-01", periods=6, freq="D")):
+        raster = Dataset.from_array(
+            arr=counts[index],
+            geo_ref=GeoReference(top_left_corner=(0.0, 2.0), cell_size=1.0, epsg=4326),
+            no_data_value=-32768,
+        )
+        raster.scale = [_PACK_SCALE]
+        raster.offset = [_PACK_OFFSET]
+        raster.to_file(str(frames / f"thetao_{day:%Y.%m.%d}.tif"))
+        del raster
+    gc.collect()
+    collection = DatasetCollection.from_files(
+        str(frames), glob="*.tif", date_format="%Y.%m.%d"
+    )
+    collection.to_netcdf(str(path))
+    del collection
+    gc.collect()
+    return counts, counts.astype("float64") * _PACK_SCALE + _PACK_OFFSET
+
+
+class TestAggregateOnAPackedNetCDF:
+    """The reduce-then-read chain returns physical values for a CF-packed file."""
+
+    def test_each_window_is_written_in_physical_units(
+        self, cmems_instance: CMEMS, tmp_path: Path
+    ):
+        """Windows equal numpy's mean of the physical values, not of the stored counts."""
+        nc_path = tmp_path / "cmems_packed.nc"
+        counts, physical = _write_packed_nc(nc_path)
+        written = cmems_instance._aggregate_one(
+            nc_path,
+            AggregationConfig(freq="3D", op="mean", out_dir=str(tmp_path)),
+            "mean",
+        )
+        assert len(written) == 2, f"expected two windows, got {len(written)}"
+        for tif, window in zip(
+            sorted(written), (slice(0, 3), slice(3, 6)), strict=True
+        ):
+            raster = Dataset.read_file(str(tif))
+            try:
+                got = np.squeeze(np.asarray(raster.read_array()))
+            finally:
+                raster.close()
+            np.testing.assert_allclose(
+                got, physical[window].mean(axis=0), rtol=1e-5, err_msg=tif.name
+            )
+            assert float(got.max()) < float(counts.min()), (
+                f"{tif.name} holds values in the range of the stored counts"
+            )

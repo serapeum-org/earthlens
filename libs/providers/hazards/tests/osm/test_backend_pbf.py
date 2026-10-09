@@ -1,4 +1,4 @@
-"""Offline unit tests for the OSM backend's `pbf` protocol branch.
+"""Offline unit tests for the OSM backend's `bulk` protocol branch.
 
 Fakes the module-level `download_extract` / `read_pbf` on `earthlens.osm.backend`
 so the branch is exercised end-to-end (region resolution, layer dispatch, bbox
@@ -57,9 +57,9 @@ def fake_pbf(monkeypatch):
 
 
 def _osm(tmp_path=None, **overrides):
-    """Build an `OSM` for a pbf request over the Malta bbox by default."""
+    """Build an `OSM` for a bulk request over the Malta bbox by default."""
     kwargs: dict[str, Any] = {
-        "variables": ["pbf:buildings"],
+        "variables": ["bulk:buildings"],
         "lat_lim": [35.8, 36.0],
         "lon_lim": [14.4, 14.6],
         "region": "malta",
@@ -70,7 +70,7 @@ def _osm(tmp_path=None, **overrides):
 
 
 class TestPbfConstruction:
-    """Constructor validation for the pbf knobs."""
+    """Constructor validation for the bulk knobs."""
 
     def test_bad_engine_rejected(self):
         """An unknown engine is rejected at construction."""
@@ -78,9 +78,9 @@ class TestPbfConstruction:
             _osm(engine="bogus")
 
     def test_defaults(self, fake_pbf):
-        """Engine defaults to pyrosm and cache_dir to the user cache."""
+        """Engine defaults to pyosmium and cache_dir to the user cache."""
         osm = _osm()
-        assert osm._engine == "pyrosm"
+        assert osm._engine == "pyosmium"
         assert osm._cache_dir == backend.default_pbf_cache_dir()
 
 
@@ -88,14 +88,14 @@ class TestPbfSearch:
     """Region requirement and the conditional bbox-area guard."""
 
     def test_region_required(self):
-        """A pbf:* query without region= raises a clear error."""
+        """A bulk:* query without region= raises a clear error."""
         with pytest.raises(ValueError, match="needs a Geofabrik region"):
             backend.OSM(
-                variables=["pbf:buildings"], lat_lim=[0, 1], lon_lim=[0, 1]
+                variables=["bulk:buildings"], lat_lim=[0, 1], lon_lim=[0, 1]
             )._api()
 
-    def test_large_bbox_allowed_for_pbf(self, fake_pbf, tmp_path):
-        """The area cap does not apply to a pbf read (whole-Earth is fine)."""
+    def test_large_bbox_allowed_for_bulk(self, fake_pbf, tmp_path):
+        """The area cap does not apply to a bulk read (whole-Earth is fine)."""
         osm = _osm(tmp_path, lat_lim=[-90, 90], lon_lim=[-180, 180])
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
@@ -107,7 +107,7 @@ class TestPbfSearch:
     def test_large_bbox_still_guarded_for_live(self):
         """A mixed request keeps guarding the bbox for the live protocol."""
         osm = backend.OSM(
-            variables=["overpass:buildings"],
+            variables=["live:buildings"],
             lat_lim=[-90, 90],
             lon_lim=[-180, 180],
         )
@@ -136,7 +136,7 @@ class TestPbfFetch:
         """The row's pyrosm_method / network_type + engine reach read_pbf."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
-            _osm(tmp_path, variables=["pbf:roads"], engine="pyosmium").download(
+            _osm(tmp_path, variables=["bulk:roads"], engine="pyosmium").download(
                 progress_bar=False
             )
         assert fake_pbf.read_kwargs["pyrosm_method"] == "get_network"

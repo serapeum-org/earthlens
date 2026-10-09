@@ -1,5 +1,34 @@
 # Change Log
 
+## 0.27.0 (2026-10-08)
+
+### Feat
+
+- **osm**: canonical live/history/bulk download types with back-compat aliases (#1236)
+
+### Fix
+
+- **ecmwf**: stop live CDS drift from reddening the serveability test lane (#1242)
+
+## 0.26.0 (2026-09-30)
+
+### Fix
+
+- **osm**: ship bulk pbf reads in [all] by folding osmium into the osm extra (#1224)
+- **risk_indicators**: retry ThinkHazard's flapping 404 instead of failing the lane (#1223)
+
+## 0.25.1 (2026-09-27)
+
+## 0.25.0 (2026-09-23)
+
+### Feat
+
+- **base,providers**: adopt SummarisedLeaf in the remaining backend catalogs (#1187)
+
+### Fix
+
+- upgrade to pyramids 0.64 and cleopatra 0.39 and repair what the bump broke (#1197)
+
 ## 0.24.0 (2026-09-08)
 
 ### BREAKING CHANGE

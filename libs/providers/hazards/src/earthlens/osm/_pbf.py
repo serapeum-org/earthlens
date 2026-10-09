@@ -13,12 +13,16 @@ Two concerns are factored here so `osm/backend.py` only routes:
   extract logs a large-file warning before it is fetched.
 * `read_pbf` — read one layer (buildings / roads / pois / …) from a local
   `.osm.pbf` into a pyramids `~pyramids.feature.collection.FeatureCollection`
-  (`G14`), wrapping the **OSM-domain SDK** (`G9`): `pyrosm` for the regional
-  in-memory path (`engine="pyrosm"`, the default) or `pyosmium`/`osmium` for the
-  bounded-memory streaming path (`engine="pyosmium"`, for planet-scale or when
-  `pyrosm` cannot hold the file). Both SDKs are imported **lazily** with an
-  install hint, so `earthlens` (and the `overpass`/`ohsome` protocols) import
-  without `earthlens[osm-pbf]`.
+  (`G14`), wrapping the **OSM-domain SDK** (`G9`): `pyosmium`/`osmium` for the
+  bounded-memory streaming path (`engine="pyosmium"`, the wheel-clean default,
+  installed by `earthlens[osm]`) or `pyrosm` for the regional in-memory path
+  (`engine="pyrosm"`, exact tag filters + mixed geometry). `pyrosm` is **not** a
+  declared dependency — its transitive `cykhash` ships sdist-only (no wheels), so
+  it would force a source build on every install (`#1186`) — and is opt-in via a
+  manual `pip install pyrosm`; `_require_pyrosm` raises a descriptive error naming
+  that command when the engine is selected uninstalled. Both SDKs are imported
+  **lazily**, so `earthlens` (and the `overpass`/`ohsome` protocols) import
+  without either.
 
 No `xarray` is imported anywhere here (`G7`); the result is assembled as a plain
 `GeoDataFrame` and handed to pyramids via `to_fc`.
@@ -28,7 +32,7 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from loguru import logger
 
@@ -280,15 +284,17 @@ def read_pbf(
     pyrosm_method: str,
     network_type: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
-    engine: Engine = "pyrosm",
+    engine: Engine = "pyosmium",
 ) -> FeatureCollection:
     """Read one layer from a local `.osm.pbf` into a `FeatureCollection` (`G14`).
 
-    Routes on `engine`: `"pyrosm"` (default) reads the whole extract in memory
-    and calls the named `pyrosm.OSM` method; `"pyosmium"` streams the file with
-    bounded memory (for planet-scale, or a file too large for `pyrosm`). Both
-    return a WGS84 `~pyramids.feature.collection.FeatureCollection`; an empty
-    layer yields a schema-only collection.
+    Routes on `engine`: `"pyosmium"` (default) streams the file with bounded
+    memory and needs only `earthlens[osm]`; `"pyrosm"` reads the whole extract
+    in memory and calls the named `pyrosm.OSM` method, giving exact tag filters
+    and mixed geometry but requiring the opt-in `pyrosm` SDK (`pip install
+    pyrosm`). Both return a WGS84
+    `~pyramids.feature.collection.FeatureCollection`; an empty layer yields a
+    schema-only collection.
 
     Args:
         path: Local path to the `.osm.pbf` extract.
@@ -299,14 +305,15 @@ def read_pbf(
             `"driving"`); used only when `pyrosm_method` is `get_network`.
         bbox: Optional `(west, south, east, north)` clip. `pyrosm` clips at read
             time; the `pyosmium` path clips the built geometry.
-        engine: `"pyrosm"` (in-memory, default) or `"pyosmium"` (streaming).
+        engine: `"pyosmium"` (streaming, default) or `"pyrosm"` (in-memory).
 
     Returns:
         FeatureCollection: The layer's features, CRS `EPSG:4326`.
 
     Raises:
-        ImportError: If the selected engine's SDK is not installed
-            (`earthlens[osm-pbf]`).
+        ImportError: If the selected engine's SDK is not installed — the default
+            `pyosmium` engine needs `earthlens[osm]`, the `pyrosm` engine
+            needs a manual `pip install pyrosm`.
         ValueError: If `engine="pyrosm"` is used on a file larger than
             `MAX_PYROSM_BYTES`, or `engine` is not a known value.
     """
@@ -316,6 +323,39 @@ def read_pbf(
     if engine == "pyosmium":
         return _read_pyosmium(path, pyrosm_method, network_type, bbox)
     raise ValueError(f"engine must be 'pyrosm' or 'pyosmium', got {engine!r}.")
+
+
+def _require_pyrosm() -> Any:
+    """Import and return the `pyrosm.OSM` reader, or raise a descriptive error.
+
+    `pyrosm` powers the in-memory `pbf` engine (`engine="pyrosm"`). It is
+    deliberately **not** a declared dependency of `earthlens`: its transitive
+    `cykhash` ships sdist-only on PyPI (no wheels), which would force a Cython
+    source build on every `earthlens[all]` install and every CI job (`#1186`). It
+    is therefore opt-in. The wheel-clean streaming `pyosmium` engine
+    (`engine="pyosmium"`, the default) is installed by `earthlens[osm]` and
+    needs no source build.
+
+    Returns:
+        The `pyrosm.OSM` reader class (typed `Any` — `pyrosm` ships no stubs).
+
+    Raises:
+        ImportError: If `pyrosm` is not installed, with a hint naming the manual
+            `pip install pyrosm` command and the default `pyosmium` engine.
+    """
+    try:
+        from pyrosm import OSM as PyrosmOSM
+    except ImportError as exc:
+        raise ImportError(
+            "The in-memory 'pyrosm' pbf engine (engine='pyrosm') is not "
+            "installed. pyrosm is an opt-in dependency because its transitive "
+            "'cykhash' ships sdist-only on PyPI (no wheels) and would force a "
+            "source build on every install (see #1186). Install it with "
+            "`pip install pyrosm` (needs a C toolchain to build cykhash), or use "
+            "the default streaming engine engine='pyosmium', which ships with "
+            "earthlens[osm]."
+        ) from exc
+    return PyrosmOSM
 
 
 def _read_pyrosm(
@@ -347,13 +387,7 @@ def _read_pyrosm(
             f"'pyrosm' engine (cap {MAX_PYROSM_BYTES / 1024**3:.0f} GB). Read it "
             "with engine='pyosmium' (streaming) instead."
         )
-    try:
-        from pyrosm import OSM as PyrosmOSM
-    except ImportError as exc:  # pragma: no cover - exercised via monkeypatch
-        raise ImportError(
-            "The OSM pbf protocol requires the `pyrosm` SDK. Install it with "
-            "`pip install earthlens[osm-pbf]`."
-        ) from exc
+    pyrosm_osm = _require_pyrosm()
 
     bounding_box = None
     if bbox is not None:
@@ -361,7 +395,7 @@ def _read_pyrosm(
 
         west, south, east, north = bbox
         bounding_box = box(west, south, east, north)
-    reader = PyrosmOSM(str(path), bounding_box=bounding_box)
+    reader = pyrosm_osm(str(path), bounding_box=bounding_box)
     method = getattr(reader, pyrosm_method)
     gdf = (
         method(network_type=network_type)
@@ -420,7 +454,7 @@ def _read_pyosmium(
     except ImportError as exc:  # pragma: no cover - exercised via monkeypatch
         raise ImportError(
             "The OSM pbf protocol's pyosmium engine requires the `osmium` "
-            "(pyosmium) SDK. Install it with `pip install earthlens[osm-pbf]`."
+            "(pyosmium) SDK. Install it with `pip install earthlens[osm]`."
         ) from exc
 
     plan = _PYOSMIUM_LAYERS.get(pyrosm_method)

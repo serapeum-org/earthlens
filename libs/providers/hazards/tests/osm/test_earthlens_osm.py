@@ -13,14 +13,22 @@ from earthlens.earthlens import EarthLens
 pytestmark = pytest.mark.osm
 
 #: Every facade key that must resolve to the OSM backend.
-OSM_KEYS = ["osm", "openstreetmap", "overpass", "ohsome"]
+OSM_KEYS = [
+    "osm",
+    "openstreetmap",
+    "overpass",
+    "ohsome",
+    "live",
+    "history",
+    "bulk",
+]
 
 
 def _make_facade(tmp_path: Path, **overrides) -> EarthLens:
     """Construct an EarthLens facade bound to the OSM backend."""
     params: dict[str, object] = dict(
         data_source="osm",
-        variables=["overpass:hospitals"],
+        variables=["live:hospitals"],
         lat_lim=[49.40, 49.42],
         lon_lim=[8.67, 8.71],
         path=str(tmp_path),
@@ -55,11 +63,11 @@ class TestFacadeRouting:
         facade = _make_facade(tmp_path, endpoint="https://example.org/api")
         assert facade.datasource._endpoint == "https://example.org/api"
 
-    def test_pbf_kwargs_forwarded(self, tmp_path: Path):
-        """region= / engine= / cache_dir= ride through to the pbf backend."""
+    def test_bulk_kwargs_forwarded(self, tmp_path: Path):
+        """region= / engine= / cache_dir= ride through to the bulk backend."""
         facade = _make_facade(
             tmp_path,
-            variables=["pbf:buildings"],
+            variables=["bulk:buildings"],
             region="malta",
             engine="pyosmium",
             cache_dir=str(tmp_path / "cache"),

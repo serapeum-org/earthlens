@@ -662,12 +662,11 @@ class GHSL(AbstractDataSource):
         The pyramids-consuming core: `merge_rasters` mosaics the tiles **and**
         reprojects them to the output CRS in one call (skipped when the source
         already matches the output CRS), then `Dataset.crop` clips to the AOI
-        bbox. The mosaic inherits the source tiles' declared no-data (JRC uses
-        `-200`, or `65535` on the uint16 products) instead of `merge_rasters`'
-        `0` default, which would mask every zero-population / zero-built-up
-        cell and promote the real sentinel to valid data. A tile that declares
-        nothing sends `"none"`, leaving the mosaic without a no-data value
-        rather than inheriting that `0`. Categorical products
+        bbox. `no_data_value` is passed explicitly as the first tile's own
+        marker (JRC uses `-200`, or `65535` on the uint16 products), so it
+        carries over onto the mosaic. A tile that declares nothing passes
+        Python `None` through, asking for no marker at all rather than
+        stamping one. Categorical products
         reproject with nearest-neighbour (so class codes are never blended);
         those with a curated legend also carry a
         colour table + a `.legend.json` sidecar, while a legend-less categorical
@@ -699,10 +698,11 @@ class GHSL(AbstractDataSource):
 
         self._raw_dir.mkdir(parents=True, exist_ok=True)
         merged = self._raw_dir / f"{rp.id}_merged.tif"
-        # merge_rasters defaults no_data_value to 0, which is doubly wrong for
-        # GHSL: 0 is an ordinary value (no population, no built-up surface), and
-        # JRC's own sentinel (-200, or 65535 on the uint16 products) would be
-        # demoted to valid data. Inherit what the source tiles declare.
+        # Carry the first tile's own no-data marker onto the mosaic
+        # explicitly -- None when it declares none, asking for no marker at
+        # all rather than a stray literal like the string "none". GHSL's 0
+        # is an ordinary value (no population, no built-up surface), so an
+        # unstamped mosaic must never fall back to it.
         first_tile = Dataset.read_file(tifs[0])
         try:
             source_no_data = first_tile.no_data_value
@@ -720,7 +720,7 @@ class GHSL(AbstractDataSource):
             dst=str(merged),
             dst_crs=dst_crs,
             resampling=resampling,
-            no_data_value=fill if fill is not None else "none",
+            no_data_value=fill,
         )
 
         dataset = Dataset.read_file(str(merged))

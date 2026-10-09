@@ -13,9 +13,9 @@ protocols and returns them as a pyramids
   (buildings / roads / pois / …) with `pyrosm` (in-memory) or `pyosmium`
   (streaming, planet-scale), and clip to the request bbox.
 
-A request names a curated **named query** (`variables=["overpass:hospitals"]`,
-`variables=["ohsome:buildings"]`, `variables=["pbf:buildings"]`) plus a bbox
-(and, for `pbf`, a `region=` Geofabrik key); the backend routes to the
+A request names a curated **named query** (`variables=["live:hospitals"]`,
+`variables=["history:buildings"]`, `variables=["bulk:buildings"]`) plus a bbox
+(and, for `bulk`, a `region=` Geofabrik key); the backend routes to the
 protocol, produces the features, converts them to a `FeatureCollection`, and
 warns about OSM's **ODbL** share-alike licence. A raw `query=` (Overpass QL) /
 `filter=` (ohsome) override is accepted for power users.
@@ -23,8 +23,8 @@ warns about OSM's **ODbL** share-alike licence. A raw `query=` (Overpass QL) /
 This is a `vector` backend (`OUTPUT_KIND = "vector"`), so the
 `earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument. All
 three protocols are public — there is **no auth class**, and the SDKs are
-imported lazily, so the package imports without `earthlens[osm]` /
-`earthlens[osm-pbf]`. ohsome's aggregation endpoints remain out of scope.
+imported lazily, so the package imports without `earthlens[osm]`. ohsome's
+aggregation endpoints remain out of scope.
 
 Public surface (re-exported from this package):
 
@@ -56,7 +56,7 @@ Examples:
         ```python
         >>> from earthlens.osm import Catalog
         >>> cat = Catalog()
-        >>> "overpass:hospitals" in cat and "ohsome:buildings" in cat
+        >>> "live:hospitals" in cat and "history:buildings" in cat
         True
 
         ```

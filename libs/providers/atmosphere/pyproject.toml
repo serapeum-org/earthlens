@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-atmosphere"
-version = "0.24.0"
+version = "0.27.0"
 description = "weather, climate, air quality and solar/wind resource backends for earthlens"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -33,7 +33,7 @@ requires-python = ">=3.11,<4"
 # this distribution brings the backends' code without their dependencies —
 # `pip install earthlens-atmosphere[<backend>]` adds exactly one backend's SDK.
 dependencies = [
-    "earthlens-core ==0.24.0",
+    "earthlens-core ==0.27.0",
 ]
 
 [project.optional-dependencies]
@@ -45,7 +45,7 @@ isimip = ["isimip-client >=2"]
 nwp = ["herbie-data >=2026.3", "ecmwf-opendata >=0.3", "ecmwflibs; sys_platform == 'win32'"]
 radar = ["earthlens-core[s3]"]
 goes = ["earthlens-core[s3]"]
-tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
+tropycal = ["tropycal >=1.5.2", "cartopy >=0.22"]
 eea_aq = ["airbase >=1.0", "nest_asyncio >=1.5"]
 mswep = ["google-api-python-client >=2.0", "google-auth >=2.0"]
 

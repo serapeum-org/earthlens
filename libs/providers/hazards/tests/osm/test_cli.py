@@ -18,12 +18,12 @@ pytestmark = pytest.mark.cli
 class TestValidator:
     """Tests for the OSM structural lint."""
 
-    def test_flags_overpass_row_missing_query_template(self):
-        """An overpass row without a query_template is flagged."""
+    def test_flags_live_row_missing_query_template(self):
+        """A live row without a query_template is flagged."""
         catalog = SimpleNamespace(
             datasets={
-                "overpass:x": SimpleNamespace(
-                    protocol="overpass", query_template="", geometry_types=["Point"]
+                "live:x": SimpleNamespace(
+                    protocol="live", query_template="", geometry_types=["Point"]
                 )
             }
         )
@@ -31,24 +31,24 @@ class TestValidator:
         assert checked == 1
         assert any("missing query_template" in i for i in issues)
 
-    def test_flags_ohsome_row_missing_filter(self):
-        """An ohsome row without an ohsome_filter is flagged."""
+    def test_flags_history_row_missing_filter(self):
+        """A history row without an ohsome_filter is flagged."""
         catalog = SimpleNamespace(
             datasets={
-                "ohsome:x": SimpleNamespace(
-                    protocol="ohsome", ohsome_filter="", geometry_types=["Polygon"]
+                "history:x": SimpleNamespace(
+                    protocol="history", ohsome_filter="", geometry_types=["Polygon"]
                 )
             }
         )
         _checked, issues = validator(catalog)
         assert any("missing ohsome_filter" in i for i in issues)
 
-    def test_flags_pbf_row_missing_method(self):
-        """A pbf row without a pyrosm_method is flagged."""
+    def test_flags_bulk_row_missing_method(self):
+        """A bulk row without a pyrosm_method is flagged."""
         catalog = SimpleNamespace(
             datasets={
-                "pbf:x": SimpleNamespace(
-                    protocol="pbf", pyrosm_method="", geometry_types=["Polygon"]
+                "bulk:x": SimpleNamespace(
+                    protocol="bulk", pyrosm_method="", geometry_types=["Polygon"]
                 )
             }
         )

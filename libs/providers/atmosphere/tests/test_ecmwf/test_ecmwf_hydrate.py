@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import collections
+import functools
+import gzip
+import json
 import re
 import textwrap
 import time
@@ -392,6 +395,23 @@ class _FixtureBlocks:
     def __call__(self, cds_variable):
         """Return the fixture blocks that list `cds_variable`."""
         return [r for r in self._rows if cds_variable in (r.get("variable") or [])]
+
+
+_SERVEABILITY_FIXTURE = (
+    Path(__file__).parent / "fixtures" / "serveability_constraints.json.gz"
+)
+
+
+@functools.lru_cache(maxsize=1)
+def _load_serveability_fixture():
+    """Load the frozen per-dataset constraints snapshot.
+
+    Returns:
+        A mapping of dataset id to its recorded `constraints.json` blocks,
+        read once and cached for the process.
+    """
+    with gzip.open(_SERVEABILITY_FIXTURE, "rb") as fh:
+        return json.loads(fh.read())
 
 
 def _audit_catalog(monkeypatch, datasets):
@@ -1013,56 +1033,245 @@ class TestAuditServeability:
 
         assert hydrate_mod.audit_serveability(lambda name: _FixtureBlocks([])) == []
 
-    @pytest.mark.integration
-    def test_no_shipped_row_is_unserveable_against_the_live_store(self):
-        """The invariant on the real catalog, re-derivable rather than asserted.
+    # Each number is the count of unserveable rows the frozen fixture reports
+    # for that dataset. Repairing any of them means choosing which data
+    # version, period, ensemble member or model a caller gets - a curation
+    # decision, tracked on a pull request rather than guessed at here - so the
+    # catalog ships them knowingly and the baseline tolerates exactly them.
+    # Counts, not just names: a bare allow-list hides a regression inside a
+    # dataset that already reports, which is how a whole batch of rows slipped
+    # past an earlier round of this work.
+    _KNOWN_UNSERVEABLE = {
+        "derived-near-surface-meteorological-variables": 8,
+        "insitu-gridded-observations-global-and-regional": 1,
+        "projections-cmip5-monthly-single-levels": 3,
+        "sis-ecde-climate-indicators": 4,
+        "sis-european-risk-extreme-precipitation-indicators": 2,
+        "sis-tourism-fire-danger-indicators": 1,
+        # These name a variable the store does not offer at all, which the
+        # repo's own RequestValidator already reports. Fixing them means
+        # finding the current name.
+        "reanalysis-era5-single-levels": 1,
+        "reanalysis-era5-single-levels-monthly-means": 5,
+        # As of 2026-09-23 the store offers none of: wind direction (4 rows),
+        # fog, surface roughness (2 rows).
+        "reanalysis-pan-carra-means": 7,
+    }
 
-        Not `e2e`: the audit issues unauthenticated `constraints.json` GETs and
-        no retrieve, so gating it behind the weekly credentialed job would let a
-        hand edit to a shard land unchallenged on every PR.
+    #: Datasets whose store was unreachable when the fixture was last captured,
+    #: recorded as `null` (unreachable) rather than `[]`. Their rows cannot be
+    #: judged by either lane until the store recovers and the fixture is
+    #: refreshed, so each is listed knowingly: a NEW unreachable dataset - a
+    #: transient outage during a refresh silently erasing coverage - fails
+    #: `test_only_documented_datasets_were_unreachable_at_capture` and is caught
+    #: in review. `cems-glofas-historical-intermediate`'s CEMS store answers 500.
+    _UNREACHABLE_AT_CAPTURE = frozenset({"cems-glofas-historical-intermediate"})
+
+    @staticmethod
+    def _counts(findings):
+        """Unserveable rows per dataset, dropping the unreadable-store marker.
+
+        A dataset the store could not answer for at all is reported as one
+        `<constraints unreadable>` row - host state on the day, not a property
+        of the catalog - so it is excluded rather than counted.
+
+        Args:
+            findings: The `(dataset, slug, selectors)` triples an audit returns.
+
+        Returns:
+            A `Counter` of unserveable-row counts keyed by dataset id.
+        """
+        return collections.Counter(
+            dataset for dataset, slug, _ in findings if slug != _UNREADABLE
+        )
+
+    @pytest.mark.integration
+    def test_no_shipped_row_is_unserveable_against_the_recorded_store(self):
+        """The #1147 invariant judged against a frozen constraints snapshot.
+
+        Offline and deterministic: it feeds `audit_serveability` a recorded
+        snapshot of every dataset's `constraints.json` (see
+        `fixtures/serveability_constraints.json.gz`) rather than the live
+        stores, so it runs on every PR without the network and a hand edit to
+        an already-captured dataset's shard that makes a row unserveable fails
+        here, not weeks later. A row in a dataset absent from the snapshot - a
+        brand-new dataset - is judged by nothing offline, which
+        `test_fixture_covers_every_audited_dataset` turns into its own failure
+        so the snapshot cannot silently fall behind the catalog.
+
+        Upstream drift is deliberately out of scope - the live stores move on
+        their own schedule and would redden unrelated PRs - so the live
+        re-derivation lives in `..._against_the_live_store` (`e2e`). Refresh
+        the snapshot with `tools/ecmwf/capture_serveability_fixture.py` when
+        the stores legitimately change, and move its count here in the same
+        commit.
+        """
+        fixture = _load_serveability_fixture()
+
+        def blocks_for(name):
+            if name not in fixture:
+                # Not captured; the coverage guard catches a genuine gap.
+                return _FixtureBlocks([])
+            recorded = fixture[name]
+            if recorded is None:
+                # Unreachable at capture time - surface it as the live audit
+                # would, not as an empty (and so serveable) store.
+                return _UnreachableBlocks()
+            return _FixtureBlocks(recorded)
+
+        findings = hydrate_mod.audit_serveability(blocks_for=blocks_for)
+        counted = self._counts(findings)
+
+        known = self._KNOWN_UNSERVEABLE
+        newly = sorted(set(counted) - set(known))
+        gone = sorted(set(known) - set(counted))
+        changed = {
+            k: (known.get(k), counted.get(k))
+            for k in set(known) | set(counted)
+            if known.get(k) != counted.get(k)
+        }
+        assert counted == known, (
+            f"the recorded serveability baseline moved: newly reporting {newly}, "
+            f"no longer reporting {gone}, changed counts {changed} - if the live "
+            "stores changed, refresh the fixture; otherwise a catalog edit broke "
+            "a row."
+        )
+
+    @pytest.mark.integration
+    def test_fixture_covers_every_audited_dataset(self):
+        """The snapshot must hold every dataset the audit would visit.
+
+        The recorded-store test looks each dataset up in the fixture and treats
+        a miss as nothing to judge, so a dataset absent from the snapshot - one
+        added to the catalog after the last refresh - would be silently
+        unjudged offline. Asserting the snapshot's dataset set equals the set
+        the audit visits (those with a row that `_promises_data`) turns that
+        into a failure here, forcing a `capture_serveability_fixture.py` refresh
+        in the same change rather than leaving a gap for the weekly e2e.
+        """
+        from earthlens.ecmwf import Catalog
+
+        audited = {
+            name
+            for name, dataset in Catalog().datasets.items()
+            if any(
+                hydrate_mod._promises_data(row) for row in dataset.variables.values()
+            )
+        }
+        recorded = set(_load_serveability_fixture())
+
+        assert recorded == audited, (
+            "the serveability fixture is out of step with the catalog: "
+            f"audited but not captured {sorted(audited - recorded)}; "
+            f"captured but no longer audited {sorted(recorded - audited)}. "
+            "Refresh it with tools/ecmwf/capture_serveability_fixture.py."
+        )
+
+    @pytest.mark.integration
+    def test_only_documented_datasets_were_unreachable_at_capture(self):
+        """A dataset recorded as unreachable must be one we listed knowingly.
+
+        A `null` entry means the store was down when the fixture was captured,
+        so neither lane can judge that dataset's rows. An entry that appears
+        without being in `_UNREACHABLE_AT_CAPTURE` is almost always a transient
+        outage caught mid-refresh, silently erasing a dataset's coverage -
+        failing here forces that to be a reviewed decision rather than a quiet
+        regression.
+        """
+        fixture = _load_serveability_fixture()
+        unreachable = {name for name, blocks in fixture.items() if blocks is None}
+
+        assert unreachable == self._UNREACHABLE_AT_CAPTURE, (
+            "unreachable-at-capture datasets drifted from the documented set: "
+            f"newly unreachable {sorted(unreachable - self._UNREACHABLE_AT_CAPTURE)} "
+            "(a refresh likely hit a transient outage - recapture, or add it to "
+            "_UNREACHABLE_AT_CAPTURE if the store is genuinely gone); recovered "
+            f"{sorted(self._UNREACHABLE_AT_CAPTURE - unreachable)} (drop it from "
+            "the documented set)."
+        )
+
+    @pytest.mark.e2e
+    @pytest.mark.ecmwf
+    def test_no_shipped_row_is_unserveable_against_the_live_store(self):
+        """No shipped row is newly unserveable against the live stores.
+
+        The live counterpart of the recorded-store test, so benign upstream
+        drift cannot redden an ordinary PR. It runs only under `-m e2e`, the
+        weekly job.
+
+        Drift-tolerant by design: it asserts the live findings name no dataset
+        beyond the known-and-tolerated set, rather than an exact count. A
+        dataset that becomes serveable (a count that falls) is benign and does
+        not fail; a dataset that becomes *un*serveable - as
+        `cams-global-fire-emissions-gfas` did when GFAS 1.4.2 added a
+        `temporal_aggregation` dimension - is a genuine catalog defect and
+        does. A total outage raises `ConstraintsUnavailable`, which is an
+        xfail, not a red lane.
         """
         try:
             findings = hydrate_mod.audit_serveability()
         except hydrate_mod.ConstraintsUnavailable as exc:
             pytest.xfail(f"the store could not be read, so nothing was checked: {exc}")
 
-        # Counts, not just names: a bare allow-list hides a regression inside
-        # a dataset that already reports, which is how a whole batch of rows
-        # slipped past an earlier round of this work. Each number is the live
-        # finding count for that dataset, so the assertion fails if a row is
-        # broken *or* if one is quietly fixed and the entry goes stale.
-        known = {
-            # Repairing these means choosing which data version, period,
-            # ensemble member or model a caller gets - a curation decision,
-            # tracked on the pull request rather than guessed at here.
-            "derived-near-surface-meteorological-variables": 8,
-            "insitu-gridded-observations-global-and-regional": 1,
-            "projections-cmip5-monthly-single-levels": 3,
-            "sis-ecde-climate-indicators": 4,
-            "sis-european-risk-extreme-precipitation-indicators": 2,
-            "sis-tourism-fire-danger-indicators": 1,
-            # A different defect, also pre-existing: these name a variable the
-            # store does not offer at all, which the repo's own RequestValidator
-            # already reports. Fixing them means finding the current name.
-            "reanalysis-era5-single-levels": 1,
-            "reanalysis-era5-single-levels-monthly-means": 5,
-            "reanalysis-pan-carra-means": 3,
-        }
-        # A dataset the store could not answer for at all is reported as one
-        # `<constraints unreadable>` row. That is the host's state on the day,
-        # not the catalog's, so it is excluded rather than counted -
-        # `cems-glofas-historical-intermediate` answers 500 as of writing.
-        counted = collections.Counter(
-            dataset for dataset, slug, _ in findings if slug != _UNREADABLE
+        counted = self._counts(findings)
+        new, worse = self._live_regressions(counted, self._KNOWN_UNSERVEABLE)
+
+        # Gather both kinds into one report rather than two sequential asserts:
+        # a single `assert not problems` keeps the composite-assertion smell
+        # (python:S9073) away while still surfacing a new dataset AND a count
+        # rise in the same run, instead of hiding the second until the first is
+        # fixed.
+        problems = []
+        if new:
+            problems.append(f"new unserveable datasets {new}")
+        if worse:
+            problems.append(
+                f"datasets with more unserveable rows than the baseline {worse} "
+                f"(counts { {k: counted[k] for k in worse} } vs baseline "
+                f"{ {k: self._KNOWN_UNSERVEABLE[k] for k in worse} })"
+            )
+        assert not problems, (
+            "serveability regressed live: "
+            + "; ".join(problems)
+            + ". Either a shipped row's selectors no longer match what the store "
+            "offers (fix the catalog), or the store legitimately changed (refresh "
+            "the fixture and move the count into the recorded-store test)."
         )
 
-        assert counted == known, (
-            "the live serveability baseline moved: "
-            f"newly reporting {sorted(set(counted) - set(known))}, "
-            f"no longer reporting {sorted(set(known) - set(counted))}, "
-            "changed counts "
-            f"{ {k: (known.get(k), counted.get(k)) for k in set(known) | set(counted) if known.get(k) != counted.get(k)} }"
-        )
+    @staticmethod
+    def _live_regressions(counted, known):
+        """Datasets unserveable beyond the known-and-tolerated baseline.
+
+        Two kinds of regression, because a bare set membership misses the
+        second: a dataset with no tolerated findings that starts reporting
+        (`new`), and a dataset already in the baseline whose count of
+        unserveable rows has risen above it (`worse`) - a fresh GFAS-style
+        break inside an already-flawed dataset, which set membership alone
+        would let pass. A count that falls is benign and ignored.
+
+        Args:
+            counted: Live unserveable-row counts per dataset.
+            known: The tolerated baseline, `_KNOWN_UNSERVEABLE`.
+
+        Returns:
+            A `(new, worse)` pair of sorted dataset-id lists.
+        """
+        new = sorted(set(counted) - set(known))
+        worse = sorted(k for k in known if counted.get(k, 0) > known[k])
+        return new, worse
+
+    def test_live_regression_check_flags_new_and_worsened_datasets(self):
+        """A new dataset *and* a count rise within a known one both regress."""
+        known = {"a": 1, "b": 2}
+        # benign: exactly the baseline, a count fall, a known dataset fully
+        # fixed (absent from counted), and nothing unserveable at all
+        assert self._live_regressions({"a": 1, "b": 2}, known) == ([], [])
+        assert self._live_regressions({"a": 1, "b": 1}, known) == ([], [])
+        assert self._live_regressions({"a": 1}, known) == ([], [])
+        assert self._live_regressions({}, known) == ([], [])
+        # regressions: a new dataset, and a count rise within a known one
+        assert self._live_regressions({"a": 1, "b": 2, "c": 1}, known) == (["c"], [])
+        assert self._live_regressions({"a": 3, "b": 2}, known) == ([], ["a"])
 
 
 class TestRedactionCoversTheCommonShapes:

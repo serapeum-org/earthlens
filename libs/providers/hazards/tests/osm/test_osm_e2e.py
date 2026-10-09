@@ -60,11 +60,11 @@ class TestOverpassLive:
     """A live Overpass named query over a tiny bbox."""
 
     def test_hospitals_returns_features(self, tmp_path: Path):
-        """overpass:hospitals over Heidelberg returns >=1 feature, EPSG:4326."""
+        """live:hospitals over Heidelberg returns >=1 feature, EPSG:4326."""
         try:
             fc = EarthLens(
                 data_source="osm",
-                variables=["overpass:hospitals"],
+                variables=["live:hospitals"],
                 lat_lim=_LAT_LIM,
                 lon_lim=_LON_LIM,
                 path=str(tmp_path),
@@ -80,11 +80,11 @@ class TestOhsomeLive:
     """A live ohsome geometry query over a small bbox + time range."""
 
     def test_buildings_snapshot_returns_features(self, tmp_path: Path):
-        """ohsome:buildings at a 2020 snapshot returns >=1 polygon feature."""
+        """history:buildings at a 2020 snapshot returns >=1 polygon feature."""
         try:
             fc = EarthLens(
                 data_source="osm",
-                variables=["ohsome:buildings"],
+                variables=["history:buildings"],
                 lat_lim=_LAT_LIM,
                 lon_lim=_LON_LIM,
                 start="2020-01-01",

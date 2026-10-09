@@ -2705,13 +2705,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         per axis. The bbox is split with :func:`split_aoi_for_url`, each
         sub-extent is downloaded via :meth:`_download_one_url_tile`, and
         the per-tile tifs are mosaicked into `<prefix>.tif` with
-        :func:`pyramids.dataset.merge.merge_rasters`, inheriting the tiles'
-        declared no-data rather than `merge_rasters`' `0` default (which would
-        mask legitimate zeros — sea-level elevation, zero rainfall). Tiles that
-        declare no no-data of their own — the usual case here, since the
-        download path leaves it unset — send `"none"`, which unsets it on the
-        mosaic instead of stamping the `0`. Per-tile tifs are deleted on
-        success.
+        :func:`pyramids.dataset.merge.merge_rasters`. `no_data_value` is
+        passed explicitly as the first tile's own marker, so a real value
+        it declares carries over. Tiles that declare no no-data of their
+        own — the usual case here, since the download path leaves it unset
+        — pass Python `None` through, which asks for no marker at all
+        rather than stamping one. Per-tile tifs are deleted on success.
         """
         sub_extents = split_aoi_for_url(self.space, scale)
         logger.info(
@@ -2728,10 +2727,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 self._download_one_url_tile(image, sub_region, scale, sub_prefix)
             )
         target = self.root_dir / f"{prefix}.tif"
-        # merge_rasters defaults no_data_value to 0, which would both mask real
-        # zeros (sea-level SRTM, zero rainfall, zero surface-water occurrence)
-        # and drop whatever the tiles declared. Inherit it instead; "none"
-        # leaves the output without a no-data value, as the tiles have.
+        # Carry the first tile's own no-data marker onto the mosaic
+        # explicitly -- None when it declares none, asking for no marker at
+        # all rather than a stray literal like the string "none".
         first_tile = PyramidsDataset.read_file(tile_paths[0])
         try:
             tile_no_data = first_tile.no_data_value
@@ -2745,7 +2743,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         merge_rasters(
             [str(p) for p in tile_paths],
             str(target),
-            no_data_value=fill if fill is not None else "none",
+            no_data_value=fill,
         )
         for p in tile_paths:
             p.unlink(missing_ok=True)
