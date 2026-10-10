@@ -1961,7 +1961,7 @@ wheels = [
 
 [[package]]
 name = "earthlens"
-version = "0.27.0"
+version = "0.27.1"
 source = { editable = "." }
 dependencies = [
     { name = "earthlens-atmosphere" },
@@ -2284,7 +2284,7 @@ notebooks = [
 
 [[package]]
 name = "earthlens-atmosphere"
-version = "0.27.0"
+version = "0.27.1"
 source = { editable = "libs/providers/atmosphere" }
 dependencies = [
     { name = "earthlens-core" },
@@ -2350,7 +2350,7 @@ provides-extras = ["s3", "ecmwf", "ecmwf-modern", "cmip6", "isimip", "nwp", "rad
 
 [[package]]
 name = "earthlens-core"
-version = "0.27.0"
+version = "0.27.1"
 source = { editable = "libs/core" }
 dependencies = [
     { name = "geopandas" },
@@ -2407,7 +2407,7 @@ provides-extras = ["s3", "test"]
 
 [[package]]
 name = "earthlens-hazards"
-version = "0.27.0"
+version = "0.27.1"
 source = { editable = "libs/providers/hazards" }
 dependencies = [
     { name = "earthlens-core" },
@@ -2454,7 +2454,7 @@ provides-extras = ["emdat", "fdsn", "hdx", "overture", "osm"]
 
 [[package]]
 name = "earthlens-imagery"
-version = "0.27.0"
+version = "0.27.1"
 source = { editable = "libs/providers/imagery" }
 dependencies = [
     { name = "earthlens-core" },
@@ -2520,7 +2520,7 @@ provides-extras = ["earthdata", "asf", "eedai", "eumetsat", "gee", "jaxa", "open
 
 [[package]]
 name = "earthlens-land"
-version = "0.27.0"
+version = "0.27.1"
 source = { editable = "libs/providers/land" }
 dependencies = [
     { name = "earthlens-core" },
@@ -2550,7 +2550,7 @@ provides-extras = ["dem", "ghsl", "gbif", "worldpop"]
 
 [[package]]
 name = "earthlens-ocean"
-version = "0.27.0"
+version = "0.27.1"
 source = { editable = "libs/providers/ocean" }
 dependencies = [
     { name = "earthlens-core" },
