@@ -19,6 +19,7 @@ import requests
 
 from earthlens.earthlens import EarthLens
 from earthlens.osm import OhsomeUnavailableError
+from earthlens.testing import skip_live_unavailable
 
 pytestmark = [pytest.mark.e2e, pytest.mark.osm]
 
@@ -40,7 +41,7 @@ def _skip_on_network(exc: Exception) -> None:
     else re-raises and fails.
     """
     if isinstance(exc, (requests.ConnectionError, requests.Timeout)):
-        pytest.skip(f"OSM service unreachable: {exc}")
+        skip_live_unavailable(f"OSM service unreachable: {exc}")
     status = getattr(exc, "status_code", None)
     # A 5xx on this tiny smoke bbox is only ever an upstream outage, never
     # something the request shape provoked (ohsome answers 4xx for a bad

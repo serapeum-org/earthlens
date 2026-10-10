@@ -18,6 +18,7 @@ import pytest
 
 from earthlens.core import EarthLens
 from earthlens.isimip import Catalog
+from earthlens.testing import skip_live_unavailable
 
 pytestmark = [pytest.mark.e2e, pytest.mark.isimip]
 
@@ -43,9 +44,9 @@ def _require_api() -> None:
             Catalog().data_url + "/datasets/", params={"page_size": 1}, timeout=20
         )
         if resp.status_code != 200:
-            pytest.skip("ISIMIP API unreachable")
+            skip_live_unavailable("ISIMIP API unreachable")
     except Exception:
-        pytest.skip("ISIMIP API unreachable")
+        skip_live_unavailable("ISIMIP API unreachable")
 
 
 def test_search_live():

@@ -20,6 +20,7 @@ import numpy as np
 import pytest
 
 from earthlens.earthlens import EarthLens
+from earthlens.testing import skip_live_unavailable
 
 pytestmark = [pytest.mark.e2e, pytest.mark.jrc]
 
@@ -54,7 +55,7 @@ def _jrc_reachable() -> bool:
 def _skip_when_offline() -> None:
     """Skip cleanly when the JRC host is unreachable."""
     if not _jrc_reachable():
-        pytest.skip("JRC jeodpp unreachable (offline)")
+        skip_live_unavailable("JRC jeodpp unreachable (offline)")
 
 
 class TestEfhmLiveFetch:

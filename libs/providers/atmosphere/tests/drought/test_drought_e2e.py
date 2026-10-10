@@ -26,6 +26,7 @@ from pathlib import Path
 import pytest
 
 from earthlens.earthlens import EarthLens
+from earthlens.testing import skip_live_unavailable
 
 # A recent USDM week: snap to a Tuesday whose Thursday release has rolled out.
 # Two weeks back is comfortably released regardless of the weekday today.
@@ -59,7 +60,7 @@ class TestUsdmLive:
         if not _reachable(
             "https://droughtmonitor.unl.edu/data/json/usdm_20250617.json"
         ):
-            pytest.skip("USDM host unreachable")
+            skip_live_unavailable("USDM host unreachable")
         fc = EarthLens(
             data_source="usdm",
             dataset="usdm",
@@ -89,7 +90,9 @@ class TestEdoLive:
     def test_edo_spaST_returns_geotiff(self, tmp_path: Path):
         """An EDO SPI ERA5 short-term coverage downloads as a pyramids-openable TIFF."""
         if not _reachable(self._EDO_PROBE, want_binary=True):
-            pytest.skip("Copernicus EDO WCS endpoint unreachable / not serving data")
+            skip_live_unavailable(
+                "Copernicus EDO WCS endpoint unreachable / not serving data"
+            )
         paths = EarthLens(
             data_source="drought",
             dataset="edo-spaST",

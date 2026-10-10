@@ -18,6 +18,7 @@ import pytest
 
 from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
+from earthlens.testing import skip_live_unavailable
 from earthlens.worldpop.rest import BASE_URL
 
 pytestmark = [pytest.mark.e2e, pytest.mark.worldpop]
@@ -43,7 +44,7 @@ def _online() -> bool:
 def _require_network():
     """Skip the whole module when the WorldPop hub is unreachable."""
     if not _online():
-        pytest.skip("WorldPop hub unreachable; skipping live e2e.")
+        skip_live_unavailable("WorldPop hub unreachable; skipping live e2e.")
 
 
 def _worldpop(tmp_path: Path, **kw):
