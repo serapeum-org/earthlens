@@ -25166,7 +25166,9 @@ touching cells. Defaults to <code>False</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/spatial.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-746">746</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-744">744</a></span>
+<span class="normal"><a href="#__codelineno-0-745">745</a></span>
+<span class="normal"><a href="#__codelineno-0-746">746</a></span>
 <span class="normal"><a href="#__codelineno-0-747">747</a></span>
 <span class="normal"><a href="#__codelineno-0-748">748</a></span>
 <span class="normal"><a href="#__codelineno-0-749">749</a></span>
@@ -25213,58 +25215,56 @@ touching cells. Defaults to <code>False</code>.</p>
 <span class="normal"><a href="#__codelineno-0-790">790</a></span>
 <span class="normal"><a href="#__codelineno-0-791">791</a></span>
 <span class="normal"><a href="#__codelineno-0-792">792</a></span>
-<span class="normal"><a href="#__codelineno-0-793">793</a></span>
-<span class="normal"><a href="#__codelineno-0-794">794</a></span>
-<span class="normal"><a href="#__codelineno-0-795">795</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="k">def</span><span class="w"> </span><span class="nf">crop_to_aoi</span><span class="p">(</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a>    <span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a>    <span class="n">space</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a>    <span class="n">epsg</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="mi">4326</span><span class="p">,</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a>    <span class="n">touch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Crop a pyramids `Dataset` to a polygon mask if present, else a bbox.</span>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">    When `space` carries a polygon `geometry` — set when the request&#39;s</span>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">    `aoi=` was a polygon rather than a plain bbox — the dataset is masked</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">    to that exact shape via `Dataset.crop(mask=...)`, so pixels outside the</span>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">    polygon become no-data and the raster is trimmed to the polygon&#39;s cell</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">    extent. Otherwise it is cropped to the rectangular `bbox`. Centralising</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">    the choice lets every raster backend honour a polygon `aoi=` the same</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">    way without duplicating the branch. On the polygon path a raster that</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">    declares no no-data value logs a warning, since the mask can then only</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">    trim to the polygon&#39;s bounding box (see `_crop_to_mask`).</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">        dataset: A `pyramids.Dataset` (anything exposing `crop`).</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">        space: A `SpatialExtent` (anything exposing an optional</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">            `geometry`).</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">        bbox: The fallback `(west, south, east, north)` quadruple, used</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">            when `space` has no polygon `geometry`.</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">        epsg: CRS of `bbox`. Defaults to `4326`.</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">        touch: For the bbox path, whether to keep cells merely touching the</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">            box. Ignored on the polygon-mask path, which always keeps</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">            touching cells. Defaults to `False`.</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a><span class="sd">        A new cropped `Dataset`.</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a>    <span class="n">geometry</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>    <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>        <span class="k">return</span> <span class="n">_crop_to_mask</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>    <span class="c1"># Widen a point / cell-edge bbox to one pixel so a zero-area box is not handed</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>    <span class="c1"># to `crop` (which would trim to nothing / error); a point AOI still yields a</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a>    <span class="c1"># 1x1 crop. The pixel size (`geo[1]`/`geo[5]`) is in the dataset&#39;s CRS units,</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>    <span class="c1"># so only widen when the bbox is in that same CRS — `epsg is None` means &quot;the</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>    <span class="c1"># dataset&#39;s own CRS&quot; (pyramids&#39; default), and an explicit `epsg` must match</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>    <span class="c1"># the dataset&#39;s. For a reprojecting crop (bbox `epsg` != the dataset&#39;s CRS)</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>    <span class="c1"># mixing the units would push the edge out by a wrong amount, so leave the</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>    <span class="c1"># bbox as-is. (A real `Dataset` exposes `geotransform` / `epsg`; the getattr</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>    <span class="c1"># guards let a bare test double without them reach crop.)</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>    <span class="n">geo</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;geotransform&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a>    <span class="k">if</span> <span class="n">geo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">epsg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;epsg&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">epsg</span><span class="p">):</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="n">bbox</span> <span class="o">=</span> <span class="n">widen_degenerate_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">geo</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">geo</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
-<a id="__codelineno-0-795" name="__codelineno-0-795"></a>    <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">bbox</span><span class="p">),</span> <span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="n">touch</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-793">793</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="k">def</span><span class="w"> </span><span class="nf">crop_to_aoi</span><span class="p">(</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>    <span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a>    <span class="n">space</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a>    <span class="n">bbox</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>    <span class="n">epsg</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="mi">4326</span><span class="p">,</span>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a>    <span class="n">touch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Crop a pyramids `Dataset` to a polygon mask if present, else a bbox.</span>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">    When `space` carries a polygon `geometry` — set when the request&#39;s</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">    `aoi=` was a polygon rather than a plain bbox — the dataset is masked</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">    to that exact shape via `Dataset.crop(mask=...)`, so pixels outside the</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">    polygon become no-data and the raster is trimmed to the polygon&#39;s cell</span>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">    extent. Otherwise it is cropped to the rectangular `bbox`. Centralising</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">    the choice lets every raster backend honour a polygon `aoi=` the same</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">    way without duplicating the branch. On the polygon path a raster that</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">    declares no no-data value logs a warning, since the mask can then only</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">    trim to the polygon&#39;s bounding box (see `_crop_to_mask`).</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">        dataset: A `pyramids.Dataset` (anything exposing `crop`).</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">        space: A `SpatialExtent` (anything exposing an optional</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">            `geometry`).</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">        bbox: The fallback `(west, south, east, north)` quadruple, used</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">            when `space` has no polygon `geometry`.</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">        epsg: CRS of `bbox`. Defaults to `4326`.</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">        touch: For the bbox path, whether to keep cells merely touching the</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">            box. Ignored on the polygon-mask path, which always keeps</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">            touching cells. Defaults to `False`.</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">        A new cropped `Dataset`.</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a>    <span class="n">geometry</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a>    <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>        <span class="k">return</span> <span class="n">_crop_to_mask</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a>    <span class="c1"># Widen a point / cell-edge bbox to one pixel so a zero-area box is not handed</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a>    <span class="c1"># to `crop` (which would trim to nothing / error); a point AOI still yields a</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a>    <span class="c1"># 1x1 crop. The pixel size (`geo[1]`/`geo[5]`) is in the dataset&#39;s CRS units,</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a>    <span class="c1"># so only widen when the bbox is in that same CRS — `epsg is None` means &quot;the</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>    <span class="c1"># dataset&#39;s own CRS&quot; (pyramids&#39; default), and an explicit `epsg` must match</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a>    <span class="c1"># the dataset&#39;s. For a reprojecting crop (bbox `epsg` != the dataset&#39;s CRS)</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a>    <span class="c1"># mixing the units would push the edge out by a wrong amount, so leave the</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>    <span class="c1"># bbox as-is. (A real `Dataset` exposes `geotransform` / `epsg`; the getattr</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>    <span class="c1"># guards let a bare test double without them reach crop.)</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>    <span class="n">geo</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;geotransform&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>    <span class="k">if</span> <span class="n">geo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">epsg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;epsg&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">epsg</span><span class="p">):</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a>        <span class="n">bbox</span> <span class="o">=</span> <span class="n">widen_degenerate_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">geo</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">geo</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a>    <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">bbox</span><span class="p">),</span> <span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="n">touch</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25393,7 +25393,9 @@ to <code>True</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/spatial.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-831">831</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-829">829</a></span>
+<span class="normal"><a href="#__codelineno-0-830">830</a></span>
+<span class="normal"><a href="#__codelineno-0-831">831</a></span>
 <span class="normal"><a href="#__codelineno-0-832">832</a></span>
 <span class="normal"><a href="#__codelineno-0-833">833</a></span>
 <span class="normal"><a href="#__codelineno-0-834">834</a></span>
@@ -25417,35 +25419,33 @@ to <code>True</code>.</p>
 <span class="normal"><a href="#__codelineno-0-852">852</a></span>
 <span class="normal"><a href="#__codelineno-0-853">853</a></span>
 <span class="normal"><a href="#__codelineno-0-854">854</a></span>
-<span class="normal"><a href="#__codelineno-0-855">855</a></span>
-<span class="normal"><a href="#__codelineno-0-856">856</a></span>
-<span class="normal"><a href="#__codelineno-0-857">857</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="k">def</span><span class="w"> </span><span class="nf">mask_to_geometry</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">space</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">touch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Mask an already-bbox-clipped `Dataset` / `NetCDF` to a polygon, if any.</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">    The counterpart to `crop_to_aoi` for backends that have *already*</span>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="sd">    cropped to the bbox by another route — CHIRPS&#39;s in-array numpy clip, or</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">    a server-side bbox (ECMWF&#39;s CDS `area`, a NetCDF cube). When `space`</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="sd">    carries a polygon `geometry`, the dataset is masked to that exact shape</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a><span class="sd">    via `crop(mask=...)`; otherwise it is returned unchanged. As with</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="sd">    `crop_to_aoi`, masking a raster that declares no no-data value logs a</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">    warning, since the mask can then only trim to the polygon&#39;s bounding box</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">    (see `_crop_to_mask`).</span>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">        dataset: A `pyramids.Dataset` / `NetCDF` (anything exposing `crop`).</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">        space: A `SpatialExtent` (anything exposing an optional</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">            `geometry`).</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">        touch: Whether to keep cells merely touching the polygon. Defaults</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">            to `True`.</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">        The masked `Dataset` when a polygon `geometry` is present, else the</span>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">        original `dataset` untouched.</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a>    <span class="n">geometry</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a>    <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a>        <span class="k">return</span> <span class="n">dataset</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a>    <span class="k">return</span> <span class="n">_crop_to_mask</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="n">touch</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-855">855</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="k">def</span><span class="w"> </span><span class="nf">mask_to_geometry</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">space</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">touch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Mask an already-bbox-clipped `Dataset` / `NetCDF` to a polygon, if any.</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">    The counterpart to `crop_to_aoi` for backends that have *already*</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="sd">    cropped to the bbox by another route — CHIRPS&#39;s in-array numpy clip, or</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">    a server-side bbox (ECMWF&#39;s CDS `area`, a NetCDF cube). When `space`</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="sd">    carries a polygon `geometry`, the dataset is masked to that exact shape</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">    via `crop(mask=...)`; otherwise it is returned unchanged. As with</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="sd">    `crop_to_aoi`, masking a raster that declares no no-data value logs a</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a><span class="sd">    warning, since the mask can then only trim to the polygon&#39;s bounding box</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="sd">    (see `_crop_to_mask`).</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">        dataset: A `pyramids.Dataset` / `NetCDF` (anything exposing `crop`).</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">        space: A `SpatialExtent` (anything exposing an optional</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">            `geometry`).</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">        touch: Whether to keep cells merely touching the polygon. Defaults</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">            to `True`.</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">        The masked `Dataset` when a polygon `geometry` is present, else the</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">        original `dataset` untouched.</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a>    <span class="n">geometry</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a>    <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a>        <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a>    <span class="k">return</span> <span class="n">_crop_to_mask</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="n">touch</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
