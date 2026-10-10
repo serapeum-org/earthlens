@@ -25,6 +25,7 @@ import requests
 
 from earthlens.earthlens import EarthLens
 from earthlens.osm._pbf import download_extract, read_pbf
+from earthlens.testing import skip_live_unavailable
 
 # Gate the SDK requirement as a per-test skipif, not a module-level
 # `importorskip`. A module-level importorskip reports a skip during *collection*,
@@ -57,7 +58,7 @@ _LON_LIM = [14.48, 14.54]
 def _skip_on_network(exc: Exception) -> None:
     """Skip (not fail) when the failure is a transport problem, else re-raise."""
     if isinstance(exc, (requests.ConnectionError, requests.Timeout)):
-        pytest.skip(f"Geofabrik unreachable: {exc}")
+        skip_live_unavailable(f"Geofabrik unreachable: {exc}")
     raise exc
 
 

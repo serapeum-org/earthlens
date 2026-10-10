@@ -99,6 +99,30 @@ def _backend_report(path: Path, *cases: tuple[str, str, str | None]) -> Path:
     return path
 
 
+def _avail_report(path: Path, *cases: tuple[str, str, str | None]) -> Path:
+    """Write a backend report of `(backend, name, skip_message)` cases.
+
+    `skip_message` is `None` for a test that ran, else the reason stamped on the
+    `<skipped>` element — used to exercise the availability-prefix classifier.
+    """
+    body = ""
+    for backend, name, message in cases:
+        classname = (
+            f"tests.{backend}.test_mod.TestX" if backend else "tests.test_mod.TestX"
+        )
+        body += f'<testcase classname="{classname}" name="{name}">'
+        if message is not None:
+            body += f'<skipped type="pytest.skip" message="{message}"/>'
+        body += "</testcase>"
+    skipped = sum(1 for _, _, message in cases if message is not None)
+    path.write_text(
+        f'<testsuites><testsuite name="s" tests="{len(cases)}" '
+        f'skipped="{skipped}">{body}</testsuite></testsuites>',
+        encoding="utf-8",
+    )
+    return path
+
+
 def _raise_parse_error(report):
     """Stand in for a second junit parse that lands on a truncated report."""
     raise ET.ParseError("no element found")
@@ -486,3 +510,59 @@ class TestDeadBackendDetection:
             ("erddap", "c", None),
         )
         assert guard.main([str(report), "lane"]) == 0, "declared exemptions failed"
+
+
+class TestAvailabilitySkips:
+    """Tests for sparing a backend whose skips are all upstream-availability skips."""
+
+    def test_an_availability_only_backend_is_spared(self, guard, tmp_path, capsys):
+        """A backend whose every skip carries the prefix does not redden the lane."""
+        down = f"{guard._LIVE_SKIP_PREFIX}geoBoundaries unreachable"
+        report = _avail_report(
+            tmp_path / "r.xml", ("admin", "a", down), ("gdacs", "b", None)
+        )
+        code = guard.main([str(report), "e2e (rest-of-hazards)"])
+        assert code == 0, (
+            f"an availability-only backend must not fail the lane, got {code}"
+        )
+        assert "admin" not in capsys.readouterr().out, (
+            "a reachable-but-down backend was blamed"
+        )
+
+    def test_a_bare_offline_skip_still_fails(self, guard, tmp_path):
+        """Without the prefix a skip is indistinguishable from unconfigured — still fails."""
+        report = _avail_report(
+            tmp_path / "r.xml",
+            ("admin", "a", "geoBoundaries unreachable (offline)"),
+            ("gdacs", "b", None),
+        )
+        assert guard.main([str(report), "lane"]) == 1, (
+            "a bare offline skip must still fail"
+        )
+
+    def test_a_mix_of_availability_and_plain_skips_still_fails(self, guard, tmp_path):
+        """One non-availability skip means the backend is not purely reachable-but-down."""
+        down = f"{guard._LIVE_SKIP_PREFIX}host unreachable"
+        report = _avail_report(
+            tmp_path / "r.xml",
+            ("admin", "a", down),
+            ("admin", "b", "missing credential"),
+            ("gdacs", "c", None),
+        )
+        assert guard.main([str(report), "lane"]) == 1, (
+            "a mixed-skip backend must still fail"
+        )
+
+    def test_classifier_returns_only_all_availability_backends(self, guard, tmp_path):
+        """`_availability_only_backends` names a backend only when every skip is availability."""
+        down = f"{guard._LIVE_SKIP_PREFIX}down"
+        report = _avail_report(
+            tmp_path / "r.xml",
+            ("admin", "a", down),
+            ("jrc", "b", down),
+            ("jrc", "c", "plain skip"),
+            ("gdacs", "d", None),
+        )
+        assert guard._availability_only_backends(report) == {"admin"}, (
+            "classifier misgrouped"
+        )

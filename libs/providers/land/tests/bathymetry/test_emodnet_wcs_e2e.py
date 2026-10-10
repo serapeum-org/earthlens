@@ -22,6 +22,7 @@ import requests
 
 from earthlens.bathymetry import WcsServiceUnavailableError
 from earthlens.earthlens import EarthLens
+from earthlens.testing import skip_live_unavailable
 
 pytestmark = [pytest.mark.e2e, pytest.mark.bathymetry]
 
@@ -48,7 +49,7 @@ def _wcs_reachable() -> bool:
 def _skip_when_offline() -> None:
     """Skip the live test cleanly when the EMODnet WCS host is unreachable."""
     if not _wcs_reachable():
-        pytest.skip("EMODnet Bathymetry WCS unreachable (offline)")
+        skip_live_unavailable("EMODnet Bathymetry WCS unreachable (offline)")
 
 
 def _elevation_stats(path: Path) -> tuple[float, float]:

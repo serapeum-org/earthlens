@@ -25,6 +25,7 @@ import numpy as np
 import pytest
 
 from earthlens.earthlens import EarthLens
+from earthlens.testing import skip_live_unavailable
 
 pytestmark = [pytest.mark.e2e, pytest.mark.solar_wind_atlas]
 
@@ -61,7 +62,7 @@ class TestWindAtlasLiveFetch:
     def _skip_when_offline(self) -> None:
         """Skip cleanly when the figshare download host is unreachable."""
         if not _reachable("https://ndownloader.figshare.com/files/17247017"):
-            pytest.skip("figshare unreachable (offline)")
+            skip_live_unavailable("figshare unreachable (offline)")
 
     def test_wind_100m_windowed_subset(self, tmp_path: Path) -> None:
         """A small wind_100m window lands one GeoTIFF of plausible wind speeds."""
@@ -91,7 +92,7 @@ class TestSolarAtlasLiveFetch:
             "World_GHI_GISdata_LTAy_AvgDailyTotals_GlobalSolarAtlas-v2_GEOTIFF.zip"
         )
         if not _reachable(url):
-            pytest.skip("Global Solar Atlas host unreachable (offline)")
+            skip_live_unavailable("Global Solar Atlas host unreachable (offline)")
 
     def test_ghi_subset_after_full_download(self, tmp_path: Path) -> None:
         """A small GHI window lands one GeoTIFF of plausible irradiation."""

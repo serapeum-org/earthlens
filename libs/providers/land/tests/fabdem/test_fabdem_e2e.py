@@ -21,6 +21,7 @@ import pytest
 
 from earthlens.biodiversity import LicenseWarning
 from earthlens.earthlens import EarthLens
+from earthlens.testing import skip_live_unavailable
 
 pytestmark = [pytest.mark.e2e, pytest.mark.slow, pytest.mark.fabdem]
 
@@ -47,7 +48,7 @@ def _bristol_reachable() -> bool:
 def _skip_when_offline() -> None:
     """Skip cleanly when the Bristol host is unreachable."""
     if not _bristol_reachable():
-        pytest.skip("Bristol data.bris.ac.uk unreachable (offline)")
+        skip_live_unavailable("Bristol data.bris.ac.uk unreachable (offline)")
 
 
 class TestFabdemLiveFetch:

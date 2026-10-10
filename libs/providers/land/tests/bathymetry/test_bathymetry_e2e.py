@@ -20,6 +20,7 @@ import numpy as np
 import pytest
 
 from earthlens.earthlens import EarthLens
+from earthlens.testing import skip_live_unavailable
 
 pytestmark = [pytest.mark.e2e, pytest.mark.bathymetry]
 
@@ -44,7 +45,7 @@ def _erddap_reachable() -> bool:
 def _skip_when_offline() -> None:
     """Skip the live tests cleanly when the ERDDAP host is unreachable."""
     if not _erddap_reachable():
-        pytest.skip("NOAA ERDDAP unreachable (offline)")
+        skip_live_unavailable("NOAA ERDDAP unreachable (offline)")
 
 
 def _elevation_stats(path: Path) -> tuple[float, float]:
