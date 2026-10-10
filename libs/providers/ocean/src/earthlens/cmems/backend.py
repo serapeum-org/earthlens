@@ -469,7 +469,9 @@ class CMEMS(AbstractDataSource):
         written: list[Path] = []
         for var_name in reduced.variable_names:
             var = reduced.get_variable(var_name)
-            arr = var.read_array()
+            # squeeze=True keeps the flat (bands, rows, cols) this loop indexes by
+            # band; pyramids 0.66 otherwise returns the dimension-preserving layout.
+            arr = var.read_array(squeeze=True)
             if arr.ndim == 2:
                 arr = arr[None, :, :]
             for i, window in enumerate(windows):
