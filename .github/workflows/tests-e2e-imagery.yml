@@ -40,4 +40,9 @@ jobs:
     uses: ./.github/workflows/tests-e2e-reusable.yml
     with:
       theme: imagery
+      # eumetsat's live Data Tailor roundtrip (submit -> poll -> stream) can
+      # outlast the 45-min default when the EPCS service is slow, so the lane
+      # gets cancelled mid-test. Give the imagery lanes 60 min. The cap is
+      # per-theme, so the other (fast) imagery lanes inherit it too.
+      timeout_minutes: 60
     secrets: inherit
