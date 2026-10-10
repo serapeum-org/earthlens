@@ -12,13 +12,18 @@ tests, passed none, and skipped at least one for *upstream availability* -
 it counts skips carrying that module's `live e2e skipped — ` prefix. The two
 partition the problem and never double-fire:
 
-- upstream was down    -> the in-process guard fails the lane, pytest exits
-                          non-zero, and this script is never reached
-- nothing was configured -> the skips carry no availability prefix, so that
-                          guard counts zero, pytest exits 0, and the lane
-                          reports green. That is the gap this script closes -
-                          the CMEMS case, where the credentials were simply
-                          never passed in.
+- upstream was down, whole lane -> the in-process guard fails the lane, pytest
+                          exits non-zero, and this script is never reached
+- upstream was down, one backend beside passing neighbours -> the in-process
+                          guard does NOT fire (something passed), so this
+                          script runs; it reads the skip reasons and spares a
+                          backend whose skips are *all* availability skips (see
+                          `_availability_only_backends`) - a transient outage is
+                          not a configuration gap
+- nothing was configured -> the skips carry no availability prefix, so neither
+                          guard spares it; pytest exits 0 and this script fails
+                          the lane. That is the gap it closes - the CMEMS case,
+                          where the credentials were simply never passed in.
 
 The workflows also treat "collected nothing" (pytest exit code 5) as a failure
 unless the lane opts out. This carries that from *collected* to *executed*.
@@ -27,13 +32,15 @@ Usage:
     python .github/scripts/assert_tests_ran.py <report.xml> <lane-name>
 
 Exits 0 when every backend in the report executed at least one test (passed,
-failed, or errored); when every backend the report names is listed in
-`_EXPECTED_EMPTY`, so a lane devoted to a declared-empty backend is not failed
-for being empty; and when the report is missing, truncated, or holds no tests
-at all - "collected nothing" is the exit-5 case, which the caller has already
-decided about. Exits 1 when a backend not listed in `_EXPECTED_EMPTY`
-contributed only skips, whether it sat beside passing neighbours or the whole
-lane was skipped. Exits 2 on a bad command line.
+failed, or errored); when a backend that ran nothing skipped only for upstream
+availability (its skips all carry the `live e2e skipped — ` prefix); when every
+backend the report names is listed in `_EXPECTED_EMPTY`, so a lane devoted to a
+declared-empty backend is not failed for being empty; and when the report is
+missing, truncated, or holds no tests at all - "collected nothing" is the exit-5
+case, which the caller has already decided about. Exits 1 when a backend not
+listed in `_EXPECTED_EMPTY`, and not all-availability-skipped, contributed only
+skips, whether it sat beside passing neighbours or the whole lane was skipped.
+Exits 2 on a bad command line.
 """
 
 from __future__ import annotations
@@ -62,6 +69,13 @@ _EXPECTED_EMPTY = {
     "mswep": "the GloH2O share is granted per person; CI cannot hold one",
     "airnow": "AIRNOW_API_KEY has never been issued for this repository",
 }
+
+#: Prefix that `earthlens.testing.skip_live_unavailable` (and the automatic
+#: `pytest_runtest_call` hook) stamp on a skip raised because the upstream
+#: service was unreachable. Kept as a literal - not imported - so this guard
+#: stays dependency-free and parses only the JUnit XML. Must stay in step with
+#: `earthlens.testing._LIVE_SKIP_PREFIX`.
+_LIVE_SKIP_PREFIX = "live e2e skipped — "
 
 
 def _backend(classname: str) -> str:
@@ -137,6 +151,50 @@ def _per_backend(report: Path) -> dict[str, tuple[int, int]]:
             slot = counts.setdefault(_backend(where), [0, 0])
             slot[1 if is_skip else 0] += 1
     return {name: (ran, skipped) for name, (ran, skipped) in counts.items()}
+
+
+def _availability_only_backends(report: Path) -> set[str]:
+    """Return backends whose skips are *all* upstream-availability skips.
+
+    A skip whose reason carries :data:`_LIVE_SKIP_PREFIX` means the upstream
+    service was unreachable, not that the backend was never configured. A
+    backend that ran nothing and whose every skip is such an availability skip
+    is "reachable-but-down", not "silently unconfigured", so the lane must not
+    be failed on its account - the outage is not this repository's defect, and
+    it will pass again once the service is back.
+
+    This complements, rather than replaces, the dead-backend check: a backend
+    with even one *non*-availability skip (a missing credential / unwired lane)
+    is still failed, so the gap this script exists to catch is untouched. The
+    in-process `earthlens.testing.pytest_sessionfinish` guard only fires when a
+    *whole* lane is availability-masked; this covers the case the in-process
+    guard cannot see - one backend down beside passing neighbours.
+
+    Args:
+        report: Path to a pytest `--junitxml` report.
+
+    Returns:
+        set[str]: Backend names whose skips are all availability-classified and
+            which therefore must not redden the lane.
+    """
+    root = ET.parse(report).getroot()
+    suites = [root] if root.tag == "testsuite" else root.findall("testsuite")
+    skipped: dict[str, int] = {}
+    availability: dict[str, int] = {}
+    for suite in suites:
+        for case in suite.iter("testcase"):
+            marker = case.find("skipped")
+            if marker is None or marker.get("type") == "pytest.xfail":
+                continue
+            backend = _backend(case.get("classname") or case.get("name") or "")
+            skipped[backend] = skipped.get(backend, 0) + 1
+            # pytest records the reason on the `message` attribute and repeats
+            # it in the element text; check both so the prefix is found either
+            # way.
+            reason = f"{marker.get('message') or ''} {marker.text or ''}"
+            if _LIVE_SKIP_PREFIX in reason:
+                availability[backend] = availability.get(backend, 0) + 1
+    return {b for b, n in skipped.items() if n and availability.get(b, 0) == n}
 
 
 def _totals(report: Path) -> tuple[int, int]:
@@ -228,16 +286,25 @@ def main(argv: list[str]) -> int:
         # which is exactly how CMEMS went unexercised. Check each separately.
         try:
             per_backend = _per_backend(report)
+            availability_only = _availability_only_backends(report)
         except ET.ParseError:
             # The report is re-read here, so a file still being written can
             # fail this parse even though the first one succeeded. Same
             # verdict as there: the caller's exit code carries the real
             # failure, and the lane did execute tests.
             return 0
+        # A backend that ran nothing is only "dead" when it was not configured.
+        # One whose every skip is an upstream-availability skip is
+        # reachable-but-down - a transient outage, not this repo's defect - so
+        # it is spared here, exactly like a declared `_EXPECTED_EMPTY` entry.
         dead = sorted(
             name
             for name, (ran, skipped) in per_backend.items()
-            if name and ran == 0 and skipped > 0 and name not in _EXPECTED_EMPTY
+            if name
+            and ran == 0
+            and skipped > 0
+            and name not in _EXPECTED_EMPTY
+            and name not in availability_only
         )
         if dead:
             for name in dead:
