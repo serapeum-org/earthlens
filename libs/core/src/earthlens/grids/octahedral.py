@@ -2,17 +2,15 @@
 
 Octahedral reduced-Gaussian grids (ECMWF `O` grids) store values as a single ragged
 sequence of points whose latitude/longitude coordinates are known per point. pyramids
-already interpolates scattered points to a raster with `gdal.Grid`
-(`pyramids.dataset.ops.interpolate.grid_points`); this module wraps the ragged points
-in a `geopandas.GeoDataFrame` and reuses that path. No new third-party dependencies.
+grids scattered coordinate arrays straight onto a raster with `gdal.Grid` via
+`Dataset.from_point_arrays` (no intermediate shapely geometry is built), which this
+module calls directly. No new third-party dependencies.
 """
 
 from __future__ import annotations
 
 import numpy as np
-from geopandas import GeoDataFrame, points_from_xy
 from pyramids.dataset import Dataset
-from pyramids.dataset.ops.interpolate import grid_points
 
 
 def from_octahedral(
@@ -27,9 +25,9 @@ def from_octahedral(
 ) -> Dataset:
     """Regrid an octahedral reduced-Gaussian field onto a regular-grid `Dataset`.
 
-    The per-point `lats`/`lons`/`values` triples are wrapped in a point
-    `geopandas.GeoDataFrame` and interpolated with `gdal.Grid` via
-    `pyramids.dataset.ops.interpolate.grid_points`.
+    The per-point `lats`/`lons`/`values` triples are interpolated with `gdal.Grid`
+    via `pyramids.dataset.Dataset.from_point_arrays`, which grids the raw coordinate
+    arrays directly without building any intermediate geometry.
 
     Args:
         lats: 1-D array of point latitudes.
@@ -76,7 +74,7 @@ def from_octahedral(
 
     See Also:
         - `from_orca`: regrid curvilinear `(ny, nx)` fields.
-        - `pyramids.dataset.ops.interpolate.grid_points`: the scattered-point
+        - `pyramids.dataset.Dataset.from_point_arrays`: the array-native scattered-point
           interpolation this adapter delegates to.
     """
     lats = np.asarray(lats, dtype=np.float64).ravel()
@@ -88,18 +86,12 @@ def from_octahedral(
             f"{lats.size}, {lons.size}, {values.size}."
         )
 
-    gdf = GeoDataFrame(
-        {"z": values},
-        geometry=points_from_xy(lons, lats),
-        crs=epsg,
-    )
-    result = grid_points(
-        gdf,
-        "z",
-        Dataset,
+    return Dataset.from_point_arrays(
+        lons,
+        lats,
+        values,
         algorithm=method,
         cell_size=cell_size,
         bbox=bbox,
         epsg=epsg,
     )
-    return result
