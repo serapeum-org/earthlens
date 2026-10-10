@@ -87,7 +87,7 @@ class _FakeVar:
         self.geotransform = (0.0, 1.0, 0.0, 0.0, 0.0, -1.0)
         self.epsg = 4326
 
-    def read_array(self) -> np.ndarray:
+    def read_array(self, *, squeeze: bool = False) -> np.ndarray:
         # A single window means `reduce("time", ...)` squeezed the time axis away,
         # so pyramids hands back a 2-D (lat, lon) array; >1 window stays 3-D
         # (time, lat, lon). This is the only case that exercises the 2-D->3-D

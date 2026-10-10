@@ -138,7 +138,7 @@ class _FakeVariable:
         # pyramids >= 0.58.1 derives this from the cube's CF coordinates.
         self.geotransform = _GLOBAL_GEO
 
-    def read_array(self, window, masked=False):
+    def read_array(self, window, masked=False, *, squeeze=False):
         col_off, row_off, width, height = window
         array = np.full(
             (self._bands, height, width),
@@ -187,7 +187,7 @@ def _fake_read_file(_url, variable=None, time_labels=None):
 class _FakeIntVariable(_FakeVariable):
     """A categorical field stored as integers, as the severity flags are."""
 
-    def read_array(self, window, masked=False):
+    def read_array(self, window, masked=False, *, squeeze=False):
         _, _, width, height = window
         data = np.full((self._bands, height, width), 3, dtype="int16")
         mask = np.zeros_like(data, dtype=bool)
@@ -198,7 +198,7 @@ class _FakeIntVariable(_FakeVariable):
 class _FakeMaskedVariable(_FakeVariable):
     """A variable whose window read masks one cell with a numeric fill value."""
 
-    def read_array(self, window, masked=False):
+    def read_array(self, window, masked=False, *, squeeze=False):
         _, _, width, height = window
         data = np.full((self._bands, height, width), 1.5, dtype="float32")
         mask = np.zeros_like(data, dtype=bool)

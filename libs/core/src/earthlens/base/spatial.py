@@ -656,7 +656,9 @@ def windowed_bbox_crop(dataset: Any, bbox: Sequence[float], *, epsg: Any = 4326)
 
         no_data = fallback.no_data_value
         return Dataset.from_array(
-            arr=fallback.read_array(),
+            # squeeze=True keeps the flat (bands, rows, cols) from_array expects; a
+            # NetCDF through this path would otherwise read the 0.66 layout.
+            arr=fallback.read_array(squeeze=True),
             no_data_value=no_data[0] if isinstance(no_data, (list, tuple)) else no_data,
             geo_ref=GeoReference(geo=fallback.geotransform, epsg=fallback.epsg),
         )

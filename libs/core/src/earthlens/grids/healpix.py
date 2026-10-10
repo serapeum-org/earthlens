@@ -6,8 +6,8 @@ Turning a HEALPix field into a raster only needs one operation: the centre
 longitude/latitude of each pixel. That mapping is the closed-form `pix2ang` from the
 HEALPix paper (Górski et al. 2005); it is implemented here in plain NumPy for both the
 RING and NESTED pixel orderings, so **no HEALPix C library (`healpy`) is required**.
-The pixel centres are then handed to the same scattered-point bridge
-(`pyramids.dataset.ops.interpolate.grid_points`) used by `from_octahedral`. No new
+The pixel centres are then gridded onto a raster with the same array-native bridge
+(`pyramids.dataset.Dataset.from_point_arrays`) used by `from_octahedral`. No new
 third-party dependencies.
 """
 
@@ -16,9 +16,7 @@ from __future__ import annotations
 import math
 
 import numpy as np
-from geopandas import GeoDataFrame, points_from_xy
 from pyramids.dataset import Dataset
-from pyramids.dataset.ops.interpolate import grid_points
 
 # Per-base-face ring/phi offsets for the NESTED -> RING index conversion, matching the
 # canonical HEALPix `xyf2ring` tables (Górski et al. 2005).
@@ -182,8 +180,8 @@ def from_healpix(
             ```
 
     See Also:
-        - `from_octahedral`: the sibling point-based adapter this function delegates to
-          via `grid_points`.
+        - `from_octahedral`: the sibling point-based adapter; both grid their points
+          through `pyramids.dataset.Dataset.from_point_arrays`.
     """
     values = np.asarray(values, dtype=np.float64).ravel()
     npix = values.size
@@ -208,12 +206,6 @@ def from_healpix(
         )
 
     lon, lat = _pix2lonlat(nside, np.arange(npix), nest)
-    gdf = GeoDataFrame(
-        {"z": values},
-        geometry=points_from_xy(lon, lat),
-        crs=epsg,
+    return Dataset.from_point_arrays(
+        lon, lat, values, algorithm=method, cell_size=cell_size, bbox=bbox, epsg=epsg
     )
-    result = grid_points(
-        gdf, "z", Dataset, algorithm=method, cell_size=cell_size, bbox=bbox, epsg=epsg
-    )
-    return result

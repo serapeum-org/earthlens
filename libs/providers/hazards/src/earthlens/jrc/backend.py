@@ -751,8 +751,12 @@ class JRC(AbstractDataSource):
                 # `masked=True` so a field that declares a numeric `_FillValue` comes
                 # back masked; `filled` then turns both that and the cubes' own NaN
                 # gaps into the NaN this writes as no-data.
+                # squeeze=True keeps the flat (bands, rows, cols) the time->band axis
+                # logic below expects; pyramids 0.66 otherwise keeps every dim separate.
                 raw = variable.read_array(
-                    window=[col_off, row_off, win_cols, win_rows], masked=True
+                    window=[col_off, row_off, win_cols, win_rows],
+                    masked=True,
+                    squeeze=True,
                 )
                 # Cast first: filling an integer array with NaN raises, and the
                 # cube's categorical fields (severity flags) are integer-stored.
