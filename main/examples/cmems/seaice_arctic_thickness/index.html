@@ -24915,10 +24915,12 @@ print('dimensions:', nc.dimension_sizes)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>read_array</code> already collapses the single time step, so the thickness comes back
-as a 2-D <code>(rows, columns)</code> masked array — there is no leading time axis to index
-away. The variable is stored unpacked (<code>scale_factor</code> 1, <code>add_offset</code> 0), so the
-values are metres as they are read.</p>
+<p><code>read_array(squeeze=True)</code> collapses the single time step, so the thickness comes
+back as a 2-D <code>(rows, columns)</code> masked array — there is no leading time axis to
+index away. (Since pyramids 0.66, <code>read_array</code> otherwise keeps a size-1
+dimension; <code>squeeze=True</code> restores the flat 2-D read.) The variable is stored
+unpacked (<code>scale_factor</code> 1, <code>add_offset</code> 0), so the values are metres as they
+are read.</p>
 </div>
 </div>
 </div>
@@ -24942,7 +24944,9 @@ values are metres as they are read.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sit_var</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s1">'sea_ice_thickness'</span><span class="p">)</span>
-<span class="n">sit</span> <span class="o">=</span> <span class="n">sit_var</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)</span>
+<span class="c1"># squeeze=True collapses the single time step to a 2-D (rows, cols) read; since</span>
+<span class="c1"># pyramids 0.66 read_array otherwise keeps the size-1 time dimension.</span>
+<span class="n">sit</span> <span class="o">=</span> <span class="n">sit_var</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">squeeze</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'grid </span><span class="si">{</span><span class="n">sit</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> x </span><span class="si">{</span><span class="n">sit</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">, epsg </span><span class="si">{</span><span class="n">sit_var</span><span class="o">.</span><span class="n">epsg</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'valid cells: </span><span class="si">{</span><span class="n">sit</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s1"> of </span><span class="si">{</span><span class="n">sit</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
@@ -24951,7 +24955,9 @@ values are metres as they are read.</p>
 <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7">sit_var = nc.get_variable('sea_ice_thickness')
-sit = sit_var.read_array(masked=True).astype('float64')
+# squeeze=True collapses the single time step to a 2-D (rows, cols) read; since
+# pyramids 0.66 read_array otherwise keeps the size-1 time dimension.
+sit = sit_var.read_array(masked=True, squeeze=True).astype('float64')
 print(f'grid {sit.shape[0]} x {sit.shape[1]}, epsg {sit_var.epsg}')
 print(f'valid cells: {sit.count()} of {sit.size}')
 print(
