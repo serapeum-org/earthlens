@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.27.1 (2026-10-10)
+
+### Fix
+
+- **e2e**: spare a reachable-but-down backend in the masked-lane guard (#1247)
+- **deps**: upgrade to pyramids 0.66 and cleopatra 0.42 (#1244)
+
 ## 0.27.0 (2026-10-08)
 
 ### Feat
