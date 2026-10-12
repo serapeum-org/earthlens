@@ -102,7 +102,7 @@ from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
 from earthlens.gee.reducers import resolve_reducer
-from earthlens.gee.sinks import AssetSink, resolve_sink
+from earthlens.gee.sinks import AssetSink, _BatchSink, resolve_sink
 from earthlens.gee.work import Artifact, DownloadResult, RasterWorkUnit
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -207,8 +207,7 @@ _EEDAI_TILING_RESAMPLE: str = "nearest"
 _METRES_PER_DEGREE: float = 111_320.0
 
 
-#: Accepted `engine` values: which layer materialises the pixels.
-def __getattr__(name: str):
+def __getattr__(name: str) -> frozenset[str]:
     """Keep `_ENGINES` readable as a module attribute.
 
     Args:
@@ -2786,6 +2785,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # `fileNamePrefix`, because each export creates one asset rather than a
         # file with a name prefix.
         sink = self._sink
+        # Only a batch sink reaches here - the caller dispatches on
+        # `sink.is_batch` - so narrow to the subclass that declares the export
+        # method and the target keyword, rather than reading them off the ABC.
+        assert isinstance(sink, _BatchSink)  # the caller guarantees this
         if isinstance(sink, AssetSink):
             # The asset sink addresses `assetId` and takes no `fileNamePrefix`:
             # each export creates one asset rather than a file with a prefix.
