@@ -143,6 +143,7 @@ from earthlens.gee.jobs import (
     wait_for_task_id,
 )
 from earthlens.gee.plans import EedaiPlan, EnginePlan
+from earthlens.gee.reader import EedaiReader
 from earthlens.gee.reducers import (
     REDUCERS,
     Max,
@@ -223,4 +224,5 @@ __all__ = [
     "AssetSink",
     "SINKS",
     "resolve_sink",
+    "EedaiReader",
 ]

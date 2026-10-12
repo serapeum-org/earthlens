@@ -76,7 +76,7 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.gee._eedai import (
-    credentials_for,
+    credentials_for,  # noqa: F401 - monkeypatch seam the test suite patches
     eedai_available,  # noqa: F401 - monkeypatch seam the test suite patches
     import_earthengine_reader,
 )
@@ -99,6 +99,7 @@ from earthlens.gee.grid import (
 )
 from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from earthlens.gee.plans import EedaiPlan, EnginePlan
+from earthlens.gee.reader import EedaiReader
 from earthlens.gee.reducers import resolve_reducer
 from earthlens.gee.sinks import AssetSink, resolve_sink
 
@@ -916,6 +917,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         )
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
         self._eedai_credential: Any = None  # lazily built in `_eedai_credentials`
+        #: The EEDAI adapter, lazily built in `_eedai_reader`.
+        self._eedai_reader_adapter: EedaiReader | None = None
         #: Region reprojections, keyed by target CRS. A large `GeoDataFrame` on
         #: a many-bucket run would otherwise be warped once per bucket per use.
         self._region_cache: dict[str, Any] = {}
@@ -1039,6 +1042,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # Re-authenticating may switch identity, so the reader's cached
         # credential must not outlive the values it was built from.
         self._eedai_credential = None
+        # The adapter holds the credential, so it has to drop with it or a
+        # re-authentication would keep reading as the previous identity.
+        self._eedai_reader_adapter = None
         # LazyClientMixin: first access to `client` runs `_open_client` (auth).
         _ = self.client
         return self
@@ -2231,25 +2237,26 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 surfacing pyramids-eo's own exception type.
             ImportError: If `pyramids-eo` (the `[eedai]` extra) is missing.
         """
-        if self._eedai_credential is not None:
-            return self._eedai_credential
-        _service_account, service_key, _project = self._resolve_credentials()
-        if service_key is None:
-            logger.warning(
-                "No Earth Engine service key resolved for the EEDAI read; falling "
-                "back to Application Default Credentials, which may authenticate "
-                "as a different identity than the Earth Engine half of this "
-                "request. Pass service_key= (or set GEE_SERVICE_KEY) to pin it."
-            )
-        try:
-            self._eedai_credential = credentials_for(service_key)
-        except ImportError:
-            raise
-        except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
-            raise AuthenticationError(
-                f"could not build Earth Engine credentials for the EEDAI read: {exc}"
-            ) from exc
-        return self._eedai_credential
+        return self._eedai_reader().credential
+
+    def _eedai_reader(self) -> EedaiReader:
+        """Return the EEDAI adapter for this request, built once.
+
+        Memoised per instance for the same reason the credential was: building
+        it writes inline key material to a transient temp file, so rebuilding it
+        per bucket would scatter those across a multi-band, multi-date download.
+
+        Returns:
+            The bound :class:`~earthlens.gee.reader.EedaiReader`.
+
+        Raises:
+            AuthenticationError: If the credential cannot be built.
+            ImportError: If `pyramids-eo` (the `[eedai]` extra) is missing.
+        """
+        if self._eedai_reader_adapter is None:
+            _account, service_key, _project = self._resolve_credentials()
+            self._eedai_reader_adapter = EedaiReader.from_service_key(service_key)
+        return self._eedai_reader_adapter
 
     def _eedai_native_fits(
         self,

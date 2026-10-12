@@ -1,0 +1,222 @@
+"""Tests for the `EedaiReader` adapter and the credential hazard it owns."""
+
+from __future__ import annotations
+
+from types import SimpleNamespace
+
+import pytest
+
+from earthlens.gee.auth import AuthenticationError
+from earthlens.gee.reader import EedaiReader
+
+from .test_backend import fake_ee, fake_reader, make_gee  # noqa: F401 - fixtures
+
+
+@pytest.fixture(autouse=True)
+def _clear_in_effect_identity():
+    """Reset the process-wide identity marker between tests."""
+    from earthlens.gee import reader as reader_module
+
+    reader_module._IN_EFFECT["credential"] = None
+    yield
+    reader_module._IN_EFFECT["credential"] = None
+
+
+class _FakeModule:
+    """Stands in for `pyramids_eo.earthengine`, recording the calls it gets."""
+
+    Window = object()
+
+    def __init__(self):
+        self.calls: list[tuple[str, str, dict]] = []
+
+    def _record(self, name):
+        def _call(asset_id, **kwargs):
+            self.calls.append((name, asset_id, kwargs))
+            return f"{name}-result"
+
+        return _call
+
+    def __getattr__(self, item):
+        return self._record(item)
+
+
+def _reader(credential="cred-a"):
+    """An adapter bound to a fake module, so no import or network is needed."""
+    adapter = EedaiReader(credential)
+    adapter._module = _FakeModule()
+    return adapter
+
+
+class TestBinding:
+    """The adapter binds the module and the credential into one object."""
+
+    def test_passes_the_credential_on_every_entry_point(self):
+        """A caller asks for a read rather than threading the credential in."""
+        adapter = _reader("cred-a")
+        adapter.estimate_cost("A/B", start="2020-01-01")
+        adapter.from_earthengine("A/B", bands=["b1"])
+        adapter.collection_from_earthengine("A/B", reducer="mean")
+        for _name, _asset, kwargs in adapter._module.calls:
+            assert kwargs["credentials"] == "cred-a"
+
+    def test_each_entry_point_calls_its_upstream_name(self):
+        """The adapter is a pass-through, not a rename."""
+        adapter = _reader()
+        adapter.estimate_cost("A/B")
+        adapter.from_earthengine("A/B")
+        adapter.collection_from_earthengine("A/B")
+        assert [name for name, _a, _k in adapter._module.calls] == [
+            "estimate_earthengine_cost",
+            "from_earthengine",
+            "collection_from_earthengine",
+        ]
+
+    def test_forwards_the_asset_id_and_the_read_spec(self):
+        """Nothing is dropped on the way through."""
+        adapter = _reader()
+        adapter.from_earthengine(
+            "USGS/SRTMGL1_003", bands=["elevation"], path="out.tif"
+        )
+        name, asset_id, kwargs = adapter._module.calls[0]
+        assert asset_id == "USGS/SRTMGL1_003"
+        assert kwargs["bands"] == ["elevation"]
+        assert kwargs["path"] == "out.tif"
+
+    def test_exposes_the_window_class(self):
+        """Callers build a read spec without importing the reader themselves."""
+        adapter = _reader()
+        assert adapter.Window is _FakeModule.Window
+
+    def test_repr_says_whether_a_credential_is_bound_without_printing_it(self):
+        """Key material must never reach a log line."""
+        assert repr(_reader("secret-key-material")) == "EedaiReader(pinned)"
+        assert repr(_reader(None)) == "EedaiReader(adc)"
+        assert "secret" not in repr(_reader("secret-key-material"))
+
+
+class TestProcessGlobalHazard:
+    """pyramids-eo configures GDAL's EEDAI credentials process-globally."""
+
+    def test_a_concurrent_read_under_another_identity_is_refused(self):
+        """Overlapping reads under two identities would read as whichever won."""
+        from earthlens.gee import reader as reader_module
+
+        reader_module._IN_EFFECT["credential"] = "cred-b"
+        with pytest.raises(AuthenticationError, match="in flight under a different"):
+            _reader("cred-a").from_earthengine("A/B")
+
+    def test_the_refusal_says_what_to_do_instead(self):
+        """It should name the remedy, not just refuse."""
+        from earthlens.gee import reader as reader_module
+
+        reader_module._IN_EFFECT["credential"] = "cred-b"
+        with pytest.raises(AuthenticationError, match="sequentially"):
+            _reader("cred-a").estimate_cost("A/B")
+
+    def test_a_concurrent_read_under_the_same_identity_is_fine(self):
+        """Only a genuine identity conflict is an error."""
+        from earthlens.gee import reader as reader_module
+
+        reader_module._IN_EFFECT["credential"] = "cred-a"
+        assert _reader("cred-a").from_earthengine("A/B") == "from_earthengine-result"
+
+    def test_sequential_reads_under_different_identities_are_fine(self):
+        """The marker is released after each read, so the next may differ."""
+        assert _reader("cred-a").from_earthengine("A/B")
+        assert _reader("cred-b").from_earthengine("A/B")
+
+    def test_the_marker_is_released_even_when_the_read_raises(self):
+        """A failed read must not leave the process wedged to one identity."""
+        from earthlens.gee import reader as reader_module
+
+        adapter = _reader("cred-a")
+
+        def _boom(asset_id, **kwargs):
+            raise RuntimeError("upstream blew up")
+
+        adapter._module.from_earthengine = _boom
+        with pytest.raises(RuntimeError, match="upstream blew up"):
+            adapter.from_earthengine("A/B")
+        assert reader_module._IN_EFFECT["credential"] is None
+
+
+class TestFromServiceKey:
+    """Building the adapter, and the error contract it keeps."""
+
+    def test_warns_when_no_key_resolves(self, monkeypatch):
+        """ADC may be a different identity than the Earth Engine half uses."""
+        from earthlens.gee import backend as backend_module
+        from earthlens.gee import reader as reader_module
+
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            reader_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        monkeypatch.setattr(backend_module, "credentials_for", lambda key: "adc-cred")
+        EedaiReader.from_service_key(None)
+        assert any("Application Default Credentials" in w for w in warnings)
+
+    def test_does_not_warn_when_a_key_resolves(self, monkeypatch):
+        """A pinned identity needs no notice."""
+        from earthlens.gee import backend as backend_module
+        from earthlens.gee import reader as reader_module
+
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            reader_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        monkeypatch.setattr(backend_module, "credentials_for", lambda key: "cred")
+        EedaiReader.from_service_key("key.json")
+        assert warnings == []
+
+    def test_a_build_failure_becomes_an_authentication_error(self, monkeypatch):
+        """The backend's error contract, not pyramids-eo's exception type."""
+        from earthlens.gee import backend as backend_module
+
+        def _boom(key):
+            raise RuntimeError("bad key")
+
+        monkeypatch.setattr(backend_module, "credentials_for", _boom)
+        with pytest.raises(AuthenticationError, match="could not build"):
+            EedaiReader.from_service_key("key.json")
+
+    def test_a_missing_extra_still_raises_importerror(self, monkeypatch):
+        """The install hint must not be swallowed into an auth error."""
+        from earthlens.gee import backend as backend_module
+
+        def _missing(key):
+            raise ImportError("install earthlens[eedai]")
+
+        monkeypatch.setattr(backend_module, "credentials_for", _missing)
+        with pytest.raises(ImportError, match="eedai"):
+            EedaiReader.from_service_key("key.json")
+
+    def test_available_reads_the_backend_seam(self, monkeypatch):
+        """So patching the backend binding still simulates a missing extra."""
+        from earthlens.gee import backend as backend_module
+
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+        assert EedaiReader.available() is False
+
+
+class TestBackendIntegration:
+    """The backend holds one adapter and drops it when the identity may change."""
+
+    def test_the_adapter_is_built_once(self, make_gee, fake_reader):
+        """Rebuilding it per bucket would scatter transient key files."""
+        gee = make_gee()
+        first = gee._eedai_reader()
+        assert gee._eedai_reader() is first
+
+    def test_the_credential_accessor_still_works(self, make_gee, fake_reader):
+        """`_eedai_credentials` is the pre-Epic-1 entry point callers use."""
+        gee = make_gee()
+        assert gee._eedai_credentials() is gee._eedai_reader().credential
+
+    def test_reauthenticating_drops_the_adapter(self, make_gee, fake_reader):
+        """Otherwise a new key would keep reading as the previous identity."""
+        gee = make_gee()
+        first = gee._eedai_reader()
+        gee.authenticate(service_account="other@x.iam", service_key="other.json")
+        assert gee._eedai_reader() is not first

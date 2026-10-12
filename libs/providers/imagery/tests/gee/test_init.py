@@ -57,6 +57,8 @@ _EXPECTED_EXPORTS = {
     "AssetSink",
     "SINKS",
     "resolve_sink",
+    # Epic 1 Task 1.5 - the EEDAI reader adapter.
+    "EedaiReader",
     "GEE",
     "AuthenticationError",
     "CloudMask",
