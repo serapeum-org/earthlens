@@ -888,17 +888,19 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         # Driven by `Sink.required_config`, so a sink declares its own
         # prerequisite instead of this function knowing each one by name.
-        if sink.required_config is not None:
-            if not {
-                "drive_folder": drive_folder,
-                "gcs_bucket": gcs_bucket,
-                "asset_id": asset_id,
-            }.get(sink.required_config):
-                hint = _SINK_PREREQUISITE_HINT.get(sink.required_config, "")
-                raise ValueError(
-                    f"export_via={export_via!r} requires "
-                    f"{sink.required_config}={hint}".rstrip()
-                )
+        prerequisites = {
+            "drive_folder": drive_folder,
+            "gcs_bucket": gcs_bucket,
+            "asset_id": asset_id,
+        }
+        if sink.required_config is not None and not prerequisites.get(
+            sink.required_config
+        ):
+            hint = _SINK_PREREQUISITE_HINT.get(sink.required_config, "")
+            raise ValueError(
+                f"export_via={export_via!r} requires "
+                f"{sink.required_config}={hint}".rstrip()
+            )
         if cloud_mask is not None and not callable(cloud_mask):
             raise TypeError(
                 "cloud_mask must be a callable ee.Image -> ee.Image (or None), "
