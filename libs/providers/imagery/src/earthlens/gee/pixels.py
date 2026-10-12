@@ -107,9 +107,6 @@ class PixelsEngine(Engine):
                 the EEDAI reader, so returning one here would serve a computed
                 request from stored pixels with the computation dropped.
         """
-        # The signature is the ABC's, so the sizing arguments are accepted and
-        # discarded here; `verdict` is the overload that uses them.
-        del band_count, bucket_start, bucket_end
         # Refuse rather than route. `_api` sends every `(True, plan)` to the
         # EEDAI reader - it has no `plan.engine` dispatch, because the reader
         # path is reached before the composited image exists. So returning a
@@ -117,12 +114,20 @@ class PixelsEngine(Engine):
         # that materialises *stored* pixels, silently dropping the very compute
         # this engine exists to serve. Wiring the fetch means threading the
         # image into that branch, which is a change to the download path proper.
+        # The request is quoted back rather than discarded: it is what the
+        # caller asked for, and naming it makes the refusal diagnosable.
+        window = (
+            f" over {bucket_start:%Y-%m-%d} to {bucket_end:%Y-%m-%d}"
+            if bucket_start is not None and bucket_end is not None
+            else ""
+        )
         raise NotImplementedError(
-            "engine='pixels' can size and describe a computePixels request but "
-            "cannot yet fetch one: the backend has no dispatch for it, and "
-            "routing it would silently serve the request from stored pixels "
-            "with any cloud_mask or filters dropped. Use engine='auto' (or "
-            "'ee') until the fetch path lands."
+            f"engine='pixels' can size and describe a computePixels request "
+            f"({var_info.id}, {band_count} band(s){window}) but cannot yet "
+            "fetch one: the backend has no dispatch for it, and routing it "
+            "would silently serve the request from stored pixels with any "
+            "cloud_mask or filters dropped. Use engine='auto' (or 'ee') until "
+            "the fetch path lands."
         )
 
     def verdict(
