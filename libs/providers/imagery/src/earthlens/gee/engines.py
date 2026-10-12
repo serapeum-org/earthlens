@@ -301,10 +301,10 @@ def resolve_engine(spec: str | Engine) -> Engine:
             ```
         - An unknown name names the alternatives:
             ```python
-            >>> resolve_engine("pixels")
+            >>> resolve_engine("telepathy")
             Traceback (most recent call last):
                 ...
-            ValueError: engine must be one of ['auto', 'ee', 'eedai'], got 'pixels'
+            ValueError: engine must be one of [...], got 'telepathy'
 
             ```
     """

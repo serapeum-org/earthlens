@@ -237,7 +237,60 @@ so `auto_split` is unnecessary. What to know before switching:
 - **`cog=True` applies to this path only.** A request served by Earth
   Engine writes a plain GeoTIFF (and logs that it did).
 
-## 5. Via the `EarthLens` facade
+## 5. The object API
+
+Every knob above is a string, and every string still works — that is the contract. Behind them the backend now
+resolves each one to a strategy object, and you can pass the object instead wherever you want something the string
+cannot express.
+
+```python
+from earthlens.gee import GEE, Percentile
+
+# The string form, unchanged.
+GEE(..., reducer="median", engine="auto", export_via="url")
+
+# The object form, for a reducer no name can express.
+GEE(..., reducer=Percentile(q=90))
+
+# Or the parameterised spelling, if you prefer strings.
+GEE(..., reducer="percentile:90")
+```
+
+**Reducers.** `mean`, `median`, `min`, `max`, `mode`, `mosaic` and `sum` dispatch to Earth Engine's convenience
+methods, which preserve band names. `Percentile` has to use `reduce`, which suffixes them, so it renames them back —
+making it interchangeable with the rest. `resolve_reducer` accepts a name, a `percentile:<q>` spec or an instance,
+and resolves once per request, so a bad percentile fails before any bucket exports rather than part-way through.
+
+**Engines.** `engine=` resolves to an `Engine`. `"auto"` prefers the EEDAI reader and falls back to Earth Engine on
+any decline; `"ee"` always uses `getDownloadURL`; `"eedai"` forces the reader and raises if it cannot serve; and
+`"pixels"` fetches through `ee.data.computePixels`, which — unlike the reader — evaluates a computation graph, so it
+serves a request carrying a `cloud_mask` or `filters` without the 32768-px per-axis cap.
+
+**Grids.** `OutputGrid` owns turning the AOI, `crs` and `scale` into a pixel grid, with one constructor per
+convention: `for_metre_grid` sizes for square metres on the ground (the reader's rule, shortening longitude by
+`cos(latitude)`), `for_earth_engine` reads `scale` as a uniform degree-equivalent (Earth Engine's rule), and
+`from_crs_transform` pins the grid origin so stacked dates align without a resample. Away from the equator the first
+two disagree on the column count — that is real, documented, and now visible in one place rather than implied by two
+method families.
+
+**In-memory results.** `materialize=True` returns a `DownloadResult` carrying the pyramids object alongside each
+written path, instead of only the paths:
+
+```python
+result = GEE(..., engine="ee").download(materialize=True)
+result.paths            # the written files, as before
+result.objects          # the in-memory pyramids Datasets
+result == result.paths  # True - it still stands in for the list return
+```
+
+It needs pixels on disk, so it is only meaningful for `export_via="url"`; a batch sink raises rather than handing
+back destinations with no objects.
+
+**Declaring the fill value.** `nodata=` (and `dtype=`) let you state the output's fill value rather than inheriting
+whatever the driver declares — which matters on the EEDAI path, where the driver declares none and a statistical
+reducer therefore folds a scene's fill pixels into the composite.
+
+## 6. Via the `EarthLens` facade
 
 Once the GEE backend is registered in the facade you'll also be able to
 do `EarthLens(data_source="gee", variables={...}, ...).download()`; until
