@@ -113,7 +113,11 @@ class EnginePlan(SummarisedLeaf):
             reason: Why the engine will not serve this request. It reaches the
                 user verbatim in the forced-engine error and the fallback log
                 line, so it should name the dial that would change the answer.
-            engine: Which engine refused.
+                Prefix it with `earthlens.gee.engines.NO_SCENES` when the
+                refusal is about the data rather than the request, which is what
+                lets a forced engine skip the bucket instead of failing.
+            engine: Which engine refused. Defaults to `"eedai"`, the engine that
+                was the only one declining when this type was introduced.
 
         Returns:
             A plan with `can_serve=False`, no tiling, and `tiles=0`.
@@ -130,10 +134,11 @@ class EnginePlan(SummarisedLeaf):
 
         Args:
             tiles: How many units the read is made of — tiles for a streamed
-                single image, scenes for a collection composite.
+                single image, scenes for a collection composite. Defaults to
+                `1`, the single-pass case.
             tile_size: Output pixels per tile side for a streamed read, or `None`
                 for a single pass.
-            engine: Which engine accepted.
+            engine: Which engine accepted. Defaults to `"eedai"`.
 
         Returns:
             A plan with `can_serve=True` and an empty reason.

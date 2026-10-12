@@ -49,6 +49,22 @@ class EedaiReader:
     Attributes:
         credential: The `EarthEngineCredentials` the reader authenticates with,
             or `None` when it falls back to Application Default Credentials.
+
+    Examples:
+        - Constructing one resolves nothing, so it is cheap and needs no extra
+          installed; it reports which identity it will read as:
+            ```python
+            >>> repr(EedaiReader())
+            'EedaiReader(adc)'
+
+            ```
+        - A bound credential never reaches the text, so an adapter is safe to
+          log:
+            ```python
+            >>> repr(EedaiReader(credential="a-secret-looking-object"))
+            'EedaiReader(pinned)'
+
+            ```
     """
 
     def __init__(self, credential: Any = None) -> None:
@@ -92,9 +108,10 @@ class EedaiReader:
                 "as a different identity than the Earth Engine half of this "
                 "request. Pass service_key= (or set GEE_SERVICE_KEY) to pin it."
             )
-        # Read `credentials_for` through the backend module, not by importing it
-        # here: that attribute is the seam the test suite patches, and a direct
-        # import would bypass it. Same reason `eedai_available` is read below.
+        # Read `credentials_for` through the backend module rather than
+        # importing it here: that attribute is the single seam through which the
+        # optional reader's credential helper is resolved, and a direct import
+        # would bypass it. Same reason `eedai_available` is read below.
         from earthlens.gee import backend as backend_module
 
         try:
@@ -139,6 +156,10 @@ class EedaiReader:
 
         Returns:
             `pyramids_eo.earthengine.Window`.
+
+        Raises:
+            ImportError: If `pyramids-eo` is not installed; the message names
+                the extra to install.
         """
         return self.module.Window
 
@@ -198,7 +219,13 @@ class EedaiReader:
             **kwargs: The discovery window, AOI, CRS and any property filter.
 
         Returns:
-            The reader's `ReadCost`.
+            The reader's `ReadCost`, whose `scene_count` is what the sizing
+            verdict is built from.
+
+        Raises:
+            ImportError: If `pyramids-eo` is not installed.
+            AuthenticationError: If another read is in flight under a different
+                service account.
         """
         return self._read("estimate_earthengine_cost", asset_id, **kwargs)
 
@@ -213,6 +240,11 @@ class EedaiReader:
 
         Returns:
             The pyramids `Dataset` the reader built.
+
+        Raises:
+            ImportError: If `pyramids-eo` is not installed.
+            AuthenticationError: If another read is in flight under a different
+                service account.
         """
         return self._read("from_earthengine", asset_id, **kwargs)
 
@@ -225,6 +257,11 @@ class EedaiReader:
 
         Returns:
             The pyramids `DatasetCollection` the reader built.
+
+        Raises:
+            ImportError: If `pyramids-eo` is not installed.
+            AuthenticationError: If another read is in flight under a different
+                service account.
         """
         return self._read("collection_from_earthengine", asset_id, **kwargs)
 

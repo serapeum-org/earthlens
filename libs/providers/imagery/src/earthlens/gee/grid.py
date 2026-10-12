@@ -75,6 +75,23 @@ def same_epsg_code(region_crs: Any, target: str) -> bool:
         `True` only when the target is an `EPSG:` code the region reports as its
         own; `False` for anything unparseable or non-EPSG, since reprojecting is
         the safe answer.
+
+    Examples:
+        - A region reporting the target's own code is already in it:
+            ```python
+            >>> from pyproj import CRS
+            >>> same_epsg_code(CRS.from_epsg(32636), "EPSG:32636")
+            True
+
+            ```
+        - The authority stays part of the comparison, so a target that is not
+          an `EPSG:` code is never matched on its number alone:
+            ```python
+            >>> from pyproj import CRS
+            >>> same_epsg_code(CRS.from_epsg(32636), "+proj=utm +zone=36")
+            False
+
+            ```
     """
     to_epsg = getattr(region_crs, "to_epsg", None)
     if not callable(to_epsg) or not target.upper().startswith("EPSG:"):
@@ -99,8 +116,26 @@ def same_crs(region_crs: Any, target: str) -> bool:
         target: The output CRS, in any form pyproj accepts.
 
     Returns:
-        `True` when the two describe the same CRS; `False` when they differ or
-        either cannot be parsed (in which case reprojecting is the safe answer).
+        `True` when the two describe the same CRS. When either side cannot be
+        parsed the answer falls back to :func:`same_epsg_code`, which says
+        `True` only for an `EPSG:` target the region reports as its own code,
+        and `False` otherwise — so an unresolvable comparison reprojects, which
+        is the safe answer.
+
+    Examples:
+        - Two spellings of one CRS compare equal, which comparing the codes
+          would never manage:
+            ```python
+            >>> same_crs("ESRI:102100", "EPSG:3857")
+            True
+
+            ```
+        - Genuinely different CRSs still differ, so the region is reprojected:
+            ```python
+            >>> same_crs("EPSG:4326", "EPSG:3857")
+            False
+
+            ```
     """
     from pyproj import CRS
 
@@ -123,7 +158,13 @@ def bbox_to_crs(
 
     Returns:
         The envelope in `crs`; the input is returned unchanged when `crs` is
-        already EPSG:4326.
+        already EPSG:4326. An AOI outside the projection's domain comes back
+        with infinite bounds rather than raising, which
+        :func:`projected_grid` then rejects by name.
+
+    Raises:
+        pyproj.exceptions.CRSError: If `crs` is not a CRS pyproj can build a
+            transformer for.
     """
     if crs.upper() == NATIVE_CRS:
         return latlon_bbox
@@ -223,6 +264,23 @@ def projected_grid(
 
     Raises:
         ValueError: If any bound is not finite, or `scale` is not positive.
+
+    Examples:
+        - A 10 km UTM window at 30 m, rounded up on both axes:
+            ```python
+            >>> projected_grid((300000.0, 3300000.0, 310000.0, 3310000.0), 30.0, "EPSG:32636")
+            (334, 334)
+
+            ```
+        - A window outside the projection's domain reprojects to infinities,
+          which are rejected by name rather than overflowing the budget maths:
+            ```python
+            >>> projected_grid((float("inf"), 0.0, 1.0, 1.0), 30.0, "EPSG:32636")
+            Traceback (most recent call last):
+                ...
+            ValueError: the AOI bounds must all be finite, got (inf, 0.0, 1.0, 1.0) in EPSG:32636
+
+            ```
     """
     if not all(math.isfinite(bound) for bound in bbox):
         # `transform_bounds` returns infinities for an AOI outside the
@@ -256,6 +314,43 @@ class OutputGrid(SummarisedLeaf):
         cutline: The region to clip the result to, or `None`. Carried alongside
             the bbox because the reader takes both: the bbox sizes the grid, the
             cutline trims the output to the exact polygon.
+
+    Examples:
+        - A grid reports its shape, its total pixels and the convention that
+          sized it:
+            ```python
+            >>> grid = OutputGrid.for_metre_grid(
+            ...     (31.2, 29.9, 31.3, 30.0), crs="EPSG:4326", scale=90.0
+            ... )
+            >>> grid.as_rows_cols()
+            (124, 108)
+            >>> grid.pixels, grid.longest_axis, grid.convention
+            (13392, 124, 'metre')
+
+            ```
+        - The two conventions disagree on the column count away from the
+          equator, which is exactly what this type makes visible: at 30 deg N a
+          degree of longitude is about 13% shorter than a degree of latitude:
+            ```python
+            >>> bbox = (31.2, 29.9, 31.3, 30.0)
+            >>> OutputGrid.for_metre_grid(bbox, crs="EPSG:4326", scale=90.0).cols
+            108
+            >>> OutputGrid.for_earth_engine(bbox, crs="EPSG:4326", scale=90.0).cols
+            124
+
+            ```
+        - A budget check names the budget it broke, so the message can be
+          handed to the user unchanged:
+            ```python
+            >>> grid = OutputGrid.for_metre_grid(
+            ...     (31.2, 29.9, 31.3, 30.0), crs="EPSG:4326", scale=90.0
+            ... )
+            >>> grid.fits(max_pixels=10_000, max_dimension=4096)
+            (False, 'about 13,392 px on a 108x124 grid, over the 10,000-px budget')
+            >>> grid.fits(max_pixels=1_000_000, max_dimension=4096)
+            (True, '')
+
+            ```
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid", arbitrary_types_allowed=True)
@@ -298,7 +393,11 @@ class OutputGrid(SummarisedLeaf):
             cutline: An optional region to clip to.
 
         Returns:
-            The sized grid.
+            The sized grid, with `convention="metre"`.
+
+        Raises:
+            ValueError: If any bound is not finite, or `scale` is not a positive
+                finite number of metres.
         """
         if crs.upper() == NATIVE_CRS:
             rows, cols = geographic_grid(bbox, scale)
@@ -337,7 +436,16 @@ class OutputGrid(SummarisedLeaf):
             cutline: An optional region to clip to.
 
         Returns:
-            The sized grid.
+            The sized grid, with `convention="degree"`.
+
+        Raises:
+            ValueError: If any bound is not finite, or `scale` is not a positive
+                finite number of metres.
+
+        See Also:
+            OutputGrid.for_metre_grid: The square-metre convention the EEDAI
+                reader sizes with, which disagrees on the column count away
+                from the equator.
         """
         if crs.upper() == NATIVE_CRS:
             if not all(math.isfinite(bound) for bound in bbox):
@@ -386,7 +494,8 @@ class OutputGrid(SummarisedLeaf):
             cutline: An optional region to clip to.
 
         Returns:
-            The grid implied by the transform over `bbox`.
+            The grid implied by the transform over `bbox`, with
+            `convention="transform"` and no `scale`.
 
         Raises:
             ValueError: If the transform is not 6 elements, or its pixel sizes
@@ -422,12 +531,23 @@ class OutputGrid(SummarisedLeaf):
 
     @property
     def pixels(self) -> int:
-        """Total pixels in one band of this grid."""
+        """Total pixels in one band of this grid.
+
+        Returns:
+            `rows * cols`. Multiply by the band count — or call
+            :meth:`band_pixels` — before comparing against a total-pixel
+            budget.
+        """
         return self.rows * self.cols
 
     @property
     def longest_axis(self) -> int:
-        """The larger of `rows` and `cols`, which per-axis caps apply to."""
+        """The larger of `rows` and `cols`, which per-axis caps apply to.
+
+        Returns:
+            The longer side in pixels, the figure Earth Engine's 32768-px
+            per-axis limit is measured against.
+        """
         return max(self.rows, self.cols)
 
     def band_pixels(self, band_count: int) -> int:

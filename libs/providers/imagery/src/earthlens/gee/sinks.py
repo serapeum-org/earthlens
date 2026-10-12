@@ -3,16 +3,16 @@
 `_export_via_batch` branched on `export_via` to pick which
 `ee.batch.Export.image.to*` to call and how to spell the destination, and
 `__init__` separately checked each sink's prerequisite. One sink per object
-instead, so Epic 3's table sink and Epic 6's video sink are new subclasses rather
-than two more branches in the same `if/elif`.
+instead, so a table or a video destination is a new subclass rather than two
+more branches in the same `if/elif`.
 
 Each sink states its own prerequisite through :attr:`Sink.required_config`, which
 is what :class:`~earthlens.gee.configs.ExportConfig`'s validator checks, so the
 requirement lives next to the sink that has it.
 
-As in Task 1.3, the *decision* is here and the *mechanics* are called back into
-the backend, so this is behaviour-identical and the characterisation locks stay
-green.
+As with :mod:`earthlens.gee.engines`, the *decision* is here and the *mechanics*
+are called back into the backend, so resolving a sink changes no observable
+behaviour.
 """
 
 from __future__ import annotations
@@ -40,17 +40,22 @@ class Sink(ABC):
     Deliberately declarative. The mechanics of writing still live on the backend
     (`_export_via_url` / `_export_via_batch`), which now reads *which* export
     method, *which* target keyword and *what* destination from the resolved sink
-    instead of branching on the `export_via` string. A `write()` method belongs
-    here once Task 1.7's `WorkUnit` owns the payload; inventing it now would be a
-    seam nothing calls.
+    instead of branching on the `export_via` string. There is no `write()`
+    method: the payload a sink would write is a
+    :class:`~earthlens.gee.work.WorkUnit`, but the backend still composites and
+    writes it, so a `write()` here would be a seam nothing calls.
 
     Attributes:
         name: The registry key, and the value a user's `export_via=` resolves
             from.
-        required_config: The `ExportConfig` field this sink cannot work without,
-            or `None` when it needs nothing extra.
+        required_config: The field this sink cannot work without, or `None` when
+            it needs nothing extra. Named once and read twice: the
+            `ExportConfig` validator rejects a request that left it unset, and a
+            batch sink reads the value off the backend under the same name when
+            it addresses its destination.
         is_batch: Whether this sink queues an asynchronous Earth Engine task
-            rather than fetching pixels synchronously.
+            rather than fetching pixels synchronously. `True` for every sink but
+            :class:`UrlSink`.
     """
 
     name: ClassVar[str]

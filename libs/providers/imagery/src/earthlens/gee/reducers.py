@@ -77,7 +77,12 @@ class Reducer(ABC):
         """
 
     def __repr__(self) -> str:
-        """Return the reducer's registry name, so plans and logs read cleanly."""
+        """Return `ClassName()`, so plans and log lines read cleanly.
+
+        Returns:
+            The class name with empty parentheses, e.g. `Median()`. A
+            parameterised reducer overrides this to show its parameter.
+        """
         return f"{type(self).__name__}()"
 
 
@@ -228,8 +233,10 @@ def resolve_reducer(spec: str | Reducer) -> Reducer:
         The resolved `Reducer`.
 
     Raises:
-        ValueError: If the name is unknown, or a parameterised spec's argument is
-            not a number in range.
+        ValueError: If the name is unknown; if `"percentile"` is given without
+            its argument, or with one that is not a number between 0 and 100; or
+            if a reducer that takes no argument is given one
+            (`"median:3"`). The message names the alternatives.
         TypeError: If `spec` is neither a string nor a `Reducer`.
 
     Examples:
