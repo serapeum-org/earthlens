@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 import time
 from collections.abc import Callable
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from tqdm import tqdm
 
@@ -47,7 +47,7 @@ def _collection_reducer_names() -> frozenset[str]:
     return frozenset(REDUCERS)
 
 
-def __getattr__(name: str):
+def __getattr__(name: str) -> frozenset[str]:
     """Keep `_COLLECTION_REDUCERS` readable as a module attribute.
 
     Args:
@@ -99,7 +99,7 @@ def slug_asset_id(asset_id: str) -> str:
     return safe_filename(asset_id)
 
 
-def reduce_collection(collection, reducer: str):
+def reduce_collection(collection: Any, reducer: str) -> Any:
     """Collapse an `ee.ImageCollection` to a single `ee.Image` by name.
 
     Dispatches to the matching convenience method on the collection

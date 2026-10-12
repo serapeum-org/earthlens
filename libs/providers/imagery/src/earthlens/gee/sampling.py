@@ -52,7 +52,7 @@ def _reducer_whitelist() -> frozenset[str]:
     return frozenset(REDUCERS) | _REGION_ONLY_REDUCERS
 
 
-def __getattr__(name: str):
+def __getattr__(name: str) -> frozenset[str]:
     """Keep `_REDUCER_WHITELIST` readable as a module attribute.
 
     Args:
