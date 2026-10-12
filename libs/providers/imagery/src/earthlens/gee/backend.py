@@ -193,8 +193,41 @@ _EEDAI_TILING_RESAMPLE: str = "nearest"
 #: longitude is scaled by `cos(latitude)` at the AOI's mid-latitude.
 _METRES_PER_DEGREE: float = 111_320.0
 
+
 #: Accepted `engine` values: which layer materialises the pixels.
-_ENGINES: frozenset[str] = frozenset({"auto", "ee", "eedai"})
+def __getattr__(name: str):
+    """Keep `_ENGINES` readable as a module attribute.
+
+    Args:
+        name: The attribute being looked up.
+
+    Returns:
+        The derived engine-name set for `_ENGINES`.
+
+    Raises:
+        AttributeError: For any other name.
+    """
+    if name == "_ENGINES":
+        return _engine_names()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def _engine_names() -> frozenset[str]:
+    """Return the engine names `engine=` accepts, from the one registry.
+
+    Derived from `earthlens.gee.engines.ENGINES` rather than restated, so
+    registering an engine is enough to make it selectable - which is what Task
+    1.13's `PixelsEngine` relies on.
+
+    Returns:
+        Every registered engine name.
+    """
+    from earthlens.gee import pixels  # noqa: F401 - registers PixelsEngine
+    from earthlens.gee.engines import ENGINES
+
+    return frozenset(ENGINES)
+
+
 _ZIP_MAGIC: bytes = b"PK\x03\x04"
 
 #: A per-image cloud/quality mask — `ee.Image -> ee.Image` — `.map`-applied
@@ -814,6 +847,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         resample: str = "nearest",
         property_filter: str | None = None,
         materialize: bool = False,
+        nodata: float | int | None = None,
+        dtype: str | None = None,
     ):
         # Validate the cheap (no-I/O) config first so user typos surface
         # before the ~3.3 s cold-cache catalog parse below.
@@ -839,9 +874,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"got {type(cloud_mask).__name__}"
             )
         collection_filters = _validate_filters(filters)
-        if engine not in _ENGINES:
+        if engine not in _engine_names():
             raise ValueError(
-                f"engine must be one of {sorted(_ENGINES)}, got {engine!r}"
+                f"engine must be one of {sorted(_engine_names())}, got {engine!r}"
             )
         _validate_pure_config(start, end, temporal_resolution, fmt)
 
@@ -907,6 +942,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             auto_split=bool(auto_split),
             http_timeout=self.http_timeout,
             wait_for_export=bool(wait_for_export),
+            materialize=bool(materialize),
+            nodata=nodata,
+            dtype=dtype,
         )
         self._engine_config = EngineConfig(
             engine=engine,

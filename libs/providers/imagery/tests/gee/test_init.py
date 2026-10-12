@@ -65,6 +65,9 @@ _EXPECTED_EXPORTS = {
     "FeatureWorkUnit",
     "Artifact",
     "DownloadResult",
+    # Epic 1 Task 1.13 - the computePixels engine.
+    "PixelsEngine",
+    "HIGH_VOLUME_ENDPOINT",
     "GEE",
     "AuthenticationError",
     "CloudMask",

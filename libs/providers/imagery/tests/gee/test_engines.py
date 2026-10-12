@@ -32,9 +32,15 @@ def _gee(make_gee, **overrides):
 class TestRegistry:
     """What `engine=` resolves to."""
 
-    def test_the_three_shipped_engines_are_registered(self):
-        """The vocabulary the constructor validates against."""
-        assert set(ENGINES) == {"auto", "ee", "eedai"}
+    def test_the_shipped_engines_are_registered(self):
+        """The vocabulary the constructor validates against.
+
+        `pixels` registers itself on import (Task 1.13), which is the mechanism
+        that makes a new engine selectable without a backend edit.
+        """
+        from earthlens.gee import pixels  # noqa: F401 - registers PixelsEngine
+
+        assert set(ENGINES) == {"auto", "ee", "eedai", "pixels"}
 
     @pytest.mark.parametrize(
         ("name", "cls"),
@@ -58,7 +64,7 @@ class TestRegistry:
     def test_an_unknown_name_lists_the_alternatives(self):
         """The error names what is available."""
         with pytest.raises(ValueError, match=r"engine must be one of"):
-            resolve_engine("pixels")
+            resolve_engine("telepathy")
 
     def test_a_non_string_is_a_type_error(self):
         """A stray object fails loudly rather than being coerced."""

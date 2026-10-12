@@ -142,6 +142,7 @@ from earthlens.gee.jobs import (
     resolve_destination,
     wait_for_task_id,
 )
+from earthlens.gee.pixels import HIGH_VOLUME_ENDPOINT, PixelsEngine
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
 from earthlens.gee.reducers import (
@@ -237,4 +238,6 @@ __all__ = [
     "FeatureWorkUnit",
     "Artifact",
     "DownloadResult",
+    "PixelsEngine",
+    "HIGH_VOLUME_ENDPOINT",
 ]
