@@ -167,6 +167,13 @@ from earthlens.gee.sinks import (
     UrlSink,
     resolve_sink,
 )
+from earthlens.gee.work import (
+    Artifact,
+    DownloadResult,
+    FeatureWorkUnit,
+    RasterWorkUnit,
+    WorkUnit,
+)
 
 __all__ = [
     "GEE",
@@ -225,4 +232,9 @@ __all__ = [
     "SINKS",
     "resolve_sink",
     "EedaiReader",
+    "WorkUnit",
+    "RasterWorkUnit",
+    "FeatureWorkUnit",
+    "Artifact",
+    "DownloadResult",
 ]

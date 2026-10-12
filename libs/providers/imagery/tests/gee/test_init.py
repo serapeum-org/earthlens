@@ -59,6 +59,12 @@ _EXPECTED_EXPORTS = {
     "resolve_sink",
     # Epic 1 Task 1.5 - the EEDAI reader adapter.
     "EedaiReader",
+    # Epic 1 Tasks 1.7/1.8 - the payload and return types.
+    "WorkUnit",
+    "RasterWorkUnit",
+    "FeatureWorkUnit",
+    "Artifact",
+    "DownloadResult",
     "GEE",
     "AuthenticationError",
     "CloudMask",

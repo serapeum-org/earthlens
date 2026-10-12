@@ -102,6 +102,7 @@ from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
 from earthlens.gee.reducers import resolve_reducer
 from earthlens.gee.sinks import AssetSink, resolve_sink
+from earthlens.gee.work import Artifact, DownloadResult, RasterWorkUnit
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
@@ -812,6 +813,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         cog: bool = False,
         resample: str = "nearest",
         property_filter: str | None = None,
+        materialize: bool = False,
     ):
         # Validate the cheap (no-I/O) config first so user typos surface
         # before the ~3.3 s cold-cache catalog parse below.
@@ -893,6 +895,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self._engine = resolve_engine(engine)
         #: The resolved destination; `export_via=` is validated above.
         self._sink = resolve_sink(export_via)
+        #: Return in-memory pyramids objects from `download()` as well as paths.
+        self.materialize = bool(materialize)
         self._export_config = ExportConfig(
             export_via=export_via,
             drive_folder=drive_folder,
@@ -1165,7 +1169,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             dates=dates,
         )
 
-    def download(self, progress_bar: bool = True) -> list[Path | str | TaskInfo]:
+    def download(
+        self, progress_bar: bool = True, *, materialize: bool | None = None
+    ) -> list[Path | str | TaskInfo] | DownloadResult:
         """Download every requested band-set of every requested dataset.
 
         Args:
@@ -1246,7 +1252,57 @@ class GEE(LazyClientMixin, AbstractDataSource):
         )  # GEE always uses the {asset_id: [band]} form
         for asset_id, bands in self.vars.items():
             outputs.extend(self._download_dataset(asset_id, list(bands), progress_bar))
-        return outputs
+        written = outputs
+        if not (self.materialize if materialize is None else materialize):
+            return written
+        return self._materialise(written)
+
+    def _materialise(self, written: list[Any]) -> DownloadResult:
+        """Read each written raster back as an in-memory pyramids object.
+
+        Deliberately a read-back rather than handing over the `Dataset` the
+        EEDAI path already built. That path closes the dataset, drops the last
+        reference and renames the file in a carefully ordered `finally` — on
+        Windows a lingering GDAL handle keeps the file locked and the rename
+        fails. Returning the live object means not closing it, which would have
+        to reorder that block; the round-trip costs one re-open per bucket and
+        touches none of it. Handing back the live object is a worthwhile
+        follow-up, not something to bolt on here.
+
+        Args:
+            written: What the sinks returned — paths, destinations or tasks.
+
+        Returns:
+            A :class:`~earthlens.gee.work.DownloadResult` carrying one artifact
+            per bucket, with `obj` set for every entry that wrote a file.
+
+        Raises:
+            ValueError: If no entry wrote a file, which is every batch sink:
+                there is nothing local to read back, so asking to materialise a
+                queued export is a mistake worth naming.
+        """
+        if not any(isinstance(entry, Path) for entry in written):
+            raise ValueError(
+                f"materialize=True needs pixels on disk, but export_via="
+                f"{self.export_via!r} queues the work remotely and returns a "
+                "destination. Use export_via='url', or pull the result from the "
+                "destination yourself."
+            )
+        artifacts: list[Artifact] = []
+        for entry in written:
+            if isinstance(entry, Path):
+                artifacts.append(
+                    Artifact(
+                        kind=self.OUTPUT_KIND,
+                        path=entry,
+                        obj=PyramidsDataset.read_file(entry),
+                    )
+                )
+            elif isinstance(entry, str):
+                artifacts.append(Artifact(kind=self.OUTPUT_KIND, destination=entry))
+            else:
+                artifacts.append(Artifact(kind=self.OUTPUT_KIND, task=entry))
+        return DownloadResult(artifacts=tuple(artifacts))
 
     def _download_dataset(
         self, asset_id: str, bands: list[str], progress_bar: bool = True
@@ -1292,8 +1348,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
         if progress_bar:
             iterator = tqdm(buckets, desc=f"{asset_id} [{','.join(bands)}]", unit="img")
         return [
-            self._api(image, var_info, bands, when, bucket_start, bucket_end)
-            for when, image, bucket_start, bucket_end in iterator
+            self._api(
+                unit.payload,
+                var_info,
+                bands,
+                unit.when,
+                unit.bucket_start,
+                unit.bucket_end,
+            )
+            for unit in iterator
         ]
 
     def _build_collection(
@@ -1387,7 +1450,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # so a typo fails before any bucket is exported.
         reducer = resolve_reducer(self.reducer or var_info.default_reducer)
         if self.temporal_resolution == "raw" or not var_info.is_image_collection:
-            yield start, reducer(collection), start, end
+            yield RasterWorkUnit(reducer(collection), start, start, end)
             return
         freq = _RESOLUTION_FREQ[self.temporal_resolution]
         bucket_starts = date_windows(start, end, freq, inclusive="left")
@@ -1400,9 +1463,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             window = collection.filterDate(
                 bucket_start.strftime("%Y-%m-%d"), bucket_end.strftime("%Y-%m-%d")
             )
-            yield (
-                bucket_start.to_pydatetime(),
+            yield RasterWorkUnit(
                 reducer(window),
+                bucket_start.to_pydatetime(),
                 bucket_start.to_pydatetime(),
                 bucket_end.to_pydatetime(),
             )
