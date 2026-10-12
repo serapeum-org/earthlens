@@ -181,7 +181,8 @@ class TestDownloadContract:
         ):
             assert isinstance(when, dt.datetime)
             assert image is not None
-            assert isinstance(start, dt.datetime) and isinstance(end, dt.datetime)
+            assert isinstance(start, dt.datetime)
+            assert isinstance(end, dt.datetime)
 
     def test_use_eedai_still_returns_the_pair(self, make_gee, fake_reader):
         """`(use_reader, plan)` — the shape the characterisation suite pinned."""
@@ -215,7 +216,8 @@ class TestRoundOneFixesStayFixed:
         plan = gee._eedai_collection_fits(
             var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
         )
-        assert plan is not None and not plan.can_serve
+        assert plan is not None
+        assert not plan.can_serve
         assert "vocabulary" in plan.reason
 
     def test_the_decline_never_reaches_the_reader(self, make_gee, fake_reader):

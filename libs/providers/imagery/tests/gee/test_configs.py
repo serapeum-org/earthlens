@@ -110,7 +110,8 @@ class TestExportConfigValues:
     def test_summary_reads_as_one_line(self):
         """It appears in logs, so it must stay readable."""
         text = str(ExportConfig(export_via="drive", drive_folder="f"))
-        assert text.startswith("ExportConfig(") and "drive" in text
+        assert text.startswith("ExportConfig(")
+        assert "drive" in text
 
 
 class TestEngineConfig:

@@ -80,7 +80,8 @@ class TestGeographicGrid:
     def test_clamps_at_the_pole(self):
         """`cos` reaches zero at 90 degrees, which would divide by zero."""
         rows, cols = geographic_grid((0.0, 89.5, 1.0, 90.0), 1000.0)
-        assert rows >= 1 and cols >= 1
+        assert rows >= 1
+        assert cols >= 1
 
 
 class TestProjectedGrid:
@@ -307,7 +308,8 @@ class TestValueSemantics:
         grid = OutputGrid.for_metre_grid(CAIRO, crs=NATIVE_CRS, scale=90.0)
         text = str(grid)
         assert text.startswith("OutputGrid(")
-        assert "EPSG:4326" in text and "metre" in text
+        assert "EPSG:4326" in text
+        assert "metre" in text
 
     @pytest.mark.parametrize("crs", ["epsg:4326", "EPSG:4326"])
     def test_the_crs_dispatch_is_case_insensitive(self, crs):

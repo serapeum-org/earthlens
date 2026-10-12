@@ -68,15 +68,17 @@ class TestItRefusesRatherThanMisroute:
         """And the message names the engine to use instead."""
         gee = _gee(make_gee, engine="pixels")
         var_info = gee.catalog.get_dataset(ASSET)
+        engine = PixelsEngine()
         with pytest.raises(NotImplementedError, match="cannot yet fetch"):
-            PixelsEngine().plan(gee, var_info, 1)
+            engine.plan(gee, var_info, 1)
 
     def test_the_refusal_names_the_alternative(self, make_gee, fake_reader):
         """A refusal should say what to do, not just decline."""
         gee = _gee(make_gee, engine="pixels")
         var_info = gee.catalog.get_dataset(ASSET)
+        engine = PixelsEngine()
         with pytest.raises(NotImplementedError, match="engine='auto'"):
-            PixelsEngine().plan(gee, var_info, 1)
+            engine.plan(gee, var_info, 1)
 
     def test_a_masked_request_is_not_served_from_stored_pixels(
         self, make_gee, fake_reader
@@ -84,8 +86,9 @@ class TestItRefusesRatherThanMisroute:
         """The specific data-correctness hole: compute must not be dropped."""
         gee = _gee(make_gee, engine="pixels", cloud_mask=lambda image: image)
         var_info = gee.catalog.get_dataset(ASSET)
+        engine = PixelsEngine()
         with pytest.raises(NotImplementedError):
-            PixelsEngine().plan(gee, var_info, 1)
+            engine.plan(gee, var_info, 1)
 
 
 class TestCapability:
@@ -97,7 +100,8 @@ class TestCapability:
         var_info = gee.catalog.get_dataset(ASSET)
         use_engine, plan = PixelsEngine().verdict(gee, var_info, 1)
         assert use_engine is True
-        assert plan is not None and plan.can_serve
+        assert plan is not None
+        assert plan.can_serve
 
     def test_it_would_serve_a_request_with_filters(self, make_gee, fake_reader):
         """The other half of the EEDAI eligibility gate it does not share."""
@@ -113,8 +117,9 @@ class TestCapability:
 
         gee = _gee(make_gee, engine="eedai", cloud_mask=lambda image: image)
         var_info = gee.catalog.get_dataset(ASSET)
+        engine = EedaiEngine()
         with pytest.raises(ValueError, match="cannot serve"):
-            EedaiEngine().plan(gee, var_info, 1)
+            engine.plan(gee, var_info, 1)
 
     def test_the_plan_names_this_engine(self, make_gee, fake_reader):
         """A plan says which engine produced it, which is why 1.6 added the field."""
@@ -225,7 +230,8 @@ class TestGridAndRequest:
         gee = _gee(make_gee, engine="pixels", scale=None)
         var_info = gee.catalog.get_dataset(ASSET)
         use_engine, plan = PixelsEngine().verdict(gee, var_info, 1)
-        assert use_engine is True and plan is not None
+        assert use_engine is True
+        assert plan is not None
         native = PixelsEngine().grid_for(gee, float(var_info.spatial_resolution))
         assert plan.tiles == native.tiles(2048)
 

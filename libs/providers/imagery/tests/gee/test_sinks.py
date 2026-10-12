@@ -127,8 +127,9 @@ class TestDestinations:
     def test_the_synchronous_sink_has_no_uri(self, make_gee):
         """It returns a path, so asking for a destination is a caller error."""
         gee = make_gee()
+        sink = UrlSink()
         with pytest.raises(NotImplementedError, match="writes a path"):
-            UrlSink().destination(gee, self.PREFIX)
+            sink.destination(gee, self.PREFIX)
 
 
 class TestTargetKeywords:

@@ -102,7 +102,7 @@ class TestBinding:
     def test_exposes_the_window_class(self):
         """Callers build a read spec without importing the reader themselves."""
         adapter = _reader()
-        assert adapter.Window is _FakeModule.Window
+        assert adapter.window_type is _FakeModule.Window
 
     def test_the_module_is_imported_once_and_then_cached(self, monkeypatch):
         """Re-importing per call is what the adapter exists to stop."""
@@ -126,7 +126,7 @@ class TestBinding:
 
         module = _FakeModule()
         monkeypatch.setattr(reader_module, "import_earthengine_reader", lambda: module)
-        assert EedaiReader("cred-a").Window is _FakeModule.Window
+        assert EedaiReader("cred-a").window_type is _FakeModule.Window
 
     def test_a_read_resolves_the_module_through_the_lazy_import(self, monkeypatch):
         """Nothing has to pre-set the module for a read to work."""
@@ -153,16 +153,18 @@ class TestProcessGlobalHazard:
         from earthlens.gee import reader as reader_module
 
         reader_module._IN_EFFECT["credential"] = "cred-b"
+        adapter = _reader("cred-a")
         with pytest.raises(AuthenticationError, match="in flight under a different"):
-            _reader("cred-a").from_earthengine("A/B")
+            adapter.from_earthengine("A/B")
 
     def test_the_refusal_says_what_to_do_instead(self):
         """It should name the remedy, not just refuse."""
         from earthlens.gee import reader as reader_module
 
         reader_module._IN_EFFECT["credential"] = "cred-b"
+        adapter = _reader("cred-a")
         with pytest.raises(AuthenticationError, match="sequentially"):
-            _reader("cred-a").estimate_cost("A/B")
+            adapter.estimate_cost("A/B")
 
     def test_a_concurrent_read_under_the_same_identity_is_fine(self):
         """Only a genuine identity conflict is an error."""

@@ -107,6 +107,9 @@ class PixelsEngine(Engine):
                 the EEDAI reader, so returning one here would serve a computed
                 request from stored pixels with the computation dropped.
         """
+        # The signature is the ABC's, so the sizing arguments are accepted and
+        # discarded here; `verdict` is the overload that uses them.
+        del band_count, bucket_start, bucket_end
         # Refuse rather than route. `_api` sends every `(True, plan)` to the
         # EEDAI reader - it has no `plan.engine` dispatch, because the reader
         # path is reached before the composited image exists. So returning a

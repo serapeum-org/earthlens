@@ -97,7 +97,8 @@ class TestTupleCompatibility:
     def test_indexes_as_the_old_tuple(self):
         """Positional access keeps working too."""
         unit = RasterWorkUnit("img", WHEN, WHEN, END)
-        assert unit[0] == WHEN and unit[1] == "img"
+        assert unit[0] == WHEN
+        assert unit[1] == "img"
 
     def test_reports_the_tuple_length(self):
         """So `len()` on it is not surprising."""
@@ -118,7 +119,8 @@ class TestTupleCompatibility:
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         collection = gee._build_collection(var_info, ["elevation"], WHEN, END)
         units = list(gee._composite(collection, var_info, WHEN, END))
-        assert units and all(isinstance(u, RasterWorkUnit) for u in units)
+        assert units
+        assert all(isinstance(u, RasterWorkUnit) for u in units)
 
 
 class TestArtifact:
@@ -170,7 +172,8 @@ class TestArtifact:
     def test_summary_reads_as_one_line(self):
         """Artifacts appear in log lines, so they must stay readable."""
         text = str(Artifact(when=WHEN, path=Path("out.tif")))
-        assert text.startswith("Artifact(") and "out.tif" in text
+        assert text.startswith("Artifact(")
+        assert "out.tif" in text
 
 
 class TestDownloadResult:
@@ -200,7 +203,9 @@ class TestDownloadResult:
 
     def test_compares_equal_to_a_peer(self):
         """Value semantics between two results."""
-        assert self._result() == self._result()
+        first = self._result()
+        second = self._result()
+        assert first == second
 
     def test_is_not_equal_to_an_unrelated_type(self):
         """Comparison against something else is simply false, not an error."""
@@ -235,11 +240,14 @@ class TestDownloadResult:
         assert list(empty) == []
         assert len(empty) == 0
         assert empty == []
-        assert empty.paths == [] and empty.objects == []
+        assert empty.paths == []
+        assert empty.objects == []
 
     def test_an_empty_result_is_hashable(self):
         """`__eq__` is overridden, so `__hash__` has to be supplied with it."""
-        assert hash(DownloadResult()) == hash(DownloadResult())
+        default = DownloadResult()
+        explicit = DownloadResult(artifacts=())
+        assert hash(default) == hash(explicit)
 
     def test_an_out_of_range_index_raises(self):
         """Indexing behaves like the list it replaced, including on overflow."""
@@ -264,7 +272,8 @@ class TestMaterializeThroughDownload:
         """Opt in and the objects come back alongside the paths."""
         result = make_gee(engine="ee").download(progress_bar=False, materialize=True)
         assert isinstance(result, DownloadResult)
-        assert result.paths and result.objects
+        assert result.paths
+        assert result.objects
 
     def test_the_constructor_flag_has_the_same_effect(self, make_gee):
         """`GEE(materialize=True)` is equivalent to passing it per call."""
@@ -313,7 +322,8 @@ class TestClosingAMaterialisedResult:
         """One open handle per bucket, all released together."""
         first, second = _Handle(), _Handle()
         self._result(first, second).close()
-        assert first.closed and second.closed
+        assert first.closed
+        assert second.closed
 
     def test_close_is_idempotent(self):
         """Calling it twice must not raise."""

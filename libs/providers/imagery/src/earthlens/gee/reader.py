@@ -163,11 +163,12 @@ class EedaiReader:
         return self._module
 
     @property
-    def Window(self) -> Any:  # noqa: N802 - mirrors the upstream class name
+    def window_type(self) -> Any:  # noqa: N802 - mirrors the upstream class name
         """Return the reader's `Window` class, for building a read spec.
 
         Returns:
-            `pyramids_eo.earthengine.Window`.
+            The `pyramids_eo.earthengine.Window` class itself, not an
+            instance — call it to build a read window.
 
         Raises:
             ImportError: If `pyramids-eo` is not installed; the message names

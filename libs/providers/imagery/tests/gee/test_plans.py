@@ -72,7 +72,10 @@ class TestValueSemantics:
 
     def test_equal_plans_compare_equal(self):
         """Value semantics, so two identical verdicts are interchangeable."""
-        assert EnginePlan.serves(tiles=2) == EnginePlan.serves(tiles=2)
+        spelled_out = EnginePlan(
+            engine="eedai", can_serve=True, tile_size=None, tiles=2, reason=""
+        )
+        assert EnginePlan.serves(tiles=2) == spelled_out
 
     def test_fields_are_addressable_by_name(self):
         """What the characterisation suite pinned before the promotion."""

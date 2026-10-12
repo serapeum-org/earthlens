@@ -165,21 +165,24 @@ class TestEedaiEngine:
         var_info = gee.catalog.get_dataset(ASSET)
         use_reader, plan = EedaiEngine().plan(gee, var_info, 1)
         assert use_reader is True
-        assert plan is not None and plan.can_serve
+        assert plan is not None
+        assert plan.can_serve
 
     def test_raises_on_an_ineligible_request(self, make_gee, fake_reader):
         """A `cloud_mask` needs compute the reader cannot run."""
         gee = _gee(make_gee, engine="eedai", cloud_mask=lambda image: image)
         var_info = gee.catalog.get_dataset(ASSET)
+        engine = EedaiEngine()
         with pytest.raises(ValueError, match="cannot serve"):
-            EedaiEngine().plan(gee, var_info, 1)
+            engine.plan(gee, var_info, 1)
 
     def test_the_ineligible_message_names_the_remedy(self, make_gee, fake_reader):
         """It should point at `engine='auto'` or `'ee'`, not just refuse."""
         gee = _gee(make_gee, engine="eedai", cloud_mask=lambda image: image)
         var_info = gee.catalog.get_dataset(ASSET)
+        engine = EedaiEngine()
         with pytest.raises(ValueError, match="engine='auto'"):
-            EedaiEngine().plan(gee, var_info, 1)
+            engine.plan(gee, var_info, 1)
 
     def test_an_empty_bucket_falls_through_rather_than_raising(
         self, make_gee, fake_reader
@@ -210,7 +213,8 @@ class TestAutoEngine:
         gee = _gee(make_gee, engine="auto")
         var_info = gee.catalog.get_dataset(ASSET)
         use_reader, plan = AutoEngine().plan(gee, var_info, 1)
-        assert use_reader is True and plan is not None
+        assert use_reader is True
+        assert plan is not None
 
     def test_falls_back_when_ineligible(self, make_gee, fake_reader):
         """A `cloud_mask` declines quietly instead of raising."""

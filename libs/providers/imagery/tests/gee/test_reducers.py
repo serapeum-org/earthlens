@@ -178,8 +178,10 @@ class TestPercentile:
 
     def test_two_equal_percentiles_are_interchangeable(self):
         """Frozen value semantics, so one can be cached or put in a set."""
-        assert Percentile(q=90) == Percentile(q=90)
-        assert len({Percentile(q=90), Percentile(q=90)}) == 1
+        from_int = Percentile(q=90)
+        from_float = Percentile(q=90.0)
+        assert from_int == from_float
+        assert len({from_int, from_float}) == 1
 
     def test_a_different_percentile_is_not_equal(self):
         """`q` is what distinguishes two instances."""
@@ -270,8 +272,9 @@ class TestBackCompatShim:
         """The old error contract is preserved."""
         from earthlens.gee._helpers import reduce_collection
 
+        collection = _FakeCollection()
         with pytest.raises(ValueError, match="unsupported reducer"):
-            reduce_collection(_FakeCollection(), "average")
+            reduce_collection(collection, "average")
 
     def test_shim_now_also_accepts_a_percentile_spec(self, fake_ee_reducer):
         """Delegating to the registry widens the shim at no cost."""

@@ -126,7 +126,8 @@ class TestBatchSinks:
         assert kwargs["crs"] == "EPSG:4326"
         assert kwargs["maxPixels"] == 1e13
         assert len(kwargs["description"]) <= 100
-        assert "image" in kwargs and "region" in kwargs
+        assert "image" in kwargs
+        assert "region" in kwargs
 
     def test_wait_false_returns_taskinfo(self, make_gee):
         """`wait_for_export=False` submits and returns a `TaskInfo`, not a string."""
