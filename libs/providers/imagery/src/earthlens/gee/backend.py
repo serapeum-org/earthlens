@@ -100,6 +100,7 @@ from earthlens.gee.grid import (
 from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reducers import resolve_reducer
+from earthlens.gee.sinks import AssetSink, resolve_sink
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
@@ -889,6 +890,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # Resolved once: `engine=` is validated above, and the object replaces
         # the `if/elif` that used to re-read the string at every decision.
         self._engine = resolve_engine(engine)
+        #: The resolved destination; `export_via=` is validated above.
+        self._sink = resolve_sink(export_via)
         self._export_config = ExportConfig(
             export_via=export_via,
             drive_folder=drive_folder,
@@ -2595,25 +2598,20 @@ class GEE(LazyClientMixin, AbstractDataSource):
             "crs": self.crs,
             "maxPixels": 1e13,
         }
-        if self.export_via == "drive":
-            task = ee.batch.Export.image.toDrive(
-                folder=self.drive_folder, fileNamePrefix=prefix, **common
-            )
-            destination = f"drive://{self.drive_folder}/{prefix}"
-        elif self.export_via == "gcs":
-            task = ee.batch.Export.image.toCloudStorage(
-                bucket=self.gcs_bucket, fileNamePrefix=prefix, **common
-            )
-            destination = f"gs://{self.gcs_bucket}/{prefix}"
+        # Which constructor, which target keyword and how the destination reads
+        # are the sink's business, so they are read off the resolved sink rather
+        # than branched on here. The asset sink addresses `assetId` and takes no
+        # `fileNamePrefix`, because each export creates one asset rather than a
+        # file with a name prefix.
+        sink = self._sink
+        if isinstance(sink, AssetSink):
+            # The asset sink addresses `assetId` and takes no `fileNamePrefix`:
+            # each export creates one asset rather than a file with a prefix.
+            target: dict[str, str] = sink.target(self, prefix)
         else:
-            # The asset sink uses `assetId` instead of `fileNamePrefix` —
-            # each export creates one asset at `<self.asset_id>/<prefix>`.
-            assert (
-                self.asset_id is not None
-            )  # constructor requires it for export_via='asset'
-            target_asset = f"{self.asset_id.rstrip('/')}/{prefix}"
-            task = ee.batch.Export.image.toAsset(assetId=target_asset, **common)
-            destination = f"ee://{target_asset}"
+            target = {**sink.target(self), "fileNamePrefix": prefix}
+        task = getattr(ee.batch.Export.image, sink.export_method)(**target, **common)
+        destination = sink.destination(self, prefix)
         if not self.wait_for_export:
             task.start()
             info = _op_to_taskinfo(task.status())

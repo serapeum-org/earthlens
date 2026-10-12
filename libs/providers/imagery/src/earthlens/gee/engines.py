@@ -305,6 +305,7 @@ def resolve_engine(spec: str | Engine) -> Engine:
             Traceback (most recent call last):
                 ...
             ValueError: engine must be one of ['auto', 'ee', 'eedai'], got 'pixels'
+
             ```
     """
     if isinstance(spec, Engine):

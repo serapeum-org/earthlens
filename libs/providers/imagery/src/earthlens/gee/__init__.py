@@ -157,6 +157,15 @@ from earthlens.gee.reducers import (
     resolve_reducer,
 )
 from earthlens.gee.sampling import sample_points, sample_points_to_gdf
+from earthlens.gee.sinks import (
+    SINKS,
+    AssetSink,
+    DriveSink,
+    GcsSink,
+    Sink,
+    UrlSink,
+    resolve_sink,
+)
 
 __all__ = [
     "GEE",
@@ -207,4 +216,11 @@ __all__ = [
     "AutoEngine",
     "ENGINES",
     "resolve_engine",
+    "Sink",
+    "UrlSink",
+    "DriveSink",
+    "GcsSink",
+    "AssetSink",
+    "SINKS",
+    "resolve_sink",
 ]
