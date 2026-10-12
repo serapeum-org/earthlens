@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -3316,10 +3316,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-via-the-earthlens-facade" class="md-nav__link">
+  <a href="#5-the-object-api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Via the EarthLens facade
+        5. The object API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-via-the-earthlens-facade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Via the EarthLens facade
       
     </span>
   </a>
@@ -23851,10 +23862,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-via-the-earthlens-facade" class="md-nav__link">
+  <a href="#5-the-object-api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Via the EarthLens facade
+        5. The object API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-via-the-earthlens-facade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Via the EarthLens facade
       
     </span>
   </a>
@@ -24141,7 +24163,56 @@ so <code>auto_split</code> is unnecessary. What to know before switching:</p>
 <li><strong><code>cog=True</code> applies to this path only.</strong> A request served by Earth
   Engine writes a plain GeoTIFF (and logs that it did).</li>
 </ul>
-<h2 id="5-via-the-earthlens-facade"><a class="toclink" href="#5-via-the-earthlens-facade">5. Via the <code>EarthLens</code> facade</a><a class="headerlink" href="#5-via-the-earthlens-facade" title="Permanent link">#</a></h2>
+<h2 id="5-the-object-api"><a class="toclink" href="#5-the-object-api">5. The object API</a><a class="headerlink" href="#5-the-object-api" title="Permanent link">#</a></h2>
+<p>Every knob above is a string, and every string still works — that is the contract. Behind them the backend now
+resolves each one to a strategy object, and you can pass the object instead wherever you want something the string
+cannot express.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">GEE</span><span class="p">,</span> <span class="n">Percentile</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># The string form, unchanged.</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">export_via</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1"># The object form, for a reducer no name can express.</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="n">Percentile</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="mi">90</span><span class="p">))</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="c1"># Or the parameterised spelling, if you prefer strings.</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;percentile:90&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Reducers.</strong> <code>mean</code>, <code>median</code>, <code>min</code>, <code>max</code>, <code>mode</code>, <code>mosaic</code> and <code>sum</code> dispatch to Earth Engine's convenience
+methods, which preserve band names. <code>Percentile</code> has to use <code>reduce</code>, which suffixes them, so it renames them back —
+making it interchangeable with the rest. <code>resolve_reducer</code> accepts a name, a <code>percentile:&lt;q&gt;</code> spec or an instance,
+and resolves once per request, so a bad percentile fails before any bucket exports rather than part-way through.</p>
+<p><strong>Engines.</strong> <code>engine=</code> resolves to an <code>Engine</code>. There are three to choose from: <code>"auto"</code> prefers the EEDAI reader and
+falls back to Earth Engine on any decline; <code>"ee"</code> always uses <code>getDownloadURL</code>; and <code>"eedai"</code> forces the reader and
+raises if it cannot serve.</p>
+<p>A fourth, <code>"pixels"</code>, is <strong>registered but not selectable</strong>. It would fetch through <code>ee.data.computePixels</code>, which
+evaluates a computation graph and so could serve a <code>cloud_mask</code> or <code>filters</code> without the 32768-px per-axis cap that
+<code>getDownloadURL</code> imposes — but only its sizing and request-body construction exist; the transport does not. It is
+registered so that the engine seam is exercised by something other than the two incumbents, and <code>engine="pixels"</code> is
+rejected at construction rather than offered as a choice that fails later. <code>selectable_engines()</code> is the list
+<code>engine=</code> accepts; <code>ENGINES</code> is every registered engine.</p>
+<p><strong>Grids.</strong> <code>OutputGrid</code> is where the AOI, <code>crs</code> and <code>scale</code> become a pixel grid, with one constructor per
+convention: <code>for_metre_grid</code> sizes for square metres on the ground (the reader's rule, shortening longitude by
+<code>cos(latitude)</code>), <code>for_earth_engine</code> reads <code>scale</code> as a uniform degree-equivalent (Earth Engine's rule), and
+<code>from_crs_transform</code> pins the grid origin so stacked dates align without a resample. Away from the equator the first
+two disagree on the column count — that is real, documented, and now visible in one place rather than implied by two
+method families.</p>
+<p><strong>In-memory results.</strong> <code>materialize=True</code> returns a <code>DownloadResult</code> carrying the pyramids object alongside each
+written path, instead of only the paths:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;ee&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">result</span><span class="o">.</span><span class="n">paths</span>     <span class="c1"># the written files</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">result</span><span class="o">.</span><span class="n">objects</span>   <span class="c1"># the in-memory pyramids Datasets</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>     <span class="c1"># the objects - materialising is what you asked for</span>
+</code></pre></div>
+<p>Note the one place the stand-in is not transparent: when you materialise, each artifact's value <em>is</em> the object, so
+<code>result</code> iterates and compares as the list of <strong>objects</strong>, not of paths. <code>result.paths</code> is how you get the files.
+Without <code>materialize=</code> nothing changes — <code>download()</code> returns the same plain list of paths it always did.</p>
+<p>It needs pixels on disk, so it is only meaningful for <code>export_via="url"</code>; a batch sink raises rather than handing
+back destinations with no objects.</p>
+<p><strong>Not yet reachable.</strong> <code>ExportConfig</code> carries <code>nodata</code> / <code>dtype</code>, and <code>EngineConfig</code> carries <code>high_volume</code>, but
+only the <code>pixels</code> request builder reads them and its fetch path is not wired — so there are deliberately no
+<code>GEE(nodata=...)</code> / <code>GEE(high_volume=...)</code> arguments yet, rather than public arguments that quietly do nothing.</p>
+<h2 id="6-via-the-earthlens-facade"><a class="toclink" href="#6-via-the-earthlens-facade">6. Via the <code>EarthLens</code> facade</a><a class="headerlink" href="#6-via-the-earthlens-facade" title="Permanent link">#</a></h2>
 <p>Once the GEE backend is registered in the facade you'll also be able to
 do <code>EarthLens(data_source="gee", variables={...}, ...).download()</code>; until
 then use <code>earthlens.gee.GEE</code> directly as above. (Tracking: plan task
