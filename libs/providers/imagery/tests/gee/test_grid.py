@@ -24,6 +24,17 @@ CAIRO = (31.2, 29.9, 31.3, 30.0)
 ORTHO = "+proj=ortho +lat_0=0 +lon_0=0 +datum=WGS84 +units=m"
 
 
+class _EpsgOnlyCrs:
+    """A CRS object exposing only `to_epsg`, as a bare fake would."""
+
+    def __init__(self, code: int = 3857) -> None:
+        self._code = code
+
+    def to_epsg(self) -> int:
+        """Return the EPSG code this stand-in reports."""
+        return self._code
+
+
 class TestGeographicGrid:
     """The EEDAI convention: square metres on the ground."""
 
@@ -88,6 +99,47 @@ class TestProjectedGrid:
         """Zero scale would divide by zero."""
         with pytest.raises(ValueError, match="positive"):
             projected_grid((0.0, 0.0, 1.0, 1.0), 0, "EPSG:32636")
+
+    def test_rejects_a_negative_scale(self):
+        """A negative scale would invert the grid rather than divide by zero."""
+        with pytest.raises(ValueError, match="positive"):
+            projected_grid((0.0, 0.0, 1.0, 1.0), -100.0, "EPSG:32636")
+
+
+class TestForEarthEngine:
+    """The degree-equivalent convention, and the guards it applies itself."""
+
+    def test_sizes_both_axes_by_the_same_degree_step(self):
+        """A square-degree AOI comes out square, which is the whole difference."""
+        assert OutputGrid.for_earth_engine(
+            CAIRO, crs=NATIVE_CRS, scale=90.0
+        ).as_rows_cols() == (124, 124)
+
+    def test_rejects_non_finite_bounds(self):
+        """Infinities would reach `math.ceil` and raise an OverflowError."""
+        with pytest.raises(ValueError, match="finite"):
+            OutputGrid.for_earth_engine(
+                (float("inf"), 0.0, 1.0, 1.0), crs=NATIVE_CRS, scale=90.0
+            )
+
+    @pytest.mark.parametrize("scale", [0, -90.0, float("inf"), float("nan")])
+    def test_rejects_a_non_positive_or_non_finite_scale(self, scale):
+        """A bad scale fails here rather than as an opaque arithmetic error."""
+        with pytest.raises(ValueError, match="scale"):
+            OutputGrid.for_earth_engine(CAIRO, crs=NATIVE_CRS, scale=scale)
+
+    def test_a_sub_degree_aoi_still_yields_one_pixel(self):
+        """Rounding up never produces a zero-sized raster."""
+        tiny = (31.2, 29.9, 31.20001, 29.90001)
+        assert OutputGrid.for_earth_engine(
+            tiny, crs=NATIVE_CRS, scale=90.0
+        ).as_rows_cols() == (1, 1)
+
+    def test_a_projected_crs_delegates_to_the_metre_sizing(self):
+        """Away from a geographic CRS there is no degree step to apply."""
+        bbox = (0.0, 0.0, 10_000.0, 10_000.0)
+        grid = OutputGrid.for_earth_engine(bbox, crs="EPSG:32636", scale=100.0)
+        assert grid.as_rows_cols() == projected_grid(bbox, 100.0, "EPSG:32636")
 
 
 class TestTheTwoConventionsDisagree:
@@ -213,6 +265,25 @@ class TestBudgets:
         grid = OutputGrid(bbox=(0, 0, 1, 1), crs=NATIVE_CRS, rows=3, cols=7)
         assert (grid.longest_axis, grid.pixels) == (7, 21)
 
+    def test_the_per_axis_cap_is_inclusive(self):
+        """A grid exactly at the cap is within it, not over it."""
+        at_cap = OutputGrid(bbox=(0, 0, 1, 1), crs=NATIVE_CRS, rows=1, cols=32_768)
+        over = OutputGrid(bbox=(0, 0, 1, 1), crs=NATIVE_CRS, rows=1, cols=32_769)
+        assert at_cap.fits(max_pixels=10**12, max_dimension=32_768)[0] is True
+        assert over.fits(max_pixels=10**12, max_dimension=32_768)[0] is False
+
+    def test_the_pixel_budget_is_inclusive(self):
+        """So is the total-pixel budget, which the plan is sized against."""
+        grid = OutputGrid(bbox=(0, 0, 1, 1), crs=NATIVE_CRS, rows=100, cols=100)
+        assert grid.fits(max_pixels=10_000, max_dimension=32_768) == (True, "")
+        assert grid.fits(max_pixels=9_999, max_dimension=32_768)[0] is False
+
+    def test_tiles_rejects_a_negative_size(self):
+        """A negative tile side is as meaningless as a zero one."""
+        grid = OutputGrid(bbox=(0, 0, 1, 1), crs=NATIVE_CRS, rows=10, cols=10)
+        with pytest.raises(ValueError, match="positive"):
+            grid.tiles(-2048)
+
 
 class TestValueSemantics:
     """It is a value object, not a mutable bag."""
@@ -234,6 +305,17 @@ class TestValueSemantics:
         text = str(grid)
         assert text.startswith("OutputGrid(")
         assert "EPSG:4326" in text and "metre" in text
+
+    @pytest.mark.parametrize("crs", ["epsg:4326", "EPSG:4326"])
+    def test_the_crs_dispatch_is_case_insensitive(self, crs):
+        """A lowercase code must not fall through to the projected sizing."""
+        assert OutputGrid.for_metre_grid(CAIRO, crs=crs, scale=90.0).as_rows_cols() == (
+            124,
+            108,
+        )
+        assert OutputGrid.for_earth_engine(
+            CAIRO, crs=crs, scale=90.0
+        ).as_rows_cols() == (124, 124)
 
     def test_carries_the_cutline_alongside_the_bbox(self):
         """The reader takes both: bbox sizes the grid, cutline trims the output."""
@@ -311,3 +393,19 @@ class TestCrsHelpers:
         bbox = bbox_to_crs((150.0, -10.0, 160.0, 10.0), ORTHO)
         with pytest.raises(ValueError, match="finite"):
             OutputGrid.for_metre_grid(bbox, crs=ORTHO, scale=90.0)
+
+    def test_the_code_fallback_rejects_a_non_numeric_code(self):
+        """A code that is not digits must decline rather than fail in `int`."""
+        assert not same_epsg_code(_EpsgOnlyCrs(), "EPSG:not-a-code")
+
+    def test_the_code_fallback_needs_something_to_ask(self):
+        """A CRS with no `to_epsg` cannot answer, so reprojecting is the answer."""
+        assert not same_epsg_code("EPSG:3857", "EPSG:3857")
+
+    def test_the_code_fallback_compares_the_numbers(self):
+        """A mismatched code is not a match either."""
+        assert not same_epsg_code(_EpsgOnlyCrs(3857), "EPSG:4326")
+
+    def test_bbox_passes_through_a_lowercase_native_crs(self):
+        """The dispatch upper-cases, so `epsg:4326` needs no transformer."""
+        assert bbox_to_crs(CAIRO, "epsg:4326") == CAIRO

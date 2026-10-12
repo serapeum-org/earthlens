@@ -68,10 +68,33 @@ class TestExportConfigValues:
         """The caller states the fill value rather than inheriting the driver's."""
         assert ExportConfig(nodata=-9999).nodata == -9999
 
-    def test_a_non_positive_timeout_is_rejected(self):
-        """A zero timeout would fail every fetch immediately."""
+    @pytest.mark.parametrize("timeout", [0, -1, -300.0])
+    def test_a_non_positive_timeout_is_rejected(self, timeout):
+        """A zero or negative timeout would fail every fetch immediately."""
         with pytest.raises(ValidationError):
-            ExportConfig(http_timeout=0)
+            ExportConfig(http_timeout=timeout)
+
+    def test_a_small_positive_timeout_is_accepted(self):
+        """The bound is exclusive at zero, not a floor on the whole range."""
+        assert ExportConfig(http_timeout=0.001).http_timeout == 0.001
+
+    def test_nodata_accepts_a_float(self):
+        """A float fill value is as valid as an integer one."""
+        assert ExportConfig(nodata=-9999.0).nodata == -9999.0
+
+    def test_dtype_can_be_pinned(self):
+        """The caller states the output type rather than inheriting the driver's."""
+        assert ExportConfig(dtype="int16").dtype == "int16"
+
+    @pytest.mark.parametrize("export_via", ["url", "drive", "gcs", "asset"])
+    def test_only_the_url_sink_is_the_default(self, export_via):
+        """Every name in the vocabulary is constructible with its destination."""
+        extra = {
+            "drive": {"drive_folder": "f"},
+            "gcs": {"gcs_bucket": "b"},
+            "asset": {"asset_id": "projects/p/assets/f"},
+        }.get(export_via, {})
+        assert ExportConfig(export_via=export_via, **extra).export_via == export_via
 
     def test_is_frozen(self):
         """A strategy cannot edit the config it was handed."""
@@ -100,6 +123,25 @@ class TestEngineConfig:
         assert config.crs == "EPSG:4326"
         assert config.scale is None
         assert config.filters == ()
+
+    def test_the_optional_hooks_default_to_unset(self):
+        """A bare config asks for nothing beyond a plain read."""
+        config = EngineConfig()
+        assert config.reducer is None
+        assert config.cloud_mask is None
+        assert config.property_filter is None
+        assert config.region is None
+        assert config.discover_extent is False
+
+    def test_filters_are_coerced_to_a_tuple(self):
+        """A list reaches the engine as the validated immutable form."""
+        config = EngineConfig(filters=[lambda collection: collection])
+        assert isinstance(config.filters, tuple)
+        assert len(config.filters) == 1
+
+    def test_grid_inputs_report_a_missing_scale(self):
+        """`None` means the asset's native resolution, and must survive the pair."""
+        assert EngineConfig().grid_inputs == ("EPSG:4326", None)
 
     def test_grid_inputs_are_held_once(self):
         """`crs`/`scale` live here, not duplicated onto `ExportConfig`."""

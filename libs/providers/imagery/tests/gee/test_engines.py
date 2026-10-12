@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+from types import SimpleNamespace
 
 import pytest
 
@@ -12,6 +13,7 @@ from earthlens.gee.engines import (
     EedaiEngine,
     EeEngine,
     Engine,
+    reader_refusal_types,
     resolve_engine,
 )
 
@@ -20,6 +22,10 @@ from .test_backend import fake_ee, fake_reader, make_gee  # noqa: F401 - fixture
 ASSET = "USGS/SRTMGL1_003"
 START = dt.datetime(2020, 6, 1)
 END = dt.datetime(2020, 7, 1)
+
+
+class _FakeReaderError(Exception):
+    """Stands in for `pyramids_eo.errors.ReaderError`, which may not be installed."""
 
 
 def _gee(make_gee, **overrides):
@@ -74,6 +80,62 @@ class TestRegistry:
     def test_repr_names_the_class(self):
         """Engines appear in log lines, so they must read cleanly."""
         assert repr(EedaiEngine()) == "EedaiEngine()"
+
+    def test_the_base_class_cannot_be_instantiated(self):
+        """`plan` is abstract, so a bare `Engine` cannot route anything."""
+        with pytest.raises(TypeError):
+            Engine()
+
+    def test_each_resolution_builds_a_fresh_instance(self):
+        """The registry holds classes, so no state leaks between backends."""
+        assert resolve_engine("auto") is not resolve_engine("auto")
+
+
+class TestReaderRefusalTypes:
+    """Which exceptions a post-routing reader refusal may arrive as."""
+
+    def test_always_includes_the_transport_error(self, monkeypatch):
+        """A discovery round trip can fail as an `OSError`."""
+        from earthlens.gee import engines as engines_module
+
+        monkeypatch.setattr(
+            engines_module, "import_earthengine_reader", lambda: SimpleNamespace()
+        )
+        assert OSError in reader_refusal_types()
+
+    def test_picks_up_the_readers_own_error(self, monkeypatch):
+        """Resolved through the guarded import, so the extra stays optional."""
+        from earthlens.gee import engines as engines_module
+
+        monkeypatch.setattr(
+            engines_module,
+            "import_earthengine_reader",
+            lambda: SimpleNamespace(ReaderError=_FakeReaderError),
+        )
+        types = reader_refusal_types()
+        assert _FakeReaderError in types
+        assert all(issubclass(entry, BaseException) for entry in types)
+
+    def test_a_non_exception_attribute_is_ignored(self, monkeypatch):
+        """A future release re-exporting something else must not poison the tuple."""
+        from earthlens.gee import engines as engines_module
+
+        monkeypatch.setattr(
+            engines_module,
+            "import_earthengine_reader",
+            lambda: SimpleNamespace(ReaderError="not a class"),
+        )
+        assert all(issubclass(entry, BaseException) for entry in reader_refusal_types())
+
+    def test_authentication_errors_are_not_recoverable(self, monkeypatch):
+        """A credential problem must surface rather than silently fall back."""
+        from earthlens.gee import engines as engines_module
+        from earthlens.gee.auth import AuthenticationError
+
+        monkeypatch.setattr(
+            engines_module, "import_earthengine_reader", lambda: SimpleNamespace()
+        )
+        assert AuthenticationError not in reader_refusal_types()
 
 
 class TestEeEngine:

@@ -94,6 +94,11 @@ class TestRegistry:
         for cls in REDUCERS.values():
             assert issubclass(cls, Reducer)
 
+    def test_the_base_class_cannot_be_instantiated(self):
+        """`__call__` is abstract, so a bare `Reducer` is not usable."""
+        with pytest.raises(TypeError):
+            Reducer()
+
 
 class TestConvenienceDispatch:
     """The seven original reducers keep their band-name-preserving semantics."""
@@ -165,6 +170,21 @@ class TestPercentile:
         """Two percentile reducers must not read identically."""
         assert repr(Percentile(q=90)) == "Percentile(q=90.0)"
 
+    def test_the_requested_percentile_reaches_earth_engine(self, fake_ee_reducer):
+        """`q` must arrive in the reducer, not just be stored on the object."""
+        collection = _FakeCollection()
+        Percentile(q=90)(collection)
+        assert collection.reduced_with == "percentile-reducer-[90.0]"
+
+    def test_two_equal_percentiles_are_interchangeable(self):
+        """Frozen value semantics, so one can be cached or put in a set."""
+        assert Percentile(q=90) == Percentile(q=90)
+        assert len({Percentile(q=90), Percentile(q=90)}) == 1
+
+    def test_a_different_percentile_is_not_equal(self):
+        """`q` is what distinguishes two instances."""
+        assert Percentile(q=90) != Percentile(q=95)
+
 
 class TestResolveReducer:
     """Name, parameterised spec, or instance — one entry point."""
@@ -218,6 +238,20 @@ class TestResolveReducer:
         """Passing a stray object fails loudly rather than being coerced."""
         with pytest.raises(TypeError, match="name or a Reducer"):
             resolve_reducer(90)
+
+    def test_a_trailing_separator_explains_the_spelling(self):
+        """`percentile:` carries no argument, so it fails like the bare name."""
+        with pytest.raises(ValueError, match="percentile:<q>"):
+            resolve_reducer("percentile:")
+
+    def test_a_second_separator_is_reported_as_a_bad_number(self):
+        """The whole tail is the argument, so it has to parse as one number."""
+        with pytest.raises(ValueError, match="'90:5'"):
+            resolve_reducer("percentile:90:5")
+
+    def test_each_resolution_builds_a_fresh_instance(self):
+        """The registry holds classes, so no state can leak between requests."""
+        assert resolve_reducer("mean") is not resolve_reducer("mean")
 
 
 class TestBackCompatShim:

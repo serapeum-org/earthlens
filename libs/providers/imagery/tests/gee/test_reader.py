@@ -41,6 +41,22 @@ class _FakeModule:
         return self._record(item)
 
 
+class _InEffectProbe:
+    """Records which credential was configured process-wide during the read."""
+
+    Window = object()
+
+    def __init__(self):
+        self.seen: list[object] = []
+
+    def from_earthengine(self, asset_id, **kwargs):
+        """Capture the in-effect credential at call time."""
+        from earthlens.gee import reader as reader_module
+
+        self.seen.append(reader_module._IN_EFFECT["credential"])
+        return "probed"
+
+
 def _reader(credential="cred-a"):
     """An adapter bound to a fake module, so no import or network is needed."""
     adapter = EedaiReader(credential)
@@ -88,6 +104,40 @@ class TestBinding:
         adapter = _reader()
         assert adapter.Window is _FakeModule.Window
 
+    def test_the_module_is_imported_once_and_then_cached(self, monkeypatch):
+        """Re-importing per call is what the adapter exists to stop."""
+        from earthlens.gee import reader as reader_module
+
+        module = _FakeModule()
+        imports: list[int] = []
+        monkeypatch.setattr(
+            reader_module,
+            "import_earthengine_reader",
+            lambda: imports.append(1) or module,
+        )
+        adapter = EedaiReader("cred-a")
+        assert adapter.module is module
+        assert adapter.module is module
+        assert imports == [1]
+
+    def test_the_window_class_triggers_the_lazy_import(self, monkeypatch):
+        """Asking for `Window` is enough; no separate resolve step is needed."""
+        from earthlens.gee import reader as reader_module
+
+        module = _FakeModule()
+        monkeypatch.setattr(reader_module, "import_earthengine_reader", lambda: module)
+        assert EedaiReader("cred-a").Window is _FakeModule.Window
+
+    def test_a_read_resolves_the_module_through_the_lazy_import(self, monkeypatch):
+        """Nothing has to pre-set the module for a read to work."""
+        from earthlens.gee import reader as reader_module
+
+        module = _FakeModule()
+        monkeypatch.setattr(reader_module, "import_earthengine_reader", lambda: module)
+        adapter = EedaiReader("cred-a")
+        assert adapter.from_earthengine("A/B") == "from_earthengine-result"
+        assert module.calls[0][1] == "A/B"
+
     def test_repr_says_whether_a_credential_is_bound_without_printing_it(self):
         """Key material must never reach a log line."""
         assert repr(_reader("secret-key-material")) == "EedaiReader(pinned)"
@@ -125,6 +175,22 @@ class TestProcessGlobalHazard:
         """The marker is released after each read, so the next may differ."""
         assert _reader("cred-a").from_earthengine("A/B")
         assert _reader("cred-b").from_earthengine("A/B")
+
+    def test_the_credential_is_in_effect_during_the_read(self):
+        """The marker has to be set while reading, not only checked beforehand."""
+        adapter = EedaiReader("cred-a")
+        probe = _InEffectProbe()
+        adapter._module = probe
+        assert adapter.from_earthengine("A/B") == "probed"
+        assert probe.seen == ["cred-a"]
+
+    def test_the_marker_returns_to_the_previous_identity_not_to_none(self):
+        """A nested read must restore what was in effect, not clear it."""
+        from earthlens.gee import reader as reader_module
+
+        reader_module._IN_EFFECT["credential"] = "cred-a"
+        _reader("cred-a").from_earthengine("A/B")
+        assert reader_module._IN_EFFECT["credential"] == "cred-a"
 
     def test_the_marker_is_released_even_when_the_read_raises(self):
         """A failed read must not leave the process wedged to one identity."""
@@ -191,6 +257,21 @@ class TestFromServiceKey:
         monkeypatch.setattr(backend_module, "credentials_for", _missing)
         with pytest.raises(ImportError, match="eedai"):
             EedaiReader.from_service_key("key.json")
+
+    def test_binds_the_built_credential_to_the_adapter(self, monkeypatch):
+        """The whole point of the adapter is carrying the credential with it."""
+        from earthlens.gee import backend as backend_module
+
+        monkeypatch.setattr(backend_module, "credentials_for", lambda key: ("c", key))
+        adapter = EedaiReader.from_service_key("key.json")
+        assert adapter.credential == ("c", "key.json")
+
+    def test_the_module_is_not_resolved_at_build_time(self, monkeypatch):
+        """Building the adapter must not pull in the optional dependency."""
+        from earthlens.gee import backend as backend_module
+
+        monkeypatch.setattr(backend_module, "credentials_for", lambda key: "cred")
+        assert EedaiReader.from_service_key("key.json")._module is None
 
     def test_available_reads_the_backend_seam(self, monkeypatch):
         """So patching the backend binding still simulates a missing extra."""

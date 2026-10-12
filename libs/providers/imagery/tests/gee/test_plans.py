@@ -85,6 +85,18 @@ class TestValueSemantics:
         with pytest.raises(TypeError):
             EnginePlan(False, None, 0, "nope")
 
+    def test_the_engine_participates_in_equality(self):
+        """Two verdicts from different engines are not the same verdict."""
+        assert EnginePlan.serves(tiles=1, engine="ee") != EnginePlan.serves(tiles=1)
+
+    def test_is_hashable(self):
+        """Frozen, so a plan can be cached or collected in a set."""
+        assert len({EnginePlan.serves(tiles=1), EnginePlan.serves(tiles=1)}) == 1
+
+    def test_an_acceptance_may_omit_the_tile_size(self):
+        """A collection plan counts scenes, so there is no tile side to give."""
+        assert EnginePlan(can_serve=True, tiles=7).tile_size is None
+
 
 class TestSummary:
     """`SummarisedLeaf` gives the plan a readable one-line form."""
@@ -99,6 +111,16 @@ class TestSummary:
         """A clear flag renders as its own name; a set one shows the count."""
         assert str(EnginePlan.serves(tiles=4, tile_size=2048)) == (
             "EnginePlan(eedai, can_serve, 4)"
+        )
+
+    def test_an_acceptance_of_nothing_keeps_its_zero(self):
+        """Only a refusal drops the count, so a served zero stays visible."""
+        assert str(EnginePlan.serves(tiles=0)) == "EnginePlan(eedai, can_serve, 0)"
+
+    def test_a_refusal_names_the_engine_that_made_it(self):
+        """With more than one engine the field stops being implied."""
+        assert str(EnginePlan.declined("over the scene cap", engine="pixels")) == (
+            "EnginePlan(pixels, over the scene cap)"
         )
 
     def test_repr_still_carries_every_field(self):

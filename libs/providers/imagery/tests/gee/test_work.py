@@ -55,6 +55,22 @@ class TestWorkUnits:
             repr(RasterWorkUnit("x", WHEN, WHEN, END)) == "RasterWorkUnit(2020-06-01)"
         )
 
+    def test_a_feature_unit_reads_the_same_way(self):
+        """Both kinds share the repr, so a vector failure is as diagnosable."""
+        assert (
+            repr(FeatureWorkUnit("x", WHEN, WHEN, END)) == "FeatureWorkUnit(2020-06-01)"
+        )
+
+    def test_the_base_class_cannot_be_instantiated(self):
+        """`window` is abstract, so a bare `WorkUnit` carries no window."""
+        with pytest.raises(TypeError):
+            WorkUnit("x", WHEN, WHEN, END)
+
+    def test_the_payload_is_reachable_under_both_names(self):
+        """`payload` stays the shared name the pipeline reads."""
+        unit = RasterWorkUnit("the-image", WHEN, WHEN, END)
+        assert unit.payload is unit.image
+
 
 class TestTupleCompatibility:
     """The four-tuple `_composite` used to yield still unpacks."""
@@ -117,6 +133,32 @@ class TestArtifact:
         """Rather than raising, so a caller can test for it."""
         assert Artifact().value is None
 
+    def test_the_value_precedence_is_obj_path_destination_then_task(self):
+        """The order is the pre-Epic-1 return contract, so it must not drift."""
+        every = {
+            "obj": "the-dataset",
+            "path": Path("out.tif"),
+            "destination": "gs://b/p",
+            "task": "the-task",
+        }
+        assert Artifact(**every).value == "the-dataset"
+        del every["obj"]
+        assert Artifact(**every).value == Path("out.tif")
+        del every["path"]
+        assert Artifact(**every).value == "gs://b/p"
+        del every["destination"]
+        assert Artifact(**every).value == "the-task"
+
+    def test_the_kind_is_carried_through(self):
+        """So a caller tells a vector result from a raster one without the payload."""
+        assert Artifact().kind == "raster"
+        assert Artifact(kind="vector").kind == "vector"
+
+    def test_summary_reads_as_one_line(self):
+        """Artifacts appear in log lines, so they must stay readable."""
+        text = str(Artifact(when=WHEN, path=Path("out.tif")))
+        assert text.startswith("Artifact(") and "out.tif" in text
+
 
 class TestDownloadResult:
     """It must stand in for the `list` `download()` used to return."""
@@ -162,6 +204,38 @@ class TestDownloadResult:
         result = DownloadResult(artifacts=(Artifact(destination="gs://b/p"),))
         assert result.paths == []
         assert result.values == ["gs://b/p"]
+
+    def test_objects_skips_an_artifact_that_materialised_nothing(self):
+        """Only the buckets that were materialised contribute an object."""
+        result = DownloadResult(
+            artifacts=(
+                Artifact(path=Path("a.tif")),
+                Artifact(path=Path("b.tif"), obj="ds-b"),
+            )
+        )
+        assert result.objects == ["ds-b"]
+        assert len(result.paths) == 2
+
+    def test_an_empty_result_stands_in_for_an_empty_list(self):
+        """A download that produced nothing must not need a special case."""
+        empty = DownloadResult()
+        assert list(empty) == []
+        assert len(empty) == 0
+        assert empty == []
+        assert empty.paths == [] and empty.objects == []
+
+    def test_an_empty_result_is_hashable(self):
+        """`__eq__` is overridden, so `__hash__` has to be supplied with it."""
+        assert hash(DownloadResult()) == hash(DownloadResult())
+
+    def test_an_out_of_range_index_raises(self):
+        """Indexing behaves like the list it replaced, including on overflow."""
+        with pytest.raises(IndexError):
+            self._result()[5]
+
+    def test_is_not_equal_to_a_tuple_of_the_same_payloads(self):
+        """Only a `list` is accepted as the pre-Epic-1 return, not any sequence."""
+        assert self._result() != ("ds-a", "ds-b")
 
 
 class TestMaterializeThroughDownload:

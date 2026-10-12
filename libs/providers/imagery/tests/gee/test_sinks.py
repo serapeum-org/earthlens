@@ -62,6 +62,10 @@ class TestRegistry:
         """Sinks appear in log lines."""
         assert repr(GcsSink()) == "GcsSink()"
 
+    def test_each_resolution_builds_a_fresh_instance(self):
+        """The registry holds classes, so no state leaks between backends."""
+        assert resolve_sink("url") is not resolve_sink("url")
+
 
 class TestPrerequisites:
     """Each sink declares the one field it cannot work without."""
@@ -149,6 +153,34 @@ class TestTargetKeywords:
         assert DriveSink.export_method == "toDrive"
         assert GcsSink.export_method == "toCloudStorage"
         assert AssetSink.export_method == "toAsset"
+
+    def test_each_batch_sink_declares_its_uri_scheme(self):
+        """The destination strings are built from these, so they must not drift."""
+        assert DriveSink.scheme == "drive"
+        assert GcsSink.scheme == "gs"
+        assert AssetSink.scheme == "ee"
+
+    @pytest.mark.parametrize(
+        ("cls", "extra"),
+        [
+            (DriveSink, {"drive_folder": "f"}),
+            (GcsSink, {"gcs_bucket": "b"}),
+            (AssetSink, {"asset_id": "projects/p/assets/f"}),
+        ],
+    )
+    def test_the_destination_starts_with_the_declared_scheme(
+        self, make_gee, cls, extra
+    ):
+        """The reported URI and the declared scheme are one statement, not two."""
+        gee = make_gee(export_via=cls.name, **extra)
+        assert cls().destination(gee, "A_B_20220101").startswith(f"{cls.scheme}://")
+
+    def test_the_asset_sink_addresses_the_same_path_it_reports(self, make_gee):
+        """`target` and `destination` must not disagree about where it landed."""
+        gee = make_gee(export_via="asset", asset_id="projects/p/assets/f")
+        sink = AssetSink()
+        target = sink.target(gee, "A_B_20220101")
+        assert sink.destination(gee, "A_B_20220101") == f"ee://{target['assetId']}"
 
 
 class TestBackendIsSinkDriven:
