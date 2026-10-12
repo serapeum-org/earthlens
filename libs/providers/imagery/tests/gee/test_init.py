@@ -39,6 +39,9 @@ _EXPECTED_EXPORTS = {
     "EedaiPlan",
     # Epic 1 Task 1.12 - the output grid value object.
     "OutputGrid",
+    # Epic 1 Task 1.9 - the strategy configs.
+    "ExportConfig",
+    "EngineConfig",
     "GEE",
     "AuthenticationError",
     "CloudMask",

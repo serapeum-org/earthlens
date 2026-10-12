@@ -118,6 +118,7 @@ from earthlens.gee.catalog import (
     Extent,
     Provider,
 )
+from earthlens.gee.configs import EngineConfig, ExportConfig
 from earthlens.gee.features import create_feature, create_geometry
 from earthlens.gee.grid import OutputGrid
 from earthlens.gee.io import (
@@ -190,4 +191,6 @@ __all__ = [
     "EnginePlan",
     "EedaiPlan",
     "OutputGrid",
+    "ExportConfig",
+    "EngineConfig",
 ]

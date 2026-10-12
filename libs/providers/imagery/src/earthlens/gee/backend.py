@@ -88,6 +88,7 @@ from earthlens.gee._helpers import (
 )
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
 from earthlens.gee.catalog import Catalog, Dataset
+from earthlens.gee.configs import EngineConfig, ExportConfig
 from earthlens.gee.features import create_feature
 from earthlens.gee.grid import (
     OutputGrid,
@@ -881,6 +882,31 @@ class GEE(LazyClientMixin, AbstractDataSource):
         #: OGR attribute-filter string narrowing collection scenes on the EEDAI
         #: path (e.g. `"CLOUDY_PIXEL_PERCENTAGE < 20"`); Earth Engine ignores it.
         self.property_filter = property_filter
+        # Composed from the same kwargs the public attrs above carry, so a
+        # strategy receives a validated slice rather than the whole backend.
+        # The public attrs stay as the back-compat surface.
+        self._export_config = ExportConfig(
+            export_via=export_via,
+            drive_folder=drive_folder,
+            gcs_bucket=gcs_bucket,
+            asset_id=asset_id,
+            cog=bool(cog),
+            resample=resample,
+            auto_split=bool(auto_split),
+            http_timeout=self.http_timeout,
+            wait_for_export=bool(wait_for_export),
+        )
+        self._engine_config = EngineConfig(
+            engine=engine,
+            reducer=reducer,
+            crs=crs,
+            scale=scale,
+            cloud_mask=cloud_mask,
+            filters=collection_filters,
+            property_filter=property_filter,
+            region=region,
+            discover_extent=bool(discover_extent),
+        )
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
         self._eedai_credential: Any = None  # lazily built in `_eedai_credentials`
         #: Region reprojections, keyed by target CRS. A large `GeoDataFrame` on
