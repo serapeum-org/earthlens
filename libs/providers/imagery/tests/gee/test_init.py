@@ -37,6 +37,8 @@ _EXPECTED_EXPORTS = {
     # Epic 1 Task 1.6 - the promoted routing verdict.
     "EnginePlan",
     "EedaiPlan",
+    # Epic 1 Task 1.12 - the output grid value object.
+    "OutputGrid",
     "GEE",
     "AuthenticationError",
     "CloudMask",

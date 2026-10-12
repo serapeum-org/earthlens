@@ -89,6 +89,12 @@ from earthlens.gee._helpers import (
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
 from earthlens.gee.catalog import Catalog, Dataset
 from earthlens.gee.features import create_feature
+from earthlens.gee.grid import (
+    OutputGrid,
+    bbox_to_crs,
+    geographic_grid,
+    same_crs,
+)
 from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reducers import resolve_reducer
@@ -407,30 +413,6 @@ def _validate_property_filter(property_filter: object) -> None:
         raise ValueError(
             f"property_filter leaves {depth} parenthesis/es unclosed: {property_filter!r}"
         )
-
-
-def _same_epsg_code(region_crs: Any, target: str) -> bool:
-    """Compare a CRS pyproj could not parse against the target by EPSG code.
-
-    The last resort when :meth:`GEE._same_crs`'s object comparison cannot run.
-    A code is trusted only against an explicitly `EPSG:` target, so the
-    authority stays part of the comparison rather than being dropped - which is
-    what made string-parsing the wrong answer in the first place.
-
-    Args:
-        region_crs: The region's CRS object.
-        target: The output CRS.
-
-    Returns:
-        `True` only when the target is an `EPSG:` code the region reports as
-        its own; `False` for anything unparseable or non-EPSG, since
-        reprojecting is the safe answer.
-    """
-    to_epsg = getattr(region_crs, "to_epsg", None)
-    if not callable(to_epsg) or not target.upper().startswith("EPSG:"):
-        return False
-    code = target.split(":", 1)[1]
-    return bool(code.isdigit() and to_epsg() == int(code))
 
 
 def _eedai_remedy(reason: str) -> str:
@@ -1603,23 +1585,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             The envelope in `self.crs`; the input is returned unchanged when the
             output CRS is already EPSG:4326.
         """
-        if self.crs.upper() == _EEDAI_NATIVE_CRS:
-            return latlon_bbox
-        from pyproj import Transformer
-
-        transformer = Transformer.from_crs(_EEDAI_NATIVE_CRS, self.crs, always_xy=True)
-        # transform_bounds densifies the edges, so a reprojected rectangle that
-        # bows still bounds the whole AOI rather than only its corners.
-        #
-        # Known asymmetry for a *large* projected AOI: upstream converts this
-        # window back to EPSG:4326 with a four-corner transform, which
-        # under-estimates the reach of an edge that bows outward. Measured on a
-        # 10 deg x 10 deg AOI, the requested northern edge came back ~0.023 deg
-        # short, so a poleward strip can read as nodata, while ~0.5 deg of
-        # unrequested ground is added on each side. Small AOIs (the common case)
-        # are affected at the ~0.002 deg level. Fixing it properly needs the
-        # densified back-transform upstream: serapeum-org/pyramids-eo#97.
-        return transformer.transform_bounds(*latlon_bbox)
+        return bbox_to_crs(latlon_bbox, self.crs)
 
     def _eedai_output_grid(
         self, bbox: tuple[float, float, float, float], scale: float
@@ -1638,21 +1604,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Returns:
             `(rows, cols)`, at least one pixel per axis.
         """
-        if self.crs.upper() == _EEDAI_NATIVE_CRS:
-            return self._eedai_grid(bbox, scale)
-        if not all(math.isfinite(bound) for bound in bbox):
-            # `transform_bounds` returns infinities for an AOI outside the
-            # projection's domain; without this the budget maths would raise an
-            # opaque OverflowError from `math.ceil` instead.
-            raise ValueError(
-                f"the AOI bounds must all be finite, got {bbox!r} in {self.crs}"
-            )
-        if not scale or scale <= 0:
-            raise ValueError("'scale' must be a positive number of metres.")
-        min_x, min_y, max_x, max_y = (float(v) for v in bbox)
-        rows = max(math.ceil((max_y - min_y) / scale), 1)
-        cols = max(math.ceil((max_x - min_x) / scale), 1)
-        return rows, cols
+        return OutputGrid.for_metre_grid(bbox, crs=self.crs, scale=scale).as_rows_cols()
 
     @staticmethod
     def _reader_end(bucket_end: dt.datetime, bucket_start: dt.datetime) -> str:
@@ -2165,14 +2117,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             or either cannot be parsed (in which case reprojecting is the safe
             answer).
         """
-        from pyproj import CRS
-
-        try:
-            return bool(CRS.from_user_input(region_crs) == CRS.from_user_input(target))
-        except Exception:  # noqa: BLE001
-            # A parse failure on either side falls back to the code check
-            # rather than assuming a match.
-            return _same_epsg_code(region_crs, target)
+        return same_crs(region_crs, target)
 
     @staticmethod
     def _eedai_grid(
@@ -2228,25 +2173,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
                 ```
         """
-        min_x, min_y, max_x, max_y = bbox
-        if not all(math.isfinite(bound) for bound in bbox):
-            raise ValueError(f"the AOI bounds must be finite, got {bbox}")
-        if scale <= 0 or not math.isfinite(scale):
-            raise ValueError(f"scale must be a positive number of metres, got {scale}")
-        # Take `cos` at the poleward edge rather than the mid-latitude: for a
-        # tall AOI the mid-latitude value would under-count columns nearer the
-        # pole, sampling coarser than asked. The poleward edge only ever errs
-        # finer. Clamped away from the pole itself, where `cos` reaches zero.
-        poleward = min(max(abs(min_y), abs(max_y)), 89.9)
-        height_m = abs(max_y - min_y) * _METRES_PER_DEGREE
-        width_m = (
-            abs(max_x - min_x) * _METRES_PER_DEGREE * math.cos(math.radians(poleward))
-        )
-        # Round up, not to nearest: rounding down would leave the raster a
-        # little coarser than the scale that was asked for.
-        rows = max(1, math.ceil(height_m / scale))
-        cols = max(1, math.ceil(width_m / scale))
-        return rows, cols
+        return geographic_grid(bbox, scale)
 
     def _warn_cog_ignored(self, var_info: Dataset) -> None:
         """Say so, once, when `cog=True` cannot apply to this request.

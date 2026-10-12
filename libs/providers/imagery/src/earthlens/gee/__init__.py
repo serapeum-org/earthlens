@@ -119,6 +119,7 @@ from earthlens.gee.catalog import (
     Provider,
 )
 from earthlens.gee.features import create_feature, create_geometry
+from earthlens.gee.grid import OutputGrid
 from earthlens.gee.io import (
     feature_collection_to_dataframe,
     feature_collection_to_gdf,
@@ -188,4 +189,5 @@ __all__ = [
     "resolve_reducer",
     "EnginePlan",
     "EedaiPlan",
+    "OutputGrid",
 ]
