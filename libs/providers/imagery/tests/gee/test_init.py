@@ -42,6 +42,13 @@ _EXPECTED_EXPORTS = {
     # Epic 1 Task 1.9 - the strategy configs.
     "ExportConfig",
     "EngineConfig",
+    # Epic 1 Task 1.3 - the engine strategy objects.
+    "Engine",
+    "EeEngine",
+    "EedaiEngine",
+    "AutoEngine",
+    "ENGINES",
+    "resolve_engine",
     "GEE",
     "AuthenticationError",
     "CloudMask",

@@ -77,7 +77,7 @@ from earthlens.base import (
 )
 from earthlens.gee._eedai import (
     credentials_for,
-    eedai_available,
+    eedai_available,  # noqa: F401 - monkeypatch seam the test suite patches
     import_earthengine_reader,
 )
 from earthlens.gee._helpers import (
@@ -89,6 +89,7 @@ from earthlens.gee._helpers import (
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
 from earthlens.gee.catalog import Catalog, Dataset
 from earthlens.gee.configs import EngineConfig, ExportConfig
+from earthlens.gee.engines import reader_refusal_types, resolve_engine
 from earthlens.gee.features import create_feature
 from earthlens.gee.grid import (
     OutputGrid,
@@ -885,6 +886,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # Composed from the same kwargs the public attrs above carry, so a
         # strategy receives a validated slice rather than the whole backend.
         # The public attrs stay as the back-compat surface.
+        # Resolved once: `engine=` is validated above, and the object replaces
+        # the `if/elif` that used to re-read the string at every decision.
+        self._engine = resolve_engine(engine)
         self._export_config = ExportConfig(
             export_via=export_via,
             drive_folder=drive_folder,
@@ -1482,7 +1486,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                         bucket_start,
                         bucket_end,
                     )
-                except _reader_errors(import_earthengine_reader()) as exc:
+                except reader_refusal_types() as exc:
                     # The reader can still refuse after routing has committed:
                     # a band set spanning resolution groups is refused by the
                     # collection reader although the single-image one handles
@@ -1490,7 +1494,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     # that refusal is the answer; under `auto` this is a request
                     # Earth Engine can serve, so falling back keeps the contract
                     # that `auto` routes rather than fails.
-                    if self.engine == "eedai":
+                    if self._engine.refusal_is_fatal():
                         raise
                     logger.warning(
                         f"the EEDAI reader could not serve {var_info.id} "
@@ -1999,55 +2003,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 skipped rather than raised, since that is a property of the
                 data and not of the request.
         """
-        if self.engine == "ee":
-            return False, None
-        eligible = self._eedai_eligible(var_info)
-        if self.engine == "eedai":
-            if not eligible:
-                raise ValueError(
-                    f"engine='eedai' cannot serve {var_info.id}: the EEDAI "
-                    "reader materialises pixels from an asset id, so it cannot "
-                    "run server-side compute (a reduced collection, cloud_mask "
-                    "or filters), and it reads only EPSG:4326 or a metre-based "
-                    f"projected CRS (got crs={self.crs!r}). Use engine='auto' "
-                    "or engine='ee'."
-                )
-            plan = self._eedai_verdict(var_info, band_count, bucket_start, bucket_end)
-            if not plan.can_serve:
-                if plan.reason.startswith(_EEDAI_NO_SCENES):
-                    # Nothing to read here, but the request itself is fine, so
-                    # let the Earth Engine path write this bucket rather than
-                    # aborting the run.
-                    logger.info(
-                        f"{var_info.id}: {plan.reason}; this bucket falls through "
-                        "to Earth Engine."
-                    )
-                    return False, None
-                raise ValueError(
-                    f"engine='eedai' cannot serve {var_info.id}: {plan.reason}. "
-                    f"{_eedai_remedy(plan.reason)}"
-                )
-            return True, plan
-        if not (eligible and eedai_available()):
-            return False, None
-        try:
-            plan = self._eedai_verdict(var_info, band_count, bucket_start, bucket_end)
-        except ValueError as exc:
-            # Sizing refused the request — a non-finite projected envelope, say.
-            # Under `auto` that is a reason to let Earth Engine serve it, not to
-            # abort the download. A forced engine has already raised above.
-            logger.warning(
-                f"the EEDAI reader could not size {var_info.id} ({exc}); "
-                "falling back to Earth Engine."
-            )
-            return False, None
-        if not plan.can_serve:
-            logger.info(
-                f"Serving {var_info.id} through Earth Engine rather than the EEDAI "
-                f"reader: {plan.reason}."
-            )
-            return False, None
-        return True, plan
+        return self._engine.plan(self, var_info, band_count, bucket_start, bucket_end)
 
     def _eedai_window(self) -> tuple[tuple[float, float, float, float], Any]:
         """Return the AOI the reader should read, as `(bbox, cutline)`.
