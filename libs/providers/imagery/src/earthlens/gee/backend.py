@@ -81,6 +81,7 @@ from earthlens.gee._eedai import (
     import_earthengine_reader,
 )
 from earthlens.gee._helpers import (
+    _COLLECTION_REDUCERS,
     EE_MAX_DIMENSION,
     slug_asset_id,
     split_aoi_for_url,
@@ -89,7 +90,7 @@ from earthlens.gee._helpers import (
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
 from earthlens.gee.catalog import Catalog, Dataset
 from earthlens.gee.configs import EngineConfig, ExportConfig
-from earthlens.gee.engines import reader_refusal_types, resolve_engine
+from earthlens.gee.engines import NO_SCENES, reader_refusal_types, resolve_engine
 from earthlens.gee.features import create_feature
 from earthlens.gee.grid import (
     OutputGrid,
@@ -168,7 +169,10 @@ _EEDAI_MAX_PIXELS: int = 200_000_000
 
 #: Marks a decline caused by the *data* rather than the request, so a forced
 #: `engine="eedai"` skips the bucket instead of failing the whole download.
-_EEDAI_NO_SCENES: str = "no scenes"
+#: Aliases `engines.NO_SCENES` rather than repeating the string: the skip is a
+#: prefix match, so two independent literals would let one drift and silently
+#: turn the bucket-skip into a hard failure.
+_EEDAI_NO_SCENES: str = NO_SCENES
 
 #: Reducers the reader must not serve, because its client-side result would not
 #: match Earth Engine's server-side one. `mosaic` is the clear case: Earth
@@ -847,8 +851,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
         resample: str = "nearest",
         property_filter: str | None = None,
         materialize: bool = False,
-        nodata: float | int | None = None,
-        dtype: str | None = None,
     ):
         # Validate the cheap (no-I/O) config first so user typos surface
         # before the ~3.3 s cold-cache catalog parse below.
@@ -943,8 +945,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
             http_timeout=self.http_timeout,
             wait_for_export=bool(wait_for_export),
             materialize=bool(materialize),
-            nodata=nodata,
-            dtype=dtype,
         )
         self._engine_config = EngineConfig(
             engine=engine,
@@ -1652,6 +1652,25 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         return self._download_one_url_tile(image, region, scale, prefix)
 
+    def _reducer_name(self, var_info: Dataset) -> str:
+        """Return the requested reducer as a name, whatever form it arrived in.
+
+        `reducer=` accepts a name, a `percentile:<q>` spec or a `Reducer`
+        instance, and two places need the *name*: the guard that refuses the
+        reader a composite it would compute differently, and the reader's own
+        `reducer=` keyword, which takes a string from its own vocabulary.
+
+        Args:
+            var_info: The catalog entry, for its `default_reducer`.
+
+        Returns:
+            The reducer's registry name.
+        """
+        requested = self.reducer or var_info.default_reducer
+        if isinstance(requested, str):
+            return requested.split(":", 1)[0]
+        return type(requested).name
+
     def _eedai_eligible(self, var_info: Dataset) -> bool:
         """Return whether this request is a raw read the EEDAI reader can serve.
 
@@ -1839,7 +1858,20 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"a collection read of {var_info.id} needs a bucket date window; "
                 "_api passes one for every bucket"
             )
-        reducer = self.reducer or var_info.default_reducer
+        # Resolve before comparing: `reducer=` accepts a `Reducer` instance as
+        # well as a name, and an instance is never a member of a set of strings,
+        # so testing the raw value let `Mosaic()` walk straight past this guard.
+        reducer = self._reducer_name(var_info)
+        if reducer not in _COLLECTION_REDUCERS:
+            # The reader takes a name from its own vocabulary. Anything outside
+            # it - `percentile` is the first such reducer - would reach the
+            # reader verbatim and raise a `ValueError` that is deliberately not
+            # in `_reader_errors`, aborting the download after the scenes had
+            # already been fetched. Earth Engine can express all of them.
+            return EnginePlan.declined(
+                f"reducer={reducer!r} is not in the reader's vocabulary, so "
+                "Earth Engine composites this instead"
+            )
         if reducer in _EEDAI_UNSUPPORTED_REDUCERS:
             # Checked before the network call: no point discovering scenes for a
             # composite the reader cannot reproduce.
@@ -2516,7 +2548,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             composite_kwargs = {
                 "start": bucket_start.strftime("%Y-%m-%d"),
                 "end": self._reader_end(bucket_end, bucket_start),
-                "reducer": self.reducer or var_info.default_reducer,
+                # A name, not the resolved object: the reader's `reducer=`
+                # takes one of its own vocabulary's strings.
+                "reducer": self._reducer_name(var_info),
             }
             if self.property_filter is not None:
                 composite_kwargs["property_filter"] = self.property_filter

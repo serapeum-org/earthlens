@@ -41,22 +41,54 @@ class TestTheSeamHeld:
         assert isinstance(_gee(make_gee, engine="pixels")._engine, PixelsEngine)
 
 
-class TestCapability:
-    """What this engine can do that the EEDAI reader cannot."""
+class TestItRefusesRatherThanMisroute:
+    """`plan` must not return a servable verdict until the fetch is wired.
 
-    def test_it_serves_a_request_with_a_cloud_mask(self, make_gee, fake_reader):
+    `_api` sends every accepted plan to the EEDAI reader, which materialises
+    *stored* pixels. A servable plan from here would therefore drop the
+    `cloud_mask` or `filters` this engine exists to serve, silently.
+    """
+
+    def test_planning_refuses_with_a_reason(self, make_gee, fake_reader):
+        """And the message names the engine to use instead."""
+        gee = _gee(make_gee, engine="pixels")
+        var_info = gee.catalog.get_dataset(ASSET)
+        with pytest.raises(NotImplementedError, match="cannot yet fetch"):
+            PixelsEngine().plan(gee, var_info, 1)
+
+    def test_the_refusal_names_the_alternative(self, make_gee, fake_reader):
+        """A refusal should say what to do, not just decline."""
+        gee = _gee(make_gee, engine="pixels")
+        var_info = gee.catalog.get_dataset(ASSET)
+        with pytest.raises(NotImplementedError, match="engine='auto'"):
+            PixelsEngine().plan(gee, var_info, 1)
+
+    def test_a_masked_request_is_not_served_from_stored_pixels(
+        self, make_gee, fake_reader
+    ):
+        """The specific data-correctness hole: compute must not be dropped."""
+        gee = _gee(make_gee, engine="pixels", cloud_mask=lambda image: image)
+        var_info = gee.catalog.get_dataset(ASSET)
+        with pytest.raises(NotImplementedError):
+            PixelsEngine().plan(gee, var_info, 1)
+
+
+class TestCapability:
+    """What the sizing half says it could serve, via `verdict`."""
+
+    def test_it_would_serve_a_request_with_a_cloud_mask(self, make_gee, fake_reader):
         """`computePixels` evaluates the graph, so compute is not a decline."""
         gee = _gee(make_gee, engine="pixels", cloud_mask=lambda image: image)
         var_info = gee.catalog.get_dataset(ASSET)
-        use_engine, plan = PixelsEngine().plan(gee, var_info, 1)
+        use_engine, plan = PixelsEngine().verdict(gee, var_info, 1)
         assert use_engine is True
         assert plan is not None and plan.can_serve
 
-    def test_it_serves_a_request_with_filters(self, make_gee, fake_reader):
+    def test_it_would_serve_a_request_with_filters(self, make_gee, fake_reader):
         """The other half of the EEDAI eligibility gate it does not share."""
         gee = _gee(make_gee, engine="pixels", filters=[lambda c: c])
         var_info = gee.catalog.get_dataset(ASSET)
-        assert PixelsEngine().plan(gee, var_info, 1)[0] is True
+        assert PixelsEngine().verdict(gee, var_info, 1)[0] is True
 
     def test_the_eedai_reader_would_decline_the_same_request(
         self, make_gee, fake_reader
@@ -73,7 +105,7 @@ class TestCapability:
         """A plan says which engine produced it, which is why 1.6 added the field."""
         gee = _gee(make_gee, engine="pixels")
         var_info = gee.catalog.get_dataset(ASSET)
-        _use, plan = PixelsEngine().plan(gee, var_info, 1)
+        _use, plan = PixelsEngine().verdict(gee, var_info, 1)
         assert plan.engine == "pixels"
 
 
@@ -86,7 +118,7 @@ class TestDeclines:
         var_info = gee.catalog.get_dataset(ASSET).model_copy(
             update={"spatial_resolution": None}
         )
-        assert PixelsEngine().plan(gee, var_info, 1) == (False, None)
+        assert PixelsEngine().verdict(gee, var_info, 1) == (False, None)
 
     def test_declines_an_aoi_the_crs_cannot_represent(self, make_gee, fake_reader):
         """The same finiteness guard the grid applies, surfaced as a fallback."""
@@ -99,7 +131,7 @@ class TestDeclines:
             lon_lim=[150.0, 160.0],
         )
         var_info = gee.catalog.get_dataset(ASSET)
-        assert PixelsEngine().plan(gee, var_info, 1) == (False, None)
+        assert PixelsEngine().verdict(gee, var_info, 1) == (False, None)
 
     def test_a_refusal_after_routing_is_fatal(self):
         """It is only reached by being asked for, so its refusal is the answer."""
@@ -143,7 +175,14 @@ class TestGridAndRequest:
 
     def test_a_declared_nodata_reaches_the_request(self, make_gee, fake_reader):
         """The ExportConfig field added in 1.9, threaded through."""
-        gee = _gee(make_gee, engine="pixels", nodata=-9999)
+        gee = _gee(make_gee, engine="pixels")
+        # Set on the config directly: there is no public `nodata=` kwarg while
+        # the fetch path that would honour it is unwired.
+        object.__setattr__(
+            gee,
+            "_export_config",
+            gee._export_config.model_copy(update={"nodata": -9999}),
+        )
         engine = PixelsEngine()
         grid = engine.grid_for(gee, 90.0)
         assert engine.request(gee, "i", grid, [])["grid"]["nodata"] == -9999
@@ -154,6 +193,59 @@ class TestGridAndRequest:
         engine = PixelsEngine()
         grid = engine.grid_for(gee, 90.0)
         assert "nodata" not in engine.request(gee, "i", grid, [])["grid"]
+
+    def test_the_grid_carries_the_backends_crs_and_cutline(self, make_gee, fake_reader):
+        """The engine reads the window from the backend rather than re-deriving it."""
+        gee = _gee(make_gee, engine="pixels")
+        grid = PixelsEngine().grid_for(gee, 90.0)
+        bbox, cutline = gee._eedai_window()
+        assert grid.crs == gee.crs
+        assert grid.bbox == bbox
+        assert grid.cutline is cutline
+
+    def test_the_dataset_resolution_is_used_when_no_scale_was_given(
+        self, make_gee, fake_reader
+    ):
+        """`scale=None` means the asset's native resolution, not no grid."""
+        gee = _gee(make_gee, engine="pixels", scale=None)
+        var_info = gee.catalog.get_dataset(ASSET)
+        use_engine, plan = PixelsEngine().verdict(gee, var_info, 1)
+        assert use_engine is True and plan is not None
+        native = PixelsEngine().grid_for(gee, float(var_info.spatial_resolution))
+        assert plan.tiles == native.tiles(2048)
+
+    def test_an_explicit_scale_overrides_the_dataset_resolution(
+        self, make_gee, fake_reader
+    ):
+        """A coarser request must not silently read at the native resolution."""
+        gee = _gee(make_gee, engine="pixels", scale=900.0)
+        engine = PixelsEngine()
+        coarse = engine.grid_for(gee, 900.0)
+        fine = engine.grid_for(gee, 90.0)
+        assert coarse.pixels < fine.pixels
+
+    def test_the_plan_counts_tiles_at_the_shared_tile_size(self, make_gee, fake_reader):
+        """A grid wider than one tile is reported as the tiles it cuts into."""
+        gee = _gee(
+            make_gee,
+            engine="pixels",
+            lat_lim=[29.0, 31.0],
+            lon_lim=[31.0, 33.0],
+            scale=30.0,
+        )
+        engine = PixelsEngine()
+        var_info = gee.catalog.get_dataset(ASSET)
+        expected = engine.grid_for(gee, 30.0).tiles(2048)
+        _use, plan = engine.verdict(gee, var_info, 1)
+        assert expected > 1, "the case has to be genuinely tiled to mean anything"
+        assert plan.tiles == expected
+
+    def test_the_tile_size_matches_the_eedai_streamers(self):
+        """The docstring claims either engine cuts the same way, so pin it."""
+        from earthlens.gee import backend as backend_module
+        from earthlens.gee import pixels as pixels_module
+
+        assert pixels_module._TILE_PIXELS == backend_module._EEDAI_TILE_PIXELS
 
 
 class TestHighVolumeEndpoint:

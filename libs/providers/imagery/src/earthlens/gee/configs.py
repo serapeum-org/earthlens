@@ -13,9 +13,9 @@ they are computed*. The same move `AggregationConfig` already made in core.
 One thing deliberately **not** done here: `crs` and `scale` are not carried as
 raw fields on both objects. Duplicating the grid inputs while leaving the
 derivation on the backend is how the god-class survives a refactor. They live on
-:class:`EngineConfig` once, and Task 1.12's `OutputGrid` owns turning them into a
-grid; `ExportConfig` reads them through :attr:`ExportConfig.grid_inputs` when a
-sink needs them for an Earth Engine export call.
+:class:`EngineConfig` once, and :class:`~earthlens.gee.grid.OutputGrid` owns
+turning them into a grid; a sink that needs them for an Earth Engine export call
+reads the pair back through :attr:`EngineConfig.grid_inputs`.
 """
 
 from __future__ import annotations
@@ -46,12 +46,45 @@ class ExportConfig(SummarisedLeaf):
         http_timeout: Timeout for the synchronous `getDownloadURL` fetch.
         wait_for_export: Block until an asynchronous task reaches a terminal
             state, rather than returning a `TaskInfo` at submission.
-        materialize: Return the in-memory pyramids object rather than only
-            writing files (Task 1.8).
+        materialize: Return the in-memory pyramids object alongside the written
+            file, as `DownloadResult.objects`, rather than only a path. Needs a
+            sink that writes pixels locally — a batch export has nothing to
+            hand back.
         nodata: The fill value to declare on the written raster. Lets the caller
             state it rather than inheriting whatever the driver does or does not
             declare — the configurable half of the no-fill-value divergence.
         dtype: The output data type, when the caller needs to pin it.
+
+    Examples:
+        - The default is the synchronous path, which needs no destination:
+            ```python
+            >>> config = ExportConfig()
+            >>> config.export_via, config.http_timeout
+            ('url', 300.0)
+
+            ```
+        - A sink's prerequisite is checked at construction, long before the
+          credential build and the catalog query a download would pay for:
+            ```python
+            >>> ExportConfig(export_via="gcs")
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for ExportConfig
+            ...
+            >>> ExportConfig(export_via="gcs", gcs_bucket="my-bucket").gcs_bucket
+            'my-bucket'
+
+            ```
+        - It is frozen, so a sink cannot rewrite the config it was handed:
+            ```python
+            >>> config = ExportConfig(cog=True)
+            >>> config.cog = False
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for ExportConfig
+            ...
+
+            ```
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid", arbitrary_types_allowed=True)
@@ -73,6 +106,10 @@ class ExportConfig(SummarisedLeaf):
     http_timeout: float = Field(default=DEFAULT_HTTP_TIMEOUT_S, gt=0)
     wait_for_export: bool = True
     materialize: bool = False
+    # Read only by `PixelsEngine.request`, whose fetch path is not wired yet,
+    # so there is deliberately no `GEE(nodata=...)` constructor kwarg: a public
+    # argument that silently does nothing is worse than its absence. The fields
+    # stay because the request builder is implemented and tested against them.
     nodata: float | int | None = None
     dtype: str | None = None
 
@@ -125,9 +162,11 @@ class EngineConfig(SummarisedLeaf):
         region: The cutline to clip to, or `None`.
         discover_extent: Fall back to an Earth Engine-side extent query when the
             catalog row's dates are missing.
-        high_volume: Route an engine that supports it at Earth Engine's
-            high-volume endpoint (Task 1.13). Less caching, and complex queries
-            cost more EECU-time there, so it is per-engine rather than global.
+        high_volume: Ask for Earth Engine's high-volume endpoint, read by the
+            engines that can use it (see
+            :meth:`~earthlens.gee.pixels.PixelsEngine.endpoint`). Less caching,
+            and complex queries cost more EECU-time there, so it is opted into
+            per request rather than switched on globally.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid", arbitrary_types_allowed=True)
@@ -155,6 +194,22 @@ class EngineConfig(SummarisedLeaf):
 
         Returns:
             `True` when a `cloud_mask` or any `filters` were given.
+
+        Examples:
+            - A plain request needs nothing computed, so the reader may serve
+              it:
+                ```python
+                >>> EngineConfig(scale=30.0).needs_server_side_compute
+                False
+
+                ```
+            - One collection filter is enough to make it an Earth Engine job:
+                ```python
+                >>> config = EngineConfig(filters=(lambda c: c.limit(10),))
+                >>> config.needs_server_side_compute
+                True
+
+                ```
         """
         return self.cloud_mask is not None or bool(self.filters)
 
@@ -166,6 +221,24 @@ class EngineConfig(SummarisedLeaf):
         reads them from one place rather than carrying its own copies.
 
         Returns:
-            The output CRS and the metre scale.
+            The output CRS and the metre scale, which is `None` when the read
+            should happen at the asset's native resolution.
+
+        Examples:
+            - The pair reads back as given, ready to unpack into a grid
+              constructor:
+                ```python
+                >>> crs, scale = EngineConfig(crs="EPSG:3857", scale=30.0).grid_inputs
+                >>> crs, scale
+                ('EPSG:3857', 30.0)
+
+                ```
+            - Without a `scale` the second half is `None`, which the engines
+              read as "use the asset's native resolution":
+                ```python
+                >>> EngineConfig().grid_inputs
+                ('EPSG:4326', None)
+
+                ```
         """
         return self.crs, self.scale

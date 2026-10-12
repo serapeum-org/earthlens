@@ -26,6 +26,8 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, ClassVar
 
+from pydantic import ConfigDict
+
 from earthlens.base.leaves import SummarisedLeaf
 
 __all__ = [
@@ -70,7 +72,13 @@ class WorkUnit(ABC):
     @property
     @abstractmethod
     def window(self) -> tuple[dt.datetime, dt.datetime]:
-        """Return the bucket's half-open `(start, end)` window."""
+        """Return the bucket's half-open `(start, end)` window.
+
+        Returns:
+            The inclusive start and exclusive end the payload covers. A
+            subclass whose payload spans something other than its own bucket
+            overrides this to say so.
+        """
 
     def as_tuple(self) -> tuple[dt.datetime, Any, dt.datetime, dt.datetime]:
         """Return the pre-Epic-1 four-tuple this replaced.
@@ -83,8 +91,8 @@ class WorkUnit(ABC):
     def __iter__(self) -> Iterator[Any]:
         """Unpack as the four-tuple `_composite` used to yield.
 
-        Kept so every existing caller — and the doctests and tests that read
-        `for when, image, start, end in gee._composite(...)` — keeps working.
+        Kept so a caller written as
+        `for when, image, start, end in gee._composite(...)` keeps working.
         New code should read the named attributes.
 
         Returns:
@@ -100,6 +108,9 @@ class WorkUnit(ABC):
 
         Returns:
             That element.
+
+        Raises:
+            IndexError: If `index` is outside the four positions.
         """
         return self.as_tuple()[index]
 
@@ -126,7 +137,41 @@ class _DatedWorkUnit(WorkUnit):
 
 
 class RasterWorkUnit(_DatedWorkUnit):
-    """One `ee.Image` — what every request produces today."""
+    """One `ee.Image` — what every request produces today.
+
+    Examples:
+        - The payload is reachable under its domain name, with the bucket it
+          covers:
+            ```python
+            >>> import datetime as dt
+            >>> unit = RasterWorkUnit(
+            ...     "an ee.Image",
+            ...     dt.datetime(2024, 1, 1),
+            ...     dt.datetime(2024, 1, 1),
+            ...     dt.datetime(2024, 2, 1),
+            ... )
+            >>> unit.kind, unit.image
+            ('raster', 'an ee.Image')
+            >>> start, end = unit.window
+            >>> start.date(), end.date()
+            (datetime.date(2024, 1, 1), datetime.date(2024, 2, 1))
+
+            ```
+        - It still unpacks as the four-tuple the pipeline used to pass around:
+            ```python
+            >>> import datetime as dt
+            >>> unit = RasterWorkUnit(
+            ...     "an ee.Image",
+            ...     dt.datetime(2024, 1, 1),
+            ...     dt.datetime(2024, 1, 1),
+            ...     dt.datetime(2024, 2, 1),
+            ... )
+            >>> when, image, bucket_start, bucket_end = unit
+            >>> when.date(), image
+            (datetime.date(2024, 1, 1), 'an ee.Image')
+
+            ```
+    """
 
     kind: ClassVar[str] = "raster"
 
@@ -163,9 +208,11 @@ class FeatureWorkUnit(_DatedWorkUnit):
 class Artifact(SummarisedLeaf):
     """What one bucket produced, written or in memory.
 
-    Exactly one of `path`, `destination` or `obj` is set, matching the three
-    things a sink can hand back: a file it wrote, a URI it queued work to, or the
-    in-memory object it built.
+    A sink populates the fields that describe what it handed back: a file it
+    wrote, a destination URI or submitted task for work it queued, and — when
+    `materialize` was asked for — the in-memory object read back from the file.
+    :attr:`value` collapses that to the single thing the pre-Epic-1 contract
+    returned.
 
     Attributes:
         kind: The work unit's kind, carried through so a caller can tell a
@@ -177,7 +224,10 @@ class Artifact(SummarisedLeaf):
         obj: The in-memory pyramids object, when `materialize` was asked for.
     """
 
-    model_config = SummarisedLeaf.model_config | {"arbitrary_types_allowed": True}
+    # Spelled out rather than derived from `SummarisedLeaf.model_config`: that
+    # base declares no config, so the `|` inherited pydantic's permissive
+    # defaults and quietly dropped both `frozen` and `extra`.
+    model_config = ConfigDict(frozen=True, extra="forbid", arbitrary_types_allowed=True)
 
     _summary_fields: ClassVar[tuple[str, ...]] = ("kind", "when", "path", "destination")
 
@@ -194,10 +244,28 @@ class Artifact(SummarisedLeaf):
 
         Preserves the pre-Epic-1 return contract: a `Path` for the synchronous
         sink, a destination string or `TaskInfo` for a batch sink, and the
-        in-memory object when one was asked for.
+        in-memory object when one was asked for. The first of `obj`, `path`,
+        `destination`, `task` that is set wins, so a materialised bucket — which
+        carries both the object and the file it was read back from — yields the
+        object.
 
         Returns:
-            The artifact's payload, whichever of the four is set.
+            The artifact's payload, or `None` when the artifact carries nothing.
+
+        Examples:
+            - A written file reads back as its path:
+                ```python
+                >>> from pathlib import Path
+                >>> Artifact(path=Path("chirps_precip_20240101.tif")).value.name
+                'chirps_precip_20240101.tif'
+
+                ```
+            - A queued export reads back as the destination it will appear at:
+                ```python
+                >>> Artifact(destination="drive://exports/era5_t2m").value
+                'drive://exports/era5_t2m'
+
+                ```
         """
         for candidate in (self.obj, self.path, self.destination, self.task):
             if candidate is not None:
@@ -214,9 +282,43 @@ class DownloadResult(SummarisedLeaf):
 
     Attributes:
         artifacts: One artifact per bucket, in the order they were written.
+
+    Examples:
+        - It stands in for the list of written paths, and compares equal to
+          one:
+            ```python
+            >>> from pathlib import Path
+            >>> result = DownloadResult(
+            ...     artifacts=(Artifact(path=Path("era5_t2m_20240101.tif")),)
+            ... )
+            >>> len(result)
+            1
+            >>> result == [Path("era5_t2m_20240101.tif")]
+            True
+
+            ```
+        - The written files are reachable as paths whatever else a bucket
+          carried:
+            ```python
+            >>> from pathlib import Path
+            >>> result = DownloadResult(
+            ...     artifacts=(
+            ...         Artifact(path=Path("a.tif")),
+            ...         Artifact(destination="gs://bucket/b"),
+            ...     )
+            ... )
+            >>> [path.name for path in result.paths]
+            ['a.tif']
+            >>> result.values[1]
+            'gs://bucket/b'
+
+            ```
     """
 
-    model_config = SummarisedLeaf.model_config | {"arbitrary_types_allowed": True}
+    # Spelled out rather than derived from `SummarisedLeaf.model_config`: that
+    # base declares no config, so the `|` inherited pydantic's permissive
+    # defaults and quietly dropped both `frozen` and `extra`.
+    model_config = ConfigDict(frozen=True, extra="forbid", arbitrary_types_allowed=True)
 
     _summary_fields: ClassVar[tuple[str, ...]] = ("artifacts",)
 
@@ -275,14 +377,17 @@ class DownloadResult(SummarisedLeaf):
     def __eq__(self, other: object) -> bool:
         """Compare equal to the plain list of payloads, as well as to a peer.
 
-        Keeps `assert el.download() == [path]` working in every existing test
-        and notebook, which is the contract this type has to preserve.
+        `download()` used to return that list, so code and notebooks written
+        against it compare the result straight to `[path]`. Keeping that true is
+        the contract this type has to preserve.
 
         Args:
             other: A `DownloadResult`, or a list of payloads.
 
         Returns:
-            Whether the two describe the same payloads.
+            Whether the two describe the same payloads, or `NotImplemented` for
+            anything else — which leaves the answer to the other operand rather
+            than claiming inequality.
         """
         if isinstance(other, DownloadResult):
             return self.artifacts == other.artifacts

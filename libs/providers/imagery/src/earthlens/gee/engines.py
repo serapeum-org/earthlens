@@ -7,16 +7,18 @@ sizing and fallback were fused into two methods, so adding an engine meant a new
 string in `_ENGINES` plus new branches in both.
 
 Each engine is an object here, and the registry resolves the `engine=` string to
-one. Adding an engine is a subclass plus a registry entry — which Task 1.13 then
-does, and that is the only real proof this seam is the right shape.
+one. Adding an engine is a subclass plus a registry entry — which
+:class:`~earthlens.gee.pixels.PixelsEngine` does, registering itself on import
+with no edit to the routing or export methods.
 
 **What moved and what did not.** The *decision* moved: eligibility, the forced
 raise, the no-scenes skip, the sizing-failure fallback and the post-routing
 refusal all live in the engines now. The *mechanics* — building the collection,
 writing through the reader or `getDownloadURL`, queueing a batch task — stay on
-the backend and are called back into, so this commit is behaviour-identical and
-the characterisation suite stays green. Moving the mechanics is what Tasks 1.4
-(`Sink`) and 1.7 (`WorkUnit`) do.
+the backend and are called back into, so routing an engine changes no observable
+behaviour. :class:`~earthlens.gee.sinks.Sink` and
+:class:`~earthlens.gee.work.WorkUnit` likewise carry the destination and the
+payload as types without having taken the writing itself off the backend.
 """
 
 from __future__ import annotations
@@ -44,12 +46,21 @@ __all__ = [
 ]
 
 #: Marker prefix on a decline caused by the *data* rather than the request, so a
-#: forced engine skips the bucket instead of failing the whole download.
+#: forced engine skips the bucket instead of failing the whole download. A plan
+#: claims the skip by starting its `reason` with this text, which is matched by
+#: prefix rather than equality so the reason can still name the dataset and
+#: window it found empty.
 NO_SCENES: str = "no scenes"
 
 
 class Engine(ABC):
     """Decide whether this engine serves a request, and if so with what plan.
+
+    Only :meth:`plan` is required. An engine whose plan can accept a read also
+    declares `refusal_is_fatal()`, which the backend consults when the read it
+    routed is refused after the fact — fatal under a forced engine, a fallback
+    under `auto`. It is only ever asked of an engine that accepted, which is why
+    :class:`EeEngine`, whose plan never does, does not define it.
 
     Attributes:
         name: The registry key, and the value a user's `engine=` string resolves
@@ -80,6 +91,20 @@ class Engine(ABC):
             `(use_this_engine, plan)`. A `False` carries `None`; a `True` always
             carries the plan the exporter reads its tiling off.
         """
+
+    def refusal_is_fatal(self) -> bool:
+        """Whether a refusal arriving *after* routing committed should propagate.
+
+        On the ABC with a safe default rather than left to each subclass: the
+        backend calls this on whichever engine it routed to, so an engine that
+        accepts a read and forgets to define it would raise `AttributeError`
+        part-way through an export instead of falling back.
+
+        Returns:
+            `False` — treat a late refusal as a fallback, which is the
+            conservative answer because it still produces the pixels.
+        """
+        return False
 
     def __repr__(self) -> str:
         """Return the engine's class name, for log lines and plans."""
@@ -161,6 +186,11 @@ class EedaiEngine(Engine):
                 compute, or targets a CRS the reader cannot size), or eligible
                 but declined by the sizing verdict. The message names the reason
                 and a matching remedy.
+            ImportError: If sizing a collection read needs the reader and the
+                `[eedai]` extra is not installed.
+            AuthenticationError: If a collection read's scene discovery cannot
+                build the reader's credential. Forced means the key is the
+                answer, so this propagates rather than falling back.
         """
         from earthlens.gee.backend import _eedai_remedy
 
@@ -211,9 +241,6 @@ class AutoEngine(Engine):
 
     name: ClassVar[str] = "auto"
 
-    def __init__(self) -> None:
-        self._eedai = EedaiEngine()
-
     def plan(
         self,
         backend: GEE,
@@ -233,10 +260,16 @@ class AutoEngine(Engine):
 
         Returns:
             `(True, plan)` when the reader serves it, else `(False, None)`.
+            Every other outcome — the extra not installed, an ineligible
+            request, a sizing failure, a credential the reader cannot build, an
+            empty bucket — is logged and routed to Earth Engine rather than
+            raised, because the caller asked for a download and not for this
+            engine.
         """
-        # Read through the backend module's binding, not a direct import: that
-        # attribute is the seam the test suite patches to simulate the extra
-        # being absent, and a direct import here would bypass it.
+        # Read `eedai_available` through the backend module's binding rather
+        # than importing it here: that attribute is the single seam through
+        # which the optional extra's presence is resolved, and a direct import
+        # would bypass it.
         from earthlens.gee import backend as backend_module
 
         if not (backend._eedai_eligible(var_info) and backend_module.eedai_available()):
@@ -273,7 +306,10 @@ class AutoEngine(Engine):
         return False
 
 
-#: Every engine addressable by `engine=`.
+#: Every engine addressable by `engine=`. Mutable on purpose: an engine in
+#: another module registers itself here on import — as
+#: :class:`~earthlens.gee.pixels.PixelsEngine` does — so the accepted names are
+#: derived from this one dict rather than restated anywhere.
 ENGINES: dict[str, type[Engine]] = {
     cls.name: cls for cls in (AutoEngine, EeEngine, EedaiEngine)
 }
@@ -328,6 +364,11 @@ def reader_refusal_types() -> tuple[type[BaseException], ...]:
 
     Returns:
         The exception types to catch around a reader export.
+
+    Raises:
+        ImportError: If `pyramids-eo` (the `[eedai]` extra) is not installed.
+            Only reached on a path that has already committed to the reader,
+            which cannot have been routed to without it.
     """
     from earthlens.gee.backend import _reader_errors
 

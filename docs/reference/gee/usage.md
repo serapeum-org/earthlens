@@ -278,17 +278,21 @@ written path, instead of only the paths:
 
 ```python
 result = GEE(..., engine="ee").download(materialize=True)
-result.paths            # the written files, as before
-result.objects          # the in-memory pyramids Datasets
-result == result.paths  # True - it still stands in for the list return
+result.paths     # the written files
+result.objects   # the in-memory pyramids Datasets
+list(result)     # the objects - materialising is what you asked for
 ```
+
+Note the one place the stand-in is not transparent: when you materialise, each artifact's value *is* the object, so
+`result` iterates and compares as the list of **objects**, not of paths. `result.paths` is how you get the files.
+Without `materialize=` nothing changes — `download()` returns the same plain list of paths it always did.
 
 It needs pixels on disk, so it is only meaningful for `export_via="url"`; a batch sink raises rather than handing
 back destinations with no objects.
 
-**Declaring the fill value.** `nodata=` (and `dtype=`) let you state the output's fill value rather than inheriting
-whatever the driver declares — which matters on the EEDAI path, where the driver declares none and a statistical
-reducer therefore folds a scene's fill pixels into the composite.
+**Not yet reachable.** `ExportConfig` carries `nodata` / `dtype`, and `EngineConfig` carries `high_volume`, but
+only the `pixels` request builder reads them and its fetch path is not wired — so there are deliberately no
+`GEE(nodata=...)` / `GEE(high_volume=...)` arguments yet, rather than public arguments that quietly do nothing.
 
 ## 6. Via the `EarthLens` facade
 

@@ -13,14 +13,24 @@ option when exports hit scaling problems, noting they "add complexity, but can
 scale to larger workloads", and points at the high-volume endpoint
 (`https://earthengine-highvolume.googleapis.com`) for parallel requests.
 
-So this engine is the first that is both **compute-capable** and **not cap-bound**
-— unlike `EedaiEngine`, it does not decline a `cloud_mask` or `filters`, because
-`computePixels` evaluates the graph server-side.
+So this engine is the first whose routing verdict is both **compute-capable** and
+**not cap-bound** — unlike `EedaiEngine`, it does not decline a `cloud_mask` or
+`filters`, because `computePixels` evaluates the graph server-side.
 
-It exists in Epic 1 rather than later for a specific reason: the `Engine` ABC's
-value was argued from a third engine that no task built, which left the central
-claim of the epic untested. Registering this one is the proof — and it required
-no edit to `_use_eedai` or `_api`, which is the acceptance criterion.
+**What it contributes today.** The engine owns the decision and the request: the
+serve/decline verdict (:meth:`PixelsEngine.plan`), the output grid
+(:meth:`PixelsEngine.grid_for`), the `computePixels` request body
+(:meth:`PixelsEngine.request`) and the endpoint to initialise against
+(:meth:`PixelsEngine.endpoint`). The call that posts that body is not wired into
+the backend's export path yet, so a request routed here is still served by the
+export mechanics the backend has — exactly the split
+:mod:`earthlens.gee.engines` describes, where the decision moved and the
+mechanics did not.
+
+It lands with the `Engine` ABC rather than after it because the ABC's value is
+the claim that a new engine is a subclass plus a registry entry. This engine is
+that claim exercised: it registers itself on import, with no edit to the
+routing or export methods.
 
 **The high-volume endpoint is per-engine, not global.** Its documented trade-off
 is real: less caching, and complex queries cost more EECU-time there than on the
@@ -50,12 +60,15 @@ HIGH_VOLUME_ENDPOINT: str = "https://earthengine-highvolume.googleapis.com"
 
 
 class PixelsEngine(Engine):
-    """Fetch pixels through `ee.data.computePixels` / `ee.data.getPixels`.
+    """Plan and shape a read for `ee.data.computePixels` / `ee.data.getPixels`.
 
-    Serves a computed image, so unlike the EEDAI reader it accepts a
-    `cloud_mask` and `filters`. It sizes its request from an
+    Accepts a computed image, so unlike the EEDAI reader it does not decline a
+    `cloud_mask` or `filters`. It sizes its request from an
     :class:`~earthlens.gee.grid.OutputGrid` rather than deriving a grid of its
     own, so it cannot disagree with the other engines about the output shape.
+
+    It answers for the routing verdict, the grid, the request body and the
+    endpoint; posting that body is not part of the backend's export path yet.
     """
 
     name: ClassVar[str] = "pixels"
@@ -85,6 +98,45 @@ class PixelsEngine(Engine):
         Returns:
             `(True, plan)` when it will serve the request, else `(False, None)`.
         """
+        # Refuse rather than route. `_api` sends every `(True, plan)` to the
+        # EEDAI reader - it has no `plan.engine` dispatch, because the reader
+        # path is reached before the composited image exists. So returning a
+        # servable plan here would hand a masked/filtered request to a reader
+        # that materialises *stored* pixels, silently dropping the very compute
+        # this engine exists to serve. Wiring the fetch means threading the
+        # image into that branch, which is a change to the download path proper.
+        raise NotImplementedError(
+            "engine='pixels' can size and describe a computePixels request but "
+            "cannot yet fetch one: the backend has no dispatch for it, and "
+            "routing it would silently serve the request from stored pixels "
+            "with any cloud_mask or filters dropped. Use engine='auto' (or "
+            "'ee') until the fetch path lands."
+        )
+
+    def verdict(
+        self,
+        backend: GEE,
+        var_info: Dataset,
+        band_count: int,
+        bucket_start: dt.datetime | None = None,
+        bucket_end: dt.datetime | None = None,
+    ) -> tuple[bool, EnginePlan | None]:
+        """Return the plan this engine *would* serve, without routing to it.
+
+        The sizing half of :meth:`plan`, split out so it stays exercisable while
+        the fetch path is unwired. It is deliberately not called by the backend.
+
+        Args:
+            backend: The `GEE` instance, for its config and the grid.
+            var_info: The catalog entry being read.
+            band_count: How many bands the read requests.
+            bucket_start: The bucket's inclusive start, for a collection read.
+            bucket_end: The bucket's exclusive end, for a collection read.
+
+        Returns:
+            `(True, plan)` when the pixel API could serve the request, else
+            `(False, None)`.
+        """
         scale = backend.scale or var_info.spatial_resolution
         if not scale:
             logger.info(
@@ -113,7 +165,13 @@ class PixelsEngine(Engine):
             scale: Ground sample distance in metres.
 
         Returns:
-            The sized grid.
+            The sized grid, carrying the AOI's cutline alongside the bbox.
+
+        Raises:
+            ValueError: If the AOI reprojects to non-finite bounds in the
+                output CRS, or `scale` is not a positive number of metres.
+                :meth:`plan` catches this and falls back rather than failing
+                the download.
         """
         bbox, cutline = backend._eedai_window()
         return OutputGrid.for_metre_grid(
@@ -127,12 +185,17 @@ class PixelsEngine(Engine):
 
         Args:
             backend: The `GEE` instance, for the export config.
-            image: The `ee.Image` to evaluate.
-            grid: The output grid to sample on.
-            bands: The bands to return.
+            image: The `ee.Image` to evaluate. It becomes the request's
+                `expression`, which is what makes a composite fetchable.
+            grid: The output grid to sample on, which supplies the request's
+                pixel dimensions and CRS.
+            bands: The bands to return; an empty list leaves `bandIds` out, so
+                the image's own bands are returned.
 
         Returns:
-            The keyword arguments for `ee.data.computePixels`.
+            The request body for `ee.data.computePixels`: `expression`,
+            `fileFormat`, `grid`, and `bandIds` when bands were named. The
+            configured `nodata` is declared on the grid when one was set.
         """
         body: dict[str, Any] = {
             "expression": image,
@@ -176,5 +239,6 @@ class PixelsEngine(Engine):
 _TILE_PIXELS: int = 2048
 
 # Registered on import, which is the whole point: adding an engine is a subclass
-# plus this line, with no edit to `_use_eedai` or `_api`.
+# plus this line. `engine='pixels'` becomes selectable because the accepted names
+# are derived from this dict, not restated next to the routing methods.
 ENGINES[PixelsEngine.name] = PixelsEngine
