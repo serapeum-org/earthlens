@@ -197,3 +197,90 @@ class TestDownloadContract:
         """The adapter holds it now, but the accessor is unchanged."""
         gee = make_gee()
         assert gee._eedai_credentials() is gee._eedai_reader().credential
+
+
+class TestRoundOneFixesStayFixed:
+    """Each of these was a verified defect; a regression must fail loudly."""
+
+    def test_a_percentile_reducer_declines_to_earth_engine(self, make_gee, fake_reader):
+        """It reached the reader verbatim and aborted after fetching scenes."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-30",
+            scale=5566.0,
+            reducer="percentile:90",
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(
+            var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+        )
+        assert plan is not None and not plan.can_serve
+        assert "vocabulary" in plan.reason
+
+    def test_the_decline_never_reaches_the_reader(self, make_gee, fake_reader):
+        """The point of declining early: no scene discovery, no credential."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-30",
+            scale=5566.0,
+            reducer="percentile:90",
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        gee._eedai_collection_fits(
+            var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+        )
+        assert fake_reader.calls == []
+
+    def test_the_remedy_names_the_reducers_the_reader_knows(self):
+        """A size remedy for a reducer problem was the mismatch to avoid."""
+        from earthlens.gee.backend import _eedai_remedy
+
+        remedy = _eedai_remedy("reducer='percentile' is not in the reader's vocabulary")
+        assert "median" in remedy
+        assert "smaller bbox" not in remedy
+
+    def test_a_reducer_instance_still_hits_the_mosaic_guard(self, make_gee):
+        """An instance is never a member of a set of strings."""
+        from earthlens.gee.reducers import Mosaic
+
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-30",
+            scale=5566.0,
+            reducer=Mosaic(),
+        )
+        assert gee._reducer_name(gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")) == (
+            "mosaic"
+        )
+
+    @pytest.mark.parametrize(
+        ("spec", "expected"),
+        [
+            ("median", "median"),
+            ("percentile:90", "percentile"),
+            (None, "mean"),
+        ],
+    )
+    def test_the_reducer_name_is_resolved_from_every_spelling(
+        self, make_gee, spec, expected
+    ):
+        """The guard and the reader-forward both need the name, not the form."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-30",
+            scale=5566.0,
+            reducer=spec,
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        assert gee._reducer_name(var_info) == expected
+
+    def test_the_no_scenes_marker_is_one_literal(self):
+        """Two copies matched by prefix would let the bucket-skip drift."""
+        from earthlens.gee import backend
+        from earthlens.gee.engines import NO_SCENES
+
+        assert backend._EEDAI_NO_SCENES is NO_SCENES

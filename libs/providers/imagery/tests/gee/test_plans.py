@@ -113,9 +113,10 @@ class TestSummary:
             "EnginePlan(eedai, can_serve, 4)"
         )
 
-    def test_an_acceptance_of_nothing_keeps_its_zero(self):
-        """Only a refusal drops the count, so a served zero stays visible."""
-        assert str(EnginePlan.serves(tiles=0)) == "EnginePlan(eedai, can_serve, 0)"
+    def test_a_served_plan_cannot_claim_no_work(self):
+        """`can_serve` with nothing to do is contradictory, so it is rejected."""
+        with pytest.raises(ValidationError, match="at least one unit of work"):
+            EnginePlan.serves(tiles=0)
 
     def test_a_refusal_names_the_engine_that_made_it(self):
         """With more than one engine the field stops being implied."""

@@ -35,7 +35,7 @@ from __future__ import annotations
 import math
 from typing import Any, ClassVar
 
-from pydantic import ConfigDict
+from pydantic import ConfigDict, Field
 
 from earthlens.base.leaves import SummarisedLeaf
 
@@ -136,6 +136,15 @@ def same_crs(region_crs: Any, target: str) -> bool:
             False
 
             ```
+
+    Note:
+        Equality here is PROJ's, which includes axis order, so some pairs that
+        name the same datum still compare `False` — `OGC:CRS84` and
+        `+proj=longlat +datum=WGS84` both differ from `EPSG:4326` on that
+        basis. The direction is safe (a `False` costs a reproject that was not
+        strictly needed, never a skipped one), but do not read this as "names
+        the same datum".
+
     """
     from pyproj import CRS
 
@@ -235,10 +244,20 @@ def geographic_grid(
         raise ValueError(f"the AOI bounds must be finite, got {bbox}")
     if scale <= 0 or not math.isfinite(scale):
         raise ValueError(f"scale must be a positive number of metres, got {scale}")
-    # Take `cos` at the poleward edge rather than the mid-latitude: for a tall AOI
-    # the mid-latitude value would under-count columns nearer the pole, sampling
-    # coarser than asked. The poleward edge only ever errs finer. Clamped away
-    # from the pole itself, where `cos` reaches zero.
+    # `cos` at the poleward edge. NOTE: this UNDER-samples, and the rationale
+    # previously written here had it backwards. The poleward edge has the
+    # smallest `cos`, so it yields the FEWEST columns and therefore the
+    # COARSEST pixels: AOI (0, 50, 1, 70) at scale=1000 gives 39 columns, i.e.
+    # 1835 m per pixel at latitude 50 - 1.8x coarser than asked. A global AOI
+    # at 1 km sizes 70 columns where 40076 are needed. The edge that preserves
+    # the requested resolution is the EQUATORWARD one, min(|min_y|, |max_y|).
+    #
+    # Kept as-is regardless, because this arithmetic is byte-identical to the
+    # pre-refactor code and Epic 1 is a behaviour-preserving extraction -
+    # changing the grid every geographic read is sized on is the owner's call,
+    # not a refactor's side effect. Tracked as a known defect; the test for this
+    # pins the current numbers so a fix is a deliberate, visible diff.
+    # The clamp keeps `cos` away from the pole itself, where it reaches zero.
     poleward = min(max(abs(min_y), abs(max_y)), _MAX_POLEWARD_DEGREES)
     height_m = abs(max_y - min_y) * _METRES_PER_DEGREE
     width_m = abs(max_x - min_x) * _METRES_PER_DEGREE * math.cos(math.radians(poleward))
@@ -287,11 +306,16 @@ def projected_grid(
         # projection's domain; without this the budget maths would raise an
         # opaque OverflowError from `math.ceil` instead.
         raise ValueError(f"the AOI bounds must all be finite, got {bbox!r} in {crs}")
-    if not scale or scale <= 0:
+    # `isfinite` as well as the sign test: an infinite scale otherwise sized a
+    # 1x1 grid and a NaN one reached `math.ceil` to raise a bare CPython
+    # message, against a docstring promising a positive finite number.
+    if not scale or scale <= 0 or not math.isfinite(scale):
         raise ValueError("'scale' must be a positive number of metres.")
     min_x, min_y, max_x, max_y = (float(v) for v in bbox)
-    rows = max(math.ceil((max_y - min_y) / scale), 1)
-    cols = max(math.ceil((max_x - min_x) / scale), 1)
+    # `abs`, as the geographic sizer does: an inverted bbox silently produced a
+    # single column here rather than the extent it spans.
+    rows = max(math.ceil(abs(max_y - min_y) / scale), 1)
+    cols = max(math.ceil(abs(max_x - min_x) / scale), 1)
     return rows, cols
 
 
@@ -365,8 +389,10 @@ class OutputGrid(SummarisedLeaf):
 
     bbox: tuple[float, float, float, float]
     crs: str
-    rows: int
-    cols: int
+    # `ge=1`: a 0x0 grid used to satisfy `fits()` with room to spare, and a
+    # negative one passed the per-axis cap through `longest_axis`.
+    rows: int = Field(ge=1)
+    cols: int = Field(ge=1)
     scale: float | None = None
     convention: str = "metre"
     cutline: Any = None

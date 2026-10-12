@@ -73,6 +73,10 @@ class PixelsEngine(Engine):
 
     name: ClassVar[str] = "pixels"
 
+    #: Not selectable with `engine=`: the sizing and the request body are
+    #: implemented, the transport that would post them is not.
+    implemented: ClassVar[bool] = False
+
     def plan(
         self,
         backend: GEE,
@@ -96,7 +100,12 @@ class PixelsEngine(Engine):
             bucket_end: The bucket's exclusive end, for a collection read.
 
         Returns:
-            `(True, plan)` when it will serve the request, else `(False, None)`.
+            Never returns — see `Raises`. :meth:`verdict` is the sizing half.
+
+        Raises:
+            NotImplementedError: Always. The backend routes any accepted plan to
+                the EEDAI reader, so returning one here would serve a computed
+                request from stored pixels with the computation dropped.
         """
         # Refuse rather than route. `_api` sends every `(True, plan)` to the
         # EEDAI reader - it has no `plan.engine` dispatch, because the reader

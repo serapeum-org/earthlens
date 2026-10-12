@@ -182,6 +182,8 @@ class EngineConfig(SummarisedLeaf):
     property_filter: str | None = None
     region: Any = None
     discover_extent: bool = False
+    # Read only by `PixelsEngine.endpoint`, whose fetch path is not wired, so
+    # there is no `GEE(high_volume=...)` kwarg yet - same reasoning as `nodata`.
     high_volume: bool = False
 
     @property

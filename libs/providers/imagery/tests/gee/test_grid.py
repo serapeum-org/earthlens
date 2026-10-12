@@ -52,16 +52,19 @@ class TestGeographicGrid:
         """Rounding up never produces a zero-sized raster."""
         assert geographic_grid((31.2, 29.9, 31.2001, 29.9001), 90.0) == (1, 1)
 
-    def test_uses_the_poleward_edge_not_the_mid_latitude(self):
-        """A tall AOI must not under-count columns nearer the pole."""
-        tall = (0.0, 50.0, 1.0, 70.0)
-        _rows, cols = geographic_grid(tall, 1000.0)
-        # The poleward edge (70 deg) shortens more than the mid-latitude (60 deg)
-        # would, so the count is the finer of the two.
-        import math
+    def test_the_poleward_cos_under_samples_a_tall_aoi(self):
+        """Pins today's under-sampling so correcting it is a visible diff."""
+        # The poleward edge has the smallest cos, so it yields the FEWEST
+        # columns and the COARSEST pixels - the opposite of what this code's
+        # comment used to claim. 39 columns over 1 degree of longitude is
+        # 1835 m per pixel at latitude 50, for a requested scale of 1000 m.
+        # Preserved from before the refactor; see the note in grid.py.
+        assert geographic_grid((0.0, 50.0, 1.0, 70.0), 1000.0) == (2227, 39)
 
-        at_mid = math.ceil(1.0 * 111_320.0 * math.cos(math.radians(60.0)) / 1000.0)
-        assert cols < at_mid
+    def test_a_global_aoi_is_under_sampled_in_longitude(self):
+        """The same defect at its worst, pinned rather than asserted as correct."""
+        # 70 columns where 40076 are needed to hold 1 km pixels at the equator.
+        assert geographic_grid((-180.0, -90.0, 180.0, 90.0), 1000.0)[1] == 70
 
     @pytest.mark.parametrize("scale", [0, -90.0, float("inf"), float("nan")])
     def test_rejects_a_non_positive_or_non_finite_scale(self, scale):

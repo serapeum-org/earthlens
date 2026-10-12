@@ -167,6 +167,15 @@ _EEDAI_MAX_NATIVE_PIXELS: int = 4_000_000_000
 #: native resolution into memory before downsampling.
 _EEDAI_MAX_PIXELS: int = 200_000_000
 
+#: The extra guidance a prerequisite message carries beyond the field name,
+#: keyed by `Sink.required_config` so a new sink needs no edit here unless it
+#: wants a hint of its own.
+_SINK_PREREQUISITE_HINT: dict[str, str] = {
+    "asset_id": (
+        "(the parent folder asset, e.g. 'projects/my-project/assets/my-folder')"
+    ),
+}
+
 #: Marks a decline caused by the *data* rather than the request, so a forced
 #: `engine="eedai"` skips the bucket instead of failing the whole download.
 #: Aliases `engines.NO_SCENES` rather than repeating the string: the skip is a
@@ -227,9 +236,9 @@ def _engine_names() -> frozenset[str]:
         Every registered engine name.
     """
     from earthlens.gee import pixels  # noqa: F401 - registers PixelsEngine
-    from earthlens.gee.engines import ENGINES
+    from earthlens.gee.engines import selectable_engines
 
-    return frozenset(ENGINES)
+    return selectable_engines()
 
 
 _ZIP_MAGIC: bytes = b"PK\x03\x04"
@@ -476,6 +485,12 @@ def _eedai_remedy(reason: str) -> str:
         return (
             "Pass a statistical reducer (mean/median/min/max/sum), or "
             "engine='ee' to keep Earth Engine's mosaic semantics."
+        )
+    if "not in the reader's vocabulary" in reason:
+        return (
+            "Pass one of the reducers the reader knows "
+            "(mean/median/min/max/mode/sum), or engine='ee', which can express "
+            "any of them."
         )
     if "credential" in reason:
         return "Fix the service key or service account, or use engine='ee'."
@@ -854,32 +869,47 @@ class GEE(LazyClientMixin, AbstractDataSource):
     ):
         # Validate the cheap (no-I/O) config first so user typos surface
         # before the ~3.3 s cold-cache catalog parse below.
-        if export_via not in {"url", "drive", "gcs", "asset"}:
-            raise ValueError(
-                f"export_via must be 'url', 'drive', 'gcs', or 'asset', "
-                f"got {export_via!r}"
-            )
+        # Resolved, not matched against a restated set: the literal vocabulary
+        # here was the reason a newly registered sink was still rejected, which
+        # made the "adding a sink needs no backend edit" claim false.
+        sink = resolve_sink(export_via)
         if property_filter is not None:
             _validate_property_filter(property_filter)
-        if export_via == "drive" and not drive_folder:
-            raise ValueError("export_via='drive' requires drive_folder=")
-        if export_via == "gcs" and not gcs_bucket:
-            raise ValueError("export_via='gcs' requires gcs_bucket=")
-        if export_via == "asset" and not asset_id:
+        # Both inputs are known now, so refuse now: checking after `download()`
+        # meant every export in the run completed - and, with the default
+        # `wait_for_export=True`, was polled to completion - before raising,
+        # losing the destinations it had just produced.
+        if materialize and sink.is_batch:
             raise ValueError(
-                "export_via='asset' requires asset_id= (the parent folder "
-                "asset, e.g. 'projects/my-project/assets/my-folder')"
+                f"materialize=True needs pixels on disk, but export_via="
+                f"{export_via!r} queues the work remotely and returns a "
+                "destination. Use export_via='url', or pull the result from "
+                "the destination yourself."
             )
+        # Driven by `Sink.required_config`, so a sink declares its own
+        # prerequisite instead of this function knowing each one by name.
+        if sink.required_config is not None:
+            if not {
+                "drive_folder": drive_folder,
+                "gcs_bucket": gcs_bucket,
+                "asset_id": asset_id,
+            }.get(sink.required_config):
+                hint = _SINK_PREREQUISITE_HINT.get(sink.required_config, "")
+                raise ValueError(
+                    f"export_via={export_via!r} requires "
+                    f"{sink.required_config}={hint}".rstrip()
+                )
         if cloud_mask is not None and not callable(cloud_mask):
             raise TypeError(
                 "cloud_mask must be a callable ee.Image -> ee.Image (or None), "
                 f"got {type(cloud_mask).__name__}"
             )
         collection_filters = _validate_filters(filters)
-        if engine not in _engine_names():
-            raise ValueError(
-                f"engine must be one of {sorted(_engine_names())}, got {engine!r}"
-            )
+        # Validated by `resolve_engine`, not re-checked here: it owns the one
+        # message that can tell "no such engine" apart from "registered but not
+        # selectable yet", and a second copy of the vocabulary is what let the
+        # two drift in the first place.
+        resolve_engine(engine)
         _validate_pure_config(start, end, temporal_resolution, fmt)
 
         # These must be set before `super().__init__` runs, because the
@@ -1280,6 +1310,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
             earthlens.gee.auth.EarthEngineAuth: Performs the one-time
                 `ee.Initialize` used by :meth:`_open_client`.
         """
+        # Before anything is exported: the refusal used to arrive after every
+        # bucket had been written and polled to completion, which threw away
+        # the destinations it had just produced.
+        if (self.materialize if materialize is None else materialize) and (
+            self._sink.is_batch
+        ):
+            raise ValueError(
+                f"materialize=True needs pixels on disk, but export_via="
+                f"{self.export_via!r} queues the work remotely and returns a "
+                "destination. Use export_via='url', or pull the result from "
+                "the destination yourself."
+            )
         # Trigger the lazy Earth Engine auth/init before any `ee` call.
         _ = self.client
         self._cog_warned = False  # the cog= notice is once per run, not per object
@@ -1319,13 +1361,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 there is nothing local to read back, so asking to materialise a
                 queued export is a mistake worth naming.
         """
-        if not any(isinstance(entry, Path) for entry in written):
-            raise ValueError(
-                f"materialize=True needs pixels on disk, but export_via="
-                f"{self.export_via!r} queues the work remotely and returns a "
-                "destination. Use export_via='url', or pull the result from the "
-                "destination yourself."
-            )
+        # The batch sinks are refused at construction, so anything reaching
+        # here with no written file produced no buckets at all - an empty result
+        # is the honest answer, not an error about the sink.
         artifacts: list[Artifact] = []
         for entry in written:
             if isinstance(entry, Path):

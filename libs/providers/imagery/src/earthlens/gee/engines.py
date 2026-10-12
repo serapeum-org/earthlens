@@ -37,6 +37,7 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
     from earthlens.gee.catalog import Dataset
 
 __all__ = [
+    "selectable_engines",
     "Engine",
     "EeEngine",
     "EedaiEngine",
@@ -91,6 +92,13 @@ class Engine(ABC):
             `(use_this_engine, plan)`. A `False` carries `None`; a `True` always
             carries the plan the exporter reads its tiling off.
         """
+
+    #: Whether this engine can actually fetch pixels, and may therefore be
+    #: selected with `engine=`. An engine registers itself to prove the seam and
+    #: to keep its sizing testable before its transport exists; until then it
+    #: stays out of the selectable vocabulary rather than being offered as a
+    #: choice that fails later.
+    implemented: ClassVar[bool] = True
 
     def refusal_is_fatal(self) -> bool:
         """Whether a refusal arriving *after* routing committed should propagate.
@@ -315,6 +323,27 @@ ENGINES: dict[str, type[Engine]] = {
 }
 
 
+def selectable_engines() -> frozenset[str]:
+    """Return the engine names `engine=` accepts.
+
+    `ENGINES` holds every registered engine; this holds the ones that can
+    actually fetch pixels. The two differ while an engine's transport is still
+    being built, which is why the vocabulary is derived from this rather than
+    from the registry directly.
+
+    Returns:
+        The names whose engine reports `implemented`.
+
+    Examples:
+        ```python
+        >>> sorted(selectable_engines())
+        ['auto', 'ee', 'eedai']
+
+        ```
+    """
+    return frozenset(name for name, engine in ENGINES.items() if engine.implemented)
+
+
 def resolve_engine(spec: str | Engine) -> Engine:
     """Resolve an engine name, or pass an instance through.
 
@@ -350,8 +379,15 @@ def resolve_engine(spec: str | Engine) -> Engine:
         raise TypeError(
             f"engine must be a name or an Engine instance, got {type(spec).__name__}"
         )
+    if spec in ENGINES and not ENGINES[spec].implemented:
+        raise ValueError(
+            f"engine={spec!r} is registered but cannot fetch pixels yet, so it "
+            f"is not selectable; use one of {sorted(selectable_engines())}"
+        )
     if spec not in ENGINES:
-        raise ValueError(f"engine must be one of {sorted(ENGINES)}, got {spec!r}")
+        raise ValueError(
+            f"engine must be one of {sorted(selectable_engines())}, got {spec!r}"
+        )
     return ENGINES[spec]()
 
 

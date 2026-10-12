@@ -261,12 +261,18 @@ methods, which preserve band names. `Percentile` has to use `reduce`, which suff
 making it interchangeable with the rest. `resolve_reducer` accepts a name, a `percentile:<q>` spec or an instance,
 and resolves once per request, so a bad percentile fails before any bucket exports rather than part-way through.
 
-**Engines.** `engine=` resolves to an `Engine`. `"auto"` prefers the EEDAI reader and falls back to Earth Engine on
-any decline; `"ee"` always uses `getDownloadURL`; `"eedai"` forces the reader and raises if it cannot serve; and
-`"pixels"` fetches through `ee.data.computePixels`, which — unlike the reader — evaluates a computation graph, so it
-serves a request carrying a `cloud_mask` or `filters` without the 32768-px per-axis cap.
+**Engines.** `engine=` resolves to an `Engine`. There are three to choose from: `"auto"` prefers the EEDAI reader and
+falls back to Earth Engine on any decline; `"ee"` always uses `getDownloadURL`; and `"eedai"` forces the reader and
+raises if it cannot serve.
 
-**Grids.** `OutputGrid` owns turning the AOI, `crs` and `scale` into a pixel grid, with one constructor per
+A fourth, `"pixels"`, is **registered but not selectable**. It would fetch through `ee.data.computePixels`, which
+evaluates a computation graph and so could serve a `cloud_mask` or `filters` without the 32768-px per-axis cap that
+`getDownloadURL` imposes — but only its sizing and request-body construction exist; the transport does not. It is
+registered so that the engine seam is exercised by something other than the two incumbents, and `engine="pixels"` is
+rejected at construction rather than offered as a choice that fails later. `selectable_engines()` is the list
+`engine=` accepts; `ENGINES` is every registered engine.
+
+**Grids.** `OutputGrid` is where the AOI, `crs` and `scale` become a pixel grid, with one constructor per
 convention: `for_metre_grid` sizes for square metres on the ground (the reader's rule, shortening longitude by
 `cos(latitude)`), `for_earth_engine` reads `scale` as a uniform degree-equivalent (Earth Engine's rule), and
 `from_crs_transform` pins the grid origin so stacked dates align without a resample. Away from the equator the first

@@ -29,6 +29,7 @@ from typing import Any, ClassVar
 from pydantic import ConfigDict
 
 from earthlens.base.leaves import SummarisedLeaf
+from earthlens.base.raster import close_quietly
 
 __all__ = [
     "WorkUnit",
@@ -350,6 +351,39 @@ class DownloadResult(SummarisedLeaf):
             The pyramids object of every artifact that carries one.
         """
         return [a.obj for a in self.artifacts if a.obj is not None]
+
+    def close(self) -> None:
+        """Close every in-memory object this result holds.
+
+        Materialising hands back live pyramids objects, and each one keeps a
+        GDAL handle open. On Windows that handle locks the file, so a later
+        write or rename of the same path fails with `PermissionError` until it
+        is released — and a `gc.collect()` cannot free it while the caller still
+        holds the result. Call this, or use the result as a context manager,
+        once the objects are no longer needed.
+
+        Idempotent, and never raises: an already-closed handle, or a value that
+        is not a dataset, is skipped.
+        """
+        for artifact in self.artifacts:
+            close_quietly(artifact.obj)
+
+    def __enter__(self) -> DownloadResult:
+        """Return the result, so it can be used as a context manager.
+
+        Returns:
+            This result.
+        """
+        return self
+
+    def __exit__(self, *exc_info: object) -> None:
+        """Close every held object on the way out.
+
+        Args:
+            *exc_info: The exception triple, ignored — closing happens either
+                way.
+        """
+        self.close()
 
     def __iter__(self) -> Iterator[Any]:  # type: ignore[override]
         """Iterate the payloads, so it stands in for the old `list` return.

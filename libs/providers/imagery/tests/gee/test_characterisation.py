@@ -268,17 +268,25 @@ class TestEngineVocabulary:
     """The `engine` strings the constructor accepts."""
 
     def test_the_engine_vocabulary(self):
-        """Pins the vocabulary, so adding an engine stays a deliberate diff.
+        """Pins what `engine=` accepts, so a change there is a deliberate diff."""
+        assert set(backend_module._ENGINES) == {"auto", "ee", "eedai"}
 
-        `pixels` joined in Task 1.13 — which is what this pin was written to
-        surface, rather than letting a new engine appear unremarked.
-        """
-        assert set(backend_module._ENGINES) == {"auto", "ee", "eedai", "pixels"}
+    def test_a_registered_engine_that_cannot_fetch_is_not_selectable(self):
+        """`pixels` is registered to exercise the seam, not offered as a choice."""
+        from earthlens.gee.engines import ENGINES, selectable_engines
 
-    @pytest.mark.parametrize("engine", ["auto", "ee", "eedai", "pixels"])
+        assert "pixels" in ENGINES
+        assert "pixels" not in selectable_engines()
+
+    @pytest.mark.parametrize("engine", ["auto", "ee", "eedai"])
     def test_each_engine_is_accepted(self, make_gee, engine):
-        """Each registered engine constructs without error."""
+        """Each selectable engine constructs without error."""
         assert _batch_gee(make_gee, engine=engine).engine == engine
+
+    def test_an_unfetchable_engine_is_rejected_at_construction(self, make_gee):
+        """Not per-bucket after auth and the collection build."""
+        with pytest.raises(ValueError, match="not selectable"):
+            _batch_gee(make_gee, engine="pixels")
 
     def test_an_unknown_engine_is_rejected(self, make_gee):
         """An unknown engine raises at construction, not at download."""

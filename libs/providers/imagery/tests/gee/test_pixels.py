@@ -14,31 +14,46 @@ ASSET = "USGS/SRTMGL1_003"
 
 
 def _gee(make_gee, **overrides):
-    """A GEE over one small SRTM read."""
+    """A GEE over one small SRTM read.
+
+    Built with a selectable engine: `engine="pixels"` is rejected at
+    construction, so these tests drive `PixelsEngine` directly against a
+    backend that holds the request.
+    """
     params = {"variables": {ASSET: ["elevation"]}, "scale": 90.0}
     params.update(overrides)
+    params.pop("engine", None)
     return make_gee(**params)
 
 
 class TestTheSeamHeld:
     """The acceptance criterion for Task 1.3, asserted rather than asserted of."""
 
-    def test_registering_is_enough_to_make_it_selectable(self):
-        """No edit to `_use_eedai` or `_api` was needed — only this entry."""
+    def test_registering_is_enough_to_reach_the_backend(self):
+        """One registry line, with no edit to `_use_eedai` or `_api`.
+
+        Selectability is a separate question: an engine that cannot fetch is
+        registered but kept out of the `engine=` vocabulary.
+        """
         assert ENGINES["pixels"] is PixelsEngine
-        assert isinstance(resolve_engine("pixels"), PixelsEngine)
+        with pytest.raises(ValueError, match="not selectable"):
+            resolve_engine("pixels")
 
     def test_it_is_a_real_engine(self):
         """It satisfies the same ABC the two incumbents do."""
         assert issubclass(PixelsEngine, Engine)
 
-    def test_the_constructor_accepts_it(self, make_gee, fake_reader):
-        """The `engine=` vocabulary is derived from the registry, not restated."""
-        assert _gee(make_gee, engine="pixels").engine == "pixels"
+    def test_it_is_registered_but_not_selectable(self, make_gee, fake_reader):
+        """Registered to exercise the seam; not offered as a working choice."""
+        from earthlens.gee.engines import selectable_engines
 
-    def test_the_backend_resolves_it_to_the_object(self, make_gee, fake_reader):
-        """Resolution happens once, in the constructor."""
-        assert isinstance(_gee(make_gee, engine="pixels")._engine, PixelsEngine)
+        assert "pixels" in ENGINES
+        assert "pixels" not in selectable_engines()
+
+    def test_the_constructor_rejects_it_with_a_reason(self, make_gee, fake_reader):
+        """Rejected up front, not per-bucket after auth and the catalog read."""
+        with pytest.raises(ValueError, match="not selectable"):
+            make_gee(variables={ASSET: ["elevation"]}, scale=90.0, engine="pixels")
 
 
 class TestItRefusesRatherThanMisroute:

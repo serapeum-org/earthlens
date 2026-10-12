@@ -29,7 +29,7 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, model_validator
 
 from earthlens.base.leaves import SummarisedLeaf
 
@@ -90,6 +90,35 @@ class EnginePlan(SummarisedLeaf):
     tile_size: int | None = None
     tiles: int = Field(default=1, ge=0)
     reason: str = ""
+
+    @model_validator(mode="after")
+    def _reject_a_self_contradictory_plan(self) -> EnginePlan:
+        """Refuse the states a plan has no meaning in.
+
+        The named constructors cannot produce these, but the model is public and
+        `ExportConfig` already validates across its fields, so the invariant
+        belongs on the type rather than in the habits of its callers.
+
+        Returns:
+            The validated plan.
+
+        Raises:
+            ValueError: If a refusal carries no reason (the remedy text would
+                read `cannot serve X: .`), if a servable plan claims no units of
+                work, or if `tile_size` is set but not positive.
+        """
+        if not self.can_serve and not (self.reason or "").strip():
+            raise ValueError("a declined plan must carry a reason")
+        if self.can_serve and self.tiles < 1:
+            raise ValueError(
+                f"a servable plan must have at least one unit of work, got "
+                f"tiles={self.tiles}"
+            )
+        if self.tile_size is not None and self.tile_size < 1:
+            raise ValueError(
+                f"tile_size must be a positive number of pixels, got {self.tile_size}"
+            )
+        return self
 
     def summary_parts(self) -> list[str]:
         """Drop the unit count from a refusal's summary.

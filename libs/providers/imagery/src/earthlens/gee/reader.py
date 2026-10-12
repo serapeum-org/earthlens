@@ -18,6 +18,18 @@ the loser reads as the wrong account, silently. Sequential reads are unaffected.
 This adapter serialises reads behind a module-level lock and refuses a read that
 would change the in-effect identity while another is in flight, so the race
 becomes an error rather than wrong pixels.
+
+**What is wired, as of this commit.** The credential factory is used — the
+backend reads `.credential` from here. The read methods and the identity guard
+are not: both real read sites call the lazily-imported module directly, so
+`estimate_cost` / `from_earthengine` / `collection_from_earthengine` have no
+production caller yet, and the guard therefore protects nothing in practice.
+Note also that `_IN_EFFECT` is set and cleared inside `_READ_LOCK`, so no other
+thread can ever observe a foreign identity through it — the lock already
+serialises the whole read. The guard fires only on same-thread re-entrancy. The
+save/restore is correct, and moving the read sites onto this adapter is what
+makes the protection real; until then this is an adapter with one live method.
+
 """
 
 from __future__ import annotations

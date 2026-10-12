@@ -1231,10 +1231,12 @@ class TestExportViaAsset:
         with pytest.raises(ValueError, match="export_via='asset' requires asset_id"):
             make_gee(export_via="asset")
 
-    def test_unknown_export_via_lists_asset_too(self, make_gee):
-        """The updated ValueError message advertises `'asset'` as a valid sink."""
-        with pytest.raises(ValueError, match="'url', 'drive', 'gcs', or 'asset'"):
+    def test_unknown_export_via_lists_every_sink(self, make_gee):
+        """The message names all four sinks, derived from the registry."""
+        with pytest.raises(ValueError) as caught:
             make_gee(export_via="ftp")
+        message = str(caught.value)
+        assert all(name in message for name in ("url", "drive", "gcs", "asset"))
 
     def test_asset_export_queues_to_asset_and_returns_ee_uri(self, make_gee):
         """An Asset export queues a `toAsset` task and returns `ee://<asset>/<prefix>`."""

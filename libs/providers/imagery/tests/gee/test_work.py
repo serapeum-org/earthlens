@@ -6,6 +6,7 @@ import datetime as dt
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from earthlens.gee.work import (
     Artifact,
@@ -16,6 +17,18 @@ from earthlens.gee.work import (
 )
 
 from .test_backend import fake_ee, fake_reader, make_gee  # noqa: F401 - fixtures
+
+
+class _Handle:
+    """A stand-in for a pyramids dataset that records being closed."""
+
+    def __init__(self):
+        self.closed = False
+
+    def close(self):
+        """Record the close."""
+        self.closed = True
+
 
 WHEN = dt.datetime(2020, 6, 1)
 END = dt.datetime(2020, 7, 1)
@@ -286,3 +299,72 @@ class TestMaterializeThroughDownload:
         """The *kind* is still raster; only the container differs."""
         gee = make_gee(engine="ee", materialize=True)
         assert gee.OUTPUT_KIND == "raster"
+
+
+class TestClosingAMaterialisedResult:
+    """Materialising hands back live GDAL handles, so they must be releasable."""
+
+    def _result(self, *handles):
+        return DownloadResult(
+            artifacts=tuple(Artifact(path=Path("a.tif"), obj=h) for h in handles)
+        )
+
+    def test_close_closes_every_held_object(self):
+        """One open handle per bucket, all released together."""
+        first, second = _Handle(), _Handle()
+        self._result(first, second).close()
+        assert first.closed and second.closed
+
+    def test_close_is_idempotent(self):
+        """Calling it twice must not raise."""
+        handle = _Handle()
+        result = self._result(handle)
+        result.close()
+        result.close()
+        assert handle.closed
+
+    def test_it_works_as_a_context_manager(self):
+        """The shape a caller should reach for."""
+        handle = _Handle()
+        with self._result(handle) as result:
+            assert result.objects == [handle]
+            assert not handle.closed
+        assert handle.closed
+
+    def test_a_value_that_is_not_a_dataset_is_skipped(self):
+        """Closing must never raise on an object with no `close`."""
+        DownloadResult(artifacts=(Artifact(obj="not a dataset"),)).close()
+
+    def test_an_unmaterialised_result_closes_cleanly(self):
+        """Nothing was opened, so there is nothing to release."""
+        DownloadResult(artifacts=(Artifact(path=Path("a.tif")),)).close()
+
+
+class TestFrozenValueObjects:
+    """Round 1 made these frozen and strict; that must stay asserted."""
+
+    def test_an_artifact_is_frozen(self):
+        """It is a value object, like every other Epic 1 leaf."""
+        artifact = Artifact(path=Path("a.tif"))
+        with pytest.raises(ValidationError):
+            artifact.kind = "vector"
+
+    def test_an_artifact_rejects_an_unknown_field(self):
+        """A mistyped keyword must not be silently dropped."""
+        with pytest.raises(ValidationError):
+            Artifact(bogus=1)
+
+    def test_a_download_result_is_frozen(self):
+        """Same contract on the container."""
+        result = DownloadResult(artifacts=())
+        with pytest.raises(ValidationError):
+            result.artifacts = ()
+
+    def test_a_download_result_rejects_an_unknown_field(self):
+        """Same contract on the container."""
+        with pytest.raises(ValidationError):
+            DownloadResult(artifacts=(), bogus=1)
+
+    def test_a_populated_result_is_hashable(self):
+        """The case the inherited permissive config used to break."""
+        assert isinstance(hash(DownloadResult(artifacts=(Artifact(obj="x"),))), int)
