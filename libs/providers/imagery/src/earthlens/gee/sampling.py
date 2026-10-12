@@ -32,20 +32,42 @@ from rtree import index
 from earthlens.gee.features import create_feature
 from earthlens.gee.io import feature_collection_to_gdf as _fc_to_gdf
 
-_REDUCER_WHITELIST: frozenset[str] = frozenset(
-    {
-        "first",
-        "mean",
-        "median",
-        "mode",
-        "max",
-        "min",
-        "sum",
-        "stdDev",
-        "variance",
-        "count",
-    }
+#: Reducers `ee.Image.reduceRegions` accepts here. The names shared with the
+#: temporal registry come from it rather than being restated, so the two cannot
+#: drift; the rest are region-only (`first`) or statistics the temporal path does
+#: not expose yet (`stdDev`, `variance`, `count`).
+_REGION_ONLY_REDUCERS: frozenset[str] = frozenset(
+    {"first", "stdDev", "variance", "count"}
 )
+
+
+def _reducer_whitelist() -> frozenset[str]:
+    """Return the reducer names a region sample accepts.
+
+    Returns:
+        The temporal registry's names plus the region-only ones.
+    """
+    from earthlens.gee.reducers import REDUCERS
+
+    return frozenset(REDUCERS) | _REGION_ONLY_REDUCERS
+
+
+def __getattr__(name: str):
+    """Keep `_REDUCER_WHITELIST` readable as a module attribute.
+
+    Args:
+        name: The attribute being looked up.
+
+    Returns:
+        The derived whitelist for `_REDUCER_WHITELIST`.
+
+    Raises:
+        AttributeError: For any other name.
+    """
+    if name == "_REDUCER_WHITELIST":
+        return _reducer_whitelist()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 _POINT_GEOM_TYPES: frozenset[str] = frozenset({"Point", "MultiPoint"})
 
@@ -63,10 +85,10 @@ def _resolve_reducer(name: str):
     Raises:
         ValueError: If `name` is not in :data:`_REDUCER_WHITELIST`.
     """
-    if name not in _REDUCER_WHITELIST:
+    allowed = _reducer_whitelist()
+    if name not in allowed:
         raise ValueError(
-            f"unsupported reducer {name!r}; expected one of "
-            f"{sorted(_REDUCER_WHITELIST)}"
+            f"unsupported reducer {name!r}; expected one of {sorted(allowed)}"
         )
     return getattr(ee.Reducer, name)()
 

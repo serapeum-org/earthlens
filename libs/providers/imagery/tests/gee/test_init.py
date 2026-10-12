@@ -22,6 +22,18 @@ from earthlens.gee import (
 )
 
 _EXPECTED_EXPORTS = {
+    # Epic 1 Task 1.1 - the reducer strategy objects and their registry.
+    "Reducer",
+    "Mean",
+    "Median",
+    "Min",
+    "Max",
+    "Mode",
+    "Mosaic",
+    "Sum",
+    "Percentile",
+    "REDUCERS",
+    "resolve_reducer",
     "GEE",
     "AuthenticationError",
     "CloudMask",

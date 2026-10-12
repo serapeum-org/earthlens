@@ -82,7 +82,6 @@ from earthlens.gee._eedai import (
 )
 from earthlens.gee._helpers import (
     EE_MAX_DIMENSION,
-    reduce_collection,
     slug_asset_id,
     split_aoi_for_url,
     wait_for_task,
@@ -91,6 +90,7 @@ from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
 from earthlens.gee.catalog import Catalog, Dataset
 from earthlens.gee.features import create_feature
 from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
+from earthlens.gee.reducers import resolve_reducer
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
@@ -1384,9 +1384,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
             (both :class:`datetime.datetime`), which the EEDAI collection path
             re-composites client-side.
         """
-        reducer = self.reducer or var_info.default_reducer
+        # Resolved once per request rather than per bucket: a parameterised
+        # reducer (`percentile:90`) validates its argument at resolution time,
+        # so a typo fails before any bucket is exported.
+        reducer = resolve_reducer(self.reducer or var_info.default_reducer)
         if self.temporal_resolution == "raw" or not var_info.is_image_collection:
-            yield start, reduce_collection(collection, reducer), start, end
+            yield start, reducer(collection), start, end
             return
         freq = _RESOLUTION_FREQ[self.temporal_resolution]
         bucket_starts = date_windows(start, end, freq, inclusive="left")
@@ -1401,7 +1404,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
             yield (
                 bucket_start.to_pydatetime(),
-                reduce_collection(window, reducer),
+                reducer(window),
                 bucket_start.to_pydatetime(),
                 bucket_end.to_pydatetime(),
             )

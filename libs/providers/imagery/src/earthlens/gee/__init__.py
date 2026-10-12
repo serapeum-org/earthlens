@@ -132,6 +132,19 @@ from earthlens.gee.jobs import (
     resolve_destination,
     wait_for_task_id,
 )
+from earthlens.gee.reducers import (
+    REDUCERS,
+    Max,
+    Mean,
+    Median,
+    Min,
+    Mode,
+    Mosaic,
+    Percentile,
+    Reducer,
+    Sum,
+    resolve_reducer,
+)
 from earthlens.gee.sampling import sample_points, sample_points_to_gdf
 
 __all__ = [
@@ -161,4 +174,15 @@ __all__ = [
     "cancel_task",
     "wait_for_task_id",
     "resolve_destination",
+    "Reducer",
+    "Mean",
+    "Median",
+    "Min",
+    "Max",
+    "Mode",
+    "Mosaic",
+    "Sum",
+    "Percentile",
+    "REDUCERS",
+    "resolve_reducer",
 ]
