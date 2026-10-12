@@ -57,7 +57,7 @@ import math
 import os
 from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, NamedTuple
+from typing import TYPE_CHECKING, Any, Literal
 
 import ee
 import pandas as pd
@@ -90,6 +90,7 @@ from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
 from earthlens.gee.catalog import Catalog, Dataset
 from earthlens.gee.features import create_feature
 from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
+from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reducers import resolve_reducer
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -556,30 +557,6 @@ def _validate_filters(
                 f"{type(image_filter).__name__}"
             )
     return collection_filters
-
-
-class EedaiPlan(NamedTuple):
-    """How the EEDAI reader should serve one request, or why it should not.
-
-    Attributes:
-        can_serve: Whether the reader takes this read at all.
-        tile_size: Output pixels per tile side when the read is streamed, or
-            `None` for a single pass (and when `can_serve` is `False`).
-        tiles: How many units the read is made of, which depends on its kind.
-            For a streamed single-image read it is the number of tiles the
-            window is cut into (`1` for a single pass); for a collection
-            composite it is the number of scenes the reader will fetch and
-            reduce. Carried here so the exporter never re-derives it — a second
-            derivation is free to disagree with the one that was routed on. It
-            is only a tile count when `tile_size` is set, which a collection
-            plan never does.
-        reason: Why the reader declined, empty when it did not.
-    """
-
-    can_serve: bool
-    tile_size: int | None
-    tiles: int
-    reason: str
 
 
 class GEE(LazyClientMixin, AbstractDataSource):
@@ -1774,15 +1751,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         if reducer in _EEDAI_UNSUPPORTED_REDUCERS:
             # Checked before the network call: no point discovering scenes for a
             # composite the reader cannot reproduce.
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"reducer={reducer!r} does not mean the same thing client-side: "
-                    "Earth Engine's is last-wins, while the reader returns the first "
-                    "scene of the stack, so Earth Engine composites this instead"
-                ),
+            return EnginePlan.declined(
+                f"reducer={reducer!r} does not mean the same thing client-side: Earth Engine's is last-wins, while the reader returns the first scene of the stack, so Earth Engine composites this instead"
             )
         reader = import_earthengine_reader()
         # Built outside the discovery `try`, so a credential problem is never
@@ -1800,7 +1770,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "falls back to Earth Engine; fix the service key to use the "
                 "fast path."
             )
-            return EedaiPlan(False, None, 0, "the EEDAI credential could not be built")
+            return EnginePlan.declined('the EEDAI credential could not be built')
         window_start = bucket_start.strftime("%Y-%m-%d")
         window_end = self._reader_end(bucket_end, bucket_start)
         # One catalog query per bucket, by necessity: every bucket has a
@@ -1831,8 +1801,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"EEDA scene discovery failed for {var_info.id}: {exc}. This "
                 "bucket falls back to Earth Engine."
             )
-            return EedaiPlan(
-                False, None, 0, f"scene discovery for {var_info.id} failed ({exc})"
+            return EnginePlan.declined(
+                f'scene discovery for {var_info.id} failed ({exc})'
             )
         if not cost.scene_count:
             # A property of the data, not of the request: this window and AOI
@@ -1840,23 +1810,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # rather than aborting a run whose earlier buckets wrote fine —
             # "raises if the request is not eligible" is about the request, and
             # this one is.
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                f"{_EEDAI_NO_SCENES}: no {var_info.id} scenes in this bucket's "
-                "window and AOI",
+            return EnginePlan.declined(
+                f"{_EEDAI_NO_SCENES}: no {var_info.id} scenes in this bucket's window and AOI"
             )
         if cost.scene_count > _EEDAI_MAX_SCENES:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{cost.scene_count:,} scenes in this bucket, over the "
-                    f"{_EEDAI_MAX_SCENES:,}-scene cap — Earth Engine reduces this "
-                    "server-side instead of the reader fetching every scene"
-                ),
+            return EnginePlan.declined(
+                f'{cost.scene_count:,} scenes in this bucket, over the {_EEDAI_MAX_SCENES:,}-scene cap — Earth Engine reduces this server-side instead of the reader fetching every scene'
             )
         # `estimate_earthengine_cost` is authoritative for the *scene count*;
         # the per-scene native footprint is sized from the catalog's metre
@@ -1865,11 +1824,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # metre-based grid would misread by ~1e5x.
         native_scale = var_info.spatial_resolution
         if not native_scale:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                f"{var_info.id} has no native resolution to size the read",
+            return EnginePlan.declined(
+                f'{var_info.id} has no native resolution to size the read'
             )
         bbox, _cutline = self._eedai_window()
         # One scene's window must satisfy the same budgets a single-image read
@@ -1877,7 +1833,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # scene-count multiple would catch - so the shared gate runs first.
         fits, reason = self._eedai_native_fits(var_info, bbox, band_count)
         if not fits:
-            return EedaiPlan(False, None, 0, reason)
+            return EnginePlan.declined(reason)
         # Every scene is warped onto the *output* window and the whole set is
         # held to reduce, so the stack is sized by the output grid - not the
         # native one. A `scale` finer than the asset makes the output grid the
@@ -1891,17 +1847,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         cols = max(native_cols, out_cols)
         total = cost.scene_count * rows * cols * max(band_count, 1)
         if total > _EEDAI_MAX_PIXELS:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"about {total:,} px across {cost.scene_count:,} scenes on a "
-                    f"{cols}x{rows} grid, over the {_EEDAI_MAX_PIXELS:,}-px "
-                    "single-pass budget"
-                ),
+            return EnginePlan.declined(
+                f'about {total:,} px across {cost.scene_count:,} scenes on a {cols}x{rows} grid, over the {_EEDAI_MAX_PIXELS:,}-px single-pass budget'
             )
-        return EedaiPlan(True, None, cost.scene_count, "")
+        return EnginePlan.serves(tiles=cost.scene_count)
 
     def _eedai_verdict(
         self,
@@ -1971,51 +1920,29 @@ class GEE(LazyClientMixin, AbstractDataSource):
         bbox, cutline = self._eedai_window()
         fits, reason = self._eedai_native_fits(var_info, bbox, band_count)
         if fits:
-            return EedaiPlan(True, None, 1, "")
+            return EnginePlan.serves(tiles=1)
         native_scale = var_info.spatial_resolution
         if not native_scale:
-            return EedaiPlan(False, None, 0, reason)
+            return EnginePlan.declined(reason)
         if cutline is not None:
-            return EedaiPlan(
-                False, None, 0, f"{reason}, and it cannot be tiled behind a cutline"
+            return EnginePlan.declined(
+                f'{reason}, and it cannot be tiled behind a cutline'
             )
         if self.resample != _EEDAI_TILING_RESAMPLE:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{reason}, and it cannot be tiled with resample="
-                    f"{self.resample!r} — an interpolating resampler would differ "
-                    "from the un-tiled read at the tile seams"
-                ),
+            return EnginePlan.declined(
+                f'{reason}, and it cannot be tiled with resample={self.resample!r} — an interpolating resampler would differ from the un-tiled read at the tile seams'
             )
         scale_m = float(self.scale or native_scale)
         native_ratio = max(scale_m / float(native_scale), 1.0)
         if native_ratio > _EEDAI_MAX_TILING_RATIO:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{reason}, and tiling it would be worse than Earth Engine: at "
-                    f"scale={scale_m:g} m over a {native_scale:g} m asset the reader "
-                    f"fetches about {native_ratio**2:,.0f} native px per output px, "
-                    "which Earth Engine aggregates server-side instead"
-                ),
+            return EnginePlan.declined(
+                f'{reason}, and tiling it would be worse than Earth Engine: at scale={scale_m:g} m over a {native_scale:g} m asset the reader fetches about {native_ratio**2:,.0f} native px per output px, which Earth Engine aggregates server-side instead'
             )
         native_rows, native_cols = self._eedai_output_grid(bbox, float(native_scale))
         native_total = native_rows * native_cols * max(band_count, 1)
         if native_total > _EEDAI_MAX_NATIVE_PIXELS:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{reason}, and tiling it would still fetch about "
-                    f"{native_total:,} native px, over the "
-                    f"{_EEDAI_MAX_NATIVE_PIXELS:,}-px ceiling on one read's total work"
-                ),
+            return EnginePlan.declined(
+                f"{reason}, and tiling it would still fetch about {native_total:,} native px, over the {_EEDAI_MAX_NATIVE_PIXELS:,}-px ceiling on one read's total work"
             )
         # One tile's native read is `tile_size * scale / native_scale` px per
         # side and is held in memory whole, so shrink the tile until that read
@@ -2042,30 +1969,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # workable tile, but this guard is deliberately kept — it was
             # removed once as unreachable, and the next change to the padding
             # made the plan divide by a zero-sized tile.
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{reason}, and no tile is small enough: the reader's "
-                    f"{_EEDAI_WINDOW_PAD}-px window padding already exceeds the "
-                    "per-tile budget here"
-                ),
+            return EnginePlan.declined(
+                f"{reason}, and no tile is small enough: the reader's {_EEDAI_WINDOW_PAD}-px window padding already exceeds the per-tile budget here"
             )
         rows, cols = self._eedai_output_grid(bbox, scale_m)
         tiles = math.ceil(rows / tile_size) * math.ceil(cols / tile_size)
         if tiles > _EEDAI_MAX_TILES:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{reason}, and tiling it would take {tiles:,} tiles (over the "
-                    f"{_EEDAI_MAX_TILES:,}-tile ceiling); every tile is its own "
-                    "fetch and they are opened together to mosaic"
-                ),
+            return EnginePlan.declined(
+                f'{reason}, and tiling it would take {tiles:,} tiles (over the {_EEDAI_MAX_TILES:,}-tile ceiling); every tile is its own fetch and they are opened together to mosaic'
             )
-        return EedaiPlan(True, tile_size, tiles, "")
+        return EnginePlan.serves(tiles=tiles, tile_size=tile_size)
 
     def _use_eedai(
         self,

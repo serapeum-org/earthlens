@@ -3750,7 +3750,7 @@ class TestExportViaEedai:
         """
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        declined = backend_module.EedaiPlan(False, None, 0, "nope")
+        declined = backend_module.EnginePlan.declined("nope")
         with pytest.raises(ValueError, match="cannot serve"):
             gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", declined)
         assert not fake_reader.calls

@@ -132,6 +132,7 @@ from earthlens.gee.jobs import (
     resolve_destination,
     wait_for_task_id,
 )
+from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reducers import (
     REDUCERS,
     Max,
@@ -185,4 +186,6 @@ __all__ = [
     "Percentile",
     "REDUCERS",
     "resolve_reducer",
+    "EnginePlan",
+    "EedaiPlan",
 ]

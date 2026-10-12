@@ -34,6 +34,9 @@ _EXPECTED_EXPORTS = {
     "Percentile",
     "REDUCERS",
     "resolve_reducer",
+    # Epic 1 Task 1.6 - the promoted routing verdict.
+    "EnginePlan",
+    "EedaiPlan",
     "GEE",
     "AuthenticationError",
     "CloudMask",
