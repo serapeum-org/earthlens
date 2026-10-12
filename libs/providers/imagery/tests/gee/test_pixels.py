@@ -98,7 +98,7 @@ class TestCapability:
         """`computePixels` evaluates the graph, so compute is not a decline."""
         gee = _gee(make_gee, engine="pixels", cloud_mask=lambda image: image)
         var_info = gee.catalog.get_dataset(ASSET)
-        use_engine, plan = PixelsEngine().verdict(gee, var_info, 1)
+        use_engine, plan = PixelsEngine().verdict(gee, var_info)
         assert use_engine is True
         assert plan is not None
         assert plan.can_serve
@@ -107,7 +107,7 @@ class TestCapability:
         """The other half of the EEDAI eligibility gate it does not share."""
         gee = _gee(make_gee, engine="pixels", filters=[lambda c: c])
         var_info = gee.catalog.get_dataset(ASSET)
-        assert PixelsEngine().verdict(gee, var_info, 1)[0] is True
+        assert PixelsEngine().verdict(gee, var_info)[0] is True
 
     def test_the_eedai_reader_would_decline_the_same_request(
         self, make_gee, fake_reader
@@ -125,7 +125,7 @@ class TestCapability:
         """A plan says which engine produced it, which is why 1.6 added the field."""
         gee = _gee(make_gee, engine="pixels")
         var_info = gee.catalog.get_dataset(ASSET)
-        _use, plan = PixelsEngine().verdict(gee, var_info, 1)
+        _use, plan = PixelsEngine().verdict(gee, var_info)
         assert plan.engine == "pixels"
 
 
@@ -138,7 +138,7 @@ class TestDeclines:
         var_info = gee.catalog.get_dataset(ASSET).model_copy(
             update={"spatial_resolution": None}
         )
-        assert PixelsEngine().verdict(gee, var_info, 1) == (False, None)
+        assert PixelsEngine().verdict(gee, var_info) == (False, None)
 
     def test_declines_an_aoi_the_crs_cannot_represent(self, make_gee, fake_reader):
         """The same finiteness guard the grid applies, surfaced as a fallback."""
@@ -151,7 +151,7 @@ class TestDeclines:
             lon_lim=[150.0, 160.0],
         )
         var_info = gee.catalog.get_dataset(ASSET)
-        assert PixelsEngine().verdict(gee, var_info, 1) == (False, None)
+        assert PixelsEngine().verdict(gee, var_info) == (False, None)
 
     def test_a_refusal_after_routing_is_fatal(self):
         """It is only reached by being asked for, so its refusal is the answer."""
@@ -229,7 +229,7 @@ class TestGridAndRequest:
         """`scale=None` means the asset's native resolution, not no grid."""
         gee = _gee(make_gee, engine="pixels", scale=None)
         var_info = gee.catalog.get_dataset(ASSET)
-        use_engine, plan = PixelsEngine().verdict(gee, var_info, 1)
+        use_engine, plan = PixelsEngine().verdict(gee, var_info)
         assert use_engine is True
         assert plan is not None
         native = PixelsEngine().grid_for(gee, float(var_info.spatial_resolution))
@@ -257,7 +257,7 @@ class TestGridAndRequest:
         engine = PixelsEngine()
         var_info = gee.catalog.get_dataset(ASSET)
         expected = engine.grid_for(gee, 30.0).tiles(2048)
-        _use, plan = engine.verdict(gee, var_info, 1)
+        _use, plan = engine.verdict(gee, var_info)
         assert expected > 1, "the case has to be genuinely tiled to mean anything"
         assert plan.tiles == expected
 

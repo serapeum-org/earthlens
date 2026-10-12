@@ -131,24 +131,20 @@ class PixelsEngine(Engine):
         )
 
     def verdict(
-        self,
-        backend: GEE,
-        var_info: Dataset,
-        band_count: int,
-        bucket_start: dt.datetime | None = None,
-        bucket_end: dt.datetime | None = None,
+        self, backend: GEE, var_info: Dataset
     ) -> tuple[bool, EnginePlan | None]:
         """Return the plan this engine *would* serve, without routing to it.
 
         The sizing half of :meth:`plan`, split out so it stays exercisable while
         the fetch path is unwired. It is deliberately not called by the backend.
 
+        It takes only what it uses: the grid follows from the AOI, `crs` and
+        `scale`, so the band count and bucket window :meth:`plan` receives
+        are not parameters here.
+
         Args:
             backend: The `GEE` instance, for its config and the grid.
             var_info: The catalog entry being read.
-            band_count: How many bands the read requests.
-            bucket_start: The bucket's inclusive start, for a collection read.
-            bucket_end: The bucket's exclusive end, for a collection read.
 
         Returns:
             `(True, plan)` when the pixel API could serve the request, else
