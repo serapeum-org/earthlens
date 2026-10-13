@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24731,7 +24731,8 @@ needs no re-read. The cells below are commented out because they fetch pixels; u
 <span class="c1">#</span>
 <span class="c1"># A pinned output grid - pixel size *and* origin - so stacked dates align without a</span>
 <span class="c1"># resample, fetched through `ee.data.computePixels`, which evaluates the composite</span>
-<span class="c1"># server-side and is not bound by getDownloadURL's 32768-px per-axis cap:</span>
+<span class="c1"># server-side. Earth Engine caps that request at 32768 px per axis as well,</span>
+<span class="c1"># so an oversize AOI needs auto_split=True there too:</span>
 <span class="c1">#</span>
 <span class="c1"># el = EarthLens(</span>
 <span class="c1">#     data_source='gee',</span>
@@ -24756,7 +24757,8 @@ needs no re-read. The cells below are commented out because they fetch pixels; u
 #
 # A pinned output grid - pixel size *and* origin - so stacked dates align without a
 # resample, fetched through `ee.data.computePixels`, which evaluates the composite
-# server-side and is not bound by getDownloadURL's 32768-px per-axis cap:
+# server-side. Earth Engine caps that request at 32768 px per axis as well,
+# so an oversize AOI needs auto_split=True there too:
 #
 # el = EarthLens(
 #     data_source='gee',
