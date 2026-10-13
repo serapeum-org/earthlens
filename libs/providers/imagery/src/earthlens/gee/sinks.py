@@ -12,16 +12,23 @@ requirement lives next to the sink that has it.
 
 As with :mod:`earthlens.gee.engines`, the *decision* is here and the *mechanics*
 are called back into the backend, so resolving a sink changes no observable
-behaviour.
+behaviour. :meth:`Sink.write` is where that decision is made: `GEE._api` hands
+the composited image to the resolved sink instead of branching on `export_via`,
+and each sink calls the transport it needs - which is also where the
+synchronous sink chooses between `getDownloadURL` and the pixel API.
 """
 
 from __future__ import annotations
 
-from abc import ABC
-from typing import TYPE_CHECKING, ClassVar
+from abc import ABC, abstractmethod
+from collections.abc import Mapping, Sequence
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, ClassVar
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from earthlens.gee.backend import GEE
+    from earthlens.gee.catalog import Dataset
+    from earthlens.gee.jobs import TaskInfo
 
 __all__ = [
     "Sink",
@@ -35,24 +42,24 @@ __all__ = [
 
 
 class Sink(ABC):
-    """Describes one destination: how to address it and how it reads back.
+    """One destination: how to address it, how to write to it, how it reads back.
 
-    Deliberately declarative. The mechanics of writing still live on the backend
-    (`_export_via_url` / `_export_via_batch`), which now reads *which* export
-    method, *which* target keyword and *what* destination from the resolved sink
-    instead of branching on the `export_via` string. There is no `write()`
-    method: the payload a sink would write is a
-    :class:`~earthlens.gee.work.WorkUnit`, but the backend still composites and
-    writes it, so a `write()` here would be a seam nothing calls.
+    The sink owns the *decision* and calls the backend for the *mechanics*, the
+    same split :mod:`earthlens.gee.engines` uses. :meth:`write` is what `_api`
+    calls, so adding a destination is a subclass plus a registry entry rather
+    than another branch in the export path.
 
     Attributes:
         name: The registry key, and the value a user's `export_via=` resolves
             from.
         required_config: The field this sink cannot work without, or `None` when
-            it needs nothing extra. Named once and read twice: the
-            `ExportConfig` validator rejects a request that left it unset, and a
-            batch sink reads the value off the backend under the same name when
-            it addresses its destination.
+            it needs nothing extra. Named once and read three times:
+            :meth:`validate_config` refuses a request that left it unset, the
+            `ExportConfig` validator does the same for a config built directly,
+            and a batch sink reads the value off the backend under this name
+            when it addresses its destination.
+        prerequisite_hint: The parenthesised hint appended to the refusal, for a
+            prerequisite whose shape is not obvious from its name.
         is_batch: Whether this sink queues an asynchronous Earth Engine task
             rather than fetching pixels synchronously. `True` for every sink but
             :class:`UrlSink`.
@@ -60,7 +67,61 @@ class Sink(ABC):
 
     name: ClassVar[str]
     required_config: ClassVar[str | None] = None
+    prerequisite_hint: ClassVar[str] = ""
     is_batch: ClassVar[bool] = True
+
+    @abstractmethod
+    def write(
+        self,
+        backend: GEE,
+        image: Any,
+        *,
+        var_info: Dataset,
+        scale: float,
+        bands: Sequence[str],
+        region: Any,
+        prefix: str,
+    ) -> Path | str | TaskInfo:
+        """Write one composited image to this destination.
+
+        Args:
+            backend: The `GEE` instance, for its config and the transports.
+            image: The composited `ee.Image` for this bucket.
+            var_info: The catalog entry being read.
+            scale: The resolved ground sample distance in metres.
+            bands: The bands the read asked for, in order.
+            region: The `ee.Geometry` to clip to.
+            prefix: The filename (or asset) stem for this bucket.
+
+        Returns:
+            A `Path` for a synchronous sink, else the destination string, or a
+            :class:`~earthlens.gee.jobs.TaskInfo` when the export was submitted
+            without waiting.
+        """
+
+    @classmethod
+    def validate_config(cls, config: Mapping[str, Any]) -> None:
+        """Refuse this sink if the destination it needs was not supplied.
+
+        Takes the prerequisite values rather than the whole backend, so it runs
+        in `GEE.__init__` before anything else is built - which is the point: a
+        `"drive"` export with no folder has to fail before the catalog parse,
+        not after a run has queued its first task.
+
+        Args:
+            config: The candidate prerequisite values, keyed as the constructor
+                spells them (`drive_folder`, `gcs_bucket`, `asset_id`).
+
+        Raises:
+            ValueError: If this sink's `required_config` is missing or empty.
+        """
+        if cls.required_config is None:
+            return
+        if not config.get(cls.required_config):
+            raise ValueError(
+                f"export_via={cls.name!r} requires "
+                f"{cls.required_config}={cls.prerequisite_hint}".rstrip()
+            )
 
     def destination(self, backend: GEE, prefix: str) -> str:
         """Return the destination string this sink reports on success.
@@ -93,6 +154,42 @@ class UrlSink(Sink):
     name: ClassVar[str] = "url"
     is_batch: ClassVar[bool] = False
 
+    def write(
+        self,
+        backend: GEE,
+        image: Any,
+        *,
+        var_info: Dataset,
+        scale: float,
+        bands: Sequence[str],
+        region: Any,
+        prefix: str,
+    ) -> Path:
+        """Fetch the pixels now, through whichever engine was resolved.
+
+        The one sink `engine=` means anything to, which is why the choice
+        between Earth Engine's two pull APIs is made here: `computePixels`
+        evaluates the same graph without the 32768-px per-axis cap, and
+        `getDownloadURL` is the historical path.
+
+        Args:
+            backend: The `GEE` instance, for the engine and the transports.
+            image: The composited `ee.Image`.
+            var_info: The catalog entry being read.
+            scale: Ground sample distance in metres.
+            bands: The bands the read asked for.
+            region: The `ee.Geometry` to clip to.
+            prefix: The filename stem.
+
+        Returns:
+            The written GeoTIFF's path.
+        """
+        from earthlens.gee.pixels import PixelsEngine
+
+        if backend._engine.name == PixelsEngine.name:
+            return backend._export_via_pixels(image, var_info, scale, bands, prefix)
+        return backend._export_via_url(image, var_info, scale, region, prefix)
+
 
 class _BatchSink(Sink):
     """An asynchronous `ee.batch.Export.image.to*` sink.
@@ -110,6 +207,40 @@ class _BatchSink(Sink):
     export_method: ClassVar[str]
     target_kwarg: ClassVar[str]
     scheme: ClassVar[str]
+
+    def write(
+        self,
+        backend: GEE,
+        image: Any,
+        *,
+        var_info: Dataset,
+        scale: float,
+        bands: Sequence[str],
+        region: Any,
+        prefix: str,
+    ) -> str | TaskInfo:
+        """Queue the export and return its destination, or its task.
+
+        `var_info` and `bands` are unused: a queued export names its own output
+        and Earth Engine selects the bands server-side from the image it was
+        handed. They stay in the signature because every sink is called the same
+        way, which is what lets `_api` stop branching.
+
+        Args:
+            backend: The `GEE` instance, for the export mechanics.
+            image: The composited `ee.Image`.
+            var_info: Unused.
+            scale: Ground sample distance in metres.
+            bands: Unused.
+            region: The `ee.Geometry` to clip to.
+            prefix: The export's description and filename stem.
+
+        Returns:
+            The destination string, or a `TaskInfo` when `wait_for_export` is
+            `False`.
+        """
+        del var_info, bands
+        return backend._export_via_batch(image, scale, region, prefix)
 
     def target(self, backend: GEE) -> dict[str, str]:
         """Return the keyword arguments that address this sink's destination.
@@ -179,6 +310,9 @@ class AssetSink(_BatchSink):
 
     name: ClassVar[str] = "asset"
     required_config: ClassVar[str | None] = "asset_id"
+    prerequisite_hint: ClassVar[str] = (
+        "(the parent folder asset, e.g. 'projects/my-project/assets/my-folder')"
+    )
     export_method: ClassVar[str] = "toAsset"
     target_kwarg: ClassVar[str] = "assetId"
     scheme: ClassVar[str] = "ee"

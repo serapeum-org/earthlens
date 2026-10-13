@@ -16,6 +16,17 @@ Engine's convenience methods, which **preserve band names**, where
 `collection.reduce(ee.Reducer.mean())` would rename `B4` to `B4_mean`.
 :class:`Percentile` has to use `reduce`, so it renames the bands back.
 
+Two capabilities, not one. A reducer can collapse a **collection** (what
+`GEE(reducer=...)` asks for) and/or stand for an **`ee.Reducer`** (what
+`sample_points` asks for), and the two sets are not the same: `mosaic` is an
+`ImageCollection` method with no `ee.Reducer` factory at all, while `stdDev`,
+`variance`, `count` and `first` are region reducers this backend does not offer
+as temporal composites. So each reducer declares both - `collection_capable`
+and `ee_factory` - and the two vocabularies are *derived* from the registry by
+:func:`collection_reducers` and :func:`sampling_reducers` rather than restated.
+Deriving one set for both is what briefly let `sample_points(reducer="mosaic")`
+past the whitelist and into `AttributeError`.
+
 Resolve a name (or an already-built object) through :func:`resolve_reducer`:
 
 ```python
@@ -47,8 +58,14 @@ __all__ = [
     "Mosaic",
     "Sum",
     "Percentile",
+    "First",
+    "StdDev",
+    "Variance",
+    "Count",
     "REDUCERS",
     "resolve_reducer",
+    "collection_reducers",
+    "sampling_reducers",
 ]
 
 
@@ -61,9 +78,38 @@ class Reducer(ABC):
     Attributes:
         name: The registry key this reducer is addressed by, and the value a
             user's `reducer=` string resolves from.
+        collection_capable: Whether this reducer can collapse a collection, i.e.
+            whether `GEE(reducer=...)` accepts it. `False` for the region-only
+            reducers, which are registry members so that one vocabulary covers
+            both paths, not so that they become temporal composites.
+        ee_factory: The `ee.Reducer` factory name this reducer stands for, or
+            `None` when it has no `ee.Reducer` equivalent. `mosaic` is the one
+            such case: it is an `ImageCollection` method, and `ee.Reducer` has no
+            `mosaic` at all.
     """
 
     name: ClassVar[str]
+    collection_capable: ClassVar[bool] = True
+    ee_factory: ClassVar[str | None] = None
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        """Default `ee_factory` to the reducer's own name.
+
+        Earth Engine spells the collection method and the reducer factory the
+        same way for almost every reducer, so restating the name per class would
+        only create somewhere for the two to drift. A class that declares
+        `ee_factory` itself keeps what it declared - which is how `Mosaic` says
+        it has no factory at all, and `Percentile` points at the parameterised
+        one. An intermediate base with no `name` of its own is not a reducer
+        yet, so it is left alone.
+
+        Args:
+            **kwargs: Forwarded to the base implementation.
+        """
+        super().__init_subclass__(**kwargs)
+        name = cls.__dict__.get("name")
+        if name is not None and "ee_factory" not in cls.__dict__:
+            cls.ee_factory = name
 
     @abstractmethod
     def __call__(self, collection: Any) -> Any:
@@ -75,6 +121,30 @@ class Reducer(ABC):
         Returns:
             The reduced `ee.Image`.
         """
+
+    def as_ee_reducer(self) -> Any:
+        """Return the `ee.Reducer` this reducer stands for.
+
+        What a *region* reduction needs: `sample_points` reduces pixels inside a
+        geometry, which takes an `ee.Reducer` rather than a collection method.
+        Built from the declared factory so the two paths cannot disagree about
+        which reducer a name means.
+
+        Returns:
+            The `ee.Reducer` instance, e.g. `ee.Reducer.mean()`.
+
+        Raises:
+            ValueError: If this reducer has no `ee.Reducer` equivalent, which is
+                `mosaic` and nothing else. Raised rather than returning `None`,
+                because the caller's next move would be to call it.
+        """
+        if self.ee_factory is None:
+            raise ValueError(
+                f"the {self.name!r} reducer is a collection method with no "
+                "ee.Reducer equivalent, so it cannot reduce a region; use one "
+                f"of {sorted(sampling_reducers())}"
+            )
+        return getattr(ee.Reducer, self.ee_factory)()
 
     def __repr__(self) -> str:
         """Return `ClassName()`, so plans and log lines read cleanly.
@@ -142,9 +212,13 @@ class Mosaic(_ConvenienceReducer):
     Note this is Earth Engine's server-side meaning. A client-side reader that
     composites scene by scene cannot reproduce it, which is why the EEDAI path
     declines this reducer rather than serving something subtly different.
+
+    It is also the one reducer with no `ee.Reducer` equivalent, so it cannot
+    reduce a region: `ee.Reducer.mosaic` does not exist.
     """
 
     name: ClassVar[str] = "mosaic"
+    ee_factory: ClassVar[str | None] = None
 
 
 class Sum(_ConvenienceReducer):
@@ -186,6 +260,7 @@ class Percentile(BaseModel, Reducer):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     name: ClassVar[str] = "percentile"
+    ee_factory: ClassVar[str | None] = "percentile"
 
     q: float = Field(ge=0, le=100)
 
@@ -202,17 +277,143 @@ class Percentile(BaseModel, Reducer):
         reduced = collection.reduce(ee.Reducer.percentile([self.q]))
         return reduced.rename(band_names)
 
+    def as_ee_reducer(self) -> Any:
+        """Return `ee.Reducer.percentile([q])`.
+
+        Overridden because this is the one factory that takes an argument, which
+        is also what makes the reducer reachable from the region path at all: a
+        percentile could not be expressed as a bare whitelist name.
+
+        Returns:
+            The `ee.Reducer` for this instance's percentile.
+        """
+        return ee.Reducer.percentile([self.q])
+
     def __repr__(self) -> str:
         """Include the percentile, since it is what distinguishes instances."""
         return f"Percentile(q={self.q!r})"
+
+
+class _RegionReducer(Reducer):
+    """A reducer that reduces pixels in a region, not images in a collection.
+
+    Registry members so that `reducer=` has one vocabulary across the backend,
+    but not temporal composites: Earth Engine exposes no band-name-preserving
+    `ImageCollection.stdDev()`, and offering one through `reduce()` would be a
+    new capability rather than the refactor this epic is.
+    """
+
+    collection_capable: ClassVar[bool] = False
+
+    def __call__(self, collection: Any) -> Any:
+        """Refuse: this reducer has no collection form.
+
+        Args:
+            collection: Ignored.
+
+        Returns:
+            Never returns.
+
+        Raises:
+            ValueError: Always, naming the reducers that do collapse a
+                collection. `GEE(...)` refuses one of these at construction, so
+                this is the backstop for a caller reaching the object directly.
+        """
+        raise ValueError(
+            f"the {self.name!r} reducer reduces pixels in a region, not images "
+            f"in a collection; use one of {sorted(collection_reducers())}"
+        )
+
+
+class First(_RegionReducer):
+    """The first unmasked value, as a region reducer."""
+
+    name: ClassVar[str] = "first"
+
+
+class StdDev(_RegionReducer):
+    """Sample standard deviation over a region."""
+
+    name: ClassVar[str] = "stdDev"
+
+
+class Variance(_RegionReducer):
+    """Sample variance over a region."""
+
+    name: ClassVar[str] = "variance"
+
+
+class Count(_RegionReducer):
+    """Count of unmasked pixels in a region."""
+
+    name: ClassVar[str] = "count"
 
 
 #: Every reducer addressable by name. `percentile` is absent deliberately: it
 #: needs a parameter, so it is reachable only through the `percentile:<q>`
 #: spelling that :func:`resolve_reducer` understands, or by passing an instance.
 REDUCERS: dict[str, type[Reducer]] = {
-    cls.name: cls for cls in (Mean, Median, Min, Max, Mode, Mosaic, Sum)
+    cls.name: cls
+    for cls in (
+        Mean,
+        Median,
+        Min,
+        Max,
+        Mode,
+        Mosaic,
+        Sum,
+        First,
+        StdDev,
+        Variance,
+        Count,
+    )
 }
+
+
+def collection_reducers() -> frozenset[str]:
+    """Return the names that can collapse an `ee.ImageCollection`.
+
+    The vocabulary `GEE(reducer=...)` accepts, and the one the EEDAI reader's
+    eligibility check reads. Derived from each reducer's own
+    `collection_capable`, so adding a reducer cannot leave this set behind.
+
+    Returns:
+        The collection-capable registry names.
+
+    Examples:
+        - The seven band-name-preserving convenience reducers:
+            ```python
+            >>> sorted(collection_reducers())
+            ['max', 'mean', 'median', 'min', 'mode', 'mosaic', 'sum']
+
+            ```
+    """
+    return frozenset(name for name, cls in REDUCERS.items() if cls.collection_capable)
+
+
+def sampling_reducers() -> frozenset[str]:
+    """Return the names that stand for an `ee.Reducer`.
+
+    The vocabulary a *region* reduction accepts. It is not the same set as
+    :func:`collection_reducers`: `mosaic` has no `ee.Reducer` factory, and the
+    region-only reducers have no collection form.
+
+    Returns:
+        The registry names carrying an `ee.Reducer` factory.
+
+    Examples:
+        - `mosaic` is absent, which is the whole reason the two sets are
+          derived separately:
+            ```python
+            >>> sorted(sampling_reducers())
+            ['count', 'first', 'max', 'mean', 'median', 'min', 'mode', 'stdDev', 'sum', 'variance']
+
+            ```
+    """
+    return frozenset(
+        name for name, cls in REDUCERS.items() if cls.ee_factory is not None
+    )
+
 
 #: Separator between a parameterised reducer's name and its argument.
 _SPEC_SEPARATOR = ":"
@@ -257,7 +458,7 @@ def resolve_reducer(spec: str | Reducer) -> Reducer:
             >>> resolve_reducer("average")
             Traceback (most recent call last):
                 ...
-            ValueError: unsupported reducer 'average'; expected one of ['max', 'mean', 'median', 'min', 'mode', 'mosaic', 'sum'] or 'percentile:<q>'
+            ValueError: unsupported reducer 'average'; expected one of ['count', 'first', 'max', 'mean', 'median', 'min', 'mode', 'mosaic', 'stdDev', 'sum', 'variance'] or 'percentile:<q>'
 
             ```
     """
@@ -286,6 +487,7 @@ def resolve_reducer(spec: str | Reducer) -> Reducer:
             f"unsupported reducer {name!r}; expected one of "
             f"{sorted(REDUCERS)} or 'percentile:<q>'"
         )
+
     if argument:
         raise ValueError(f"the {name!r} reducer takes no argument, got {spec!r}")
     return REDUCERS[name]()

@@ -29,7 +29,7 @@ the CRS, or the values you asked for.
 |---|---|---|---|
 | Path | `ee.Image.getDownloadURL` | `ee.data.computePixels` | GDAL's `EEDAI` driver via pyramids-eo |
 | Server-side compute | **Yes** — the full Earth Engine graph | **Yes** — the expression is the graph | **No** — it reads stored pixels |
-| Size cap | 32768 px per axis (`auto_split=True` tiles around it) | none | none; oversize windows stream to disk in tiles |
+| Size cap | 32768 px per axis (`auto_split=True` tiles around it) | the same 32768 px per axis, same remedy | none; oversize windows stream to disk in tiles |
 | Round-trip | HTTP + zip | the GeoTIFF bytes, directly | direct read from the asset |
 | Extra needed | `[gee]` | `[gee]` | `[gee]` **and** `[eedai]` |
 | Temporal composite | server-side | server-side | client-side, per time bucket |
@@ -322,7 +322,7 @@ blocking; `list_recent_tasks`, `get_task_status`, `wait_for_task_id`, `cancel_ta
 | Situation | Engine |
 |---|---|
 | Any `cloud_mask` / `filters` / computed graph | `ee` (forced) |
-| A computed graph *and* an AOI over 32768 px | `pixels` — a graph with no per-axis cap |
+| A computed graph *and* an AOI over 32768 px | `pixels` with `auto_split=True`, or `drive` |
 | An output grid that must align with an earlier download | `ee` or `pixels` with `crs_transform=` |
 | Raw pixels from one asset, large AOI | `eedai` — no 32768-px cap, no zip round-trip |
 | A composite whose masking must match Earth Engine exactly | `ee` |
@@ -343,7 +343,10 @@ blocking; `list_recent_tasks`, `get_task_status`, `wait_for_task_id`, `cancel_ta
   EEDAI reader's warp kernel alone.
 - **`nodata=` and `high_volume=`** are `engine="pixels"` only; any other engine warns at construction and
   ignores them.
-- **`auto_split=True`** is only meaningful for `engine="ee"`, where the 32768-px cap exists.
+- **`auto_split=True`** applies to `engine="ee"` and `engine="pixels"`, which share Earth Engine's
+  32768-px per-axis cap. Measured, because the guide implies otherwise: a `computePixels` request of
+  39,479 × 12 px comes back as `Pixel grid dimensions (39479x12) must be less than or equal to
+  32768`. The reader has no such cap, so `auto_split` means nothing to it.
 - **Credentials are always needed**, even for `engine="eedai"`: the request is built through `ee` before
   its pixels are fetched.
 - **No Sentinel-1 preprocessing** ships in the backend — no speckle filter, no terrain correction. Note

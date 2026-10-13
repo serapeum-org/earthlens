@@ -352,6 +352,45 @@ class DownloadResult(SummarisedLeaf):
         """
         return [a.obj for a in self.artifacts if a.obj is not None]
 
+    def collection(self, **kwargs: Any) -> Any:
+        """Stack the written rasters into a pyramids `DatasetCollection`.
+
+        A multi-bucket download is a time series, and pyramids already has the
+        type for one, so the result should hand it over rather than leaving the
+        caller to glob the directory back. Built from the written files through
+        `DatasetCollection.from_files`, which is pyramids' own constructor for
+        exactly this - there is no public API for stacking in-memory datasets,
+        and the files are on disk either way.
+
+        The default date pattern is matched to this backend's filenames
+        (`<asset>_<bands>_<YYYYMMDD>.tif`), whose dates carry no separators;
+        pass `date_regex=` / `date_format=` to override for files named by
+        something else.
+
+        Args:
+            **kwargs: Forwarded to `DatasetCollection.from_files`, overriding
+                the date pattern above when given.
+
+        Returns:
+            The pyramids `DatasetCollection` over this result's paths.
+
+        Raises:
+            ValueError: If no bucket wrote a file - a batch export returns
+                destinations, so there is nothing local to stack.
+        """
+        from pyramids.dataset import DatasetCollection
+
+        paths = self.paths
+        if not paths:
+            raise ValueError(
+                "this result holds no written files, so there is nothing to "
+                "stack; a batch export returns destinations - pull them first, "
+                "then DatasetCollection.from_files(...) over the pulled files."
+            )
+        options: dict[str, Any] = {"date_regex": r"\d{8}", "date_format": "%Y%m%d"}
+        options.update(kwargs)
+        return DatasetCollection.from_files([str(path) for path in paths], **options)
+
     def close(self) -> None:
         """Close every in-memory object this result holds.
 

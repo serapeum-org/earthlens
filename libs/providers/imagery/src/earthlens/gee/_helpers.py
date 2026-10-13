@@ -35,16 +35,19 @@ EE_MAX_DIMENSION: int = 32768
 def _collection_reducer_names() -> frozenset[str]:
     """Return the band-name-preserving reducer names, from the one registry.
 
-    Derived from `earthlens.gee.reducers.REDUCERS` rather than restated, so this
-    module cannot drift from it. Imported lazily because `reducers` imports
-    pydantic and this module is loaded on every backend import.
+    Derived from `earthlens.gee.reducers.collection_reducers` rather than
+    restated, so this module cannot drift from it. It is the *collection*
+    vocabulary specifically: the registry also holds region-only reducers, which
+    have no band-name-preserving collection method and must not appear here.
+    Imported lazily because `reducers` imports pydantic and this module is loaded
+    on every backend import.
 
     Returns:
-        The registry's convenience-reducer names.
+        The registry's collection-capable reducer names.
     """
-    from earthlens.gee.reducers import REDUCERS
+    from earthlens.gee.reducers import collection_reducers
 
-    return frozenset(REDUCERS)
+    return collection_reducers()
 
 
 def __getattr__(name: str) -> frozenset[str]:

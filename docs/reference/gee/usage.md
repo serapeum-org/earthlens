@@ -268,13 +268,18 @@ and resolves once per request, so a bad percentile fails before any bucket expor
 | `"auto"` (default) | the reader when the request qualifies, else Earth Engine | only on the Earth Engine side | 32768 px |
 | `"ee"` | `ee.Image.getDownloadURL` | yes | 32768 px |
 | `"eedai"` | the pyramids-eo EEDAI reader, forced | no — raises if the request needs one | none |
-| `"pixels"` | `ee.data.computePixels` | yes | none |
+| `"pixels"` | `ee.data.computePixels` | yes | 32768 px (`auto_split=True` tiles it) |
 
-`"pixels"` is the one to reach for when a request needs **both** server-side compute and an output larger than
-`getDownloadURL` will serve: it evaluates the graph, so a `cloud_mask` or `filters` survives, and it is not bound by
-the 32768-px per-axis limit that makes `auto_split=True` necessary on the `"ee"` path. It returns the GeoTIFF bytes
-directly, so there is no URL to expire and no zip to unpack. It applies to `export_via="url"` only — it is a pull, so
-it has nothing to say about a queued export, and a batch sink ignores it.
+`"pixels"` is the one to reach for when a request needs **both** server-side compute and the modern extraction
+API: it evaluates the graph, so a `cloud_mask` or `filters` survives, and it returns the GeoTIFF bytes directly, so
+there is no URL to expire and no zip to unpack. It applies to `export_via="url"` only — it is a pull, so it has
+nothing to say about a queued export, and a batch sink ignores it.
+
+**It is capped per axis like the thumbnail path**, which the Earth Engine guide's "can scale to larger workloads"
+framing does not say: a 39,479 × 12 px request is refused with `Pixel grid dimensions (39479x12) must be
+less than or equal to 32768`. So `auto_split=True` means the same thing here as on the `"ee"` path — tile the
+AOI, fetch each tile, mosaic — and without it an oversize request is refused up front, naming that remedy.
+Each tile is sized through the engine, so a grid pinned with `crs_transform=` stays on its lattice across tiles.
 
 `"eedai"` remains the fastest path for a *raw* read of a stored asset, because it streams the pixels without
 evaluating anything. `"auto"` prefers it and falls back to Earth Engine on any decline.

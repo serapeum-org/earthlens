@@ -13,9 +13,19 @@ option when exports hit scaling problems, noting they "add complexity, but can
 scale to larger workloads", and points at the high-volume endpoint
 (`https://earthengine-highvolume.googleapis.com`) for parallel requests.
 
-So this engine is the first whose routing verdict is both **compute-capable** and
-**not cap-bound** — unlike `EedaiEngine`, it does not decline a `cloud_mask` or
-`filters`, because `computePixels` evaluates the graph server-side.
+So this engine is the first whose routing verdict is **compute-capable without
+being the thumbnail path** — unlike `EedaiEngine`, it does not decline a
+`cloud_mask` or `filters`, because `computePixels` evaluates the graph
+server-side.
+
+**It is still cap-bound, which the guide's framing hides.** Measured against the
+live API: a 39,479 x 12 px request is refused with
+`Pixel grid dimensions (39479x12) must be less than or equal to 32768`. The
+32768-px per-axis limit belongs to Earth Engine, not to `getDownloadURL`, so the
+epic's expectation that this engine would serve an oversize composite
+*unsplit* was wrong. What it does give is a composite at that size at all
+(`EedaiEngine` declines one) and `auto_split` to get past the cap, tiling and
+mosaicking exactly as the `getDownloadURL` path does.
 
 **What it owns.** The decision and the request: the serve/decline verdict
 (:meth:`PixelsEngine.plan`), the output grid (:meth:`PixelsEngine.grid_for`),
@@ -68,7 +78,9 @@ class PixelsEngine(Engine):
     Accepts a computed image, so unlike the EEDAI reader it does not decline a
     `cloud_mask` or `filters`. It sizes its request from an
     :class:`~earthlens.gee.grid.OutputGrid` rather than deriving a grid of its
-    own, so it cannot disagree with the other engines about the output shape.
+    own, so it cannot disagree with the other engines about the output shape -
+    including about the 32768-px per-axis cap, which Earth Engine applies to a
+    `computePixels` grid as well, and which `auto_split=True` tiles around.
 
     It answers for the routing verdict, the grid, the request body and the
     endpoint; `GEE._export_via_pixels` posts that body.
@@ -144,6 +156,40 @@ class PixelsEngine(Engine):
             return False, None
         return True, EnginePlan.serves(tiles=grid.tiles(_TILE_PIXELS), engine=self.name)
 
+    def grid_for_window(
+        self,
+        backend: GEE,
+        bbox: tuple[float, float, float, float],
+        scale: float,
+        cutline: Any = None,
+    ) -> OutputGrid:
+        """Return the grid for one window, which may be a tile of the AOI.
+
+        Split out of :meth:`grid_for` so a tiled request sizes each tile the
+        same way the whole AOI is sized - including keeping a pinned lattice,
+        so the tiles still share pixel edges with each other and with any other
+        request pinned to the same transform.
+
+        Args:
+            backend: The `GEE` instance, for the CRS and the pinned transform.
+            bbox: The window in the output CRS.
+            scale: Ground sample distance in metres, ignored when pinned.
+            cutline: An optional region to clip to.
+
+        Returns:
+            The sized grid for that window.
+
+        Raises:
+            ValueError: If the window cannot be sized - non-finite bounds, a
+                non-positive `scale`, or a malformed pinned transform.
+        """
+        pinned = backend._pinned_grid(bbox=bbox, cutline=cutline)
+        if pinned is not None:
+            return pinned
+        return OutputGrid.for_metre_grid(
+            bbox, crs=backend.crs, scale=scale, cutline=cutline
+        )
+
     def grid_for(self, backend: GEE, scale: float) -> OutputGrid:
         """Return the output grid this engine would request.
 
@@ -169,13 +215,8 @@ class PixelsEngine(Engine):
                 pinned transform is malformed. :meth:`plan` catches this and
                 falls back rather than failing the download.
         """
-        pinned = backend._pinned_grid()
-        if pinned is not None:
-            return pinned
         bbox, cutline = backend._eedai_window()
-        return OutputGrid.for_metre_grid(
-            bbox, crs=backend.crs, scale=scale, cutline=cutline
-        )
+        return self.grid_for_window(backend, bbox, scale, cutline)
 
     def request(
         self, backend: GEE, image: Any, grid: OutputGrid, bands: list[str]

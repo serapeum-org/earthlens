@@ -147,3 +147,32 @@ class TestBackCompatAlias:
 
         assert backend.EedaiPlan is EnginePlan
         assert "EedaiPlan" in backend.__all__
+
+
+class TestTheSelfContradictoryStates:
+    """The model is public, so the invariants are the type's, not the callers'.
+
+    The named constructors cannot produce any of these; a caller building an
+    `EnginePlan` directly can, which is why the validator exists - and why it
+    needs covering rather than trusting that nobody does.
+    """
+
+    def test_a_refusal_must_carry_a_reason(self):
+        """Otherwise the remedy text reads `cannot serve X: .`."""
+        with pytest.raises(ValidationError, match="must carry a reason"):
+            EnginePlan(can_serve=False, reason="   ")
+
+    def test_a_servable_plan_must_have_work_to_do(self):
+        """Zero units of work would read as "serving nothing"."""
+        with pytest.raises(ValidationError, match="at least one unit of work"):
+            EnginePlan(can_serve=True, tiles=0)
+
+    def test_a_tile_size_must_be_positive(self):
+        """A zero or negative tile size would divide the AOI into nothing."""
+        with pytest.raises(ValidationError, match="positive number of pixels"):
+            EnginePlan(can_serve=True, tiles=1, tile_size=0)
+
+    def test_a_valid_plan_passes_all_three(self):
+        """The validator must not narrow what the constructors produce."""
+        plan = EnginePlan(can_serve=True, tiles=2, tile_size=2048)
+        assert (plan.can_serve, plan.tiles, plan.tile_size) == (True, 2, 2048)

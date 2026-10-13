@@ -46,6 +46,7 @@ __all__ = [
     "same_crs",
     "same_epsg_code",
     "bbox_to_crs",
+    "bbox_to_latlon",
     "geographic_grid",
     "projected_grid",
     "validate_crs_transform",
@@ -260,6 +261,38 @@ def bbox_to_crs(
     # properly needs the densified back-transform upstream:
     # serapeum-org/pyramids-eo#97.
     return transformer.transform_bounds(*latlon_bbox)
+
+
+def bbox_to_latlon(
+    bbox: tuple[float, float, float, float], crs: str
+) -> tuple[float, float, float, float]:
+    """Bring an envelope in `crs` back to EPSG:4326.
+
+    The inverse of :func:`bbox_to_crs`, which only ever converts *into* an
+    output CRS. Scene discovery needs the other direction: it queries the Earth
+    Engine catalog in lat/lon whatever the request's CRS, and it has to ask about
+    the window the read will take.
+
+    Args:
+        bbox: `(min_x, min_y, max_x, max_y)` in `crs`.
+        crs: The CRS `bbox` is expressed in.
+
+    Returns:
+        The envelope in EPSG:4326; the input unchanged when `crs` is already
+        EPSG:4326.
+
+    Raises:
+        pyproj.exceptions.CRSError: If `crs` is not a CRS pyproj can build a
+            transformer for.
+    """
+    if crs.upper() == NATIVE_CRS:
+        return bbox
+    from pyproj import Transformer
+
+    transformer = Transformer.from_crs(crs, NATIVE_CRS, always_xy=True)
+    # Densified like the forward call, so a reprojected rectangle whose edge
+    # bows outward still bounds the whole window rather than only its corners.
+    return transformer.transform_bounds(*bbox)
 
 
 def geographic_grid(
@@ -662,6 +695,42 @@ class OutputGrid(SummarisedLeaf):
                 snapped_max_y,
             ),
         )
+
+    def latlon_bbox(self) -> tuple[float, float, float, float]:
+        """Return this grid's window in EPSG:4326.
+
+        Scene discovery queries the Earth Engine catalog in lat/lon whatever the
+        output CRS, so the grid has to be able to say where it is in lat/lon -
+        and say it about the window the read will actually take, not a second
+        geometry derived elsewhere.
+
+        Returns:
+            `(min_lon, min_lat, max_lon, max_lat)`, the bbox unchanged when the
+            grid is already in EPSG:4326.
+
+        Examples:
+            - A geographic grid answers with its own bbox:
+                ```python
+                >>> grid = OutputGrid.for_metre_grid(
+                ...     (31.2, 29.9, 31.3, 30.0), crs="EPSG:4326", scale=90.0
+                ... )
+                >>> grid.latlon_bbox()
+                (31.2, 29.9, 31.3, 30.0)
+
+                ```
+            - A projected one is brought back:
+                ```python
+                >>> utm = OutputGrid.for_metre_grid(
+                ...     (330_000.0, 3_310_000.0, 340_000.0, 3_320_000.0),
+                ...     crs="EPSG:32636",
+                ...     scale=90.0,
+                ... )
+                >>> [round(term, 2) for term in utm.latlon_bbox()]
+                [31.24, 29.91, 31.34, 30.0]
+
+                ```
+        """
+        return bbox_to_latlon(self.bbox, self.crs)
 
     def request_transform(self) -> tuple[float, ...]:
         """Return the affine transform that describes this grid.

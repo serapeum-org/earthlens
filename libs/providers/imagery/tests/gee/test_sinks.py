@@ -217,6 +217,10 @@ class TestBackendIsSinkDriven:
 
             name = "probe"
 
+            def write(self, backend, image, **kwargs):
+                """Stand in for a transport; the registry is what is under test."""
+                return "probed"
+
         SINKS["probe"] = _Probe
         try:
             assert isinstance(resolve_sink("probe"), _Probe)

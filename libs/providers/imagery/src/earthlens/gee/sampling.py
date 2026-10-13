@@ -32,24 +32,25 @@ from rtree import index
 from earthlens.gee.features import create_feature
 from earthlens.gee.io import feature_collection_to_gdf as _fc_to_gdf
 
-#: Reducers `ee.Image.reduceRegions` accepts here. The names shared with the
-#: temporal registry come from it rather than being restated, so the two cannot
-#: drift; the rest are region-only (`first`) or statistics the temporal path does
-#: not expose yet (`stdDev`, `variance`, `count`).
-_REGION_ONLY_REDUCERS: frozenset[str] = frozenset(
-    {"first", "stdDev", "variance", "count"}
-)
 
-
+# Reducers `ee.Image.reduceRegions` accepts here. Every name comes from the one
+# registry rather than being restated - including the region-only ones (`first`,
+# `stdDev`, `variance`, `count`), which are registry members precisely so this
+# module does not keep a second list.
 def _reducer_whitelist() -> frozenset[str]:
     """Return the reducer names a region sample accepts.
 
-    Returns:
-        The temporal registry's names plus the region-only ones.
-    """
-    from earthlens.gee.reducers import REDUCERS
+    Derived from the registry's `ee_factory` declarations, which is narrower than
+    the registry itself: `mosaic` is an `ImageCollection` method and
+    `ee.Reducer.mosaic` does not exist, so taking every registry name here sent
+    `reducer="mosaic"` into an `AttributeError` instead of the refusal below.
 
-    return frozenset(REDUCERS) | _REGION_ONLY_REDUCERS
+    Returns:
+        The registry names that stand for an `ee.Reducer`.
+    """
+    from earthlens.gee.reducers import sampling_reducers
+
+    return sampling_reducers()
 
 
 def __getattr__(name: str) -> frozenset[str]:
@@ -76,21 +77,31 @@ def _resolve_reducer(name: str):
     """Resolve a reducer name to an `ee.Reducer` instance via the whitelist.
 
     Args:
-        name: The reducer factory name on `ee.Reducer` (e.g. `"mean"`).
-            Must be one of :data:`_REDUCER_WHITELIST`.
+        name: A reducer name (e.g. `"mean"`), or the parameterised
+            `"percentile:<q>"` spec. A bare name must be one of
+            :data:`_REDUCER_WHITELIST`.
 
     Returns:
-        The `ee.Reducer` instance returned by `getattr(ee.Reducer, name)()`.
+        The `ee.Reducer` the registry builds for `name`, e.g.
+        `ee.Reducer.mean()`, or `ee.Reducer.percentile([q])` for a
+        `percentile:<q>` spec.
 
     Raises:
         ValueError: If `name` is not in :data:`_REDUCER_WHITELIST`.
     """
+    from earthlens.gee.reducers import resolve_reducer
+
     allowed = _reducer_whitelist()
-    if name not in allowed:
+    base, _, _argument = name.partition(":")
+    # `percentile:<q>` is admitted explicitly: it is the one reducer that cannot
+    # be a bare whitelist name, and the registry is the only thing that knows
+    # how to build it. Everything else must be a declared sampling reducer, so
+    # the refusal still names the same vocabulary it always did.
+    if base not in allowed and base != "percentile":
         raise ValueError(
             f"unsupported reducer {name!r}; expected one of {sorted(allowed)}"
         )
-    return getattr(ee.Reducer, name)()
+    return resolve_reducer(name).as_ee_reducer()
 
 
 def sample_points(

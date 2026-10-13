@@ -498,6 +498,112 @@ def test_live_pinned_grids_share_their_pixel_boundaries(tmp_path, engine):
         )
 
 
+def _download_wide_strip(tmp_path, engine: str, **overrides):
+    """Fetch a composited strip wider than Earth Engine's synchronous cap.
+
+    A 360-degree strip 0.1 degrees tall at 1 km is about 39,000 x 11 px: over the
+    32768-px per-axis limit on the long axis, and barely over a megabyte of
+    pixels, so it tests the cap rather than the bandwidth.
+
+    Args:
+        tmp_path: Directory to write under.
+        engine: The engine to force.
+        **overrides: Extra `EarthLens` keyword arguments.
+
+    Returns:
+        The written GeoTIFF's path.
+    """
+    el = EarthLens(
+        data_source="gee",
+        start="2020-06-01",
+        end="2020-06-03",
+        variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+        temporal_resolution="raw",
+        lat_lim=[9.9, 10.0],
+        lon_lim=[-180.0, 180.0],
+        path=str(tmp_path / f"strip-{engine}"),
+        scale=1000,
+        engine=engine,
+        **overrides,
+    ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
+    paths = el.download(progress_bar=False)
+    assert len(paths) == 1, f"{engine}: expected one GeoTIFF, got {paths}"
+    return paths[0]
+
+
+@_skip_without_creds
+def test_live_pixels_is_capped_per_axis_like_the_thumbnail_path(tmp_path):
+    """Earth Engine caps a `computePixels` grid too, and this is the evidence.
+
+    Task 1.13 expected this engine to serve an oversize composite unsplit. It
+    does not: the live API refuses the request. What the backend must do is own
+    that refusal rather than letting a raw Earth Engine error out, which is what
+    this asserts.
+    """
+    with pytest.raises(ValueError, match="same per-axis cap"):
+        _download_wide_strip(tmp_path, "pixels")
+
+
+@_skip_without_creds
+def test_live_pixels_serves_that_request_when_it_may_split_it(tmp_path):
+    """And with `auto_split=True` the oversize composite does succeed.
+
+    Which is the acceptance criterion in substance: a composited AOI wider than
+    32768 px comes back as one raster, tiled and mosaicked rather than refused.
+    """
+    import numpy as np
+
+    written = _download_wide_strip(tmp_path, "pixels", auto_split=True)
+    assert written.is_file() and written.stat().st_size > 0
+
+    values, _epsg, bbox = _open_raster(written)
+    assert values.shape[2] > 32768, (
+        f"the mosaic came back {values.shape[2]} px wide, so it did not "
+        "exercise the cap"
+    )
+    assert abs((bbox[2] - bbox[0]) - 360.0) < 1.0, f"not a global strip: {bbox}"
+    assert np.isfinite(values).any(), "the mosaic has no valid pixels"
+
+
+@_skip_without_creds
+def test_live_get_download_url_still_refuses_that_request(tmp_path):
+    """The other half: the cap is real, and `auto_split=False` still reports it.
+
+    Without this the test above could pass for the wrong reason - a cap that had
+    quietly stopped applying to either engine.
+    """
+    with pytest.raises(ValueError, match="32,768|auto_split"):
+        _download_wide_strip(tmp_path, "ee")
+
+
+@_skip_without_creds
+def test_live_a_materialised_download_stacks_into_a_datacube(tmp_path):
+    """Task 1.8's `.collection()`, against real rasters.
+
+    Two monthly buckets, so the collection has a time axis to build; the unit
+    test can only check which constructor is called and with what.
+    """
+    el = EarthLens(
+        data_source="gee",
+        start="2020-06-01",
+        end="2020-07-31",
+        variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+        temporal_resolution="monthly",
+        lat_lim=[9.9, 10.1],
+        lon_lim=[76.3, 76.5],
+        path=str(tmp_path / "cube"),
+        scale=5566,
+        engine="ee",
+    ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
+    result = el.download(progress_bar=False, materialize=True)
+    assert len(result.paths) == 2, f"expected two buckets, got {result.paths}"
+    cube = result.collection()
+    try:
+        assert len(cube) == 2, f"the cube did not stack both buckets: {len(cube)}"
+    finally:
+        result.close()
+
+
 def _download_chirps(tmp_path, engine: str):
     """Fetch a tiny CHIRPS precipitation composite through one engine."""
     el = EarthLens(

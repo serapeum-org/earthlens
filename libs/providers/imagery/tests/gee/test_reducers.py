@@ -75,9 +75,17 @@ class _FakeReduced:
 class TestRegistry:
     """The registry's contents and what it deliberately omits."""
 
-    def test_registry_holds_the_seven_convenience_reducers(self):
-        """The band-name-preserving reducers are addressable by name."""
-        assert set(REDUCERS) == set(CONVENIENCE)
+    def test_the_collection_vocabulary_is_the_seven(self):
+        """The band-name-preserving reducers, which `GEE(reducer=)` accepts.
+
+        The registry itself is wider: it also holds the region-only reducers,
+        so that one vocabulary covers both the collection and the sampling
+        path. Which of them can composite is `collection_reducers()`.
+        """
+        from earthlens.gee.reducers import collection_reducers
+
+        assert set(collection_reducers()) == set(CONVENIENCE)
+        assert set(CONVENIENCE) <= set(REDUCERS)
 
     @pytest.mark.parametrize(("name", "cls"), CONVENIENCE.items())
     def test_each_name_maps_to_its_class(self, name, cls):
@@ -285,15 +293,28 @@ class TestBackCompatShim:
         assert out.renamed_to == ["B4", "B3"]
 
     def test_the_derived_name_set_matches_the_registry(self):
-        """`_COLLECTION_REDUCERS` is a view on the registry, not a second copy."""
+        """`_COLLECTION_REDUCERS` is a view on the registry, not a second copy.
+
+        The *collection-capable* view specifically: a region reducer has no
+        band-name-preserving collection method, so including it here would
+        offer the EEDAI reader a composite it cannot make.
+        """
         from earthlens.gee import _helpers
+        from earthlens.gee.reducers import collection_reducers
 
-        assert set(_helpers._COLLECTION_REDUCERS) == set(REDUCERS)
+        assert set(_helpers._COLLECTION_REDUCERS) == set(collection_reducers())
 
-    def test_the_sampling_whitelist_shares_the_registry_names(self):
-        """Region sampling adds its own names on top of the shared base."""
+    def test_the_sampling_whitelist_is_a_view_on_the_registry(self):
+        """Region sampling reads the same registry, filtered by capability.
+
+        Not the whole registry: `mosaic` is a collection method and
+        `ee.Reducer.mosaic` does not exist, so taking every name sent
+        `reducer="mosaic"` into an `AttributeError`.
+        """
         from earthlens.gee import sampling
+        from earthlens.gee.reducers import sampling_reducers
 
         whitelist = sampling._REDUCER_WHITELIST
-        assert set(REDUCERS) <= set(whitelist)
+        assert set(whitelist) == set(sampling_reducers())
         assert {"first", "stdDev", "variance", "count"} <= set(whitelist)
+        assert "mosaic" not in whitelist

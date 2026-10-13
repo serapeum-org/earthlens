@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from earthlens.gee import backend as backend_module
 from earthlens.gee.engines import ENGINES, Engine, resolve_engine
 from earthlens.gee.grid import OutputGrid
 from earthlens.gee.pixels import HIGH_VOLUME_ENDPOINT, PixelsEngine
@@ -13,6 +14,12 @@ from earthlens.gee.pixels import HIGH_VOLUME_ENDPOINT, PixelsEngine
 from .test_backend import fake_ee, fake_reader, make_gee  # noqa: F401 - fixtures
 
 ASSET = "USGS/SRTMGL1_003"
+
+
+def _record_merge(sink: list, sources, target) -> None:
+    """Stand in for `merge_rasters`, recording the call and writing the mosaic."""
+    sink.append({"sources": list(sources), "target": str(target)})
+    Path(target).write_bytes(b"merged")
 
 
 def _gee(make_gee, **overrides):
@@ -281,6 +288,97 @@ class TestGridAndRequest:
         from earthlens.gee import pixels as pixels_module
 
         assert pixels_module._TILE_PIXELS == backend_module._EEDAI_TILE_PIXELS
+
+
+class TestThePerAxisCapAppliesHereToo:
+    """Earth Engine caps a `computePixels` grid exactly as it caps a thumbnail.
+
+    Measured, not assumed: the live API refuses a 39,479 x 12 px request with
+    `Pixel grid dimensions (39479x12) must be less than or equal to 32768`. The
+    epic expected this engine to be uncapped, and it is not - so the backend has
+    to own the refusal rather than let a raw Earth Engine error surface.
+    """
+
+    #: A 360-degree strip 0.1 degrees tall at 1 km: ~39,000 px on the long axis.
+    WIDE = {"lat_lim": [9.9, 10.0], "lon_lim": [-180.0, 180.0], "scale": 1000.0}
+
+    def test_an_oversize_request_is_refused(self, make_gee, fake_reader):
+        """Before the request goes out, with our message rather than theirs."""
+        gee = _gee(make_gee, engine="pixels", **self.WIDE)
+        with pytest.raises(ValueError, match="same per-axis cap"):
+            gee.download(progress_bar=False)
+
+    def test_the_refusal_quotes_the_grid_and_the_remedies(self, make_gee, fake_reader):
+        """A caller can act on it: the size, and the four ways out."""
+        gee = _gee(make_gee, engine="pixels", **self.WIDE)
+        with pytest.raises(ValueError, match="auto_split=True"):
+            gee.download(progress_bar=False)
+
+    def test_nothing_is_posted_when_it_is_refused(self, make_gee, fake_reader):
+        """The point of checking first: no request, no partial file."""
+        gee = _gee(make_gee, engine="pixels", **self.WIDE)
+        with pytest.raises(ValueError):
+            gee.download(progress_bar=False)
+        assert gee.client.compute_pixels_calls == []
+
+    def test_auto_split_tiles_it_instead(self, make_gee, fake_reader, monkeypatch):
+        """`auto_split=True` means the same thing here as on the `ee` path."""
+        merged: list[dict] = []
+        monkeypatch.setattr(
+            backend_module,
+            "merge_rasters",
+            lambda sources, target, **kwargs: _record_merge(merged, sources, target),
+        )
+        gee = _gee(make_gee, engine="pixels", auto_split=True, **self.WIDE)
+        (out,) = gee.download(progress_bar=False)
+        assert len(gee.client.compute_pixels_calls) > 1, "the AOI was not split"
+        assert len(merged) == 1, "the tiles were not mosaicked"
+        assert out.name.endswith(".tif")
+
+    def test_every_tile_is_within_the_cap(self, make_gee, fake_reader, monkeypatch):
+        """Splitting that still breaks the cap would only move the error."""
+        merged: list[dict] = []
+        monkeypatch.setattr(
+            backend_module,
+            "merge_rasters",
+            lambda sources, target, **kwargs: _record_merge(merged, sources, target),
+        )
+        gee = _gee(make_gee, engine="pixels", auto_split=True, **self.WIDE)
+        gee.download(progress_bar=False)
+        for body in gee.client.compute_pixels_calls:
+            dimensions = body["grid"]["dimensions"]
+            assert max(dimensions["width"], dimensions["height"]) <= 32768, dimensions
+
+    def test_a_pinned_request_keeps_its_lattice_across_tiles(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """Each tile is sized through the engine, so the pin survives tiling."""
+        merged: list[dict] = []
+        monkeypatch.setattr(
+            backend_module,
+            "merge_rasters",
+            lambda sources, target, **kwargs: _record_merge(merged, sources, target),
+        )
+        pixel = 0.01
+        gee = _gee(
+            make_gee,
+            engine="pixels",
+            auto_split=True,
+            crs_transform=(pixel, 0.0, -180.0, 0.0, -pixel, 10.0),
+            **self.WIDE,
+        )
+        gee.download(progress_bar=False)
+        assert len(gee.client.compute_pixels_calls) > 1
+        for body in gee.client.compute_pixels_calls:
+            origin = body["grid"]["affineTransform"]["translateX"]
+            offset = (origin - (-180.0)) / pixel
+            assert abs(offset - round(offset)) < 1e-6, origin
+
+    def test_a_request_within_the_cap_is_untouched(self, make_gee, fake_reader):
+        """One request, no tiling, for the ordinary case."""
+        gee = _gee(make_gee, engine="pixels")
+        gee.download(progress_bar=False)
+        assert len(gee.client.compute_pixels_calls) == 1
 
 
 class TestHighVolumeEndpoint:
