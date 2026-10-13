@@ -24182,15 +24182,50 @@ cannot express.</p>
 methods, which preserve band names. <code>Percentile</code> has to use <code>reduce</code>, which suffixes them, so it renames them back —
 making it interchangeable with the rest. <code>resolve_reducer</code> accepts a name, a <code>percentile:&lt;q&gt;</code> spec or an instance,
 and resolves once per request, so a bad percentile fails before any bucket exports rather than part-way through.</p>
-<p><strong>Engines.</strong> <code>engine=</code> resolves to an <code>Engine</code>. There are three to choose from: <code>"auto"</code> prefers the EEDAI reader and
-falls back to Earth Engine on any decline; <code>"ee"</code> always uses <code>getDownloadURL</code>; and <code>"eedai"</code> forces the reader and
-raises if it cannot serve.</p>
-<p>A fourth, <code>"pixels"</code>, is <strong>registered but not selectable</strong>. It would fetch through <code>ee.data.computePixels</code>, which
-evaluates a computation graph and so could serve a <code>cloud_mask</code> or <code>filters</code> without the 32768-px per-axis cap that
-<code>getDownloadURL</code> imposes — but only its sizing and request-body construction exist; the transport does not. It is
-registered so that the engine seam is exercised by something other than the two incumbents, and <code>engine="pixels"</code> is
-rejected at construction rather than offered as a choice that fails later. <code>selectable_engines()</code> is the list
-<code>engine=</code> accepts; <code>ENGINES</code> is every registered engine.</p>
+<p><strong>Engines.</strong> <code>engine=</code> resolves to an <code>Engine</code>, and there are four:</p>
+<table>
+<thead>
+<tr>
+<th><code>engine=</code></th>
+<th>Transport</th>
+<th>Runs a computation graph?</th>
+<th>Per-axis cap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"auto"</code> (default)</td>
+<td>the reader when the request qualifies, else Earth Engine</td>
+<td>only on the Earth Engine side</td>
+<td>32768 px</td>
+</tr>
+<tr>
+<td><code>"ee"</code></td>
+<td><code>ee.Image.getDownloadURL</code></td>
+<td>yes</td>
+<td>32768 px</td>
+</tr>
+<tr>
+<td><code>"eedai"</code></td>
+<td>the pyramids-eo EEDAI reader, forced</td>
+<td>no — raises if the request needs one</td>
+<td>none</td>
+</tr>
+<tr>
+<td><code>"pixels"</code></td>
+<td><code>ee.data.computePixels</code></td>
+<td>yes</td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<p><code>"pixels"</code> is the one to reach for when a request needs <strong>both</strong> server-side compute and an output larger than
+<code>getDownloadURL</code> will serve: it evaluates the graph, so a <code>cloud_mask</code> or <code>filters</code> survives, and it is not bound by
+the 32768-px per-axis limit that makes <code>auto_split=True</code> necessary on the <code>"ee"</code> path. It returns the GeoTIFF bytes
+directly, so there is no URL to expire and no zip to unpack. It applies to <code>export_via="url"</code> only — it is a pull, so
+it has nothing to say about a queued export, and a batch sink ignores it.</p>
+<p><code>"eedai"</code> remains the fastest path for a <em>raw</em> read of a stored asset, because it streams the pixels without
+evaluating anything. <code>"auto"</code> prefers it and falls back to Earth Engine on any decline.</p>
 <p><strong>Grids.</strong> <code>OutputGrid</code> is where the AOI, <code>crs</code> and <code>scale</code> become a pixel grid, with one constructor per
 convention: <code>for_metre_grid</code> sizes for square metres on the ground (the reader's rule, shortening longitude by
 <code>cos(latitude)</code>), <code>for_earth_engine</code> reads <code>scale</code> as a uniform degree-equivalent (Earth Engine's rule), and
