@@ -38,6 +38,14 @@ the CRS, or the values you asked for.
 will serve. It is never chosen automatically: `"auto"` keeps preferring the reader and then `"ee"`, so the
 preference order is a separate, reviewable decision rather than a side effect of adding an engine.
 
+One sampling difference is worth knowing, and it is deliberate. `"pixels"` sends an explicit grid, so it sizes on
+the **metre** convention — square metres on the ground, shortening longitude by `cos(latitude)`, the same rule the
+EEDAI reader uses — while `"ee"` lets Earth Engine read `scale` in a geographic CRS as a uniform
+degree-equivalent. Away from the equator the two therefore return **different column counts** for one AOI at one
+`scale`: at 30° N a degree of longitude is about 13% shorter than a degree of latitude. The AOI, the CRS and the
+values agree (a live e2e compares their elevation distributions on the same SRTM window); the grid does not. Pass
+`crs_transform=` when the grid itself has to be identical.
+
 `engine="auto"` (the default) picks `eedai` when the request is a *raw read* and the extra is installed,
 otherwise `ee`. A request is a raw read when **all** of these hold:
 
