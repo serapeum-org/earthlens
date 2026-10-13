@@ -24968,18 +24968,19 @@ become a pixel count, with one named constructor per convention.</p>
 <span class="c1"># Earth Engine reads `scale` in a geographic CRS as a uniform degree-equivalent,</span>
 <span class="c1"># while the EEDAI reader sizes for square metres on the ground.</span>
 <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span><span class="mf">31.2</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">)</span>
+<span class="n">CRS</span> <span class="o">=</span> <span class="s1">'EPSG:4326'</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s1">'earth engine:'</span><span class="p">,</span>
-    <span class="n">OutputGrid</span><span class="o">.</span><span class="n">for_earth_engine</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s1">'EPSG:4326'</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">90.0</span><span class="p">)</span><span class="o">.</span><span class="n">as_rows_cols</span><span class="p">(),</span>
+    <span class="n">OutputGrid</span><span class="o">.</span><span class="n">for_earth_engine</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">CRS</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">90.0</span><span class="p">)</span><span class="o">.</span><span class="n">as_rows_cols</span><span class="p">(),</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s1">'metre grid:  '</span><span class="p">,</span>
-    <span class="n">OutputGrid</span><span class="o">.</span><span class="n">for_metre_grid</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s1">'EPSG:4326'</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">90.0</span><span class="p">)</span><span class="o">.</span><span class="n">as_rows_cols</span><span class="p">(),</span>
+    <span class="n">OutputGrid</span><span class="o">.</span><span class="n">for_metre_grid</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">CRS</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">90.0</span><span class="p">)</span><span class="o">.</span><span class="n">as_rows_cols</span><span class="p">(),</span>
 <span class="p">)</span>
 
 <span class="c1"># Or pin the grid outright, so two downloads over different AOIs share pixel edges.</span>
 <span class="n">pinned</span> <span class="o">=</span> <span class="n">OutputGrid</span><span class="o">.</span><span class="n">from_crs_transform</span><span class="p">(</span>
-    <span class="n">bbox</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s1">'EPSG:4326'</span><span class="p">,</span> <span class="n">crs_transform</span><span class="o">=</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">31.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">)</span>
+    <span class="n">bbox</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">CRS</span><span class="p">,</span> <span class="n">crs_transform</span><span class="o">=</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">31.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'pinned:      '</span><span class="p">,</span> <span class="n">pinned</span><span class="o">.</span><span class="n">convention</span><span class="p">,</span> <span class="n">pinned</span><span class="o">.</span><span class="n">as_rows_cols</span><span class="p">(),</span> <span class="n">pinned</span><span class="o">.</span><span class="n">crs_transform</span><span class="p">)</span>
 </pre></div>
@@ -25000,18 +25001,19 @@ print('drive needs:', resolve_sink('drive').required_config)
 # Earth Engine reads `scale` in a geographic CRS as a uniform degree-equivalent,
 # while the EEDAI reader sizes for square metres on the ground.
 bbox = (31.2, 29.9, 31.3, 30.0)
+CRS = 'EPSG:4326'
 print(
     'earth engine:',
-    OutputGrid.for_earth_engine(bbox, crs='EPSG:4326', scale=90.0).as_rows_cols(),
+    OutputGrid.for_earth_engine(bbox, crs=CRS, scale=90.0).as_rows_cols(),
 )
 print(
     'metre grid:  ',
-    OutputGrid.for_metre_grid(bbox, crs='EPSG:4326', scale=90.0).as_rows_cols(),
+    OutputGrid.for_metre_grid(bbox, crs=CRS, scale=90.0).as_rows_cols(),
 )
 
 # Or pin the grid outright, so two downloads over different AOIs share pixel edges.
 pinned = OutputGrid.from_crs_transform(
-    bbox, crs='EPSG:4326', crs_transform=(0.001, 0.0, 31.2, 0.0, -0.001, 30.0)
+    bbox, crs=CRS, crs_transform=(0.001, 0.0, 31.2, 0.0, -0.001, 30.0)
 )
 print('pinned:      ', pinned.convention, pinned.as_rows_cols(), pinned.crs_transform)</div>
 </div>
