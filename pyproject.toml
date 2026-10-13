@@ -396,6 +396,10 @@ omit = [
     "libs/*/tests/**/*",
     "libs/providers/*/tests/*",
     "libs/providers/*/tests/**/*",
+    # The test harness, not the product: its lines run in every member's lane
+    # but are attributed to core's. Same exclusion as codecov.yml, so a local
+    # run and CI agree.
+    "libs/core/src/earthlens/testing/*",
 ]
 
 [tool.coverage.report]

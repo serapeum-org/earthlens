@@ -69,6 +69,15 @@ flag_management:
 ignore:
   - "libs/*/tests/**"
   - "libs/providers/*/tests/**"
+  # `earthlens.testing` is the test harness. It lives under core's `src` (so a
+  # member run on its own can import it, and so it ships for downstream code
+  # testing its own backend), which means its lines are *attributed* to the
+  # `core` flag — but most of them execute in the five provider lanes, which
+  # upload under their own flags. Measuring it therefore reports a drop in
+  # core's coverage every time the shared test infrastructure grows, which is
+  # the opposite of the incentive this repo wants. Its own behaviour is
+  # covered by real tests in libs/core/tests either way.
+  - "libs/core/src/earthlens/testing/**"
   - "tools/**"
   - "docs/**"
   - "examples/**"
