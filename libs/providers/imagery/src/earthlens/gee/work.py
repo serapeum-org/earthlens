@@ -424,11 +424,24 @@ class DownloadResult(SummarisedLeaf):
             than claiming inequality.
         """
         if isinstance(other, DownloadResult):
-            return self.artifacts == other.artifacts
+            # By payload, not by artifact. Comparing artifacts made equality
+            # intransitive: two results could each equal the same plain list
+            # while differing from one another, because one carried a path and
+            # the other the object read back from it.
+            return self.values == other.values
         if isinstance(other, list):
             return self.values == other
         return NotImplemented
 
     def __hash__(self) -> int:
-        """Hash by the artifacts, since the model is frozen."""
-        return hash(self.artifacts)
+        """Hash consistently with `__eq__`, which compares payloads.
+
+        Deliberately coarse. Equality is by payload, and a materialised payload
+        is a GDAL-backed object that need not be hashable, so the payloads
+        themselves cannot go into the hash. The count can: equal results always
+        agree on it, which is what `__hash__` has to guarantee.
+
+        Returns:
+            A hash of the number of artifacts.
+        """
+        return hash(len(self.artifacts))

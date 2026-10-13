@@ -378,3 +378,68 @@ class TestFrozenValueObjects:
     def test_a_populated_result_is_hashable(self):
         """The case the inherited permissive config used to break."""
         assert isinstance(hash(DownloadResult(artifacts=(Artifact(obj="x"),))), int)
+
+
+class TestEqualityIsTransitive:
+    """Comparing equal to a list and to a peer must agree."""
+
+    def test_two_results_with_the_same_payloads_are_equal(self):
+        """Even when one carries the object and the other only the path."""
+        from pathlib import Path as _P
+
+        written = DownloadResult(artifacts=(Artifact(path=_P("a.tif")),))
+        same = DownloadResult(artifacts=(Artifact(path=_P("a.tif")),))
+        assert written == same
+
+    def test_equality_is_transitive_through_the_list(self):
+        """The case the artifact-wise comparison broke."""
+        from pathlib import Path as _P
+
+        first = DownloadResult(artifacts=(Artifact(path=_P("a.tif")),))
+        second = DownloadResult(artifacts=(Artifact(path=_P("a.tif")),))
+        payloads = [_P("a.tif")]
+        assert first == payloads
+        assert second == payloads
+        assert first == second
+
+    def test_differing_payloads_are_not_equal(self):
+        """Transitivity must not be bought with blanket equality."""
+        from pathlib import Path as _P
+
+        assert DownloadResult(artifacts=(Artifact(path=_P("a.tif")),)) != (
+            DownloadResult(artifacts=(Artifact(path=_P("b.tif")),))
+        )
+
+    def test_equal_results_hash_alike(self):
+        """What `__hash__` has to guarantee for `__eq__`."""
+        from pathlib import Path as _P
+
+        first = DownloadResult(artifacts=(Artifact(path=_P("a.tif")),))
+        second = DownloadResult(artifacts=(Artifact(path=_P("a.tif")),))
+        assert first == second
+        assert hash(first) == hash(second)
+
+    def test_a_materialised_result_is_hashable(self):
+        """A GDAL-backed payload need not be hashable, but the result must be."""
+        assert isinstance(
+            hash(DownloadResult(artifacts=(Artifact(obj=_Handle()),))), int
+        )
+
+
+class TestEngineConfigIsLive:
+    """It is derived, so it cannot disagree with the public attributes."""
+
+    def test_it_tracks_a_reassigned_attribute(self, make_gee):
+        """A snapshot taken in `__init__` would have gone stale here."""
+        gee = make_gee(crs="EPSG:4326")
+        gee.crs = "EPSG:3857"
+        assert gee._engine_config.crs == "EPSG:3857"
+
+    def test_the_eligibility_check_reads_it(self, make_gee, fake_reader):
+        """One definition of "is anything shaping this server-side?"."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        assert gee._eedai_eligible(var_info) is True
+        gee.cloud_mask = lambda image: image
+        assert gee._engine_config.needs_server_side_compute is True
+        assert gee._eedai_eligible(var_info) is False

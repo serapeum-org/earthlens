@@ -203,7 +203,7 @@ _EEDAI_TILING_RESAMPLE: str = "nearest"
 
 #: Metres per degree of latitude on a sphere of Earth's mean radius. Used to
 #: turn the EEDAI path's metre `scale` into a pixel grid over a lat/lon AOI;
-#: longitude is scaled by `cos(latitude)` at the AOI's mid-latitude.
+#: longitude is scaled by `cos(latitude)` at the AOI's equatorward edge.
 _METRES_PER_DEGREE: float = 111_320.0
 
 
@@ -977,17 +977,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
             wait_for_export=bool(wait_for_export),
             materialize=bool(materialize),
         )
-        self._engine_config = EngineConfig(
-            engine=engine,
-            reducer=reducer,
-            crs=crs,
-            scale=scale,
-            cloud_mask=cloud_mask,
-            filters=collection_filters,
-            property_filter=property_filter,
-            region=region,
-            discover_extent=bool(discover_extent),
-        )
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
         self._eedai_credential: Any = None  # lazily built in `_eedai_credentials`
         #: The EEDAI adapter, lazily built in `_eedai_reader`.
@@ -1710,6 +1699,30 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return requested.split(":", 1)[0]
         return type(requested).name
 
+    @property
+    def _engine_config(self) -> EngineConfig:
+        """Return the engine settings as one value object, built from the live ones.
+
+        Derived rather than snapshotted in `__init__`: `crs`, `scale`,
+        `cloud_mask` and the rest stay public and writable, so a stored copy
+        would silently go stale the moment one was reassigned - which is why
+        nothing read the stored one.
+
+        Returns:
+            The current engine configuration.
+        """
+        return EngineConfig(
+            engine=self.engine,
+            reducer=self.reducer,
+            crs=self.crs,
+            scale=self.scale,
+            cloud_mask=self.cloud_mask,
+            filters=tuple(self.filters),
+            property_filter=self.property_filter,
+            region=self.region,
+            discover_extent=bool(self.discover_extent),
+        )
+
     def _eedai_eligible(self, var_info: Dataset) -> bool:
         """Return whether this request is a raw read the EEDAI reader can serve.
 
@@ -1739,8 +1752,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """
         return (
             self.export_via == "url"
-            and self.cloud_mask is None
-            and not self.filters
+            # The config owns the "is anything shaping this server-side?"
+            # question, so the reader's eligibility and the engines read one
+            # definition instead of each repeating the two-term test.
+            and not self._engine_config.needs_server_side_compute
             and var_info.ee_type in ("image", "image_collection")
             and self._eedai_crs_supported()
         )
@@ -2294,8 +2309,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         pyramids documents as a worst-case *upper bound* for cap pre-checks
         — it over-counts both axes (and unevenly, so a square AOI comes out
         non-square). Here the real span is used, with longitude degrees
-        shortened by `cos(latitude)` at the AOI's mid-latitude, so the pixels
-        are square on the ground at the requested `scale`.
+        shortened by `cos(latitude)` at the AOI's equatorward edge - the
+        latitude where a degree of longitude is longest, and so the one that
+        needs the most pixels to hold the requested `scale`. Sizing on any
+        poleward latitude instead would deliver pixels coarser than asked.
 
         Args:
             bbox: The lat/lon window `(min_x, min_y, max_x, max_y)`.
@@ -2312,16 +2329,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Examples:
             - A 0.1° box over Cairo at 90 m is taller than it is wide in
-              pixels: a degree of longitude is shorter at that latitude, and
-              the grid is sized at the box's poleward edge:
+              pixels, because a degree of longitude is shorter at that
+              latitude:
                 ```python
                 >>> from earthlens.gee.backend import GEE
                 >>> GEE._eedai_grid((31.2, 29.9, 31.3, 30.0), 90.0)
                 (124, 108)
 
                 ```
-            - Spanning the equator the two axes match, because the poleward
-              edge is 1° and a degree of longitude is barely shortened there:
+            - Sitting on the equator the two axes match, because a degree of
+              longitude is not shortened there at all:
                 ```python
                 >>> from earthlens.gee.backend import GEE
                 >>> GEE._eedai_grid((0.0, 0.0, 1.0, 1.0), 1000.0)
