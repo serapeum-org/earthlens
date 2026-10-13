@@ -26,13 +26,16 @@ import threading
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import cdsapi
 import pandas as pd
 import pytest
 
 from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.ecmwf import ECMWF, CadsUnavailableError, Variable
 from earthlens.testing import skip_live_unavailable
+
+#: The `ecmwf` extra is optional, so a missing `cdsapi` skips this module
+#: rather than erroring the whole directory's collection.
+cdsapi = pytest.importorskip("cdsapi")
 
 _LIVE_CDS_TEST_CLASSES = frozenset(
     {
@@ -48,24 +51,6 @@ _LIVE_CDS_TEST_CLASSES = frozenset(
         "TestXdsE2E",
     }
 )
-
-
-def pytest_collection_modifyitems(items):
-    """Tag every test in this subtree with `@pytest.mark.ecmwf`.
-
-    Lets the suite be filtered with `-m ecmwf` to run only the ECMWF
-    backend's tests (e.g. within the atmosphere CI lane).
-
-    Pytest delivers the FULL item list to every conftest hook,
-    not just items from this subtree, so we filter by path.
-    """
-    here = Path(__file__).parent.resolve()
-    for item in items:
-        try:
-            if Path(item.fspath).resolve().is_relative_to(here):
-                item.add_marker(pytest.mark.ecmwf)
-        except (OSError, ValueError):
-            continue
 
 
 @pytest.fixture(autouse=True)

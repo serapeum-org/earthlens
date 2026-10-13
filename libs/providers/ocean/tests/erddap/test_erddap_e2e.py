@@ -13,7 +13,6 @@ Run with:
 
 from __future__ import annotations
 
-import socket
 from pathlib import Path
 
 import pandas as pd
@@ -26,16 +25,7 @@ pytestmark = [pytest.mark.e2e, pytest.mark.erddap]
 _HOST = "coastwatch.pfeg.noaa.gov"
 
 
-def _network_ok() -> bool:
-    """Return True when the CoastWatch ERDDAP host is reachable on 443."""
-    try:
-        socket.create_connection((_HOST, 443), timeout=5).close()
-        return True
-    except OSError:
-        return False
-
-
-_offline_skip = pytest.mark.skipif(not _network_ok(), reason=f"{_HOST} unreachable")
+_offline_skip = pytest.mark.requires_host(_HOST)
 
 
 #: Every shipped griddap row paired with a window inside its real coverage and

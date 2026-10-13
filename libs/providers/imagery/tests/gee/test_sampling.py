@@ -5,7 +5,6 @@ from __future__ import annotations
 import inspect
 from types import SimpleNamespace
 
-import ee
 import geopandas as _gpd
 import geopandas as gpd
 import pytest
@@ -18,6 +17,10 @@ from earthlens.gee.sampling import (
     sample_points,
     sample_points_to_gdf,
 )
+
+#: The `gee` extra is optional, so a missing `earthengine-api` skips this
+#: module rather than erroring the whole directory's collection.
+ee = pytest.importorskip("ee")
 
 
 class _FakeFeatureCollection:

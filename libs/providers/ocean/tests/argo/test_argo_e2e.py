@@ -17,8 +17,6 @@ Run with:
 
 from __future__ import annotations
 
-import socket
-
 import pytest
 
 pytest.importorskip("argopy")
@@ -45,18 +43,7 @@ _FLOAT_WMO = "6902746"
 _SDK_SKIP = (OSError, RecursionError, AttributeError)
 
 
-def _network_ok() -> bool:
-    """Return True when the Ifremer ERDDAP host is reachable on 443."""
-    try:
-        socket.create_connection(("erddap.ifremer.fr", 443), timeout=5).close()
-        return True
-    except OSError:
-        return False
-
-
-_offline_skip = pytest.mark.skipif(
-    not _network_ok(), reason="Argo (Ifremer) host unreachable"
-)
+_offline_skip = pytest.mark.requires_host("erddap.ifremer.fr")
 
 
 def _download_or_skip(backend) -> object:

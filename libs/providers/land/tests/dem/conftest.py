@@ -5,7 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from botocore.exceptions import ClientError
+
+#: boto3 ships with the backend's optional extra; absent, skip the module
+#: instead of interrupting collection for the directory.
+ClientError = pytest.importorskip("botocore.exceptions").ClientError
 
 
 class FakeS3Client:

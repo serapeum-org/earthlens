@@ -9,7 +9,6 @@ from collections.abc import Mapping
 from typing import List
 from unittest.mock import MagicMock
 
-import cdsapi
 import numpy as np
 import pandas as pd
 import pytest
@@ -25,6 +24,10 @@ from earthlens.chc import CHIRPS
 from earthlens.earthlens import EarthLens, _LazyRegistry, _source_dirname
 from earthlens.ecmwf import ECMWF
 from earthlens.s3 import S3
+
+#: The `ecmwf` extra is optional, so a missing `cdsapi` skips this module
+#: rather than erroring the whole directory's collection.
+cdsapi = pytest.importorskip("cdsapi")
 
 
 class _SentinelClient:

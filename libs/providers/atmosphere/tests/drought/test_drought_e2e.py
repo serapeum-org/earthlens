@@ -123,7 +123,7 @@ class TestEdoLive:
             "coverageID=spaST&CRS", "coverageID=smand&CRS"
         ).replace("TIME=2025-12-21", "TIME=2024-06-21")
         if not _reachable(probe, want_binary=True):
-            pytest.skip(
+            skip_live_unavailable(
                 "Copernicus EDO/GDO WCS endpoint unreachable / not serving data"
             )
         paths = EarthLens(
@@ -155,7 +155,7 @@ class TestSpeibaseLive:
 
         endpoint = Catalog().get("speibase-12").endpoint
         if not _reachable(endpoint, want_binary=True):
-            pytest.skip(
+            skip_live_unavailable(
                 "SPEIbase host unreachable (digital.csic.es did not serve NetCDF "
                 "from this network)"
             )

@@ -6,9 +6,12 @@ import io
 from typing import Any
 
 import pytest
-from botocore.exceptions import ClientError
 
 from earthlens.goes import GOES, Catalog
+
+#: boto3 ships with the backend's optional extra; absent, skip the module
+#: instead of interrupting collection for the directory.
+ClientError = pytest.importorskip("botocore.exceptions").ClientError
 
 
 class _FakeBody:

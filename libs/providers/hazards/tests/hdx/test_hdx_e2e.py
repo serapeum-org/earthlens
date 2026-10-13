@@ -12,7 +12,6 @@ Run with:
 
 from __future__ import annotations
 
-import socket
 from pathlib import Path
 
 import pytest
@@ -23,18 +22,7 @@ from earthlens.hdx import HDX
 pytestmark = [pytest.mark.e2e, pytest.mark.hdx]
 
 
-def _hdx_reachable() -> bool:
-    """Return whether `data.humdata.org` answers on HTTPS."""
-    try:
-        socket.create_connection(("data.humdata.org", 443), timeout=5).close()
-        return True
-    except OSError:
-        return False
-
-
-requires_network = pytest.mark.skipif(
-    not _hdx_reachable(), reason="data.humdata.org is unreachable (offline)"
-)
+requires_network = pytest.mark.requires_host("data.humdata.org")
 
 
 @requires_network

@@ -2351,3 +2351,362 @@ class TestGdalGuardDetection:
         # banned import itself -- letting it count would have it satisfy the very
         # rule that exists to precede it.
         assert not _imports_pyramids(ast.parse(source).body[0])
+
+
+# ---------------------------------------------------------------------------
+# Test-suite hygiene: the three rules the live-gating seam replaced an idiom
+# for. Same shape as the GDAL rule above -- walk the source, assert something no
+# single review would catch -- but pointed at `tests/` rather than `src/`,
+# because that is where each of these regressions actually happened.
+# ---------------------------------------------------------------------------
+
+#: Dotted network entry points that must never be reached at *import* time. A
+#: `-m "not e2e"` run still imports every module it then deselects, so a probe
+#: at module scope (or in a decorator expression, which is evaluated just as
+#: eagerly) puts real sockets in the unit lane and makes its skip reason
+#: unreadable to both masked-lane guards.
+_NETWORK_CALLS: frozenset[str] = frozenset(
+    {
+        "socket.create_connection",
+        "socket.gethostbyname",
+        "urllib.request.urlopen",
+        "requests.get",
+        "requests.head",
+        "requests.post",
+        "requests.put",
+        "requests.delete",
+        "requests.request",
+        "boto3.client",
+        "boto3.resource",
+        "HttpClient",
+    }
+)
+
+#: Words that mark a skip reason as an *availability* skip. One of these in a
+#: bare `pytest.skip` is the bug this rule exists for: the two masked-lane
+#: guards read an unprefixed skip as "this backend was never configured", so an
+#: outage is reported as a missing credential and, beside passing neighbours,
+#: reddens the whole lane (issue in `planning/testing`, finding `C1`).
+_AVAILABILITY_WORDS = re.compile(
+    r"\b(unavailable|unreachable|offline|is down|not responding)\b", re.IGNORECASE
+)
+
+
+def _test_modules() -> list[Path]:
+    """Return every test module and conftest across the six members."""
+    return sorted(
+        path
+        for pattern in ("libs/core/tests/**/*.py", "libs/providers/*/tests/**/*.py")
+        for path in _ROOT.glob(pattern)
+        if not _EXCLUDED_DIRS.intersection(path.parts)
+    )
+
+
+_TEST_MODULES = _test_modules()
+_TEST_IDS = [str(p.relative_to(_ROOT)).replace("\\", "/") for p in _TEST_MODULES]
+
+
+def _dotted(node: ast.AST) -> str:
+    """Return the dotted source spelling of a call target (`a.b.c`), or `""`."""
+    parts: list[str] = []
+    while isinstance(node, ast.Attribute):
+        parts.append(node.attr)
+        node = node.value
+    if isinstance(node, ast.Name):
+        parts.append(node.id)
+    return ".".join(reversed(parts))
+
+
+def _is_network_call(node: ast.Call) -> bool:
+    """Return whether `node` calls one of the known network entry points."""
+    dotted = _dotted(node.func)
+    if dotted in _NETWORK_CALLS:
+        return True
+    # `from socket import create_connection` / `from requests import get` leave
+    # only the bare name, so match the tail too -- but only for the distinctive
+    # ones, or every `get()` in the suite would trip.
+    return dotted in {"create_connection", "urlopen"}
+
+
+def _import_time_nodes(tree: ast.Module):
+    """Yield the nodes evaluated when the module is imported.
+
+    A function body is deferred, but its *decorators* and argument defaults are
+    not: `@pytest.mark.skipif(not _probe(), ...)` runs the probe at import, which
+    is exactly the idiom this rule retired.
+    """
+    stack: list[ast.AST] = list(tree.body)
+    while stack:
+        node = stack.pop()
+        yield node
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            stack.extend(node.decorator_list)
+            stack.extend(node.args.defaults)
+            stack.extend(d for d in node.args.kw_defaults if d is not None)
+            continue
+        stack.extend(ast.iter_child_nodes(node))
+
+
+def _networking_helpers(tree: ast.Module) -> set[str]:
+    """Return module-level function names whose body reaches the network."""
+    return {
+        node.name
+        for node in tree.body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and any(
+            isinstance(child, ast.Call) and _is_network_call(child)
+            for child in ast.walk(node)
+        )
+    }
+
+
+@functools.cache
+def _import_time_probes(path: Path) -> tuple[tuple[int, str], ...]:
+    """Return `(line, target)` for every network call made at import time."""
+    tree = ast.parse(_source_text(path))
+    helpers = _networking_helpers(tree)
+    found: list[tuple[int, str]] = []
+    for node in _import_time_nodes(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        target = _dotted(node.func)
+        if _is_network_call(node) or target in helpers:
+            found.append((node.lineno, target or "<call>"))
+    return tuple(sorted(set(found)))
+
+
+@functools.cache
+def _unprefixed_availability_skips(path: Path) -> tuple[tuple[int, str], ...]:
+    """Return `(line, reason)` for every bare `pytest.skip` naming an outage."""
+    found: list[tuple[int, str]] = []
+    for node in ast.walk(ast.parse(_source_text(path))):
+        if not isinstance(node, ast.Call) or _dotted(node.func) != "pytest.skip":
+            continue
+        if not node.args:
+            continue
+        text = " ".join(
+            part.value
+            for part in ast.walk(node.args[0])
+            if isinstance(part, ast.Constant) and isinstance(part.value, str)
+        )
+        if _AVAILABILITY_WORDS.search(text):
+            found.append((node.lineno, text.strip()))
+    return tuple(sorted(set(found)))
+
+
+class TestNoImportTimeNetworkProbes:
+    """No test module opens a socket while pytest is still collecting."""
+
+    @pytest.mark.parametrize("path", _TEST_MODULES, ids=_TEST_IDS)
+    def test_no_probe_at_module_scope(self, path):
+        """Reachability is decided by `requires_host` at run time, not at import."""
+        offenders = _import_time_probes(path)
+        assert not offenders, (
+            f"{path.name} reaches the network at import time "
+            f"{[f'line {line}: {target}' for line, target in offenders]}. "
+            "`-m` deselects after collection, so this runs in the unit lane too: "
+            "move the probe behind `@pytest.mark.requires_host(...)` or an autouse "
+            "fixture that calls `earthlens.testing.require_reachable`"
+        )
+
+    def test_the_walk_sees_a_decorator_expression(self):
+        """A probe inside a `skipif` decorator is import-time, and is caught."""
+        tree = ast.parse(
+            "import socket\n"
+            "@pytest.mark.skipif(not socket.create_connection(('h', 443)), reason='x')\n"
+            "def test_x():\n"
+            "    pass\n"
+        )
+        calls = [n for n in _import_time_nodes(tree) if isinstance(n, ast.Call)]
+        assert any(_is_network_call(call) for call in calls)
+
+    def test_the_walk_leaves_a_function_body_alone(self):
+        """The same call inside the test body is exactly what the rule wants."""
+        tree = ast.parse(
+            "import socket\ndef test_x():\n    socket.create_connection(('h', 443))\n"
+        )
+        calls = [n for n in _import_time_nodes(tree) if isinstance(n, ast.Call)]
+        assert not any(_is_network_call(call) for call in calls)
+
+    def test_a_local_probe_helper_is_followed_one_level(self):
+        """`_host_ok()` called at module scope counts as the probe it wraps."""
+        tree = ast.parse(
+            "import socket\n"
+            "def _host_ok(h):\n"
+            "    return socket.create_connection((h, 443))\n"
+            "_ONLINE = _host_ok('example.org')\n"
+        )
+        assert "_host_ok" in _networking_helpers(tree)
+
+
+class TestAvailabilitySkipsCarryTheGuardPrefix:
+    """An outage skips through the shared helpers, never a bare `pytest.skip`."""
+
+    @pytest.mark.parametrize("path", _TEST_MODULES, ids=_TEST_IDS)
+    def test_no_unprefixed_availability_skip(self, path):
+        """A skip that says "unavailable" must be one the guards can count."""
+        offenders = _unprefixed_availability_skips(path)
+        assert not offenders, (
+            f"{path.name} skips for upstream availability without the guard prefix "
+            f"{[f'line {line}: {reason!r}' for line, reason in offenders]}. "
+            "Use `earthlens.testing.skip_on_upstream(exc)` (classify and re-raise) "
+            "or `skip_live_unavailable(reason)`, so a masked lane is diagnosed as an "
+            "outage instead of a missing credential"
+        )
+
+    def test_the_rule_matches_the_idiom_it_retired(self):
+        """The detector fires on the exact spelling the migration removed."""
+        tree = ast.parse('pytest.skip(f"EMODnet WCS unavailable: {exc}")')
+        node = tree.body[0].value
+        text = " ".join(
+            part.value
+            for part in ast.walk(node.args[0])
+            if isinstance(part, ast.Constant) and isinstance(part.value, str)
+        )
+        assert _AVAILABILITY_WORDS.search(text)
+
+    def test_the_rule_leaves_a_configuration_skip_alone(self):
+        """A missing credential is not an outage and must stay a plain skip."""
+        assert not _AVAILABILITY_WORDS.search("set AIRNOW_API_KEY to run live e2e")
+
+
+#: Import roots that only exist when an optional extra is installed. Derived
+#: from the `[project.optional-dependencies]` tables of the seven distributions
+#: (distribution name -> import name, which differ often enough to be worth
+#: spelling out: `earthengine-api` -> `ee`, `hdx-python-api` -> `hdx`,
+#: `herbie-data` -> `herbie`, `isimip-client` -> `isimip_client`).
+_OPTIONAL_SDKS: frozenset[str] = frozenset(
+    {
+        "airbase",
+        "argopy",
+        "asf_search",
+        "boto3",
+        "botocore",
+        "cartopy",
+        "cdsapi",
+        "copernicusmarine",
+        "dataretrieval",
+        "duckdb",
+        "earthaccess",
+        "ee",
+        "erddapy",
+        "eumdac",
+        "googleapiclient",
+        "gportal",
+        "hdx",
+        "herbie",
+        "isimip_client",
+        "obspy",
+        "ohsome",
+        "openeo",
+        "osmium",
+        "overpy",
+        "overturemaps",
+        "py7zr",
+        "pygbif",
+        "pyobis",
+        "pyramids_eo",
+        "pyrosm",
+        "rtree",
+        "sentinelhub",
+        "tropycal",
+        "worldpoppy",
+    }
+)
+
+#: Test modules permitted a hard module-scope SDK import, each with the reason.
+#: Empty: every remaining case became `pytest.importorskip`, which skips the
+#: module instead of erroring the whole directory's collection. Kept as the
+#: same explicit escape hatch `_GDAL_ALLOWED` is, and policed the same way --
+#: an entry that stops being needed fails the test below.
+_SDK_IMPORT_ALLOWED: frozenset[str] = frozenset()
+
+
+def _module_scope_sdk_imports(path: Path) -> list[tuple[int, str]]:
+    """Return `(line, root)` for each unguarded module-scope optional-SDK import.
+
+    An import inside a function, under `if TYPE_CHECKING:`, or in a
+    `try: ... except ImportError:` is already soft and does not count.
+    """
+    tree = ast.parse(_source_text(path))
+    soft: set[int] = set()
+    for node in ast.walk(tree):
+        deferred = (
+            isinstance(node, ast.Try)
+            and any(_handles_import_error(h) for h in node.handlers)
+        ) or (isinstance(node, ast.If) and _is_type_checking(node.test))
+        if deferred or isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            soft.update(
+                line
+                for child in ast.walk(node)
+                if (line := getattr(child, "lineno", None)) is not None
+            )
+    found: list[tuple[int, str]] = []
+    for node in ast.walk(tree):
+        if getattr(node, "lineno", None) in soft:
+            continue
+        if isinstance(node, ast.Import):
+            roots = [alias.name.split(".")[0] for alias in node.names]
+        elif isinstance(node, ast.ImportFrom):
+            roots = [(node.module or "").split(".")[0]] if node.level == 0 else []
+        else:
+            continue
+        found.extend((node.lineno, root) for root in roots if root in _OPTIONAL_SDKS)
+    return sorted(set(found))
+
+
+def _handles_import_error(handler: ast.ExceptHandler) -> bool:
+    """Return whether an `except` clause catches `ImportError`/`ModuleNotFoundError`."""
+    names = {"ImportError", "ModuleNotFoundError", "Exception"}
+    node = handler.type
+    if node is None:
+        return True
+    if isinstance(node, ast.Name):
+        return node.id in names
+    if isinstance(node, ast.Tuple):
+        return any(isinstance(e, ast.Name) and e.id in names for e in node.elts)
+    return False
+
+
+def _is_type_checking(node: ast.AST) -> bool:
+    """Return whether an `if` test is the `TYPE_CHECKING` guard."""
+    return (isinstance(node, ast.Name) and node.id == "TYPE_CHECKING") or (
+        isinstance(node, ast.Attribute) and node.attr == "TYPE_CHECKING"
+    )
+
+
+class TestOptionalSdkAbsenceIsASkip:
+    """A missing extra skips the module; it never errors the whole directory."""
+
+    @pytest.mark.parametrize("path", _TEST_MODULES, ids=_TEST_IDS)
+    def test_no_hard_sdk_import_at_module_scope(self, path):
+        """`pytest.importorskip`, a `sys.modules` fake, or a function-local import."""
+        rel = str(path.relative_to(_ROOT)).replace("\\", "/")
+        if rel in _SDK_IMPORT_ALLOWED:
+            pytest.skip(f"{rel} is an explicit allowance")
+        offenders = _module_scope_sdk_imports(path)
+        assert not offenders, (
+            f"{path.name} imports optional SDK(s) at module scope "
+            f"{[f'line {line}: {root}' for line, root in offenders]}. A missing extra "
+            "then interrupts collection for the whole directory instead of skipping "
+            "one module -- which is what any environment narrower than `extras: all` "
+            "gets, including the only resolution the `argo` backend installs in. Use "
+            "`pytest.importorskip(\"<sdk>\")`"
+        )
+
+    def test_the_allowances_are_still_used(self):
+        """An allowance that no longer applies is a false claim; drop it."""
+        stale = [
+            rel
+            for rel in _SDK_IMPORT_ALLOWED
+            if not _module_scope_sdk_imports(_ROOT / rel)
+        ]
+        assert not stale, f"_SDK_IMPORT_ALLOWED entries no longer needed: {stale}"
+
+    def test_a_guarded_import_is_not_an_offender(self):
+        """The soft forms the policy allows do not trip the rule."""
+        tree = ast.parse(
+            "try:\n    import boto3\nexcept ImportError:\n    boto3 = None\n"
+        )
+        node = next(n for n in ast.walk(tree) if isinstance(n, ast.Try))
+        assert _handles_import_error(node.handlers[0])
