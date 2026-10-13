@@ -467,6 +467,34 @@ def _validate_property_filter(property_filter: object) -> None:
         )
 
 
+def _declaring(reader: Any, nodata: float | int) -> Any:
+    """Return an in-memory copy of `reader` that declares `nodata`.
+
+    Earth Engine writes no no-data value into the GeoTIFF it returns, and a fill
+    value nothing declares is just data: a `-9999` ocean pixel folds into every
+    mean and every colour ramp. pyramids has no way to stamp a declaration onto
+    an existing raster without also rewriting its pixels - `_set_no_data_value`
+    fills the whole band with the value, and `change_no_data_value` does not
+    persist - so the declaration is made where pyramids does accept one, at
+    construction.
+
+    Args:
+        reader: The pyramids `Dataset` holding the fetched pixels.
+        nodata: The fill value to declare.
+
+    Returns:
+        A new in-memory `Dataset` over the same array, georeferencing and CRS,
+        with `nodata` declared. The caller closes it.
+    """
+    from pyramids.base.georeference import GeoReference
+
+    return PyramidsDataset.from_array(
+        reader.read_array(),
+        geo_ref=GeoReference(geo=reader.geotransform, epsg=reader.epsg),
+        no_data_value=nodata,
+    )
+
+
 def _eedai_remedy(reason: str) -> str:
     """Suggest what to change, given why the reader declined.
 
@@ -983,23 +1011,26 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # rather than a refusal, because it is how `cog` and `property_filter`
         # already report being on the wrong path, and because ignoring the
         # argument still produces the pixels that were asked for.
-        # Two different gates, because the two arguments are honoured at
-        # different points. `nodata` is declared on the `computePixels` request
-        # body, and that request is only ever made for the synchronous sink -
-        # so a batch export ignores it as surely as another engine does, and
-        # gating on the engine alone let `engine='pixels', export_via='drive'`
-        # pass silently. `high_volume` picks the host the session is opened
-        # against, which happens whatever the sink, so it needs the engine only.
-        # Judged on the *resolved* engine, not the argument: `engine=` also
-        # takes an `Engine` instance, and comparing that to a name warned
-        # about an argument the request was about to honour.
-        if nodata is not None and not (
+        # Earth Engine takes a fill value in exactly two places, and they are
+        # not the ones the first pass assumed. Its `PixelGrid` has no nodata
+        # field at all - a request carrying one is refused with `Unknown name
+        # "nodata" at 'grid'` - so the pixel path has to unmask the expression
+        # and declare the value on the raster it writes itself. The only place
+        # the API accepts one directly is `GeoTiffImageExportOptions.noData`,
+        # i.e. a file-based batch export. Everything else ignores it: an asset
+        # export has no file format, and `getDownloadURL` has no such argument.
+        # Judged on the resolved engine, not the argument, because `engine=`
+        # also takes an `Engine` instance.
+        honours_nodata = (
             resolved_engine.name == PixelsEngine.name and not sink.is_batch
-        ):
+        ) or sink.takes_format_options
+        if nodata is not None and not honours_nodata:
             logger.warning(
-                f"nodata={nodata} is declared on the pixel API's request, which "
-                "is made only for engine='pixels' with export_via='url'; this "
-                f"request (engine={resolved_engine.name!r}, "
+                f"nodata={nodata} is honoured by engine='pixels' with "
+                "export_via='url' (unmasked server-side, declared on the "
+                "written raster) and by export_via='drive'/'gcs' (Earth "
+                f"Engine's own GeoTIFF option); this request "
+                f"(engine={resolved_engine.name!r}, "
                 f"export_via={export_via!r}) ignores it."
             )
         if high_volume and resolved_engine.name != PixelsEngine.name:
@@ -1877,6 +1908,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # the grid and the request body are this engine's, not the ABC's, and
         # the caller has already dispatched on the name.
         assert isinstance(engine, PixelsEngine)  # the caller guarantees this
+        nodata = self._export_config.nodata
+        if nodata is not None:
+            # The only way a fill value can reach these pixels: the request
+            # body has no field for one, and an Earth Engine composite returns
+            # masked pixels as 0 in a GeoTIFF - measured, on a CHIRPS window
+            # over the Arabian Sea, which came back 0.0 over water with no
+            # no-data declared. Unmasking first puts the caller's value there
+            # instead, and the write declares it.
+            image = image.unmask(nodata)
         serves, plan = engine.plan(self, var_info, max(len(bands), 1))
         if not serves or plan is None:
             raise ValueError(
@@ -2031,15 +2071,21 @@ class GEE(LazyClientMixin, AbstractDataSource):
         target = self.root_dir / f"{prefix}.tif"
         staged = self.root_dir / f"{prefix}.partial.tif"
         write_cog = self.cog if as_cog is None else as_cog
+        nodata = self._export_config.nodata
         try:
             payload = ee.data.computePixels(body)
             staged.write_bytes(payload)
             reader = PyramidsDataset.read_file(staged)
             try:
-                if write_cog:
-                    reader.cog.to_cog(str(target))
-                else:
-                    reader.to_file(str(target))
+                writer = reader if nodata is None else _declaring(reader, nodata)
+                try:
+                    if write_cog:
+                        writer.cog.to_cog(str(target))
+                    else:
+                        writer.to_file(str(target))
+                finally:
+                    if writer is not reader:
+                        close_quietly(writer)
             finally:
                 close_quietly(reader)
         finally:
@@ -3383,6 +3429,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
             common["scale"] = scale
         else:
             common["crsTransform"] = list(crs_transform)
+        nodata = self._export_config.nodata
+        if nodata is not None and self._sink.takes_format_options:
+            # `GeoTiffImageExportOptions.noData`, the only fill value Earth
+            # Engine's API accepts directly. An asset export has no file
+            # format, so it declares none - the constructor warns about that.
+            common["formatOptions"] = {"noData": nodata}
         # Which constructor, which target keyword and how the destination reads
         # are the sink's business, so they are read off the resolved sink rather
         # than branched on here. The asset sink addresses `assetId` and takes no

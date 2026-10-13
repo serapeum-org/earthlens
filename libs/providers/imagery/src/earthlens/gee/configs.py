@@ -112,10 +112,14 @@ class ExportConfig(SummarisedLeaf):
     http_timeout: float = Field(default=DEFAULT_HTTP_TIMEOUT_S, gt=0)
     wait_for_export: bool = True
     materialize: bool = False
-    # Set from `GEE(nodata=...)` and declared on the `computePixels` grid. Only
-    # that engine's request can express it - `getDownloadURL` has no nodata
-    # argument - so the backend warns rather than silently ignoring it when the
-    # request is routed elsewhere.
+    # Set from `GEE(nodata=...)`. NOT a field on the pixel API's request:
+    # Earth Engine's `PixelGrid` is `dimensions` / `affineTransform` /
+    # `crsCode` / `crsWkt`, and a body carrying a `nodata` is refused with
+    # `Unknown name "nodata" at 'grid'`. Two paths can honour it instead - the
+    # pixel engine unmasks the expression with it and declares it on the raster
+    # it writes, and a file-based batch export passes it as Earth Engine's own
+    # `GeoTiffImageExportOptions.noData`. The backend warns on the paths that
+    # can do neither.
     nodata: float | int | None = None
     # No constructor kwarg: nothing reads it yet. `computePixels` does take a
     # `dataType`, but the dtype a user asks for and the dtype pyramids writes

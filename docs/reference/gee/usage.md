@@ -335,12 +335,24 @@ engine logs a warning at construction and changes nothing — an argument that q
 one that says so.
 
 ```python
-# -9999 is declared on the request's grid; the high-volume host serves it.
+# Masked pixels come back as -9999 and the raster declares it; the high-volume
+# host serves the request.
 GEE(..., engine="pixels", nodata=-9999, high_volume=True)
+
+# Or let Earth Engine declare it on a queued export instead.
+GEE(..., export_via="drive", drive_folder="out", nodata=-9999)
 ```
 
-`nodata=` is the fill value declared on the fetched raster, which is the configurable half of the no-fill-value
-divergence the engines otherwise have. `high_volume=True` initialises Earth Engine against the
+`nodata=` is the fill value for pixels Earth Engine masked. It is worth knowing what happens without it:
+a masked composite comes back with those pixels as **0** and no no-data declared — measured on a CHIRPS window over
+the Arabian Sea, where the sea read as 0 mm of rain rather than as absent. Setting `nodata=-9999` unmasks the
+image with that value server-side and declares it on the written raster, so a reader honours it.
+
+It is *not* a field on the pixel API's request. Earth Engine's `PixelGrid` is `dimensions` / `affineTransform` /
+`crsCode` / `crsWkt`, and a body carrying a `nodata` is refused outright with
+`Unknown name "nodata" at 'grid'`. The one place the API takes a fill value directly is
+`GeoTiffImageExportOptions.noData`, so `export_via="drive"` / `"gcs"` pass it there. `export_via="asset"` creates
+an asset with no file format, and `getDownloadURL` has no such argument, so both of those ignore it and say so. `high_volume=True` initialises Earth Engine against the
 [high-volume endpoint](https://developers.google.com/earth-engine/cloud/highvolume), documented for many parallel
 requests; its trade-off is real (less caching, and complex queries cost more EECU-time there), which is why it is
 per-backend rather than global. `ee` keeps one session per process, so the last backend to open its connection

@@ -48,6 +48,10 @@ class _FakeImage:
         self.calls.append(("clip", (geom,)))
         return self
 
+    def unmask(self, value):
+        self.calls.append(("unmask", (value,)))
+        return self
+
     def getDownloadURL(self, params):  # noqa: N802 - mirrors the ee API
         self.download_params = dict(params)
         self.download_params_list.append(dict(params))
@@ -249,6 +253,13 @@ class _FakePyramidsHandle:
         # Real getDownloadURL tiles declare no no-data; the backend reads this
         # to inherit it rather than letting merge_rasters stamp its 0 default.
         self.no_data_value = no_data_value
+        # Enough of a raster for the declaring copy the nodata path builds.
+        self.geotransform = (31.2, 0.001, 0.0, 30.0, 0.0, -0.001)
+        self.epsg = 4326
+
+    def read_array(self, *args, **kwargs):
+        """Stand in for the pixel array; its identity is what is asserted."""
+        return [[1.0]]
 
     def to_file(self, path: str) -> None:
         from pathlib import Path as _Path
@@ -291,12 +302,24 @@ class _FakePyramidsDataset:
         cls.from_bytes_calls = []
         cls.from_archive_calls = []
         cls.read_file_calls = []
+        cls.from_array_calls = []
 
     @classmethod
     def read_file(cls, path, **kwargs):
         """Record the staged path and hand back a handle over its bytes."""
         cls.read_file_calls.append(str(path))
         return _FakePyramidsHandle(Path(path).read_bytes())
+
+    from_array_calls: list[dict] = []
+
+    @classmethod
+    def from_array(cls, arr, *, geo_ref=None, no_data_value=None, path=None):
+        """Record the declared no-data and hand back a handle carrying it."""
+        cls.from_array_calls.append({"no_data_value": no_data_value, "path": path})
+        handle = _FakePyramidsHandle(b"declared", no_data_value=(no_data_value,))
+        if path is not None:
+            Path(path).write_bytes(b"declared")
+        return handle
 
     @classmethod
     def from_bytes(

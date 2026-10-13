@@ -69,6 +69,12 @@ class Sink(ABC):
     required_config: ClassVar[str | None] = None
     prerequisite_hint: ClassVar[str] = ""
     is_batch: ClassVar[bool] = True
+    #: Whether this sink writes a GeoTIFF whose format options Earth Engine
+    #: accepts, which is the only place its API takes a fill value
+    #: (`GeoTiffImageExportOptions.noData`). `False` for the synchronous sink,
+    #: which writes the file here rather than server-side, and for the asset
+    #: sink, which creates an asset and has no file format at all.
+    takes_format_options: ClassVar[bool] = False
 
     @abstractmethod
     def write(
@@ -216,6 +222,7 @@ class _BatchSink(Sink):
     export_method: ClassVar[str]
     target_kwarg: ClassVar[str]
     scheme: ClassVar[str]
+    takes_format_options: ClassVar[bool] = True
 
     def write(
         self,
@@ -319,6 +326,9 @@ class AssetSink(_BatchSink):
 
     name: ClassVar[str] = "asset"
     required_config: ClassVar[str | None] = "asset_id"
+    # An asset is not a file, so it carries no `fileFormat` and no format
+    # options - which is why `nodata=` cannot reach this one.
+    takes_format_options: ClassVar[bool] = False
     prerequisite_hint: ClassVar[str] = (
         "(the parent folder asset, e.g. 'projects/my-project/assets/my-folder')"
     )

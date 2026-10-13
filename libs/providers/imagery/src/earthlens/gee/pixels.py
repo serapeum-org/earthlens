@@ -235,8 +235,15 @@ class PixelsEngine(Engine):
         Returns:
             The request body for `ee.data.computePixels`: `expression`,
             `fileFormat`, and a `grid` of `dimensions` + `affineTransform` +
-            `crsCode`, plus `bandIds` when bands were named. The configured
-            `nodata` is declared on the grid when one was set.
+            `crsCode`, plus `bandIds` when bands were named.
+
+            No `nodata`: Earth Engine's `PixelGrid` has exactly four fields
+            (`dimensions`, `affineTransform`, `crsCode`, `crsWkt`) and
+            `ComputePixelsRequest` has no fill value either, so a request
+            carrying one is refused outright with `Unknown name "nodata" at
+            'grid'`. A fill value reaches the pixels through the *expression*
+            instead - `GEE._export_via_pixels` unmasks the image with it - and
+            is declared on the raster this backend writes.
         """
         body: dict[str, Any] = {
             "expression": image,
@@ -253,9 +260,6 @@ class PixelsEngine(Engine):
         body["grid"]["affineTransform"] = affine_transform(grid.request_transform())
         if bands:
             body["bandIds"] = list(bands)
-        nodata = backend._export_config.nodata
-        if nodata is not None:
-            body["grid"]["nodata"] = nodata
         return body
 
     def endpoint(self, high_volume: bool) -> str | None:

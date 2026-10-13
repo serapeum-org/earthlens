@@ -11,7 +11,12 @@ from earthlens.gee.engines import ENGINES, Engine, resolve_engine
 from earthlens.gee.grid import OutputGrid
 from earthlens.gee.pixels import HIGH_VOLUME_ENDPOINT, PixelsEngine
 
-from .test_backend import fake_ee, fake_reader, make_gee  # noqa: F401 - fixtures
+from .test_backend import (  # noqa: F401 - fixtures
+    _FakePyramidsDataset,
+    fake_ee,
+    fake_reader,
+    make_gee,
+)
 
 ASSET = "USGS/SRTMGL1_003"
 
@@ -214,19 +219,24 @@ class TestGridAndRequest:
         assert engine.request(gee, "i", grid, ["B4"])["bandIds"] == ["B4"]
         assert "bandIds" not in engine.request(gee, "i", grid, [])
 
-    def test_a_declared_nodata_reaches_the_request(self, make_gee, fake_reader):
-        """The ExportConfig field added in 1.9, threaded through."""
-        gee = _gee(make_gee, engine="pixels")
-        # Set on the config directly, so this stays a test of the request
-        # builder rather than of the `nodata=` kwarg that now feeds it.
-        object.__setattr__(
-            gee,
-            "_export_config",
-            gee._export_config.model_copy(update={"nodata": -9999}),
-        )
-        engine = PixelsEngine()
-        grid = engine.grid_for(gee, 90.0)
-        assert engine.request(gee, "i", grid, [])["grid"]["nodata"] == -9999
+    def test_the_request_body_has_only_the_fields_the_api_declares(
+        self, make_gee, fake_reader
+    ):
+        """`PixelGrid` is `dimensions` / `affineTransform` / `crsCode` / `crsWkt`.
+
+        Anything else is refused by the server, which is how the `nodata` field
+        this engine used to send was found: `Unknown name "nodata" at 'grid'`.
+        """
+        gee = _gee(make_gee, engine="pixels", nodata=-9999)
+        gee.download(progress_bar=False)
+        (body,) = gee.client.compute_pixels_calls
+        assert set(body) <= {"expression", "fileFormat", "grid", "bandIds"}
+        assert set(body["grid"]) <= {
+            "dimensions",
+            "affineTransform",
+            "crsCode",
+            "crsWkt",
+        }
 
     def test_no_nodata_key_when_none_was_declared(self, make_gee, fake_reader):
         """Unset means today's behaviour, so the key is absent."""
@@ -528,35 +538,110 @@ class TestCog:
 
 
 class TestNodata:
-    """`GEE(nodata=...)` is declared on the request, which is the only path for it."""
+    """`GEE(nodata=...)` reaches the pixels, which is not where it first went.
 
-    def test_it_reaches_the_request_grid(self, make_gee, fake_reader):
-        """The fill value the caller stated, not whatever the driver declares."""
+    Earth Engine's `PixelGrid` has four fields - `dimensions`,
+    `affineTransform`, `crsCode`, `crsWkt` - and `ComputePixelsRequest` has no
+    fill value either, so the body this engine first built was refused outright:
+    `Invalid JSON payload received. Unknown name "nodata" at 'grid'`. The offline
+    fake accepted any body, so every test passed and the live lane never set it.
+
+    A fill value reaches the pixels through the expression instead (`unmask`),
+    and is declared on the raster this backend writes.
+    """
+
+    def test_the_request_carries_no_nodata(self, make_gee, fake_reader):
+        """The field does not exist, so sending one fails the whole request."""
         gee = _gee(make_gee, engine="pixels", nodata=-9999)
         gee.download(progress_bar=False)
         (body,) = gee.client.compute_pixels_calls
-        assert body["grid"]["nodata"] == -9999
+        assert "nodata" not in body["grid"]
+        assert set(body["grid"]) <= {"dimensions", "affineTransform", "crsCode"}
 
-    def test_absent_by_default(self, make_gee, fake_reader):
-        """An unset nodata leaves the key out rather than sending null."""
-        gee = _gee(make_gee, engine="pixels")
+    def test_the_image_is_unmasked_with_it(self, make_gee, fake_reader):
+        """Which is what puts the value into the masked pixels."""
+        gee = _gee(make_gee, engine="pixels", nodata=-9999)
         gee.download(progress_bar=False)
         (body,) = gee.client.compute_pixels_calls
-        assert "nodata" not in body["grid"]
+        assert ("unmask", (-9999,)) in body["expression"].calls
+
+    def test_the_written_raster_declares_it(self, make_gee, fake_reader):
+        """An undeclared fill value is just data: it folds into every mean."""
+        _FakePyramidsDataset.reset()
+        gee = _gee(make_gee, engine="pixels", nodata=-9999)
+        gee.download(progress_bar=False)
+        assert [-9999] == [
+            call["no_data_value"] for call in _FakePyramidsDataset.from_array_calls
+        ]
 
     def test_zero_is_a_value_and_not_an_absence(self, make_gee, fake_reader):
         """`0` is a legitimate fill value, so the test cannot be truthiness."""
+        _FakePyramidsDataset.reset()
         gee = _gee(make_gee, engine="pixels", nodata=0)
         gee.download(progress_bar=False)
         (body,) = gee.client.compute_pixels_calls
-        assert body["grid"]["nodata"] == 0
+        assert ("unmask", (0,)) in body["expression"].calls
+        assert [0] == [
+            call["no_data_value"] for call in _FakePyramidsDataset.from_array_calls
+        ]
+
+    def test_an_unset_nodata_changes_nothing(self, make_gee, fake_reader):
+        """No unmask, no declaring copy: the default path is untouched."""
+        _FakePyramidsDataset.reset()
+        gee = _gee(make_gee, engine="pixels")
+        gee.download(progress_bar=False)
+        (body,) = gee.client.compute_pixels_calls
+        assert not [call for call in body["expression"].calls if call[0] == "unmask"]
+        assert _FakePyramidsDataset.from_array_calls == []
 
     def test_the_config_carries_it(self):
-        """`ExportConfig.nodata`, where the request builder reads it."""
+        """`ExportConfig.nodata`, where both write paths read it."""
         from earthlens.gee.configs import ExportConfig
 
         assert ExportConfig().nodata is None
         assert ExportConfig(nodata=-1).nodata == -1
+
+
+class TestNodataOnABatchExport:
+    """The one place Earth Engine's API takes a fill value directly."""
+
+    def test_a_drive_export_sends_the_geotiff_option(self, make_gee, fake_reader):
+        """`GeoTiffImageExportOptions.noData`, per the live API schema."""
+        gee = _gee(
+            make_gee, export_via="drive", drive_folder="out", nodata=-9999, engine="ee"
+        )
+        gee.download(progress_bar=False)
+        (_method, kwargs) = gee.client.export_image.calls[-1]
+        assert kwargs["formatOptions"] == {"noData": -9999}
+
+    def test_a_gcs_export_sends_it_too(self, make_gee, fake_reader):
+        """Same option, same file format."""
+        gee = _gee(
+            make_gee, export_via="gcs", gcs_bucket="b", nodata=-9999, engine="ee"
+        )
+        gee.download(progress_bar=False)
+        (_method, kwargs) = gee.client.export_image.calls[-1]
+        assert kwargs["formatOptions"] == {"noData": -9999}
+
+    def test_an_asset_export_does_not(self, make_gee, fake_reader):
+        """An asset is not a file, so it carries no format options at all."""
+        gee = _gee(
+            make_gee,
+            export_via="asset",
+            asset_id="projects/p/assets/f",
+            nodata=-9999,
+            engine="ee",
+        )
+        gee.download(progress_bar=False)
+        (_method, kwargs) = gee.client.export_image.calls[-1]
+        assert "formatOptions" not in kwargs
+
+    def test_an_unset_nodata_sends_no_options(self, make_gee, fake_reader):
+        """The export keywords are unchanged for everyone who sets nothing."""
+        gee = _gee(make_gee, export_via="drive", drive_folder="out", engine="ee")
+        gee.download(progress_bar=False)
+        (_method, kwargs) = gee.client.export_image.calls[-1]
+        assert "formatOptions" not in kwargs
 
 
 class TestTheAffineTransformMapping:

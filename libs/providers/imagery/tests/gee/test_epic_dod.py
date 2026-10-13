@@ -497,35 +497,49 @@ class TestTheIgnoredArgumentNoticesAreHonest:
     `nodata` that nothing would read.
     """
 
-    def test_nodata_warns_when_the_pixel_engine_meets_a_batch_sink(
+    def test_nodata_warns_on_the_sink_that_cannot_carry_it(
         self, make_gee, fake_reader, monkeypatch
     ):
-        """The request body is never built for a queued export."""
+        """An asset export has no file format, so no fill value can be declared."""
         collected = _collect_warnings(monkeypatch)
         _gee(
             make_gee,
             engine="pixels",
-            export_via="drive",
-            drive_folder="out",
+            export_via="asset",
+            asset_id="projects/p/assets/f",
             nodata=-9999,
         )
         assert [message for message in collected if "nodata" in message]
 
-    def test_the_notice_names_both_halves_of_the_reason(
+    def test_the_notice_names_where_it_would_be_honoured(
         self, make_gee, fake_reader, monkeypatch
     ):
-        """So a caller can see which of the two to change."""
+        """So a caller can see which engine or sink to pick instead."""
         collected = _collect_warnings(monkeypatch)
         _gee(
             make_gee,
-            engine="pixels",
-            export_via="drive",
-            drive_folder="out",
+            engine="ee",
+            export_via="asset",
+            asset_id="projects/p/assets/f",
             nodata=-9999,
         )
         (message,) = [m for m in collected if "nodata" in m]
         assert "engine='pixels'" in message
-        assert "export_via='drive'" in message
+        assert "drive" in message
+
+    def test_nodata_is_silent_on_a_file_based_batch_export(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """Earth Engine's own GeoTIFF option carries it there."""
+        collected = _collect_warnings(monkeypatch)
+        _gee(
+            make_gee,
+            engine="ee",
+            export_via="drive",
+            drive_folder="out",
+            nodata=-9999,
+        )
+        assert not [message for message in collected if "nodata" in message]
 
     def test_nodata_is_silent_where_it_is_honoured(
         self, make_gee, fake_reader, monkeypatch

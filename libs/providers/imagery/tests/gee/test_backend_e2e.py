@@ -605,6 +605,50 @@ def test_live_a_materialised_download_stacks_into_a_datacube(tmp_path):
         result.close()
 
 
+@_skip_without_creds
+def test_live_nodata_reaches_the_pixels_and_the_declaration(tmp_path):
+    """`nodata=` is honoured end to end, which it was not when it shipped.
+
+    The first implementation put `nodata` on the `computePixels` grid, where no
+    such field exists, so every request carrying it was refused with
+    `Unknown name "nodata" at 'grid'`. Nothing caught it: the offline fake
+    accepts any body, and no live test set the argument. This is that test.
+
+    The AOI straddles the Kerala coast, and CHIRPS is land-only, so the Arabian
+    Sea half is masked and the fill value has to appear.
+    """
+    import numpy as np
+
+    el = EarthLens(
+        data_source="gee",
+        start="2020-06-01",
+        end="2020-06-03",
+        variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+        temporal_resolution="raw",
+        lat_lim=[9.9, 10.2],
+        lon_lim=[75.5, 76.3],
+        path=str(tmp_path / "nodata"),
+        scale=5566,
+        engine="pixels",
+        nodata=-9999,
+    ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
+    (written,) = el.download(progress_bar=False)
+
+    from pyramids.dataset import Dataset
+
+    raster = Dataset.read_file(str(written))
+    try:
+        declared = raster.no_data_value
+        values = np.asarray(raster.read_array(), dtype="float64")
+    finally:
+        raster.close()
+    assert declared[0] == -9999, f"the raster declares {declared}, not -9999"
+    assert int(np.sum(values == -9999)) > 0, (
+        "no pixel carries the fill value, so the unmask did not reach the expression"
+    )
+    assert float(np.max(values)) > 0.0, "the AOI has no valid rainfall left"
+
+
 def _download_chirps(tmp_path, engine: str):
     """Fetch a tiny CHIRPS precipitation composite through one engine."""
     el = EarthLens(

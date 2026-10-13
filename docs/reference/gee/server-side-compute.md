@@ -343,8 +343,14 @@ blocking; `list_recent_tasks`, `get_task_status`, `wait_for_task_id`, `cancel_ta
 - **`cog=True`** applies to the paths that write the raster themselves — the EEDAI reader and
   `engine="pixels"`. `getDownloadURL` and the batch sinks ignore it, and so does `resample=`, which is the
   EEDAI reader's warp kernel alone.
-- **`nodata=` and `high_volume=`** are `engine="pixels"` only; any other engine warns at construction and
-  ignores them.
+- **`nodata=`** is honoured by `engine="pixels"` on the `"url"` sink (the expression is unmasked with it and
+  the written raster declares it) and by `export_via="drive"` / `"gcs"` (Earth Engine's own
+  `GeoTiffImageExportOptions.noData`). It is **not** a field on the pixel API's request — a body carrying one
+  is refused with `Unknown name "nodata" at 'grid'` — and an asset export has no file format at all, so
+  that sink and `getDownloadURL` ignore it and warn. Without it, a masked composite's pixels come back as 0
+  with nothing declared.
+- **`high_volume=`** is `engine="pixels"` only; any other engine warns and initialises against the regular
+  endpoint.
 - **`auto_split=True`** applies to `engine="ee"` and `engine="pixels"`, which share Earth Engine's
   32768-px per-axis cap. Measured, because the guide implies otherwise: a `computePixels` request of
   39,479 × 12 px comes back as `Pixel grid dimensions (39479x12) must be less than or equal to
