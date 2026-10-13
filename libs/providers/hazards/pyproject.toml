@@ -114,28 +114,4 @@ earthlens-core = { workspace = true }
 [tool.pytest.ini_options]
 testpaths = "tests"
 consider_namespace_packages = true
-addopts = "--import-mode=importlib"
-markers = [
-    "admin: tests for the administrative-boundaries backend (geoBoundaries + CGAZ + Natural Earth + US Census TIGER/Line; no extra SDK — core requests + pyramids; all four public, GADM omitted for license).",
-    "aqueduct: tests for the WRI Aqueduct riverine flood-risk backend (files.wri.org 2015 Analyzer, CC-BY-4.0; no extra SDK — core requests + pyramids; country/state/basin exposure shapefiles).",
-    "cli: tests for the `earthlens` console script / federated catalog-query CLI (typer and rich are core dependencies; no extra needed).",
-    "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
-    "emdat: tests for the EM-DAT disaster backend (the UCLouvain Dataverse archive is anonymous and needs no extra; the GDIS sources need the `emdat` extra: earthaccess, plus an Earthdata Login).",
-    "gdis: tests for the GDIS half of the EM-DAT backend (needs an Earthdata Login plus acceptance of the SEDAC data-use agreement); deselect with `-m \"not gdis\"` on a machine without credentials.",
-    "fdsn: tests for the FDSN seismic-event backend (requires the `fdsn` extra: obspy).",
-    "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
-    "flodis: tests for the FLODIS observed-flood footprints<->impacts backend (public Zenodo record 8123096, CC-BY-4.0, no extra SDK — core HttpClient + pandas; global companion to hanze, sibling of emdat).",
-    "flopros: tests for the FLOPROS flood-protection-standard backend (NHESS-2016 supplement shapefile, CC-BY-3.0, no extra SDK — core HttpClient + base/archive + pyramids; subnational protection standards as return periods).",
-    "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
-    "hanze: tests for the HANZE historical European flood-impacts backend (public Zenodo record 20478847, CC-BY-4.0, no extra SDK — core HttpClient + pandas + pyramids).",
-    "hdx: tests for the Humanitarian Data Exchange backend (requires the `hdx` extra: hdx-python-api).",
-    "jrc: tests for the JRC European Flood Hazard Map backend (river-flood water depth per return period, Europe + Mediterranean; open HTTPS from the JRC, no extra SDK — core requests + pyramids `/vsicurl` windowed reads; CC-BY 4.0).",
-    "integration: exercises multiple modules together with mocked I/O.",
-    "osm: tests for the OpenStreetMap backend (requires the `osm` extra: overpy + ohsome; two public keyless protocols — Overpass current-state via overpy, OSM history via ohsome; the non-e2e suite fakes both SDKs).",
-    "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; the `osm` extra ships the default streaming pyosmium engine (osmium), while the in-memory pyrosm engine is opt-in via a manual `pip install pyrosm`; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract and installs pyrosm to exercise its engine).",
-    "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",
-    "risk_indicators: tests for the risk-indicators backend (GFDRR ThinkHazard! + INFORM Risk + Global Forest Watch; no extra SDK — core requests + pandas + pyramids; GFW datasets need GFW_API_KEY, ThinkHazard/INFORM are public).",
-    "nsi: tests for the NSI US flood exposure/loss backend (USACE National Structure Inventory + FEMA NFHL flood zones + FEMA NFIP claims v3; no extra SDK — core requests + pandas + pyramids; per-instance OUTPUT_KIND; all three keyless US public domain).",
-    "slow: mark test as slow.",
-    "unit: in-process unit test, no network or filesystem outside tmp_path.",
-]
+addopts = "--import-mode=importlib --strict-markers"

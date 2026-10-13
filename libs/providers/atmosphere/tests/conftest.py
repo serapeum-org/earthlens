@@ -58,8 +58,11 @@ def chirps_base_dir() -> Path:
 from earthlens.testing import (  # noqa: F401 - fixtures + hooks used by name
     _earthlens_dirs_scratch,
     isolate_earthlens_dirs,
+    pytest_collection_modifyitems,
+    pytest_configure,
     pytest_runtest_call,
     pytest_sessionfinish,
     real_pooled_session,
+    require_marked_hosts,
     unpooled_http_transport,
 )

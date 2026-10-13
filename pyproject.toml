@@ -126,6 +126,19 @@ all = [
 [dependency-groups]
 dev = [
     "nbval >=0.11.0",
+    # pytest-socket: the non-e2e lanes run with `--disable-socket`, so a unit
+    # test that reaches the network fails where it used to pass quietly against
+    # a real host. `--allow-hosts=127.0.0.1,::1` keeps a local emulator usable.
+    "pytest-socket >=0.7.0",
+    # moto: in-process AWS doubles for the six boto3 backends (goes, nwm, dem,
+    # radar, s3, caravan), replacing their hand-built client/paginator fakes.
+    # The sibling `unicloud` repo already tests its S3 layer this way.
+    "moto >=5.0.22",
+    # pytest-recording + vcrpy: the offline middle tier. A cassette replays a
+    # real provider exchange with no socket; the default record mode is `none`,
+    # so a marked test cannot silently re-record against the live service.
+    "pytest-recording >=0.13.2",
+    "vcrpy >=6.0.2",
     # psutil: the aggregator's handle-release test counts the process's open
     # files before and after a run. Deleting the input proves nothing on POSIX,
     # which permits unlinking an open file, so the descriptor is counted
@@ -439,79 +452,7 @@ testpaths = [
     "libs/providers/ocean/tests",
 ]
 consider_namespace_packages = true
-addopts = "--import-mode=importlib"
-markers = [
-    "slow: mark test as slow.",
-    "fast: mark test as fast.",
-    "unit: in-process unit test, no network or filesystem outside tmp_path.",
-    "integration: exercises multiple modules together with mocked I/O.",
-    "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
-    "catrare: tests for the CatRaRE DWD heavy-rainfall event-catalogue backend (opendata.dwd.de FileGDB v2026.01, CC-BY-4.0 / GeoNutzV, no extra SDK — core HttpClient + pyramids; RADKLIM-derived events reprojected from the RADOLAN grid).",
-    "chc: tests for the Climate Hazards Center (CHC) FTP backend (no extra SDK; covers CHIRPS / CHIRP / CHIRTS / WBGT / SPI / SPEI / CHC_CMIP6 etc.).",
-    "caravan: tests for the Caravan large-sample hydrology backend (no extra SDK; static Zenodo archives read over HTTP Range, includes the open GRDC-Caravan subset).",
-    "s3: tests for the S3 backend (requires the `s3` extra: boto3).",
-    "ecmwf: tests for the ECMWF/CDS backend (requires the `ecmwf` extra: cdsapi).",
-    "gee: tests for the Google Earth Engine backend (requires the `gee` extra: earthengine-api).",
-    "cmems: tests for the Copernicus Marine backend (requires the `cmems` extra: copernicusmarine).",
-    "fdsn: tests for the FDSN seismic-event backend (requires the `fdsn` extra: obspy).",
-    "earthdata: tests for the NASA Earthdata backend (requires the `earthdata` extra: earthaccess; Python >=3.12).",
-    "asf: tests for the ASF InSAR backend (requires the `asf` extra: asf_search; reuses EDL auth from `earthdata`).",
-    "hdx: tests for the Humanitarian Data Exchange backend (requires the `hdx` extra: hdx-python-api).",
-    "eumetsat: tests for the EUMETSAT Data Store backend (requires the `eumetsat` extra: eumdac).",
-    "stac: tests for the STAC backend (requires the `stac` extra: pyramids-gis[stac] → pystac-client + stac-asset).",
-    "openeo: tests for the openEO server-side-processing backend (requires the `openeo` extra: openeo).",
-    "sentinel_hub: tests for the Sentinel Hub server-side-render backend (requires the `sentinel-hub` extra: sentinelhub).",
-    "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
-    "flopros: tests for the FLOPROS flood-protection-standard backend (NHESS-2016 supplement shapefile, CC-BY-3.0, no extra SDK — core HttpClient + base/archive + pyramids; subnational protection standards as return periods).",
-    "hanze: tests for the HANZE historical European flood-impacts backend (public Zenodo record 20478847, CC-BY-4.0, no extra SDK — core HttpClient + pandas + pyramids).",
-    "emdat: tests for the EM-DAT disaster backend (the UCLouvain Dataverse archive is anonymous and needs no extra; the GDIS sources need the `emdat` extra: earthaccess, plus an Earthdata Login).",
-    "gdis: tests for the GDIS half of the EM-DAT backend (needs an Earthdata Login plus acceptance of the SEDAC data-use agreement); deselect with `-m \"not gdis\"` on a machine without credentials.",
-    "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
-    "airnow: tests for the AirNow air-quality backend (US/Canada EPA `/aq/data/` bbox REST; no extra SDK — core `requests` + `pandas`; needs a free AIRNOW_API_KEY for live e2e).",
-    "eea: tests for the EEA (`eea_aq`) air-quality backend (requires the `eea_aq` extra: airbase; European monitor observations via Parquet; public, no auth).",
-    "sensor_community: tests for the Sensor.Community air-quality backend (crowdsourced low-cost sensors; no extra SDK — core `requests` + `pandas`; public archive + live JSON API, ODbL).",
-    "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
-    "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
-    "flodis: tests for the FLODIS observed-flood footprints<->impacts backend (public Zenodo record 8123096, CC-BY-4.0, no extra SDK — core HttpClient + pandas; global companion to hanze, sibling of emdat).",
-    "mswep: tests for the GloH2O MSWEP / MSWX backend (requires the `mswep` extra).",
-    "nwm: tests for the NOAA National Water Model backend (requires the `nwm` extra: boto3; unsigned noaa-nwm-pds bucket).",
-    "cmip6: tests for the CMIP6 backend (raw archive on the open Pangeo gs://cmip6 bucket; anonymous, no extra SDK; reads via pyramids).",
-    "isimip: tests for the ISIMIP bias-adjusted climate-forcing backend (requires the `isimip` extra: isimip-client; facet search + server-side cutout job on the ISIMIP repository, public/no auth).",
-    "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",
-    "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",
-    "radar: tests for the NEXRAD Level-II radar backend (requires the `radar` extra: boto3; unsigned unidata-nexrad-level2-chunks bucket).",
-    "dem: tests for the Copernicus DEM backend (GLO-30 / GLO-90; requires the `dem` extra: boto3; anonymous copernicus-dem-30m / -90m buckets; raw COG tiles — no decode, mosaic/crop is pyramids downstream).",
-    "goes: tests for the NOAA GOES-R ABI backend (requires the `goes` extra: boto3; unsigned noaa-goes19/18/16 buckets).",
-    "usgs_water: tests for the USGS NWIS / Water Data backend (requires the `usgs-water` extra: dataretrieval; anonymous access works).",
-    "ghsl: tests for the GHSL backend (JRC Global Human Settlement Layer; open HTTPS, no extra SDK for the direct path; localised via pyramids).",
-    "worldpop: tests for the WorldPop population data hub backend (open CC-BY-4.0; default REST path needs only core requests + pyramids, optional `worldpop` extra adds worldpoppy).",
-    "cli: tests for the `earthlens` console script / federated catalog-query CLI (typer and rich are core dependencies; no extra needed).",
-    "biodiversity: tests for the shared biodiversity-cluster helpers (`wkt_from_bbox`, `occurrences_to_fc`, `LicenseWarning`; no extra SDK).",
-    "gbif: tests for the GBIF species-occurrence backend (requires the `gbif` extra: pygbif; search is anonymous).",
-    "obis: tests for the OBIS marine-occurrence backend (requires the `obis` extra: pyobis; search is anonymous).",
-    "wdpa: tests for the Protected Planet (WDPA) backend (no extra SDK; direct v4 REST via core `requests`; needs a token).",
-    "iucn: tests for the IUCN Red List v4 backend (no extra SDK; direct v4 REST via core `requests`; needs a Bearer token).",
-    "jaxa: tests for the JAXA backend (three protocols — authless STAC/COG via jaxa.earth, credentialed SFTP via gportal, credentialed FTP via P-Tree/Himawari; the jaxa-earth and gportal branches need the `jaxa` extra, the ptree branch uses stdlib `ftplib` only).",
-    "ptree: e2e-only selector for the live P-Tree Himawari HSD FTP fetch (needs $JAXA_PTREE_USERNAME + $JAXA_PTREE_PASSWORD; 30-day rolling archive; the no-network ptree unit tests carry `@pytest.mark.jaxa + @pytest.mark.unit` instead so `-m ptree` does not pick them up).",
-    "argo: tests for the Argo float-profile backend (requires the `argo` extra: argopy; open data, no auth).",
-    "erddap: tests for the generic ERDDAP backend (requires the `erddap` extra: erddapy; griddap raster via direct .nc download + pyramids, tabledap tabular via to_pandas; public servers only).",
-    "bathymetry: tests for the bathymetry DEM backend (GEBCO 2020 + ETOPO1 ice/bedrock via NOAA ERDDAP griddap; EMODnet Bathymetry European DTM via OGC WCS; no extra SDK — core requests + pyramids).",
-    "fabdem: tests for the FABDEM V1-2 bare-earth DEM backend (Forest And Buildings removed Copernicus DEM, ~30m; open HTTPS from the University of Bristol, no extra SDK — core requests + pyramids; CC-BY-NC-SA 4.0 non-commercial).",
-    "real_band_names: JRC tests that exercise the real band-naming helper instead of the offline stub.",
-    "jrc: tests for the JRC hazards backend — the European Flood Hazard Map (river-flood water depth per return period, Europe + Mediterranean) and the probabilistic sea-level (Total Water Level) forecasts (global 0.25 deg gridded cubes + a per-country coastal summary); open HTTPS from the JRC, no extra SDK — core requests + pyramids `/vsicurl` windowed reads; CC-BY 4.0).",
-    "solar_wind_atlas: tests for the Solar & Wind Atlas backend (Global Solar Atlas + Global Wind Atlas climatology layers; no extra SDK — core requests + pyramids; GWA windowed /vsicurl COG read, GSA download-then-localise).",
-    "pvgis: tests for the JRC PVGIS solar-radiation / PV time-series backend (keyless REST via core `requests` + `pandas`; no extra SDK).",
-    "climate_indices: tests for the climate / teleconnection index backend (NOAA PSL + KNMI Climate Explorer monthly ASCII series; no extra SDK — core requests + pandas).",
-    "nrel: tests for the NREL NSRDB / WIND Toolkit solar-wind time-series backend (keyed REST CSV via core `requests` + `pandas`; no extra SDK; required api_key + email auth).",
-    "risk_indicators: tests for the risk-indicators backend (GFDRR ThinkHazard! + INFORM Risk + Global Forest Watch; no extra SDK — core requests + pandas + pyramids; GFW datasets need GFW_API_KEY, ThinkHazard/INFORM are public).",
-    "nsi: tests for the NSI US flood exposure/loss backend (USACE National Structure Inventory + FEMA NFHL flood zones + FEMA NFIP claims v3; no extra SDK — core requests + pandas + pyramids; per-instance OUTPUT_KIND; all three keyless US public domain).",
-    "glaciers: tests for the glaciers backend (RGI 7.0 per-region outlines via IHP-WINS + GLIMS WFS time-series outlines + WGMS Fluctuations of Glaciers tabular; no extra SDK — core requests + pandas + pyramids; mixed per-instance OUTPUT_KIND; all sources open, no auth).",
-    "osm: tests for the OpenStreetMap backend (requires the `osm` extra: overpy + ohsome; two public keyless protocols — Overpass current-state via overpy, OSM history via ohsome; the non-e2e suite fakes both SDKs).",
-    "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; the `osm` extra ships the default streaming pyosmium engine (osmium), while the in-memory pyrosm engine is opt-in via a manual `pip install pyrosm`; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract and installs pyrosm to exercise its engine).",
-    "admin: tests for the administrative-boundaries backend (geoBoundaries + CGAZ + Natural Earth + US Census TIGER/Line; no extra SDK — core requests + pyramids; all four public, GADM omitted for license).",
-    "soilgrids: tests for the SoilGrids backend (ISRIC SoilGrids 2.0 soil properties via OGC WCS at maps.isric.org; no extra SDK — core requests + pyramids' Dataset.from_wcs; all public, CC-BY 4.0, no auth).",
-    "drought: tests for the drought backend (US Drought Monitor / Copernicus EDO+GDO / CSIC SPEIbase; no extra SDK — core `requests` + pyramids; EDO/GDO fetched via the Copernicus GetCoverage REST endpoint, SPEIbase via direct NetCDF).",
-]
+addopts = "--import-mode=importlib --strict-markers"
 
 # uv workspace. Each member (libs/core, libs/providers/*) is an independently
 # lockable uv project; this root is the workspace root and the "install
