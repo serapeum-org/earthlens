@@ -32,10 +32,15 @@ import pytest
 #: makes the test's behaviour depend on whether the machine running it happens
 #: to have an AWS profile.
 _DUMMY_CREDENTIALS: dict[str, str] = {
-    "AWS_ACCESS_KEY_ID": "testing",
-    "AWS_SECRET_ACCESS_KEY": "testing",
-    "AWS_SECURITY_TOKEN": "testing",
-    "AWS_SESSION_TOKEN": "testing",
+    # The `nosec B105` markers below are deliberate: these placeholders are
+    # inert by design, and being inert is the entire point. They stop
+    # botocore's credential chain at its first step so it never reaches the
+    # metadata service. No account stands behind them, and the in-process
+    # emulator never checks a signature.
+    "AWS_ACCESS_KEY_ID": "testing",  # nosec B105
+    "AWS_SECRET_ACCESS_KEY": "testing",  # nosec B105
+    "AWS_SECURITY_TOKEN": "testing",  # nosec B105
+    "AWS_SESSION_TOKEN": "testing",  # nosec B105
     "AWS_DEFAULT_REGION": "us-east-1",
     # Belt and braces: some botocore paths probe IMDS for the region or role
     # even when credentials are present.
