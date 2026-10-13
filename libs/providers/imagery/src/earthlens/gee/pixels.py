@@ -73,9 +73,9 @@ class PixelsEngine(Engine):
 
     name: ClassVar[str] = "pixels"
 
-    #: Not selectable with `engine=`: the sizing and the request body are
-    #: implemented, the transport that would post them is not.
-    implemented: ClassVar[bool] = False
+    #: Selectable: the backend dispatches a `pixels` plan to
+    #: `GEE._export_via_pixels`, which posts the request this engine builds.
+    implemented: ClassVar[bool] = True
 
     def plan(
         self,
@@ -100,35 +100,10 @@ class PixelsEngine(Engine):
             bucket_end: The bucket's exclusive end, for a collection read.
 
         Returns:
-            Never returns — see `Raises`. :meth:`verdict` is the sizing half.
-
-        Raises:
-            NotImplementedError: Always. The backend routes any accepted plan to
-                the EEDAI reader, so returning one here would serve a computed
-                request from stored pixels with the computation dropped.
+            `(True, plan)` when the pixel API will serve the request, else
+            `(False, None)` so the caller falls back to Earth Engine.
         """
-        # Refuse rather than route. `_api` sends every `(True, plan)` to the
-        # EEDAI reader - it has no `plan.engine` dispatch, because the reader
-        # path is reached before the composited image exists. So returning a
-        # servable plan here would hand a masked/filtered request to a reader
-        # that materialises *stored* pixels, silently dropping the very compute
-        # this engine exists to serve. Wiring the fetch means threading the
-        # image into that branch, which is a change to the download path proper.
-        # The request is quoted back rather than discarded: it is what the
-        # caller asked for, and naming it makes the refusal diagnosable.
-        window = (
-            f" over {bucket_start:%Y-%m-%d} to {bucket_end:%Y-%m-%d}"
-            if bucket_start is not None and bucket_end is not None
-            else ""
-        )
-        raise NotImplementedError(
-            f"engine='pixels' can size and describe a computePixels request "
-            f"({var_info.id}, {band_count} band(s){window}) but cannot yet "
-            "fetch one: the backend has no dispatch for it, and routing it "
-            "would silently serve the request from stored pixels with any "
-            "cloud_mask or filters dropped. Use engine='auto' (or 'ee') until "
-            "the fetch path lands."
-        )
+        return self.verdict(backend, var_info)
 
     def verdict(
         self, backend: GEE, var_info: Dataset

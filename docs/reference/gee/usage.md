@@ -261,16 +261,23 @@ methods, which preserve band names. `Percentile` has to use `reduce`, which suff
 making it interchangeable with the rest. `resolve_reducer` accepts a name, a `percentile:<q>` spec or an instance,
 and resolves once per request, so a bad percentile fails before any bucket exports rather than part-way through.
 
-**Engines.** `engine=` resolves to an `Engine`. There are three to choose from: `"auto"` prefers the EEDAI reader and
-falls back to Earth Engine on any decline; `"ee"` always uses `getDownloadURL`; and `"eedai"` forces the reader and
-raises if it cannot serve.
+**Engines.** `engine=` resolves to an `Engine`, and there are four:
 
-A fourth, `"pixels"`, is **registered but not selectable**. It would fetch through `ee.data.computePixels`, which
-evaluates a computation graph and so could serve a `cloud_mask` or `filters` without the 32768-px per-axis cap that
-`getDownloadURL` imposes — but only its sizing and request-body construction exist; the transport does not. It is
-registered so that the engine seam is exercised by something other than the two incumbents, and `engine="pixels"` is
-rejected at construction rather than offered as a choice that fails later. `selectable_engines()` is the list
-`engine=` accepts; `ENGINES` is every registered engine.
+| `engine=` | Transport | Runs a computation graph? | Per-axis cap |
+|---|---|---|---|
+| `"auto"` (default) | the reader when the request qualifies, else Earth Engine | only on the Earth Engine side | 32768 px |
+| `"ee"` | `ee.Image.getDownloadURL` | yes | 32768 px |
+| `"eedai"` | the pyramids-eo EEDAI reader, forced | no — raises if the request needs one | none |
+| `"pixels"` | `ee.data.computePixels` | yes | none |
+
+`"pixels"` is the one to reach for when a request needs **both** server-side compute and an output larger than
+`getDownloadURL` will serve: it evaluates the graph, so a `cloud_mask` or `filters` survives, and it is not bound by
+the 32768-px per-axis limit that makes `auto_split=True` necessary on the `"ee"` path. It returns the GeoTIFF bytes
+directly, so there is no URL to expire and no zip to unpack. It applies to `export_via="url"` only — it is a pull, so
+it has nothing to say about a queued export, and a batch sink ignores it.
+
+`"eedai"` remains the fastest path for a *raw* read of a stored asset, because it streams the pixels without
+evaluating anything. `"auto"` prefers it and falls back to Earth Engine on any decline.
 
 **Grids.** `OutputGrid` is where the AOI, `crs` and `scale` become a pixel grid, with one constructor per
 convention: `for_metre_grid` sizes for square metres on the ground (the reader's rule, shortening longitude by

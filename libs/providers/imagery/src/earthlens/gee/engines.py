@@ -327,17 +327,18 @@ def selectable_engines() -> frozenset[str]:
     """Return the engine names `engine=` accepts.
 
     `ENGINES` holds every registered engine; this holds the ones that can
-    actually fetch pixels. The two differ while an engine's transport is still
-    being built, which is why the vocabulary is derived from this rather than
-    from the registry directly.
+    actually fetch pixels. They agree today, and the distinction exists so an
+    engine can be registered - and its sizing tested - before its transport is
+    written, without being offered as a choice that fails later.
 
     Returns:
         The names whose engine reports `implemented`.
 
     Examples:
         ```python
+        >>> from earthlens.gee import pixels  # noqa: F401 - registers it
         >>> sorted(selectable_engines())
-        ['auto', 'ee', 'eedai']
+        ['auto', 'ee', 'eedai', 'pixels']
 
         ```
     """

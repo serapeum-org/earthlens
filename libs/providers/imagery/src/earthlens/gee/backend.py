@@ -55,7 +55,7 @@ import datetime as dt
 import gc
 import math
 import os
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -89,7 +89,12 @@ from earthlens.gee._helpers import (
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
 from earthlens.gee.catalog import Catalog, Dataset
 from earthlens.gee.configs import EngineConfig, ExportConfig
-from earthlens.gee.engines import NO_SCENES, reader_refusal_types, resolve_engine
+from earthlens.gee.engines import (
+    NO_SCENES,
+    EedaiEngine,
+    reader_refusal_types,
+    resolve_engine,
+)
 from earthlens.gee.features import create_feature
 from earthlens.gee.grid import (
     OutputGrid,
@@ -98,6 +103,7 @@ from earthlens.gee.grid import (
     same_crs,
 )
 from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
+from earthlens.gee.pixels import PixelsEngine
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
 from earthlens.gee.reducers import resolve_reducer
@@ -1616,7 +1622,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 bucket_start,
                 bucket_end,
             )
-            if use_reader:
+            # `plan.engine`, not just the boolean: an accepted plan says WHICH
+            # engine accepted it, and only the reader's plans belong on the
+            # reader path. Taking any yes here is what let a `pixels` plan - a
+            # request carrying a cloud_mask or filters - be served from stored
+            # pixels with the computation silently dropped.
+            if use_reader and plan is not None and plan.engine == EedaiEngine.name:
                 assert plan is not None  # a yes always carries its plan
                 try:
                     return self._export_via_eedai(
@@ -1648,8 +1659,85 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # to its own bbox / cutline.
         region = self._ee_region()
         if self.export_via == "url":
+            # `pixels` replaces `getDownloadURL` for the synchronous sink only:
+            # it is a pull, so it has nothing to say about a queued export.
+            if self._engine.name == "pixels":
+                return self._export_via_pixels(
+                    image, var_info, float(scale), bands, prefix
+                )
             return self._export_via_url(image, var_info, float(scale), region, prefix)
         return self._export_via_batch(image, float(scale), region, prefix)
+
+    def _export_via_pixels(
+        self,
+        image: Any,
+        var_info: Dataset,
+        scale: float,
+        bands: Sequence[str],
+        prefix: str,
+    ) -> Path:
+        """Fetch one bucket through `ee.data.computePixels` → `<prefix>.tif`.
+
+        Earth Engine's documented extraction call for a *computed* image. Unlike
+        `getDownloadURL` it is not capped at 32768 px per axis, and unlike the
+        EEDAI reader it evaluates the computation graph, so a `cloud_mask` or
+        `filters` survives.
+
+        It returns the GeoTIFF bytes directly rather than a URL, so there is no
+        second HTTP hop to retry and no zip to unpack: the body goes to a staged
+        file and is renamed on success, the same write-then-rename the other
+        paths use so a failure cannot leave a truncated raster at the final
+        name.
+
+        Args:
+            image: The composited `ee.Image` for this bucket.
+            var_info: The catalog entry being read.
+            scale: Ground sample distance in metres.
+            bands: The bands to fetch, in order.
+            prefix: The filename stem for this bucket.
+
+        Returns:
+            The written path.
+
+        Raises:
+            ValueError: If the engine declines to size the request, which means
+                the catalog row carries no resolution to size from.
+        """
+        engine = self._engine
+        # Narrowed for the same reason the batch export narrows to `_BatchSink`:
+        # the grid and the request body are this engine's, not the ABC's, and
+        # the caller has already dispatched on the name.
+        assert isinstance(engine, PixelsEngine)  # the caller guarantees this
+        serves, plan = engine.plan(self, var_info, max(len(bands), 1))
+        if not serves or plan is None:
+            raise ValueError(
+                f"engine='pixels' cannot size a read of {var_info.id}; use "
+                "engine='auto' so Earth Engine serves it instead."
+            )
+        grid = engine.grid_for(self, scale)
+        body = engine.request(self, image, grid, list(bands))
+        logger.info(
+            f"computePixels {var_info.id} [{', '.join(bands) or 'all bands'}] "
+            f"at {grid.cols}x{grid.rows} px in {grid.crs}"
+        )
+        target = self.root_dir / f"{prefix}.tif"
+        staged = self.root_dir / f"{prefix}.partial.tif"
+        try:
+            payload = ee.data.computePixels(body)
+            staged.write_bytes(payload)
+            reader = PyramidsDataset.read_file(staged)
+            try:
+                if self.cog:
+                    reader.cog.to_cog(str(target))
+                else:
+                    reader.to_file(str(target))
+            finally:
+                close_quietly(reader)
+                reader = None
+        finally:
+            _discard_quietly(staged)
+        logger.info(f"Wrote {target} (computePixels{', COG' if self.cog else ''})")
+        return target
 
     def _export_via_url(
         self, image, var_info: Dataset, scale: float, region, prefix: str

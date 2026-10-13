@@ -180,8 +180,16 @@ class _FakeEE:
         self.image_log: list = []
         self.export_image = _FakeExportImage()
         self.batch = SimpleNamespace(Export=SimpleNamespace(image=self.export_image))
+        #: Records every `ee.data.computePixels` body and returns GeoTIFF bytes.
+        self.compute_pixels_calls: list[dict] = []
+        self.data = SimpleNamespace(computePixels=self._compute_pixels)
         self.authenticate_calls = 0
         self.initialize_calls: list[dict] = []
+
+    def _compute_pixels(self, body):
+        """Record the request and return the bytes of a tiny real GeoTIFF."""
+        self.compute_pixels_calls.append(body)
+        return _TINY_GEOTIFF
 
     def Authenticate(self):  # noqa: N802 - mirrors the ee API
         self.authenticate_calls += 1
@@ -250,6 +258,11 @@ class _FakePyramidsHandle:
     def close(self) -> None:
         """Record the release so tests can assert the handle is not leaked."""
         _FakePyramidsHandle.closed_handles.append(self)
+
+
+#: Stand-in body for an `ee.data.computePixels` response. The pyramids reader is
+#: faked in these tests, so only its identity matters, not its format.
+_TINY_GEOTIFF = b"computepixels-geotiff-body"
 
 
 class _FakePyramidsDataset:

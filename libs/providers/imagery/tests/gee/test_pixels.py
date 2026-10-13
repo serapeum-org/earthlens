@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from earthlens.gee.engines import ENGINES, Engine, resolve_engine
@@ -14,81 +16,93 @@ ASSET = "USGS/SRTMGL1_003"
 
 
 def _gee(make_gee, **overrides):
-    """A GEE over one small SRTM read.
-
-    Built with a selectable engine: `engine="pixels"` is rejected at
-    construction, so these tests drive `PixelsEngine` directly against a
-    backend that holds the request.
-    """
+    """A GEE over one small SRTM read."""
     params = {"variables": {ASSET: ["elevation"]}, "scale": 90.0}
     params.update(overrides)
-    params.pop("engine", None)
     return make_gee(**params)
 
 
 class TestTheSeamHeld:
-    """The acceptance criterion for Task 1.3, asserted rather than asserted of."""
+    """The acceptance criterion for the Engine ABC, asserted rather than claimed."""
 
     def test_registering_is_enough_to_reach_the_backend(self):
-        """One registry line, with no edit to `_use_eedai` or `_api`.
-
-        Selectability is a separate question: an engine that cannot fetch is
-        registered but kept out of the `engine=` vocabulary.
-        """
+        """One registry line, with no edit to `_use_eedai`."""
         assert ENGINES["pixels"] is PixelsEngine
-        with pytest.raises(ValueError, match="not selectable"):
-            resolve_engine("pixels")
+        assert isinstance(resolve_engine("pixels"), PixelsEngine)
 
-    def test_it_is_a_real_engine(self):
-        """It satisfies the same ABC the two incumbents do."""
-        assert issubclass(PixelsEngine, Engine)
-
-    def test_it_is_registered_but_not_selectable(self, make_gee, fake_reader):
-        """Registered to exercise the seam; not offered as a working choice."""
+    def test_it_is_selectable(self):
+        """It can fetch, so it belongs in the `engine=` vocabulary."""
         from earthlens.gee.engines import selectable_engines
 
-        assert "pixels" in ENGINES
-        assert "pixels" not in selectable_engines()
+        assert "pixels" in selectable_engines()
 
-    def test_the_constructor_rejects_it_with_a_reason(self, make_gee, fake_reader):
-        """Rejected up front, not per-bucket after auth and the catalog read."""
-        with pytest.raises(ValueError, match="not selectable"):
-            make_gee(variables={ASSET: ["elevation"]}, scale=90.0, engine="pixels")
+    def test_it_is_a_real_engine(self):
+        """It satisfies the same ABC the incumbents do."""
+        assert issubclass(PixelsEngine, Engine)
+
+    def test_the_constructor_accepts_it(self, make_gee, fake_reader):
+        """The vocabulary is derived from the registry, not restated."""
+        assert _gee(make_gee, engine="pixels").engine == "pixels"
+
+    def test_the_backend_resolves_it_to_the_object(self, make_gee, fake_reader):
+        """Resolution happens once, in the constructor."""
+        assert isinstance(_gee(make_gee, engine="pixels")._engine, PixelsEngine)
 
 
-class TestItRefusesRatherThanMisroute:
-    """`plan` must not return a servable verdict until the fetch is wired.
+class TestFetching:
+    """`download()` through the pixel API writes a raster like any other sink."""
 
-    `_api` sends every accepted plan to the EEDAI reader, which materialises
-    *stored* pixels. A servable plan from here would therefore drop the
-    `cloud_mask` or `filters` this engine exists to serve, silently.
-    """
+    def test_it_writes_a_file(self, make_gee, fake_reader):
+        """The same return shape the `url` sink gives."""
+        (out,) = _gee(make_gee, engine="pixels").download(progress_bar=False)
+        assert isinstance(out, Path)
+        assert out.is_file()
 
-    def test_planning_refuses_with_a_reason(self, make_gee, fake_reader):
-        """And the message names the engine to use instead."""
+    def test_it_calls_compute_pixels_once_per_bucket(self, make_gee, fake_reader):
+        """And reaches `ee.data.computePixels`, not `getDownloadURL`."""
         gee = _gee(make_gee, engine="pixels")
-        var_info = gee.catalog.get_dataset(ASSET)
-        engine = PixelsEngine()
-        with pytest.raises(NotImplementedError, match="cannot yet fetch"):
-            engine.plan(gee, var_info, 1)
+        gee.download(progress_bar=False)
+        assert len(gee.client.compute_pixels_calls) == 1
 
-    def test_the_refusal_names_the_alternative(self, make_gee, fake_reader):
-        """A refusal should say what to do, not just decline."""
+    def test_it_does_not_use_get_download_url(self, make_gee, fake_reader):
+        """The capped thumbnail path is bypassed entirely."""
         gee = _gee(make_gee, engine="pixels")
-        var_info = gee.catalog.get_dataset(ASSET)
-        engine = PixelsEngine()
-        with pytest.raises(NotImplementedError, match="engine='auto'"):
-            engine.plan(gee, var_info, 1)
+        gee.download(progress_bar=False)
+        assert gee.client.export_image.calls == []
 
-    def test_a_masked_request_is_not_served_from_stored_pixels(
+    def test_the_request_carries_the_grid_and_the_expression(
         self, make_gee, fake_reader
     ):
-        """The specific data-correctness hole: compute must not be dropped."""
+        """What `computePixels` evaluates, and the shape it returns."""
+        gee = _gee(make_gee, engine="pixels")
+        gee.download(progress_bar=False)
+        (body,) = gee.client.compute_pixels_calls
+        assert body["fileFormat"] == "GEO_TIFF"
+        assert body["expression"] is not None
+        assert body["grid"]["dimensions"]["width"] > 0
+
+    def test_it_serves_a_masked_request(self, make_gee, fake_reader):
+        """The capability the EEDAI reader cannot offer, end to end."""
         gee = _gee(make_gee, engine="pixels", cloud_mask=lambda image: image)
-        var_info = gee.catalog.get_dataset(ASSET)
-        engine = PixelsEngine()
-        with pytest.raises(NotImplementedError):
-            engine.plan(gee, var_info, 1)
+        (out,) = gee.download(progress_bar=False)
+        assert out.is_file()
+        assert len(gee.client.compute_pixels_calls) == 1
+
+    def test_a_dataset_with_no_resolvable_scale_is_refused(self, make_gee, fake_reader):
+        """There is no grid to request, so it says so rather than guessing."""
+        gee = _gee(make_gee, engine="pixels", scale=None)
+        var_info = gee.catalog.get_dataset(ASSET).model_copy(
+            update={"spatial_resolution": None}
+        )
+        with pytest.raises(ValueError, match="cannot size"):
+            gee._export_via_pixels("image", var_info, 0.0, ["elevation"], "prefix")
+
+    def test_the_batch_sinks_are_untouched_by_it(self, make_gee, fake_reader):
+        """`pixels` is a pull, so it has nothing to say about a queued export."""
+        gee = _gee(make_gee, engine="pixels", export_via="drive", drive_folder="out")
+        (out,) = gee.download(progress_bar=False)
+        assert out.startswith("drive://")
+        assert gee.client.compute_pixels_calls == []
 
 
 class TestCapability:
