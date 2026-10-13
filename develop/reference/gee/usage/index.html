@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24232,21 +24232,46 @@ convention: <code>for_metre_grid</code> sizes for square metres on the ground (t
 <code>from_crs_transform</code> pins the grid origin so stacked dates align without a resample. Away from the equator the first
 two disagree on the column count — that is real, documented, and now visible in one place rather than implied by two
 method families.</p>
+<p>The third one is what <code>crs_transform=</code> selects:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># A 10 m grid in UTM 36N, pinned to a round origin rather than to the AOI.</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:32636&quot;</span><span class="p">,</span> <span class="n">crs_transform</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">300_000</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3_400_000</span><span class="p">))</span>
+</code></pre></div>
+<p>Six terms, <code>(x_scale, x_shear, x_origin, y_shear, y_scale, y_origin)</code>, in the units of <code>crs</code> — the order
+Earth Engine's own <code>crsTransform</code> uses. It pins the pixel size <strong>and</strong> the origin, so two downloads over different
+AOIs land on the same pixel boundaries and differencing them needs no resample. Earth Engine treats it as an
+alternative to <code>scale</code>, not an addition, so a pinned request sends the transform and no scale: <code>getDownloadURL</code> and
+the batch sinks take it directly, and <code>engine="pixels"</code> sends it as the request's <code>affineTransform</code>. The EEDAI reader
+sizes its own metre grid and takes no transform, so a pinned request is never routed to it and <code>engine="eedai"</code>
+raises. You still need a resolvable <code>scale</code> (from <code>scale=</code> or the catalog row), because the routing and naming
+decisions are made on it — it simply is not sent. The per-axis cap is checked against the pinned grid,
+so a transform finer than <code>scale</code> cannot slip an oversized request past it.</p>
 <p><strong>In-memory results.</strong> <code>materialize=True</code> returns a <code>DownloadResult</code> carrying the pyramids object alongside each
 written path, instead of only the paths:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;ee&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">result</span><span class="o">.</span><span class="n">paths</span>     <span class="c1"># the written files</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">result</span><span class="o">.</span><span class="n">objects</span>   <span class="c1"># the in-memory pyramids Datasets</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>     <span class="c1"># the objects - materialising is what you asked for</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;ee&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">result</span><span class="o">.</span><span class="n">paths</span>     <span class="c1"># the written files</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">result</span><span class="o">.</span><span class="n">objects</span>   <span class="c1"># the in-memory pyramids Datasets</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>     <span class="c1"># the objects - materialising is what you asked for</span>
 </code></pre></div>
 <p>Note the one place the stand-in is not transparent: when you materialise, each artifact's value <em>is</em> the object, so
 <code>result</code> iterates and compares as the list of <strong>objects</strong>, not of paths. <code>result.paths</code> is how you get the files.
 Without <code>materialize=</code> nothing changes — <code>download()</code> returns the same plain list of paths it always did.</p>
 <p>It needs pixels on disk, so it is only meaningful for <code>export_via="url"</code>; a batch sink raises rather than handing
 back destinations with no objects.</p>
-<p><strong>Not yet reachable.</strong> <code>ExportConfig</code> carries <code>nodata</code> / <code>dtype</code>, and <code>EngineConfig</code> carries <code>high_volume</code>, but
-only the <code>pixels</code> request builder reads them and its fetch path is not wired — so there are deliberately no
-<code>GEE(nodata=...)</code> / <code>GEE(high_volume=...)</code> arguments yet, rather than public arguments that quietly do nothing.</p>
+<p><strong>The pixel API's own two knobs.</strong> Both are honoured by <code>engine="pixels"</code> and by nothing else, because the
+<code>computePixels</code> request body and its endpoint are the only places they can be expressed. Passing either to another
+engine logs a warning at construction and changes nothing — an argument that quietly does nothing is worse than
+one that says so.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># -9999 is declared on the request&#39;s grid; the high-volume host serves it.</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;pixels&quot;</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=-</span><span class="mi">9999</span><span class="p">,</span> <span class="n">high_volume</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><code>nodata=</code> is the fill value declared on the fetched raster, which is the configurable half of the no-fill-value
+divergence the engines otherwise have. <code>high_volume=True</code> initialises Earth Engine against the
+<a href="https://developers.google.com/earth-engine/cloud/highvolume">high-volume endpoint</a>, documented for many parallel
+requests; its trade-off is real (less caching, and complex queries cost more EECU-time there), which is why it is
+per-backend rather than global. <code>ee</code> keeps one session per process, so the last backend to open its connection
+decides the host for the others too. <code>ExportConfig.dtype</code> is still unreachable on purpose: <code>computePixels</code> takes a
+<code>dataType</code>, but the dtype a caller asks for and the dtype pyramids writes have to agree, and that pairing is not
+built.</p>
 <h2 id="6-via-the-earthlens-facade"><a class="toclink" href="#6-via-the-earthlens-facade">6. Via the <code>EarthLens</code> facade</a><a class="headerlink" href="#6-via-the-earthlens-facade" title="Permanent link">#</a></h2>
 <p>Once the GEE backend is registered in the facade you'll also be able to
 do <code>EarthLens(data_source="gee", variables={...}, ...).download()</code>; until
