@@ -214,6 +214,25 @@ _PROBE_CACHE: dict[str, str | None] = {}
 _PROBE_TIMEOUT = 10.0
 
 
+#: pytest-socket raises `SocketBlockedError` for a blocked `socket()` and
+#: `SocketConnectBlockedError` for a blocked `connect()` under `--allow-hosts`.
+#: The two share no base beyond `RuntimeError`, and importing them would make
+#: the plugin a hard dependency of this module, so they are matched by name.
+_SOCKET_BLOCK_ERRORS = frozenset({"SocketBlockedError", "SocketConnectBlockedError"})
+
+
+def _is_socket_blocked(exc: BaseException) -> bool:
+    """Return whether `exc` is pytest-socket refusing the connection.
+
+    Args:
+        exc: The exception to classify.
+
+    Returns:
+        `True` when the lane's socket block raised it.
+    """
+    return type(exc).__name__ in _SOCKET_BLOCK_ERRORS
+
+
 def _probe(target: str, timeout: float) -> str | None:
     """Return `None` when `target` answers, else the reason it did not.
 
@@ -234,7 +253,7 @@ def _probe(target: str, timeout: float) -> str | None:
     except Exception as exc:  # noqa: BLE001 - any probe failure is a verdict
         # pytest-socket blocking the probe means the test is in the wrong lane,
         # not that the host is down. Let that surface as the error it is.
-        if type(exc).__name__ == "SocketBlockedError":
+        if _is_socket_blocked(exc):
             raise
         return f"{target} unreachable ({type(exc).__name__})"
     return None
@@ -310,6 +329,21 @@ def require_marked_hosts(request: pytest.FixtureRequest) -> None:
             require_reachable(target, timeout=timeout)
 
 
+#: What to tell someone whose non-e2e test just tried to open a socket. A bare
+#: `SocketBlockedError` names the symptom; this names the decision they have to
+#: make. Borrowed from Airflow, whose DB-access block fails with a sentence
+#: saying which marker to add rather than with a connection error.
+_SOCKET_BLOCKED_HELP = (
+    "{nodeid} opened a network socket, and this lane runs with "
+    "`--disable-socket` because it must not touch the network.\n"
+    "Either fake the transport (`earthlens.testing.fake_http` / `FakeResponse`, "
+    "or an emulator on 127.0.0.1), or mark the test `@pytest.mark.e2e` so it "
+    "runs in a live lane instead.\n"
+    "If it is a *reachability probe*, it belongs in "
+    "`@pytest.mark.requires_host(...)`, which runs only for selected tests."
+)
+
+
 @pytest.hookimpl(wrapper=True)
 def pytest_runtest_call(item: pytest.Item) -> Generator[None, object, object]:
     """Turn an upstream-availability failure in a live `e2e` test into a skip.
@@ -319,6 +353,10 @@ def pytest_runtest_call(item: pytest.Item) -> Generator[None, object, object]:
     `skipped`, not `failed`. This wrapper inspects the exception a `e2e`-marked
     test raises and, when `is_upstream_unavailable` recognises it, re-raises it as
     a skip. Every other failure — and every non-`e2e` test — propagates unchanged.
+
+    It also rewrites pytest-socket's `SocketBlockedError` into a message that
+    says what to do about it, since that error arrives in the lane where the
+    author is least likely to know the lane blocks sockets at all.
 
     Args:
         item: The test item pytest is about to run.
@@ -333,6 +371,8 @@ def pytest_runtest_call(item: pytest.Item) -> Generator[None, object, object]:
             reason = is_upstream_unavailable(exc)
             if reason is not None:
                 pytest.skip(f"{_LIVE_SKIP_PREFIX}{reason}")
+        elif _is_socket_blocked(exc):
+            raise RuntimeError(_SOCKET_BLOCKED_HELP.format(nodeid=item.nodeid)) from exc
         raise
 
 

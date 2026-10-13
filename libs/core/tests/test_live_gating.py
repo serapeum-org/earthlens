@@ -104,14 +104,14 @@ def test_probe_reports_the_failure_type(monkeypatch: pytest.MonkeyPatch) -> None
 def test_probe_reraises_a_blocked_socket(monkeypatch: pytest.MonkeyPatch) -> None:
     """A pytest-socket block is a lane error, not an upstream outage."""
 
-    class SocketBlockedError(RuntimeError):
+    class SocketConnectBlockedError(RuntimeError):
         """Named to match pytest-socket's, which is what the probe keys on."""
 
     def _blocked(address, timeout):
-        raise SocketBlockedError("no sockets in this lane")
+        raise SocketConnectBlockedError("no sockets in this lane")
 
     monkeypatch.setattr(_live.socket, "create_connection", _blocked)
-    with pytest.raises(SocketBlockedError):
+    with pytest.raises(SocketConnectBlockedError):
         _live._probe("example.org", 1.0)
 
 
