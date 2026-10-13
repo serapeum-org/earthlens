@@ -303,3 +303,59 @@ class TestBackendIntegration:
         first = gee._eedai_reader()
         gee.authenticate(service_account="other@x.iam", service_key="other.json")
         assert gee._eedai_reader() is not first
+
+
+class TestTheBackendReadsThroughTheAdapter:
+    """The guard is only real if production calls go through it."""
+
+    def test_the_cost_query_goes_through_the_adapter(self, make_gee, fake_reader):
+        """So the scene-discovery call holds the lock like any other read."""
+        import datetime as dt
+
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-30",
+            scale=5566.0,
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        gee._eedai_collection_fits(
+            var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+        )
+        assert fake_reader.cost_calls, "the scene-cost query never reached the reader"
+
+    def test_the_adapter_injects_the_credential_on_a_cost_query(
+        self, make_gee, fake_reader
+    ):
+        """The call site no longer passes one, so the adapter must supply it."""
+        import datetime as dt
+
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-30",
+            scale=5566.0,
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        gee._eedai_collection_fits(
+            var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+        )
+        _asset_id, kwargs = fake_reader.cost_calls[0]
+        assert kwargs["credentials"] is not None
+
+    def test_the_adapter_injects_the_credential_on_a_pixel_read(
+        self, make_gee, fake_reader
+    ):
+        """The same for the read that actually fetches pixels."""
+        make_gee().download(progress_bar=False)
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["credentials"] is not None
+
+    def test_the_backend_no_longer_imports_the_module_itself(self):
+        """The import moved to the adapter, which is what owns the lock."""
+        import inspect
+
+        from earthlens.gee import backend as backend_module
+
+        source = inspect.getsource(backend_module)
+        assert "import_earthengine_reader()" not in source

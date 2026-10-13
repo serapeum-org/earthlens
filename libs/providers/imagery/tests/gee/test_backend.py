@@ -1524,8 +1524,13 @@ class TestApi:
             lon_lim=[0.0, 40.0],
             scale=30.0,
         )
-        with pytest.raises(ValueError, match="32768-px"):
+        with pytest.raises(ValueError, match=r"32,?768-px") as caught:
             gee.download(progress_bar=False)
+        message = str(caught.value)
+        # The message quotes the grid Earth Engine would actually build, and
+        # names a way out rather than only refusing.
+        assert "148427x148427" in message
+        assert "auto_split=True" in message
 
     def test_missing_scale_raises(self, make_gee):
         """`_api` raises when there is no `scale` and no dataset `spatial_resolution`."""
@@ -2094,7 +2099,12 @@ class _FakeReaderModule:
 def fake_reader(monkeypatch):
     """Patch the guarded pyramids-eo loader with an in-memory fake reader."""
     reader = _FakeReaderModule()
-    monkeypatch.setattr(backend_module, "import_earthengine_reader", lambda: reader)
+    # Patched on the reader module, which is where the import now happens: the
+    # backend reaches pyramids-eo through `EedaiReader`, so that adapter owns
+    # the lock and the identity check around every call.
+    from earthlens.gee import reader as reader_module
+
+    monkeypatch.setattr(reader_module, "import_earthengine_reader", lambda: reader)
     reader.credential_builds = []
     monkeypatch.setattr(
         backend_module,

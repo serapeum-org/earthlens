@@ -78,7 +78,6 @@ from earthlens.base import (
 from earthlens.gee._eedai import (
     credentials_for,  # noqa: F401 - monkeypatch seam the test suite patches
     eedai_available,  # noqa: F401 - monkeypatch seam the test suite patches
-    import_earthengine_reader,
 )
 from earthlens.gee._helpers import (
     _COLLECTION_REDUCERS,
@@ -166,6 +165,11 @@ _EEDAI_MAX_NATIVE_PIXELS: int = 4_000_000_000
 #: driver has no overviews worth trusting, so it fetches the AOI at the asset's
 #: native resolution into memory before downsampling.
 _EEDAI_MAX_PIXELS: int = 200_000_000
+
+#: Total pixels one synchronous `getDownloadURL` fetch is sized against. Earth
+#: Engine caps the response itself; this is only used to phrase the per-axis
+#: refusal, so it is the per-axis cap squared rather than a documented limit.
+_EE_URL_MAX_PIXELS: int = EE_MAX_DIMENSION * EE_MAX_DIMENSION
 
 #: The extra guidance a prerequisite message carries beyond the field name,
 #: keyed by `Sink.required_config` so a new sink needs no edit here unless it
@@ -1667,16 +1671,36 @@ class GEE(LazyClientMixin, AbstractDataSource):
         `ValueError` is raised with a coarser-scale / smaller-bbox /
         `export_via="drive"` hint.
         """
+        # Two sizings, deliberately. `estimate_pixel_dims` is pyramids' documented
+        # worst-case UPPER bound, which is the right thing to make the decision
+        # on: it over-counts, so it can only split or refuse too eagerly, never
+        # too late. `OutputGrid.for_earth_engine` predicts the grid Earth Engine
+        # will actually build, which is the right thing to put in the message -
+        # quoting the upper bound told the caller a pixel count Earth Engine
+        # never produces. The decision still rests on the bound, so this changes
+        # no behaviour, only what the error says.
         width_px, height_px = self.space.estimate_pixel_dims(scale)
         if max(width_px, height_px) > EE_MAX_DIMENSION:
             if self.auto_split:
                 return self._auto_split_and_download(image, var_info, scale, prefix)
+            grid = OutputGrid.for_earth_engine(
+                (
+                    self.space.longitude_min,
+                    self.space.latitude_min,
+                    self.space.longitude_max,
+                    self.space.latitude_max,
+                ),
+                crs=self.crs,
+                scale=scale,
+            )
+            _fits, reason = grid.fits(
+                max_pixels=_EE_URL_MAX_PIXELS, max_dimension=EE_MAX_DIMENSION
+            )
             raise ValueError(
-                f"{var_info.id}: the requested AOI at scale={scale} m is about "
-                f"{width_px}x{height_px} px, over Earth Engine's "
-                f"{EE_MAX_DIMENSION}-px per-axis limit for synchronous downloads. "
-                "Use a coarser scale, a smaller bbox, export_via='drive', or "
-                "auto_split=True."
+                f"{var_info.id}: the requested AOI at scale={scale} m is "
+                f"{grid.cols}x{grid.rows} px on Earth Engine's grid"
+                f"{f' - {reason}' if reason else ''}. Use a coarser scale, a "
+                "smaller bbox, export_via='drive', or auto_split=True."
             )
         return self._download_one_url_tile(image, region, scale, prefix)
 
@@ -1932,7 +1956,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return EnginePlan.declined(
                 f"reducer={reducer!r} does not mean the same thing client-side: Earth Engine's is last-wins, while the reader returns the first scene of the stack, so Earth Engine composites this instead"
             )
-        reader = import_earthengine_reader()
+        # The adapter, not the raw module: it owns the lock and the identity
+        # check around a reader call, which is the whole reason it exists.
         # Built outside the discovery `try`, so a credential problem is never
         # reported as "no scenes". Under a forced engine it raises; under
         # `auto` it warns and falls back, because `auto`'s contract is to route
@@ -1958,7 +1983,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # and was removed rather than left in as dead weight. Reducing this to
         # one query per run needs upstream to expose the per-scene times.
         try:
-            cost = reader.estimate_earthengine_cost(
+            cost = self._eedai_reader().estimate_cost(
                 var_info.id,
                 start=window_start,
                 end=window_end,
@@ -1968,10 +1993,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 # output CRS here would have degrees read as projected metres
                 # and discover scenes over the wrong ground.
                 crs=_EEDAI_NATIVE_CRS,
-                credentials=credentials,
                 property_filter=self.property_filter,
             )
-        except _reader_errors(reader) as exc:
+        except _reader_errors(self._eedai_reader().module) as exc:
             # A discovery failure is a fallback, not a crash - but it is
             # worth more than an info line, because a persistent one
             # silently disables the fast path for the whole run.
@@ -2565,8 +2589,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
             ImportError: If `pyramids-eo` (the `[eedai]` extra) is missing.
             AuthenticationError: If the reader's credentials cannot be built.
         """
-        reader = import_earthengine_reader()
-        credentials = self._eedai_credentials()
+        # The adapter owns the lock, the identity check and the credential, so
+        # the process-global GDAL configuration a reader call mutates is only
+        # ever touched from one place.
+        reader = self._eedai_reader()
         target = self.root_dir / f"{prefix}.tif"
         # Write beside the target and rename on success: `to_file` / `to_cog`
         # write in place, so a mid-write failure would otherwise leave a
@@ -2627,14 +2653,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
             dataset = reader.from_earthengine(
                 var_info.id,
                 bands=list(bands),
-                window=reader.Window(
+                window=reader.window_type(
                     bbox=bbox,
                     crs=self.crs,
                     shape=self._eedai_output_grid(bbox, scale),
                     resample=self.resample,
                 ),
                 geometry=cutline,
-                credentials=credentials,
                 **composite_kwargs,
                 **read_options,
             )

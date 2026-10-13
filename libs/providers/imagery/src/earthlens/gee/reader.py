@@ -19,16 +19,19 @@ This adapter serialises reads behind a module-level lock and refuses a read that
 would change the in-effect identity while another is in flight, so the race
 becomes an error rather than wrong pixels.
 
-**What is wired, as of this commit.** The credential factory is used — the
-backend reads `.credential` from here. The read methods and the identity guard
-are not: both real read sites call the lazily-imported module directly, so
-`estimate_cost` / `from_earthengine` / `collection_from_earthengine` have no
-production caller yet, and the guard therefore protects nothing in practice.
-Note also that `_IN_EFFECT` is set and cleared inside `_READ_LOCK`, so no other
-thread can ever observe a foreign identity through it — the lock already
-serialises the whole read. The guard fires only on same-thread re-entrancy. The
-save/restore is correct, and moving the read sites onto this adapter is what
-makes the protection real; until then this is an adapter with one live method.
+**What the protection actually is.** Both production read sites now go through
+this adapter — the per-bucket scene-cost query and the pixel read — so every
+call that mutates the process-global GDAL configuration passes through one
+place, holding `_READ_LOCK` for its duration. That serialisation is the real
+protection: two threads reading under different identities can no longer
+interleave and have one pick up the other's credential.
+
+`_guard_identity` is the narrower half. Because `_IN_EFFECT` is set and cleared
+*inside* the lock, another thread can never observe a foreign identity through
+it; what it catches is a same-thread re-entrant read under a different identity,
+which is what a callback or a nested read inside a read would do. That is a real
+mistake worth naming rather than deadlocking or silently mixing credentials, but
+it is not what stops the cross-thread race — the lock is.
 
 """
 
