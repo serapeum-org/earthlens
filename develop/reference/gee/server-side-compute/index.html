@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -3272,15 +3272,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-two-engines" class="md-nav__link">
+  <a href="#the-three-engines" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The two engines
+        The three engines
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The two engines">
+    <nav class="md-nav" aria-label="The three engines">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -23879,15 +23879,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-two-engines" class="md-nav__link">
+  <a href="#the-three-engines" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The two engines
+        The three engines
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The two engines">
+    <nav class="md-nav" aria-label="The three engines">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -24128,9 +24128,9 @@ computation is available at all.</p>
 </tr>
 </tbody>
 </table>
-<p>Using <code>filters=</code> or <code>cloud_mask=</code> moves the request onto the Earth Engine engine. That is not a
-limitation to work around; it is the only engine that can run a graph.</p>
-<h2 id="the-two-engines"><a class="toclink" href="#the-two-engines">The two engines</a><a class="headerlink" href="#the-two-engines" title="Permanent link">#</a></h2>
+<p>Using <code>filters=</code> or <code>cloud_mask=</code> moves the request onto an Earth Engine engine. That is not a
+limitation to work around; those are the only engines that can run a graph.</p>
+<h2 id="the-three-engines"><a class="toclink" href="#the-three-engines">The three engines</a><a class="headerlink" href="#the-three-engines" title="Permanent link">#</a></h2>
 <p><code>engine=</code> selects <strong>who materialises the pixels</strong> for <code>export_via="url"</code>. It does not change the AOI,
 the CRS, or the values you asked for.</p>
 <table>
@@ -24138,6 +24138,7 @@ the CRS, or the values you asked for.</p>
 <tr>
 <th></th>
 <th><code>engine="ee"</code></th>
+<th><code>engine="pixels"</code></th>
 <th><code>engine="eedai"</code></th>
 </tr>
 </thead>
@@ -24145,35 +24146,51 @@ the CRS, or the values you asked for.</p>
 <tr>
 <td>Path</td>
 <td><code>ee.Image.getDownloadURL</code></td>
+<td><code>ee.data.computePixels</code></td>
 <td>GDAL's <code>EEDAI</code> driver via pyramids-eo</td>
 </tr>
 <tr>
 <td>Server-side compute</td>
 <td><strong>Yes</strong> — the full Earth Engine graph</td>
+<td><strong>Yes</strong> — the expression is the graph</td>
 <td><strong>No</strong> — it reads stored pixels</td>
 </tr>
 <tr>
 <td>Size cap</td>
 <td>32768 px per axis (<code>auto_split=True</code> tiles around it)</td>
+<td>the same 32768 px per axis, same remedy</td>
 <td>none; oversize windows stream to disk in tiles</td>
 </tr>
 <tr>
 <td>Round-trip</td>
 <td>HTTP + zip</td>
+<td>the GeoTIFF bytes, directly</td>
 <td>direct read from the asset</td>
 </tr>
 <tr>
 <td>Extra needed</td>
+<td><code>[gee]</code></td>
 <td><code>[gee]</code></td>
 <td><code>[gee]</code> <strong>and</strong> <code>[eedai]</code></td>
 </tr>
 <tr>
 <td>Temporal composite</td>
 <td>server-side</td>
+<td>server-side</td>
 <td>client-side, per time bucket</td>
 </tr>
 </tbody>
 </table>
+<p><code>"pixels"</code> is the engine for a request that needs <strong>both</strong> a graph and an output larger than <code>getDownloadURL</code>
+will serve. It is never chosen automatically: <code>"auto"</code> keeps preferring the reader and then <code>"ee"</code>, so the
+preference order is a separate, reviewable decision rather than a side effect of adding an engine.</p>
+<p>One sampling difference is worth knowing, and it is deliberate. <code>"pixels"</code> sends an explicit grid, so it sizes on
+the <strong>metre</strong> convention — square metres on the ground, shortening longitude by <code>cos(latitude)</code>, the same rule the
+EEDAI reader uses — while <code>"ee"</code> lets Earth Engine read <code>scale</code> in a geographic CRS as a uniform
+degree-equivalent. Away from the equator the two therefore return <strong>different column counts</strong> for one AOI at one
+<code>scale</code>: at 30° N a degree of longitude is about 13% shorter than a degree of latitude. The AOI, the CRS and the
+values agree (a live e2e compares their elevation distributions on the same SRTM window); the grid does not. Pass
+<code>crs_transform=</code> when the grid itself has to be identical.</p>
 <p><code>engine="auto"</code> (the default) picks <code>eedai</code> when the request is a <em>raw read</em> and the extra is installed,
 otherwise <code>ee</code>. A request is a raw read when <strong>all</strong> of these hold:</p>
 <ul>
@@ -24461,6 +24478,14 @@ blocking; <code>list_recent_tasks</code>, <code>get_task_status</code>, <code>wa
 <td><code>ee</code> (forced)</td>
 </tr>
 <tr>
+<td>A computed graph <em>and</em> an AOI over 32768 px</td>
+<td><code>pixels</code> with <code>auto_split=True</code>, or <code>drive</code></td>
+</tr>
+<tr>
+<td>An output grid that must align with an earlier download</td>
+<td><code>ee</code> or <code>pixels</code> with <code>crs_transform=</code></td>
+</tr>
+<tr>
 <td>Raw pixels from one asset, large AOI</td>
 <td><code>eedai</code> — no 32768-px cap, no zip round-trip</td>
 </tr>
@@ -24490,8 +24515,15 @@ blocking; <code>list_recent_tasks</code>, <code>get_task_status</code>, <code>wa
   Earth Engine error at download time.</li>
 <li><strong>Mixed-resolution band requests</strong> (10 m <code>B4</code> + 20 m <code>B11</code> + 60 m <code>B1</code> in one call) are a sharp edge on
   the EEDAI path. Request one resolution group at a time, or use <code>engine="ee"</code>.</li>
-<li><strong><code>cog=True</code> and <code>resample=</code></strong> apply to the EEDAI path only; the Earth Engine paths ignore them.</li>
-<li><strong><code>auto_split=True</code></strong> is only meaningful for <code>engine="ee"</code>, where the 32768-px cap exists.</li>
+<li><strong><code>cog=True</code></strong> applies to the paths that write the raster themselves — the EEDAI reader and
+  <code>engine="pixels"</code>. <code>getDownloadURL</code> and the batch sinks ignore it, and so does <code>resample=</code>, which is the
+  EEDAI reader's warp kernel alone.</li>
+<li><strong><code>nodata=</code> and <code>high_volume=</code></strong> are <code>engine="pixels"</code> only; any other engine warns at construction and
+  ignores them.</li>
+<li><strong><code>auto_split=True</code></strong> applies to <code>engine="ee"</code> and <code>engine="pixels"</code>, which share Earth Engine's
+  32768-px per-axis cap. Measured, because the guide implies otherwise: a <code>computePixels</code> request of
+  39,479 × 12 px comes back as <code>Pixel grid dimensions (39479x12) must be less than or equal to
+  32768</code>. The reader has no such cap, so <code>auto_split</code> means nothing to it.</li>
 <li><strong>Credentials are always needed</strong>, even for <code>engine="eedai"</code>: the request is built through <code>ee</code> before
   its pixels are fetched.</li>
 <li><strong>No Sentinel-1 preprocessing</strong> ships in the backend — no speckle filter, no terrain correction. Note
