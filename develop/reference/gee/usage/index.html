@@ -3316,21 +3316,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-the-object-api" class="md-nav__link">
+  <a href="#5-via-the-earthlens-facade" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. The object API
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-via-the-earthlens-facade" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. Via the EarthLens facade
+        5. Via the EarthLens facade
       
     </span>
   </a>
@@ -23862,21 +23851,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-the-object-api" class="md-nav__link">
+  <a href="#5-via-the-earthlens-facade" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. The object API
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-via-the-earthlens-facade" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. Via the EarthLens facade
+        5. Via the EarthLens facade
       
     </span>
   </a>
@@ -24163,116 +24141,7 @@ so <code>auto_split</code> is unnecessary. What to know before switching:</p>
 <li><strong><code>cog=True</code> applies to this path only.</strong> A request served by Earth
   Engine writes a plain GeoTIFF (and logs that it did).</li>
 </ul>
-<h2 id="5-the-object-api"><a class="toclink" href="#5-the-object-api">5. The object API</a><a class="headerlink" href="#5-the-object-api" title="Permanent link">#</a></h2>
-<p>Every knob above is a string, and every string still works — that is the contract. Behind them the backend now
-resolves each one to a strategy object, and you can pass the object instead wherever you want something the string
-cannot express.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">GEE</span><span class="p">,</span> <span class="n">Percentile</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># The string form, unchanged.</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">export_via</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1"># The object form, for a reducer no name can express.</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="n">Percentile</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="mi">90</span><span class="p">))</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="c1"># Or the parameterised spelling, if you prefer strings.</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;percentile:90&quot;</span><span class="p">)</span>
-</code></pre></div>
-<p><strong>Reducers.</strong> <code>mean</code>, <code>median</code>, <code>min</code>, <code>max</code>, <code>mode</code>, <code>mosaic</code> and <code>sum</code> dispatch to Earth Engine's convenience
-methods, which preserve band names. <code>Percentile</code> has to use <code>reduce</code>, which suffixes them, so it renames them back —
-making it interchangeable with the rest. <code>resolve_reducer</code> accepts a name, a <code>percentile:&lt;q&gt;</code> spec or an instance,
-and resolves once per request, so a bad percentile fails before any bucket exports rather than part-way through.</p>
-<p><strong>Engines.</strong> <code>engine=</code> resolves to an <code>Engine</code>, and there are four:</p>
-<table>
-<thead>
-<tr>
-<th><code>engine=</code></th>
-<th>Transport</th>
-<th>Runs a computation graph?</th>
-<th>Per-axis cap</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>"auto"</code> (default)</td>
-<td>the reader when the request qualifies, else Earth Engine</td>
-<td>only on the Earth Engine side</td>
-<td>32768 px</td>
-</tr>
-<tr>
-<td><code>"ee"</code></td>
-<td><code>ee.Image.getDownloadURL</code></td>
-<td>yes</td>
-<td>32768 px</td>
-</tr>
-<tr>
-<td><code>"eedai"</code></td>
-<td>the pyramids-eo EEDAI reader, forced</td>
-<td>no — raises if the request needs one</td>
-<td>none</td>
-</tr>
-<tr>
-<td><code>"pixels"</code></td>
-<td><code>ee.data.computePixels</code></td>
-<td>yes</td>
-<td>none</td>
-</tr>
-</tbody>
-</table>
-<p><code>"pixels"</code> is the one to reach for when a request needs <strong>both</strong> server-side compute and an output larger than
-<code>getDownloadURL</code> will serve: it evaluates the graph, so a <code>cloud_mask</code> or <code>filters</code> survives, and it is not bound by
-the 32768-px per-axis limit that makes <code>auto_split=True</code> necessary on the <code>"ee"</code> path. It returns the GeoTIFF bytes
-directly, so there is no URL to expire and no zip to unpack. It applies to <code>export_via="url"</code> only — it is a pull, so
-it has nothing to say about a queued export, and a batch sink ignores it.</p>
-<p><code>"eedai"</code> remains the fastest path for a <em>raw</em> read of a stored asset, because it streams the pixels without
-evaluating anything. <code>"auto"</code> prefers it and falls back to Earth Engine on any decline.</p>
-<p><strong>Grids.</strong> <code>OutputGrid</code> is where the AOI, <code>crs</code> and <code>scale</code> become a pixel grid, with one constructor per
-convention: <code>for_metre_grid</code> sizes for square metres on the ground (the reader's rule, shortening longitude by
-<code>cos(latitude)</code>), <code>for_earth_engine</code> reads <code>scale</code> as a uniform degree-equivalent (Earth Engine's rule), and
-<code>from_crs_transform</code> pins the grid origin so stacked dates align without a resample. Away from the equator the first
-two disagree on the column count — that is real, documented, and now visible in one place rather than implied by two
-method families.</p>
-<p>The third one is what <code>crs_transform=</code> selects:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># A 10 m grid in UTM 36N, pinned to a round origin rather than to the AOI.</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:32636&quot;</span><span class="p">,</span> <span class="n">crs_transform</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">300_000</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3_400_000</span><span class="p">))</span>
-</code></pre></div>
-<p>Six terms, <code>(x_scale, x_shear, x_origin, y_shear, y_scale, y_origin)</code>, in the units of <code>crs</code> — the order
-Earth Engine's own <code>crsTransform</code> uses. It pins the pixel size <strong>and</strong> the origin, so two downloads over different
-AOIs land on the same pixel boundaries and differencing them needs no resample. Earth Engine treats it as an
-alternative to <code>scale</code>, not an addition, so a pinned request sends the transform and no scale: <code>getDownloadURL</code> and
-the batch sinks take it directly, and <code>engine="pixels"</code> sends it as the request's <code>affineTransform</code>. The EEDAI reader
-sizes its own metre grid and takes no transform, so a pinned request is never routed to it and <code>engine="eedai"</code>
-raises. You still need a resolvable <code>scale</code> (from <code>scale=</code> or the catalog row), because the routing and naming
-decisions are made on it — it simply is not sent. The per-axis cap is checked against the pinned grid,
-so a transform finer than <code>scale</code> cannot slip an oversized request past it.</p>
-<p><strong>In-memory results.</strong> <code>materialize=True</code> returns a <code>DownloadResult</code> carrying the pyramids object alongside each
-written path, instead of only the paths:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;ee&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">result</span><span class="o">.</span><span class="n">paths</span>     <span class="c1"># the written files</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">result</span><span class="o">.</span><span class="n">objects</span>   <span class="c1"># the in-memory pyramids Datasets</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>     <span class="c1"># the objects - materialising is what you asked for</span>
-</code></pre></div>
-<p>Note the one place the stand-in is not transparent: when you materialise, each artifact's value <em>is</em> the object, so
-<code>result</code> iterates and compares as the list of <strong>objects</strong>, not of paths. <code>result.paths</code> is how you get the files.
-Without <code>materialize=</code> nothing changes — <code>download()</code> returns the same plain list of paths it always did.</p>
-<p>It needs pixels on disk, so it is only meaningful for <code>export_via="url"</code>; a batch sink raises rather than handing
-back destinations with no objects.</p>
-<p><strong>The pixel API's own two knobs.</strong> Both are honoured by <code>engine="pixels"</code> and by nothing else, because the
-<code>computePixels</code> request body and its endpoint are the only places they can be expressed. Passing either to another
-engine logs a warning at construction and changes nothing — an argument that quietly does nothing is worse than
-one that says so.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># -9999 is declared on the request&#39;s grid; the high-volume host serves it.</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;pixels&quot;</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=-</span><span class="mi">9999</span><span class="p">,</span> <span class="n">high_volume</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</code></pre></div>
-<p><code>nodata=</code> is the fill value declared on the fetched raster, which is the configurable half of the no-fill-value
-divergence the engines otherwise have. <code>high_volume=True</code> initialises Earth Engine against the
-<a href="https://developers.google.com/earth-engine/cloud/highvolume">high-volume endpoint</a>, documented for many parallel
-requests; its trade-off is real (less caching, and complex queries cost more EECU-time there), which is why it is
-per-backend rather than global. <code>ee</code> keeps one session per process, so the last backend to open its connection
-decides the host for the others too. <code>ExportConfig.dtype</code> is still unreachable on purpose: <code>computePixels</code> takes a
-<code>dataType</code>, but the dtype a caller asks for and the dtype pyramids writes have to agree, and that pairing is not
-built.</p>
-<h2 id="6-via-the-earthlens-facade"><a class="toclink" href="#6-via-the-earthlens-facade">6. Via the <code>EarthLens</code> facade</a><a class="headerlink" href="#6-via-the-earthlens-facade" title="Permanent link">#</a></h2>
+<h2 id="5-via-the-earthlens-facade"><a class="toclink" href="#5-via-the-earthlens-facade">5. Via the <code>EarthLens</code> facade</a><a class="headerlink" href="#5-via-the-earthlens-facade" title="Permanent link">#</a></h2>
 <p>Once the GEE backend is registered in the facade you'll also be able to
 do <code>EarthLens(data_source="gee", variables={...}, ...).download()</code>; until
 then use <code>earthlens.gee.GEE</code> directly as above. (Tracking: plan task
