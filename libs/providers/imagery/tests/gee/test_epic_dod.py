@@ -329,8 +329,9 @@ class TestTheSinkOwnsItsWrite:
     @pytest.mark.parametrize("empty", ["", None])
     def test_an_empty_prerequisite_is_refused_like_a_missing_one(self, empty):
         """A key that is present but blank addresses nothing either."""
+        sink = DriveSink()
         with pytest.raises(ValueError, match="requires drive_folder"):
-            DriveSink().validate_config({"drive_folder": empty})
+            sink.validate_config({"drive_folder": empty})
 
     def test_the_url_sink_needs_nothing(self):
         """`required_config` is `None`, so there is nothing to refuse."""

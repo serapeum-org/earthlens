@@ -297,6 +297,17 @@ class Percentile(BaseModel, Reducer):
         """Include the percentile, since it is what distinguishes instances."""
         return f"Percentile(q={self.q!r})"
 
+    def __str__(self) -> str:
+        """Match `__repr__`, which pydantic's own `__str__` would otherwise hide.
+
+        A `BaseModel` prints as its fields (`q=90.0`), so `print(reducer)` in a
+        log line or a notebook said nothing about *which* reducer it was.
+
+        Returns:
+            The same text as :meth:`__repr__`.
+        """
+        return repr(self)
+
 
 class _RegionReducer(Reducer):
     """A reducer that reduces pixels in a region, not images in a collection.
@@ -476,7 +487,7 @@ def resolve_reducer(spec: str | Reducer) -> Reducer:
             >>> resolve_reducer("average")
             Traceback (most recent call last):
                 ...
-            ValueError: unsupported reducer 'average'; expected one of ['count', 'first', 'max', 'mean', 'median', 'min', 'mode', 'mosaic', 'stdDev', 'sum', 'variance'] or 'percentile:<q>'
+            ValueError: unsupported reducer 'average'; expected one of ['max', 'mean', 'median', 'min', 'mode', 'mosaic', 'sum'] or 'percentile:<q>' for a collection, or ['count', 'first', 'stdDev', 'variance'] for a region sample
 
             ```
     """
@@ -501,9 +512,14 @@ def resolve_reducer(spec: str | Reducer) -> Reducer:
             ) from None
         return Percentile(q=q)
     if name not in REDUCERS:
+        # The two vocabularies are named separately, because the registry holds
+        # both and a caller who mistyped a temporal reducer should not be
+        # offered `stdDev` as though it would composite a time bucket.
         raise ValueError(
             f"unsupported reducer {name!r}; expected one of "
-            f"{sorted(REDUCERS)} or 'percentile:<q>'"
+            f"{sorted(collection_reducers())} or 'percentile:<q>' for a "
+            f"collection, or {sorted(sampling_reducers() - collection_reducers())} "
+            "for a region sample"
         )
 
     if argument:

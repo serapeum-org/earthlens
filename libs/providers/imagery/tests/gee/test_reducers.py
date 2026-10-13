@@ -264,6 +264,19 @@ class TestResolveReducer:
         assert resolve_reducer("mean") is not resolve_reducer("mean")
 
 
+class TestPercentilePrintsAsItself:
+    """A `BaseModel` prints as its fields, which said nothing about which reducer."""
+
+    def test_str_matches_repr(self):
+        """`print(reducer)` showed `q=90.0` with no class name at all."""
+        reducer = Percentile(q=90)
+        assert str(reducer) == repr(reducer) == "Percentile(q=90.0)"
+
+    def test_the_plain_reducers_are_unaffected(self):
+        """They are not pydantic models, so they already read correctly."""
+        assert str(Median()) == "Median()"
+
+
 class TestBackCompatShim:
     """`_helpers.reduce_collection` keeps working for the seven original names."""
 

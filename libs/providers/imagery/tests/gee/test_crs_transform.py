@@ -9,6 +9,7 @@ request shapes that carry it, and the one engine that cannot honour it.
 from __future__ import annotations
 
 import datetime as dt
+from pathlib import Path
 
 import pytest
 
@@ -39,6 +40,12 @@ def _composited(gee):
     collection = gee._build_collection(var_info, ["elevation"], START, END)
     ((_when, image, _start, _end),) = gee._composite(collection, var_info, START, END)
     return var_info, image
+
+
+def _record_merge(sink: list, sources, target) -> None:
+    """Stand in for `merge_rasters`, recording the call and writing the mosaic."""
+    sink.append({"sources": list(sources), "target": str(target)})
+    Path(target).write_bytes(b"merged")
 
 
 def _collect_warnings(monkeypatch):
@@ -136,14 +143,32 @@ class TestTheGridIsPinned:
         assert _gee(make_gee, crs_transform=PINNED)._pinned_grid().scale is None
 
     def test_the_transform_sizes_the_pixels(self, make_gee, fake_reader):
-        """0.001-degree pixels over the 0.1-degree AOI: a ~100-px side.
+        """0.001-degree pixels over the 0.1-degree AOI: exactly 100 a side.
 
-        101 and not 100 because the span is a float hair over 0.1 degrees and
-        the grid ceilings rather than truncating, which is the right way round:
-        a short grid would clip the AOI.
+        It read 101 for a while, and the reason is worth keeping: an AOI edge
+        that is an exact multiple of the pixel size still divides to
+        `100.00000000000142` in binary floating point, and a bare `ceil` turned
+        that into a whole extra column - 100 m of overhang at this pixel size,
+        and present or absent depending on how large the pinned origin was.
+        The lattice snap treats near-exact as exact.
         """
         grid = _gee(make_gee, crs_transform=PINNED)._pinned_grid()
-        assert (grid.cols, grid.rows) == (101, 101)
+        assert (grid.cols, grid.rows) == (100, 100)
+
+    def test_the_count_does_not_depend_on_the_origins_magnitude(
+        self, make_gee, fake_reader
+    ):
+        """The same window pinned at 31.2 and at 0.0 is the same grid.
+
+        It was not: the float error in `(30.0 - 29.9) / 0.001` grows with the
+        origin, so the AOI came out 101 px wide pinned at 31.2 and 100 px wide
+        pinned at 0.
+        """
+        at_aoi = _gee(make_gee, crs_transform=PINNED)._pinned_grid()
+        at_zero = _gee(
+            make_gee, crs_transform=(0.001, 0.0, 0.0, 0.0, -0.001, 0.0)
+        )._pinned_grid()
+        assert (at_aoi.cols, at_aoi.rows) == (at_zero.cols, at_zero.rows)
 
     def test_the_pixel_engine_reads_the_pinned_grid(self, make_gee, fake_reader):
         """One builder, so the engine cannot disagree with the backend."""
@@ -280,10 +305,15 @@ class TestTheWindowSnapsOntoTheLattice:
         assert offset == pytest.approx(round(offset), abs=1e-6)
 
     def test_it_snaps_outward_and_still_covers_the_aoi(self, make_gee, fake_reader):
-        """Snapping inward would clip the window the caller asked for."""
+        """Snapping inward would clip the window the caller asked for.
+
+        To within the lattice's own floating-point representation: an edge
+        reconstructed as `origin + n * pixel` can land a few parts in 1e15
+        inside the requested one, which is nanometres of ground.
+        """
         grid = self._grid(make_gee)
         assert grid.bbox[0] <= self.OFFSET[0]
-        assert grid.bbox[2] >= self.OFFSET[2]
+        assert grid.bbox[2] >= self.OFFSET[2] - 1e-9
 
     def test_the_request_quotes_the_snapped_origin(self, make_gee, fake_reader):
         """Not the pinned one: that can lie far outside the AOI.
@@ -355,6 +385,48 @@ class TestAProjectedPin:
         assert params["crs"] == "EPSG:32636"
 
 
+class TestTheTiledUrlPathChecksItsTilesToo:
+    """The `getDownloadURL` path sends the transform per tile, so it is as capped."""
+
+    FINE = (1e-06, 0.0, 31.2, 0.0, -1e-06, 30.0)
+
+    def test_a_pinned_tile_over_the_cap_is_refused(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """With our message, not Earth Engine's grid error.
+
+        The splitter is stubbed to hand back the whole AOI, which is exactly
+        what sizing the split on `scale` used to do for a finer pin.
+        """
+        monkeypatch.setattr(
+            backend_module, "split_aoi_for_url", lambda space, scale, **kw: [space]
+        )
+        gee = _gee(make_gee, engine="ee", auto_split=True, crs_transform=self.FINE)
+        with pytest.raises(ValueError, match="still over Earth Engine's"):
+            _export(gee)
+
+    def test_an_unpinned_tiled_request_is_left_alone(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """The splitter already guarantees the cap when it sized the tiles."""
+        merged: list[dict] = []
+        monkeypatch.setattr(
+            backend_module,
+            "merge_rasters",
+            lambda sources, target, **kwargs: _record_merge(merged, sources, target),
+        )
+        gee = _gee(
+            make_gee,
+            engine="ee",
+            auto_split=True,
+            lat_lim=[0.0, 40.0],
+            lon_lim=[0.0, 40.0],
+            scale=30.0,
+        )
+        assert _export(gee) is not None
+        assert len(merged) == 1
+
+
 class TestTheReaderCannotHonourIt:
     """The EEDAI reader sizes its own metre grid and takes no transform."""
 
@@ -405,7 +477,7 @@ class TestTheSizeCheckReadsThePinnedGrid:
     def test_the_message_counts_the_pinned_pixels(self, make_gee, fake_reader):
         """And the count is the pinned grid's, not the scale-sized one's."""
         gee = _gee(make_gee, engine="ee", crs_transform=self.FINE)
-        with pytest.raises(ValueError, match="100001x100001 px"):
+        with pytest.raises(ValueError, match="100000x100000 px"):
             _export(gee)
 
     def test_the_same_aoi_at_scale_is_not_refused(self, make_gee, fake_reader):

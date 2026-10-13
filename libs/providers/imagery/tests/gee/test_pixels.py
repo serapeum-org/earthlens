@@ -374,6 +374,73 @@ class TestThePerAxisCapAppliesHereToo:
             offset = (origin - (-180.0)) / pixel
             assert abs(offset - round(offset)) < 1e-6, origin
 
+    def test_a_pin_finer_than_the_scale_is_split_on_the_pin(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """The split has to be sized on the grid the request will use.
+
+        `split_aoi_for_url` takes a metre scale, so splitting at `scale` while a
+        `crs_transform` pinned a much finer pixel asked for too few tiles and
+        sent each one out over the cap: a 4-degree AOI pinned at 0.0001 degrees
+        is 40,000 px wide, and at `scale=5000` it looks 78 px wide, so
+        `auto_split=True` produced one tile 40,000 px across. Both of the
+        earlier pinned-tiling tests pinned a *coarser* pixel than `scale`, so
+        neither entered this region.
+        """
+        merged: list[dict] = []
+        monkeypatch.setattr(
+            backend_module,
+            "merge_rasters",
+            lambda sources, target, **kwargs: _record_merge(merged, sources, target),
+        )
+        gee = _gee(
+            make_gee,
+            engine="pixels",
+            auto_split=True,
+            lat_lim=[29.0, 30.0],
+            lon_lim=[31.0, 35.0],
+            scale=5000.0,
+            crs_transform=(0.0001, 0.0, 31.0, 0.0, -0.0001, 30.0),
+        )
+        gee.download(progress_bar=False)
+        assert len(gee.client.compute_pixels_calls) > 1, "the AOI was not split"
+        for body in gee.client.compute_pixels_calls:
+            dimensions = body["grid"]["dimensions"]
+            assert max(dimensions["width"], dimensions["height"]) <= 32768, dimensions
+
+    def test_the_tiling_scale_follows_the_pinned_pixel(self, make_gee, fake_reader):
+        """`scale` is what the splitter takes, so the pin is expressed as one."""
+        gee = _gee(
+            make_gee,
+            engine="pixels",
+            auto_split=True,
+            lat_lim=[29.0, 30.0],
+            lon_lim=[31.0, 35.0],
+            scale=5000.0,
+            crs_transform=(0.0001, 0.0, 31.0, 0.0, -0.0001, 30.0),
+        )
+        assert gee._tiling_scale(5000.0) < 5000.0
+
+    def test_an_unpinned_request_splits_on_its_own_scale(self, make_gee, fake_reader):
+        """Nothing changes for a request that is sized from `scale`."""
+        gee = _gee(make_gee, engine="pixels", auto_split=True, **self.WIDE)
+        assert gee._tiling_scale(1000.0) == 1000.0
+
+    def test_a_tile_still_over_the_cap_is_refused_here(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """Rather than by Earth Engine, which reports it as a grid error.
+
+        Forced by making the splitter return the whole AOI as one tile, which
+        is what the sizing bug above did on its own.
+        """
+        monkeypatch.setattr(
+            backend_module, "split_aoi_for_url", lambda space, scale, **kw: [space]
+        )
+        gee = _gee(make_gee, engine="pixels", auto_split=True, **self.WIDE)
+        with pytest.raises(ValueError, match="still over Earth Engine's"):
+            gee.download(progress_bar=False)
+
     def test_a_request_within_the_cap_is_untouched(self, make_gee, fake_reader):
         """One request, no tiling, for the ordinary case."""
         gee = _gee(make_gee, engine="pixels")

@@ -61,6 +61,45 @@ _METRES_PER_DEGREE: float = 111_320.0
 #: Latitude beyond which `cos` is clamped, so a polar AOI cannot divide by zero.
 _MAX_POLEWARD_DEGREES: float = 89.9
 
+#: How close to a whole pixel counts as *on* the lattice. A window whose edge is
+#: an exact multiple of the pixel size still divides to something like
+#: `100.00000000000142` in binary floating point, and a bare `ceil` turns that
+#: into a whole extra column - one that is 100 m wide at 0.001 degrees, and whose
+#: appearance depends on how large the pinned origin happens to be.
+_LATTICE_EPSILON: float = 1e-9
+
+
+def _lattice_floor(offset: float) -> int:
+    """Return the lattice index at or below `offset`, treating near-exact as exact.
+
+    Args:
+        offset: The window edge in pixels from the pinned origin.
+
+    Returns:
+        `floor(offset)`, or the nearest whole index when `offset` is within
+        :data:`_LATTICE_EPSILON` of one.
+    """
+    nearest = round(offset)
+    if abs(offset - nearest) <= max(_LATTICE_EPSILON, abs(offset) * 1e-12):
+        return int(nearest)
+    return math.floor(offset)
+
+
+def _lattice_ceil(offset: float) -> int:
+    """Return the lattice index at or above `offset`, treating near-exact as exact.
+
+    Args:
+        offset: The window edge in pixels from the pinned origin.
+
+    Returns:
+        `ceil(offset)`, or the nearest whole index when `offset` is within
+        :data:`_LATTICE_EPSILON` of one.
+    """
+    nearest = round(offset)
+    if abs(offset - nearest) <= max(_LATTICE_EPSILON, abs(offset) * 1e-12):
+        return int(nearest)
+    return math.ceil(offset)
+
 
 def validate_crs_transform(crs_transform: object) -> tuple[float, ...] | None:
     """Normalise an explicit grid transform, or reject it.
@@ -737,12 +776,12 @@ class OutputGrid(SummarisedLeaf):
         # output then covers the AOI and begins at a whole number of pixels from
         # the pinned origin - so the request quotes THIS origin, not the one it
         # was given, which may lie far outside the AOI.
-        first_col = math.floor((min_x - x_origin) / x_pixel)
-        last_col = math.ceil((max_x - x_origin) / x_pixel)
+        first_col = _lattice_floor((min_x - x_origin) / x_pixel)
+        last_col = _lattice_ceil((max_x - x_origin) / x_pixel)
         # y counts downward from the pinned origin, the north-up convention the
         # negative `y_scale` expresses.
-        first_row = math.floor((y_origin - max_y) / y_pixel)
-        last_row = math.ceil((y_origin - min_y) / y_pixel)
+        first_row = _lattice_floor((y_origin - max_y) / y_pixel)
+        last_row = _lattice_ceil((y_origin - min_y) / y_pixel)
         cols = max(1, last_col - first_col)
         rows = max(1, last_row - first_row)
         snapped_min_x = x_origin + first_col * x_pixel
@@ -773,36 +812,42 @@ class OutputGrid(SummarisedLeaf):
     def latlon_bbox(self) -> tuple[float, float, float, float]:
         """Return this grid's window in EPSG:4326.
 
-        Scene discovery queries the Earth Engine catalog in lat/lon whatever the
-        output CRS, so the grid has to be able to say where it is in lat/lon -
-        and say it about the window the read will actually take, not a second
-        geometry derived elsewhere.
+        Part of this value object's public surface, for a caller holding a
+                grid in a projected CRS who needs to say where it is in lat/lon - a
+                catalog query, a map extent, a sanity check against an AOI.
 
-        Returns:
-            `(min_lon, min_lat, max_lon, max_lat)`, the bbox unchanged when the
-            grid is already in EPSG:4326.
+                The backend's own scene discovery deliberately does **not** go through
+                here: it derives its lat/lon AOI from the original geometry
+                (`GEE._eedai_latlon_aoi`), because transforming a projected *window*
+                back loses a little ground at the edges where the envelope bows
+                (pyramids-eo#97). Reprojecting a bbox is the right answer only when the
+                bbox is all you have.
 
-        Examples:
-            - A geographic grid answers with its own bbox:
-                ```python
-                >>> grid = OutputGrid.for_metre_grid(
-                ...     (31.2, 29.9, 31.3, 30.0), crs="EPSG:4326", scale=90.0
-                ... )
-                >>> grid.latlon_bbox()
-                (31.2, 29.9, 31.3, 30.0)
+                Returns:
+                    `(min_lon, min_lat, max_lon, max_lat)`, the bbox unchanged when the
+                    grid is already in EPSG:4326.
 
-                ```
-            - A projected one is brought back:
-                ```python
-                >>> utm = OutputGrid.for_metre_grid(
-                ...     (330_000.0, 3_310_000.0, 340_000.0, 3_320_000.0),
-                ...     crs="EPSG:32636",
-                ...     scale=90.0,
-                ... )
-                >>> [round(term, 2) for term in utm.latlon_bbox()]
-                [31.24, 29.91, 31.34, 30.0]
+                Examples:
+                    - A geographic grid answers with its own bbox:
+                        ```python
+                        >>> grid = OutputGrid.for_metre_grid(
+                        ...     (31.2, 29.9, 31.3, 30.0), crs="EPSG:4326", scale=90.0
+                        ... )
+                        >>> grid.latlon_bbox()
+                        (31.2, 29.9, 31.3, 30.0)
 
-                ```
+                        ```
+                    - A projected one is brought back:
+                        ```python
+                        >>> utm = OutputGrid.for_metre_grid(
+                        ...     (330_000.0, 3_310_000.0, 340_000.0, 3_320_000.0),
+                        ...     crs="EPSG:32636",
+                        ...     scale=90.0,
+                        ... )
+                        >>> [round(term, 2) for term in utm.latlon_bbox()]
+                        [31.24, 29.91, 31.34, 30.0]
+
+                        ```
         """
         return bbox_to_latlon(self.bbox, self.crs)
 

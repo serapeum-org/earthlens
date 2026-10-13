@@ -279,7 +279,11 @@ nothing to say about a queued export, and a batch sink ignores it.
 framing does not say: a 39,479 × 12 px request is refused with `Pixel grid dimensions (39479x12) must be
 less than or equal to 32768`. So `auto_split=True` means the same thing here as on the `"ee"` path — tile the
 AOI, fetch each tile, mosaic — and without it an oversize request is refused up front, naming that remedy.
-Each tile is sized through the engine, so a grid pinned with `crs_transform=` stays on its lattice across tiles.
+Each tile is sized through the engine, so a grid pinned with `crs_transform=` stays on its lattice across tiles,
+and the split is computed from the pinned pixel rather than from `scale` - otherwise a transform finer than `scale`
+would be split as though it were coarse, and each tile would still be over the cap. Every tile is checked against
+the cap before it is requested, so an AOI that cannot be brought under it is refused here rather than by Earth
+Engine.
 
 `"eedai"` remains the fastest path for a *raw* read of a stored asset, because it streams the pixels without
 evaluating anything. `"auto"` prefers it and falls back to Earth Engine on any decline.

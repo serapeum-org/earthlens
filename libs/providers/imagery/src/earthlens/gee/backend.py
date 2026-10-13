@@ -975,7 +975,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # message that can tell "no such engine" apart from "registered but not
         # selectable yet", and a second copy of the vocabulary is what let the
         # two drift in the first place.
-        resolve_engine(engine)
+        resolved_engine = resolve_engine(engine)
         # `nodata` and `high_volume` are expressible only through the pixel
         # API's request body and endpoint. Warned about here rather than at
         # export time: both are decided by `engine=`, which is known now, so
@@ -990,20 +990,23 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # gating on the engine alone let `engine='pixels', export_via='drive'`
         # pass silently. `high_volume` picks the host the session is opened
         # against, which happens whatever the sink, so it needs the engine only.
+        # Judged on the *resolved* engine, not the argument: `engine=` also
+        # takes an `Engine` instance, and comparing that to a name warned
+        # about an argument the request was about to honour.
         if nodata is not None and not (
-            engine == PixelsEngine.name and not sink.is_batch
+            resolved_engine.name == PixelsEngine.name and not sink.is_batch
         ):
             logger.warning(
                 f"nodata={nodata} is declared on the pixel API's request, which "
                 "is made only for engine='pixels' with export_via='url'; this "
-                f"request (engine={engine!r}, export_via={export_via!r}) "
-                "ignores it."
+                f"request (engine={resolved_engine.name!r}, "
+                f"export_via={export_via!r}) ignores it."
             )
-        if high_volume and engine != PixelsEngine.name:
+        if high_volume and resolved_engine.name != PixelsEngine.name:
             logger.warning(
                 "high_volume=True is only used by the pixel API, so "
-                f"engine={engine!r} ignores it and initialises against the "
-                "regular endpoint; pass engine='pixels' to use it."
+                f"engine={resolved_engine.name!r} ignores it and initialises "
+                "against the regular endpoint; pass engine='pixels' to use it."
             )
         _validate_pure_config(start, end, temporal_resolution, fmt)
 
@@ -1060,7 +1063,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # The public attrs stay as the back-compat surface.
         # Resolved once: `engine=` is validated above, and the object replaces
         # the `if/elif` that used to re-read the string at every decision.
-        self._engine = resolve_engine(engine)
+        self._engine = resolved_engine
         #: The resolved destination; `export_via=` is validated above.
         self._sink = resolve_sink(export_via)
         #: Return in-memory pyramids objects from `download()` as well as paths.
@@ -1728,7 +1731,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "GEE(...) — the catalog has no nominal spatial_resolution for it."
             )
         prefix = f"{slug_asset_id(var_info.id)}_{'-'.join(bands)}_{when:%Y%m%d}"
-        if self.export_via == "url":
+        # `is_batch`, not the name: the reader can serve any sink that wants
+        # pixels now, so a synchronous sink added later gets the fast path
+        # without an edit here - which is what makes the `Sink` seam a seam.
+        if not self._sink.is_batch:
             served = self._try_via_eedai(
                 var_info, bands, float(scale), prefix, bucket_start, bucket_end
             )
@@ -1833,7 +1839,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """Fetch one bucket through `ee.data.computePixels` → `<prefix>.tif`.
 
         Earth Engine's documented extraction call for a *computed* image. Unlike
-        `getDownloadURL` it is not capped at 32768 px per axis, and unlike the
+        `getDownloadURL` it returns the bytes directly, and unlike the
         EEDAI reader it evaluates the computation graph, so a `cloud_mask` or
         `filters` survives.
 
@@ -1896,6 +1902,37 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         return self._fetch_one_pixels_tile(image, var_info, grid, bands, prefix)
 
+    def _tiling_scale(self, scale: float) -> float:
+        """Return the metre scale the AOI has to be split on.
+
+        :func:`split_aoi_for_url` sizes its tiles at a metre scale, which is the
+        right input only when the request is sized from `scale`. A pinned
+        `crs_transform` sets the pixel independently, and it can be far finer -
+        so splitting at `scale` asked for too few tiles and each one still went
+        out over the per-axis cap. Measured before the fix: a 4-degree AOI
+        pinned at 0.0001 degrees is 40,000 px wide, while at `scale=5000` it
+        looks 78 px wide, so `auto_split=True` produced a single tile 40,000 px
+        across.
+
+        The pinned pixel is therefore expressed back as the scale that would
+        produce the same grid, which is what the splitter can take. The finer of
+        the two axes decides, so the split errs toward more tiles rather than
+        fewer.
+
+        Args:
+            scale: The resolved ground sample distance in metres.
+
+        Returns:
+            `scale` itself for an unpinned request, else the smaller scale that
+            represents the pinned grid.
+        """
+        pinned = self._pinned_grid()
+        if pinned is None:
+            return scale
+        sized = OutputGrid.for_metre_grid(pinned.bbox, crs=self.crs, scale=scale)
+        factor = max(pinned.cols / sized.cols, pinned.rows / sized.rows)
+        return scale / factor if factor > 1 else scale
+
     def _pixels_split_and_fetch(
         self,
         image: Any,
@@ -1924,7 +1961,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """
         engine = self._engine
         assert isinstance(engine, PixelsEngine)  # the caller guarantees this
-        sub_extents = split_aoi_for_url(self.space, scale)
+        sub_extents = split_aoi_for_url(self.space, self._tiling_scale(scale))
         logger.info(
             f"{var_info.id}: AOI exceeds the {EE_MAX_DIMENSION}-px per-axis cap "
             f"at scale={scale} m; fetching {len(sub_extents)} computePixels "
@@ -1936,6 +1973,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 (sub.west, sub.south, sub.east, sub.north), self.crs
             )
             tile_grid = engine.grid_for_window(self, tile_bbox, scale)
+            # Checked per tile, not inferred from the split: the splitter works
+            # in lat/lon degrees at a metre scale while the tile is sized in the
+            # output CRS, so this is the only place the cap can be *known* to
+            # hold. Raising here beats letting Earth Engine refuse the tile.
+            if tile_grid.longest_axis > EE_MAX_DIMENSION:
+                raise ValueError(
+                    f"{var_info.id}: splitting the AOI left a tile of "
+                    f"{tile_grid.cols}x{tile_grid.rows} px, still over Earth "
+                    f"Engine's {EE_MAX_DIMENSION}-px per-axis cap. Use a "
+                    "coarser scale or crs_transform, a smaller bbox, or "
+                    "export_via='drive'."
+                )
             tile_prefix = f"{prefix}_tile_{index:04d}"
             tile_paths.append(
                 self._fetch_one_pixels_tile(
@@ -2165,7 +2214,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
             The current engine configuration.
         """
         return EngineConfig(
-            engine=self.engine,
+            # The resolved name, not the raw attribute: `engine=` accepts an
+            # `Engine` instance, and this field is a `str`, so passing the
+            # attribute through made a perfectly good instance fail validation
+            # inside a `ValueError` handler that reported it as a sizing
+            # failure.
+            engine=self._engine.name,
             reducer=self.reducer,
             crs=self.crs,
             scale=self.scale,
@@ -3268,13 +3322,27 @@ class GEE(LazyClientMixin, AbstractDataSource):
         — pass Python `None` through, which asks for no marker at all
         rather than stamping one. Per-tile tifs are deleted on success.
         """
-        sub_extents = split_aoi_for_url(self.space, scale)
+        sub_extents = split_aoi_for_url(self.space, self._tiling_scale(scale))
         logger.info(
             f"{var_info.id}: AOI exceeds {EE_MAX_DIMENSION}-px per-axis cap at "
             f"scale={scale} m; auto-splitting into {len(sub_extents)} tile(s)."
         )
         tile_paths: list[Path] = []
         for k, sub in enumerate(sub_extents):
+            # A pinned request sends its transform per tile, so the tile is as
+            # cap-bound as the whole AOI was; the unpinned case is guaranteed by
+            # the splitter itself, which sized these extents at this scale.
+            pinned_tile = self._pinned_grid(
+                bbox=bbox_to_crs((sub.west, sub.south, sub.east, sub.north), self.crs)
+            )
+            if pinned_tile is not None and pinned_tile.longest_axis > EE_MAX_DIMENSION:
+                raise ValueError(
+                    f"{var_info.id}: splitting the AOI left a tile of "
+                    f"{pinned_tile.cols}x{pinned_tile.rows} px, still over "
+                    f"Earth Engine's {EE_MAX_DIMENSION}-px per-axis cap. Use a "
+                    "coarser scale or crs_transform, a smaller bbox, or "
+                    "export_via='drive'."
+                )
             sub_region = ee.Geometry.Rectangle(
                 [sub.west, sub.south, sub.east, sub.north]
             )
