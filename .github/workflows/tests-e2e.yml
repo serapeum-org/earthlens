@@ -136,9 +136,11 @@ jobs:
         # quarantined right now) is the healthy state, so treat it as a pass.
         run: |
           set +e
-          # --no-build: lock-pinned and wheel-only, so a source build here
-          # would mean running a dependency's setup script.
-          uv run --locked --no-build pytest -m "e2e and quarantined" -rs -v
+          # --no-sync --no-build: the setup step already installed and
+          # lock-verified the env, so nothing is installed here and no
+          # dependency's setup script can run. (--no-build alone fails: it
+          # also forbids the workspace's own editable wheel.)
+          uv run --locked --no-sync --no-build pytest -m "e2e and quarantined" -rs -v
           code=$?
           set -e
           if [ "$code" -eq 5 ]; then
