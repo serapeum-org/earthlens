@@ -33,17 +33,19 @@ from earthlens.gee.features import create_feature
 from earthlens.gee.io import feature_collection_to_gdf as _fc_to_gdf
 
 
-# Reducers `ee.Image.reduceRegions` accepts here. Every name comes from the one
-# registry rather than being restated - including the region-only ones (`first`,
-# `stdDev`, `variance`, `count`), which are registry members precisely so this
-# module does not keep a second list.
 def _reducer_whitelist() -> frozenset[str]:
-    """Return the reducer names a region sample accepts.
+    """Return the reducer names `ee.Image.reduceRegions` accepts here.
+
+    Every name comes from the one registry rather than being restated -
+    including the region-only ones (`first`, `stdDev`, `variance`, `count`),
+    which are registry members precisely so this module does not keep a second
+    list.
 
     Derived from the registry's `ee_factory` declarations, which is narrower than
     the registry itself: `mosaic` is an `ImageCollection` method and
     `ee.Reducer.mosaic` does not exist, so taking every registry name here sent
-    `reducer="mosaic"` into an `AttributeError` instead of the refusal below.
+    `reducer="mosaic"` into an `AttributeError` instead of the refusal
+    :func:`_resolve_reducer` raises.
 
     Returns:
         The registry names that stand for an `ee.Reducer`.
@@ -87,7 +89,9 @@ def _resolve_reducer(name: str):
         `percentile:<q>` spec.
 
     Raises:
-        ValueError: If `name` is not in :data:`_REDUCER_WHITELIST`.
+        ValueError: If `name` is neither in :data:`_REDUCER_WHITELIST` nor a
+            `percentile` spec, or if it is `"percentile"` without a numeric
+            percentile between 0 and 100.
     """
     from earthlens.gee.reducers import resolve_reducer
 
@@ -124,16 +128,18 @@ def sample_points(
             columns are carried through as feature properties.
         scale_m: The pixel scale (metres) passed to
             `image.reduceRegions(scale=...)`.
-        reducer: The name of an `ee.Reducer` factory; must be one of
-            the supported reducers (see :data:`_REDUCER_WHITELIST`).
-            Defaults to `"first"`.
+        reducer: The name of an `ee.Reducer` factory; must be one of the
+            supported reducers (see :data:`_REDUCER_WHITELIST`), or the
+            parameterised `"percentile:<q>"` spec, which is the one reducer
+            that cannot be named on its own. Defaults to `"first"`.
 
     Returns:
         An `ee.FeatureCollection` of the input points, each carrying
         the reduced band value(s).
 
     Raises:
-        ValueError: If `reducer` is not in :data:`_REDUCER_WHITELIST`,
+        ValueError: If `reducer` is neither in :data:`_REDUCER_WHITELIST` nor a
+            valid `"percentile:<q>"` spec,
             if `gdf` is empty, or if any geometry is not a `Point` /
             `MultiPoint` (sampling at a polygon would silently
             change the semantic from "sample one pixel per point" to
@@ -201,8 +207,8 @@ def sample_points_to_gdf(
         gdf: A `GeoDataFrame` of point geometries.
         scale_m: The pixel scale (metres) passed to
             `image.reduceRegions(scale=...)`.
-        reducer: The reducer name; one of :data:`_REDUCER_WHITELIST`.
-            Defaults to `"first"`.
+        reducer: The reducer name; one of :data:`_REDUCER_WHITELIST`, or a
+            `"percentile:<q>"` spec. Defaults to `"first"`.
         crs: The CRS to stamp onto the output `GeoDataFrame`. Defaults
             to `4326`.
 
@@ -211,8 +217,8 @@ def sample_points_to_gdf(
         input properties plus the reduced band value(s).
 
     Raises:
-        ValueError: If `reducer` is not in :data:`_REDUCER_WHITELIST`,
-            or if `gdf` is empty.
+        ValueError: If `reducer` is neither in :data:`_REDUCER_WHITELIST` nor a
+            valid `"percentile:<q>"` spec, or if `gdf` is empty.
     """
     fc = sample_points(image, gdf, scale_m=scale_m, reducer=reducer)
     return _fc_to_gdf(fc, crs=crs)

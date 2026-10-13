@@ -217,8 +217,8 @@ class TestGridAndRequest:
     def test_a_declared_nodata_reaches_the_request(self, make_gee, fake_reader):
         """The ExportConfig field added in 1.9, threaded through."""
         gee = _gee(make_gee, engine="pixels")
-        # Set on the config directly: there is no public `nodata=` kwarg while
-        # the fetch path that would honour it is unwired.
+        # Set on the config directly, so this stays a test of the request
+        # builder rather than of the `nodata=` kwarg that now feeds it.
         object.__setattr__(
             gee,
             "_export_config",

@@ -169,20 +169,29 @@ class UrlSink(Sink):
 
         The one sink `engine=` means anything to, which is why the choice
         between Earth Engine's two pull APIs is made here: `computePixels`
-        evaluates the same graph without the 32768-px per-axis cap, and
-        `getDownloadURL` is the historical path.
+        returns the GeoTIFF bytes directly from an explicit grid, and
+        `getDownloadURL` is the historical zip-over-HTTP path. Both evaluate the
+        same graph and both are bound by Earth Engine's 32768-px per-axis cap,
+        so the choice is about transport, not about what can be asked for.
 
         Args:
             backend: The `GEE` instance, for the engine and the transports.
             image: The composited `ee.Image`.
             var_info: The catalog entry being read.
             scale: Ground sample distance in metres.
-            bands: The bands the read asked for.
+            bands: The bands the read asked for. Only the pixel API selects
+                bands on the request; `getDownloadURL` takes them from `image`.
             region: The `ee.Geometry` to clip to.
             prefix: The filename stem.
 
         Returns:
             The written GeoTIFF's path.
+
+        Raises:
+            ValueError: If the request exceeds the per-axis cap and
+                `auto_split` is off, or no scale can be resolved.
+            RuntimeError: If Earth Engine returns a zip instead of a GeoTIFF on
+                the `getDownloadURL` path.
         """
         from earthlens.gee.pixels import PixelsEngine
 

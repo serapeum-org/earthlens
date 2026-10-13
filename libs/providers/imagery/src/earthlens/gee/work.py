@@ -377,6 +377,23 @@ class DownloadResult(SummarisedLeaf):
         Raises:
             ValueError: If no bucket wrote a file - a batch export returns
                 destinations, so there is nothing local to stack.
+
+        Examples:
+            - A result with no written files says so, and says what to do
+              instead, rather than handing back an empty collection:
+                ```python
+                >>> from earthlens.gee.work import Artifact, DownloadResult
+                >>> queued = DownloadResult(
+                ...     artifacts=(Artifact(destination="gs://my-bucket/srtm"),)
+                ... )
+                >>> queued.paths
+                []
+                >>> queued.collection()  # doctest: +ELLIPSIS
+                Traceback (most recent call last):
+                    ...
+                ValueError: this result holds no written files, ...
+
+                ```
         """
         from pyramids.dataset import DatasetCollection
 

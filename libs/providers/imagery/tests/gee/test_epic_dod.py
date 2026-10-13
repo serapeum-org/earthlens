@@ -15,6 +15,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from earthlens.gee import backend as backend_module
 from earthlens.gee import sampling
 from earthlens.gee.grid import NATIVE_CRS, OutputGrid, bbox_to_latlon
 from earthlens.gee.reducers import (
@@ -31,14 +32,68 @@ from earthlens.gee.reducers import (
     resolve_reducer,
     sampling_reducers,
 )
-from earthlens.gee.sinks import AssetSink, DriveSink, GcsSink, UrlSink, resolve_sink
+from earthlens.gee.sinks import (
+    SINKS,
+    AssetSink,
+    DriveSink,
+    GcsSink,
+    Sink,
+    UrlSink,
+    resolve_sink,
+)
 from earthlens.gee.work import Artifact, DownloadResult
 
-from .test_backend import fake_ee, fake_reader, make_gee  # noqa: F401 - fixtures
+from .test_backend import (  # noqa: F401 - fixtures
+    _FakePyramidsDataset,
+    fake_ee,
+    fake_reader,
+    make_gee,
+)
 
 ASSET = "USGS/SRTMGL1_003"
 START = dt.datetime(2000, 2, 11)
 END = dt.datetime(2000, 2, 13)
+
+
+class _SinkWithoutWrite(Sink):
+    """A sink that forgot its transport, so the ABC must refuse to build it."""
+
+    name = "no-write"
+
+
+class _ProbeSink(Sink):
+    """A throwaway destination, to prove registration is all a sink needs."""
+
+    name = "probe"
+
+    def write(self, backend, image, **kwargs):
+        """Stand in for a transport; what is under test is reaching it."""
+        return "probed"
+
+
+@pytest.fixture
+def probe_sink():
+    """Register `_ProbeSink` for one test, then take it back out."""
+    SINKS[_ProbeSink.name] = _ProbeSink
+    yield _ProbeSink
+    del SINKS[_ProbeSink.name]
+
+
+def _collect_warnings(monkeypatch):
+    """Collect the backend's warnings instead of emitting them."""
+    collected: list[str] = []
+    monkeypatch.setattr(
+        backend_module.logger,
+        "warning",
+        lambda msg, *args, **kwargs: collected.append(msg),
+    )
+    return collected
+
+
+def _record_merge(sink: list, sources, target) -> None:
+    """Stand in for `merge_rasters`, recording the call and writing the mosaic."""
+    sink.append({"sources": list(sources), "target": str(target)})
+    Path(target).write_bytes(b"merged")
 
 
 def _gee(make_gee, **overrides):
@@ -221,6 +276,11 @@ class TestTheSinkOwnsItsWrite:
         for sink in (UrlSink(), DriveSink(), GcsSink(), AssetSink()):
             assert callable(sink.write)
 
+    def test_a_sink_without_a_write_cannot_be_built(self):
+        """What makes "cannot forget it" true rather than a convention."""
+        with pytest.raises(TypeError, match="abstract"):
+            _SinkWithoutWrite()
+
     def test_the_url_sink_writes_a_path(self, make_gee, fake_reader):
         """The synchronous sink fetches now and returns the file."""
         gee = _gee(make_gee, engine="ee")
@@ -265,6 +325,12 @@ class TestTheSinkOwnsItsWrite:
     def test_validate_config_accepts_a_supplied_prerequisite(self):
         """And says nothing when the destination is there."""
         assert DriveSink().validate_config({"drive_folder": "out"}) is None
+
+    @pytest.mark.parametrize("empty", ["", None])
+    def test_an_empty_prerequisite_is_refused_like_a_missing_one(self, empty):
+        """A key that is present but blank addresses nothing either."""
+        with pytest.raises(ValueError, match="requires drive_folder"):
+            DriveSink().validate_config({"drive_folder": empty})
 
     def test_the_url_sink_needs_nothing(self):
         """`required_config` is `None`, so there is nothing to refuse."""
@@ -324,6 +390,25 @@ class TestTheResultStacksIntoADatacube:
             date_regex=r"\d{4}-\d{2}-\d{2}", date_format="%Y-%m-%d"
         )
         assert calls[0]["date_regex"] == r"\d{4}-\d{2}-\d{2}"
+
+    def test_only_the_written_files_are_stacked(self, monkeypatch):
+        """A mixed result can still stack: a destination is not a file."""
+        from pyramids import dataset as pyramids_dataset
+
+        calls: list[list[str]] = []
+        monkeypatch.setattr(
+            pyramids_dataset.DatasetCollection,
+            "from_files",
+            classmethod(lambda cls, files, **kw: calls.append(files) or "cube"),
+        )
+        result = DownloadResult(
+            artifacts=(
+                Artifact(path=Path("a_elevation_20000211.tif")),
+                Artifact(destination="drive://folder/a_elevation_20000212"),
+            )
+        )
+        assert result.collection() == "cube"
+        assert [Path(name).name for name in calls[0]] == ["a_elevation_20000211.tif"]
 
     def test_a_batch_result_says_why_it_cannot(self):
         """Destinations are not local files, so there is nothing to stack."""
@@ -399,3 +484,198 @@ class TestTheReducerAbcStaysOneThing:
         collection = SimpleNamespace(stdDev=lambda: "reduced")
         with pytest.raises(ValueError):
             reducer(collection)
+
+
+class TestTheIgnoredArgumentNoticesAreHonest:
+    """A notice about nothing is as bad as silence about something.
+
+    Both arguments are honoured at different points - `nodata` on the
+    `computePixels` request body, which is only built for the synchronous sink,
+    and `high_volume` on the session's host, which is chosen whatever the sink -
+    so one gate for both let `engine="pixels", export_via="drive"` accept a
+    `nodata` that nothing would read.
+    """
+
+    def test_nodata_warns_when_the_pixel_engine_meets_a_batch_sink(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """The request body is never built for a queued export."""
+        collected = _collect_warnings(monkeypatch)
+        _gee(
+            make_gee,
+            engine="pixels",
+            export_via="drive",
+            drive_folder="out",
+            nodata=-9999,
+        )
+        assert [message for message in collected if "nodata" in message]
+
+    def test_the_notice_names_both_halves_of_the_reason(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """So a caller can see which of the two to change."""
+        collected = _collect_warnings(monkeypatch)
+        _gee(
+            make_gee,
+            engine="pixels",
+            export_via="drive",
+            drive_folder="out",
+            nodata=-9999,
+        )
+        (message,) = [m for m in collected if "nodata" in m]
+        assert "engine='pixels'" in message
+        assert "export_via='drive'" in message
+
+    def test_nodata_is_silent_where_it_is_honoured(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """The pixel engine on the synchronous sink does read it."""
+        collected = _collect_warnings(monkeypatch)
+        _gee(make_gee, engine="pixels", nodata=-9999)
+        assert not [message for message in collected if "nodata" in message]
+
+    def test_high_volume_is_silent_on_a_batch_sink(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """It picks the host the session opens on, which happens either way."""
+        collected = _collect_warnings(monkeypatch)
+        _gee(
+            make_gee,
+            engine="pixels",
+            export_via="drive",
+            drive_folder="out",
+            high_volume=True,
+        )
+        assert not [message for message in collected if "high_volume" in message]
+
+
+class TestTheCogNoticeIsHonestToo:
+    """`cog=` reaches the paths that write the raster themselves, and no other."""
+
+    def test_it_is_silent_on_the_pixel_path(self, make_gee, fake_reader, monkeypatch):
+        """That path writes its own file, so the flag is honoured there."""
+        collected = _collect_warnings(monkeypatch)
+        gee = _gee(make_gee, engine="pixels", cog=True)
+        gee.download(progress_bar=False)
+        assert not [message for message in collected if "cog=True" in message]
+
+    def test_it_still_warns_on_get_download_url(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """Where the flag genuinely does nothing."""
+        collected = _collect_warnings(monkeypatch)
+        gee = _gee(make_gee, engine="ee", cog=True)
+        gee.download(progress_bar=False)
+        assert [message for message in collected if "cog=True" in message]
+
+    def test_it_still_warns_for_a_batch_export(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A queued export writes the file Earth Engine's way, not ours."""
+        collected = _collect_warnings(monkeypatch)
+        gee = _gee(
+            make_gee, engine="pixels", export_via="drive", drive_folder="out", cog=True
+        )
+        gee.download(progress_bar=False)
+        assert [message for message in collected if "cog=True" in message]
+
+
+class TestATiledPixelFetchKeepsItsCog:
+    """`cog=True` honoured per tile and then lost in the stitch is still lost."""
+
+    WIDE = {"lat_lim": [9.9, 10.0], "lon_lim": [-180.0, 180.0], "scale": 1000.0}
+
+    def test_the_mosaic_is_rewritten_as_a_cog(self, make_gee, fake_reader, monkeypatch):
+        """`merge_rasters` writes a plain GeoTIFF, so the mosaic is converted."""
+        merged: list[dict] = []
+        monkeypatch.setattr(
+            backend_module,
+            "merge_rasters",
+            lambda sources, target, **kwargs: _record_merge(merged, sources, target),
+        )
+        _FakePyramidsDataset.reset()
+        gee = _gee(make_gee, engine="pixels", auto_split=True, cog=True, **self.WIDE)
+        (out,) = gee.download(progress_bar=False)
+        assert out.is_file()
+        assert any(
+            path.endswith(".merged.tif")
+            for path in _FakePyramidsDataset.read_file_calls
+        ), "the merged raster was never re-read, so no COG was written"
+
+    def test_the_staged_mosaic_is_not_left_behind(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """The staging file is the COG's input, not an output."""
+        merged: list[dict] = []
+        monkeypatch.setattr(
+            backend_module,
+            "merge_rasters",
+            lambda sources, target, **kwargs: _record_merge(merged, sources, target),
+        )
+        gee = _gee(make_gee, engine="pixels", auto_split=True, cog=True, **self.WIDE)
+        (out,) = gee.download(progress_bar=False)
+        assert not (out.parent / f"{out.stem}.merged.tif").exists()
+
+    def test_without_the_flag_the_mosaic_is_written_once(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """No staging, no re-read: the url path's behaviour is unchanged."""
+        merged: list[dict] = []
+        monkeypatch.setattr(
+            backend_module,
+            "merge_rasters",
+            lambda sources, target, **kwargs: _record_merge(merged, sources, target),
+        )
+        _FakePyramidsDataset.reset()
+        gee = _gee(make_gee, engine="pixels", auto_split=True, **self.WIDE)
+        gee.download(progress_bar=False)
+        assert not any(
+            path.endswith(".merged.tif")
+            for path in _FakePyramidsDataset.read_file_calls
+        )
+
+
+class TestARegisteredSinkReachesTheBackend:
+    """Task 1.4's acceptance criterion, end to end rather than at the registry.
+
+    `resolve_sink` accepted a newly registered sink, but `ExportConfig` declared
+    `export_via` as a closed `Literal` of the four shipped names and is
+    validated at runtime - so the seam stopped at the config, and "adding a
+    destination is a subclass plus a registry entry" was false for anything
+    that reached one.
+    """
+
+    def test_the_config_accepts_it(self, probe_sink):
+        """The vocabulary is the registry's, not a restated literal."""
+        from earthlens.gee.configs import ExportConfig
+
+        assert ExportConfig(export_via="probe").export_via == "probe"
+
+    def test_an_unregistered_name_is_still_refused(self):
+        """Widening to `str` must not mean accepting anything."""
+        from pydantic import ValidationError
+
+        from earthlens.gee.configs import ExportConfig
+
+        with pytest.raises(ValidationError, match="export_via must be one of"):
+            ExportConfig(export_via="nope")
+
+    def test_the_backend_writes_through_it(self, make_gee, fake_reader, probe_sink):
+        """One subclass, one registry entry, no edit to the export path."""
+        gee = _gee(make_gee, export_via="probe")
+        (written,) = gee.download(progress_bar=False)
+        assert written == "probed"
+
+    def test_the_prerequisite_message_has_one_source(self, probe_sink):
+        """The asset hint lived in two places and had already drifted a space."""
+        from pydantic import ValidationError
+
+        from earthlens.gee.configs import ExportConfig
+        from earthlens.gee.sinks import AssetSink
+
+        sink = AssetSink()
+        with pytest.raises(ValueError) as from_sink:
+            sink.validate_config({})
+        with pytest.raises(ValidationError) as from_config:
+            ExportConfig(export_via="asset")
+        assert str(from_sink.value) in str(from_config.value)

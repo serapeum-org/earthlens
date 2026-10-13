@@ -20,11 +20,12 @@ reads the pair back through :attr:`EngineConfig.grid_inputs`.
 
 from __future__ import annotations
 
-from typing import Any, ClassVar, Literal
+from typing import Any, ClassVar
 
 from pydantic import ConfigDict, Field, model_validator
 
 from earthlens.base.leaves import SummarisedLeaf
+from earthlens.gee.sinks import resolve_sink
 
 __all__ = ["ExportConfig", "EngineConfig"]
 
@@ -96,7 +97,12 @@ class ExportConfig(SummarisedLeaf):
         "materialize",
     )
 
-    export_via: Literal["url", "drive", "gcs", "asset"] = "url"
+    # `str`, not a `Literal` of the four shipped names: this model is validated
+    # at runtime, so a closed literal here rejected a sink that `SINKS` had
+    # accepted - which made "adding a destination is a subclass plus a registry
+    # entry" false for anything that reached a config. `resolve_sink` is the
+    # vocabulary, as `resolve_engine` is for `engine`.
+    export_via: str = "url"
     drive_folder: str | None = None
     gcs_bucket: str | None = None
     asset_id: str | None = None
@@ -123,28 +129,27 @@ class ExportConfig(SummarisedLeaf):
 
         Each asynchronous sink needs exactly one extra field, and finding that
         out at download time — after the credential build and the catalog
-        query — wastes the whole setup. The messages are the backend's own,
-        preserved verbatim.
+        query — wastes the whole setup.
+
+        Delegated to the sink rather than restated here: this validator used to
+        keep its own table of field names and messages, so the one prerequisite
+        hint existed twice and had already drifted by a space. The sink is the
+        single source for both the requirement and its wording.
 
         Returns:
             The validated config.
 
         Raises:
-            ValueError: If the chosen sink's required field is missing.
+            ValueError: If `export_via` names no registered sink, or the chosen
+                sink's required field is missing.
         """
-        required = {
-            "drive": ("drive_folder", "export_via='drive' requires drive_folder="),
-            "gcs": ("gcs_bucket", "export_via='gcs' requires gcs_bucket="),
-            "asset": (
-                "asset_id",
-                "export_via='asset' requires asset_id= (the parent folder "
-                "asset, e.g. 'projects/my-project/assets/my-folder')",
-            ),
-        }
-        if self.export_via in required:
-            field, message = required[self.export_via]
-            if not getattr(self, field):
-                raise ValueError(message)
+        resolve_sink(self.export_via).validate_config(
+            {
+                "drive_folder": self.drive_folder,
+                "gcs_bucket": self.gcs_bucket,
+                "asset_id": self.asset_id,
+            }
+        )
         return self
 
 

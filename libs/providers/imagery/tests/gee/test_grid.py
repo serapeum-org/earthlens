@@ -247,6 +247,49 @@ class TestFromCrsTransform:
         )
         assert grid.rows == 10
 
+    def test_a_positive_y_scale_is_normalised_to_north_up(self):
+        """A south-up transform must not invert the grid it sizes.
+
+        The terms are accepted, so the only safe reading is the north-up one:
+        the same window, the same pixel count, and a negative `y_scale` with the
+        origin at the top so the request cannot place the raster upside down.
+        """
+        grid = OutputGrid.from_crs_transform(
+            (0.0, 0.0, 100.0, 100.0),
+            crs="EPSG:32636",
+            crs_transform=(10.0, 0.0, 0.0, 0.0, 10.0, 0.0),
+        )
+        assert grid.as_rows_cols() == (10, 10)
+        assert grid.bbox == (0.0, 0.0, 100.0, 100.0)
+        assert grid.crs_transform == (10.0, 0.0, 0.0, 0.0, -10.0, 100.0)
+
+    def test_a_window_below_the_pinned_origin_snaps_outward(self):
+        """Snapping has to floor, not truncate, or a negative offset rounds in.
+
+        An AOI south and west of the pinned origin gives both offsets a negative
+        sign, which is where `int()` would snap towards the origin and clip the
+        window the caller asked for.
+        """
+        grid = OutputGrid.from_crs_transform(
+            (-70.045, -33.515, -70.015, -33.485),
+            crs=NATIVE_CRS,
+            crs_transform=(0.01, 0.0, -70.0, 0.0, -0.01, -33.0),
+        )
+        assert grid.bbox[0] <= -70.045
+        assert grid.bbox[3] >= -33.485
+        offset = (grid.bbox[0] - (-70.0)) / 0.01
+        assert offset == pytest.approx(round(offset), abs=1e-6)
+
+    def test_a_degenerate_window_still_gets_one_pixel(self):
+        """A zero-area window would otherwise size a grid with no extent."""
+        grid = OutputGrid.from_crs_transform(
+            (300_000.0, 3_400_000.0, 300_000.0, 3_400_000.0),
+            crs="EPSG:32636",
+            crs_transform=(10.0, 0.0, 300_000.0, 0.0, -10.0, 3_400_000.0),
+        )
+        assert grid.as_rows_cols() == (1, 1)
+        assert grid.bbox == (300_000.0, 3_399_990.0, 300_010.0, 3_400_000.0)
+
     def test_rejects_a_wrong_length_transform(self):
         """An affine transform is six numbers."""
         with pytest.raises(ValueError, match="6 elements"):

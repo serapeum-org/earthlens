@@ -82,6 +82,17 @@ class TestValidation:
         with pytest.raises(TypeError, match="six numbers"):
             _gee(make_gee, crs_transform=[0.001, 0, "x", 0, -0.001, 30])
 
+    def test_a_numpy_transform_is_accepted(self, make_gee, fake_reader):
+        """The realistic way to pin: an existing raster's own geotransform.
+
+        pyramids hands those back as a numpy array, so the check is the iterable
+        protocol rather than a `list`/`tuple` whitelist.
+        """
+        import numpy as np
+
+        gee = _gee(make_gee, crs_transform=np.array(PINNED))
+        assert gee.crs_transform == PINNED
+
     @pytest.mark.parametrize("length", [5, 7])
     def test_the_wrong_length_is_refused(self, make_gee, fake_reader, length):
         """Earth Engine's transform is six terms, not an arbitrary affine."""
@@ -300,6 +311,50 @@ class TestTheWindowSnapsOntoTheLattice:
             _gee(make_gee, crs_transform=(0.001, 0.5, 31.2, 0.0, -0.001, 30.0))
 
 
+class TestAProjectedPin:
+    """The case the feature exists for: a metre lattice in a projected CRS.
+
+    Every other test here pins a degree grid, which never exercises the AOI
+    reprojection that a pinned request in another CRS goes through before it can
+    be snapped.
+    """
+
+    #: 30 m pixels pinned to a round UTM 36N origin.
+    UTM = (30.0, 0.0, 300_000.0, 0.0, -30.0, 3_400_000.0)
+
+    def _pinned(self, make_gee, **overrides):
+        """A pinned backend reading into UTM zone 36N."""
+        return _gee(make_gee, crs="EPSG:32636", crs_transform=self.UTM, **overrides)
+
+    def test_the_window_snaps_onto_the_metre_lattice(self, make_gee, fake_reader):
+        """The AOI arrives in metres only after a reprojection, then snaps."""
+        grid = self._pinned(make_gee)._pinned_grid()
+        for value, origin in ((grid.bbox[0], 300_000.0), (grid.bbox[3], 3_400_000.0)):
+            offset = (value - origin) / 30.0
+            assert offset == pytest.approx(round(offset), abs=1e-6)
+
+    def test_the_grid_is_sized_in_metres_not_degrees(self, make_gee, fake_reader):
+        """A 0.1-degree AOI is ~10 km, so ~350 px of 30 m and not 0.003 of one."""
+        grid = self._pinned(make_gee)._pinned_grid()
+        assert 300 < grid.cols < 500
+        assert 300 < grid.rows < 500
+
+    def test_the_pixel_request_carries_the_metre_transform(self, make_gee, fake_reader):
+        """Including the CRS the terms are expressed in, which is not the AOI's."""
+        gee = self._pinned(make_gee, engine="pixels")
+        _export(gee)
+        (body,) = gee.client.compute_pixels_calls
+        assert body["grid"]["crsCode"] == "EPSG:32636"
+        assert body["grid"]["affineTransform"]["scaleX"] == 30.0
+        assert body["grid"]["affineTransform"]["scaleY"] == -30.0
+
+    def test_the_url_request_carries_it_too(self, make_gee, fake_reader):
+        """`getDownloadURL` snaps server-side, so it gets the pinned origin."""
+        params = _export(self._pinned(make_gee, engine="ee")).download_params
+        assert params["crs_transform"] == list(self.UTM)
+        assert params["crs"] == "EPSG:32636"
+
+
 class TestTheReaderCannotHonourIt:
     """The EEDAI reader sizes its own metre grid and takes no transform."""
 
@@ -374,6 +429,20 @@ class TestWhatIsIgnoredSaysSo:
         collected = _collect_warnings(monkeypatch)
         _gee(make_gee, engine="pixels", nodata=-9999)
         assert not [message for message in collected if "nodata" in message]
+
+    def test_nodata_warns_under_the_default_engine(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """`GEE(nodata=...)` without an `engine=` is the likeliest way to hit this.
+
+        `auto` may still route to Earth Engine or the reader, neither of which
+        can declare a fill value, so the notice has to arrive for the default
+        too - and name the engine that is dropping it.
+        """
+        collected = _collect_warnings(monkeypatch)
+        _gee(make_gee, nodata=-9999)
+        assert [message for message in collected if "nodata" in message]
+        assert any("'auto'" in message for message in collected)
 
     def test_high_volume_warns_on_another_engine(
         self, make_gee, fake_reader, monkeypatch

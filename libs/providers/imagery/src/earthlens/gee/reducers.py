@@ -70,10 +70,14 @@ __all__ = [
 
 
 class Reducer(ABC):
-    """Collapse an `ee.ImageCollection` into a single `ee.Image`.
+    """One reducer name, in both of the senses the backend reduces things.
 
-    Subclasses are callable, so an instance can be passed anywhere the backend
-    accepts a `collection -> image` operation.
+    A subclass declares which of the two it supports: collapsing an
+    `ee.ImageCollection` into a single `ee.Image` (calling the instance) and/or
+    standing for an `ee.Reducer` that collapses pixels inside a region
+    (:meth:`as_ee_reducer`). Most support both, so an instance can be passed
+    anywhere the backend accepts a `collection -> image` operation; a
+    region-only one refuses the call instead.
 
     Attributes:
         name: The registry key this reducer is addressed by, and the value a
@@ -309,10 +313,7 @@ class _RegionReducer(Reducer):
         """Refuse: this reducer has no collection form.
 
         Args:
-            collection: Ignored.
-
-        Returns:
-            Never returns.
+            collection: Ignored — there is no reduction to apply it to.
 
         Raises:
             ValueError: Always, naming the reducers that do collapse a
@@ -326,25 +327,42 @@ class _RegionReducer(Reducer):
 
 
 class First(_RegionReducer):
-    """The first unmasked value, as a region reducer."""
+    """The first unmasked value in a region, for a region reduction only.
+
+    Reachable through `sample_points(reducer="first")`; `GEE(reducer="first")`
+    is refused, because there is no collection form to composite with.
+    """
 
     name: ClassVar[str] = "first"
 
 
 class StdDev(_RegionReducer):
-    """Sample standard deviation over a region."""
+    """Sample standard deviation over a region, for a region reduction only.
+
+    Reachable through `sample_points(reducer="stdDev")`; `GEE(reducer="stdDev")`
+    is refused, because there is no collection form to composite with.
+    """
 
     name: ClassVar[str] = "stdDev"
 
 
 class Variance(_RegionReducer):
-    """Sample variance over a region."""
+    """Sample variance over a region, for a region reduction only.
+
+    Reachable through `sample_points(reducer="variance")`;
+    `GEE(reducer="variance")` is refused, because there is no collection form to
+    composite with.
+    """
 
     name: ClassVar[str] = "variance"
 
 
 class Count(_RegionReducer):
-    """Count of unmasked pixels in a region."""
+    """Count of unmasked pixels in a region, for a region reduction only.
+
+    Reachable through `sample_points(reducer="count")`; `GEE(reducer="count")`
+    is refused, because there is no collection form to composite with.
+    """
 
     name: ClassVar[str] = "count"
 

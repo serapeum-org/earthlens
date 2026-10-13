@@ -34,9 +34,11 @@ the CRS, or the values you asked for.
 | Extra needed | `[gee]` | `[gee]` | `[gee]` **and** `[eedai]` |
 | Temporal composite | server-side | server-side | client-side, per time bucket |
 
-`"pixels"` is the engine for a request that needs **both** a graph and an output larger than `getDownloadURL`
-will serve. It is never chosen automatically: `"auto"` keeps preferring the reader and then `"ee"`, so the
-preference order is a separate, reviewable decision rather than a side effect of adding an engine.
+`"pixels"` is the engine for a request that needs a graph and wants Earth Engine's current extraction API for
+it: the GeoTIFF bytes come back directly, with no URL to expire and no zip to unpack, from a grid the request
+states outright. It does **not** buy a bigger output — the per-axis cap is the same, and `auto_split=True` is what
+gets past it on either path. It is never chosen automatically: `"auto"` keeps preferring the reader and then
+`"ee"`, so the preference order is a separate, reviewable decision rather than a side effect of adding an engine.
 
 One sampling difference is worth knowing, and it is deliberate. `"pixels"` sends an explicit grid, so it sizes on
 the **metre** convention — square metres on the ground, shortening longitude by `cos(latitude)`, the same rule the
@@ -322,7 +324,7 @@ blocking; `list_recent_tasks`, `get_task_status`, `wait_for_task_id`, `cancel_ta
 | Situation | Engine |
 |---|---|
 | Any `cloud_mask` / `filters` / computed graph | `ee` (forced) |
-| A computed graph *and* an AOI over 32768 px | `pixels` with `auto_split=True`, or `drive` |
+| A computed graph *and* an AOI over 32768 px | `ee` or `pixels`, either with `auto_split=True`, or `drive` |
 | An output grid that must align with an earlier download | `ee` or `pixels` with `crs_transform=` |
 | Raw pixels from one asset, large AOI | `eedai` — no 32768-px cap, no zip round-trip |
 | A composite whose masking must match Earth Engine exactly | `ee` |

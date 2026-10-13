@@ -207,8 +207,9 @@ class EedaiEngine(Engine):
 
         Raises:
             ValueError: If the request is ineligible (it needs server-side
-                compute, or targets a CRS the reader cannot size), or eligible
-                but declined by the sizing verdict. The message names the reason
+                compute, targets a CRS the reader cannot size, or pins a
+                `crs_transform` the reader cannot honour), or eligible but
+                declined by the sizing verdict. The message names the reason
                 and a matching remedy.
             ImportError: If sizing a collection read needs the reader and the
                 `[eedai]` extra is not installed.

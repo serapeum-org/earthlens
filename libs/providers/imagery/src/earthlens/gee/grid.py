@@ -94,6 +94,23 @@ def validate_crs_transform(crs_transform: object) -> tuple[float, ...] | None:
             True
 
             ```
+        - A rotated lattice is refused, because no column of it could be
+          snapped to:
+            ```python
+            >>> validate_crs_transform([10, 0.5, 300000, 0.5, -10, 3400000])
+            Traceback (most recent call last):
+                ...
+            ValueError: crs_transform shear terms must be zero: earthlens pins axis-aligned grids, got x_shear=0.5, y_shear=0.5
+
+            ```
+        - So is a transform of the wrong length:
+            ```python
+            >>> validate_crs_transform((10, 0, 300000))
+            Traceback (most recent call last):
+                ...
+            ValueError: crs_transform must have 6 elements, got 3
+
+            ```
     """
     if crs_transform is None:
         return None
@@ -284,6 +301,22 @@ def bbox_to_latlon(
     Raises:
         pyproj.exceptions.CRSError: If `crs` is not a CRS pyproj can build a
             transformer for.
+
+    Examples:
+        - A lat/lon window is already the answer, so it is handed back
+          untouched:
+            ```python
+            >>> bbox_to_latlon((31.2, 29.9, 31.3, 30.0), "EPSG:4326")
+            (31.2, 29.9, 31.3, 30.0)
+
+            ```
+        - A UTM window comes back in degrees:
+            ```python
+            >>> window = (330_000.0, 3_310_000.0, 340_000.0, 3_320_000.0)
+            >>> [round(term, 2) for term in bbox_to_latlon(window, "EPSG:32636")]
+            [31.24, 29.91, 31.34, 30.0]
+
+            ```
     """
     if crs.upper() == NATIVE_CRS:
         return bbox
@@ -636,21 +669,62 @@ class OutputGrid(SummarisedLeaf):
         resample. Mutually exclusive with `scale`, which Earth Engine also treats
         as an either/or.
 
+        `bbox` is a request, not the answer: the window is snapped **outward**
+        onto the lattice the transform defines, so the returned grid's `bbox`
+        covers the one asked for and begins on a grid line. Its `crs_transform`
+        therefore carries the *snapped* origin — which is the origin the request
+        must quote, since the pinned one may lie far outside the AOI — while the
+        pixel sizes are the ones that were pinned.
+
         Args:
-            bbox: The window in `crs`.
+            bbox: The window to cover, `(min_x, min_y, max_x, max_y)` in `crs`.
             crs: The output CRS.
             crs_transform: A 6-element affine transform
-                `(x_scale, x_shear, x_origin, y_shear, y_scale, y_origin)`.
+                `(x_scale, x_shear, x_origin, y_shear, y_scale, y_origin)`, in
+                the units of `crs`.
             cutline: An optional region to clip to.
 
         Returns:
-            The grid implied by the transform over `bbox`, with
-            `convention="transform"`, no `scale`, and `crs_transform` carrying
-            the transform through to the request.
+            The grid implied by the transform over `bbox`, snapped outward to
+            the lattice, with `convention="transform"`, no `scale`, and
+            `crs_transform` carrying the snapped transform to the request.
 
         Raises:
+            TypeError: If `crs_transform` is not an iterable of numbers.
             ValueError: If the transform is not six finite terms, its pixel
                 sizes are zero, or it carries shear.
+
+        Examples:
+            - A window already on the lattice is kept, and the transform comes
+              back alongside the pixel counts:
+                ```python
+                >>> grid = OutputGrid.from_crs_transform(
+                ...     (300_000.0, 3_399_000.0, 300_100.0, 3_400_000.0),
+                ...     crs="EPSG:32636",
+                ...     crs_transform=(10, 0, 300_000, 0, -10, 3_400_000),
+                ... )
+                >>> grid.cols, grid.rows
+                (10, 100)
+                >>> grid.crs_transform
+                (10.0, 0.0, 300000.0, 0.0, -10.0, 3400000.0)
+
+                ```
+            - A window off the lattice is widened to it, so the origin stays a
+              whole number of pixels from the pinned one:
+                ```python
+                >>> grid = OutputGrid.from_crs_transform(
+                ...     (300_005.0, 3_399_995.0, 300_025.0, 3_400_000.0),
+                ...     crs="EPSG:32636",
+                ...     crs_transform=(10, 0, 300_000, 0, -10, 3_400_000),
+                ... )
+                >>> grid.bbox
+                (300000.0, 3399990.0, 300030.0, 3400000.0)
+                >>> grid.cols, grid.rows
+                (3, 1)
+                >>> grid.scale is None, grid.convention
+                (True, 'transform')
+
+                ```
         """
         terms = validate_crs_transform(crs_transform)
         assert terms is not None  # a transform was given, so one comes back
@@ -759,6 +833,18 @@ class OutputGrid(SummarisedLeaf):
                 >>> terms = grid.request_transform()
                 >>> round(terms[0], 8), terms[2], terms[5]
                 (0.00092593, 31.2, 30.0)
+
+                ```
+            - A pinned grid hands back the transform it was snapped to, so the
+              request quotes the lattice rather than the AOI:
+                ```python
+                >>> pinned = OutputGrid.from_crs_transform(
+                ...     (300_005.0, 3_399_995.0, 300_025.0, 3_400_000.0),
+                ...     crs="EPSG:32636",
+                ...     crs_transform=(10, 0, 300_000, 0, -10, 3_400_000),
+                ... )
+                >>> pinned.request_transform()
+                (10.0, 0.0, 300000.0, 0.0, -10.0, 3400000.0)
 
                 ```
         """
