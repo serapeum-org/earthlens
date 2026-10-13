@@ -14,6 +14,8 @@ from typing import Any, Callable
 import pytest
 import requests
 
+from earthlens.testing import FakeResponse
+
 
 def _make_feature(
     *,
@@ -81,36 +83,6 @@ def _make_payload(features: list[dict[str, Any]] | None = None) -> dict[str, Any
     }
 
 
-class _FakeResponse:
-    """Stand-in for a `requests.Response` returning a canned payload."""
-
-    def __init__(
-        self,
-        payload: dict[str, Any],
-        status_error: Exception | None,
-        status_code: int = 200,
-    ):
-        self._payload = payload
-        self._status_error = status_error
-        self.status_code = status_code
-        self.headers: dict[str, str] = {}
-
-    def raise_for_status(self) -> None:
-        if self._status_error is not None:
-            raise self._status_error
-        if self.status_code >= 400:
-            # Neutral label (the response carries the real status_code, which is
-            # what gdacs_http_status reads first) so it is never mis-labelled.
-            raise requests.HTTPError(f"{self.status_code} HTTP Error", response=self)
-
-    def json(self) -> dict[str, Any]:
-        return self._payload
-
-    def close(self) -> None:
-        """Match the `requests.Response.close` shape (no-op)."""
-        return None
-
-
 class _FakeGdacs:
     """Callable `requests.get` stand-in that records the query params."""
 
@@ -120,11 +92,13 @@ class _FakeGdacs:
         self.status_error: Exception | None = None
         self.status_code: int = 200
 
-    def __call__(self, url: str, **kwargs: Any) -> _FakeResponse:
+    def __call__(self, url: str, **kwargs: Any) -> FakeResponse:
         entry: dict[str, Any] = {"url": url}
         entry.update(kwargs)
         self.calls.append(entry)
-        return _FakeResponse(self.payload, self.status_error, self.status_code)
+        return FakeResponse(
+            json=self.payload, raises=self.status_error, status_code=self.status_code
+        )
 
     def set_payload(self, payload: dict[str, Any]) -> None:
         """Pin the payload the next SEARCH call returns."""

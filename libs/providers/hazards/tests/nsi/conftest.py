@@ -13,6 +13,8 @@ from typing import Any
 
 import pytest
 
+from earthlens.testing import FakeResponse
+
 #: A two-feature canned NSI structures GeoJSON (trimmed from a live capture).
 STRUCTURES_GEOJSON: dict[str, Any] = {
     "type": "FeatureCollection",
@@ -147,31 +149,6 @@ def make_nfip_records(count: int) -> list[dict[str, Any]]:
     ]
 
 
-class _FakeResponse:
-    """A minimal `requests.Response` stand-in wrapping a JSON payload.
-
-    Carries `status_code` and `headers` so the real
-    :class:`~earthlens.base.http.HttpClient` retry/JSON path runs unchanged.
-    """
-
-    def __init__(
-        self,
-        payload: Any,
-        status_code: int = 200,
-        headers: dict[str, str] | None = None,
-    ) -> None:
-        self._payload = payload
-        self.status_code = status_code
-        self.headers = headers or {}
-
-    def raise_for_status(self) -> None:
-        """No-op: canned responses are always 200."""
-
-    def json(self) -> Any:
-        """Return the wrapped payload."""
-        return self._payload
-
-
 class _FakeSession:
     """A `requests.Session` stand-in routing each verb to a canned payload.
 
@@ -224,20 +201,20 @@ class _FakeSession:
         # (a server that paginates but does not emit the flag in f=geojson).
         self.nfhl_omit_exceeded = nfhl_omit_exceeded
 
-    def get(self, url: str, params: dict | None = None, **kwargs: Any) -> _FakeResponse:
+    def get(self, url: str, params: dict | None = None, **kwargs: Any) -> FakeResponse:
         """Route a GET to its canned payload by URL and query params."""
         params = params or {}
         self.calls.append({"method": "GET", "url": url, "params": params})
         if "nsiapi/structures" in url:
-            return _FakeResponse(self.structures)
+            return FakeResponse(json=self.structures)
         if "/query" in url:
             feats = self.nfhl.get("features", [])
             count = int(params.get("resultRecordCount", len(feats)))
             if self.nfhl_ignore_paging:
                 # Same full page every time, always flagged exceeded.
                 page = feats[:count]
-                return _FakeResponse(
-                    {
+                return FakeResponse(
+                    json={
                         "type": "FeatureCollection",
                         "features": page,
                         "exceededTransferLimit": True,
@@ -251,7 +228,7 @@ class _FakeSession:
             payload: dict[str, Any] = {"type": "FeatureCollection", "features": page}
             if not self.nfhl_omit_exceeded:
                 payload["exceededTransferLimit"] = offset + per_page < len(feats)
-            return _FakeResponse(payload)
+            return FakeResponse(json=payload)
         if "NfipClaims" in url:
             skip = 0 if self.nfip_ignore_paging else int(params.get("$skip", 0))
             top = int(params.get("$top", len(self.nfip_records)))
@@ -261,13 +238,13 @@ class _FakeSession:
                     payload["metadata"] = None
                 elif not self.nfip_omit_count:
                     payload["metadata"] = {"count": self.nfip_total}
-            return _FakeResponse(payload)
+            return FakeResponse(json=payload)
         raise AssertionError(f"no fixture routed for URL {url!r}")
 
-    def post(self, url: str, json: dict | None = None, **kwargs: Any) -> _FakeResponse:
+    def post(self, url: str, json: dict | None = None, **kwargs: Any) -> FakeResponse:
         """Route a POST (the NSI polygon body) to the structures payload."""
         self.calls.append({"method": "POST", "url": url, "json": json})
-        return _FakeResponse(self.structures)
+        return FakeResponse(json=self.structures)
 
 
 def make_client(session: _FakeSession):

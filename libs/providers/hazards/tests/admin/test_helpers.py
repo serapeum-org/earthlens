@@ -16,31 +16,9 @@ from earthlens.admin._helpers import (
     tiger_url,
     vsicurl,
 )
+from earthlens.testing import FakeResponse
 
 pytestmark = pytest.mark.admin
-
-
-class _FakeResponse:
-    """A minimal `requests` response stub returning a fixed JSON payload."""
-
-    def __init__(self, payload: Any, raised: Exception | None = None):
-        self._payload = payload
-        self._raised = raised
-        self.status_code = 200
-        self.headers: dict[str, str] = {}
-
-    def raise_for_status(self) -> None:
-        """Raise the configured error, mimicking a non-2xx status."""
-        if self._raised is not None:
-            raise self._raised
-
-    def json(self) -> Any:
-        """Return the canned JSON payload."""
-        return self._payload
-
-    def close(self) -> None:
-        """No-op close, matching the requests.Response interface."""
-        return None
 
 
 class _FakeCRS:
@@ -105,7 +83,9 @@ def test_geoboundaries_resolve_dict_payload(monkeypatch):
     monkeypatch.setattr(
         _helpers.requests,
         "get",
-        lambda url, **kwargs: _FakeResponse({"gjDownloadURL": "http://x/k.geojson"}),
+        lambda url, **kwargs: FakeResponse(
+            json={"gjDownloadURL": "http://x/k.geojson"}
+        ),
     )
     assert geoboundaries_resolve("KEN", "ADM1") == "http://x/k.geojson"
 
@@ -115,7 +95,9 @@ def test_geoboundaries_resolve_list_payload(monkeypatch):
     monkeypatch.setattr(
         _helpers.requests,
         "get",
-        lambda url, **kwargs: _FakeResponse([{"gjDownloadURL": "http://x/0.geojson"}]),
+        lambda url, **kwargs: FakeResponse(
+            json=[{"gjDownloadURL": "http://x/0.geojson"}]
+        ),
     )
     assert geoboundaries_resolve("USA", "ADM0") == "http://x/0.geojson"
 
@@ -127,7 +109,7 @@ def test_geoboundaries_resolve_builds_api_url(monkeypatch):
     def _capture(url, **kwargs):
         seen["url"] = url
         seen["timeout"] = kwargs.get("timeout")
-        return _FakeResponse({"gjDownloadURL": "http://x/y.geojson"})
+        return FakeResponse(json={"gjDownloadURL": "http://x/y.geojson"})
 
     monkeypatch.setattr(_helpers.requests, "get", _capture)
     geoboundaries_resolve("ken", "ADM2", timeout=12.0)
@@ -138,7 +120,7 @@ def test_geoboundaries_resolve_builds_api_url(monkeypatch):
 def test_geoboundaries_resolve_empty_list_raises(monkeypatch):
     """An empty-list API response raises a clear ValueError, not IndexError."""
     monkeypatch.setattr(
-        _helpers.requests, "get", lambda url, **kwargs: _FakeResponse([])
+        _helpers.requests, "get", lambda url, **kwargs: FakeResponse(json=[])
     )
     with pytest.raises(ValueError, match="no boundary for KEN/ADM1"):
         geoboundaries_resolve("KEN", "ADM1")
@@ -151,8 +133,8 @@ def test_geoboundaries_resolve_http_error_propagates(monkeypatch):
     monkeypatch.setattr(
         _helpers.requests,
         "get",
-        lambda url, **kwargs: _FakeResponse(
-            {}, raised=requests.HTTPError("500 Server Error")
+        lambda url, **kwargs: FakeResponse(
+            json={}, raises=requests.HTTPError("500 Server Error")
         ),
     )
     with pytest.raises(requests.HTTPError, match="500"):

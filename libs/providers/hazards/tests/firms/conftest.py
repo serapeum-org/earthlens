@@ -11,6 +11,8 @@ from collections.abc import Iterator
 
 import pytest
 
+from earthlens.testing import FakeResponse
+
 #: A minimal valid VIIRS area-CSV body (header + one detection row).
 VIIRS_CSV = (
     "latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,"
@@ -25,37 +27,11 @@ EMPTY_CSV = (
 )
 
 
-class _FakeResponse:
-    """Stand-in for a `requests.Response` with a canned text body.
-
-    `raise_for_status` mimics real `requests` by embedding the request
-    `url` in the error message, so a test can prove the backend never
-    routes a MAP_KEY-bearing URL through it.
-    """
-
-    def __init__(self, text: str, status_code: int = 200, url: str = ""):
-        self.text = text
-        self.status_code = status_code
-        self.url = url
-        self.headers: dict[str, str] = {}
-
-    def raise_for_status(self) -> None:
-        import requests
-
-        if self.status_code >= 400:
-            raise requests.HTTPError(
-                f"{self.status_code} Client Error for url: {self.url}"
-            )
-
-    def close(self) -> None:
-        """No-op — the fake holds no socket (closed by HttpClient on retry)."""
-
-
 class _FakeFirms:
     """Callable `requests.get` stand-in recording URLs and serving bodies.
 
     By default every call returns :data:`VIIRS_CSV`. Set `responses` to
-    a list of `_FakeResponse` to serve a scripted sequence (popped in
+    a list of `FakeResponse` to serve a scripted sequence (popped in
     order), e.g. a 429 then a CSV for the back-off test.
     """
 
@@ -63,15 +39,15 @@ class _FakeFirms:
         self.calls: list[str] = []
         self.text: str = VIIRS_CSV
         self.status_code: int = 200
-        self.responses: list[_FakeResponse] | None = None
+        self.responses: list[FakeResponse] | None = None
 
-    def __call__(self, url: str, **kwargs: object) -> _FakeResponse:
+    def __call__(self, url: str, **kwargs: object) -> FakeResponse:
         self.calls.append(url)
         if self.responses is not None:
             resp = self.responses.pop(0)
             resp.url = url  # mirror the requested URL (carries the MAP_KEY)
             return resp
-        return _FakeResponse(self.text, self.status_code, url=url)
+        return FakeResponse(text=self.text, status_code=self.status_code, url=url)
 
 
 @pytest.fixture

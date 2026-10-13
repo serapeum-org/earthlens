@@ -13,11 +13,13 @@ Run with:
 from __future__ import annotations
 
 from pathlib import Path
+from typing import NoReturn
 
 import pytest
 
 from earthlens.earthlens import EarthLens
-from earthlens.testing import skip_on_upstream
+from earthlens.osm import OhsomeUnavailableError
+from earthlens.testing import skip_live_unavailable, skip_on_upstream
 
 pytestmark = [pytest.mark.e2e, pytest.mark.osm]
 
@@ -26,6 +28,31 @@ pytestmark = [pytest.mark.e2e, pytest.mark.osm]
 # features without straining the public services.
 _LAT_LIM = [49.40, 49.42]
 _LON_LIM = [8.67, 8.71]
+
+
+def _skip_on_network(exc: Exception) -> NoReturn:
+    """Skip an ohsome throttle/outage; let the shared classifier judge the rest.
+
+    One arm is genuinely backend-specific and stays here: `api.ohsome.org` is
+    keyless, so a `403` from its front proxy is a throttle (#1025) and a `5xx`
+    on this tiny smoke bbox is an outage (#790) — neither is a regression. The
+    generic status rule deliberately refuses to forgive a `403`, and widening
+    it for everyone would mask real auth failures, so the exception is declared
+    here rather than in the shared classifier. Equally deliberately, a `404` or
+    a `600` on the same type re-raises: ohsome answers 4xx for a bad
+    filter/bbox/time, and #1088 exists to keep that failing.
+
+    Everything else goes to `skip_on_upstream`, which skips a transport dropout
+    with the guard prefix and re-raises anything that is not an outage.
+    """
+    status = getattr(exc, "status_code", None)
+    if (
+        isinstance(exc, OhsomeUnavailableError)
+        and status is not None
+        and (status in (403, 429) or 500 <= status < 600)
+    ):
+        skip_live_unavailable(f"ohsome public endpoint unavailable (HTTP {status})")
+    skip_on_upstream(exc)
 
 
 class TestOverpassLive:
@@ -42,7 +69,7 @@ class TestOverpassLive:
                 path=str(tmp_path),
             ).download(progress_bar=False)
         except Exception as exc:  # noqa: BLE001 - transport -> skip, else re-raise
-            skip_on_upstream(exc)
+            _skip_on_network(exc)
         assert len(fc) >= 1, "expected at least one hospital feature"
         assert fc.crs.to_epsg() == 4326
         assert {"osm_id", "osm_type"} <= set(fc.columns)
@@ -63,7 +90,7 @@ class TestOhsomeLive:
                 path=str(tmp_path),
             ).download(progress_bar=False)
         except Exception as exc:  # noqa: BLE001 - transport -> skip, else re-raise
-            skip_on_upstream(exc)
+            _skip_on_network(exc)
         assert len(fc) >= 1, "expected at least one building feature"
         assert fc.crs.to_epsg() == 4326
         assert "@osmId" in fc.columns

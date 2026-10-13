@@ -39,12 +39,7 @@ import pandas as pd
 from pyramids.feature.collection import FeatureCollection
 from shapely.geometry import LineString, Point, Polygon, box
 
-from earthlens.base import (
-    UpstreamUnavailableError,
-    exception_chain,
-    is_http_status,
-    response_status,
-)
+from earthlens.base import exception_chain, is_http_status, response_status
 
 # `LicenseWarning` is shared across the ODbL / restrictive-license backends; it
 # lives in the biodiversity cluster's helper module (overture re-exports the same
@@ -114,15 +109,8 @@ class OhsomeResponseError(RuntimeError):
         self.body_preview = body_preview
 
 
-class OhsomeUnavailableError(OhsomeResponseError, UpstreamUnavailableError):
+class OhsomeUnavailableError(OhsomeResponseError):
     """The public ohsome endpoint refused a request with a retry-worthy status.
-
-    Both bases are load-bearing: `OhsomeResponseError` keeps the response
-    evidence an ohsome-specific handler reads, while
-    :class:`~earthlens.base.UpstreamUnavailableError` is what the shared
-    availability classifier recognises — including for the `403` the generic
-    status rule deliberately refuses to forgive, because on this keyless public
-    endpoint it is a front-proxy throttle and never a credential problem.
 
     A specialisation of `OhsomeResponseError` for the throttle / block / outage
     case: raised when `api.ohsome.org` answers a `403` (its front proxy blocking

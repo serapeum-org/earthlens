@@ -44,6 +44,9 @@ class FakeResponse:
         reason: The HTTP reason phrase.
         chunks: What :meth:`iter_content` should yield, for a streaming body
             whose chunk boundaries matter. Defaults to slicing `content`.
+        raises: An exception :meth:`raise_for_status` should raise instead of
+            deriving one from the status. Two of the replaced doubles existed
+            only to carry a backend's own typed error this way.
 
     Examples:
         - A JSON body behaves like the real thing:
@@ -75,6 +78,7 @@ class FakeResponse:
         url: str = "https://example.invalid/",
         reason: str = "",
         chunks: list[bytes] | None = None,
+        raises: BaseException | None = None,
     ) -> None:
         self.status_code = status_code
         self._payload = json
@@ -82,6 +86,7 @@ class FakeResponse:
         self.url = url
         self.reason = reason
         self._chunks = chunks
+        self._raises = raises
         if content is None and text is None and json is not None:
             text = _json.dumps(json)
         if content is None:
@@ -115,8 +120,11 @@ class FakeResponse:
         """Raise `requests.HTTPError` for a 4xx/5xx, and nothing for a 2xx.
 
         Raises:
+            BaseException: The `raises` exception when one was supplied.
             HTTPError: When the status is 400 or above.
         """
+        if self._raises is not None:
+            raise self._raises
         if self.status_code >= 400:
             import requests
 

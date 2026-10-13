@@ -39,7 +39,9 @@ concurrency:
 
 on:
   schedule:
-    # Monday 05:00 UTC, after Sunday's e2e cron, so a drift report lands next
+    # Monday 05:00 UTC. (It used to be timed to follow a Sunday e2e cron;
+    # that cron was removed in #1036 and the live sweep now runs on merge.)
+    # Early in the week, so a drift report lands next
     # to the e2e failures it explains.
     - cron: '0 5 * * 1'
   workflow_dispatch:

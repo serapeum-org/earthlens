@@ -39,11 +39,12 @@ jobs:
   # installs overpy/ohsome/osmium, though its tests still fake them via
   # monkeypatch. `verify-lock` is the `uv.lock` up-to-date check.
   test:
-    name: ${{ matrix.member.name }} (py${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    name: ${{ matrix.member.name }} (py${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest]
         python-version: ["3.11", "3.12", "3.13", "3.14"]
         member:
           - { name: core, dir: libs/core }
@@ -52,6 +53,16 @@ jobs:
           - { name: imagery, dir: libs/providers/imagery }
           - { name: land, dir: libs/providers/land }
           - { name: hazards, dir: libs/providers/hazards }
+        include:
+          # One Windows leg. Nothing in CI ran on Windows, although it is the
+          # primary development platform here and the repo has already shipped
+          # a Windows-specific class of bug (a cache-to-output filename case
+          # collision that Linux cannot reproduce). One member on one Python
+          # is enough to catch the path/case family without quadrupling the
+          # matrix; core is the member every other one depends on.
+          - os: windows-latest
+            python-version: "3.12"
+            member: { name: core, dir: libs/core }
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -67,21 +78,63 @@ jobs:
           version: "0.11.29"
 
       - name: Run ${{ matrix.member.name }} unit + integration suite
+        shell: bash
         # --disable-socket: this lane must not touch the network. `-m` deselects
         # only *after* collection, so a probe at module scope used to run here
         # anyway (~18 outbound connects per collection); the probes now live
         # behind `requires_host`, and this keeps them there. Unix sockets and
         # loopback stay open so a local emulator (moto, fake-gcs) still works.
-        run: >
-          uv run --locked pytest
-          -c ${{ matrix.member.dir }}/pyproject.toml
-          ${{ matrix.member.dir }}/tests
-          -m "not e2e"
-          --disable-socket --allow-unix-socket --allow-hosts=127.0.0.1,::1
-          --cov=${{ matrix.member.dir }}/src
-          --cov-report=xml
+        #
+        # Coverage is measured on the Linux legs only. The Windows leg exists
+        # to catch path and filename-case bugs, and uploading a second report
+        # under the same flag would only duplicate what ubuntu already sent.
+        env:
+          MEMBER_DIR: ${{ matrix.member.dir }}
+          WITH_COV: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          cov=()
+          if [ "$WITH_COV" = "true" ]; then
+            cov=(--cov="$MEMBER_DIR/src" --cov-report=xml)
+          fi
+          uv run --locked pytest \
+            -c "$MEMBER_DIR/pyproject.toml" "$MEMBER_DIR/tests" \
+            -m "not e2e" \
+            --disable-socket --allow-unix-socket --allow-hosts=127.0.0.1,::1 \
+            "${cov[@]}"
 
       - name: Upload coverage reports to Codecov with GitHub Action
+        if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           flags: ${{ matrix.member.name }}
+
+  # The third declared environment. The matrix above installs `extras: all`
+  # everywhere, so "the SDK is missing" is a state it structurally cannot
+  # reach — yet it is the state every `pip install earthlens` starts in, and
+  # three backends (argo, osm-pbf, eedai) are never installed in CI at all.
+  # This lane installs the providers with no SDK extras and asserts each
+  # backend either imports or raises an ImportError that names the extra,
+  # rather than letting a raw `No module named 'ee'` reach the user.
+  no-extras:
+    name: no SDK extras (import contract)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
+        with:
+          python-version: "3.12"
+          install-groups: "groups: dev"
+          verify-lock: true
+          version: "0.11.29"
+
+      - name: Assert every backend fails cleanly without its SDK
+        run: >
+          uv run --locked pytest
+          -c libs/core/pyproject.toml
+          libs/core/tests/test_backend_import_errors.py
+          -v
+          --disable-socket --allow-unix-socket --allow-hosts=127.0.0.1,::1

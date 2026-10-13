@@ -71,7 +71,7 @@ class TestDownloadSinglePoint:
 
     def test_returns_tagged_frame(self, tmp_path, bind_session, seriescalc_payload):
         """A single point returns the hourly rows tagged with lat/lon/product."""
-        session = bind_session(FakeResponse(seriescalc_payload))
+        session = bind_session(FakeResponse(json=seriescalc_payload))
         df = _backend(tmp_path).download(progress_bar=False)
         assert len(session.calls) == 1, f"expected 1 GET, got {len(session.calls)}"
         n = len(seriescalc_payload["outputs"]["hourly"])
@@ -83,14 +83,14 @@ class TestDownloadSinglePoint:
         self, tmp_path, bind_session, seriescalc_payload
     ):
         """seriescalc derives startyear/endyear from the request window."""
-        session = bind_session(FakeResponse(seriescalc_payload))
+        session = bind_session(FakeResponse(json=seriescalc_payload))
         _backend(tmp_path).download(progress_bar=False)
         assert "startyear=2020" in session.calls[0], session.calls[0]
         assert "endyear=2020" in session.calls[0], session.calls[0]
 
     def test_knobs_forwarded_to_url(self, tmp_path, bind_session, seriescalc_payload):
         """PV knobs ride through to the query string; None knobs are dropped."""
-        session = bind_session(FakeResponse(seriescalc_payload))
+        session = bind_session(FakeResponse(json=seriescalc_payload))
         _backend(tmp_path, pvcalculation=1, peakpower=1, loss=None).download(
             progress_bar=False
         )
@@ -99,14 +99,14 @@ class TestDownloadSinglePoint:
 
     def test_writes_csv(self, tmp_path, bind_session, seriescalc_payload):
         """The download writes a CSV table to root_dir."""
-        bind_session(FakeResponse(seriescalc_payload))
+        bind_session(FakeResponse(json=seriescalc_payload))
         _backend(tmp_path).download(progress_bar=False)
         assert (tmp_path / "pvgis_seriescalc.csv").exists(), "CSV not written"
 
     def test_writes_parquet(self, tmp_path, bind_session, seriescalc_payload):
         """The download writes Parquet when requested (needs pyarrow)."""
         pytest.importorskip("pyarrow")
-        bind_session(FakeResponse(seriescalc_payload))
+        bind_session(FakeResponse(json=seriescalc_payload))
         _backend(tmp_path, output_format="parquet").download(progress_bar=False)
         assert (tmp_path / "pvgis_seriescalc.parquet").exists(), "Parquet not written"
 
@@ -117,7 +117,7 @@ class TestDownloadSinglePoint:
         messages: list[str] = []
         sink_id = logger.add(messages.append, level="INFO")
         try:
-            bind_session(FakeResponse(seriescalc_payload))
+            bind_session(FakeResponse(json=seriescalc_payload))
             _backend(tmp_path).download(progress_bar=False)
         finally:
             logger.remove(sink_id)
@@ -129,7 +129,7 @@ class TestDownloadTmy:
 
     def test_tmy_routing(self, tmp_path, bind_session, tmy_payload):
         """A tmy request parses the TMY shape and omits the year window."""
-        session = bind_session(FakeResponse(tmy_payload))
+        session = bind_session(FakeResponse(json=tmy_payload))
         df = _backend(tmp_path, variables=["tmy"]).download(progress_bar=False)
         assert "RH" in df.columns, list(df.columns)
         assert "startyear" not in session.calls[0], session.calls[0]
@@ -141,7 +141,7 @@ class TestDownloadBbox:
 
     def test_one_get_per_grid_point(self, tmp_path, bind_session, seriescalc_payload):
         """A 2x2 bbox at 1-degree spacing issues one GET per grid point."""
-        session = bind_session(FakeResponse(seriescalc_payload))
+        session = bind_session(FakeResponse(json=seriescalc_payload))
         df = _backend(
             tmp_path,
             point=None,
@@ -154,7 +154,7 @@ class TestDownloadBbox:
 
     def test_over_cap_raises(self, tmp_path, bind_session, seriescalc_payload):
         """A grid larger than max_points raises before any fetch."""
-        bind_session(FakeResponse(seriescalc_payload))
+        bind_session(FakeResponse(json=seriescalc_payload))
         backend = _backend(
             tmp_path,
             point=None,
@@ -172,7 +172,7 @@ class TestDownloadBbox:
         messages: list[str] = []
         sink_id = logger.add(messages.append, level="WARNING")
         try:
-            bind_session(FakeResponse(seriescalc_payload))
+            bind_session(FakeResponse(json=seriescalc_payload))
             _backend(
                 tmp_path,
                 point=None,
@@ -195,19 +195,21 @@ class TestCoverageAndAggregate:
 
     def test_single_point_out_of_coverage_raises(self, tmp_path, bind_session):
         """A single out-of-coverage point raises ValueError naming the coord."""
-        bind_session(FakeResponse({"message": "Location over the sea"}, 400))
+        bind_session(
+            FakeResponse(json={"message": "Location over the sea"}, status_code=400)
+        )
         with pytest.raises(ValueError, match=r"lat=45.0, lon=8.0"):
             _backend(tmp_path).download(progress_bar=False)
 
     def test_single_point_error_text_fallback(self, tmp_path, bind_session):
         """A non-JSON error body falls back to the response text."""
-        bind_session(FakeResponse(None, 400, text="boom"))
+        bind_session(FakeResponse(status_code=400, text="boom"))
         with pytest.raises(ValueError, match="boom"):
             _backend(tmp_path).download(progress_bar=False)
 
     def test_bbox_skips_out_of_coverage(self, tmp_path, bind_session):
         """An out-of-coverage point in a bbox is skipped, yielding an empty frame."""
-        bind_session(FakeResponse({"message": "sea"}, 400))
+        bind_session(FakeResponse(json={"message": "sea"}, status_code=400))
         df = _backend(
             tmp_path,
             point=None,

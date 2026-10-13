@@ -15,6 +15,7 @@ from typing import Any
 import pytest
 
 import earthlens.pvgis.backend as backend
+from earthlens.testing import FakeResponse
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -22,32 +23,6 @@ FIXTURES = Path(__file__).parent / "fixtures"
 def load_fixture(name: str) -> dict[str, Any]:
     """Load a captured PVGIS JSON fixture by file stem."""
     return json.loads((FIXTURES / f"{name}.json").read_text(encoding="utf-8"))
-
-
-class FakeResponse:
-    """Minimal stand-in for a `requests.Response` over a fixed payload."""
-
-    def __init__(self, payload: Any, status_code: int = 200, text: str = "") -> None:
-        self._payload = payload
-        self.status_code = status_code
-        self.text = text
-        self.headers: dict[str, str] = {}
-
-    def json(self) -> Any:
-        """Return the JSON payload, raising `ValueError` when there is none."""
-        if self._payload is None:
-            raise ValueError("no JSON body")
-        return self._payload
-
-    def raise_for_status(self) -> None:
-        """Raise an `HTTPError` mirroring a real error status."""
-        import requests
-
-        raise requests.HTTPError(f"HTTP {self.status_code}")
-
-    def close(self) -> None:
-        """Release the response (a no-op for the fake, mirrors requests)."""
-        return None
 
 
 class FakeSession:

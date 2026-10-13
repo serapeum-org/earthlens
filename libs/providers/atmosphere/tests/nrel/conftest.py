@@ -17,6 +17,7 @@ import pytest
 
 import earthlens.nrel._helpers as helpers
 import earthlens.nrel.backend as backend
+from earthlens.testing import FakeResponse
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -24,34 +25,6 @@ FIXTURES = Path(__file__).parent / "fixtures"
 def load_csv(name: str) -> str:
     """Load a trimmed NSRDB / WTK CSV fixture by file stem."""
     return (FIXTURES / f"{name}.csv").read_text(encoding="utf-8")
-
-
-class FakeResponse:
-    """Minimal stand-in for a `requests.Response` over a fixed body."""
-
-    def __init__(
-        self, text: str = "", status_code: int = 200, payload: Any = None
-    ) -> None:
-        self.text = text
-        self.status_code = status_code
-        self._payload = payload
-        self.headers: dict[str, str] = {}
-
-    def json(self) -> Any:
-        """Return the JSON payload, raising `ValueError` when there is none."""
-        if self._payload is None:
-            raise ValueError("no JSON body")
-        return self._payload
-
-    def raise_for_status(self) -> None:
-        """Raise an `HTTPError` mirroring a real error status."""
-        import requests
-
-        raise requests.HTTPError(f"HTTP {self.status_code}")
-
-    def close(self) -> None:
-        """Release the response (no-op; nothing to release)."""
-        return None
 
 
 class FakeSession:

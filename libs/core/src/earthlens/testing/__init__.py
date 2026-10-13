@@ -21,6 +21,7 @@ What lives here, by submodule:
 | `_markers`| the one marker registry, registered via `pytest_configure` |
 | `_tagging`| the directory-derived backend marker for every test       |
 | `_fakes`  | the shared `requests.Response` double and the URL router  |
+| `_contracts` | the cross-backend contracts and their `Base*` classes  |
 
 Requires pytest, which is why it is behind the `test` extra
 (`pip install earthlens-core[test]`) — importing this module without it raises
@@ -29,6 +30,20 @@ Requires pytest, which is why it is behind the `test` extra
 
 from __future__ import annotations
 
+from earthlens.testing._contracts import (
+    EQUIVALENT_DATE_FORMS,
+    BaseBackendDateContract,
+    BaseCatalogContract,
+    BaseOutputKindContract,
+    BasePolygonAoiContract,
+    assert_capability_flags_are_bools,
+    assert_catalog_loader_shape,
+    assert_equivalent_date_forms_agree,
+    assert_iso_datetime_string_accepted,
+    assert_no_raw_date_parsing,
+    assert_output_kind_is_declared,
+    assert_polygon_support_matches,
+)
 from earthlens.testing._dirs import _earthlens_dirs_scratch, isolate_earthlens_dirs
 from earthlens.testing._fakes import FakeHttp, FakeResponse, fake_http
 from earthlens.testing._http import real_pooled_session, unpooled_http_transport
@@ -48,11 +63,23 @@ from earthlens.testing._markers import MARKERS, pytest_configure
 from earthlens.testing._tagging import marker_for_path, tag_items_by_directory
 
 __all__ = [
+    "EQUIVALENT_DATE_FORMS",
     "MARKERS",
+    "BaseBackendDateContract",
+    "BaseCatalogContract",
+    "BaseOutputKindContract",
+    "BasePolygonAoiContract",
     "FakeHttp",
     "FakeResponse",
     "_LIVE_SKIP_PREFIX",
     "_earthlens_dirs_scratch",
+    "assert_capability_flags_are_bools",
+    "assert_catalog_loader_shape",
+    "assert_equivalent_date_forms_agree",
+    "assert_iso_datetime_string_accepted",
+    "assert_no_raw_date_parsing",
+    "assert_output_kind_is_declared",
+    "assert_polygon_support_matches",
     "fake_http",
     "is_upstream_unavailable",
     "isolate_earthlens_dirs",

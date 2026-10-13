@@ -4,6 +4,16 @@ permissions:
   contents: read
 
 on:
+  # Also on pull requests: a packaging or namespace regression (a missing
+  # package-data glob, a namespace `__init__.py` creeping back in) used to be
+  # caught only after merge, because this workflow ran on push-to-main and at
+  # release. The PR leg is reduced to one Python version; the full 3.11-3.14
+  # sweep still runs on merge and at release.
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'mkdocs.yml'
   push:
     branches: [main]
   workflow_dispatch:
@@ -97,7 +107,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        # One version on a pull request, the full floor-to-ceiling sweep on a
+        # merge or a release. A packaging regression shows on any of them, so
+        # the PR leg only needs to be fast enough to be worth gating on.
+        python-version: >-
+          ${{ github.event_name == 'pull_request'
+          && fromJSON('["3.12"]')
+          || fromJSON('["3.11", "3.12", "3.13", "3.14"]') }}
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

@@ -242,7 +242,7 @@ jobs:
       needs.detect.outputs.matrix != '[]' &&
       github.repository == 'serapeum-org/earthlens'
     runs-on: ubuntu-latest
-    # A live provider host can hang (see the scheduled workflow's Dataverse
+    # A live provider host can hang (see the merge sweep's Dataverse
     # probe); cap the job rather than hold a runner for the 6-hour default.
     # The cap is a caller-tunable input (default 45) so a theme with slower
     # live hosts can raise it without touching the other themes.

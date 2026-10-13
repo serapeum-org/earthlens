@@ -14,6 +14,8 @@ from typing import Any, Callable
 
 import pytest
 
+from earthlens.testing import FakeResponse
+
 
 def _location(
     *,
@@ -57,32 +59,6 @@ def _measurement(
     return {"value": value, "period": {"datetimeFrom": {"utc": utc}}}
 
 
-class _FakeResponse:
-    """Canned `requests`-like response with json/raise_for_status."""
-
-    def __init__(
-        self,
-        payload: dict[str, Any],
-        status_code: int = 200,
-        headers: dict[str, str] | None = None,
-    ) -> None:
-        self._payload = payload
-        self.status_code = status_code
-        self.headers = headers or {}
-
-    def json(self) -> dict[str, Any]:
-        return self._payload
-
-    def raise_for_status(self) -> None:
-        if self.status_code >= 400:
-            import requests
-
-            raise requests.HTTPError(f"HTTP {self.status_code}")
-
-    def close(self) -> None:
-        return None
-
-
 class _FakeOpenaq:
     """Recording transport state shared by the patched session.
 
@@ -98,7 +74,7 @@ class _FakeOpenaq:
         self.measurements: dict[str, Any] = {"results": [_measurement()]}
         self.n_429: int = 0
 
-    def respond(self, url: str, params: dict[str, Any]) -> _FakeResponse:
+    def respond(self, url: str, params: dict[str, Any]) -> FakeResponse:
         self.calls.append((url, params))
         # The real v3 list endpoints paginate: page 1 returns the rows,
         # later pages return an empty `results` to signal the end. Model
@@ -106,12 +82,12 @@ class _FakeOpenaq:
         page = int(params.get("page", 1))
         if "/locations" in url:
             body = self.locations if page == 1 else {"results": []}
-            return _FakeResponse(body)
+            return FakeResponse(json=body)
         if self.n_429 > 0:
             self.n_429 -= 1
-            return _FakeResponse({}, status_code=429, headers={"Retry-After": "0"})
+            return FakeResponse(json={}, status_code=429, headers={"Retry-After": "0"})
         body = self.measurements if page == 1 else {"results": []}
-        return _FakeResponse(body)
+        return FakeResponse(json=body)
 
     def location_calls(self) -> list[dict[str, Any]]:
         """Return the params of every locations request made."""
@@ -134,7 +110,7 @@ class _FakeSession:
         params: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
         timeout: float | None = None,
-    ) -> _FakeResponse:
+    ) -> FakeResponse:
         return self._state.respond(url, dict(params or {}))
 
 

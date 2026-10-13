@@ -388,6 +388,15 @@ exclude = [
 [tool.coverage.run]
 branch = true
 source = ["libs"]
+# `source = ["libs"]` includes libs/*/tests/**, so a bare local `pytest --cov`
+# counted the test files as covered source and read ~15 points high. CI never
+# saw it because each lane passes an explicit `--cov=<member>/src`.
+omit = [
+    "libs/*/tests/*",
+    "libs/*/tests/**/*",
+    "libs/providers/*/tests/*",
+    "libs/providers/*/tests/**/*",
+]
 
 [tool.coverage.report]
 show_missing = true

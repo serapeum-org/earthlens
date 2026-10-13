@@ -10,6 +10,7 @@ import pytest
 import earthlens.climate_indices
 from earthlens.climate_indices import backend
 from earthlens.earthlens import EarthLens
+from earthlens.testing import FakeResponse
 
 pytestmark = pytest.mark.climate_indices
 
@@ -18,24 +19,9 @@ KEYS = ["climate-indices", "climate_indices", "climate-indices:teleconnections"]
 DATA = Path(__file__).parent / "data"
 
 
-class _FakeResponse:
-    """A minimal stand-in for `requests.Response`."""
-
-    def __init__(self, text: str) -> None:
-        self.text = text
-        self.status_code = 200
-        self.headers: dict[str, str] = {}
-
-    def raise_for_status(self) -> None:
-        """No-op: the fixture responses are always 200."""
-
-    def close(self) -> None:
-        """No-op close — the fake owns no socket."""
-
-
-def _fake_get(url: str, timeout: float | None = None, **_kwargs) -> _FakeResponse:
+def _fake_get(url: str, timeout: float | None = None, **_kwargs) -> FakeResponse:
     """Return the ONI fixture for any URL."""
-    return _FakeResponse((DATA / "psl" / "oni.data").read_text())
+    return FakeResponse(text=(DATA / "psl" / "oni.data").read_text())
 
 
 @pytest.mark.unit
