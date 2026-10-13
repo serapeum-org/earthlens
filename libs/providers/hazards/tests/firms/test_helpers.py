@@ -11,20 +11,9 @@ from earthlens.firms._helpers import (
     classify_body,
     firms_get,
 )
+from earthlens.testing import FakeResponse
 
 pytestmark = pytest.mark.firms
-
-
-class _Resp:
-    """Minimal fake response with the HttpClient-driven shape."""
-
-    def __init__(self, text: str = "", status_code: int = 200):
-        self.text = text
-        self.status_code = status_code
-        self.headers: dict[str, str] = {}
-
-    def close(self) -> None:
-        """No-op — the fake holds no socket."""
 
 
 def test_single_day_window_is_day_range_one():
@@ -93,7 +82,7 @@ def test_firms_get_returns_csv_without_retry():
 
     def _get(url, **kwargs):
         calls["n"] += 1
-        return _Resp("latitude,longitude\n1,2")
+        return FakeResponse(text="latitude,longitude\n1,2")
 
     resp = firms_get("u", timeout=1, get=_get, sleep=waits.append)
     assert resp.text.startswith("latitude")
@@ -104,7 +93,10 @@ def test_firms_get_returns_csv_without_retry():
 def test_firms_get_retries_on_429_then_succeeds():
     """A 429 once triggers one back-off then returns the CSV."""
     waits: list[float] = []
-    responses = [_Resp("rate limit", 429), _Resp("latitude,longitude\n1,2")]
+    responses = [
+        FakeResponse(text="rate limit", status_code=429),
+        FakeResponse(text="latitude,longitude\n1,2"),
+    ]
 
     def _get(url, **kwargs):
         return responses.pop(0)
@@ -118,8 +110,8 @@ def test_firms_get_retries_on_quota_body_200():
     """A HTTP-200 quota body is treated as rate-limited and retried."""
     waits: list[float] = []
     responses = [
-        _Resp("You have exceeded your transaction limit", 200),
-        _Resp("latitude,longitude\n1,2"),
+        FakeResponse(text="You have exceeded your transaction limit", status_code=200),
+        FakeResponse(text="latitude,longitude\n1,2"),
     ]
 
     def _get(url, **kwargs):
@@ -135,7 +127,7 @@ def test_firms_get_gives_up_after_max_retries():
     waits: list[float] = []
 
     def _get(url, **kwargs):
-        return _Resp("transaction limit reached", 200)
+        return FakeResponse(text="transaction limit reached", status_code=200)
 
     resp = firms_get("u", timeout=1, get=_get, sleep=waits.append, max_retries=3)
     assert classify_body(resp.text) == "quota"

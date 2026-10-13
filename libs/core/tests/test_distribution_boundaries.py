@@ -2710,3 +2710,144 @@ class TestOptionalSdkAbsenceIsASkip:
         )
         node = next(n for n in ast.walk(tree) if isinstance(n, ast.Try))
         assert _handles_import_error(node.handlers[0])
+
+
+#: The provider subpackages. Core is released independently of all five, so a
+#: core test that imports one has an undeclared dependency on it.
+_PROVIDER_PACKAGES: frozenset[str] = frozenset(
+    path.name
+    for pattern in ("libs/providers/*/src/earthlens/*",)
+    for path in _ROOT.glob(pattern)
+    if path.is_dir() and not path.name.startswith(("_", "."))
+)
+
+#: Core tests allowed to reach a provider's *private* module, each with the
+#: reason. Same shape and the same self-policing as `_GDAL_ALLOWED`: an entry
+#: that stops being needed fails the test below.
+_CORE_PRIVATE_PROVIDER_ALLOWED: dict[str, str] = {
+    # These two drive a *core CLI* branch (`datasets refresh --tiles`, the
+    # `--live` validator's error path) and the only way in is to monkeypatch
+    # the helper the CLI calls. Moving them to the land tests would make a
+    # provider's suite responsible for core's CLI, which is worse. They are
+    # soft imports, so a core-only environment skips them.
+    "libs/core/tests/cli/test_datasets.py": "monkeypatches ghsl/gee helpers to drive core CLI branches",
+    "libs/core/tests/cli/test_validate.py": "monkeypatches ghsl_url to drive the core --live validator",
+}
+
+
+def _core_test_modules() -> list[Path]:
+    """Return every test module under `libs/core/tests`."""
+    return sorted(
+        path
+        for path in _ROOT.glob("libs/core/tests/**/*.py")
+        if not _EXCLUDED_DIRS.intersection(path.parts)
+    )
+
+
+_CORE_TESTS = _core_test_modules()
+_CORE_IDS = [str(p.relative_to(_ROOT)).replace("\\", "/") for p in _CORE_TESTS]
+
+
+def _provider_imports(path: Path) -> list[tuple[int, str, bool, bool]]:
+    """Return `(line, module, is_private, is_soft)` per provider import.
+
+    Three spellings count, at any depth — a function-local import is still a
+    dependency, it just fails later:
+
+    * `import earthlens.<provider>...`
+    * `from earthlens.<provider> import ...`
+    * `pytest.importorskip("earthlens.<provider>...")`, which is *soft* (the
+      point of this rule) but still names the module, so the private-module
+      rule below can see it.
+    """
+    found: list[tuple[int, str, bool, bool]] = []
+    for node in ast.walk(ast.parse(_source_text(path))):
+        soft = False
+        if isinstance(node, ast.Import):
+            modules = [alias.name for alias in node.names]
+        elif isinstance(node, ast.ImportFrom) and node.level == 0:
+            modules = [node.module or ""]
+        elif (
+            isinstance(node, ast.Call)
+            and _dotted(node.func).endswith("importorskip")
+            and node.args
+            and isinstance(node.args[0], ast.Constant)
+            and isinstance(node.args[0].value, str)
+        ):
+            modules = [node.args[0].value]
+            soft = True
+        else:
+            continue
+        for module in modules:
+            parts = module.split(".")
+            if len(parts) < 2 or parts[0] != "earthlens":
+                continue
+            if parts[1] not in _PROVIDER_PACKAGES:
+                continue
+            private = any(part.startswith("_") for part in parts[2:])
+            found.append((node.lineno, module, private, soft))
+    return found
+
+
+def _is_soft_import(path: Path, lineno: int) -> bool:
+    """Return whether the import at `lineno` is guarded (importorskip / try)."""
+    text = _source_text(path)
+    tree = ast.parse(text)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Try) and any(
+            _handles_import_error(handler) for handler in node.handlers
+        ):
+            if any(
+                getattr(child, "lineno", None) == lineno for child in ast.walk(node)
+            ):
+                return True
+    return False
+
+
+class TestCoreTestsDoNotDependOnProviders:
+    """Core is released on its own, so its tests must run without the providers."""
+
+    @pytest.mark.parametrize("path", _CORE_TESTS, ids=_CORE_IDS)
+    def test_provider_imports_are_soft(self, path):
+        """A provider import in a core test is `importorskip`, not a hard import."""
+        offenders = [
+            f"line {line}: {module}"
+            for line, module, _private, soft in _provider_imports(path)
+            if not soft and not _is_soft_import(path, line)
+        ]
+        assert not offenders, (
+            f"{path.name} hard-imports provider package(s) {offenders}. core is "
+            "released independently of all five providers, so `cd libs/core && "
+            'pytest` must skip these rather than error: use '
+            '`pytest.importorskip("earthlens.<provider>")`'
+        )
+
+    @pytest.mark.parametrize("path", _CORE_TESTS, ids=_CORE_IDS)
+    def test_no_private_provider_modules(self, path):
+        """Core never reaches into a provider's underscore-private modules."""
+        rel = str(path.relative_to(_ROOT)).replace("\\", "/")
+        offenders = [
+            f"line {line}: {module}"
+            for line, module, private, _soft in _provider_imports(path)
+            if private
+        ]
+        if rel in _CORE_PRIVATE_PROVIDER_ALLOWED:
+            assert offenders, (
+                f"{rel} is in _CORE_PRIVATE_PROVIDER_ALLOWED "
+                f"({_CORE_PRIVATE_PROVIDER_ALLOWED[rel]!r}) but no longer imports a "
+                "private provider module -- drop the allowance"
+            )
+            return
+        assert not offenders, (
+            f"{path.name} imports private provider module(s) {offenders}. This is "
+            "the reverse of TestNoPrivateCoreImports: the provider owns that name "
+            "and may rename it in any release. Assert the promise from the "
+            "provider's own tests, or add an entry to "
+            "_CORE_PRIVATE_PROVIDER_ALLOWED with the reason"
+        )
+
+    def test_the_provider_list_was_discovered(self):
+        """The rule is only meaningful if the provider packages were found."""
+        assert len(_PROVIDER_PACKAGES) > 40, (
+            f"expected the 60-odd provider subpackages, found {len(_PROVIDER_PACKAGES)}"
+        )

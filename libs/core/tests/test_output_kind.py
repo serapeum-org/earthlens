@@ -18,10 +18,15 @@ import pandas as pd
 import pytest
 
 from earthlens.base import AbstractDataSource, OutputKind, TemporalExtent
-from earthlens.chc import CHIRPS
 from earthlens.earthlens import EarthLens
-from earthlens.ecmwf import ECMWF
-from earthlens.s3 import S3
+
+#: Core's tests sweep the backend registry, so a handful of them need a
+#: real provider. The providers are separate distributions, so the import
+#: is soft: `cd libs/core && pytest` with only earthlens-core installed
+#: skips these rather than erroring the whole module.
+CHIRPS = pytest.importorskip("earthlens.chc").CHIRPS
+ECMWF = pytest.importorskip("earthlens.ecmwf").ECMWF
+S3 = pytest.importorskip("earthlens.s3").S3
 
 
 class _GuardBackend(AbstractDataSource):
@@ -86,7 +91,8 @@ class TestAbstractDataSourceOutputKindDefault:
 
     def test_gee_backend_inherits_raster(self):
         """GEE backend inherits raster (separate test — it may be installed conditionally)."""
-        from earthlens.gee import GEE
+        _earthlens_gee = pytest.importorskip("earthlens.gee")
+        GEE = _earthlens_gee.GEE
 
         assert GEE.OUTPUT_KIND == "raster", (
             f"GEE drifted from raster: {GEE.OUTPUT_KIND!r}"

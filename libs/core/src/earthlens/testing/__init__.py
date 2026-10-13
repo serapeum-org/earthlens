@@ -22,6 +22,8 @@ What lives here, by submodule:
 | `_tagging`| the directory-derived backend marker for every test       |
 | `_fakes`  | the shared `requests.Response` double and the URL router  |
 | `_contracts` | the cross-backend contracts and their `Base*` classes  |
+| `_aws`    | an in-process S3 (moto), so a bucket backend meets real semantics |
+| `_cassettes` | recorded provider exchanges, replayed with no socket     |
 
 Requires pytest, which is why it is behind the `test` extra
 (`pip install earthlens-core[test]`) — importing this module without it raises
@@ -30,6 +32,8 @@ Requires pytest, which is why it is behind the `test` extra
 
 from __future__ import annotations
 
+from earthlens.testing._aws import aws_credentials, s3_emulator, seed_s3
+from earthlens.testing._cassettes import assert_cassette_is_scrubbed, vcr_config
 from earthlens.testing._contracts import (
     EQUIVALENT_DATE_FORMS,
     BaseBackendDateContract,
@@ -73,6 +77,7 @@ __all__ = [
     "FakeResponse",
     "_LIVE_SKIP_PREFIX",
     "_earthlens_dirs_scratch",
+    "assert_cassette_is_scrubbed",
     "assert_capability_flags_are_bools",
     "assert_catalog_loader_shape",
     "assert_equivalent_date_forms_agree",
@@ -80,6 +85,7 @@ __all__ = [
     "assert_no_raw_date_parsing",
     "assert_output_kind_is_declared",
     "assert_polygon_support_matches",
+    "aws_credentials",
     "fake_http",
     "is_upstream_unavailable",
     "isolate_earthlens_dirs",
@@ -93,7 +99,10 @@ __all__ = [
     "require_reachable",
     "reset_reachability_cache",
     "skip_live_unavailable",
+    "s3_emulator",
+    "seed_s3",
     "skip_on_upstream",
     "tag_items_by_directory",
     "unpooled_http_transport",
+    "vcr_config",
 ]

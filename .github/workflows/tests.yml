@@ -149,3 +149,52 @@ jobs:
           libs/core/tests/test_backend_import_errors.py
           -v
           --disable-socket --allow-unix-socket --allow-hosts=127.0.0.1,::1
+
+  # `unit` and `integration` were decorative: 344 tests carried them and no
+  # lane selected on either, so neither could fail for being wrong. They now
+  # mean something, and these two jobs are what they mean.
+  #
+  #   unit        - no network AT ALL. Not even loopback, so a test that
+  #                 quietly needs a local emulator cannot hide in this set.
+  #   integration - the offline middle tier: loopback is open, because this
+  #                 is where the moto emulator and the replayed cassettes run.
+  #                 `--block-network` is pytest-recording's own guard: a
+  #                 `vcr`-marked test that asks for an exchange its cassette
+  #                 does not hold fails instead of reaching the provider.
+  marker-lanes:
+    name: ${{ matrix.lane.name }} contract
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        lane:
+          - name: unit
+            marker: unit
+            flags: "--disable-socket --allow-unix-socket"
+          - name: integration
+            marker: integration
+            flags: >-
+              --disable-socket --allow-unix-socket
+              --allow-hosts=127.0.0.1,::1 --block-network
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
+        with:
+          python-version: "3.12"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
+          version: "0.11.29"
+
+      - name: Run the ${{ matrix.lane.name }} lane
+        shell: bash
+        env:
+          MARKER: ${{ matrix.lane.marker }}
+          FLAGS: ${{ matrix.lane.flags }}
+        # Exit 5 (nothing carries the marker) would mean the category had been
+        # emptied without anyone removing the lane, so it is a failure here.
+        run: |
+          uv run --locked --no-sync --no-build pytest             -c pyproject.toml libs             -m "$MARKER and not e2e"             $FLAGS -q

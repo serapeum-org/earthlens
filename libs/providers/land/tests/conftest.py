@@ -11,6 +11,7 @@ from __future__ import annotations
 # root can reach it; see earthlens.testing for why it cannot live here.
 from earthlens.testing import (  # noqa: F401 - fixtures + hooks used by name
     _earthlens_dirs_scratch,
+    aws_credentials,
     isolate_earthlens_dirs,
     pytest_collection_modifyitems,
     pytest_configure,
@@ -18,5 +19,7 @@ from earthlens.testing import (  # noqa: F401 - fixtures + hooks used by name
     pytest_sessionfinish,
     real_pooled_session,
     require_marked_hosts,
+    s3_emulator,
     unpooled_http_transport,
+    vcr_config,
 )

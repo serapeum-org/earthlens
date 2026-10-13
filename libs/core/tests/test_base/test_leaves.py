@@ -434,7 +434,8 @@ class TestLengthAndWhitespace:
 
     def test_a_real_shipped_title_is_clipped_as_prose(self):
         """A synthetic value cannot show the heuristic meets real catalog text."""
-        from earthlens.cmems.catalog import Catalog
+        _earthlens_cmems_catalog = pytest.importorskip("earthlens.cmems.catalog")
+        Catalog = _earthlens_cmems_catalog.Catalog
 
         row = Catalog().get_dataset("cmems_mod_glo_phy_my_0.083deg_P1D-m")
         rendered = str(row)

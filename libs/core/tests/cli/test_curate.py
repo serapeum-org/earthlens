@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import pytest
 
-import earthlens.stac.cli as stac_cli
 from earthlens.cli import curate as curate_mod
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.curate import (
@@ -12,6 +11,12 @@ from earthlens.cli.curate import (
     probe_dataset,
     supported_providers,
 )
+
+#: Core's tests sweep the backend registry, so a handful of them need a
+#: real provider. The providers are separate distributions, so the import
+#: is soft: `cd libs/core && pytest` with only earthlens-core installed
+#: skips these rather than erroring the whole module.
+stac_cli = pytest.importorskip("earthlens.stac.cli")
 
 pytestmark = pytest.mark.cli
 
@@ -113,7 +118,7 @@ class TestProbeDataset:
 
     def test_network_error_is_captured(self, monkeypatch):
         """A failed request (every endpoint) reports 'error', not raised."""
-        import earthlens.stac.cli as stac_cli
+        stac_cli = pytest.importorskip("earthlens.stac.cli")
 
         def boom(url):
             raise RuntimeError("connection refused")

@@ -8,14 +8,19 @@ from types import SimpleNamespace
 import pytest
 from typer.testing import CliRunner
 
-import earthlens.stac.cli as stac_cli
 from earthlens.cli import curate as curate_mod
 from earthlens.cli import datasets as datasets_mod
 from earthlens.cli import refresh as refresh_mod
 from earthlens.cli.app import app
 from earthlens.cli.refresh import CoverageOutcome
 from earthlens.cli.table import build_table
-from earthlens.gee import _hydrate as hydrate_mod
+
+#: Core's tests sweep the backend registry, so a handful of them need a
+#: real provider. The providers are separate distributions, so the import
+#: is soft: `cd libs/core && pytest` with only earthlens-core installed
+#: skips these rather than erroring the whole module.
+stac_cli = pytest.importorskip("earthlens.stac.cli")
+hydrate_mod = pytest.importorskip("earthlens.gee._hydrate")
 
 pytestmark = pytest.mark.cli
 
@@ -265,7 +270,7 @@ class TestRefresh:
         import geopandas as gpd
         from shapely.geometry import box
 
-        import earthlens.ghsl._helpers as ghsl_helpers
+        ghsl_helpers = pytest.importorskip("earthlens.ghsl._helpers")
         from earthlens.cli import refresh as refresh_mod
 
         frame = gpd.GeoDataFrame(
@@ -306,7 +311,7 @@ class TestRefresh:
         """--write rewrites the (temp-redirected) catalog and reports the path."""
         import shutil
 
-        import earthlens.stac.catalog as stac_catalog
+        stac_catalog = pytest.importorskip("earthlens.stac.catalog")
 
         dst = tmp_path / "catalog"
         shutil.copytree(stac_catalog.CATALOG_PATH, dst)
@@ -331,7 +336,7 @@ class TestRefresh:
 
         from rich.console import Console
 
-        import earthlens.stac.catalog as stac_catalog
+        stac_catalog = pytest.importorskip("earthlens.stac.catalog")
 
         dst = tmp_path / "catalog"
         shutil.copytree(stac_catalog.CATALOG_PATH, dst)
@@ -387,8 +392,9 @@ class TestAudit:
 
     def test_strict_exits_nonzero_on_variable_drift(self, monkeypatch):
         """--strict exits 1 when a curated variable is no longer served (#1129)."""
-        import earthlens.erddap.cli as erddap_cli
-        from earthlens.erddap.catalog import Dataset
+        erddap_cli = pytest.importorskip("earthlens.erddap.cli")
+        _earthlens_erddap_catalog = pytest.importorskip("earthlens.erddap.catalog")
+        Dataset = _earthlens_erddap_catalog.Dataset
 
         record = Dataset(
             server_url="https://x/erddap",
@@ -416,8 +422,9 @@ class TestAudit:
 
     def test_variable_audit_error_is_surfaced_in_default_output(self, monkeypatch):
         """A variable-fetch error prints a human-visible line, not only via --json."""
-        import earthlens.erddap.cli as erddap_cli
-        from earthlens.erddap.catalog import Dataset
+        erddap_cli = pytest.importorskip("earthlens.erddap.cli")
+        _earthlens_erddap_catalog = pytest.importorskip("earthlens.erddap.catalog")
+        Dataset = _earthlens_erddap_catalog.Dataset
 
         record = Dataset(
             server_url="https://x/erddap",
