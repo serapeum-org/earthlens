@@ -348,6 +348,11 @@ class TestECMWFBackend:
             lat_lim=[4.0, 5.0],
             lon_lim=[-75.0, -74.0],
             path=str(tmp_path),
+            # The constraints lookup is a live HTTP call the faked client
+            # never sees, so without this the "offline" test reached the real
+            # CDS on every unit run. The provider's own suite sets the same
+            # flag; the facade forwards it through **backend_kwargs.
+            skip_constraints=True,
         )
         earthlens.download(progress_bar=False)
 

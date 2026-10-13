@@ -638,9 +638,17 @@ class TestValidate:
 
     def test_live_flag_runs_live_validator(self, monkeypatch):
         """--live routes through the reachability validator (mocked)."""
-        from earthlens.cli import validate as validate_mod
+        import requests
 
-        monkeypatch.setattr(validate_mod, "_http_head", lambda url: 200)
+        from earthlens.testing import FakeResponse
+
+        # Not `validate._http_head`: `cli.toolkit.http_head` aliases it at
+        # import, and each provider's `live_validator` binds that alias again
+        # with a `from ... import`, so patching the definition reaches none of
+        # them. `requests.head` is looked up per call, so it reaches all three.
+        monkeypatch.setattr(
+            requests, "head", lambda url, **kwargs: FakeResponse(status_code=200)
+        )
         result = runner.invoke(app, ["datasets", "validate", "ghsl", "--live", "-j"])
         payload = json.loads(result.output)
         assert payload[0]["status"] == "ok", "ghsl live validate ran"
