@@ -1964,7 +1964,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # a request Earth Engine can still serve rather than to fail it - but
         # loudly, so a fixable key does not silently disable the fast path.
         try:
-            credentials = self._eedai_credentials()
+            # Called for its failure, not its value: the adapter binds the
+            # credential for the read itself, but building it here keeps a
+            # broken key from being reported later as "no scenes".
+            self._eedai_credentials()
         except AuthenticationError:
             if self.engine == "eedai":
                 raise
