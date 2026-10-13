@@ -54,7 +54,7 @@ jobs:
         run: |
           set -euo pipefail
           version=$(ls dist/earthlens-[0-9]*.whl | sed -E 's|.*/earthlens-([^-]+)-py3.*|\1|')
-          printf 'earthlens[all]==%s\npytest\npytest-cov\nhypothesis\npsutil\n' "${version}" \
+          printf 'earthlens[all]==%s\npytest\npytest-cov\npytest-socket\nhypothesis\npsutil\n' "${version}" \
             > dist/requirements.in
           uv pip compile --generate-hashes --universal --python-version 3.11 \
             --find-links dist \
@@ -214,4 +214,9 @@ jobs:
         # marker set) drive collection. Skip e2e tests — they hit live CDS /
         # FTP / S3 services and require credentials that aren't provisioned
         # here. The dedicated tests-e2e.yml workflow runs them with secrets.
-        run: pytest -vvv -sv -m "not e2e"
+        # --disable-socket for the same reason as tests.yml: this lane is the
+        # one that collects all six members at once, so it was paying every
+        # module-scope probe in the repo. Loopback stays open for emulators.
+        run: >
+          pytest -vvv -sv -m "not e2e"
+          --disable-socket --allow-unix-socket --allow-hosts=127.0.0.1,::1

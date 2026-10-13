@@ -67,11 +67,17 @@ jobs:
           version: "0.11.29"
 
       - name: Run ${{ matrix.member.name }} unit + integration suite
+        # --disable-socket: this lane must not touch the network. `-m` deselects
+        # only *after* collection, so a probe at module scope used to run here
+        # anyway (~18 outbound connects per collection); the probes now live
+        # behind `requires_host`, and this keeps them there. Unix sockets and
+        # loopback stay open so a local emulator (moto, fake-gcs) still works.
         run: >
           uv run --locked pytest
           -c ${{ matrix.member.dir }}/pyproject.toml
           ${{ matrix.member.dir }}/tests
           -m "not e2e"
+          --disable-socket --allow-unix-socket --allow-hosts=127.0.0.1,::1
           --cov=${{ matrix.member.dir }}/src
           --cov-report=xml
 

@@ -135,7 +135,7 @@ repos:
     hooks:
       - id: pytest-check
         name: "[py   -  test] pytest"
-        entry: uv run --active pytest -v --cov=libs --cov-report=term-missing -m "not slow and not e2e" -p no:cacheprovider
+        entry: uv run --active pytest -v --cov=libs --cov-report=term-missing -m "not e2e" --disable-socket --allow-unix-socket --allow-hosts=127.0.0.1,::1 -p no:cacheprovider
         language: system
         pass_filenames: false
         always_run: true
