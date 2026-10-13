@@ -16,6 +16,29 @@ import pytest
 from earthlens.base.s3 import S3Auth
 
 
+@pytest.fixture(autouse=True)
+def _offline_aws_credentials(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Stop botocore's credential chain before it reaches the metadata service.
+
+    A *signed* client resolves credentials eagerly, walking env -> shared
+    config -> the EC2 instance metadata service at 169.254.169.254. With no
+    credentials configured, three tests here reached that address: silently on
+    a developer machine, and visibly once the lane blocked sockets. The result
+    was also non-deterministic — the same tests behaved differently depending
+    on whether the machine running them happened to have an AWS profile.
+
+    Dummy values stop the chain at the first step. This configures the SDK
+    under test; it does not gate anything (`-m` still decides what runs).
+    """
+    monkeypatch.setenv("AWS_ACCESS_KEY_ID", "testing")
+    monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "testing")
+    monkeypatch.setenv("AWS_SESSION_TOKEN", "testing")
+    monkeypatch.setenv("AWS_DEFAULT_REGION", "us-east-1")
+    # Belt and braces: even with credentials present, botocore probes IMDS for
+    # the region/role in some code paths.
+    monkeypatch.setenv("AWS_EC2_METADATA_DISABLED", "true")
+
+
 class FakeS3Client:
     """Minimal stand-in for a `boto3` S3 client used in the backend tests.
 
