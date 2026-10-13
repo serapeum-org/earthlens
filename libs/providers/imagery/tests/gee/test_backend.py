@@ -3801,7 +3801,11 @@ class TestExportViaEedai:
         pixel count modest while splitting into thousands of tiles, each its
         own fetch, all opened together to mosaic.
         """
-        gee = make_gee(lat_lim=[0.0, 89.0], lon_lim=[0.0, 0.1], scale=1.0)
+        # Off the equator and very narrow, so the strip stays well inside the
+        # total-work budget (1.4e9 px of 4e9) while splitting into 1223 tiles.
+        # The old AOI reached from the equator to 89 deg, which now sizes its
+        # full equatorial width and trips the work budget first instead.
+        gee = make_gee(lat_lim=[60.0, 82.5], lon_lim=[0.0, 0.01], scale=1.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003").model_copy(
             update={"spatial_resolution": 1.0}
         )

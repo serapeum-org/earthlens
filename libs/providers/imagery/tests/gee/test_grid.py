@@ -52,19 +52,35 @@ class TestGeographicGrid:
         """Rounding up never produces a zero-sized raster."""
         assert geographic_grid((31.2, 29.9, 31.2001, 29.9001), 90.0) == (1, 1)
 
-    def test_the_poleward_cos_under_samples_a_tall_aoi(self):
-        """Pins today's under-sampling so correcting it is a visible diff."""
-        # The poleward edge has the smallest cos, so it yields the FEWEST
-        # columns and the COARSEST pixels - the opposite of what this code's
-        # comment used to claim. 39 columns over 1 degree of longitude is
-        # 1835 m per pixel at latitude 50, for a requested scale of 1000 m.
-        # Preserved from before the refactor; see the note in grid.py.
-        assert geographic_grid((0.0, 50.0, 1.0, 70.0), 1000.0) == (2227, 39)
+    def test_a_tall_aoi_honours_the_requested_scale(self):
+        """Sized on the equatorward edge, so no pixel is coarser than asked."""
+        # 72 columns over 1 degree of longitude is 994 m per pixel at latitude
+        # 50, the widest point of the AOI, for a requested 1000 m. Sizing on the
+        # poleward edge gave 39 columns, i.e. 1835 m - coarser than asked.
+        assert geographic_grid((0.0, 50.0, 1.0, 70.0), 1000.0) == (2227, 72)
 
-    def test_a_global_aoi_is_under_sampled_in_longitude(self):
-        """The same defect at its worst, pinned rather than asserted as correct."""
-        # 70 columns where 40076 are needed to hold 1 km pixels at the equator.
-        assert geographic_grid((-180.0, -90.0, 180.0, 90.0), 1000.0)[1] == 70
+    def test_a_southern_aoi_is_sized_the_same_as_its_mirror(self):
+        """The edge is chosen by distance from the equator, not by sign."""
+        northern = geographic_grid((0.0, 50.0, 1.0, 70.0), 1000.0)
+        southern = geographic_grid((0.0, -70.0, 1.0, -50.0), 1000.0)
+        assert northern == southern
+
+    def test_a_global_aoi_spans_the_full_equator(self):
+        """An AOI containing the equator is not shortened at all."""
+        import math
+
+        rows, cols = geographic_grid((-180.0, -90.0, 180.0, 90.0), 1000.0)
+        assert cols == math.ceil(360 * 111_320.0 / 1000.0)
+        assert rows == math.ceil(180 * 111_320.0 / 1000.0)
+
+    def test_an_aoi_straddling_the_equator_uses_the_equator(self):
+        """`min(|min_y|, |max_y|)` would pick the wrong edge here."""
+        # The equator is inside the span, so cos is 1 and the full width is kept.
+        assert geographic_grid((0.0, -10.0, 1.0, 10.0), 1000.0)[1] == 112
+
+    def test_an_aoi_inside_the_polar_cap_still_yields_a_pixel(self):
+        """The clamp keeps cos away from zero at the pole itself."""
+        assert geographic_grid((0.0, 89.95, 1.0, 89.99), 1000.0) == (5, 1)
 
     @pytest.mark.parametrize("scale", [0, -90.0, float("inf"), float("nan")])
     def test_rejects_a_non_positive_or_non_finite_scale(self, scale):

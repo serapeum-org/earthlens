@@ -244,23 +244,39 @@ def geographic_grid(
         raise ValueError(f"the AOI bounds must be finite, got {bbox}")
     if scale <= 0 or not math.isfinite(scale):
         raise ValueError(f"scale must be a positive number of metres, got {scale}")
-    # `cos` at the poleward edge. NOTE: this UNDER-samples, and the rationale
-    # previously written here had it backwards. The poleward edge has the
-    # smallest `cos`, so it yields the FEWEST columns and therefore the
-    # COARSEST pixels: AOI (0, 50, 1, 70) at scale=1000 gives 39 columns, i.e.
-    # 1835 m per pixel at latitude 50 - 1.8x coarser than asked. A global AOI
-    # at 1 km sizes 70 columns where 40076 are needed. The edge that preserves
-    # the requested resolution is the EQUATORWARD one, min(|min_y|, |max_y|).
+    # `cos` at the EQUATORWARD edge of the AOI, which is the edge where a
+    # degree of longitude is longest and so needs the most pixels to hold the
+    # requested ground sample distance. Sizing on the poleward edge instead -
+    # which is what this did before, with a comment claiming the opposite -
+    # takes the SMALLEST cosine, yields the FEWEST columns and so delivers
+    # pixels coarser than asked: AOI (0, 50, 1, 70) at scale=1000 produced 39
+    # columns, i.e. 1835 m per pixel at latitude 50, and a global AOI at 1 km
+    # produced 70 columns where 40076 are needed.
     #
-    # Kept as-is regardless, because this arithmetic is byte-identical to the
-    # pre-refactor code and Epic 1 is a behaviour-preserving extraction -
-    # changing the grid every geographic read is sized on is the owner's call,
-    # not a refactor's side effect. Tracked as a known defect; the test for this
-    # pins the current numbers so a fix is a deliberate, visible diff.
-    # The clamp keeps `cos` away from the pole itself, where it reaches zero.
-    poleward = min(max(abs(min_y), abs(max_y)), _MAX_POLEWARD_DEGREES)
+    # The consequence of this choice is that a tall AOI is over-sampled towards
+    # the pole rather than under-sampled towards the equator. That is the right
+    # way round: an over-sampled read still contains every pixel the caller
+    # asked for and can be downsampled, while an under-sampled one has thrown
+    # the detail away and cannot be recovered.
+    #
+    # The clamp keeps `cos` away from the pole itself, where it reaches zero;
+    # it now applies to the far edge, since the near one cannot be the pole
+    # unless the whole AOI is.
+    if min_y <= 0.0 <= max_y:
+        # The AOI straddles the equator, so the equator itself is inside it and
+        # is the widest latitude: `cos` is 1 and longitude is not shortened at
+        # all. Taking `min(|min_y|, |max_y|)` here would be wrong - for a global
+        # AOI that is 90, which collapses the width to almost nothing.
+        equatorward = 0.0
+    else:
+        equatorward = min(abs(min_y), abs(max_y))
+    if equatorward > _MAX_POLEWARD_DEGREES:
+        # An AOI entirely inside the polar cap: clamp so `cos` stays non-zero.
+        equatorward = _MAX_POLEWARD_DEGREES
     height_m = abs(max_y - min_y) * _METRES_PER_DEGREE
-    width_m = abs(max_x - min_x) * _METRES_PER_DEGREE * math.cos(math.radians(poleward))
+    width_m = (
+        abs(max_x - min_x) * _METRES_PER_DEGREE * math.cos(math.radians(equatorward))
+    )
     # Round up, not to nearest: rounding down would leave the raster a little
     # coarser than the scale that was asked for.
     rows = max(1, math.ceil(height_m / scale))
