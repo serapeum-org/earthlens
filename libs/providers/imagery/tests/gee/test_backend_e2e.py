@@ -554,7 +554,8 @@ def test_live_pixels_serves_that_request_when_it_may_split_it(tmp_path):
     import numpy as np
 
     written = _download_wide_strip(tmp_path, "pixels", auto_split=True)
-    assert written.is_file() and written.stat().st_size > 0
+    assert written.is_file(), f"the mosaic was not written: {written}"
+    assert written.stat().st_size > 0, "the mosaic is empty"
 
     values, _epsg, bbox = _open_raster(written)
     assert values.shape[2] > 32768, (

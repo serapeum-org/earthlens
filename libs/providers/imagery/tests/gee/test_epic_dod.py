@@ -119,13 +119,15 @@ class TestAsEeReducer:
 
     def test_mosaic_refuses_rather_than_returning_none(self):
         """A `None` here would only fail at the call site instead."""
+        mosaic = Mosaic()
         with pytest.raises(ValueError, match="no ee.Reducer equivalent"):
-            Mosaic().as_ee_reducer()
+            mosaic.as_ee_reducer()
 
     def test_the_refusal_names_the_region_vocabulary(self):
         """So the message points at something that would work."""
+        mosaic = Mosaic()
         with pytest.raises(ValueError, match="stdDev"):
-            Mosaic().as_ee_reducer()
+            mosaic.as_ee_reducer()
 
     def test_a_percentile_builds_a_parameterised_reducer(self, monkeypatch):
         """The reducer no bare whitelist name could express."""
@@ -152,8 +154,10 @@ class TestTheRegionReducersStayOutOfTheCollectionPath:
     @pytest.mark.parametrize("cls", [First, StdDev, Variance, Count])
     def test_calling_one_on_a_collection_raises(self, cls):
         """The backstop for reaching the object directly."""
+        reducer = cls()
+        collection = SimpleNamespace()
         with pytest.raises(ValueError, match="not images in a collection"):
-            cls()(SimpleNamespace())
+            reducer(collection)
 
     @pytest.mark.parametrize("name", ["first", "stdDev", "variance", "count"])
     def test_the_constructor_refuses_one(self, make_gee, fake_reader, name):
@@ -172,8 +176,9 @@ class TestTheRegionReducersStayOutOfTheCollectionPath:
 
     def test_a_reducer_object_is_checked_too(self, make_gee, fake_reader):
         """`reducer=` takes objects, so the capability check has to see them."""
+        reducer = StdDev()
         with pytest.raises(ValueError, match="reduces pixels in a region"):
-            _gee(make_gee, reducer=StdDev())
+            _gee(make_gee, reducer=reducer)
 
 
 class TestSamplingReachesTheRegistry:
@@ -253,8 +258,9 @@ class TestTheSinkOwnsItsWrite:
     )
     def test_validate_config_refuses_a_missing_prerequisite(self, name, field):
         """The sink refuses itself, so the constructor names no destination."""
+        sink = resolve_sink(name)
         with pytest.raises(ValueError, match=f"requires {field}"):
-            resolve_sink(name).validate_config({})
+            sink.validate_config({})
 
     def test_validate_config_accepts_a_supplied_prerequisite(self):
         """And says nothing when the destination is there."""
@@ -266,8 +272,9 @@ class TestTheSinkOwnsItsWrite:
 
     def test_the_asset_hint_travels_with_the_sink(self):
         """The hint used to live in a dict in `backend.py`, keyed by field name."""
+        sink = AssetSink()
         with pytest.raises(ValueError, match="parent folder asset"):
-            AssetSink().validate_config({})
+            sink.validate_config({})
 
     def test_the_constructor_still_refuses_through_the_sink(self, make_gee):
         """Same error text as before, now raised by the sink that needs it."""
@@ -388,5 +395,7 @@ class TestTheReducerAbcStaysOneThing:
 
     def test_a_region_reducer_is_not_callable_as_a_composite(self):
         """It is a `Reducer`, but calling it is the error, not the silence."""
+        reducer = StdDev()
+        collection = SimpleNamespace(stdDev=lambda: "reduced")
         with pytest.raises(ValueError):
-            StdDev()(SimpleNamespace(stdDev=lambda: "reduced"))
+            reducer(collection)
