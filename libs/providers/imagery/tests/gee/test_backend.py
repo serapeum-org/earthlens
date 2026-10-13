@@ -185,11 +185,20 @@ class _FakeEE:
         self.data = SimpleNamespace(computePixels=self._compute_pixels)
         self.authenticate_calls = 0
         self.initialize_calls: list[dict] = []
+        #: Records every stubbed `EarthEngineAuth.initialize`, host included.
+        self.auth_calls: list[dict] = []
 
     def _compute_pixels(self, body):
         """Record the request and return the bytes of a tiny real GeoTIFF."""
         self.compute_pixels_calls.append(body)
         return _TINY_GEOTIFF
+
+    def initialize_auth(self, service_account, service_key, project=None, host=None):
+        """Stand in for `EarthEngineAuth.initialize`, recording the host."""
+        self.auth_calls.append(
+            {"service_account": service_account, "project": project, "host": host}
+        )
+        return project or "fake-project"
 
     def Authenticate(self):  # noqa: N802 - mirrors the ee API
         self.authenticate_calls += 1
@@ -245,6 +254,11 @@ class _FakePyramidsHandle:
         from pathlib import Path as _Path
 
         _Path(path).write_bytes(self._body)
+
+    @property
+    def cog(self):
+        """Stand in for `Dataset.cog`, which the pixel path writes through."""
+        return _FakeCogWriter(self)
 
     opened_handles: list[_FakePyramidsHandle] = []
     closed_handles: list[_FakePyramidsHandle] = []
@@ -454,9 +468,7 @@ def fake_ee(monkeypatch) -> _FakeEE:
     monkeypatch.setattr(
         backend_module.EarthEngineAuth,
         "initialize",
-        staticmethod(
-            lambda service_account, service_key, project=None: project or "fake-project"
-        ),
+        staticmethod(fake.initialize_auth),
     )
     return fake
 
@@ -1979,7 +1991,9 @@ class _FakeCogWriter:
     def to_cog(self, path, **kwargs):
         self._dataset.written = str(path)
         self._dataset.wrote_cog = True
-        Path(path).write_bytes(b"eedai-cog")
+        # The pixel path's handle carries the fetched bytes, so write those when
+        # there are any; the EEDAI dataset has none and keeps its marker.
+        Path(path).write_bytes(getattr(self._dataset, "_body", b"eedai-cog"))
         return Path(path)
 
 

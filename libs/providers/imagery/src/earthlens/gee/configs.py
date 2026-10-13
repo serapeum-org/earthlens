@@ -106,11 +106,15 @@ class ExportConfig(SummarisedLeaf):
     http_timeout: float = Field(default=DEFAULT_HTTP_TIMEOUT_S, gt=0)
     wait_for_export: bool = True
     materialize: bool = False
-    # Read only by `PixelsEngine.request`, whose fetch path is not wired yet,
-    # so there is deliberately no `GEE(nodata=...)` constructor kwarg: a public
-    # argument that silently does nothing is worse than its absence. The fields
-    # stay because the request builder is implemented and tested against them.
+    # Set from `GEE(nodata=...)` and declared on the `computePixels` grid. Only
+    # that engine's request can express it - `getDownloadURL` has no nodata
+    # argument - so the backend warns rather than silently ignoring it when the
+    # request is routed elsewhere.
     nodata: float | int | None = None
+    # No constructor kwarg: nothing reads it yet. `computePixels` does take a
+    # `dataType`, but the dtype a user asks for and the dtype pyramids writes
+    # have to agree, and that pairing is not built. A kwarg that set this field
+    # and changed nothing is the failure mode `nodata` just came out of.
     dtype: str | None = None
 
     @model_validator(mode="after")
@@ -163,10 +167,14 @@ class EngineConfig(SummarisedLeaf):
         discover_extent: Fall back to an Earth Engine-side extent query when the
             catalog row's dates are missing.
         high_volume: Ask for Earth Engine's high-volume endpoint, read by the
-            engines that can use it (see
-            :meth:`~earthlens.gee.pixels.PixelsEngine.endpoint`). Less caching,
-            and complex queries cost more EECU-time there, so it is opted into
-            per request rather than switched on globally.
+            engines that can use it (see :meth:`~earthlens.gee.engines.Engine.endpoint`,
+            which only :class:`~earthlens.gee.pixels.PixelsEngine` overrides).
+            Less caching, and complex queries cost more EECU-time there, so it
+            is opted into per request rather than switched on globally.
+        crs_transform: A 6-element affine transform pinning the output grid's
+            pixel size *and* origin, or `None` to size the grid from `scale`.
+            Earth Engine treats the two as an either/or, so a request carrying
+            one sends the transform and not the scale.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid", arbitrary_types_allowed=True)
@@ -182,9 +190,15 @@ class EngineConfig(SummarisedLeaf):
     property_filter: str | None = None
     region: Any = None
     discover_extent: bool = False
-    # Read only by `PixelsEngine.endpoint`, whose fetch path is not wired, so
-    # there is no `GEE(high_volume=...)` kwarg yet - same reasoning as `nodata`.
+    # Set from `GEE(high_volume=...)`; `Engine.endpoint` turns it into the host
+    # `_open_client` initialises against. Engine-scoped on purpose: only the
+    # pixel API documents a high-volume endpoint, so every other engine answers
+    # `None` and is initialised exactly as before.
     high_volume: bool = False
+    # The explicitly pinned output grid (`GEE(crs_transform=...)`), or `None` to
+    # size from `scale`. It lives here rather than on `ExportConfig` because it
+    # is a grid input, like `crs` and `scale`, and the engines are what read it.
+    crs_transform: tuple[float, ...] | None = None
 
     @property
     def needs_server_side_compute(self) -> bool:

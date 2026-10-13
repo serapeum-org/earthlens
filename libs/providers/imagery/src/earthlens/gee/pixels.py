@@ -17,15 +17,18 @@ So this engine is the first whose routing verdict is both **compute-capable** an
 **not cap-bound** — unlike `EedaiEngine`, it does not decline a `cloud_mask` or
 `filters`, because `computePixels` evaluates the graph server-side.
 
-**What it contributes today.** The engine owns the decision and the request: the
-serve/decline verdict (:meth:`PixelsEngine.plan`), the output grid
-(:meth:`PixelsEngine.grid_for`), the `computePixels` request body
-(:meth:`PixelsEngine.request`) and the endpoint to initialise against
-(:meth:`PixelsEngine.endpoint`). The call that posts that body is not wired into
-the backend's export path yet, so a request routed here is still served by the
-export mechanics the backend has — exactly the split
-:mod:`earthlens.gee.engines` describes, where the decision moved and the
-mechanics did not.
+**What it owns.** The decision and the request: the serve/decline verdict
+(:meth:`PixelsEngine.plan`), the output grid (:meth:`PixelsEngine.grid_for`),
+the `computePixels` request body (:meth:`PixelsEngine.request`) and the endpoint
+to initialise against (:meth:`PixelsEngine.endpoint`). `GEE._export_via_pixels`
+posts that body and writes the GeoTIFF it returns, so `engine='pixels'` fetches
+through this engine end to end.
+
+Wiring it exposed a defect worth recording. The backend read "some engine
+accepted" as "the EEDAI reader accepted", so the first request routed here was
+served from stored pixels with the composite silently dropped. An accepted plan
+now has to name its engine, which is why
+:class:`~earthlens.gee.plans.EnginePlan` carries `engine` at all.
 
 It lands with the `Engine` ABC rather than after it because the ABC's value is
 the claim that a new engine is a subclass plus a registry entry. This engine is
@@ -53,7 +56,7 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
     from earthlens.gee.backend import GEE
     from earthlens.gee.catalog import Dataset
 
-__all__ = ["PixelsEngine", "HIGH_VOLUME_ENDPOINT"]
+__all__ = ["PixelsEngine", "HIGH_VOLUME_ENDPOINT", "affine_transform"]
 
 #: The host Earth Engine documents for parallel programmatic requests.
 HIGH_VOLUME_ENDPOINT: str = "https://earthengine-highvolume.googleapis.com"
@@ -68,7 +71,7 @@ class PixelsEngine(Engine):
     own, so it cannot disagree with the other engines about the output shape.
 
     It answers for the routing verdict, the grid, the request body and the
-    endpoint; posting that body is not part of the backend's export path yet.
+    endpoint; `GEE._export_via_pixels` posts that body.
     """
 
     name: ClassVar[str] = "pixels"
@@ -108,14 +111,13 @@ class PixelsEngine(Engine):
     def verdict(
         self, backend: GEE, var_info: Dataset
     ) -> tuple[bool, EnginePlan | None]:
-        """Return the plan this engine *would* serve, without routing to it.
+        """Return the plan this engine would serve, given only what sizes it.
 
-        The sizing half of :meth:`plan`, split out so it stays exercisable while
-        the fetch path is unwired. It is deliberately not called by the backend.
-
-        It takes only what it uses: the grid follows from the AOI, `crs` and
-        `scale`, so the band count and bucket window :meth:`plan` receives
-        are not parameters here.
+        The sizing half of :meth:`plan`, which calls it. Split out because it
+        takes only what it uses: the grid follows from the AOI, `crs` and either
+        `scale` or a pinned `crs_transform`, so the band count and bucket window
+        :meth:`plan` receives are not parameters here, and a caller after the
+        grid verdict alone need not invent them.
 
         Args:
             backend: The `GEE` instance, for its config and the grid.
@@ -145,22 +147,31 @@ class PixelsEngine(Engine):
     def grid_for(self, backend: GEE, scale: float) -> OutputGrid:
         """Return the output grid this engine would request.
 
-        Uses the metre convention: `computePixels` takes an explicit `grid`, so
-        the pixels are sized on the ground rather than as a degree-equivalent.
+        A `crs_transform` pins the grid outright, which is the one case where
+        `scale` is not consulted: Earth Engine treats the two as an either/or,
+        and the point of pinning is that two requests over different AOIs land
+        on the same pixel boundaries. Otherwise the metre convention applies:
+        `computePixels` takes an explicit `grid`, so the pixels are sized on the
+        ground rather than as a degree-equivalent.
 
         Args:
-            backend: The `GEE` instance, for the AOI, CRS and cutline.
-            scale: Ground sample distance in metres.
+            backend: The `GEE` instance, for the AOI, CRS, cutline and the
+                optional pinned transform.
+            scale: Ground sample distance in metres. Ignored when the request
+                pins a `crs_transform`.
 
         Returns:
             The sized grid, carrying the AOI's cutline alongside the bbox.
 
         Raises:
             ValueError: If the AOI reprojects to non-finite bounds in the
-                output CRS, or `scale` is not a positive number of metres.
-                :meth:`plan` catches this and falls back rather than failing
-                the download.
+                output CRS, `scale` is not a positive number of metres, or a
+                pinned transform is malformed. :meth:`plan` catches this and
+                falls back rather than failing the download.
         """
+        pinned = backend._pinned_grid()
+        if pinned is not None:
+            return pinned
         bbox, cutline = backend._eedai_window()
         return OutputGrid.for_metre_grid(
             bbox, crs=backend.crs, scale=scale, cutline=cutline
@@ -182,8 +193,9 @@ class PixelsEngine(Engine):
 
         Returns:
             The request body for `ee.data.computePixels`: `expression`,
-            `fileFormat`, `grid`, and `bandIds` when bands were named. The
-            configured `nodata` is declared on the grid when one was set.
+            `fileFormat`, and a `grid` of `dimensions` + `affineTransform` +
+            `crsCode`, plus `bandIds` when bands were named. The configured
+            `nodata` is declared on the grid when one was set.
         """
         body: dict[str, Any] = {
             "expression": image,
@@ -193,6 +205,11 @@ class PixelsEngine(Engine):
                 "crsCode": grid.crs,
             },
         }
+        # Always, not only for a pinned grid: dimensions alone leave Earth Engine
+        # to use the CRS's default transform, which returned a 90 m AOI over
+        # Cairo as 1-degree pixels starting at lat/lon 0. The transform fixes
+        # where the pixels fall, the dimensions how many come back.
+        body["grid"]["affineTransform"] = affine_transform(grid.request_transform())
         if bands:
             body["bandIds"] = list(bands)
         nodata = backend._export_config.nodata
@@ -200,9 +217,14 @@ class PixelsEngine(Engine):
             body["grid"]["nodata"] = nodata
         return body
 
-    @staticmethod
-    def endpoint(high_volume: bool) -> str | None:
+    def endpoint(self, high_volume: bool) -> str | None:
         """Return the host to initialise against, or `None` for the default.
+
+        Overrides the ABC's `None`, which is how `GEE(high_volume=True)` reaches
+        `ee.Initialize` for this engine and for no other: the endpoint is
+        documented for the pixel API's parallel requests, and its trade-off
+        (less caching, more EECU-time on complex queries) is only worth taking
+        where that applies.
 
         Args:
             high_volume: Whether the caller opted into the high-volume endpoint.
@@ -220,6 +242,43 @@ class PixelsEngine(Engine):
             so its refusal is the answer.
         """
         return True
+
+
+def affine_transform(crs_transform: tuple[float, ...]) -> dict[str, float]:
+    """Spell a 6-element transform the way Earth Engine's `PixelGrid` wants it.
+
+    The tuple order is the one
+    :meth:`~earthlens.gee.grid.OutputGrid.from_crs_transform` documents, which
+    is also the order Earth Engine's own `crsTransform` lists, so this is a
+    renaming and not a reordering.
+
+    Args:
+        crs_transform: The 6-element affine transform
+            `(x_scale, x_shear, x_origin, y_shear, y_scale, y_origin)`.
+
+    Returns:
+        The same six terms keyed as `PixelGrid.affineTransform` expects.
+
+    Examples:
+        - A north-up 10 m grid in a projected CRS:
+            ```python
+            >>> terms = affine_transform((10.0, 0.0, 300000.0, 0.0, -10.0, 3400000.0))
+            >>> terms["scaleX"], terms["scaleY"], terms["translateX"]
+            (10.0, -10.0, 300000.0)
+            >>> sorted(terms)
+            ['scaleX', 'scaleY', 'shearX', 'shearY', 'translateX', 'translateY']
+
+            ```
+    """
+    x_scale, x_shear, x_origin, y_shear, y_scale, y_origin = crs_transform
+    return {
+        "scaleX": x_scale,
+        "shearX": x_shear,
+        "translateX": x_origin,
+        "shearY": y_shear,
+        "scaleY": y_scale,
+        "translateY": y_origin,
+    }
 
 
 #: Tiles are sized the same as the EEDAI streamer's, so a tiled request through

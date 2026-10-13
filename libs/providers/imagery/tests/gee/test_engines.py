@@ -28,6 +28,17 @@ class _FakeReaderError(Exception):
     """Stands in for `pyramids_eo.errors.ReaderError`, which may not be installed."""
 
 
+class _UnwiredEngine(Engine):
+    """An engine that registers to prove the seam but cannot fetch yet."""
+
+    name = "unwired"
+    implemented = False
+
+    def plan(self, backend, var_info, band_count, bucket_start=None, bucket_end=None):
+        """Never serves; it exists to be refused by `resolve_engine`."""
+        return False, None
+
+
 def _gee(make_gee, **overrides):
     """A GEE over one small SRTM read."""
     params = {"variables": {ASSET: ["elevation"]}, "scale": 90.0}
@@ -89,6 +100,33 @@ class TestRegistry:
     def test_each_resolution_builds_a_fresh_instance(self):
         """The registry holds classes, so no state leaks between backends."""
         assert resolve_engine("auto") is not resolve_engine("auto")
+
+
+class TestTheSelectableVocabulary:
+    """Registering an engine is not the same as offering it as a choice.
+
+    Every shipped engine can fetch today, so without a stand-in nothing
+    exercises the refusal - which is how it stopped being covered when the
+    pixel engine's transport landed.
+    """
+
+    def test_a_registered_but_unwired_engine_is_refused(self, monkeypatch):
+        """Named, so the message can say "not yet" rather than "no such engine"."""
+        monkeypatch.setitem(ENGINES, _UnwiredEngine.name, _UnwiredEngine)
+        with pytest.raises(ValueError, match="cannot fetch pixels yet"):
+            resolve_engine(_UnwiredEngine.name)
+
+    def test_it_is_left_out_of_the_vocabulary(self, monkeypatch):
+        """So the refusal and the list of alternatives cannot disagree."""
+        from earthlens.gee.engines import selectable_engines
+
+        monkeypatch.setitem(ENGINES, _UnwiredEngine.name, _UnwiredEngine)
+        assert _UnwiredEngine.name not in selectable_engines()
+        assert "pixels" in selectable_engines()
+
+    def test_the_abc_treats_a_late_refusal_as_a_fallback(self):
+        """The conservative default, which still produces the pixels."""
+        assert _UnwiredEngine().refusal_is_fatal() is False
 
 
 class TestReaderRefusalTypes:

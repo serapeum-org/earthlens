@@ -100,6 +100,22 @@ class Engine(ABC):
     #: choice that fails later.
     implemented: ClassVar[bool] = True
 
+    def endpoint(self, high_volume: bool) -> str | None:
+        """Return the Earth Engine host to initialise against, or `None`.
+
+        On the ABC so the backend can ask whichever engine it resolved, instead
+        of testing for one engine by name before a global `ee.Initialize`. The
+        default answers `None` — initialise exactly as before — and only an
+        engine that documents an alternative host overrides it.
+
+        Args:
+            high_volume: Whether the caller opted into the high-volume endpoint.
+
+        Returns:
+            `None`: this engine has one host, so there is nothing to choose.
+        """
+        return None
+
     def refusal_is_fatal(self) -> bool:
         """Whether a refusal arriving *after* routing committed should propagate.
 
@@ -203,13 +219,22 @@ class EedaiEngine(Engine):
         from earthlens.gee.backend import _eedai_remedy
 
         if not backend._eedai_eligible(var_info):
+            # The pinned grid is named separately because it is the one
+            # ineligibility a caller can misread as a CRS problem: the CRS is
+            # fine, the reader just sizes its own grid and takes no transform.
+            pinned = (
+                " It also pins crs_transform, which the reader cannot honour: "
+                "it sizes its own metre grid from scale."
+                if backend._engine_config.crs_transform is not None
+                else ""
+            )
             raise ValueError(
                 f"engine='eedai' cannot serve {var_info.id}: the EEDAI "
                 "reader materialises pixels from an asset id, so it cannot "
                 "run server-side compute (a reduced collection, cloud_mask "
                 "or filters), and it reads only EPSG:4326 or a metre-based "
-                f"projected CRS (got crs={backend.crs!r}). Use engine='auto' "
-                "or engine='ee'."
+                f"projected CRS (got crs={backend.crs!r}).{pinned} Use "
+                "engine='auto' or engine='ee'."
             )
         plan = backend._eedai_verdict(var_info, band_count, bucket_start, bucket_end)
         if plan.can_serve:

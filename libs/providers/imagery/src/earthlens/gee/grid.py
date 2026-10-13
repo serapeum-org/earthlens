@@ -33,6 +33,7 @@ testable, rather than implicit in two method families that happen to differ.
 from __future__ import annotations
 
 import math
+from collections.abc import Iterable
 from typing import Any, ClassVar
 
 from pydantic import ConfigDict, Field
@@ -47,6 +48,7 @@ __all__ = [
     "bbox_to_crs",
     "geographic_grid",
     "projected_grid",
+    "validate_crs_transform",
 ]
 
 #: The CRS scene discovery and every lat/lon AOI are expressed in.
@@ -57,6 +59,72 @@ _METRES_PER_DEGREE: float = 111_320.0
 
 #: Latitude beyond which `cos` is clamped, so a polar AOI cannot divide by zero.
 _MAX_POLEWARD_DEGREES: float = 89.9
+
+
+def validate_crs_transform(crs_transform: object) -> tuple[float, ...] | None:
+    """Normalise an explicit grid transform, or reject it.
+
+    One definition, called both by `GEE(crs_transform=...)` - so a bad transform
+    is refused at construction, before the catalog parse and any request - and by
+    :meth:`OutputGrid.from_crs_transform`, which cannot snap a grid it has not
+    checked.
+
+    Args:
+        crs_transform: The candidate transform
+            `(x_scale, x_shear, x_origin, y_shear, y_scale, y_origin)`, in the
+            units of the output CRS, or `None` for an unpinned grid.
+
+    Returns:
+        The six terms as floats, or `None` when none was given.
+
+    Raises:
+        TypeError: If it is not an iterable of numbers.
+        ValueError: If it does not hold exactly six finite terms, either pixel
+            size is zero (which would collapse the grid to no extent), or either
+            shear term is non-zero - a sheared lattice is not axis-aligned, so
+            there is no single column a window could be snapped to.
+
+    Examples:
+        - A north-up 10 m grid in a projected CRS passes through:
+            ```python
+            >>> validate_crs_transform([10, 0, 300000, 0, -10, 3400000])
+            (10.0, 0.0, 300000.0, 0.0, -10.0, 3400000.0)
+            >>> validate_crs_transform(None) is None
+            True
+
+            ```
+    """
+    if crs_transform is None:
+        return None
+    if isinstance(crs_transform, (str, bytes, bytearray)) or not isinstance(
+        crs_transform, Iterable
+    ):
+        raise TypeError(
+            "crs_transform must be an iterable of six numbers "
+            "(x_scale, x_shear, x_origin, y_shear, y_scale, y_origin), got "
+            f"{type(crs_transform).__name__}"
+        )
+    try:
+        terms = tuple(float(term) for term in crs_transform)
+    except (TypeError, ValueError):
+        raise TypeError(
+            f"crs_transform must hold six numbers, got {crs_transform!r}"
+        ) from None
+    if len(terms) != 6:
+        raise ValueError(f"crs_transform must have 6 elements, got {len(terms)}")
+    if not all(math.isfinite(term) for term in terms):
+        raise ValueError(f"crs_transform terms must be finite, got {terms}")
+    if not terms[0] or not terms[4]:
+        raise ValueError(
+            "crs_transform pixel sizes must be non-zero, got "
+            f"x_scale={terms[0]}, y_scale={terms[4]}"
+        )
+    if terms[1] or terms[3]:
+        raise ValueError(
+            "crs_transform shear terms must be zero: earthlens pins axis-aligned "
+            f"grids, got x_shear={terms[1]}, y_shear={terms[3]}"
+        )
+    return terms
 
 
 def same_epsg_code(region_crs: Any, target: str) -> bool:
@@ -348,6 +416,11 @@ class OutputGrid(SummarisedLeaf):
         cols: Grid width in pixels.
         scale: The metre ground sample distance the grid was sized for, or `None`
             when the grid came from an explicit `crs_transform`.
+        crs_transform: The 6-element affine transform the grid was pinned to, or
+            `None` when `rows`/`cols` were sized from `scale`. Carried rather
+            than discarded because a pinned grid has to reach the request that
+            quotes it: Earth Engine takes the transform itself, not the pixel
+            count it implies.
         convention: Which sizing rule produced `rows`/`cols` — `"metre"` for the
             EEDAI reader's square-metre grid, `"degree"` for Earth Engine's
             degree-equivalent reading of `scale`, `"transform"` for a pinned one.
@@ -401,6 +474,7 @@ class OutputGrid(SummarisedLeaf):
         "cols",
         "scale",
         "convention",
+        "crs_transform",
     )
 
     bbox: tuple[float, float, float, float]
@@ -412,6 +486,7 @@ class OutputGrid(SummarisedLeaf):
     scale: float | None = None
     convention: str = "metre"
     cutline: Any = None
+    crs_transform: tuple[float, ...] | None = None
 
     @classmethod
     def for_metre_grid(
@@ -537,30 +612,97 @@ class OutputGrid(SummarisedLeaf):
 
         Returns:
             The grid implied by the transform over `bbox`, with
-            `convention="transform"` and no `scale`.
+            `convention="transform"`, no `scale`, and `crs_transform` carrying
+            the transform through to the request.
 
         Raises:
-            ValueError: If the transform is not 6 elements, or its pixel sizes
-                are zero.
+            ValueError: If the transform is not six finite terms, its pixel
+                sizes are zero, or it carries shear.
         """
-        if len(crs_transform) != 6:
-            raise ValueError(
-                f"crs_transform must have 6 elements, got {len(crs_transform)}"
-            )
-        x_scale, _x_shear, _x_origin, _y_shear, y_scale, _y_origin = crs_transform
-        if not x_scale or not y_scale:
-            raise ValueError("crs_transform pixel sizes must be non-zero")
+        terms = validate_crs_transform(crs_transform)
+        assert terms is not None  # a transform was given, so one comes back
+        x_scale, x_shear, x_origin, y_shear, y_scale, y_origin = terms
         min_x, min_y, max_x, max_y = bbox
-        cols = max(1, math.ceil(abs(max_x - min_x) / abs(x_scale)))
-        rows = max(1, math.ceil(abs(max_y - min_y) / abs(y_scale)))
+        x_pixel, y_pixel = abs(x_scale), abs(y_scale)
+        # Snapped OUTWARD onto the lattice the transform defines, which is the
+        # whole point of pinning: the window has to start on a grid line, or two
+        # AOIs would share a pixel size and still be half a pixel apart. The
+        # output then covers the AOI and begins at a whole number of pixels from
+        # the pinned origin - so the request quotes THIS origin, not the one it
+        # was given, which may lie far outside the AOI.
+        first_col = math.floor((min_x - x_origin) / x_pixel)
+        last_col = math.ceil((max_x - x_origin) / x_pixel)
+        # y counts downward from the pinned origin, the north-up convention the
+        # negative `y_scale` expresses.
+        first_row = math.floor((y_origin - max_y) / y_pixel)
+        last_row = math.ceil((y_origin - min_y) / y_pixel)
+        cols = max(1, last_col - first_col)
+        rows = max(1, last_row - first_row)
+        snapped_min_x = x_origin + first_col * x_pixel
+        snapped_max_y = y_origin - first_row * y_pixel
         return cls(
-            bbox=bbox,
+            bbox=(
+                snapped_min_x,
+                snapped_max_y - rows * y_pixel,
+                snapped_min_x + cols * x_pixel,
+                snapped_max_y,
+            ),
             crs=crs,
             rows=rows,
             cols=cols,
             scale=None,
             convention="transform",
             cutline=cutline,
+            crs_transform=(
+                x_pixel,
+                x_shear,
+                snapped_min_x,
+                y_shear,
+                -y_pixel,
+                snapped_max_y,
+            ),
+        )
+
+    def request_transform(self) -> tuple[float, ...]:
+        """Return the affine transform that describes this grid.
+
+        Earth Engine's `computePixels` grid is pixel dimensions plus a transform;
+        there is no `scale` field, and a request that sends dimensions alone gets
+        the CRS's default transform - one unit per pixel at the CRS origin, which
+        is how a 90 m AOI over Cairo came back as 1-degree pixels starting at
+        lat/lon 0. So every request needs one, pinned or not.
+
+        A pinned grid already is a transform. An unsized one derives it from the
+        window and the pixel counts, dividing exactly, so the raster covers the
+        requested bbox rather than overhanging it by the rounding the ceiling
+        introduced.
+
+        Returns:
+            `(x_scale, x_shear, x_origin, y_shear, y_scale, y_origin)`, north-up
+            (so `y_scale` is negative and the origin is the top-left corner).
+
+        Examples:
+            - An unpinned grid describes the window it was sized for:
+                ```python
+                >>> grid = OutputGrid.for_metre_grid(
+                ...     (31.2, 29.9, 31.3, 30.0), crs="EPSG:4326", scale=90.0
+                ... )
+                >>> terms = grid.request_transform()
+                >>> round(terms[0], 8), terms[2], terms[5]
+                (0.00092593, 31.2, 30.0)
+
+                ```
+        """
+        if self.crs_transform is not None:
+            return self.crs_transform
+        min_x, min_y, max_x, max_y = self.bbox
+        return (
+            (max_x - min_x) / self.cols,
+            0.0,
+            min_x,
+            0.0,
+            -(max_y - min_y) / self.rows,
+            max_y,
         )
 
     def as_rows_cols(self) -> tuple[int, int]:

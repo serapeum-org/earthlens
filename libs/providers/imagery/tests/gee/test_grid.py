@@ -208,6 +208,36 @@ class TestFromCrsTransform:
         assert grid.convention == "transform"
         assert grid.scale is None, "a pinned grid has no single metre scale"
 
+    def test_it_carries_the_transform_it_was_built_from(self):
+        """A pinned grid has to be able to hand the transform to a request."""
+        terms = (10.0, 0.0, 300_000.0, 0.0, -10.0, 3_401_000.0)
+        grid = OutputGrid.from_crs_transform(
+            (300_000.0, 3_400_000.0, 301_000.0, 3_401_000.0),
+            crs="EPSG:32636",
+            crs_transform=terms,
+        )
+        assert grid.crs_transform == terms
+
+    def test_integer_terms_are_normalised_to_floats(self):
+        """So a caller passing ints and one passing floats produce one value."""
+        grid = OutputGrid.from_crs_transform(
+            (0.0, 0.0, 100.0, 100.0),
+            crs="EPSG:32636",
+            crs_transform=(10, 0, 0, 0, -10, 100),
+        )
+        assert grid.crs_transform == (10.0, 0.0, 0.0, 0.0, -10.0, 100.0)
+
+    def test_the_sized_constructors_pin_nothing(self):
+        """The field is what tells a pinned grid from a scale-sized one."""
+        assert (
+            OutputGrid.for_metre_grid(CAIRO, crs=NATIVE_CRS, scale=90.0).crs_transform
+            is None
+        )
+        assert (
+            OutputGrid.for_earth_engine(CAIRO, crs=NATIVE_CRS, scale=90.0).crs_transform
+            is None
+        )
+
     def test_a_negative_y_scale_is_accepted(self):
         """North-up transforms carry a negative y pixel size by convention."""
         grid = OutputGrid.from_crs_transform(

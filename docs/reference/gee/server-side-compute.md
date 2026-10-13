@@ -17,22 +17,26 @@ computation is available at all.
 | A per-image transform — masking, rescaling, dB conversion | `cloud_mask=` |
 | Anything else Earth Engine can do | `el.datasource.client` — the raw `ee` module, already authenticated |
 
-Using `filters=` or `cloud_mask=` moves the request onto the Earth Engine engine. That is not a
-limitation to work around; it is the only engine that can run a graph.
+Using `filters=` or `cloud_mask=` moves the request onto an Earth Engine engine. That is not a
+limitation to work around; those are the only engines that can run a graph.
 
-## The two engines
+## The three engines
 
 `engine=` selects **who materialises the pixels** for `export_via="url"`. It does not change the AOI,
 the CRS, or the values you asked for.
 
-| | `engine="ee"` | `engine="eedai"` |
-|---|---|---|
-| Path | `ee.Image.getDownloadURL` | GDAL's `EEDAI` driver via pyramids-eo |
-| Server-side compute | **Yes** — the full Earth Engine graph | **No** — it reads stored pixels |
-| Size cap | 32768 px per axis (`auto_split=True` tiles around it) | none; oversize windows stream to disk in tiles |
-| Round-trip | HTTP + zip | direct read from the asset |
-| Extra needed | `[gee]` | `[gee]` **and** `[eedai]` |
-| Temporal composite | server-side | client-side, per time bucket |
+| | `engine="ee"` | `engine="pixels"` | `engine="eedai"` |
+|---|---|---|---|
+| Path | `ee.Image.getDownloadURL` | `ee.data.computePixels` | GDAL's `EEDAI` driver via pyramids-eo |
+| Server-side compute | **Yes** — the full Earth Engine graph | **Yes** — the expression is the graph | **No** — it reads stored pixels |
+| Size cap | 32768 px per axis (`auto_split=True` tiles around it) | none | none; oversize windows stream to disk in tiles |
+| Round-trip | HTTP + zip | the GeoTIFF bytes, directly | direct read from the asset |
+| Extra needed | `[gee]` | `[gee]` | `[gee]` **and** `[eedai]` |
+| Temporal composite | server-side | server-side | client-side, per time bucket |
+
+`"pixels"` is the engine for a request that needs **both** a graph and an output larger than `getDownloadURL`
+will serve. It is never chosen automatically: `"auto"` keeps preferring the reader and then `"ee"`, so the
+preference order is a separate, reviewable decision rather than a side effect of adding an engine.
 
 `engine="auto"` (the default) picks `eedai` when the request is a *raw read* and the extra is installed,
 otherwise `ee`. A request is a raw read when **all** of these hold:
@@ -310,6 +314,8 @@ blocking; `list_recent_tasks`, `get_task_status`, `wait_for_task_id`, `cancel_ta
 | Situation | Engine |
 |---|---|
 | Any `cloud_mask` / `filters` / computed graph | `ee` (forced) |
+| A computed graph *and* an AOI over 32768 px | `pixels` — a graph with no per-axis cap |
+| An output grid that must align with an earlier download | `ee` or `pixels` with `crs_transform=` |
 | Raw pixels from one asset, large AOI | `eedai` — no 32768-px cap, no zip round-trip |
 | A composite whose masking must match Earth Engine exactly | `ee` |
 | Long time series over a small AOI | `eedai`, watching the scene cap |
@@ -324,7 +330,11 @@ blocking; `list_recent_tasks`, `get_task_status`, `wait_for_task_id`, `cancel_ta
   Earth Engine error at download time.
 - **Mixed-resolution band requests** (10 m `B4` + 20 m `B11` + 60 m `B1` in one call) are a sharp edge on
   the EEDAI path. Request one resolution group at a time, or use `engine="ee"`.
-- **`cog=True` and `resample=`** apply to the EEDAI path only; the Earth Engine paths ignore them.
+- **`cog=True`** applies to the paths that write the raster themselves — the EEDAI reader and
+  `engine="pixels"`. `getDownloadURL` and the batch sinks ignore it, and so does `resample=`, which is the
+  EEDAI reader's warp kernel alone.
+- **`nodata=` and `high_volume=`** are `engine="pixels"` only; any other engine warns at construction and
+  ignores them.
 - **`auto_split=True`** is only meaningful for `engine="ee"`, where the 32768-px cap exists.
 - **Credentials are always needed**, even for `engine="eedai"`: the request is built through `ee` before
   its pixels are fetched.

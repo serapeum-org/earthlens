@@ -310,6 +310,41 @@ class TestMaterializeThroughDownload:
         assert gee.OUTPUT_KIND == "raster"
 
 
+class TestMaterialiseKinds:
+    """`_materialise` wraps whatever the sink returned, not only paths."""
+
+    def test_a_destination_string_becomes_a_destination_artifact(
+        self, make_gee, fake_reader
+    ):
+        """A batch sink returns a URI, which is the artifact's value."""
+        result = make_gee()._materialise(["drive://folder/prefix"])
+        assert result.values == ["drive://folder/prefix"]
+
+    def test_a_task_becomes_a_task_artifact(self, make_gee, fake_reader):
+        """`wait_for_export=False` returns a handle rather than a destination."""
+        import datetime as _dt
+
+        from earthlens.gee.jobs import TaskInfo
+
+        now = _dt.datetime(2026, 1, 1)
+        task = TaskInfo(
+            id="T1",
+            operation_name="projects/p/operations/T1",
+            description="d",
+            state="READY",
+            task_type="EXPORT_IMAGE",
+            create_time=now,
+            update_time=now,
+        )
+        result = make_gee()._materialise([task])
+        assert result.values == [task]
+
+    def test_a_batch_sink_is_refused_at_construction(self, make_gee, fake_reader):
+        """Before any export runs, so a polled run cannot lose its destinations."""
+        with pytest.raises(ValueError, match="materialize=True needs pixels"):
+            make_gee(export_via="drive", drive_folder="out", materialize=True)
+
+
 class TestClosingAMaterialisedResult:
     """Materialising hands back live GDAL handles, so they must be releasable."""
 

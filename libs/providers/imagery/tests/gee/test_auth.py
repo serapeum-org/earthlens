@@ -373,6 +373,18 @@ class TestEarthEngineAuthInitialize:
         assert project == "override"
         assert init.call_args.kwargs["project"] == "override"
 
+    def test_a_host_becomes_opt_url(self, key_file, stub_ee):
+        """The engine's endpoint is the host the session is opened against."""
+        _creds, init = stub_ee
+        EarthEngineAuth.initialize("sa@x.iam", key_file, host="https://h.test")
+        assert init.call_args.kwargs["opt_url"] == "https://h.test"
+
+    def test_no_host_leaves_the_call_shape_alone(self, key_file, stub_ee):
+        """Every engine that asks for no host initialises exactly as before."""
+        _creds, init = stub_ee
+        EarthEngineAuth.initialize("sa@x.iam", key_file)
+        assert "opt_url" not in init.call_args.kwargs
+
     def test_inline_json_goes_straight_to_key_data(self, monkeypatch):
         """Inline JSON is passed as `key_data=`, never positionally as a filename."""
         monkeypatch.setattr(auth_module.ee, "Initialize", MagicMock())

@@ -286,6 +286,23 @@ convention: `for_metre_grid` sizes for square metres on the ground (the reader's
 two disagree on the column count — that is real, documented, and now visible in one place rather than implied by two
 method families.
 
+The third one is what `crs_transform=` selects:
+
+```python
+# A 10 m grid in UTM 36N, pinned to a round origin rather than to the AOI.
+GEE(..., crs="EPSG:32636", crs_transform=(10, 0, 300_000, 0, -10, 3_400_000))
+```
+
+Six terms, `(x_scale, x_shear, x_origin, y_shear, y_scale, y_origin)`, in the units of `crs` — the order
+Earth Engine's own `crsTransform` uses. It pins the pixel size **and** the origin, so two downloads over different
+AOIs land on the same pixel boundaries and differencing them needs no resample. Earth Engine treats it as an
+alternative to `scale`, not an addition, so a pinned request sends the transform and no scale: `getDownloadURL` and
+the batch sinks take it directly, and `engine="pixels"` sends it as the request's `affineTransform`. The EEDAI reader
+sizes its own metre grid and takes no transform, so a pinned request is never routed to it and `engine="eedai"`
+raises. You still need a resolvable `scale` (from `scale=` or the catalog row), because the routing and naming
+decisions are made on it — it simply is not sent. The per-axis cap is checked against the pinned grid,
+so a transform finer than `scale` cannot slip an oversized request past it.
+
 **In-memory results.** `materialize=True` returns a `DownloadResult` carrying the pyramids object alongside each
 written path, instead of only the paths:
 
@@ -303,9 +320,24 @@ Without `materialize=` nothing changes — `download()` returns the same plain l
 It needs pixels on disk, so it is only meaningful for `export_via="url"`; a batch sink raises rather than handing
 back destinations with no objects.
 
-**Not yet reachable.** `ExportConfig` carries `nodata` / `dtype`, and `EngineConfig` carries `high_volume`, but
-only the `pixels` request builder reads them and its fetch path is not wired — so there are deliberately no
-`GEE(nodata=...)` / `GEE(high_volume=...)` arguments yet, rather than public arguments that quietly do nothing.
+**The pixel API's own two knobs.** Both are honoured by `engine="pixels"` and by nothing else, because the
+`computePixels` request body and its endpoint are the only places they can be expressed. Passing either to another
+engine logs a warning at construction and changes nothing — an argument that quietly does nothing is worse than
+one that says so.
+
+```python
+# -9999 is declared on the request's grid; the high-volume host serves it.
+GEE(..., engine="pixels", nodata=-9999, high_volume=True)
+```
+
+`nodata=` is the fill value declared on the fetched raster, which is the configurable half of the no-fill-value
+divergence the engines otherwise have. `high_volume=True` initialises Earth Engine against the
+[high-volume endpoint](https://developers.google.com/earth-engine/cloud/highvolume), documented for many parallel
+requests; its trade-off is real (less caching, and complex queries cost more EECU-time there), which is why it is
+per-backend rather than global. `ee` keeps one session per process, so the last backend to open its connection
+decides the host for the others too. `ExportConfig.dtype` is still unreachable on purpose: `computePixels` takes a
+`dataType`, but the dtype a caller asks for and the dtype pyramids writes have to agree, and that pairing is not
+built.
 
 ## 6. Via the `EarthLens` facade
 

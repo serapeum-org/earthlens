@@ -292,11 +292,11 @@ class TestHighVolumeEndpoint:
 
     def test_off_by_default(self):
         """Less caching and more EECU-time on complex queries, so not global."""
-        assert PixelsEngine.endpoint(high_volume=False) is None
+        assert PixelsEngine().endpoint(high_volume=False) is None
 
     def test_returned_when_asked_for(self):
         """Opting in selects the host for this engine only."""
-        assert PixelsEngine.endpoint(high_volume=True) == HIGH_VOLUME_ENDPOINT
+        assert PixelsEngine().endpoint(high_volume=True) == HIGH_VOLUME_ENDPOINT
 
     def test_the_config_carries_the_flag(self):
         """`EngineConfig.high_volume`, defaulting off."""
@@ -304,3 +304,108 @@ class TestHighVolumeEndpoint:
 
         assert EngineConfig().high_volume is False
         assert EngineConfig(high_volume=True).high_volume is True
+
+    def test_every_other_engine_answers_none(self):
+        """The ABC's default, so a new engine needs no endpoint decision."""
+        from earthlens.gee.engines import AutoEngine, EedaiEngine, EeEngine
+
+        for engine in (EeEngine(), EedaiEngine(), AutoEngine()):
+            assert engine.endpoint(high_volume=True) is None
+
+
+class TestTheEndpointReachesEarthEngine:
+    """Asking for the endpoint is one thing; opening the session on it another."""
+
+    def test_the_default_host_is_not_overridden(self, make_gee, fake_reader):
+        """An unasked-for endpoint must not change how anyone authenticates."""
+        gee = _gee(make_gee, engine="pixels")
+        gee.download(progress_bar=False)
+        assert gee.client.auth_calls[-1]["host"] is None
+
+    def test_high_volume_reaches_the_auth_call(self, make_gee, fake_reader):
+        """`GEE(high_volume=True)` is what points the session at the host."""
+        gee = _gee(make_gee, engine="pixels", high_volume=True)
+        gee.download(progress_bar=False)
+        assert gee.client.auth_calls[-1]["host"] == HIGH_VOLUME_ENDPOINT
+
+    def test_another_engine_keeps_the_default_host(self, make_gee, fake_reader):
+        """It is engine-scoped: `ee` is initialised as it always was."""
+        gee = _gee(make_gee, engine="ee", high_volume=True)
+        gee.download(progress_bar=False)
+        assert gee.client.auth_calls[-1]["host"] is None
+
+    def test_the_application_default_path_gets_it_too(
+        self, make_gee, fake_ee, fake_reader, monkeypatch
+    ):
+        """The no-key branch initialises `ee` directly, so it needs it as well."""
+        gee = _gee(make_gee, engine="pixels", high_volume=True)
+        for name in ("GEE_SERVICE_ACCOUNT", "GEE_SERVICE_KEY", "GEE_PROJECT"):
+            monkeypatch.delenv(name, raising=False)
+        gee.authenticate(project="adc-project")
+        assert fake_ee.initialize_calls == [
+            {"project": "adc-project", "opt_url": HIGH_VOLUME_ENDPOINT}
+        ]
+
+
+class TestCog:
+    """`cog=True` is honoured on the pixel path, which writes the file itself."""
+
+    def test_it_writes_through_the_cog_writer(self, make_gee, fake_reader):
+        """`to_cog`, not `to_file`: the flag has to reach the write."""
+        gee = _gee(make_gee, engine="pixels", cog=True)
+        (out,) = gee.download(progress_bar=False)
+        assert out.is_file()
+
+    def test_the_plain_path_is_unchanged(self, make_gee, fake_reader):
+        """And without the flag the ordinary writer still runs."""
+        (out,) = _gee(make_gee, engine="pixels").download(progress_bar=False)
+        assert out.is_file()
+
+
+class TestNodata:
+    """`GEE(nodata=...)` is declared on the request, which is the only path for it."""
+
+    def test_it_reaches_the_request_grid(self, make_gee, fake_reader):
+        """The fill value the caller stated, not whatever the driver declares."""
+        gee = _gee(make_gee, engine="pixels", nodata=-9999)
+        gee.download(progress_bar=False)
+        (body,) = gee.client.compute_pixels_calls
+        assert body["grid"]["nodata"] == -9999
+
+    def test_absent_by_default(self, make_gee, fake_reader):
+        """An unset nodata leaves the key out rather than sending null."""
+        gee = _gee(make_gee, engine="pixels")
+        gee.download(progress_bar=False)
+        (body,) = gee.client.compute_pixels_calls
+        assert "nodata" not in body["grid"]
+
+    def test_zero_is_a_value_and_not_an_absence(self, make_gee, fake_reader):
+        """`0` is a legitimate fill value, so the test cannot be truthiness."""
+        gee = _gee(make_gee, engine="pixels", nodata=0)
+        gee.download(progress_bar=False)
+        (body,) = gee.client.compute_pixels_calls
+        assert body["grid"]["nodata"] == 0
+
+    def test_the_config_carries_it(self):
+        """`ExportConfig.nodata`, where the request builder reads it."""
+        from earthlens.gee.configs import ExportConfig
+
+        assert ExportConfig().nodata is None
+        assert ExportConfig(nodata=-1).nodata == -1
+
+
+class TestTheAffineTransformMapping:
+    """The 6-tuple is renamed, not reordered, on its way into the request."""
+
+    def test_the_six_terms_keep_their_meaning(self):
+        """Earth Engine's `crsTransform` lists them in this order too."""
+        from earthlens.gee.pixels import affine_transform
+
+        assert affine_transform((1.0, 2.0, 3.0, 4.0, 5.0, 6.0)) == {
+            "scaleX": 1.0,
+            "shearX": 2.0,
+            "translateX": 3.0,
+            "shearY": 4.0,
+            "scaleY": 5.0,
+            "translateY": 6.0,
+        }
