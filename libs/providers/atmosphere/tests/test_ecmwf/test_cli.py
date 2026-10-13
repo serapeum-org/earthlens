@@ -1255,8 +1255,15 @@ class TestLiveValidator:
 
     def test_supported_under_live(self):
         """ecmwf gains a live-only validator via discovery."""
+        from earthlens.cli.validate import _LIVE_VALIDATORS, supported_providers
+
+        # Asserted through the registry rather than by running the validator:
+        # the claim is that discovery wires one up, and `live=True` would
+        # otherwise reach the real CDS from the unit lane — which it did,
+        # passing either way because the assertion accepted "error" too.
         assert validate_one(_info()).status == "unsupported"
-        assert validate_one(_info(), live=True).status in {"ok", "error"}
+        assert "ecmwf" in _LIVE_VALIDATORS
+        assert "ecmwf" in supported_providers(live=True)
 
 
 class TestCommands:

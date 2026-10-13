@@ -119,15 +119,17 @@ def test_skip_on_upstream_skips_an_availability_failure() -> None:
     """A 503 becomes a prefixed skip rather than a lane failure."""
     import requests
 
+    dropped = requests.ConnectionError("boom")
     with pytest.raises(pytest.skip.Exception) as excinfo:
-        skip_on_upstream(requests.ConnectionError("boom"))
+        skip_on_upstream(dropped)
     assert str(excinfo.value).startswith(_LIVE_SKIP_PREFIX), str(excinfo.value)
 
 
 def test_skip_on_upstream_reraises_a_real_failure() -> None:
     """A request-shaping error stays the failure it is."""
+    real_failure = ValueError("bad bbox")
     with pytest.raises(ValueError, match="bad bbox"):
-        skip_on_upstream(ValueError("bad bbox"))
+        skip_on_upstream(real_failure)
 
 
 def _run_lane(

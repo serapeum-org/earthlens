@@ -1,8 +1,9 @@
 name: Tests - Suite
 
+# Read-only by default; the coverage upload's OIDC token is granted to the one
+# job that needs it rather than to every job in the workflow.
 permissions:
   contents: read
-  id-token: write
 
 on:
   push:
@@ -41,6 +42,11 @@ jobs:
   test:
     name: ${{ matrix.member.name }} (py${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    # Codecov's upload authenticates with an OIDC token, so this is the only
+    # job that needs more than read.
+    permissions:
+      contents: read
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -132,8 +138,10 @@ jobs:
           version: "0.11.29"
 
       - name: Assert every backend fails cleanly without its SDK
+        # --no-build: the env is lock-pinned and wheel-only here, so a source
+        # build would mean running a dependency's setup script. Fail instead.
         run: >
-          uv run --locked pytest
+          uv run --locked --no-build pytest
           -c libs/core/pyproject.toml
           libs/core/tests/test_backend_import_errors.py
           -v
