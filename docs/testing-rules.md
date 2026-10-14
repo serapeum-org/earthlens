@@ -49,8 +49,20 @@ new class that re-implements the S3 listing contract. Four cases are allow-liste
 cannot express them: two drive a second page of pagination (the emulator paginates only past a thousand keys),
 one asserts what the SDK was *called with*, and one injects a mid-transfer failure.
 
-The REST half is still review-only: a cassette has to be recorded against the live service, so it is captured
-when that backend is next touched with credentials to hand, not retrofitted in bulk.
+Eleven REST backends now carry a cassette too — climate_indices, drought, pvgis, obis, gdacs, bathymetry,
+nsi, hanze, nrel, iucn and risk_indicators — recorded live and replayed with the socket blocked *and* the
+environment stripped of credentials, so a cassette that only worked because a key happened to be exported
+would fail. `test_cassette_hygiene.py` re-checks every committed recording for an unscrubbed header or query
+parameter, so the scrubbing is a gate rather than a habit.
+
+Recording one is `--record-mode=once` with the network open; `vcr_config` reads that flag rather than pinning
+`record_mode`, because `use_cassette` lets the fixture override the command line and a hardcoded `none` would
+make recording impossible.
+
+Four backends are deliberately left on fakes: glaciers, ghsl, worldpop and cmems fetch the payload itself, so
+their cassettes came out at 58 MB, 8 MB, 2.3 MB and 2.1 MB. A cassette stores the response body, and committing
+a raster to git to avoid downloading it is a bad trade. If those need the tier, they need a metadata-only call
+to record against.
 
 ## The three test tiers
 

@@ -1,0 +1,998 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.34.2
+    method: GET
+    uri: https://api.obis.org/v3/taxon/complete/Mola%20mola
+  response:
+    body:
+      string: '[{"id":127405,"scientificName":"Mola mola","acceptedNameUsageID":"127405","scientificNameAuthorship":"(Linnaeus,
+        1758)","rank":"Species","kingdom":"Animalia","phylum":"Chordata","class":"Teleostei","order":"Tetraodontiformes","family":"Molidae","genus":"Mola","species":"Mola
+        mola"}]'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '283'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 14 Oct 2026 16:15:52 GMT
+      ETag:
+      - W/"11b-wu7WOAse6rotTsBPmR7VAwGLrLI"
+      Server:
+      - nginx/1.14.0 (Ubuntu)
+      Vary:
+      - Accept-Encoding
+      X-Cache-Date:
+      - Wed, 14 Oct 2026 16:15:52 GMT
+      X-Powered-By:
+      - Express
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Host:
+      - api.obis.org
+      If-None-Match:
+      - W/"cba-rsRw+t+76yVK5NMnOXMX4ztoetY"
+      User-Agent:
+      - Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+        Gecko)         Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.52
+    method: GET
+    uri: https://api.obis.org/v3/occurrence?enddate=2020-12-31&geometry=POLYGON+%28%280+40%2C+0+55%2C+-20+55%2C+-20+40%2C+0+40%29%29&mof=False&offset=0&scientificname=Mola+mola&size=1&startdate=2010-01-01&taxonid=127405
+  response:
+    body:
+      string: '{"total":2212,"results":[{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_24830","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2012-05-23","date_end":1337731200000,"date_mid":1337731200000,"date_start":1337731200000,"date_year":2012,"day":"23","decimalLatitude":46.99834,"decimalLongitude":-4.761159,"eventDate":"2012-05-23","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-4.761159
+        46.99834)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-05-23","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"5","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_24830","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_24830","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-05-23
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2012","id":"00095a56-1f58-47f1-853c-7ca5a7364d93","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":148,"shoredistance":93343,"sst":14.77,"sss":35.42}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 14 Oct 2026 16:15:52 GMT
+      ETag:
+      - W/"cba-6gm9aF83y22q2olCVFqWr1hVa0o"
+      Server:
+      - nginx/1.14.0 (Ubuntu)
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Cache-Date:
+      - Wed, 14 Oct 2026 16:15:52 GMT
+      X-Powered-By:
+      - Express
+      content-length:
+      - '3258'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Host:
+      - api.obis.org
+      If-None-Match:
+      - W/"25d1c-C4L1tZsYmIkpcuLgi0/dlUPe4sQ"
+      User-Agent:
+      - Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+        Gecko)         Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.52
+    method: GET
+    uri: https://api.obis.org/v3/occurrence?enddate=2020-12-31&geometry=POLYGON+%28%280+40%2C+0+55%2C+-20+55%2C+-20+40%2C+0+40%29%29&mof=False&offset=0&scientificname=Mola+mola&size=50&startdate=2010-01-01&taxonid=127405
+  response:
+    body:
+      string: '{"total":2212,"results":[{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_24830","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2012-05-23","date_end":1337731200000,"date_mid":1337731200000,"date_start":1337731200000,"date_year":2012,"day":"23","decimalLatitude":46.99834,"decimalLongitude":-4.761159,"eventDate":"2012-05-23","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-4.761159
+        46.99834)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-05-23","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"5","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_24830","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_24830","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-05-23
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2012","id":"00095a56-1f58-47f1-853c-7ca5a7364d93","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":148,"shoredistance":93343,"sst":14.77,"sss":35.42},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_39747","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2015-05-28","date_end":1432771200000,"date_mid":1432771200000,"date_start":1432771200000,"date_year":2015,"day":"28","decimalLatitude":47.146641,"decimalLongitude":-5.365034,"eventDate":"2015-05-28","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-5.365034
+        47.146641)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2015-05-28","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"5","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_39747","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_39747","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2015-05-28
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2015","id":"0025bb11-10bf-4a7a-946a-4f4d8cb36083","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":156,"shoredistance":103636,"sst":14.49,"sss":35.47},{"basisOfRecord":"HumanObservation","brackish":false,"catalogNumber":"I1424130901","class":"Teleostei","classid":293496,"collectionCode":"I142","coordinateUncertaintyInMeters":10000,"country":"FR","datasetID":"https://marineinfo.org/id/dataset/4554","date_end":1343260800000,"date_mid":1343260800000,"date_start":1343260800000,"date_year":2012,"day":"26","decimalLatitude":49.02959,"decimalLongitude":-5.56318,"eventDate":"2012-07-26/2012-07-26","family":"Molidae","familyid":125609,"genus":"Mola","genusid":126233,"gigaclass":"Actinopterygii","gigaclassid":10194,"infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"MNHN-SPN","kingdom":"Animalia","kingdomid":2,"marine":true,"modified":"2014-04-30
+        15:51:43","month":"7","occurrenceID":"urn:catalog:MNHN-SPN:I142:I1424130901","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"scientificName":"Mola
+        mola","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"year":"2012","id":"0071834f-07be-4f26-8216-f4f5dfa7a465","dataset_id":"9a81d405-545b-4a1b-bdaa-aff5350a0c39","node_id":["4bf79a01-65a9-4db6-b37b-18434f26ddfc"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola (Linnaeus, 1758)","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":109,"shoredistance":69521,"sst":13.37,"sss":35.23},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_42403","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2015-10-30","date_end":1446163200000,"date_mid":1446163200000,"date_start":1446163200000,"date_year":2015,"day":"30","decimalLatitude":46.754722,"decimalLongitude":-4.213442,"eventDate":"2015-10-30","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-4.213442
+        46.754722)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2015-10-30","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"10","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_42403","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_42403","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2015-10-30
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2015","id":"0075f79f-8551-4ec4-b61c-579f082a86bb","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":136.4,"shoredistance":95556,"sst":15.09,"sss":35.35},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_82307","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-06-19","date_end":1340064000000,"date_mid":1340064000000,"date_start":1340064000000,"date_year":2012,"day":"19","decimalLatitude":48.9865,"decimalLongitude":-5.50886,"eventDate":"2012-06-19","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-5.50886
+        48.9865)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-06-19","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"6","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_82307","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_82307","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-06-19
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"00ba613d-4d88-499b-aff9-7a29e729a4fe","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":109,"shoredistance":63417,"sst":13.37,"sss":35.25},{"basisOfRecord":"HumanObservation","brackish":false,"catalogNumber":"I1423678401","class":"Teleostei","classid":293496,"collectionCode":"I142","coordinateUncertaintyInMeters":10000,"country":"FR","datasetID":"https://marineinfo.org/id/dataset/4554","date_end":1342396800000,"date_mid":1342396800000,"date_start":1342396800000,"date_year":2012,"day":"16","decimalLatitude":45.55522,"decimalLongitude":-3.3515,"eventDate":"2012-07-16/2012-07-16","family":"Molidae","familyid":125609,"genus":"Mola","genusid":126233,"gigaclass":"Actinopterygii","gigaclassid":10194,"infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"MNHN-SPN","kingdom":"Animalia","kingdomid":2,"marine":true,"modified":"2014-04-30
+        15:51:43","month":"7","occurrenceID":"urn:catalog:MNHN-SPN:I142:I1423678401","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"scientificName":"Mola
+        mola","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"year":"2012","id":"00d66e73-7df2-4fd7-b648-9a493f072a9f","dataset_id":"9a81d405-545b-4a1b-bdaa-aff5350a0c39","node_id":["4bf79a01-65a9-4db6-b37b-18434f26ddfc"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola (Linnaeus, 1758)","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":166.4,"shoredistance":147535,"sst":16.07,"sss":35.41},{"basisOfRecord":"HumanObservation","brackish":false,"class":"Teleostei","classid":293496,"coordinateUncertaintyInMeters":55,"datasetName":"Sea
+        Watch Foundation Marine Megafauna Sightings: 1971 to present","date_end":1535760000000,"date_mid":1535760000000,"date_start":1535760000000,"date_year":2018,"decimalLatitude":49.2591,"decimalLongitude":-2.0347,"depth":0,"eventDate":"2018-09-01T11:25:00","eventID":"SWF_13_304601","eventRemarks":"Sighting_ID:SIG-NNYME","eventType":"Observation","family":"Molidae","familyid":125609,"footprintSRS":"EPSG:4326","genus":"Mola","genusid":126233,"gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"validated
+        by","identificationVerificationStatus":"verified","identifiedBy":"Anonymous","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"SeaWatchFoundation","kingdom":"Animalia","kingdomid":2,"marine":true,"maximumDepthInMeters":0,"minimumDepthInMeters":0,"occurrenceID":"SWF_13_304601_1","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"samplingProtocol":"Casual
+        sighting","scientificName":"Mola mola","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"superdomain":"Biota","superdomainid":1,"taxonRank":"Species","vernacularName":"Ocean
+        Sunfish","id":"00d68f9e-6fa7-46ad-a7fa-78bc074f60cb","dataset_id":"dcf9975f-d35f-4433-826b-376385121c98","node_id":["f92d5d7f-47a6-4605-9fd0-a8538dfde3fd"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":[],"bathymetry":20,"shoredistance":2105,"sst":13.18,"sss":34.78},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_91191","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-07-26","date_end":1343260800000,"date_mid":1343260800000,"date_start":1343260800000,"date_year":2012,"day":"26","decimalLatitude":46.47399,"decimalLongitude":-3.50405,"eventDate":"2012-07-26","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-3.50405
+        46.47399)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-07-26","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"7","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_91191","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_91191","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-07-26
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"00f90cbf-8b93-4221-a017-75e6ed9a6fbe","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":123.4,"shoredistance":88667,"sst":15.45,"sss":35.22},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_80135","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-06-09","date_end":1339200000000,"date_mid":1339200000000,"date_start":1339200000000,"date_year":2012,"day":"9","decimalLatitude":45.1544,"decimalLongitude":-2.31525,"eventDate":"2012-06-09","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-2.31525
+        45.1544)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-06-09","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"6","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_80135","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_80135","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-06-09
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"01047a8f-07bb-4630-8bfc-b8153d0c03fd","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":119,"shoredistance":88424,"sst":16.42,"sss":34.82},{"basisOfRecord":"MaterialSample","brackish":false,"class":"Teleostei","classid":293496,"datasetID":"dassh.ac.uk:jncc_mr_snapshot_whole_uk_3","datasetName":"Marine
+        Recorder Snapshot extract of surveys entered by SeaSearch","date_end":1466985600000,"date_mid":1466985600000,"date_start":1466985600000,"date_year":2016,"decimalLatitude":48.89416,"decimalLongitude":-2.016805,"depth":12,"eventDate":"2016-06-27","eventID":"MRMCS02200000036.001","eventRemarks":"geometry:
+        http://vocab.nerc.ac.uk/collection/L02/current/Point","eventTime":"15:00:20","family":"Molidae","familyid":125609,"genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationQualifier":"qualifier:
+        ON SURFACE","identifiedBy":"Paul Chambers","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"DASSH","kingdom":"Animalia","kingdomid":2,"marine":true,"minimumDepthInMeters":12,"occurrenceID":"MRMCS02200000A17","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"3213:
+        Seasearch","parentEventID":"MRMCS02200000036","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordedBy":"Contact:
+        info@seasearch.org.uk","samplingProtocol":"MRMCS02200000004_METH_002","scientificName":"Mola
+        mola","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"superdomain":"Biota","superdomainid":1,"id":"01352135-5cc0-4f66-8625-2a0dec73d3e4","dataset_id":"3e981ea4-29b3-4df5-8529-38d798262eb1","node_id":["f92d5d7f-47a6-4605-9fd0-a8538dfde3fd"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":[],"bathymetry":22.4,"shoredistance":9062,"sst":13.27,"sss":34.54},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_86842","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-07-17","date_end":1342483200000,"date_mid":1342483200000,"date_start":1342483200000,"date_year":2012,"day":"17","decimalLatitude":45.88371,"decimalLongitude":-1.74751,"eventDate":"2012-07-17","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-1.74751
+        45.88371)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-07-17","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"7","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_86842","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_86842","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-07-17
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"014c0148-3078-4f35-a237-d46318f1149f","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":49,"shoredistance":28938,"sst":15.3,"sss":33.97},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_92955","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-08-07","date_end":1344297600000,"date_mid":1344297600000,"date_start":1344297600000,"date_year":2012,"day":"7","decimalLatitude":47.30497,"decimalLongitude":-5.36552,"eventDate":"2012-08-07","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-5.36552
+        47.30497)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-08-07","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"8","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_92955","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_92955","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-08-07
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"019498c5-15ec-4fda-91a8-da28c558a0d0","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":145,"shoredistance":89475,"sst":14.41,"sss":35.43},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_19741","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2011-10-22","date_end":1319241600000,"date_mid":1319241600000,"date_start":1319241600000,"date_year":2011,"day":"22","decimalLatitude":45.280805,"decimalLongitude":-2.688977,"eventDate":"2011-10-22","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-2.688977
+        45.280805)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2011-10-22","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"10","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_19741","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_19741","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2011-10-22
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2011","id":"01b88bba-4199-4eb4-a9d9-028d9af4f81f","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":125.4,"shoredistance":118735,"sst":16.32,"sss":35.21},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_90491","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-07-25","date_end":1343174400000,"date_mid":1343174400000,"date_start":1343174400000,"date_year":2012,"day":"25","decimalLatitude":47.04432,"decimalLongitude":-3.90018,"eventDate":"2012-07-25","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-3.90018
+        47.04432)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-07-25","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"7","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_90491","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_90491","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-07-25
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"01cebb9f-d382-4033-b73e-e4de3806e16f","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":117.4,"shoredistance":57239,"sst":14.92,"sss":35.16},{"basisOfRecord":"HumanObservation","brackish":false,"catalogNumber":"I1422539001","class":"Teleostei","classid":293496,"collectionCode":"I142","coordinateUncertaintyInMeters":10000,"country":"FR","datasetID":"https://marineinfo.org/id/dataset/4554","date_end":1337299200000,"date_mid":1337299200000,"date_start":1337299200000,"date_year":2012,"day":"18","decimalLatitude":43.56482,"decimalLongitude":-1.64269,"eventDate":"2012-05-18/2012-05-18","family":"Molidae","familyid":125609,"genus":"Mola","genusid":126233,"gigaclass":"Actinopterygii","gigaclassid":10194,"infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"MNHN-SPN","kingdom":"Animalia","kingdomid":2,"marine":true,"modified":"2014-04-30
+        15:51:43","month":"5","occurrenceID":"urn:catalog:MNHN-SPN:I142:I1422539001","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"scientificName":"Mola
+        mola","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"year":"2012","id":"02058c3e-b3df-400e-888e-2114c7a6a1b8","dataset_id":"9a81d405-545b-4a1b-bdaa-aff5350a0c39","node_id":["4bf79a01-65a9-4db6-b37b-18434f26ddfc"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola (Linnaeus, 1758)","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":85,"shoredistance":9557,"sst":16.66,"sss":34.64},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_82262","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-06-19","date_end":1340064000000,"date_mid":1340064000000,"date_start":1340064000000,"date_year":2012,"day":"19","decimalLatitude":47.62437,"decimalLongitude":-6.13246,"eventDate":"2012-06-19","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-6.13246
+        47.62437)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-06-19","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"6","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_82262","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_82262","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-06-19
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"02409750-b5c7-47fe-b222-3b10efc6a32f","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":153.4,"shoredistance":104877,"sst":14.23,"sss":35.48},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_92970","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-08-07","date_end":1344297600000,"date_mid":1344297600000,"date_start":1344297600000,"date_year":2012,"day":"7","decimalLatitude":46.41991,"decimalLongitude":-6.40972,"eventDate":"2012-08-07","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-6.40972
+        46.41991)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-08-07","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"8","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_92970","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_92970","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-08-07
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"026f97be-6045-422b-a76b-a2b7c504b383","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":4680,"shoredistance":214273,"sst":15.09,"sss":35.65},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_83558","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-06-23","date_end":1340409600000,"date_mid":1340409600000,"date_start":1340409600000,"date_year":2012,"day":"23","decimalLatitude":46.46658,"decimalLongitude":-2.07168,"eventDate":"2012-06-23","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-2.07168
+        46.46658)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-06-23","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"6","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_83558","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_83558","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-06-23
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"027036ca-5fa7-46f3-b915-4664b552127f","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":35,"shoredistance":19933,"sst":14.76,"sss":34.13},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_80633","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-06-12","date_end":1339459200000,"date_mid":1339459200000,"date_start":1339459200000,"date_year":2012,"day":"12","decimalLatitude":49.21529,"decimalLongitude":-4.71875,"eventDate":"2012-06-12","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-4.71875
+        49.21529)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-06-12","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"6","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_80633","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_80633","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-06-12
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"02772a61-790b-4b21-b5a4-09876f1b45d6","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":96.4,"shoredistance":63329,"sst":13.15,"sss":35.14},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_19238","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2011-09-12","date_end":1315785600000,"date_mid":1315785600000,"date_start":1315785600000,"date_year":2011,"day":"12","decimalLatitude":46.935961,"decimalLongitude":-5.361798,"eventDate":"2011-09-12","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-5.361798
+        46.935961)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2011-09-12","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"9","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_19238","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_19238","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2011-09-12
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2011","id":"028e9b61-6add-4d22-8b89-fd8ba2f1293b","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":851,"shoredistance":121078,"sst":14.67,"sss":35.52},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_91220","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-07-26","date_end":1343260800000,"date_mid":1343260800000,"date_start":1343260800000,"date_year":2012,"day":"26","decimalLatitude":49.33626,"decimalLongitude":-4.02882,"eventDate":"2012-07-26","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-4.02882
+        49.33626)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-07-26","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"7","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_91220","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_91220","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-07-26
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"0295af90-72b0-4c68-88d4-790ab8f0cc13","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":87,"shoredistance":58688,"sst":13.17,"sss":35.06},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_62010","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2018-05-26","date_end":1527292800000,"date_mid":1527292800000,"date_start":1527292800000,"date_year":2018,"day":"26","decimalLatitude":46.524031,"decimalLongitude":-4.430763,"eventDate":"2018-05-26","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-4.430763
+        46.524031)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2018-05-26","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"5","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_62010","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_62010","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2018-05-26
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2018","id":"02c5c0f6-7c78-40c4-8ce5-00b4623fb92a","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":144,"shoredistance":125169,"sst":15.17,"sss":35.48},{"basisOfRecord":"HumanObservation","brackish":false,"catalogNumber":"I1422654501","class":"Teleostei","classid":293496,"collectionCode":"I142","coordinateUncertaintyInMeters":10000,"country":"FR","datasetID":"https://marineinfo.org/id/dataset/4554","date_end":1337731200000,"date_mid":1337731200000,"date_start":1337731200000,"date_year":2012,"day":"23","decimalLatitude":46.90048,"decimalLongitude":-4.96078,"eventDate":"2012-05-23/2012-05-23","family":"Molidae","familyid":125609,"genus":"Mola","genusid":126233,"gigaclass":"Actinopterygii","gigaclassid":10194,"infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"MNHN-SPN","kingdom":"Animalia","kingdomid":2,"marine":true,"modified":"2014-04-30
+        15:51:43","month":"5","occurrenceID":"urn:catalog:MNHN-SPN:I142:I1422654501","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"scientificName":"Mola
+        mola","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"year":"2012","id":"02e7879f-ecac-4461-b95e-7b9ecae343a6","dataset_id":"9a81d405-545b-4a1b-bdaa-aff5350a0c39","node_id":["4bf79a01-65a9-4db6-b37b-18434f26ddfc"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola (Linnaeus, 1758)","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":145,"shoredistance":108912,"sst":14.78,"sss":35.47},{"basisOfRecord":"HumanObservation","brackish":false,"catalogNumber":"7496877","class":"Teleostei","classid":293496,"collectionCode":"Observations","datasetName":"iNaturalist
+        research-grade observations","dateIdentified":"2017-08-14T20:13:47Z","date_end":1501804800000,"date_mid":1501804800000,"date_start":1501804800000,"date_year":2017,"decimalLatitude":43.6343399167,"decimalLongitude":-1.7695814167,"dynamicProperties":"{\"evidenceOfPresence\":\"organism\"}","eventDate":"2017-08-04T20:32:00+02:00","eventTime":"20:32:00+02:00","family":"Molidae","familyid":125609,"genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationID":"15657109","identifiedBy":"Julien
+        Renoult","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"iNaturalist","kingdom":"Animalia","kingdomid":2,"license":"https://creativecommons.org/publicdomain/zero/1.0/","lifeStage":"juvenile","marine":true,"modified":"2022-01-12T11:33:15Z","occurrenceID":"https://www.inaturalist.org/observations/7496877","occurrenceStatus":"urn:lsid:marinespecies.org:taxname:127405","order":"Tetraodontiformes","orderid":10332,"parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordedBy":"Julien
+        Renoult","references":"https://www.inaturalist.org/observations/7496877","rightsHolder":"Julien
+        Renoult","scientificName":"Mola mola","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"superdomain":"Biota","superdomainid":1,"taxonID":"49601","taxonRank":"species","verbatimEventDate":"2017/08/04
+        8:32 PM CEST","vitality":"alive","id":"02f3ba4c-637a-4f3f-9106-ee7ebf8be740","dataset_id":"eaea291a-1e1d-4382-b86f-ac3cc15b8d5a","node_id":["f92d5d7f-47a6-4605-9fd0-a8538dfde3fd"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":131,"shoredistance":22198,"sst":16.69,"sss":34.68},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_90502","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-07-25","date_end":1343174400000,"date_mid":1343174400000,"date_start":1343174400000,"date_year":2012,"day":"25","decimalLatitude":50.20872,"decimalLongitude":-3.87945,"eventDate":"2012-07-25","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-3.87945
+        50.20872)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-07-25","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"7","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_90502","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_90502","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-07-25
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"02fb5e1f-eadb-4bc9-9f11-46e3a13379ac","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":41,"shoredistance":3137,"sst":12.81,"sss":34.81},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_86883","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-07-17","date_end":1342483200000,"date_mid":1342483200000,"date_start":1342483200000,"date_year":2012,"day":"17","decimalLatitude":45.65368,"decimalLongitude":-4.19116,"eventDate":"2012-07-17","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-4.19116
+        45.65368)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-07-17","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"7","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_86883","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_86883","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-07-17
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"03278c12-0407-4f3a-a0fe-a1ef4d34aff3","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":4003.4,"shoredistance":181414,"sst":15.86,"sss":35.61},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_81647","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-06-17","date_end":1339891200000,"date_mid":1339891200000,"date_start":1339891200000,"date_year":2012,"day":"17","decimalLatitude":45.33028,"decimalLongitude":-3.09146,"eventDate":"2012-06-17","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-3.09146
+        45.33028)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-06-17","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"6","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_81647","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_81647","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-06-17
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"03398067-193e-49bd-bcb9-459169525df5","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":152.4,"shoredistance":149542,"sst":16.25,"sss":35.4},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_61950","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2018-05-25","date_end":1527206400000,"date_mid":1527206400000,"date_start":1527206400000,"date_year":2018,"day":"25","decimalLatitude":46.810027,"decimalLongitude":-4.496133,"eventDate":"2018-05-25","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-4.496133
+        46.810027)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2018-05-25","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"5","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_61950","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_61950","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2018-05-25
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2018","id":"0348d4c2-18e8-4a81-9552-5760e07229e1","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":146.4,"shoredistance":105951,"sst":15,"sss":35.4},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_61819","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2018-05-23","date_end":1527033600000,"date_mid":1527033600000,"date_start":1527033600000,"date_year":2018,"day":"23","decimalLatitude":47.322145,"decimalLongitude":-5.522718,"eventDate":"2018-05-23","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-5.522718
+        47.322145)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2018-05-23","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"5","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_61819","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_61819","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2018-05-23
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2018","id":"03894c7e-cd73-4466-85f6-5ad94b88d51f","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":149.4,"shoredistance":93459,"sst":14.41,"sss":35.46},{"basisOfRecord":"HumanObservation","brackish":false,"catalogNumber":"I1423734201","class":"Teleostei","classid":293496,"collectionCode":"I142","coordinateUncertaintyInMeters":10000,"country":"FR","datasetID":"https://marineinfo.org/id/dataset/4554","date_end":1342483200000,"date_mid":1342483200000,"date_start":1342483200000,"date_year":2012,"day":"17","decimalLatitude":46.64946,"decimalLongitude":-4.66112,"eventDate":"2012-07-17/2012-07-17","family":"Molidae","familyid":125609,"genus":"Mola","genusid":126233,"gigaclass":"Actinopterygii","gigaclassid":10194,"infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"MNHN-SPN","kingdom":"Animalia","kingdomid":2,"marine":true,"modified":"2014-04-30
+        15:51:43","month":"7","occurrenceID":"urn:catalog:MNHN-SPN:I142:I1423734201","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"scientificName":"Mola
+        mola","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"year":"2012","id":"03dc911a-6dd8-4b59-a299-73501349ab6c","dataset_id":"9a81d405-545b-4a1b-bdaa-aff5350a0c39","node_id":["4bf79a01-65a9-4db6-b37b-18434f26ddfc"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola (Linnaeus, 1758)","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":159,"shoredistance":127197,"sst":15.02,"sss":35.48},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_37071","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2014-10-24","date_end":1414108800000,"date_mid":1414108800000,"date_start":1414108800000,"date_year":2014,"day":"24","decimalLatitude":43.439884,"decimalLongitude":-2.145067,"eventDate":"2014-10-24","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-2.145067
+        43.439884)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2014-10-24","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"10","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_37071","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_37071","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2014-10-24
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2014","id":"04320c57-7536-474c-b017-9515374c0281","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":138.4,"shoredistance":14952,"sst":16.72,"sss":34.89},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_86863","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-07-17","date_end":1342483200000,"date_mid":1342483200000,"date_start":1342483200000,"date_year":2012,"day":"17","decimalLatitude":46.46717,"decimalLongitude":-4.6409,"eventDate":"2012-07-17","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-4.6409
+        46.46717)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-07-17","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"7","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_86863","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_86863","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-07-17
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"0437a178-865a-4919-a4cf-35a3f7c3e587","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":197.4,"shoredistance":141197,"sst":15.19,"sss":35.53},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_86843","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-07-17","date_end":1342483200000,"date_mid":1342483200000,"date_start":1342483200000,"date_year":2012,"day":"17","decimalLatitude":46.05699,"decimalLongitude":-3.04707,"eventDate":"2012-07-17","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-3.04707
+        46.05699)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-07-17","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"7","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_86843","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_86843","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-07-17
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"044b7665-a83f-4441-881d-76aeb41c8c7b","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":118.4,"shoredistance":87771,"sst":15.8,"sss":35.07},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_25238","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2012-10-29","date_end":1351468800000,"date_mid":1351468800000,"date_start":1351468800000,"date_year":2012,"day":"29","decimalLatitude":46.55951,"decimalLongitude":-4.208134,"eventDate":"2012-10-29","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-4.208134
+        46.55951)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-10-29","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"10","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_25238","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_25238","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-10-29
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2012","id":"047bed54-3563-4152-8584-5c67c120ca73","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":146.4,"shoredistance":110544,"sst":15.25,"sss":35.43},{"basisOfRecord":"HumanObservation","brackish":false,"catalogNumber":"O28919","class":"Teleostei","classid":293496,"collectionCode":"ICES
+        Biodiversity - Cetaceans (JCDP)","datasetID":"https://marineinfo.org/id/dataset/8631","datasetName":"ICES
+        Biodiversity - Cetaceans (JCDP)","dateIdentified":"2012-06-06","date_end":1338940800000,"date_mid":1338940800000,"date_start":1338940800000,"date_year":2012,"day":"6","decimalLatitude":50.01095,"decimalLongitude":-5.704833333,"depth":0,"eventDate":"2012-06-06T18:07:00/2012-06-06T18:24:00","eventID":"S28919","eventRemarks":"The
+        eventIDs correspond to sightings of marine mammals during an effort at a dedicated
+        survey","eventTime":"18:07:00/18:24:00","family":"Molidae","familyid":125609,"footprintSRS":"EPSG:4326","genus":"Mola","genusid":126233,"gigaclass":"Actinopterygii","gigaclassid":10194,"identificationReferences":"WoRMs","infraphylum":"Gnathostomata","infraphylumid":1828,"kingdom":"Animalia","kingdomid":2,"locationID":"https://www.ospar.org/convention/the-north-east-atlantic/iii","marine":true,"maximumDepthInMeters":0,"modified":"2024-08-27
+        12:07:48","month":"6","occurrenceID":"O28919","occurrenceRemarks":"OcurrenceIDs
+        correspond to identification of marinemammals","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"parentEventID":"E86294","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"samplingProtocol":"Single
+        platform line-transect, distance sampling method","scientificName":"Mola mola","scientificNameAuthorship":"(Linnaeus,
+        1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"year":"2012","id":"04919b7a-7baf-4b0f-8df5-f2e361da96b4","dataset_id":"dcd440cf-1c0d-4113-9f59-5b84d91ce4f6","node_id":["4bf79a01-65a9-4db6-b37b-18434f26ddfc"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":[],"bathymetry":59,"shoredistance":3216,"sst":12.75,"sss":34.84},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_20728","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2011-10-29","date_end":1319846400000,"date_mid":1319846400000,"date_start":1319846400000,"date_year":2011,"day":"29","decimalLatitude":46.244204,"decimalLongitude":-2.923974,"eventDate":"2011-10-29","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-2.923974
+        46.244204)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2011-10-29","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"10","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_20728","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_20728","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2011-10-29
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2011","id":"04acc75e-2b25-4952-84b6-49d7e7c6b486","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":111,"shoredistance":65442,"sst":15.61,"sss":35.01},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_23862","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2012-05-09","date_end":1336521600000,"date_mid":1336521600000,"date_start":1336521600000,"date_year":2012,"day":"9","decimalLatitude":45.828078,"decimalLongitude":-2.662598,"eventDate":"2012-05-09","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-2.662598
+        45.828078)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-05-09","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"5","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_23862","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_23862","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-05-09
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2012","id":"04c19317-bba4-4f84-8794-e71f7512dd7e","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":109,"shoredistance":96441,"sst":15.95,"sss":34.93},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_114773","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2016-07-16","date_end":1468627200000,"date_mid":1468627200000,"date_start":1468627200000,"date_year":2016,"day":"16","decimalLatitude":48.473567,"decimalLongitude":-6.799518,"eventDate":"2016-07-16","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-6.799518
+        48.473567)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2016-07-16","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"7","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_114773","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_114773","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2016-07-16
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2016","id":"04f9c3b1-6ab4-41ba-aed2-354053f3ed6e","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":137.4,"shoredistance":121597,"sst":13.95,"sss":35.45},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_39688","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2015-05-27","date_end":1432684800000,"date_mid":1432684800000,"date_start":1432684800000,"date_year":2015,"day":"27","decimalLatitude":47.60434,"decimalLongitude":-5.25182,"eventDate":"2015-05-27","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-5.25182
+        47.60434)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2015-05-27","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"5","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_39688","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_39688","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2015-05-27
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2015","id":"0514115a-9325-49fa-8832-d7f1fec232b7","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":129,"shoredistance":56068,"sst":14.19,"sss":35.34},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_75256","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-05-19","date_end":1337385600000,"date_mid":1337385600000,"date_start":1337385600000,"date_year":2012,"day":"19","decimalLatitude":48.17943,"decimalLongitude":-5.18677,"eventDate":"2012-05-19","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-5.18677
+        48.17943)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-05-19","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"5","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_75256","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_75256","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-05-19
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"05294c7c-31f0-4f04-b2bc-813da3180770","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":109.4,"shoredistance":26417,"sst":13.37,"sss":35.25},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_47232","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2016-05-25","date_end":1464134400000,"date_mid":1464134400000,"date_start":1464134400000,"date_year":2016,"day":"25","decimalLatitude":46.548267,"decimalLongitude":-4.363153,"eventDate":"2016-05-25","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-4.363153
+        46.548267)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2016-05-25","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"5","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_47232","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_47232","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2016-05-25
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2016","id":"0534cee4-a3c8-47fd-a64e-c75ea32f6e80","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":148,"shoredistance":119612,"sst":15.19,"sss":35.46},{"basisOfRecord":"HumanObservation","brackish":false,"catalogNumber":"I14214401","class":"Teleostei","classid":293496,"collectionCode":"I142","coordinateUncertaintyInMeters":10000,"country":"FR","datasetID":"https://marineinfo.org/id/dataset/4554","date_end":1321488000000,"date_mid":1321488000000,"date_start":1321488000000,"date_year":2011,"day":"17","decimalLatitude":45.18894,"decimalLongitude":-3.4375,"eventDate":"2011-11-17/2011-11-17","family":"Molidae","familyid":125609,"genus":"Mola","genusid":126233,"gigaclass":"Actinopterygii","gigaclassid":10194,"infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"MNHN-SPN","kingdom":"Animalia","kingdomid":2,"marine":true,"modified":"2014-04-30
+        15:51:43","month":"11","occurrenceID":"urn:catalog:MNHN-SPN:I142:I14214401","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"scientificName":"Mola
+        mola","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"year":"2011","id":"054cb8bf-0b52-4f74-9dd4-aa67fbfd51d4","dataset_id":"9a81d405-545b-4a1b-bdaa-aff5350a0c39","node_id":["4bf79a01-65a9-4db6-b37b-18434f26ddfc"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola (Linnaeus, 1758)","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":2692.4,"shoredistance":176457,"sst":16.22,"sss":35.54},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Doremus,
+        G. and H. Peltier\",\"pubdate\":\"2025\",\"title_html\":\"Observatoire Pelagis
+        boat surveys 2003-2021\",\"title\":\"Observatoire Pelagis boat surveys 2003-2021\",\"serinfo\":{\"sername\":\"OBIS-SEAMAP\",\"issue\":\"1403\"},\"onlink\":\"https:\\/\\/doi.org\\/10.15468\\/7z4bg9\"}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1403_23773","class":"Teleostei","classid":293496,"collectionCode":"1403","coordinatePrecision":"1e-06","datasetID":"1403","datasetName":"Observatoire
+        Pelagis boat surveys 2003-2021","dateIdentified":"2012-05-07","date_end":1336348800000,"date_mid":1336348800000,"date_start":1336348800000,"date_year":2012,"day":"7","decimalLatitude":45.302999,"decimalLongitude":-2.267737,"eventDate":"2012-05-07","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-2.267737
+        45.302999)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-05-07","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-10-20
+        10:31:31","month":"5","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1403_23773","occurrenceRemarks":"Visual;
+        boat","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1403_23773","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-05-07
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"France,Northeast Atlantic","year":"2012","id":"05504f6b-583e-4310-8ad1-43a391977624","dataset_id":"924c4d25-6358-44a3-8f4d-24086256ad3e","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":110,"shoredistance":86138,"sst":16.32,"sss":34.77},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_82868","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-06-20","date_end":1340150400000,"date_mid":1340150400000,"date_start":1340150400000,"date_year":2012,"day":"20","decimalLatitude":45.63787,"decimalLongitude":-6.37089,"eventDate":"2012-06-20","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-6.37089
+        45.63787)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-06-20","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"6","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_82868","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_82868","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-06-20
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"0554233e-3f87-4fcd-ac87-db57db5c81f0","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":4824,"shoredistance":223063,"sst":15.5,"sss":35.68},{"basisOfRecord":"HumanObservation","brackish":false,"catalogNumber":"I1424092201","class":"Teleostei","classid":293496,"collectionCode":"I142","coordinateUncertaintyInMeters":10000,"country":"FR","datasetID":"https://marineinfo.org/id/dataset/4554","date_end":1343174400000,"date_mid":1343174400000,"date_start":1343174400000,"date_year":2012,"day":"25","decimalLatitude":49.40391,"decimalLongitude":-3.96468,"eventDate":"2012-07-25/2012-07-25","family":"Molidae","familyid":125609,"genus":"Mola","genusid":126233,"gigaclass":"Actinopterygii","gigaclassid":10194,"infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"MNHN-SPN","kingdom":"Animalia","kingdomid":2,"marine":true,"modified":"2014-04-30
+        15:51:43","month":"7","occurrenceID":"urn:catalog:MNHN-SPN:I142:I1424092201","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"scientificName":"Mola
+        mola","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"year":"2012","id":"05633dd2-d100-4993-b69b-6281c8c39f7c","dataset_id":"9a81d405-545b-4a1b-bdaa-aff5350a0c39","node_id":["4bf79a01-65a9-4db6-b37b-18434f26ddfc"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola (Linnaeus, 1758)","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":83,"shoredistance":63557,"sst":13.16,"sss":35.06},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_82337","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-06-19","date_end":1340064000000,"date_mid":1340064000000,"date_start":1340064000000,"date_year":2012,"day":"19","decimalLatitude":49.55765,"decimalLongitude":-5.11355,"eventDate":"2012-06-19","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-5.11355
+        49.55765)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-06-19","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"6","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_82337","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_82337","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-06-19
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"056582a5-d4e5-4172-8229-ecd5d99cad47","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":92.4,"shoredistance":44488,"sst":13.25,"sss":35.08},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_114631","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2016-07-21","date_end":1469059200000,"date_mid":1469059200000,"date_start":1469059200000,"date_year":2016,"day":"21","decimalLatitude":47.719512,"decimalLongitude":-5.004062,"eventDate":"2016-07-21","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-5.004062
+        47.719512)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2016-07-21","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"7","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_114631","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_114631","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2016-07-21
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2016","id":"05d38cbe-3660-4d72-afa6-406cb63182f7","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":120,"shoredistance":36546,"sst":13.99,"sss":35.26},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_90507","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2012-07-25","date_end":1343174400000,"date_mid":1343174400000,"date_start":1343174400000,"date_year":2012,"day":"25","decimalLatitude":49.92947,"decimalLongitude":-3.92718,"eventDate":"2012-07-25","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-3.92718
+        49.92947)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2012-07-25","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"7","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_90507","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_90507","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2012-07-25
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2012","id":"05d83c3d-3b30-4214-b771-2fed00bd3254","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":72,"shoredistance":32664,"sst":13.03,"sss":34.92},{"basisOfRecord":"HumanObservation","brackish":false,"class":"Teleostei","classid":293496,"coordinateUncertaintyInMeters":11,"datasetName":"Sea
+        Watch Foundation Marine Megafauna Sightings: 1971 to present","date_end":1563667200000,"date_mid":1563667200000,"date_start":1563667200000,"date_year":2019,"decimalLatitude":49.2245,"decimalLongitude":-2.0186,"depth":0,"eventDate":"2019-07-21T19:00:00","eventID":"SWF_13_304950","eventRemarks":"Sighting_ID:SIG-3QW07","eventType":"Observation","family":"Molidae","familyid":125609,"fieldNotes":"10m
+        off slip","footprintSRS":"EPSG:4326","genus":"Mola","genusid":126233,"gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"validated
+        by","identificationVerificationStatus":"verified","identifiedBy":"Anonymous","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"SeaWatchFoundation","kingdom":"Animalia","kingdomid":2,"marine":true,"maximumDepthInMeters":0,"minimumDepthInMeters":0,"occurrenceID":"SWF_13_304950_1","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"samplingProtocol":"Casual
+        sighting","scientificName":"Mola mola","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"superdomain":"Biota","superdomainid":1,"taxonRank":"Species","vernacularName":"Ocean
+        Sunfish","id":"061067b4-820e-44e7-a969-8af27327ec81","dataset_id":"dcf9975f-d35f-4433-826b-376385121c98","node_id":["f92d5d7f-47a6-4605-9fd0-a8538dfde3fd"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["ON_LAND"],"bathymetry":-2,"shoredistance":-2,"sst":13.19,"sss":34.73},{"associatedReferences":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]","basisOfRecord":"HumanObservation","bibliographicCitation":"[{\"crossref\":{\"citeinfo\":{\"origin\":\"Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach\",\"pubdate\":\"2009\",\"title\":\"OBIS-SEAMAP: The world data center
+        for marine mammal, sea bird, and sea turtle distributions\",\"onlink\":\"http:\\/\\/www.tos.org\\/oceanography\\/article\\/obis-seamap-the-world-data-center-for-marine-mammal-sea-bird-and-sea-turtle\",\"serinfo\":{\"sername\":\"Oceanography\",\"issue\":\"22(2):104-115\"}}}}]Halpin,
+        P.N., A.J. Read, E. Fujioka, B.D. Best, B. Donnelly, L.J. Hazen, C. Kot, K.
+        Urian, E. LaBrecque, A. Dimatteo, J. Cleary, C. Good, L.B. Crowder, and K.D.
+        Hyrenbach. 2009. OBIS-SEAMAP: The world data center for marine mammal, sea
+        bird, and sea turtle distributions. Oceanography 22(2):104-115","brackish":false,"catalogNumber":"1404_114719","class":"Teleostei","classid":293496,"collectionCode":"1404","coordinatePrecision":"1e-06","datasetID":"1404","datasetName":"Observatoire
+        Pelagis aerial surveys 2002-2021","dateIdentified":"2016-07-06","date_end":1467763200000,"date_mid":1467763200000,"date_start":1467763200000,"date_year":2016,"day":"6","decimalLatitude":47.359588,"decimalLongitude":-3.980177,"eventDate":"2016-07-06","family":"Molidae","familyid":125609,"footprintWKT":"POINT(-3.980177
+        47.359588)","genus":"Mola","genusid":126233,"geodeticDatum":"EPSG:4326","georeferencedDate":"2016-07-06","gigaclass":"Actinopterygii","gigaclassid":10194,"identificationRemarks":"Identification
+        Type:Visual sighting","infraphylum":"Gnathostomata","infraphylumid":1828,"institutionCode":"PELAGIS","kingdom":"Animalia","kingdomid":2,"license":"http://creativecommons.org/licenses/by-nc/4.0/","marine":true,"modified":"2022-01-18
+        19:37:34","month":"7","nomenclaturalCode":"WoRMS LSID","occurrenceID":"1404_114719","occurrenceRemarks":"Visual;
+        plane","occurrenceStatus":"present","order":"Tetraodontiformes","orderid":10332,"ownerInstitutionCode":"PELAGIS","parvphylum":"Osteichthyes","parvphylumid":152352,"phylum":"Chordata","phylumid":1821,"recordNumber":"1404_114719","rightsHolder":"PELAGIS","scientificName":"Mola
+        mola","scientificNameAuthorship":"(Linnaeus, 1758)","scientificNameID":"urn:lsid:marinespecies.org:taxname:127405","species":"Mola
+        mola","speciesid":127405,"specificEpithet":"mola","subphylum":"Vertebrata","subphylumid":146419,"superclass":"Actinopteri","superclassid":843664,"taxonRank":"Species","taxonRemarks":"Taxon
+        recorded as \"Mola mola\" by the provider","taxonomicStatus":"valid","type":"Event","verbatimEventDate":"2016-07-06
+        00:00:00","vernacularName":"Ocean sunfish","waterBody":"Global","year":"2016","id":"06168d87-e7f6-4cde-8f9c-cf992235b780","dataset_id":"2101d4c5-c20b-49c0-a44b-3d6484c4c891","node_id":["573654c1-4ce7-4ea2-b2f1-e4d42f8f9c31"],"dropped":false,"absence":false,"originalScientificName":"Mola
+        mola","aphiaID":127405,"category":"VU","flags":["NO_DEPTH"],"bathymetry":105,"shoredistance":37984,"sst":14.53,"sss":35.06}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 14 Oct 2026 16:15:53 GMT
+      ETag:
+      - W/"2574e-n6850X82qdLHUyr7fDLOwu0CMlA"
+      Server:
+      - nginx/1.14.0 (Ubuntu)
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Cache-Date:
+      - Wed, 14 Oct 2026 16:15:53 GMT
+      X-Powered-By:
+      - Express
+      content-length:
+      - '153422'
+    status:
+      code: 200
+      message: OK
+version: 1

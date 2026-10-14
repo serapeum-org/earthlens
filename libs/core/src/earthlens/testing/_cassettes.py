@@ -54,6 +54,12 @@ _SECRET_QUERY: tuple[str, ...] = (
     "X-Amz-Credential",
     "X-Amz-Signature",
     "X-Amz-Security-Token",
+    # Identity, not a secret, but just as unwelcome in a committed file: NREL
+    # authenticates with `api_key` *and* `email`, so a recording carries the
+    # maintainer's address into git unless it is scrubbed too.
+    "email",
+    "username",
+    "user",
 )
 
 #: What a scrubbed value is replaced with, so a diff of the cassette shows the
@@ -62,17 +68,29 @@ _PLACEHOLDER = "REDACTED"
 
 
 @pytest.fixture(scope="module")
-def vcr_config() -> dict[str, Any]:
+def vcr_config(request: pytest.FixtureRequest) -> dict[str, Any]:
     """Configure `pytest-recording` for every `@pytest.mark.vcr` test.
 
+    Args:
+        request: The pytest request, read for the `--record-mode` option.
+
     Returns:
-        The vcrpy options: `none` record mode, credential filtering on both
-        headers and query parameters, and matching that ignores the parts of
-        a request a replay cannot reproduce byte-for-byte.
+        The vcrpy options: the record mode, credential filtering on headers,
+        query parameters and form bodies, and matching that ignores the parts
+        of a request a replay cannot reproduce byte-for-byte.
     """
     return {
-        # A marked test replays or fails; it never reaches the network.
-        "record_mode": "none",
+        # Default `none`: a marked test replays or fails, never reaching the
+        # network. Passed through from `--record-mode` rather than hardcoded,
+        # because this fixture *overrides* the command line — `use_cassette`
+        # ends with `if "record_mode" in merged_config: record_mode =
+        # merged_config["record_mode"]`, so pinning it here would make
+        # `--record-mode=once` silently do nothing and leave no way to
+        # record a cassette in the first place.
+        # `or "none"`: the option is always registered, so `getoption` returns
+        # its `None` default rather than falling back to ours.
+        "record_mode": request.config.getoption("--record-mode", default=None)
+        or "none",
         "filter_headers": [(name, _PLACEHOLDER) for name in _SECRET_HEADERS],
         "filter_query_parameters": [(name, _PLACEHOLDER) for name in _SECRET_QUERY],
         # Scrub the response's own credentials too — a token-minting endpoint
@@ -87,37 +105,67 @@ def vcr_config() -> dict[str, Any]:
 
 
 def assert_cassette_is_scrubbed(path: Any) -> None:
-    """Assert a recorded cassette carries no obvious credential.
+    """Assert a recorded cassette carries no unscrubbed credential.
 
-    A belt-and-braces check for the committed YAML: `filter_headers` only
-    scrubs what it was told about, so a backend that invents a new header name
-    would leak until someone noticed. Point this at the cassette directory in
-    a test and a leak fails the suite instead of reaching the repository.
+    A belt-and-braces check for the committed YAML: the vcrpy filters only
+    scrub what they were told about, so a backend that invents a new header
+    name would leak until someone noticed. Point this at the cassette
+    directory in a test and a leak fails the suite instead of reaching the
+    repository.
+
+    Only the *request* side is inspected — its headers and the query string of
+    its URI. A response body is not searched, because the secret names are
+    ordinary English words (`key`, `user`, `email`) that occur constantly in
+    real payloads; searching bodies for them reports every cassette and so
+    reports nothing.
 
     Args:
         path: A cassette file, or a directory of them.
 
     Raises:
-        AssertionError: When a cassette contains an unscrubbed secret-looking
-            header or query parameter.
+        AssertionError: When a request carries a secret-looking header or
+            query parameter whose value was not replaced.
+
+    Examples:
+        ```python
+        >>> from earthlens.testing import assert_cassette_is_scrubbed
+        >>> assert_cassette_is_scrubbed.__name__
+        'assert_cassette_is_scrubbed'
+
+        ```
     """
     import pathlib
+    import urllib.parse
+
+    import yaml
 
     root = pathlib.Path(path)
     files = sorted(root.rglob("*.yaml")) if root.is_dir() else [root]
+    secret_headers = {name.lower() for name in _SECRET_HEADERS}
+    secret_query = {name.lower() for name in _SECRET_QUERY}
     offenders: list[str] = []
+
     for cassette in files:
-        text = cassette.read_text(encoding="utf-8", errors="replace")
-        lowered = text.lower()
-        for name in (*_SECRET_HEADERS, *_SECRET_QUERY):
-            marker = name.lower()
-            if marker not in lowered:
-                continue
-            # Present is fine as long as every occurrence was redacted.
-            for line in text.splitlines():
-                if marker in line.lower() and _PLACEHOLDER not in line:
-                    offenders.append(f"{cassette.name}: {line.strip()[:100]}")
+        loaded = yaml.safe_load(cassette.read_text(encoding="utf-8")) or {}
+        for interaction in loaded.get("interactions") or []:
+            request = interaction.get("request") or {}
+            for name, value in (request.get("headers") or {}).items():
+                if name.lower() not in secret_headers:
+                    continue
+                for item in value if isinstance(value, list) else [value]:
+                    if _PLACEHOLDER not in str(item):
+                        offenders.append(f"{cassette.name}: header {name}")
+            query = urllib.parse.urlparse(request.get("uri") or "").query
+            for name, values in urllib.parse.parse_qs(query).items():
+                if name.lower() not in secret_query:
+                    continue
+                for item in values:
+                    if _PLACEHOLDER not in item:
+                        offenders.append(f"{cassette.name}: query {name}")
+
     assert not offenders, (
-        "cassette(s) carry an unscrubbed credential — add the name to "
-        "_SECRET_HEADERS / _SECRET_QUERY and re-record:\n" + "\n".join(offenders)
+        "cassette(s) carry an unscrubbed credential - add the name to "
+        "_SECRET_HEADERS / _SECRET_QUERY and re-record:"
+        + chr(10)
+        + chr(10).join(offenders)
     )
