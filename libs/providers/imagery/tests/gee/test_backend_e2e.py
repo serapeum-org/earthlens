@@ -330,6 +330,325 @@ def test_live_srtm_projected_crs_reads_the_same_ground(tmp_path):
         )
 
 
+def _download_pinned(tmp_path, label, lon_min, crs_transform, engine="pixels"):
+    """Fetch the shared SRTM window on an explicitly pinned grid.
+
+    Args:
+        tmp_path: Directory to write under; `label` keeps two fetches apart.
+        label: A name for this fetch's output directory.
+        lon_min: The AOI's western edge, varied to move the window off the
+            pinned grid's origin.
+        crs_transform: The 6-element transform to pin the grid with.
+        engine: The engine to force.
+
+    Returns:
+        The written GeoTIFF's path.
+    """
+    el = EarthLens(
+        data_source="gee",
+        start="2000-02-11",
+        end="2000-02-12",
+        variables={"USGS/SRTMGL1_003": ["elevation"]},
+        lat_lim=[29.95, 30.0],
+        lon_lim=[lon_min, 31.3],
+        path=str(tmp_path / label),
+        scale=90,
+        engine=engine,
+        crs_transform=crs_transform,
+    ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
+    paths = el.download(progress_bar=False)
+    assert len(paths) == 1, f"{label}: expected one GeoTIFF, got {paths}"
+    return paths[0]
+
+
+@_skip_without_creds
+def test_live_srtm_pixels_matches_ee(tmp_path):
+    """`computePixels` returns the same elevations as `getDownloadURL`.
+
+    The comparison Task 1.13 asks for before anything considers preferring the
+    newer API: same AOI, same CRS, same distribution. Both engines evaluate the
+    graph server-side on the same grid convention, so unlike the EEDAI
+    comparison this one can be tight.
+    """
+    import numpy as np
+
+    ee_path = _download_srtm(tmp_path, "ee")
+    pixels_path = _download_srtm(tmp_path, "pixels")
+    assert pixels_path.is_file(), f"pixels output missing: {pixels_path}"
+    assert pixels_path.stat().st_size > 0, "pixels GeoTIFF is empty"
+
+    ee_values, ee_epsg, ee_bbox = _open_raster(ee_path)
+    pixels_values, pixels_epsg, pixels_bbox = _open_raster(pixels_path)
+
+    assert pixels_epsg == ee_epsg, f"CRS differs: {pixels_epsg} vs {ee_epsg}"
+    assert pixels_values.shape[0] == ee_values.shape[0], "band count differs"
+    for got, want in zip(pixels_bbox, ee_bbox, strict=True):
+        assert abs(got - want) < 1e-3, f"AOI differs: {pixels_bbox} vs {ee_bbox}"
+
+    ee_finite = ee_values[np.isfinite(ee_values)]
+    pixels_finite = pixels_values[np.isfinite(pixels_values)]
+    assert ee_finite.size, "the getDownloadURL raster has no valid pixels"
+    assert pixels_finite.size, "the computePixels raster has no valid pixels"
+    for quantile in (0.05, 0.5, 0.95):
+        got = float(np.quantile(pixels_finite, quantile))
+        want = float(np.quantile(ee_finite, quantile))
+        assert abs(got - want) < 5.0, (
+            f"computePixels q{quantile} {got:.2f} m differs from getDownloadURL "
+            f"{want:.2f} m"
+        )
+
+
+@_skip_without_creds
+def test_live_pixels_composites_server_side(tmp_path):
+    """A reduced collection through `computePixels` matches Earth Engine's reduce.
+
+    The regression this pins is the one wiring the transport exposed: a plan
+    accepted by this engine was once served from the EEDAI reader's stored
+    pixels, which silently dropped the reduction. A single scene would not match
+    the ten-day mean.
+    """
+    import numpy as np
+
+    ee_path = _download_chirps(tmp_path, "ee")
+    pixels_path = _download_chirps(tmp_path, "pixels")
+    ee_values, ee_epsg, _ee_bbox = _open_raster(ee_path)
+    pixels_values, pixels_epsg, _pixels_bbox = _open_raster(pixels_path)
+    assert pixels_epsg == ee_epsg, f"CRS differs: {pixels_epsg} vs {ee_epsg}"
+
+    ee_finite = ee_values[np.isfinite(ee_values)]
+    pixels_finite = pixels_values[np.isfinite(pixels_values)]
+    assert ee_finite.size, "the Earth Engine composite has no valid pixels"
+    assert pixels_finite.size, "the computePixels composite has no valid pixels"
+    assert float(np.nanstd(ee_finite)) > 0.5, (
+        "the reference composite is nearly flat, so it cannot tell a correct "
+        "composite from a dropped reduction"
+    )
+    for quantile in (0.05, 0.5, 0.95):
+        got = float(np.quantile(pixels_finite, quantile))
+        want = float(np.quantile(ee_finite, quantile))
+        assert abs(got - want) < 2.0, (
+            f"computePixels composite q{quantile} {got:.3f} mm differs from "
+            f"Earth Engine {want:.3f} mm"
+        )
+
+
+@_skip_without_creds
+def test_live_high_volume_endpoint_serves_the_same_request(tmp_path):
+    """The high-volume host is a host, not a different answer.
+
+    Opting in changes which endpoint the session is opened against, so the
+    thing worth asserting live is that the request still succeeds there and
+    returns the same pixels.
+    """
+    import numpy as np
+
+    el = EarthLens(
+        data_source="gee",
+        start="2000-02-11",
+        end="2000-02-12",
+        variables={"USGS/SRTMGL1_003": ["elevation"]},
+        lat_lim=[29.95, 30.0],
+        lon_lim=[31.25, 31.3],
+        path=str(tmp_path / "high-volume"),
+        scale=90,
+        engine="pixels",
+        high_volume=True,
+    ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
+    (high_volume_path,) = el.download(progress_bar=False)
+    assert high_volume_path.is_file(), "the high-volume fetch wrote nothing"
+
+    regular_path = _download_srtm(tmp_path, "pixels")
+    high_volume_values, _epsg, _bbox = _open_raster(high_volume_path)
+    regular_values, _regular_epsg, _regular_bbox = _open_raster(regular_path)
+    assert high_volume_values.shape == regular_values.shape, "grids differ"
+    assert np.allclose(high_volume_values, regular_values, equal_nan=True), (
+        "the high-volume endpoint returned different pixels"
+    )
+
+
+@_skip_without_creds
+@pytest.mark.parametrize("engine", ["pixels", "ee"])
+def test_live_pinned_grids_share_their_pixel_boundaries(tmp_path, engine):
+    """Two different AOIs, one `crs_transform`, one grid.
+
+    The point of pinning: without it each output's origin follows its own AOI,
+    so differencing two windows needs a resample first. With it both origins sit
+    an integer number of pixels from the pinned one.
+
+    Both engines that accept a transform are exercised, because they send it
+    differently - `computePixels` as the request grid's `affineTransform`,
+    `getDownloadURL` as `crs_transform` in place of `scale`, which Earth Engine
+    rejects if both arrive.
+    """
+    pixel = 0.001
+    origin = (pixel, 0.0, 31.2, 0.0, -pixel, 30.0)
+    wide = _download_pinned(tmp_path, f"wide-{engine}", 31.25, origin, engine)
+    narrow = _download_pinned(tmp_path, f"narrow-{engine}", 31.2523, origin, engine)
+
+    _wide_values, _wide_epsg, wide_bbox = _open_raster(wide)
+    _narrow_values, _narrow_epsg, narrow_bbox = _open_raster(narrow)
+    assert wide_bbox[0] != narrow_bbox[0], (
+        "the two AOIs reduced to the same window, so the test proves nothing"
+    )
+    for name, bbox in (("wide", wide_bbox), ("narrow", narrow_bbox)):
+        offset = (bbox[0] - origin[2]) / pixel
+        assert abs(offset - round(offset)) < 1e-3, (
+            f"{name} west edge {bbox[0]} is {offset:.3f} pixels from the pinned "
+            "origin, so it did not land on the pinned grid"
+        )
+
+
+def _download_wide_strip(tmp_path, engine: str, **overrides):
+    """Fetch a composited strip wider than Earth Engine's synchronous cap.
+
+    A 360-degree strip 0.1 degrees tall at 1 km is about 39,000 x 11 px: over the
+    32768-px per-axis limit on the long axis, and barely over a megabyte of
+    pixels, so it tests the cap rather than the bandwidth.
+
+    Args:
+        tmp_path: Directory to write under.
+        engine: The engine to force.
+        **overrides: Extra `EarthLens` keyword arguments.
+
+    Returns:
+        The written GeoTIFF's path.
+    """
+    el = EarthLens(
+        data_source="gee",
+        start="2020-06-01",
+        end="2020-06-03",
+        variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+        temporal_resolution="raw",
+        lat_lim=[9.9, 10.0],
+        lon_lim=[-180.0, 180.0],
+        path=str(tmp_path / f"strip-{engine}"),
+        scale=1000,
+        engine=engine,
+        **overrides,
+    ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
+    paths = el.download(progress_bar=False)
+    assert len(paths) == 1, f"{engine}: expected one GeoTIFF, got {paths}"
+    return paths[0]
+
+
+@_skip_without_creds
+def test_live_pixels_is_capped_per_axis_like_the_thumbnail_path(tmp_path):
+    """Earth Engine caps a `computePixels` grid too, and this is the evidence.
+
+    Task 1.13 expected this engine to serve an oversize composite unsplit. It
+    does not: the live API refuses the request. What the backend must do is own
+    that refusal rather than letting a raw Earth Engine error out, which is what
+    this asserts.
+    """
+    with pytest.raises(ValueError, match="same per-axis cap"):
+        _download_wide_strip(tmp_path, "pixels")
+
+
+@_skip_without_creds
+def test_live_pixels_serves_that_request_when_it_may_split_it(tmp_path):
+    """And with `auto_split=True` the oversize composite does succeed.
+
+    Which is the acceptance criterion in substance: a composited AOI wider than
+    32768 px comes back as one raster, tiled and mosaicked rather than refused.
+    """
+    import numpy as np
+
+    written = _download_wide_strip(tmp_path, "pixels", auto_split=True)
+    assert written.is_file(), f"the mosaic was not written: {written}"
+    assert written.stat().st_size > 0, "the mosaic is empty"
+
+    values, _epsg, bbox = _open_raster(written)
+    assert values.shape[2] > 32768, (
+        f"the mosaic came back {values.shape[2]} px wide, so it did not "
+        "exercise the cap"
+    )
+    assert abs((bbox[2] - bbox[0]) - 360.0) < 1.0, f"not a global strip: {bbox}"
+    assert np.isfinite(values).any(), "the mosaic has no valid pixels"
+
+
+@_skip_without_creds
+def test_live_get_download_url_still_refuses_that_request(tmp_path):
+    """The other half: the cap is real, and `auto_split=False` still reports it.
+
+    Without this the test above could pass for the wrong reason - a cap that had
+    quietly stopped applying to either engine.
+    """
+    with pytest.raises(ValueError, match="32,768|auto_split"):
+        _download_wide_strip(tmp_path, "ee")
+
+
+@_skip_without_creds
+def test_live_a_materialised_download_stacks_into_a_datacube(tmp_path):
+    """Task 1.8's `.collection()`, against real rasters.
+
+    Two monthly buckets, so the collection has a time axis to build; the unit
+    test can only check which constructor is called and with what.
+    """
+    el = EarthLens(
+        data_source="gee",
+        start="2020-06-01",
+        end="2020-07-31",
+        variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+        temporal_resolution="monthly",
+        lat_lim=[9.9, 10.1],
+        lon_lim=[76.3, 76.5],
+        path=str(tmp_path / "cube"),
+        scale=5566,
+        engine="ee",
+    ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
+    result = el.download(progress_bar=False, materialize=True)
+    assert len(result.paths) == 2, f"expected two buckets, got {result.paths}"
+    cube = result.collection()
+    try:
+        assert len(cube) == 2, f"the cube did not stack both buckets: {len(cube)}"
+    finally:
+        result.close()
+
+
+@_skip_without_creds
+def test_live_nodata_reaches_the_pixels_and_the_declaration(tmp_path):
+    """`nodata=` is honoured end to end, which it was not when it shipped.
+
+    The first implementation put `nodata` on the `computePixels` grid, where no
+    such field exists, so every request carrying it was refused with
+    `Unknown name "nodata" at 'grid'`. Nothing caught it: the offline fake
+    accepts any body, and no live test set the argument. This is that test.
+
+    The AOI straddles the Kerala coast, and CHIRPS is land-only, so the Arabian
+    Sea half is masked and the fill value has to appear.
+    """
+    import numpy as np
+
+    el = EarthLens(
+        data_source="gee",
+        start="2020-06-01",
+        end="2020-06-03",
+        variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+        temporal_resolution="raw",
+        lat_lim=[9.9, 10.2],
+        lon_lim=[75.5, 76.3],
+        path=str(tmp_path / "nodata"),
+        scale=5566,
+        engine="pixels",
+        nodata=-9999,
+    ).authenticate(service_account=_SERVICE_ACCOUNT, service_key=_SERVICE_KEY)
+    (written,) = el.download(progress_bar=False)
+
+    from pyramids.dataset import Dataset
+
+    raster = Dataset.read_file(str(written))
+    try:
+        declared = raster.no_data_value
+        values = np.asarray(raster.read_array(), dtype="float64")
+    finally:
+        raster.close()
+    assert declared[0] == -9999, f"the raster declares {declared}, not -9999"
+    assert int(np.sum(values == -9999)) > 0, (
+        "no pixel carries the fill value, so the unmask did not reach the expression"
+    )
+    assert float(np.max(values)) > 0.0, "the AOI has no valid rainfall left"
+
+
 def _download_chirps(tmp_path, engine: str):
     """Fetch a tiny CHIRPS precipitation composite through one engine."""
     el = EarthLens(

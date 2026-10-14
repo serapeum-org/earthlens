@@ -29,6 +29,7 @@ from pathlib import Path
 from typing import Any, cast
 
 import ee
+from loguru import logger
 from pydantic import BaseModel, ConfigDict, SecretStr
 
 from earthlens.base.auth import AbstractAuth
@@ -378,6 +379,7 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
         service_account: str,
         service_key: str,
         project: str | None = None,
+        host: str | None = None,
     ) -> str:
         """Authenticate the service account and call `ee.Initialize`.
 
@@ -393,6 +395,10 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
                 the JSON content as a string, told apart by a leading `{`.
             project: Cloud project id to scope the calls to. If omitted,
                 the key file's `project_id` is used.
+            host: An alternative Earth Engine endpoint to initialise against
+                (`ee.Initialize(opt_url=...)`), or `None` for the default one.
+                Supplied by the resolved engine, which is the only thing that
+                knows whether its API documents one.
 
         Returns:
             The Cloud project id the connection was initialised with.
@@ -466,8 +472,15 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
                 f"that the key file/JSON is valid. See {_SERVICE_ACCOUNT_DOCS}."
             ) from None
 
+        # Passed only when a host was chosen, so the call shape stays exactly
+        # as it was for every engine that does not ask for one.
+        host_kwargs = {"opt_url": host} if host else {}
+        if host:
+            logger.info(f"initialising Earth Engine against {host}")
         try:
-            ee.Initialize(credentials=credentials, project=resolved_project)
+            ee.Initialize(
+                credentials=credentials, project=resolved_project, **host_kwargs
+            )
         except ee.EEException as exc:
             # Classify on the raw text and report the redacted one. The needles
             # are fixed substrings that hold no key material, so classification

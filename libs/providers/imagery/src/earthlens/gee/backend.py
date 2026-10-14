@@ -55,9 +55,9 @@ import datetime as dt
 import gc
 import math
 import os
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, NamedTuple
+from typing import TYPE_CHECKING, Any, Literal
 
 import ee
 import pandas as pd
@@ -76,21 +76,40 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.gee._eedai import (
-    credentials_for,
-    eedai_available,
-    import_earthengine_reader,
+    credentials_for,  # noqa: F401 - monkeypatch seam the test suite patches
+    eedai_available,  # noqa: F401 - monkeypatch seam the test suite patches
 )
 from earthlens.gee._helpers import (
+    _COLLECTION_REDUCERS,
     EE_MAX_DIMENSION,
-    reduce_collection,
     slug_asset_id,
     split_aoi_for_url,
     wait_for_task,
 )
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
 from earthlens.gee.catalog import Catalog, Dataset
+from earthlens.gee.configs import EngineConfig, ExportConfig
+from earthlens.gee.engines import (
+    NO_SCENES,
+    EedaiEngine,
+    reader_refusal_types,
+    resolve_engine,
+)
 from earthlens.gee.features import create_feature
+from earthlens.gee.grid import (
+    OutputGrid,
+    bbox_to_crs,
+    geographic_grid,
+    same_crs,
+    validate_crs_transform,
+)
 from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
+from earthlens.gee.pixels import PixelsEngine
+from earthlens.gee.plans import EedaiPlan, EnginePlan
+from earthlens.gee.reader import EedaiReader
+from earthlens.gee.reducers import collection_reducers, resolve_reducer
+from earthlens.gee.sinks import AssetSink, _BatchSink, resolve_sink
+from earthlens.gee.work import Artifact, DownloadResult, RasterWorkUnit
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
@@ -154,9 +173,17 @@ _EEDAI_MAX_NATIVE_PIXELS: int = 4_000_000_000
 #: native resolution into memory before downsampling.
 _EEDAI_MAX_PIXELS: int = 200_000_000
 
+#: Total pixels one synchronous `getDownloadURL` fetch is sized against. Earth
+#: Engine caps the response itself; this is only used to phrase the per-axis
+#: refusal, so it is the per-axis cap squared rather than a documented limit.
+_EE_URL_MAX_PIXELS: int = EE_MAX_DIMENSION * EE_MAX_DIMENSION
+
 #: Marks a decline caused by the *data* rather than the request, so a forced
 #: `engine="eedai"` skips the bucket instead of failing the whole download.
-_EEDAI_NO_SCENES: str = "no scenes"
+#: Aliases `engines.NO_SCENES` rather than repeating the string: the skip is a
+#: prefix match, so two independent literals would let one drift and silently
+#: turn the bucket-skip into a hard failure.
+_EEDAI_NO_SCENES: str = NO_SCENES
 
 #: Reducers the reader must not serve, because its client-side result would not
 #: match Earth Engine's server-side one. `mosaic` is the clear case: Earth
@@ -178,11 +205,43 @@ _EEDAI_TILING_RESAMPLE: str = "nearest"
 
 #: Metres per degree of latitude on a sphere of Earth's mean radius. Used to
 #: turn the EEDAI path's metre `scale` into a pixel grid over a lat/lon AOI;
-#: longitude is scaled by `cos(latitude)` at the AOI's mid-latitude.
+#: longitude is scaled by `cos(latitude)` at the AOI's equatorward edge.
 _METRES_PER_DEGREE: float = 111_320.0
 
-#: Accepted `engine` values: which layer materialises the pixels.
-_ENGINES: frozenset[str] = frozenset({"auto", "ee", "eedai"})
+
+def __getattr__(name: str) -> frozenset[str]:
+    """Keep `_ENGINES` readable as a module attribute.
+
+    Args:
+        name: The attribute being looked up.
+
+    Returns:
+        The derived engine-name set for `_ENGINES`.
+
+    Raises:
+        AttributeError: For any other name.
+    """
+    if name == "_ENGINES":
+        return _engine_names()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def _engine_names() -> frozenset[str]:
+    """Return the engine names `engine=` accepts, from the one registry.
+
+    Derived from `earthlens.gee.engines.ENGINES` rather than restated, so
+    registering an engine is enough to make it selectable - which is what Task
+    1.13's `PixelsEngine` relies on.
+
+    Returns:
+        Every registered engine name.
+    """
+    from earthlens.gee import pixels  # noqa: F401 - registers PixelsEngine
+    from earthlens.gee.engines import selectable_engines
+
+    return selectable_engines()
+
+
 _ZIP_MAGIC: bytes = b"PK\x03\x04"
 
 #: A per-image cloud/quality mask — `ee.Image -> ee.Image` — `.map`-applied
@@ -408,28 +467,32 @@ def _validate_property_filter(property_filter: object) -> None:
         )
 
 
-def _same_epsg_code(region_crs: Any, target: str) -> bool:
-    """Compare a CRS pyproj could not parse against the target by EPSG code.
+def _declaring(reader: Any, nodata: float | int) -> Any:
+    """Return an in-memory copy of `reader` that declares `nodata`.
 
-    The last resort when :meth:`GEE._same_crs`'s object comparison cannot run.
-    A code is trusted only against an explicitly `EPSG:` target, so the
-    authority stays part of the comparison rather than being dropped - which is
-    what made string-parsing the wrong answer in the first place.
+    Earth Engine writes no no-data value into the GeoTIFF it returns, and a fill
+    value nothing declares is just data: a `-9999` ocean pixel folds into every
+    mean and every colour ramp. pyramids has no way to stamp a declaration onto
+    an existing raster without also rewriting its pixels - `_set_no_data_value`
+    fills the whole band with the value, and `change_no_data_value` does not
+    persist - so the declaration is made where pyramids does accept one, at
+    construction.
 
     Args:
-        region_crs: The region's CRS object.
-        target: The output CRS.
+        reader: The pyramids `Dataset` holding the fetched pixels.
+        nodata: The fill value to declare.
 
     Returns:
-        `True` only when the target is an `EPSG:` code the region reports as
-        its own; `False` for anything unparseable or non-EPSG, since
-        reprojecting is the safe answer.
+        A new in-memory `Dataset` over the same array, georeferencing and CRS,
+        with `nodata` declared. The caller closes it.
     """
-    to_epsg = getattr(region_crs, "to_epsg", None)
-    if not callable(to_epsg) or not target.upper().startswith("EPSG:"):
-        return False
-    code = target.split(":", 1)[1]
-    return bool(code.isdigit() and to_epsg() == int(code))
+    from pyramids.base.georeference import GeoReference
+
+    return PyramidsDataset.from_array(
+        reader.read_array(),
+        geo_ref=GeoReference(geo=reader.geotransform, epsg=reader.epsg),
+        no_data_value=nodata,
+    )
 
 
 def _eedai_remedy(reason: str) -> str:
@@ -451,6 +514,12 @@ def _eedai_remedy(reason: str) -> str:
         return (
             "Pass a statistical reducer (mean/median/min/max/sum), or "
             "engine='ee' to keep Earth Engine's mosaic semantics."
+        )
+    if "not in the reader's vocabulary" in reason:
+        return (
+            "Pass one of the reducers the reader knows "
+            "(mean/median/min/max/mode/sum), or engine='ee', which can express "
+            "any of them."
         )
     if "credential" in reason:
         return "Fix the service key or service account, or use engine='ee'."
@@ -558,30 +627,6 @@ def _validate_filters(
     return collection_filters
 
 
-class EedaiPlan(NamedTuple):
-    """How the EEDAI reader should serve one request, or why it should not.
-
-    Attributes:
-        can_serve: Whether the reader takes this read at all.
-        tile_size: Output pixels per tile side when the read is streamed, or
-            `None` for a single pass (and when `can_serve` is `False`).
-        tiles: How many units the read is made of, which depends on its kind.
-            For a streamed single-image read it is the number of tiles the
-            window is cut into (`1` for a single pass); for a collection
-            composite it is the number of scenes the reader will fetch and
-            reduce. Carried here so the exporter never re-derives it — a second
-            derivation is free to disagree with the one that was routed on. It
-            is only a tile count when `tile_size` is set, which a collection
-            plan never does.
-        reason: Why the reader declined, empty when it did not.
-    """
-
-    can_serve: bool
-    tile_size: int | None
-    tiles: int
-    reason: str
-
-
 class GEE(LazyClientMixin, AbstractDataSource):
     """Google Earth Engine data source.
 
@@ -611,8 +656,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
             an error under `engine="eedai"`.
         reducer: Override the per-dataset `default_reducer` for the
             temporal composite (`mean` / `median` / `min` / `max` /
-            `mode` / `mosaic` / `sum`). `None` (the default) uses each
-            dataset's own `default_reducer`.
+            `mode` / `mosaic` / `sum`, or `percentile:<q>`). `None` (the
+            default) uses each dataset's own `default_reducer`. The registry
+            also holds the region-only reducers `first` / `stdDev` /
+            `variance` / `count`, which collapse pixels inside a region rather
+            than images in a collection; naming one here is refused at
+            construction, since there is nothing for it to composite. Pass
+            those to :func:`~earthlens.gee.sampling.sample_points` instead.
         export_via: How to get pixels out — `"url"` (synchronous
             `getDownloadURL`, capped at 32768 px per axis; the default),
             `"drive"` (asynchronous `ee.batch.Export.image.toDrive`;
@@ -632,13 +682,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
         http_timeout: Timeout in seconds for the synchronous
             `getDownloadURL` HTTP request (`export_via="url"`). Defaults
             to 300 s.
-        auto_split: For `export_via="url"`, when the estimated request
-            exceeds Earth Engine's 32768-px per-axis cap, automatically
-            split the AOI into tiles each within the cap, download each
-            tile separately, and mosaic them back into a single GeoTIFF
-            via `pyramids.dataset.merge.merge_rasters`. Defaults to
-            `False` — the previous behaviour, which raises `ValueError`
-            with an actionable message.
+        auto_split: For `export_via="url"`, when the request exceeds Earth
+            Engine's 32768-px per-axis cap, automatically split the AOI into
+            tiles each within the cap, download each tile separately, and
+            mosaic them back into a single GeoTIFF via
+            `pyramids.dataset.merge.merge_rasters`. Applies to both pull APIs
+            — `engine="ee"` and `engine="pixels"` share that cap — and means
+            nothing to `engine="eedai"`, which has none. Defaults to `False` —
+            the previous behaviour, which raises `ValueError` with an
+            actionable message.
         discover_extent: When the catalog entry's `extent.end_date`
             (and/or `start_date`) is missing, fall back to an EE-side
             `reduceColumns(minMax)` over `system:time_start` to discover
@@ -699,9 +751,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `engine="ee"` when you need Earth Engine's masking exactly. It
             falls back to Earth Engine's
             `getDownloadURL` otherwise. `"ee"` always uses `getDownloadURL`
-            (the historical behaviour). `"eedai"` forces the reader and
-            raises if the request is not eligible. The EEDAI path reads
-            pixels straight from the asset, so Earth Engine's 32768-px
+            (the historical behaviour). `"pixels"` uses
+            `ee.data.computePixels`, Earth Engine's current extraction API: it
+            evaluates the same graph (so a `cloud_mask` / `filters` survives)
+            and returns the GeoTIFF bytes directly from an explicit grid, with
+            no URL to expire and no zip to unpack. It is bound by the same
+            32768-px per-axis cap as `getDownloadURL` — measured, not assumed —
+            so `auto_split=True` tiles for it exactly as it does there. It is
+            never chosen by `"auto"`; ask for it by name. `"eedai"` forces the
+            reader and raises if the request is not eligible. The EEDAI path
+            reads pixels straight from the asset, so Earth Engine's 32768-px
             synchronous cap does not apply and `auto_split` is unnecessary —
             a window too large to materialise is streamed to disk in tiles
             and mosaicked. It cannot run server-side compute, which is why
@@ -709,20 +768,23 @@ class GEE(LazyClientMixin, AbstractDataSource):
             asynchronous `"drive"` / `"gcs"` / `"asset"` sinks, which are
             Earth Engine-only.
 
-            The two engines do not produce byte-identical rasters. Earth
-            Engine reads `scale` in a geographic CRS as a uniform
-            degree-equivalent, while the EEDAI grid is sized for square
-            metres on the ground, so away from the equator the column counts
-            differ; and the reader downsamples locally (nearest by default)
-            where Earth Engine aggregates server-side. The AOI, CRS and
-            values agree — the sampling does not. `"eedai"` still needs the
-            `[gee]` extra and Earth Engine credentials: the request is built
-            through `ee` before the pixels are fetched.
-        cog: Write the EEDAI path's raster as a Cloud Optimized GeoTIFF
-            (tiled, with overviews) via `Dataset.cog.to_cog` instead of a
-            plain GeoTIFF. Applies only to the EEDAI path — the Earth
-            Engine `getDownloadURL` and batch-export sinks are unaffected.
-            Defaults to `False`.
+            The engines do not produce byte-identical rasters. `"ee"` reads
+            `scale` in a geographic CRS as a uniform degree-equivalent, while
+            the EEDAI grid — and the explicit grid `"pixels"` sends — is sized
+            for square metres on the ground, so away from the equator the
+            column counts differ; and the reader downsamples locally (nearest
+            by default) where Earth Engine aggregates server-side. The AOI, CRS
+            and values agree — the sampling does not. Pass `crs_transform=`
+            when the grid itself has to match across engines or across
+            downloads. `"eedai"` still needs the `[gee]` extra and Earth Engine
+            credentials: the request is built through `ee` before the pixels
+            are fetched.
+        cog: Write the raster as a Cloud Optimized GeoTIFF (tiled, with
+            overviews) via `Dataset.cog.to_cog` instead of a plain GeoTIFF.
+            Applies to the paths that write the file themselves — the EEDAI
+            reader and `engine="pixels"`. `getDownloadURL` streams Earth
+            Engine's own bytes and the batch sinks write server-side, so both
+            ignore it. Defaults to `False`.
         resample: Resampling kernel the EEDAI reader warps the native grid
             with — `"nearest"` (the default), `"average"`, `"bilinear"`, … .
             This path always warps from the asset's native resolution to the
@@ -744,6 +806,37 @@ class GEE(LazyClientMixin, AbstractDataSource):
             can neutralise the time and space clauses it is combined with. Only
             obvious malformations (unbalanced quotes or parentheses, a statement
             separator, a SQL comment) are rejected here. Defaults to `None`.
+        crs_transform: A 6-element affine transform
+            `(x_scale, x_shear, x_origin, y_shear, y_scale, y_origin)`, in the
+            units of `crs`, pinning the output grid's pixel size *and* origin.
+            Earth Engine treats it as an alternative to `scale` rather than an
+            addition, so a pinned request sends the transform and no scale: two
+            downloads over different AOIs then land on the same pixel
+            boundaries and differencing them needs no resample. Honoured on
+            every Earth Engine path — `getDownloadURL` and the batch sinks
+            take it directly, and `engine="pixels"` sends it as the request's
+            `affineTransform`. The EEDAI reader sizes its own metre grid and
+            cannot pin one, so a pinned request is never routed to it and
+            `engine="eedai"` raises. A resolvable `scale` (from `scale=` or the
+            catalog row) is still required, because the routing and naming
+            decisions are made on it; it is simply not sent. Defaults to
+            `None`.
+        nodata: The fill value to declare on the fetched raster. Only the pixel
+            API's request body can carry one — `getDownloadURL` has no such
+            argument and the batch sinks declare it through their own format
+            options — so it applies to `engine="pixels"` and is ignored, with a
+            warning, anywhere else. Defaults to `None`.
+        high_volume: Initialise Earth Engine against the
+            [high-volume endpoint](https://developers.google.com/earth-engine/cloud/highvolume)
+            (`https://earthengine-highvolume.googleapis.com`), which is
+            documented for many parallel requests. The trade-off is real: less
+            caching, and complex queries cost more EECU-time there than on the
+            regular endpoint, so it is opted into per backend rather than
+            switched on globally. Only `engine="pixels"` uses it, because the
+            pixel API is what the endpoint is documented for; ignored, with a
+            warning, elsewhere. `ee` holds one session per process, so the last
+            backend to open its connection decides the host for every backend
+            in that process. Defaults to `False`.
 
     Credentials are not constructor arguments — the constructor describes
     only what to fetch. Supply them at the authentication step:
@@ -758,14 +851,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
             (missing/invalid key, unregistered project, missing IAM role).
         ValueError: At construction for a bad `export_via` (or `"drive"`
             without `drive_folder` / `"gcs"` without `gcs_bucket` /
-            `"asset"` without `asset_id`); from the parent on a bad date
-            range; from :meth:`_check_input_dates` on an unknown
-            `temporal_resolution`; from :meth:`_api` on a missing scale
-            or an oversized `"url"` request (unless `auto_split=True`);
-            from :meth:`_download_dataset` on an unknown asset id or band.
-        TypeError: At construction when `cloud_mask` is not callable, or
+            `"asset"` without `asset_id`), a `crs_transform` that is not six
+            finite terms with non-zero, unsheared pixel sizes, or a `reducer`
+            that reduces a region rather than a collection; from the parent on
+            a bad date range; from :meth:`_check_input_dates` on an unknown
+            `temporal_resolution`; from :meth:`_api` on a missing scale or an
+            oversized `"url"` request on either pull API (unless
+            `auto_split=True`); from :meth:`_download_dataset` on an unknown
+            asset id or band.
+        TypeError: At construction when `cloud_mask` is not callable, when
             `filters` is a `str` / bytes-like / mapping / non-iterable or
-            contains a non-callable entry.
+            contains a non-callable entry, or when `crs_transform` is not an
+            iterable of numbers.
         NotImplementedError: From :meth:`download` when `aggregate=` is
             passed (not yet supported).
         RuntimeError: From :meth:`_api` if a `"drive"` / `"gcs"` export
@@ -845,38 +942,102 @@ class GEE(LazyClientMixin, AbstractDataSource):
         wait_for_export: bool = True,
         cloud_mask: CloudMask | None = None,
         filters: Iterable[CollectionFilter] | None = None,
-        engine: Literal["auto", "ee", "eedai"] = "auto",
+        engine: Literal["auto", "ee", "eedai", "pixels"] = "auto",
         cog: bool = False,
         resample: str = "nearest",
         property_filter: str | None = None,
+        materialize: bool = False,
+        crs_transform: Sequence[float] | None = None,
+        nodata: float | int | None = None,
+        high_volume: bool = False,
     ):
         # Validate the cheap (no-I/O) config first so user typos surface
         # before the ~3.3 s cold-cache catalog parse below.
-        if export_via not in {"url", "drive", "gcs", "asset"}:
-            raise ValueError(
-                f"export_via must be 'url', 'drive', 'gcs', or 'asset', "
-                f"got {export_via!r}"
-            )
+        # Resolved, not matched against a restated set: the literal vocabulary
+        # here was the reason a newly registered sink was still rejected, which
+        # made the "adding a sink needs no backend edit" claim false.
+        sink = resolve_sink(export_via)
         if property_filter is not None:
             _validate_property_filter(property_filter)
-        if export_via == "drive" and not drive_folder:
-            raise ValueError("export_via='drive' requires drive_folder=")
-        if export_via == "gcs" and not gcs_bucket:
-            raise ValueError("export_via='gcs' requires gcs_bucket=")
-        if export_via == "asset" and not asset_id:
+        # Both inputs are known now, so refuse now: checking after `download()`
+        # meant every export in the run completed - and, with the default
+        # `wait_for_export=True`, was polled to completion - before raising,
+        # losing the destinations it had just produced.
+        if materialize and sink.is_batch:
             raise ValueError(
-                "export_via='asset' requires asset_id= (the parent folder "
-                "asset, e.g. 'projects/my-project/assets/my-folder')"
+                f"materialize=True needs pixels on disk, but export_via="
+                f"{export_via!r} queues the work remotely and returns a "
+                "destination. Use export_via='url', or pull the result from "
+                "the destination yourself."
             )
+        # The sink refuses itself, so this function knows no destination by
+        # name: it hands over the candidate values and lets the resolved sink
+        # say whether the one it needs is there.
+        sink.validate_config(
+            {
+                "drive_folder": drive_folder,
+                "gcs_bucket": gcs_bucket,
+                "asset_id": asset_id,
+            }
+        )
         if cloud_mask is not None and not callable(cloud_mask):
             raise TypeError(
                 "cloud_mask must be a callable ee.Image -> ee.Image (or None), "
                 f"got {type(cloud_mask).__name__}"
             )
         collection_filters = _validate_filters(filters)
-        if engine not in _ENGINES:
+        pinned_transform = validate_crs_transform(crs_transform)
+        # Resolved here, not only at composite time: `reducer=` names one
+        # vocabulary now, and four of its members reduce pixels in a region
+        # rather than images in a collection. Refusing at construction keeps
+        # that distinction a config error like every other one, instead of a
+        # failure part-way through a run that has already written buckets.
+        if reducer is not None and not resolve_reducer(reducer).collection_capable:
             raise ValueError(
-                f"engine must be one of {sorted(_ENGINES)}, got {engine!r}"
+                f"reducer={reducer!r} reduces pixels in a region, not images in "
+                "a collection, so it cannot composite a time bucket; use one of "
+                f"{sorted(collection_reducers())}, 'percentile:<q>', or pass it "
+                "to sample_points(reducer=...) instead."
+            )
+        # Validated by `resolve_engine`, not re-checked here: it owns the one
+        # message that can tell "no such engine" apart from "registered but not
+        # selectable yet", and a second copy of the vocabulary is what let the
+        # two drift in the first place.
+        resolved_engine = resolve_engine(engine)
+        # `nodata` and `high_volume` are expressible only through the pixel
+        # API's request body and endpoint. Warned about here rather than at
+        # export time: both are decided by `engine=`, which is known now, so
+        # the notice arrives while the caller can still act on it. A warning
+        # rather than a refusal, because it is how `cog` and `property_filter`
+        # already report being on the wrong path, and because ignoring the
+        # argument still produces the pixels that were asked for.
+        # Earth Engine takes a fill value in exactly two places, and they are
+        # not the ones the first pass assumed. Its `PixelGrid` has no nodata
+        # field at all - a request carrying one is refused with `Unknown name
+        # "nodata" at 'grid'` - so the pixel path has to unmask the expression
+        # and declare the value on the raster it writes itself. The only place
+        # the API accepts one directly is `GeoTiffImageExportOptions.noData`,
+        # i.e. a file-based batch export. Everything else ignores it: an asset
+        # export has no file format, and `getDownloadURL` has no such argument.
+        # Judged on the resolved engine, not the argument, because `engine=`
+        # also takes an `Engine` instance.
+        honours_nodata = (
+            resolved_engine.name == PixelsEngine.name and not sink.is_batch
+        ) or sink.takes_format_options
+        if nodata is not None and not honours_nodata:
+            logger.warning(
+                f"nodata={nodata} is honoured by engine='pixels' with "
+                "export_via='url' (unmasked server-side, declared on the "
+                "written raster) and by export_via='drive'/'gcs' (Earth "
+                f"Engine's own GeoTIFF option); this request "
+                f"(engine={resolved_engine.name!r}, "
+                f"export_via={export_via!r}) ignores it."
+            )
+        if high_volume and resolved_engine.name != PixelsEngine.name:
+            logger.warning(
+                "high_volume=True is only used by the pixel API, so "
+                f"engine={resolved_engine.name!r} ignores it and initialises "
+                "against the regular endpoint; pass engine='pixels' to use it."
             )
         _validate_pure_config(start, end, temporal_resolution, fmt)
 
@@ -922,8 +1083,39 @@ class GEE(LazyClientMixin, AbstractDataSource):
         #: OGR attribute-filter string narrowing collection scenes on the EEDAI
         #: path (e.g. `"CLOUDY_PIXEL_PERCENTAGE < 20"`); Earth Engine ignores it.
         self.property_filter = property_filter
+        #: The validated 6-element transform pinning the output grid, or `None`.
+        self.crs_transform: tuple[float, ...] | None = pinned_transform
+        #: Fill value declared on the pixel API's request, or `None`.
+        self.nodata = nodata
+        #: Initialise against Earth Engine's high-volume endpoint.
+        self.high_volume = bool(high_volume)
+        # Composed from the same kwargs the public attrs above carry, so a
+        # strategy receives a validated slice rather than the whole backend.
+        # The public attrs stay as the back-compat surface.
+        # Resolved once: `engine=` is validated above, and the object replaces
+        # the `if/elif` that used to re-read the string at every decision.
+        self._engine = resolved_engine
+        #: The resolved destination; `export_via=` is validated above.
+        self._sink = resolve_sink(export_via)
+        #: Return in-memory pyramids objects from `download()` as well as paths.
+        self.materialize = bool(materialize)
+        self._export_config = ExportConfig(
+            export_via=export_via,
+            drive_folder=drive_folder,
+            gcs_bucket=gcs_bucket,
+            asset_id=asset_id,
+            cog=bool(cog),
+            resample=resample,
+            auto_split=bool(auto_split),
+            http_timeout=self.http_timeout,
+            wait_for_export=bool(wait_for_export),
+            materialize=bool(materialize),
+            nodata=nodata,
+        )
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
         self._eedai_credential: Any = None  # lazily built in `_eedai_credentials`
+        #: The EEDAI adapter, lazily built in `_eedai_reader`.
+        self._eedai_reader_adapter: EedaiReader | None = None
         #: Region reprojections, keyed by target CRS. A large `GeoDataFrame` on
         #: a many-bucket run would otherwise be warped once per bucket per use.
         self._region_cache: dict[str, Any] = {}
@@ -1047,6 +1239,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # Re-authenticating may switch identity, so the reader's cached
         # credential must not outlive the values it was built from.
         self._eedai_credential = None
+        # The adapter holds the credential, so it has to drop with it or a
+        # re-authentication would keep reading as the previous identity.
+        self._eedai_reader_adapter = None
         # LazyClientMixin: first access to `client` runs `_open_client` (auth).
         _ = self.client
         return self
@@ -1059,7 +1254,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         environment variables), then uses a service-account key when a
         `service_account` + `service_key` pair is available (via
         :class:`EarthEngineAuth`); otherwise runs `ee.Authenticate()` and
-        `ee.Initialize(project=...)` against the resolved `project`. The
+        `ee.Initialize(project=...)` against the resolved `project`. The host is
+        whatever the resolved engine's :meth:`~earthlens.gee.engines.Engine.endpoint`
+        returns for this backend's `high_volume` setting — the default for every
+        engine but the pixel API's, which can be pointed at the high-volume
+        endpoint. `ee` keeps one session per process, so the last backend to
+        open its connection decides the host for the others too. The
         `ee.Authenticate()` flow is interactive — it opens a browser and
         waits for the user to paste a token, so on a headless box (CI,
         Docker, remote shell) it will hang or fail with whatever the EE
@@ -1085,14 +1285,19 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "environment variables. See "
                 "https://developers.google.com/earth-engine/guides/service_account."
             )
+        # The resolved engine decides the host: only the pixel API documents
+        # an alternative one, and `Engine.endpoint` answers `None` for the rest,
+        # so this reads the same for every other engine as it did before.
+        host = self._engine.endpoint(self._engine_config.high_volume)
         if service_account and service_key:
             self.project = EarthEngineAuth.initialize(
-                service_account, service_key, project
+                service_account, service_key, project, host=host
             )
             return ee
+        host_kwargs = {"opt_url": host} if host else {}
         try:
             ee.Authenticate()
-            ee.Initialize(project=project)
+            ee.Initialize(project=project, **host_kwargs)
         except ee.EEException as exc:
             # `ee.Authenticate()` falls back to application-default credentials,
             # and an ADC file is an `authorized_user` JSON - a credential shape
@@ -1167,7 +1372,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             dates=dates,
         )
 
-    def download(self, progress_bar: bool = True) -> list[Path | str | TaskInfo]:
+    def download(
+        self, progress_bar: bool = True, *, materialize: bool | None = None
+    ) -> list[Path | str | TaskInfo] | DownloadResult:
         """Download every requested band-set of every requested dataset.
 
         Args:
@@ -1238,6 +1445,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
             earthlens.gee.auth.EarthEngineAuth: Performs the one-time
                 `ee.Initialize` used by :meth:`_open_client`.
         """
+        # Before anything is exported: the refusal used to arrive after every
+        # bucket had been written and polled to completion, which threw away
+        # the destinations it had just produced.
+        if (self.materialize if materialize is None else materialize) and (
+            self._sink.is_batch
+        ):
+            raise ValueError(
+                f"materialize=True needs pixels on disk, but export_via="
+                f"{self.export_via!r} queues the work remotely and returns a "
+                "destination. Use export_via='url', or pull the result from "
+                "the destination yourself."
+            )
         # Trigger the lazy Earth Engine auth/init before any `ee` call.
         _ = self.client
         self._cog_warned = False  # the cog= notice is once per run, not per object
@@ -1248,7 +1467,53 @@ class GEE(LazyClientMixin, AbstractDataSource):
         )  # GEE always uses the {asset_id: [band]} form
         for asset_id, bands in self.vars.items():
             outputs.extend(self._download_dataset(asset_id, list(bands), progress_bar))
-        return outputs
+        written = outputs
+        if not (self.materialize if materialize is None else materialize):
+            return written
+        return self._materialise(written)
+
+    def _materialise(self, written: list[Any]) -> DownloadResult:
+        """Read each written raster back as an in-memory pyramids object.
+
+        Deliberately a read-back rather than handing over the `Dataset` the
+        EEDAI path already built. That path closes the dataset, drops the last
+        reference and renames the file in a carefully ordered `finally` — on
+        Windows a lingering GDAL handle keeps the file locked and the rename
+        fails. Returning the live object means not closing it, which would have
+        to reorder that block; the round-trip costs one re-open per bucket and
+        touches none of it. Handing back the live object is a worthwhile
+        follow-up, not something to bolt on here.
+
+        Args:
+            written: What the sinks returned — paths, destinations or tasks.
+
+        Returns:
+            A :class:`~earthlens.gee.work.DownloadResult` carrying one artifact
+            per bucket, with `obj` set for every entry that wrote a file.
+
+        Raises:
+            ValueError: If no entry wrote a file, which is every batch sink:
+                there is nothing local to read back, so asking to materialise a
+                queued export is a mistake worth naming.
+        """
+        # The batch sinks are refused at construction, so anything reaching
+        # here with no written file produced no buckets at all - an empty result
+        # is the honest answer, not an error about the sink.
+        artifacts: list[Artifact] = []
+        for entry in written:
+            if isinstance(entry, Path):
+                artifacts.append(
+                    Artifact(
+                        kind=self.OUTPUT_KIND,
+                        path=entry,
+                        obj=PyramidsDataset.read_file(entry),
+                    )
+                )
+            elif isinstance(entry, str):
+                artifacts.append(Artifact(kind=self.OUTPUT_KIND, destination=entry))
+            else:
+                artifacts.append(Artifact(kind=self.OUTPUT_KIND, task=entry))
+        return DownloadResult(artifacts=tuple(artifacts))
 
     def _download_dataset(
         self, asset_id: str, bands: list[str], progress_bar: bool = True
@@ -1294,8 +1559,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
         if progress_bar:
             iterator = tqdm(buckets, desc=f"{asset_id} [{','.join(bands)}]", unit="img")
         return [
-            self._api(image, var_info, bands, when, bucket_start, bucket_end)
-            for when, image, bucket_start, bucket_end in iterator
+            self._api(
+                unit.payload,
+                var_info,
+                bands,
+                unit.when,
+                unit.bucket_start,
+                unit.bucket_end,
+            )
+            for unit in iterator
         ]
 
     def _build_collection(
@@ -1384,9 +1656,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
             (both :class:`datetime.datetime`), which the EEDAI collection path
             re-composites client-side.
         """
-        reducer = self.reducer or var_info.default_reducer
+        # Resolved once per request rather than per bucket: a parameterised
+        # reducer (`percentile:90`) validates its argument at resolution time,
+        # so a typo fails before any bucket is exported.
+        reducer = resolve_reducer(self.reducer or var_info.default_reducer)
         if self.temporal_resolution == "raw" or not var_info.is_image_collection:
-            yield start, reduce_collection(collection, reducer), start, end
+            yield RasterWorkUnit(reducer(collection), start, start, end)
             return
         freq = _RESOLUTION_FREQ[self.temporal_resolution]
         bucket_starts = date_windows(start, end, freq, inclusive="left")
@@ -1399,9 +1674,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             window = collection.filterDate(
                 bucket_start.strftime("%Y-%m-%d"), bucket_end.strftime("%Y-%m-%d")
             )
-            yield (
+            yield RasterWorkUnit(
+                reducer(window),
                 bucket_start.to_pydatetime(),
-                reduce_collection(window, reducer),
                 bucket_start.to_pydatetime(),
                 bucket_end.to_pydatetime(),
             )
@@ -1417,8 +1692,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
     ) -> Path | str | TaskInfo:
         """Export one composited `ee.Image` via the configured `export_via`.
 
-        For `export_via="url"`: estimate the request's pixel dimensions
-        from the bbox and `scale`; if either axis exceeds Earth Engine's
+        For `export_via="url"`: size the request from the bbox and `scale` —
+        or exactly, from `crs_transform`, when the grid is pinned; if either
+        axis exceeds Earth Engine's
         32768-px synchronous limit, either auto-split + mosaic via
         pyramids (when `auto_split=True`) or raise a `ValueError`
         pointing the user at a coarser `scale`, a smaller bbox,
@@ -1432,8 +1708,19 @@ class GEE(LazyClientMixin, AbstractDataSource):
         left in the destination for the caller to pull; for `"asset"`
         a new EE asset is created at `<asset_id>/<prefix>`.
 
+        The write itself is delegated to the resolved
+        :class:`~earthlens.gee.sinks.Sink`, so this method decides only *whether
+        the reader serves the bucket* and leaves *where the pixels go* to the
+        sink.
+
+        `engine="pixels"` replaces `getDownloadURL` on the `"url"` sink with
+        `ee.data.computePixels` (:meth:`_export_via_pixels`). It evaluates the
+        same composited `image` server-side, and Earth Engine applies the same
+        32768-px per-axis cap to it, so the size check and `auto_split` apply
+        there too - only the transport differs.
+
         A raw, no-compute request may instead be served by the pyramids-eo
-        EEDAI reader — see :meth:`_use_eedai` for when, and
+        EEDAI reader — see :meth:`_try_via_eedai` for when, and
         :meth:`_export_via_eedai` for what that path does. The composited
         `image` is then unused: the reader materialises the asset's own
         pixels.
@@ -1452,7 +1739,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             For `"url"`: the :class:`pathlib.Path` of the written GeoTIFF.
             For `"drive"` / `"gcs"` / `"asset"`: a destination string
             (`"drive://<folder>/<prefix>"` / `"gs://<bucket>/<prefix>"` /
-            `"ee://<asset_id>/<prefix>"`).
+            `"ee://<asset_id>/<prefix>"`), or a
+            :class:`~earthlens.gee.jobs.TaskInfo` when `wait_for_export=False`
+            left the task running.
 
         Raises:
             ValueError: If no output scale can be resolved; for `"url"` with
@@ -1473,49 +1762,397 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "GEE(...) — the catalog has no nominal spatial_resolution for it."
             )
         prefix = f"{slug_asset_id(var_info.id)}_{'-'.join(bands)}_{when:%Y%m%d}"
-        if self.export_via == "url":
-            # An empty request is not one band: upstream opens every band the
-            # asset has, so budget for that rather than under-counting.
-            use_reader, plan = self._use_eedai(
-                var_info,
-                max(len(bands) or len(var_info.bands), 1),
-                bucket_start,
-                bucket_end,
+        # `is_batch`, not the name: the reader can serve any sink that wants
+        # pixels now, so a synchronous sink added later gets the fast path
+        # without an edit here - which is what makes the `Sink` seam a seam.
+        if not self._sink.is_batch:
+            served = self._try_via_eedai(
+                var_info, bands, float(scale), prefix, bucket_start, bucket_end
             )
-            if use_reader:
-                assert plan is not None  # a yes always carries its plan
-                try:
-                    return self._export_via_eedai(
-                        var_info,
-                        bands,
-                        float(scale),
-                        prefix,
-                        plan,
-                        bucket_start,
-                        bucket_end,
-                    )
-                except _reader_errors(import_earthengine_reader()) as exc:
-                    # The reader can still refuse after routing has committed:
-                    # a band set spanning resolution groups is refused by the
-                    # collection reader although the single-image one handles
-                    # it, and only upstream knows that. Under a forced engine
-                    # that refusal is the answer; under `auto` this is a request
-                    # Earth Engine can serve, so falling back keeps the contract
-                    # that `auto` routes rather than fails.
-                    if self.engine == "eedai":
-                        raise
-                    logger.warning(
-                        f"the EEDAI reader could not serve {var_info.id} "
-                        f"({exc}); falling back to Earth Engine for this bucket."
-                    )
+            if served is not None:
+                return served
         self._warn_cog_ignored(var_info)
         self._warn_property_filter_ignored(var_info)
         # Only the Earth Engine paths need the `ee.Geometry`; the reader clips
         # to its own bbox / cutline.
         region = self._ee_region()
-        if self.export_via == "url":
-            return self._export_via_url(image, var_info, float(scale), region, prefix)
-        return self._export_via_batch(image, float(scale), region, prefix)
+        # The resolved sink writes: it knows whether it pulls pixels now or
+        # queues work, and - for the synchronous one - which of Earth Engine's
+        # two pull APIs the resolved engine asked for. Adding a destination is
+        # a `Sink` subclass, not another branch here.
+        return self._sink.write(
+            self,
+            image,
+            var_info=var_info,
+            scale=float(scale),
+            bands=bands,
+            region=region,
+            prefix=prefix,
+        )
+
+    def _try_via_eedai(
+        self,
+        var_info: Dataset,
+        bands: list[str],
+        scale: float,
+        prefix: str,
+        bucket_start: dt.datetime,
+        bucket_end: dt.datetime,
+    ) -> Path | None:
+        """Serve one bucket from the EEDAI reader, or decline so Earth Engine does.
+
+        Split out of :meth:`_api` so that method reads as the sink dispatch it
+        is. Every question about routing to the reader is answered here: whether
+        this request is the reader's at all, and what a refusal that arrives
+        after routing has committed means.
+
+        Args:
+            var_info: The catalog entry being read.
+            bands: The band ids the read asks for.
+            scale: The resolved ground sample distance in metres.
+            prefix: The filename stem for this bucket.
+            bucket_start: Inclusive start of this bucket's date window.
+            bucket_end: Exclusive end of that window.
+
+        Returns:
+            The written path when the reader served the bucket, else `None` —
+            because no engine accepted the request, because the engine that
+            accepted was not the reader, or because the reader refused after
+            routing under an engine whose refusals are not fatal.
+
+        Raises:
+            ValueError: From :meth:`_use_eedai` when `engine="eedai"` was forced
+                and the request cannot be served, and from the reader when a
+                late refusal is fatal.
+        """
+        # An empty request is not one band: upstream opens every band the
+        # asset has, so budget for that rather than under-counting.
+        use_reader, plan = self._use_eedai(
+            var_info,
+            max(len(bands) or len(var_info.bands), 1),
+            bucket_start,
+            bucket_end,
+        )
+        # `plan.engine`, not just the boolean: an accepted plan says WHICH
+        # engine accepted it, and only the reader's plans belong on the reader
+        # path. Taking any yes here is what let a `pixels` plan - a request
+        # carrying a cloud_mask or filters - be served from stored pixels with
+        # the computation silently dropped.
+        if not (use_reader and plan is not None and plan.engine == EedaiEngine.name):
+            return None
+        try:
+            return self._export_via_eedai(
+                var_info, bands, scale, prefix, plan, bucket_start, bucket_end
+            )
+        except reader_refusal_types() as exc:
+            # The reader can still refuse after routing has committed: a band
+            # set spanning resolution groups is refused by the collection
+            # reader although the single-image one handles it, and only upstream
+            # knows that. Under a forced engine that refusal is the answer;
+            # under `auto` this is a request Earth Engine can serve, so falling
+            # back keeps the contract that `auto` routes rather than fails.
+            if self._engine.refusal_is_fatal():
+                raise
+            logger.warning(
+                f"the EEDAI reader could not serve {var_info.id} "
+                f"({exc}); falling back to Earth Engine for this bucket."
+            )
+            return None
+
+    def _export_via_pixels(
+        self,
+        image: Any,
+        var_info: Dataset,
+        scale: float,
+        bands: Sequence[str],
+        prefix: str,
+    ) -> Path:
+        """Fetch one bucket through `ee.data.computePixels` → `<prefix>.tif`.
+
+        Earth Engine's documented extraction call for a *computed* image. Unlike
+        `getDownloadURL` it returns the bytes directly, and unlike the
+        EEDAI reader it evaluates the computation graph, so a `cloud_mask` or
+        `filters` survives.
+
+        It returns the GeoTIFF bytes directly rather than a URL, so there is no
+        second HTTP hop to retry and no zip to unpack: the body goes to a staged
+        file and is renamed on success, the same write-then-rename the other
+        paths use so a failure cannot leave a truncated raster at the final
+        name.
+
+        Earth Engine applies its 32768-px per-axis cap to a `computePixels`
+        grid too - measured, not assumed: a 39,479 x 12 px request is refused
+        with `Pixel grid dimensions (39479x12) must be less than or equal to
+        32768`. So an oversize request is tiled when `auto_split=True`, and
+        refused here with that remedy named when it is not, rather than left to
+        surface as a raw Earth Engine error.
+
+        Args:
+            image: The composited `ee.Image` for this bucket.
+            var_info: The catalog entry being read.
+            scale: Ground sample distance in metres.
+            bands: The bands to fetch, in order.
+            prefix: The filename stem for this bucket.
+
+        Returns:
+            The written path.
+
+        Raises:
+            ValueError: If the engine declines to size the request, which means
+                the catalog row carries no resolution to size from; or if the
+                grid exceeds Earth Engine's per-axis cap and `auto_split` is
+                off.
+        """
+        engine = self._engine
+        # Narrowed for the same reason the batch export narrows to `_BatchSink`:
+        # the grid and the request body are this engine's, not the ABC's, and
+        # the caller has already dispatched on the name.
+        assert isinstance(engine, PixelsEngine)  # the caller guarantees this
+        nodata = self._export_config.nodata
+        if nodata is not None:
+            # The only way a fill value can reach these pixels: the request
+            # body has no field for one, and an Earth Engine composite returns
+            # masked pixels as 0 in a GeoTIFF - measured, on a CHIRPS window
+            # over the Arabian Sea, which came back 0.0 over water with no
+            # no-data declared. Unmasking first puts the caller's value there
+            # instead, and the write declares it.
+            image = image.unmask(nodata)
+        serves, plan = engine.plan(self, var_info, max(len(bands), 1))
+        if not serves or plan is None:
+            raise ValueError(
+                f"engine='pixels' cannot size a read of {var_info.id}; use "
+                "engine='auto' so Earth Engine serves it instead."
+            )
+        grid = engine.grid_for(self, scale)
+        if grid.longest_axis > EE_MAX_DIMENSION:
+            if self.auto_split:
+                return self._pixels_split_and_fetch(
+                    image, var_info, scale, bands, prefix
+                )
+            _fits, reason = grid.fits(
+                max_pixels=_EE_URL_MAX_PIXELS, max_dimension=EE_MAX_DIMENSION
+            )
+            raise ValueError(
+                f"{var_info.id}: engine='pixels' would request "
+                f"{grid.cols}x{grid.rows} px"
+                f"{f' - {reason}' if reason else ''}. Earth Engine applies the "
+                "same per-axis cap to computePixels as to getDownloadURL. Use a "
+                "coarser scale, a smaller bbox, export_via='drive', or "
+                "auto_split=True."
+            )
+        return self._fetch_one_pixels_tile(image, var_info, grid, bands, prefix)
+
+    def _tiling_scale(self, scale: float) -> float:
+        """Return the metre scale the AOI has to be split on.
+
+        :func:`split_aoi_for_url` sizes its tiles at a metre scale, which is the
+        right input only when the request is sized from `scale`. A pinned
+        `crs_transform` sets the pixel independently, and it can be far finer -
+        so splitting at `scale` asked for too few tiles and each one still went
+        out over the per-axis cap. Measured before the fix: a 4-degree AOI
+        pinned at 0.0001 degrees is 40,000 px wide, while at `scale=5000` it
+        looks 78 px wide, so `auto_split=True` produced a single tile 40,000 px
+        across.
+
+        The pinned pixel is therefore expressed back as the scale that would
+        produce the same grid, which is what the splitter can take. The finer of
+        the two axes decides, so the split errs toward more tiles rather than
+        fewer.
+
+        Args:
+            scale: The resolved ground sample distance in metres.
+
+        Returns:
+            `scale` itself for an unpinned request, else the smaller scale that
+            represents the pinned grid.
+        """
+        pinned = self._pinned_grid()
+        if pinned is None:
+            return scale
+        sized = OutputGrid.for_metre_grid(pinned.bbox, crs=self.crs, scale=scale)
+        factor = max(pinned.cols / sized.cols, pinned.rows / sized.rows)
+        return scale / factor if factor > 1 else scale
+
+    def _pixels_split_and_fetch(
+        self,
+        image: Any,
+        var_info: Dataset,
+        scale: float,
+        bands: Sequence[str],
+        prefix: str,
+    ) -> Path:
+        """Tile an oversize AOI, fetch each tile through `computePixels`, mosaic.
+
+        The pixel API is capped per axis exactly as `getDownloadURL` is, so
+        `auto_split=True` means the same thing here: split the AOI with
+        :func:`split_aoi_for_url`, fetch each sub-window, and merge the tiles.
+        Each tile is sized through the engine, so a pinned grid stays pinned and
+        the tiles keep sharing pixel edges.
+
+        Args:
+            image: The composited `ee.Image`.
+            var_info: The catalog entry being read.
+            scale: Ground sample distance in metres.
+            bands: The bands to fetch, in order.
+            prefix: The filename stem for the mosaic.
+
+        Returns:
+            The mosaicked path.
+        """
+        engine = self._engine
+        assert isinstance(engine, PixelsEngine)  # the caller guarantees this
+        sub_extents = split_aoi_for_url(self.space, self._tiling_scale(scale))
+        logger.info(
+            f"{var_info.id}: AOI exceeds the {EE_MAX_DIMENSION}-px per-axis cap "
+            f"at scale={scale} m; fetching {len(sub_extents)} computePixels "
+            "tile(s)."
+        )
+        tile_paths: list[Path] = []
+        for index, sub in enumerate(sub_extents):
+            tile_bbox = bbox_to_crs(
+                (sub.west, sub.south, sub.east, sub.north), self.crs
+            )
+            tile_grid = engine.grid_for_window(self, tile_bbox, scale)
+            # Checked per tile, not inferred from the split: the splitter works
+            # in lat/lon degrees at a metre scale while the tile is sized in the
+            # output CRS, so this is the only place the cap can be *known* to
+            # hold. Raising here beats letting Earth Engine refuse the tile.
+            if tile_grid.longest_axis > EE_MAX_DIMENSION:
+                raise ValueError(
+                    f"{var_info.id}: splitting the AOI left a tile of "
+                    f"{tile_grid.cols}x{tile_grid.rows} px, still over Earth "
+                    f"Engine's {EE_MAX_DIMENSION}-px per-axis cap. Use a "
+                    "coarser scale or crs_transform, a smaller bbox, or "
+                    "export_via='drive'."
+                )
+            tile_prefix = f"{prefix}_tile_{index:04d}"
+            tile_paths.append(
+                self._fetch_one_pixels_tile(
+                    image, var_info, tile_grid, bands, tile_prefix, as_cog=False
+                )
+            )
+        # The tiles are plain GeoTIFFs whatever `cog` says - converting each one
+        # only to merge them would be wasted work - and the mosaic carries the
+        # flag instead.
+        return self._mosaic_tiles(tile_paths, prefix, as_cog=self.cog)
+
+    def _fetch_one_pixels_tile(
+        self,
+        image: Any,
+        var_info: Dataset,
+        grid: OutputGrid,
+        bands: Sequence[str],
+        prefix: str,
+        *,
+        as_cog: bool | None = None,
+    ) -> Path:
+        """Fetch one `computePixels` window to `<prefix>.tif`.
+
+        The single-window worker shared by the whole-AOI path and the tiled one,
+        so the staging, the COG choice and the handle release are written once.
+
+        Args:
+            image: The composited `ee.Image`.
+            var_info: The catalog entry, for the log line.
+            grid: The window to request.
+            bands: The bands to fetch, in order.
+            prefix: The filename stem.
+
+        Returns:
+            The written path.
+        """
+        engine = self._engine
+        assert isinstance(engine, PixelsEngine)  # only this engine gets here
+        body = engine.request(self, image, grid, list(bands))
+        logger.info(
+            f"computePixels {var_info.id} [{', '.join(bands) or 'all bands'}] "
+            f"at {grid.cols}x{grid.rows} px in {grid.crs}"
+        )
+        target = self.root_dir / f"{prefix}.tif"
+        staged = self.root_dir / f"{prefix}.partial.tif"
+        write_cog = self.cog if as_cog is None else as_cog
+        nodata = self._export_config.nodata
+        try:
+            payload = ee.data.computePixels(body)
+            staged.write_bytes(payload)
+            reader = PyramidsDataset.read_file(staged)
+            try:
+                writer = reader if nodata is None else _declaring(reader, nodata)
+                try:
+                    if write_cog:
+                        writer.cog.to_cog(str(target))
+                    else:
+                        writer.to_file(str(target))
+                finally:
+                    if writer is not reader:
+                        close_quietly(writer)
+            finally:
+                close_quietly(reader)
+        finally:
+            _discard_quietly(staged)
+        logger.info(f"Wrote {target} (computePixels{', COG' if write_cog else ''})")
+        return target
+
+    def _mosaic_tiles(
+        self, tile_paths: list[Path], prefix: str, *, as_cog: bool = False
+    ) -> Path:
+        """Merge per-tile rasters into `<prefix>.tif` and delete the tiles.
+
+        Shared by both tiled paths, which differ only in how a tile is fetched
+        and in whether the result is a COG. `merge_rasters` writes a plain
+        GeoTIFF, so a mosaic that has to be cloud-optimised is merged to a
+        staged file and rewritten through `Dataset.cog` - otherwise `cog=True`
+        would be honoured for every tile and then lost in the stitch.
+
+        `as_cog` is passed rather than read from `self.cog` so each path keeps
+        its own contract: the pixel API writes its own raster and honours the
+        flag, while `getDownloadURL` documents that it ignores it, and a tiled
+        request must not quietly differ from the single-request one.
+
+        Args:
+            tile_paths: The written tiles, in order.
+            prefix: The filename stem for the mosaic.
+            as_cog: Write the mosaic as a Cloud Optimized GeoTIFF.
+
+        Returns:
+            The mosaicked path.
+        """
+        target = self.root_dir / f"{prefix}.tif"
+        # Carry the first tile's own no-data marker onto the mosaic
+        # explicitly -- None when it declares none, asking for no marker at
+        # all rather than a stray literal like the string "none".
+        first_tile = PyramidsDataset.read_file(tile_paths[0])
+        try:
+            tile_no_data = first_tile.no_data_value
+        finally:
+            # Release before the unlink below: a live handle holds a Windows
+            # lock, and `Path.unlink` would raise PermissionError on it.
+            first_tile.close()
+        fill = (
+            tile_no_data[0] if isinstance(tile_no_data, (list, tuple)) else tile_no_data
+        )
+        merged = self.root_dir / f"{prefix}.merged.tif" if as_cog else target
+        merge_rasters(
+            [str(path) for path in tile_paths], str(merged), no_data_value=fill
+        )
+        if as_cog:
+            try:
+                reader = PyramidsDataset.read_file(merged)
+                try:
+                    reader.cog.to_cog(str(target))
+                finally:
+                    # Release before the unlink: a live handle holds a Windows
+                    # lock, the same reason the no-data probe above closes.
+                    close_quietly(reader)
+            finally:
+                _discard_quietly(merged)
+        for path in tile_paths:
+            path.unlink(missing_ok=True)
+        logger.info(
+            f"Stitched {len(tile_paths)} tile(s) into {target} via pyramids"
+            f"{', COG' if as_cog else ''}."
+        )
+        return target
 
     def _export_via_url(
         self, image, var_info: Dataset, scale: float, region, prefix: str
@@ -1536,19 +2173,145 @@ class GEE(LazyClientMixin, AbstractDataSource):
         :func:`pyramids.dataset.merge.merge_rasters`; otherwise a
         `ValueError` is raised with a coarser-scale / smaller-bbox /
         `export_via="drive"` hint.
+
+        A pinned `crs_transform` changes both halves of that: the request sends
+        the transform in place of `scale`, which Earth Engine treats as an
+        either/or, and the cap is checked against the grid the transform
+        implies rather than against an estimate made at `scale`.
         """
-        width_px, height_px = self.space.estimate_pixel_dims(scale)
+        # Two sizings, deliberately. `estimate_pixel_dims` is pyramids' documented
+        # worst-case UPPER bound, which is the right thing to make the decision
+        # on: it over-counts, so it can only split or refuse too eagerly, never
+        # too late. `OutputGrid.for_earth_engine` predicts the grid Earth Engine
+        # will actually build, which is the right thing to put in the message -
+        # quoting the upper bound told the caller a pixel count Earth Engine
+        # never produces. The decision still rests on the bound, so this changes
+        # no behaviour, only what the error says.
+        # A pinned grid is the exception to the two sizings above: its pixel
+        # size comes from the transform, not from `scale`, so an estimate made
+        # at `scale` describes a grid this request will not produce. The pinned
+        # grid is exact, so it answers both the decision and the message.
+        pinned = self._pinned_grid()
+        width_px, height_px = (
+            (pinned.cols, pinned.rows)
+            if pinned is not None
+            else self.space.estimate_pixel_dims(scale)
+        )
         if max(width_px, height_px) > EE_MAX_DIMENSION:
             if self.auto_split:
                 return self._auto_split_and_download(image, var_info, scale, prefix)
+            grid = pinned or OutputGrid.for_earth_engine(
+                (
+                    self.space.longitude_min,
+                    self.space.latitude_min,
+                    self.space.longitude_max,
+                    self.space.latitude_max,
+                ),
+                crs=self.crs,
+                scale=scale,
+            )
+            _fits, reason = grid.fits(
+                max_pixels=_EE_URL_MAX_PIXELS, max_dimension=EE_MAX_DIMENSION
+            )
+            # A pinned request was not sized by `scale`, so quoting the scale
+            # would describe a grid it never asked for.
+            sized = (
+                f"pinned by crs_transform={list(pinned.crs_transform or ())}"
+                if pinned is not None
+                else f"at scale={scale} m"
+            )
             raise ValueError(
-                f"{var_info.id}: the requested AOI at scale={scale} m is about "
-                f"{width_px}x{height_px} px, over Earth Engine's "
-                f"{EE_MAX_DIMENSION}-px per-axis limit for synchronous downloads. "
-                "Use a coarser scale, a smaller bbox, export_via='drive', or "
-                "auto_split=True."
+                f"{var_info.id}: the requested AOI {sized} is "
+                f"{grid.cols}x{grid.rows} px on Earth Engine's grid"
+                f"{f' - {reason}' if reason else ''}. Use a coarser scale, a "
+                "smaller bbox, export_via='drive', or auto_split=True."
             )
         return self._download_one_url_tile(image, region, scale, prefix)
+
+    def _reducer_name(self, var_info: Dataset) -> str:
+        """Return the requested reducer as a name, whatever form it arrived in.
+
+        `reducer=` accepts a name, a `percentile:<q>` spec or a `Reducer`
+        instance, and two places need the *name*: the guard that refuses the
+        reader a composite it would compute differently, and the reader's own
+        `reducer=` keyword, which takes a string from its own vocabulary.
+
+        Args:
+            var_info: The catalog entry, for its `default_reducer`.
+
+        Returns:
+            The reducer's registry name.
+        """
+        requested = self.reducer or var_info.default_reducer
+        if isinstance(requested, str):
+            return requested.split(":", 1)[0]
+        return type(requested).name
+
+    @property
+    def _engine_config(self) -> EngineConfig:
+        """Return the engine settings as one value object, built from the live ones.
+
+        Derived rather than snapshotted in `__init__`: `crs`, `scale`,
+        `cloud_mask` and the rest stay public and writable, so a stored copy
+        would silently go stale the moment one was reassigned - which is why
+        nothing read the stored one.
+
+        Returns:
+            The current engine configuration.
+        """
+        return EngineConfig(
+            # The resolved name, not the raw attribute: `engine=` accepts an
+            # `Engine` instance, and this field is a `str`, so passing the
+            # attribute through made a perfectly good instance fail validation
+            # inside a `ValueError` handler that reported it as a sizing
+            # failure.
+            engine=self._engine.name,
+            reducer=self.reducer,
+            crs=self.crs,
+            scale=self.scale,
+            cloud_mask=self.cloud_mask,
+            filters=tuple(self.filters),
+            property_filter=self.property_filter,
+            region=self.region,
+            discover_extent=bool(self.discover_extent),
+            high_volume=bool(self.high_volume),
+            crs_transform=self.crs_transform,
+        )
+
+    def _pinned_grid(
+        self,
+        bbox: tuple[float, float, float, float] | None = None,
+        cutline: Any = None,
+    ) -> OutputGrid | None:
+        """Return the grid a `crs_transform` pins, or `None` when none was given.
+
+        One builder for every path that needs it, so a pinned grid cannot be
+        derived two different ways: the pixel engine asks for it to size its
+        request, the `getDownloadURL` path asks for it to decide whether the
+        request fits Earth Engine's per-axis cap, and a tiled request asks for
+        it per tile - which is what keeps the tiles on the same lattice.
+
+        Args:
+            bbox: The window in the output CRS, or `None` for the whole AOI.
+            cutline: The region to clip to, when a window was given; ignored for
+                the whole AOI, which carries its own.
+
+        Returns:
+            The pinned :class:`~earthlens.gee.grid.OutputGrid` over that window,
+            or `None` when the grid is sized from `scale`.
+
+        Raises:
+            ValueError: If the AOI reprojects to non-finite bounds in the output
+                CRS. The transform itself was validated at construction.
+        """
+        crs_transform = self._engine_config.crs_transform
+        if crs_transform is None:
+            return None
+        if bbox is None:
+            bbox, cutline = self._eedai_window()
+        return OutputGrid.from_crs_transform(
+            bbox, crs=self.crs, crs_transform=crs_transform, cutline=cutline
+        )
 
     def _eedai_eligible(self, var_info: Dataset) -> bool:
         """Return whether this request is a raw read the EEDAI reader can serve.
@@ -1569,20 +2332,30 @@ class GEE(LazyClientMixin, AbstractDataSource):
         its lat/lon AOI into that CRS first (see :meth:`_eedai_window`); a
         geographic CRS other than EPSG:4326, or a projected one whose axis is
         not in metres, is not sized correctly by the metre `scale` and stays on
-        Earth Engine.
+        Earth Engine. A pinned `crs_transform` is declined for the same kind of
+        reason: the reader sizes its own grid from `scale` and takes no
+        transform, so it could not land on the lattice that was pinned.
 
         Args:
             var_info: The catalog entry for the dataset being fetched.
 
         Returns:
-            `True` when the request is a raw, no-compute read.
+            `True` when the request is a raw, no-compute read on an unpinned
+            grid.
         """
         return (
             self.export_via == "url"
-            and self.cloud_mask is None
-            and not self.filters
+            # The config owns the "is anything shaping this server-side?"
+            # question, so the reader's eligibility and the engines read one
+            # definition instead of each repeating the two-term test.
+            and not self._engine_config.needs_server_side_compute
             and var_info.ee_type in ("image", "image_collection")
             and self._eedai_crs_supported()
+            # The reader sizes its own metre grid from `scale` and takes no
+            # transform, so it cannot honour a pinned one. Routing a pinned
+            # request to it would return pixels on a grid other than the one
+            # the caller pinned, which is worse than not using the reader.
+            and self._engine_config.crs_transform is None
         )
 
     def _eedai_crs_supported(self) -> bool:
@@ -1623,23 +2396,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             The envelope in `self.crs`; the input is returned unchanged when the
             output CRS is already EPSG:4326.
         """
-        if self.crs.upper() == _EEDAI_NATIVE_CRS:
-            return latlon_bbox
-        from pyproj import Transformer
-
-        transformer = Transformer.from_crs(_EEDAI_NATIVE_CRS, self.crs, always_xy=True)
-        # transform_bounds densifies the edges, so a reprojected rectangle that
-        # bows still bounds the whole AOI rather than only its corners.
-        #
-        # Known asymmetry for a *large* projected AOI: upstream converts this
-        # window back to EPSG:4326 with a four-corner transform, which
-        # under-estimates the reach of an edge that bows outward. Measured on a
-        # 10 deg x 10 deg AOI, the requested northern edge came back ~0.023 deg
-        # short, so a poleward strip can read as nodata, while ~0.5 deg of
-        # unrequested ground is added on each side. Small AOIs (the common case)
-        # are affected at the ~0.002 deg level. Fixing it properly needs the
-        # densified back-transform upstream: serapeum-org/pyramids-eo#97.
-        return transformer.transform_bounds(*latlon_bbox)
+        return bbox_to_crs(latlon_bbox, self.crs)
 
     def _eedai_output_grid(
         self, bbox: tuple[float, float, float, float], scale: float
@@ -1658,21 +2415,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Returns:
             `(rows, cols)`, at least one pixel per axis.
         """
-        if self.crs.upper() == _EEDAI_NATIVE_CRS:
-            return self._eedai_grid(bbox, scale)
-        if not all(math.isfinite(bound) for bound in bbox):
-            # `transform_bounds` returns infinities for an AOI outside the
-            # projection's domain; without this the budget maths would raise an
-            # opaque OverflowError from `math.ceil` instead.
-            raise ValueError(
-                f"the AOI bounds must all be finite, got {bbox!r} in {self.crs}"
-            )
-        if not scale or scale <= 0:
-            raise ValueError("'scale' must be a positive number of metres.")
-        min_x, min_y, max_x, max_y = (float(v) for v in bbox)
-        rows = max(math.ceil((max_y - min_y) / scale), 1)
-        cols = max(math.ceil((max_x - min_x) / scale), 1)
-        return rows, cols
+        return OutputGrid.for_metre_grid(bbox, crs=self.crs, scale=scale).as_rows_cols()
 
     @staticmethod
     def _reader_end(bucket_end: dt.datetime, bucket_start: dt.datetime) -> str:
@@ -1713,6 +2456,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Returns:
             `(min_lon, min_lat, max_lon, max_lat)`.
         """
+        # A region's bounds are the AOI, and they can be in any CRS, so that
+        # case is resolved here; a plain lat/lon bbox is already the answer and
+        # `OutputGrid.latlon_bbox` is what says so for a grid in another CRS.
         region = self.region
         if region is not None:
             latlon = region
@@ -1767,28 +2513,38 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"a collection read of {var_info.id} needs a bucket date window; "
                 "_api passes one for every bucket"
             )
-        reducer = self.reducer or var_info.default_reducer
+        # Resolve before comparing: `reducer=` accepts a `Reducer` instance as
+        # well as a name, and an instance is never a member of a set of strings,
+        # so testing the raw value let `Mosaic()` walk straight past this guard.
+        reducer = self._reducer_name(var_info)
+        if reducer not in _COLLECTION_REDUCERS:
+            # The reader takes a name from its own vocabulary. Anything outside
+            # it - `percentile` is the first such reducer - would reach the
+            # reader verbatim and raise a `ValueError` that is deliberately not
+            # in `_reader_errors`, aborting the download after the scenes had
+            # already been fetched. Earth Engine can express all of them.
+            return EnginePlan.declined(
+                f"reducer={reducer!r} is not in the reader's vocabulary, so "
+                "Earth Engine composites this instead"
+            )
         if reducer in _EEDAI_UNSUPPORTED_REDUCERS:
             # Checked before the network call: no point discovering scenes for a
             # composite the reader cannot reproduce.
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"reducer={reducer!r} does not mean the same thing client-side: "
-                    "Earth Engine's is last-wins, while the reader returns the first "
-                    "scene of the stack, so Earth Engine composites this instead"
-                ),
+            return EnginePlan.declined(
+                f"reducer={reducer!r} does not mean the same thing client-side: Earth Engine's is last-wins, while the reader returns the first scene of the stack, so Earth Engine composites this instead"
             )
-        reader = import_earthengine_reader()
+        # The adapter, not the raw module: it owns the lock and the identity
+        # check around a reader call, which is the whole reason it exists.
         # Built outside the discovery `try`, so a credential problem is never
         # reported as "no scenes". Under a forced engine it raises; under
         # `auto` it warns and falls back, because `auto`'s contract is to route
         # a request Earth Engine can still serve rather than to fail it - but
         # loudly, so a fixable key does not silently disable the fast path.
         try:
-            credentials = self._eedai_credentials()
+            # Called for its failure, not its value: the adapter binds the
+            # credential for the read itself, but building it here keeps a
+            # broken key from being reported later as "no scenes".
+            self._eedai_credentials()
         except AuthenticationError:
             if self.engine == "eedai":
                 raise
@@ -1797,7 +2553,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "falls back to Earth Engine; fix the service key to use the "
                 "fast path."
             )
-            return EedaiPlan(False, None, 0, "the EEDAI credential could not be built")
+            return EnginePlan.declined('the EEDAI credential could not be built')
         window_start = bucket_start.strftime("%Y-%m-%d")
         window_end = self._reader_end(bucket_end, bucket_start)
         # One catalog query per bucket, by necessity: every bucket has a
@@ -1807,7 +2563,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # and was removed rather than left in as dead weight. Reducing this to
         # one query per run needs upstream to expose the per-scene times.
         try:
-            cost = reader.estimate_earthengine_cost(
+            cost = self._eedai_reader().estimate_cost(
                 var_info.id,
                 start=window_start,
                 end=window_end,
@@ -1817,10 +2573,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 # output CRS here would have degrees read as projected metres
                 # and discover scenes over the wrong ground.
                 crs=_EEDAI_NATIVE_CRS,
-                credentials=credentials,
                 property_filter=self.property_filter,
             )
-        except _reader_errors(reader) as exc:
+        except _reader_errors(self._eedai_reader().module) as exc:
             # A discovery failure is a fallback, not a crash - but it is
             # worth more than an info line, because a persistent one
             # silently disables the fast path for the whole run.
@@ -1828,8 +2583,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"EEDA scene discovery failed for {var_info.id}: {exc}. This "
                 "bucket falls back to Earth Engine."
             )
-            return EedaiPlan(
-                False, None, 0, f"scene discovery for {var_info.id} failed ({exc})"
+            return EnginePlan.declined(
+                f'scene discovery for {var_info.id} failed ({exc})'
             )
         if not cost.scene_count:
             # A property of the data, not of the request: this window and AOI
@@ -1837,23 +2592,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # rather than aborting a run whose earlier buckets wrote fine —
             # "raises if the request is not eligible" is about the request, and
             # this one is.
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                f"{_EEDAI_NO_SCENES}: no {var_info.id} scenes in this bucket's "
-                "window and AOI",
+            return EnginePlan.declined(
+                f"{_EEDAI_NO_SCENES}: no {var_info.id} scenes in this bucket's window and AOI"
             )
         if cost.scene_count > _EEDAI_MAX_SCENES:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{cost.scene_count:,} scenes in this bucket, over the "
-                    f"{_EEDAI_MAX_SCENES:,}-scene cap — Earth Engine reduces this "
-                    "server-side instead of the reader fetching every scene"
-                ),
+            return EnginePlan.declined(
+                f'{cost.scene_count:,} scenes in this bucket, over the {_EEDAI_MAX_SCENES:,}-scene cap — Earth Engine reduces this server-side instead of the reader fetching every scene'
             )
         # `estimate_earthengine_cost` is authoritative for the *scene count*;
         # the per-scene native footprint is sized from the catalog's metre
@@ -1862,11 +2606,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # metre-based grid would misread by ~1e5x.
         native_scale = var_info.spatial_resolution
         if not native_scale:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                f"{var_info.id} has no native resolution to size the read",
+            return EnginePlan.declined(
+                f'{var_info.id} has no native resolution to size the read'
             )
         bbox, _cutline = self._eedai_window()
         # One scene's window must satisfy the same budgets a single-image read
@@ -1874,7 +2615,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # scene-count multiple would catch - so the shared gate runs first.
         fits, reason = self._eedai_native_fits(var_info, bbox, band_count)
         if not fits:
-            return EedaiPlan(False, None, 0, reason)
+            return EnginePlan.declined(reason)
         # Every scene is warped onto the *output* window and the whole set is
         # held to reduce, so the stack is sized by the output grid - not the
         # native one. A `scale` finer than the asset makes the output grid the
@@ -1888,17 +2629,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         cols = max(native_cols, out_cols)
         total = cost.scene_count * rows * cols * max(band_count, 1)
         if total > _EEDAI_MAX_PIXELS:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"about {total:,} px across {cost.scene_count:,} scenes on a "
-                    f"{cols}x{rows} grid, over the {_EEDAI_MAX_PIXELS:,}-px "
-                    "single-pass budget"
-                ),
+            return EnginePlan.declined(
+                f'about {total:,} px across {cost.scene_count:,} scenes on a {cols}x{rows} grid, over the {_EEDAI_MAX_PIXELS:,}-px single-pass budget'
             )
-        return EedaiPlan(True, None, cost.scene_count, "")
+        return EnginePlan.serves(tiles=cost.scene_count)
 
     def _eedai_verdict(
         self,
@@ -1968,51 +2702,29 @@ class GEE(LazyClientMixin, AbstractDataSource):
         bbox, cutline = self._eedai_window()
         fits, reason = self._eedai_native_fits(var_info, bbox, band_count)
         if fits:
-            return EedaiPlan(True, None, 1, "")
+            return EnginePlan.serves(tiles=1)
         native_scale = var_info.spatial_resolution
         if not native_scale:
-            return EedaiPlan(False, None, 0, reason)
+            return EnginePlan.declined(reason)
         if cutline is not None:
-            return EedaiPlan(
-                False, None, 0, f"{reason}, and it cannot be tiled behind a cutline"
+            return EnginePlan.declined(
+                f'{reason}, and it cannot be tiled behind a cutline'
             )
         if self.resample != _EEDAI_TILING_RESAMPLE:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{reason}, and it cannot be tiled with resample="
-                    f"{self.resample!r} — an interpolating resampler would differ "
-                    "from the un-tiled read at the tile seams"
-                ),
+            return EnginePlan.declined(
+                f'{reason}, and it cannot be tiled with resample={self.resample!r} — an interpolating resampler would differ from the un-tiled read at the tile seams'
             )
         scale_m = float(self.scale or native_scale)
         native_ratio = max(scale_m / float(native_scale), 1.0)
         if native_ratio > _EEDAI_MAX_TILING_RATIO:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{reason}, and tiling it would be worse than Earth Engine: at "
-                    f"scale={scale_m:g} m over a {native_scale:g} m asset the reader "
-                    f"fetches about {native_ratio**2:,.0f} native px per output px, "
-                    "which Earth Engine aggregates server-side instead"
-                ),
+            return EnginePlan.declined(
+                f'{reason}, and tiling it would be worse than Earth Engine: at scale={scale_m:g} m over a {native_scale:g} m asset the reader fetches about {native_ratio**2:,.0f} native px per output px, which Earth Engine aggregates server-side instead'
             )
         native_rows, native_cols = self._eedai_output_grid(bbox, float(native_scale))
         native_total = native_rows * native_cols * max(band_count, 1)
         if native_total > _EEDAI_MAX_NATIVE_PIXELS:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{reason}, and tiling it would still fetch about "
-                    f"{native_total:,} native px, over the "
-                    f"{_EEDAI_MAX_NATIVE_PIXELS:,}-px ceiling on one read's total work"
-                ),
+            return EnginePlan.declined(
+                f"{reason}, and tiling it would still fetch about {native_total:,} native px, over the {_EEDAI_MAX_NATIVE_PIXELS:,}-px ceiling on one read's total work"
             )
         # One tile's native read is `tile_size * scale / native_scale` px per
         # side and is held in memory whole, so shrink the tile until that read
@@ -2039,30 +2751,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # workable tile, but this guard is deliberately kept — it was
             # removed once as unreachable, and the next change to the padding
             # made the plan divide by a zero-sized tile.
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{reason}, and no tile is small enough: the reader's "
-                    f"{_EEDAI_WINDOW_PAD}-px window padding already exceeds the "
-                    "per-tile budget here"
-                ),
+            return EnginePlan.declined(
+                f"{reason}, and no tile is small enough: the reader's {_EEDAI_WINDOW_PAD}-px window padding already exceeds the per-tile budget here"
             )
         rows, cols = self._eedai_output_grid(bbox, scale_m)
         tiles = math.ceil(rows / tile_size) * math.ceil(cols / tile_size)
         if tiles > _EEDAI_MAX_TILES:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{reason}, and tiling it would take {tiles:,} tiles (over the "
-                    f"{_EEDAI_MAX_TILES:,}-tile ceiling); every tile is its own "
-                    "fetch and they are opened together to mosaic"
-                ),
+            return EnginePlan.declined(
+                f'{reason}, and tiling it would take {tiles:,} tiles (over the {_EEDAI_MAX_TILES:,}-tile ceiling); every tile is its own fetch and they are opened together to mosaic'
             )
-        return EedaiPlan(True, tile_size, tiles, "")
+        return EnginePlan.serves(tiles=tiles, tile_size=tile_size)
 
     def _use_eedai(
         self,
@@ -2105,55 +2803,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 skipped rather than raised, since that is a property of the
                 data and not of the request.
         """
-        if self.engine == "ee":
-            return False, None
-        eligible = self._eedai_eligible(var_info)
-        if self.engine == "eedai":
-            if not eligible:
-                raise ValueError(
-                    f"engine='eedai' cannot serve {var_info.id}: the EEDAI "
-                    "reader materialises pixels from an asset id, so it cannot "
-                    "run server-side compute (a reduced collection, cloud_mask "
-                    "or filters), and it reads only EPSG:4326 or a metre-based "
-                    f"projected CRS (got crs={self.crs!r}). Use engine='auto' "
-                    "or engine='ee'."
-                )
-            plan = self._eedai_verdict(var_info, band_count, bucket_start, bucket_end)
-            if not plan.can_serve:
-                if plan.reason.startswith(_EEDAI_NO_SCENES):
-                    # Nothing to read here, but the request itself is fine, so
-                    # let the Earth Engine path write this bucket rather than
-                    # aborting the run.
-                    logger.info(
-                        f"{var_info.id}: {plan.reason}; this bucket falls through "
-                        "to Earth Engine."
-                    )
-                    return False, None
-                raise ValueError(
-                    f"engine='eedai' cannot serve {var_info.id}: {plan.reason}. "
-                    f"{_eedai_remedy(plan.reason)}"
-                )
-            return True, plan
-        if not (eligible and eedai_available()):
-            return False, None
-        try:
-            plan = self._eedai_verdict(var_info, band_count, bucket_start, bucket_end)
-        except ValueError as exc:
-            # Sizing refused the request — a non-finite projected envelope, say.
-            # Under `auto` that is a reason to let Earth Engine serve it, not to
-            # abort the download. A forced engine has already raised above.
-            logger.warning(
-                f"the EEDAI reader could not size {var_info.id} ({exc}); "
-                "falling back to Earth Engine."
-            )
-            return False, None
-        if not plan.can_serve:
-            logger.info(
-                f"Serving {var_info.id} through Earth Engine rather than the EEDAI "
-                f"reader: {plan.reason}."
-            )
-            return False, None
-        return True, plan
+        return self._engine.plan(self, var_info, band_count, bucket_start, bucket_end)
 
     def _eedai_window(self) -> tuple[tuple[float, float, float, float], Any]:
         """Return the AOI the reader should read, as `(bbox, cutline)`.
@@ -2249,14 +2899,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             or either cannot be parsed (in which case reprojecting is the safe
             answer).
         """
-        from pyproj import CRS
-
-        try:
-            return bool(CRS.from_user_input(region_crs) == CRS.from_user_input(target))
-        except Exception:  # noqa: BLE001
-            # A parse failure on either side falls back to the code check
-            # rather than assuming a match.
-            return _same_epsg_code(region_crs, target)
+        return same_crs(region_crs, target)
 
     @staticmethod
     def _eedai_grid(
@@ -2270,8 +2913,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         pyramids documents as a worst-case *upper bound* for cap pre-checks
         — it over-counts both axes (and unevenly, so a square AOI comes out
         non-square). Here the real span is used, with longitude degrees
-        shortened by `cos(latitude)` at the AOI's mid-latitude, so the pixels
-        are square on the ground at the requested `scale`.
+        shortened by `cos(latitude)` at the AOI's equatorward edge - the
+        latitude where a degree of longitude is longest, and so the one that
+        needs the most pixels to hold the requested `scale`. Sizing on any
+        poleward latitude instead would deliver pixels coarser than asked.
 
         Args:
             bbox: The lat/lon window `(min_x, min_y, max_x, max_y)`.
@@ -2288,16 +2933,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Examples:
             - A 0.1° box over Cairo at 90 m is taller than it is wide in
-              pixels: a degree of longitude is shorter at that latitude, and
-              the grid is sized at the box's poleward edge:
+              pixels, because a degree of longitude is shorter at that
+              latitude:
                 ```python
                 >>> from earthlens.gee.backend import GEE
                 >>> GEE._eedai_grid((31.2, 29.9, 31.3, 30.0), 90.0)
                 (124, 108)
 
                 ```
-            - Spanning the equator the two axes match, because the poleward
-              edge is 1° and a degree of longitude is barely shortened there:
+            - Sitting on the equator the two axes match, because a degree of
+              longitude is not shortened there at all:
                 ```python
                 >>> from earthlens.gee.backend import GEE
                 >>> GEE._eedai_grid((0.0, 0.0, 1.0, 1.0), 1000.0)
@@ -2312,43 +2957,34 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
                 ```
         """
-        min_x, min_y, max_x, max_y = bbox
-        if not all(math.isfinite(bound) for bound in bbox):
-            raise ValueError(f"the AOI bounds must be finite, got {bbox}")
-        if scale <= 0 or not math.isfinite(scale):
-            raise ValueError(f"scale must be a positive number of metres, got {scale}")
-        # Take `cos` at the poleward edge rather than the mid-latitude: for a
-        # tall AOI the mid-latitude value would under-count columns nearer the
-        # pole, sampling coarser than asked. The poleward edge only ever errs
-        # finer. Clamped away from the pole itself, where `cos` reaches zero.
-        poleward = min(max(abs(min_y), abs(max_y)), 89.9)
-        height_m = abs(max_y - min_y) * _METRES_PER_DEGREE
-        width_m = (
-            abs(max_x - min_x) * _METRES_PER_DEGREE * math.cos(math.radians(poleward))
-        )
-        # Round up, not to nearest: rounding down would leave the raster a
-        # little coarser than the scale that was asked for.
-        rows = max(1, math.ceil(height_m / scale))
-        cols = max(1, math.ceil(width_m / scale))
-        return rows, cols
+        return geographic_grid(bbox, scale)
 
     def _warn_cog_ignored(self, var_info: Dataset) -> None:
         """Say so, once, when `cog=True` cannot apply to this request.
 
-        `cog=` only reaches the EEDAI writer, so a request that stays on
-        Earth Engine silently yields a plain GeoTIFF. Without a notice the
-        only symptom is an output that is not a COG.
+        `cog=` reaches the paths that write the raster themselves - the EEDAI
+        reader and the pixel API - and nothing else, so a `getDownloadURL` or
+        batch request silently yields a plain GeoTIFF. Without a notice the only
+        symptom is an output that is not a COG.
+
+        It is therefore not enough to ask "did the reader decline?": the pixel
+        engine reaches this method on the same branch and *does* honour the
+        flag, so warning there would be a notice about nothing.
 
         Args:
             var_info: The catalog entry being written (named in the notice).
         """
         if not self.cog or self._cog_warned:
             return
+        if self._engine.name == PixelsEngine.name and not self._sink.is_batch:
+            return
         self._cog_warned = True
         logger.warning(
-            f"cog=True has no effect for {var_info.id}: it applies to the EEDAI "
-            "path, and this request is served by Earth Engine (see engine=). A "
-            "plain GeoTIFF is written instead."
+            f"cog=True has no effect for {var_info.id}: it applies to the paths "
+            "that write the raster themselves (the EEDAI reader and "
+            "engine='pixels'), and this request is served by Earth Engine's "
+            "getDownloadURL or a batch export. A plain GeoTIFF is written "
+            "instead."
         )
 
     def _warn_property_filter_ignored(self, var_info: Dataset) -> None:
@@ -2403,25 +3039,26 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 surfacing pyramids-eo's own exception type.
             ImportError: If `pyramids-eo` (the `[eedai]` extra) is missing.
         """
-        if self._eedai_credential is not None:
-            return self._eedai_credential
-        _service_account, service_key, _project = self._resolve_credentials()
-        if service_key is None:
-            logger.warning(
-                "No Earth Engine service key resolved for the EEDAI read; falling "
-                "back to Application Default Credentials, which may authenticate "
-                "as a different identity than the Earth Engine half of this "
-                "request. Pass service_key= (or set GEE_SERVICE_KEY) to pin it."
-            )
-        try:
-            self._eedai_credential = credentials_for(service_key)
-        except ImportError:
-            raise
-        except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
-            raise AuthenticationError(
-                f"could not build Earth Engine credentials for the EEDAI read: {exc}"
-            ) from exc
-        return self._eedai_credential
+        return self._eedai_reader().credential
+
+    def _eedai_reader(self) -> EedaiReader:
+        """Return the EEDAI adapter for this request, built once.
+
+        Memoised per instance for the same reason the credential was: building
+        it writes inline key material to a transient temp file, so rebuilding it
+        per bucket would scatter those across a multi-band, multi-date download.
+
+        Returns:
+            The bound :class:`~earthlens.gee.reader.EedaiReader`.
+
+        Raises:
+            AuthenticationError: If the credential cannot be built.
+            ImportError: If `pyramids-eo` (the `[eedai]` extra) is missing.
+        """
+        if self._eedai_reader_adapter is None:
+            _account, service_key, _project = self._resolve_credentials()
+            self._eedai_reader_adapter = EedaiReader.from_service_key(service_key)
+        return self._eedai_reader_adapter
 
     def _eedai_native_fits(
         self,
@@ -2541,8 +3178,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
             ImportError: If `pyramids-eo` (the `[eedai]` extra) is missing.
             AuthenticationError: If the reader's credentials cannot be built.
         """
-        reader = import_earthengine_reader()
-        credentials = self._eedai_credentials()
+        # The adapter owns the lock, the identity check and the credential, so
+        # the process-global GDAL configuration a reader call mutates is only
+        # ever touched from one place.
+        reader = self._eedai_reader()
         target = self.root_dir / f"{prefix}.tif"
         # Write beside the target and rename on success: `to_file` / `to_cog`
         # write in place, so a mid-write failure would otherwise leave a
@@ -2580,7 +3219,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             composite_kwargs = {
                 "start": bucket_start.strftime("%Y-%m-%d"),
                 "end": self._reader_end(bucket_end, bucket_start),
-                "reducer": self.reducer or var_info.default_reducer,
+                # A name, not the resolved object: the reader's `reducer=`
+                # takes one of its own vocabulary's strings.
+                "reducer": self._reducer_name(var_info),
             }
             if self.property_filter is not None:
                 composite_kwargs["property_filter"] = self.property_filter
@@ -2601,14 +3242,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
             dataset = reader.from_earthengine(
                 var_info.id,
                 bands=list(bands),
-                window=reader.Window(
+                window=reader.window_type(
                     bbox=bbox,
                     crs=self.crs,
                     shape=self._eedai_output_grid(bbox, scale),
                     resample=self.resample,
                 ),
                 geometry=cutline,
-                credentials=credentials,
                 **composite_kwargs,
                 **read_options,
             )
@@ -2654,10 +3294,26 @@ class GEE(LazyClientMixin, AbstractDataSource):
         auto-split loop. Stripped of size-checking — callers are
         expected to have already verified that the request fits the
         Earth Engine synchronous limit.
+
+        A pinned `crs_transform` is sent instead of `scale` (Earth Engine takes
+        one or the other). Every tile sends the same transform and its own
+        region, which is what keeps the tiles on one lattice: the transform
+        fixes the pixel size and origin, the region only says how far to go.
         """
-        url = image.getDownloadURL(
-            {"scale": scale, "crs": self.crs, "region": region, "format": "GEO_TIFF"}
-        )
+        params: dict[str, Any] = {
+            "crs": self.crs,
+            "region": region,
+            "format": "GEO_TIFF",
+        }
+        # Earth Engine documents `crs_transform` and `scale` as mutually
+        # exclusive, so a pinned request sends the transform in place of the
+        # scale rather than beside it.
+        crs_transform = self._engine_config.crs_transform
+        if crs_transform is None:
+            params["scale"] = scale
+        else:
+            params["crs_transform"] = list(crs_transform)
+        url = image.getDownloadURL(params)
         target = self.root_dir / f"{prefix}.tif"
         # Route the (single-shot, expiring) getDownloadURL fetch through the
         # shared HttpClient so a transient 429/5xx is retried with back-off
@@ -2712,13 +3368,27 @@ class GEE(LazyClientMixin, AbstractDataSource):
         — pass Python `None` through, which asks for no marker at all
         rather than stamping one. Per-tile tifs are deleted on success.
         """
-        sub_extents = split_aoi_for_url(self.space, scale)
+        sub_extents = split_aoi_for_url(self.space, self._tiling_scale(scale))
         logger.info(
             f"{var_info.id}: AOI exceeds {EE_MAX_DIMENSION}-px per-axis cap at "
             f"scale={scale} m; auto-splitting into {len(sub_extents)} tile(s)."
         )
         tile_paths: list[Path] = []
         for k, sub in enumerate(sub_extents):
+            # A pinned request sends its transform per tile, so the tile is as
+            # cap-bound as the whole AOI was; the unpinned case is guaranteed by
+            # the splitter itself, which sized these extents at this scale.
+            pinned_tile = self._pinned_grid(
+                bbox=bbox_to_crs((sub.west, sub.south, sub.east, sub.north), self.crs)
+            )
+            if pinned_tile is not None and pinned_tile.longest_axis > EE_MAX_DIMENSION:
+                raise ValueError(
+                    f"{var_info.id}: splitting the AOI left a tile of "
+                    f"{pinned_tile.cols}x{pinned_tile.rows} px, still over "
+                    f"Earth Engine's {EE_MAX_DIMENSION}-px per-axis cap. Use a "
+                    "coarser scale or crs_transform, a smaller bbox, or "
+                    "export_via='drive'."
+                )
             sub_region = ee.Geometry.Rectangle(
                 [sub.west, sub.south, sub.east, sub.north]
             )
@@ -2726,29 +3396,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             tile_paths.append(
                 self._download_one_url_tile(image, sub_region, scale, sub_prefix)
             )
-        target = self.root_dir / f"{prefix}.tif"
-        # Carry the first tile's own no-data marker onto the mosaic
-        # explicitly -- None when it declares none, asking for no marker at
-        # all rather than a stray literal like the string "none".
-        first_tile = PyramidsDataset.read_file(tile_paths[0])
-        try:
-            tile_no_data = first_tile.no_data_value
-        finally:
-            # Release before the unlink below: a live handle holds a Windows
-            # lock, and `Path.unlink` would raise PermissionError on it.
-            first_tile.close()  # release the handle before the tiles are unlinked
-        fill = (
-            tile_no_data[0] if isinstance(tile_no_data, (list, tuple)) else tile_no_data
-        )
-        merge_rasters(
-            [str(p) for p in tile_paths],
-            str(target),
-            no_data_value=fill,
-        )
-        for p in tile_paths:
-            p.unlink(missing_ok=True)
-        logger.info(f"Stitched {len(tile_paths)} tile(s) into {target} via pyramids.")
-        return target
+        return self._mosaic_tiles(tile_paths, prefix)
 
     def _export_via_batch(
         self, image, scale: float, region, prefix: str
@@ -2761,34 +3409,50 @@ class GEE(LazyClientMixin, AbstractDataSource):
         When `wait_for_export=False` returns a :class:`TaskInfo`
         immediately so the caller can track the task asynchronously via
         :mod:`earthlens.gee.jobs`.
+
+        A pinned `crs_transform` is sent as the export's `crsTransform` instead
+        of `scale`: Earth Engine's export API rejects both together, so this is
+        an either/or rather than a preference.
         """
-        common = {
+        common: dict[str, Any] = {
             "image": image,
             "description": prefix[:100],
             "region": region,
-            "scale": scale,
             "crs": self.crs,
             "maxPixels": 1e13,
         }
-        if self.export_via == "drive":
-            task = ee.batch.Export.image.toDrive(
-                folder=self.drive_folder, fileNamePrefix=prefix, **common
-            )
-            destination = f"drive://{self.drive_folder}/{prefix}"
-        elif self.export_via == "gcs":
-            task = ee.batch.Export.image.toCloudStorage(
-                bucket=self.gcs_bucket, fileNamePrefix=prefix, **common
-            )
-            destination = f"gs://{self.gcs_bucket}/{prefix}"
+        # `crsTransform` and `scale` are mutually exclusive in Earth Engine's
+        # own export API - passing both is an error, not a preference - so a
+        # pinned request sends the transform instead.
+        crs_transform = self._engine_config.crs_transform
+        if crs_transform is None:
+            common["scale"] = scale
         else:
-            # The asset sink uses `assetId` instead of `fileNamePrefix` —
-            # each export creates one asset at `<self.asset_id>/<prefix>`.
-            assert (
-                self.asset_id is not None
-            )  # constructor requires it for export_via='asset'
-            target_asset = f"{self.asset_id.rstrip('/')}/{prefix}"
-            task = ee.batch.Export.image.toAsset(assetId=target_asset, **common)
-            destination = f"ee://{target_asset}"
+            common["crsTransform"] = list(crs_transform)
+        nodata = self._export_config.nodata
+        if nodata is not None and self._sink.takes_format_options:
+            # `GeoTiffImageExportOptions.noData`, the only fill value Earth
+            # Engine's API accepts directly. An asset export has no file
+            # format, so it declares none - the constructor warns about that.
+            common["formatOptions"] = {"noData": nodata}
+        # Which constructor, which target keyword and how the destination reads
+        # are the sink's business, so they are read off the resolved sink rather
+        # than branched on here. The asset sink addresses `assetId` and takes no
+        # `fileNamePrefix`, because each export creates one asset rather than a
+        # file with a name prefix.
+        sink = self._sink
+        # Only a batch sink reaches here - the caller dispatches on
+        # `sink.is_batch` - so narrow to the subclass that declares the export
+        # method and the target keyword, rather than reading them off the ABC.
+        assert isinstance(sink, _BatchSink)  # the caller guarantees this
+        if isinstance(sink, AssetSink):
+            # The asset sink addresses `assetId` and takes no `fileNamePrefix`:
+            # each export creates one asset rather than a file with a prefix.
+            target: dict[str, str] = sink.target(self, prefix)
+        else:
+            target = {**sink.target(self), "fileNamePrefix": prefix}
+        task = getattr(ee.batch.Export.image, sink.export_method)(**target, **common)
+        destination = sink.destination(self, prefix)
         if not self.wait_for_export:
             task.start()
             info = _op_to_taskinfo(task.status())

@@ -118,7 +118,17 @@ from earthlens.gee.catalog import (
     Extent,
     Provider,
 )
+from earthlens.gee.configs import EngineConfig, ExportConfig
+from earthlens.gee.engines import (
+    ENGINES,
+    AutoEngine,
+    EedaiEngine,
+    EeEngine,
+    Engine,
+    resolve_engine,
+)
 from earthlens.gee.features import create_feature, create_geometry
+from earthlens.gee.grid import OutputGrid
 from earthlens.gee.io import (
     feature_collection_to_dataframe,
     feature_collection_to_gdf,
@@ -132,7 +142,39 @@ from earthlens.gee.jobs import (
     resolve_destination,
     wait_for_task_id,
 )
+from earthlens.gee.pixels import HIGH_VOLUME_ENDPOINT, PixelsEngine
+from earthlens.gee.plans import EedaiPlan, EnginePlan
+from earthlens.gee.reader import EedaiReader
+from earthlens.gee.reducers import (
+    REDUCERS,
+    Max,
+    Mean,
+    Median,
+    Min,
+    Mode,
+    Mosaic,
+    Percentile,
+    Reducer,
+    Sum,
+    resolve_reducer,
+)
 from earthlens.gee.sampling import sample_points, sample_points_to_gdf
+from earthlens.gee.sinks import (
+    SINKS,
+    AssetSink,
+    DriveSink,
+    GcsSink,
+    Sink,
+    UrlSink,
+    resolve_sink,
+)
+from earthlens.gee.work import (
+    Artifact,
+    DownloadResult,
+    FeatureWorkUnit,
+    RasterWorkUnit,
+    WorkUnit,
+)
 
 __all__ = [
     "GEE",
@@ -161,4 +203,41 @@ __all__ = [
     "cancel_task",
     "wait_for_task_id",
     "resolve_destination",
+    "Reducer",
+    "Mean",
+    "Median",
+    "Min",
+    "Max",
+    "Mode",
+    "Mosaic",
+    "Sum",
+    "Percentile",
+    "REDUCERS",
+    "resolve_reducer",
+    "EnginePlan",
+    "EedaiPlan",
+    "OutputGrid",
+    "ExportConfig",
+    "EngineConfig",
+    "Engine",
+    "EeEngine",
+    "EedaiEngine",
+    "AutoEngine",
+    "ENGINES",
+    "resolve_engine",
+    "Sink",
+    "UrlSink",
+    "DriveSink",
+    "GcsSink",
+    "AssetSink",
+    "SINKS",
+    "resolve_sink",
+    "EedaiReader",
+    "WorkUnit",
+    "RasterWorkUnit",
+    "FeatureWorkUnit",
+    "Artifact",
+    "DownloadResult",
+    "PixelsEngine",
+    "HIGH_VOLUME_ENDPOINT",
 ]

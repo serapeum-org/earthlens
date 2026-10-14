@@ -48,6 +48,10 @@ class _FakeImage:
         self.calls.append(("clip", (geom,)))
         return self
 
+    def unmask(self, value):
+        self.calls.append(("unmask", (value,)))
+        return self
+
     def getDownloadURL(self, params):  # noqa: N802 - mirrors the ee API
         self.download_params = dict(params)
         self.download_params_list.append(dict(params))
@@ -180,8 +184,25 @@ class _FakeEE:
         self.image_log: list = []
         self.export_image = _FakeExportImage()
         self.batch = SimpleNamespace(Export=SimpleNamespace(image=self.export_image))
+        #: Records every `ee.data.computePixels` body and returns GeoTIFF bytes.
+        self.compute_pixels_calls: list[dict] = []
+        self.data = SimpleNamespace(computePixels=self._compute_pixels)
         self.authenticate_calls = 0
         self.initialize_calls: list[dict] = []
+        #: Records every stubbed `EarthEngineAuth.initialize`, host included.
+        self.auth_calls: list[dict] = []
+
+    def _compute_pixels(self, body):
+        """Record the request and return the bytes of a tiny real GeoTIFF."""
+        self.compute_pixels_calls.append(body)
+        return _TINY_GEOTIFF
+
+    def initialize_auth(self, service_account, service_key, project=None, host=None):
+        """Stand in for `EarthEngineAuth.initialize`, recording the host."""
+        self.auth_calls.append(
+            {"service_account": service_account, "project": project, "host": host}
+        )
+        return project or "fake-project"
 
     def Authenticate(self):  # noqa: N802 - mirrors the ee API
         self.authenticate_calls += 1
@@ -232,11 +253,23 @@ class _FakePyramidsHandle:
         # Real getDownloadURL tiles declare no no-data; the backend reads this
         # to inherit it rather than letting merge_rasters stamp its 0 default.
         self.no_data_value = no_data_value
+        # Enough of a raster for the declaring copy the nodata path builds.
+        self.geotransform = (31.2, 0.001, 0.0, 30.0, 0.0, -0.001)
+        self.epsg = 4326
+
+    def read_array(self, *args, **kwargs):
+        """Stand in for the pixel array; its identity is what is asserted."""
+        return [[1.0]]
 
     def to_file(self, path: str) -> None:
         from pathlib import Path as _Path
 
         _Path(path).write_bytes(self._body)
+
+    @property
+    def cog(self):
+        """Stand in for `Dataset.cog`, which the pixel path writes through."""
+        return _FakeCogWriter(self)
 
     opened_handles: list[_FakePyramidsHandle] = []
     closed_handles: list[_FakePyramidsHandle] = []
@@ -252,6 +285,11 @@ class _FakePyramidsHandle:
         _FakePyramidsHandle.closed_handles.append(self)
 
 
+#: Stand-in body for an `ee.data.computePixels` response. The pyramids reader is
+#: faked in these tests, so only its identity matters, not its format.
+_TINY_GEOTIFF = b"computepixels-geotiff-body"
+
+
 class _FakePyramidsDataset:
     """Stand-in for `pyramids.dataset.Dataset` — captures `from_*` calls."""
 
@@ -264,12 +302,24 @@ class _FakePyramidsDataset:
         cls.from_bytes_calls = []
         cls.from_archive_calls = []
         cls.read_file_calls = []
+        cls.from_array_calls = []
 
     @classmethod
     def read_file(cls, path, **kwargs):
         """Record the staged path and hand back a handle over its bytes."""
         cls.read_file_calls.append(str(path))
         return _FakePyramidsHandle(Path(path).read_bytes())
+
+    from_array_calls: list[dict] = []
+
+    @classmethod
+    def from_array(cls, arr, *, geo_ref=None, no_data_value=None, path=None):
+        """Record the declared no-data and hand back a handle carrying it."""
+        cls.from_array_calls.append({"no_data_value": no_data_value, "path": path})
+        handle = _FakePyramidsHandle(b"declared", no_data_value=(no_data_value,))
+        if path is not None:
+            Path(path).write_bytes(b"declared")
+        return handle
 
     @classmethod
     def from_bytes(
@@ -441,9 +491,7 @@ def fake_ee(monkeypatch) -> _FakeEE:
     monkeypatch.setattr(
         backend_module.EarthEngineAuth,
         "initialize",
-        staticmethod(
-            lambda service_account, service_key, project=None: project or "fake-project"
-        ),
+        staticmethod(fake.initialize_auth),
     )
     return fake
 
@@ -1231,10 +1279,12 @@ class TestExportViaAsset:
         with pytest.raises(ValueError, match="export_via='asset' requires asset_id"):
             make_gee(export_via="asset")
 
-    def test_unknown_export_via_lists_asset_too(self, make_gee):
-        """The updated ValueError message advertises `'asset'` as a valid sink."""
-        with pytest.raises(ValueError, match="'url', 'drive', 'gcs', or 'asset'"):
+    def test_unknown_export_via_lists_every_sink(self, make_gee):
+        """The message names all four sinks, derived from the registry."""
+        with pytest.raises(ValueError) as caught:
             make_gee(export_via="ftp")
+        message = str(caught.value)
+        assert all(name in message for name in ("url", "drive", "gcs", "asset"))
 
     def test_asset_export_queues_to_asset_and_returns_ee_uri(self, make_gee):
         """An Asset export queues a `toAsset` task and returns `ee://<asset>/<prefix>`."""
@@ -1522,8 +1572,13 @@ class TestApi:
             lon_lim=[0.0, 40.0],
             scale=30.0,
         )
-        with pytest.raises(ValueError, match="32768-px"):
+        with pytest.raises(ValueError, match=r"32,?768-px") as caught:
             gee.download(progress_bar=False)
+        message = str(caught.value)
+        # The message quotes the grid Earth Engine would actually build, and
+        # names a way out rather than only refusing.
+        assert "148427x148427" in message
+        assert "auto_split=True" in message
 
     def test_missing_scale_raises(self, make_gee):
         """`_api` raises when there is no `scale` and no dataset `spatial_resolution`."""
@@ -1959,7 +2014,9 @@ class _FakeCogWriter:
     def to_cog(self, path, **kwargs):
         self._dataset.written = str(path)
         self._dataset.wrote_cog = True
-        Path(path).write_bytes(b"eedai-cog")
+        # The pixel path's handle carries the fetched bytes, so write those when
+        # there are any; the EEDAI dataset has none and keeps its marker.
+        Path(path).write_bytes(getattr(self._dataset, "_body", b"eedai-cog"))
         return Path(path)
 
 
@@ -2092,7 +2149,12 @@ class _FakeReaderModule:
 def fake_reader(monkeypatch):
     """Patch the guarded pyramids-eo loader with an in-memory fake reader."""
     reader = _FakeReaderModule()
-    monkeypatch.setattr(backend_module, "import_earthengine_reader", lambda: reader)
+    # Patched on the reader module, which is where the import now happens: the
+    # backend reaches pyramids-eo through `EedaiReader`, so that adapter owns
+    # the lock and the identity check around every call.
+    from earthlens.gee import reader as reader_module
+
+    monkeypatch.setattr(reader_module, "import_earthengine_reader", lambda: reader)
     reader.credential_builds = []
     monkeypatch.setattr(
         backend_module,
@@ -3750,7 +3812,7 @@ class TestExportViaEedai:
         """
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        declined = backend_module.EedaiPlan(False, None, 0, "nope")
+        declined = backend_module.EnginePlan.declined("nope")
         with pytest.raises(ValueError, match="cannot serve"):
             gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", declined)
         assert not fake_reader.calls
@@ -3799,7 +3861,11 @@ class TestExportViaEedai:
         pixel count modest while splitting into thousands of tiles, each its
         own fetch, all opened together to mosaic.
         """
-        gee = make_gee(lat_lim=[0.0, 89.0], lon_lim=[0.0, 0.1], scale=1.0)
+        # Off the equator and very narrow, so the strip stays well inside the
+        # total-work budget (1.4e9 px of 4e9) while splitting into 1223 tiles.
+        # The old AOI reached from the equator to 89 deg, which now sizes its
+        # full equatorial width and trips the work budget first instead.
+        gee = make_gee(lat_lim=[60.0, 82.5], lon_lim=[0.0, 0.01], scale=1.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003").model_copy(
             update={"spatial_resolution": 1.0}
         )
