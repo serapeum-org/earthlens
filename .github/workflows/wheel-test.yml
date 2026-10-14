@@ -52,6 +52,15 @@ jobs:
         # them at job time, so every version is hash-verified (S8544) and an
         # upstream release cannot redden an unrelated PR.
         #
+        # `moto` and `pytest-recording` are test-only, but the suite does not
+        # merely run slower without them: `pytest-recording` registers the
+        # `vcr` marker, and `--strict-markers` turns an unregistered marker
+        # into a collection error, so every `test_wire.py` aborts the whole
+        # run instead of skipping. `moto` degrades more quietly — the bucket
+        # fixtures `importorskip` it — but silently skipping the six boto3
+        # backends in the one lane that exercises the built wheels is not
+        # worth saving a pin.
+        #
         # `uv pip compile`, not `uv export`: the workspace lock is deliberately
         # forked (argopy needs xarray>=2025.7, openeo needs <2025.1.2, declared
         # in `[tool.uv] conflicts`) and `export` emits the union of both forks
@@ -64,7 +73,7 @@ jobs:
         run: |
           set -euo pipefail
           version=$(ls dist/earthlens-[0-9]*.whl | sed -E 's|.*/earthlens-([^-]+)-py3.*|\1|')
-          printf 'earthlens[all]==%s\npytest\npytest-cov\npytest-socket\nhypothesis\npsutil\n' "${version}" \
+          printf 'earthlens[all]==%s\npytest\npytest-cov\npytest-socket\nhypothesis\npsutil\nmoto\npytest-recording\n' "${version}" \
             > dist/requirements.in
           uv pip compile --generate-hashes --universal --python-version 3.11 \
             --find-links dist \
