@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23865,8 +23865,18 @@ in-process S3) and <code>vcr_config</code> (cassettes, record mode <code>none</c
 new class that re-implements the S3 listing contract. Four cases are allow-listed, each because a real bucket
 cannot express them: two drive a second page of pagination (the emulator paginates only past a thousand keys),
 one asserts what the SDK was <em>called with</em>, and one injects a mid-transfer failure.</p>
-<p>The REST half is still review-only: a cassette has to be recorded against the live service, so it is captured
-when that backend is next touched with credentials to hand, not retrofitted in bulk.</p>
+<p>Eleven REST backends now carry a cassette too — climate_indices, drought, pvgis, obis, gdacs, bathymetry,
+nsi, hanze, nrel, iucn and risk_indicators — recorded live and replayed with the socket blocked <em>and</em> the
+environment stripped of credentials, so a cassette that only worked because a key happened to be exported
+would fail. <code>test_cassette_hygiene.py</code> re-checks every committed recording for an unscrubbed header or query
+parameter, so the scrubbing is a gate rather than a habit.</p>
+<p>Recording one is <code>--record-mode=once</code> with the network open; <code>vcr_config</code> reads that flag rather than pinning
+<code>record_mode</code>, because <code>use_cassette</code> lets the fixture override the command line and a hardcoded <code>none</code> would
+make recording impossible.</p>
+<p>Four backends are deliberately left on fakes: glaciers, ghsl, worldpop and cmems fetch the payload itself, so
+their cassettes came out at 58 MB, 8 MB, 2.3 MB and 2.1 MB. A cassette stores the response body, and committing
+a raster to git to avoid downloading it is a bad trade. If those need the tier, they need a metadata-only call
+to record against.</p>
 <h2 id="the-three-test-tiers"><a class="toclink" href="#the-three-test-tiers">The three test tiers</a><a class="headerlink" href="#the-three-test-tiers" title="Permanent link">#</a></h2>
 <table>
 <thead>
