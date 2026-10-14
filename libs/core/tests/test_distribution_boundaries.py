@@ -2851,3 +2851,83 @@ class TestCoreTestsDoNotDependOnProviders:
         assert len(_PROVIDER_PACKAGES) > 40, (
             f"expected the 60-odd provider subpackages, found {len(_PROVIDER_PACKAGES)}"
         )
+
+
+#: The part of the S3 surface that is unmistakably S3 and unmistakably drifts:
+#: the listing contract, with its `Delimiter` / `CommonPrefixes` branch and its
+#: pagination envelope. A class re-implementing it is standing in for botocore,
+#: which `earthlens.testing.s3_emulator` does with a real S3 instead.
+#:
+#: Deliberately excludes `get_object` / `download_file` / `head_object`: other
+#: SDK doubles define those names, and a stub that overrides only one of them
+#: to raise is injecting a transport failure, which is not a bucket state the
+#: emulator can hold.
+_S3_CLIENT_METHODS = frozenset({"list_objects_v2", "get_paginator"})
+
+#: Test modules still allowed to define an S3 client double, each with the
+#: reason the emulator cannot serve that case. Anything else is a regression.
+_S3_DOUBLE_ALLOWED: dict[str, str] = {
+    # Unit-tests the pagination helper itself by driving continuation tokens
+    # directly; the emulator only paginates past a thousand keys.
+    "libs/providers/atmosphere/tests/goes/conftest.py": "drives continuation tokens",
+    # Three tests assert what the SDK was *called with* (`downloaded`,
+    # `extra_args`) and one injects a mid-transfer failure. A call log is the
+    # double's job, and a transport error is not a bucket state.
+    "libs/providers/atmosphere/tests/s3/conftest.py": "asserts call shape",
+    # Asserts the helper requests the *second* page — the emulator paginates
+    # faithfully, but only past a thousand keys, so forcing the branch there
+    # would mean seeding a thousand objects to test one `if`.
+    "libs/providers/atmosphere/tests/goes/test_helpers.py": "drives a second page",
+    # Same: proves the station walk follows `IsTruncated` across two pages.
+    "libs/providers/atmosphere/tests/radar/test_cli.py": "drives a second page",
+}
+
+
+def _s3_doubles(path: Path) -> list[str]:
+    """Return the names of classes in `path` that stand in for an S3 client."""
+    try:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+    except (OSError, SyntaxError):  # pragma: no cover - unreadable test module
+        return []
+    found = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.ClassDef):
+            continue
+        methods = {
+            child.name
+            for child in node.body
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+        }
+        if methods & _S3_CLIENT_METHODS:
+            found.append(node.name)
+    return found
+
+
+class TestBucketTestsUseTheEmulator:
+    """A bucket backend is tested against S3's semantics, not a re-implementation."""
+
+    @pytest.mark.parametrize("path", _TEST_MODULES, ids=_TEST_IDS)
+    def test_no_new_s3_client_double(self, path):
+        """A hand-written S3 client belongs in the allow-list or nowhere."""
+        relative = path.relative_to(_ROOT).as_posix()
+        doubles = _s3_doubles(path)
+        if relative in _S3_DOUBLE_ALLOWED:
+            return
+        assert not doubles, (
+            f"{relative} defines {doubles}, standing in for an S3 client. "
+            "Use the `s3_emulator` fixture from `earthlens.testing`, which runs "
+            "a real S3 in-process, so the error shapes, the pagination envelope "
+            "and the streaming body are S3's rather than the double's. If the "
+            "case genuinely cannot be expressed against a real bucket, add the "
+            "file to `_S3_DOUBLE_ALLOWED` with the reason"
+        )
+
+    @pytest.mark.parametrize("relative", sorted(_S3_DOUBLE_ALLOWED))
+    def test_the_allowance_is_still_used(self, relative):
+        """An allowance that stopped being used is a false claim; delete it."""
+        path = _ROOT / relative
+        assert path.exists(), f"{relative} is gone; drop its _S3_DOUBLE_ALLOWED entry"
+        assert _s3_doubles(path), (
+            f"{relative} no longer defines an S3 client double "
+            f"({_S3_DOUBLE_ALLOWED[relative]}); drop its _S3_DOUBLE_ALLOWED entry"
+        )

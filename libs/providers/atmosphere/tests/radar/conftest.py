@@ -7,52 +7,11 @@ any network.
 
 from __future__ import annotations
 
-import sys
-import types
-
 import pytest
 
-
-class _Body:
-    """Stand-in for an S3 object body."""
-
-    def __init__(self, data: bytes) -> None:
-        self._data = data
-
-    def read(self) -> bytes:
-        return self._data
-
-
-class _FakeS3:
-    """Minimal anonymous S3 client over an in-memory `{key: bytes}` map."""
-
-    def __init__(self, objects: dict[str, bytes]) -> None:
-        self.objects = objects
-        self.get_calls: list[str] = []
-
-    def list_objects_v2(self, Bucket, Prefix="", Delimiter=None, **kwargs):
-        """Mimic list_objects_v2 (CommonPrefixes with Delimiter, else Contents)."""
-        keys = [k for k in self.objects if k.startswith(Prefix)]
-        if Delimiter:
-            prefixes: set[str] = set()
-            contents: list[str] = []
-            for k in keys:
-                rest = k[len(Prefix) :]
-                if Delimiter in rest:
-                    prefixes.add(Prefix + rest.split(Delimiter, 1)[0] + Delimiter)
-                else:
-                    contents.append(k)
-            return {
-                "CommonPrefixes": [{"Prefix": p} for p in sorted(prefixes)],
-                "Contents": [{"Key": k} for k in sorted(contents)],
-                "IsTruncated": False,
-            }
-        return {"Contents": [{"Key": k} for k in sorted(keys)], "IsTruncated": False}
-
-    def get_object(self, Bucket, Key):
-        """Record the get and return the object's bytes."""
-        self.get_calls.append(Key)
-        return {"Body": _Body(self.objects[Key])}
+import earthlens.radar.backend as backend_module
+from earthlens.radar.backend import BUCKET
+from earthlens.testing import seed_s3
 
 
 def _ktlx_objects() -> dict[str, bytes]:
@@ -67,17 +26,33 @@ def _ktlx_objects() -> dict[str, bytes]:
 
 
 @pytest.fixture
-def fake_s3(monkeypatch: pytest.MonkeyPatch) -> _FakeS3:
-    """Inject a fake `boto3`/`botocore` whose client serves the KTLX tree."""
-    client = _FakeS3(_ktlx_objects())
-    boto3_mod = types.ModuleType("boto3")
-    boto3_mod.client = lambda *a, **k: client
-    botocore = types.ModuleType("botocore")
-    botocore.UNSIGNED = object()
-    client_mod = types.ModuleType("botocore.client")
-    client_mod.Config = lambda **k: None
-    botocore.client = client_mod
-    monkeypatch.setitem(sys.modules, "boto3", boto3_mod)
-    monkeypatch.setitem(sys.modules, "botocore", botocore)
-    monkeypatch.setitem(sys.modules, "botocore.client", client_mod)
-    return client
+def fake_s3(s3_emulator):
+    """An in-process S3 serving the KTLX tree from the real chunk bucket.
+
+    Replaces a hand-written client that re-implemented `list_objects_v2` —
+    including its `Delimiter` / `CommonPrefixes` branch and a `IsTruncated`
+    field it always set to `False`. Those are exactly the semantics the
+    backend's prefix walk depends on, so they are better borrowed from an S3
+    implementation than restated here.
+
+    Nothing is injected: `mock_aws()` intercepts inside botocore, so the
+    unsigned client `Radar._s3_client` builds for itself resolves here too.
+    """
+    seed_s3(s3_emulator, BUCKET, _ktlx_objects())
+    return s3_emulator
+
+
+@pytest.fixture
+def pin_client(monkeypatch):
+    """Make the backend reuse one specific client instead of building its own.
+
+    The emulator returns a fresh client per `boto3.client()` call — faithful to
+    boto3 — so a test that injects a failure by replacing a method on *its*
+    client needs the backend to use that same object.
+    """
+
+    def _pin(client):
+        monkeypatch.setattr(backend_module, "_s3_client", lambda region: client)
+        return client
+
+    return _pin

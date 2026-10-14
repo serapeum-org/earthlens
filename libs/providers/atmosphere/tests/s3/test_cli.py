@@ -18,6 +18,7 @@ from earthlens.cli.adapter import list_backends, load_catalog
 from earthlens.cli.curate import probe_dataset
 from earthlens.cli.refresh import refresh_one
 from earthlens.cli.validate import validate_one
+from earthlens.testing import seed_s3
 
 pytestmark = pytest.mark.cli
 
@@ -25,30 +26,6 @@ pytestmark = pytest.mark.cli
 def _info():
     """Return the BackendInfo for the s3 backend."""
     return next(b for b in list_backends() if b.provider == "s3")
-
-
-class _FakeClient:
-    """A boto3-like client returning a fixed listing."""
-
-    def __init__(self, contents: list[dict[str, str]]):
-        self._contents = contents
-
-    def list_objects_v2(self, **kw: Any) -> dict[str, Any]:
-        """Return the canned Contents payload."""
-        return {"Contents": self._contents}
-
-
-class _FakeAuth:
-    """A stand-in `S3Auth` yielding a `_FakeClient`."""
-
-    contents: list[dict[str, str]] = []
-
-    def __init__(self, creds: Any):
-        pass
-
-    def client(self) -> _FakeClient:
-        """Return the fake client."""
-        return _FakeClient(type(self).contents)
 
 
 class TestProber:
@@ -77,11 +54,10 @@ class TestProber:
         result = probe_dataset(_info(), "not-a-bucket")
         assert result.status == "error", "unknown dataset -> error"
 
-    def test_sample_keys_helper_uses_unsigned_client(self, monkeypatch):
+    def test_sample_keys_helper_uses_unsigned_client(self, s3_emulator):
         """_s3_sample_keys returns the Contents keys from an unsigned client."""
-        monkeypatch.setattr(_FakeAuth, "contents", [{"Key": "k1"}, {"Key": "k2"}])
-        monkeypatch.setattr(s3_auth, "S3Auth", _FakeAuth)
-        assert s3_cli._s3_sample_keys("b", "p", None) == ["k1", "k2"]
+        seed_s3(s3_emulator, "probe-bucket", {"p/k1": b"", "p/k2": b""})
+        assert s3_cli._s3_sample_keys("probe-bucket", "p", None) == ["p/k1", "p/k2"]
 
 
 class TestWriter:
@@ -129,8 +105,9 @@ class TestLiveValidator:
         result = validate_one(_info(), live=True)
         assert any("bucket error" in i for i in result.issues), "error captured"
 
-    def test_live_keys_lists_one(self, monkeypatch):
+    def test_live_keys_lists_one(self, s3_emulator):
         """_s3_live_keys returns the object keys from an unsigned client."""
-        monkeypatch.setattr(_FakeAuth, "contents", [{"Key": "k"}])
-        monkeypatch.setattr(s3_auth, "S3Auth", _FakeAuth)
-        assert s3_cli._s3_live_keys("b", "p", None) == ["k"], "object key returned"
+        seed_s3(s3_emulator, "probe-bucket", {"p/k": b""})
+        assert s3_cli._s3_live_keys("probe-bucket", "p", None) == ["p/k"], (
+            "object key returned"
+        )

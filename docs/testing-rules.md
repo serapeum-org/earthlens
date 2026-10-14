@@ -13,7 +13,7 @@ depends on someone remembering.
 | `R5` | Every marker is declared **once**, in `earthlens.testing._markers`, and changes what runs. A marker nothing selects on gets deleted | `--strict-markers` |
 | `R6` | A backend's selector marker comes from the directory auto-tagger, not a hand-written `pytestmark` | `tag_items_by_directory` |
 | `R7` | A cross-backend contract is a `Base*` class in `earthlens.testing`, subclassed by the provider. **Core's tests never import a provider** | `TestCoreTestsDoNotDependOnProviders` |
-| `R8` | A new JSON-REST backend gets a cassette, not a new `FakeResponse` class; a new bucket backend gets the `s3_emulator` | review |
+| `R8` | A new JSON-REST backend gets a cassette, not a new `FakeResponse` class; a new bucket backend gets the `s3_emulator` | `TestBucketTestsUseTheEmulator` (buckets); review (REST) |
 | `R9` | Every e2e CI lane carries `--junitxml` + `assert_tests_ran.py`, `-rs`, a `timeout-minutes` and a path scope. An exemption is declared in the lane table | the lane table in `tests-e2e-reusable.yml` |
 | `R10` | A chronically unreliable live backend goes to `quarantined` — not deleted, and not left reddening a shared lane | review |
 
@@ -42,8 +42,15 @@ that warns selects nothing. In a lane keyed on `-m "e2e and <backend>"`, that is
 separately versioned distribution. The `Base*` classes let the provider assert the contract from its own lane,
 where the failure is attributed correctly.
 
-**`R8` — the tier exists now.** `earthlens.testing` ships `s3_emulator` (an in-process S3) and `vcr_config`
-(cassettes, record mode `none`, credentials filtered). Reach for those before writing another response double.
+**`R8` — the tier exists, and the bucket half is enforced.** `earthlens.testing` ships `s3_emulator` (an
+in-process S3) and `vcr_config` (cassettes, record mode `none`, credentials filtered). All six bucket backends
+— goes, nwm, nwp, dem, radar, s3 — now run against the emulator, and `TestBucketTestsUseTheEmulator` fails any
+new class that re-implements the S3 listing contract. Four cases are allow-listed, each because a real bucket
+cannot express them: two drive a second page of pagination (the emulator paginates only past a thousand keys),
+one asserts what the SDK was *called with*, and one injects a mid-transfer failure.
+
+The REST half is still review-only: a cassette has to be recorded against the live service, so it is captured
+when that backend is next touched with credentials to hand, not retrofitted in bulk.
 
 ## The three test tiers
 

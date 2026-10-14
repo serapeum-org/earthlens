@@ -9,40 +9,12 @@ from typing import Any
 import pytest
 
 from earthlens.nwm import NWM, Catalog
+from earthlens.nwm.backend import BUCKET
+from earthlens.testing import seed_s3
 
 #: boto3 ships with the backend's optional extra; absent, skip the module
 #: instead of interrupting collection for the directory.
 ClientError = pytest.importorskip("botocore.exceptions").ClientError
-
-
-class _FakeBody:
-    """Minimal file-like stand-in for a boto3 streaming body.
-
-    Exposes `read(size=-1)` so `shutil.copyfileobj` can stream it to disk
-    the way the backend streams the real `StreamingBody`.
-    """
-
-    def __init__(self, data: bytes) -> None:
-        self._buffer = io.BytesIO(data)
-
-    def read(self, size: int = -1) -> bytes:
-        """Return up to `size` bytes (whole payload when `size < 0`)."""
-        return self._buffer.read(size)
-
-
-class FakeS3:
-    """In-memory unsigned-S3 client double recording every `get_object`."""
-
-    def __init__(self, available: set[str] | None = None) -> None:
-        self.available = available
-        self.requested: list[tuple[str, str]] = []
-
-    def get_object(self, Bucket: str, Key: str) -> dict[str, Any]:
-        """Return fake bytes for a known key, or raise NoSuchKey for a miss."""
-        self.requested.append((Bucket, Key))
-        if self.available is not None and Key not in self.available:
-            raise ClientError({"Error": {"Code": "NoSuchKey"}}, "GetObject")
-        return {"Body": _FakeBody(b"netcdf:" + Key.encode())}
 
 
 class FakeLabeled:
@@ -190,3 +162,31 @@ def patch_client(monkeypatch):
         return fake
 
     return _patch
+
+
+@pytest.fixture
+def seed_nwm(s3_emulator):
+    """Publish the keys an NWM run plans for, on an in-process S3.
+
+    Replaces `patch_client(nwm, FakeS3(available=...))`. The old double's
+    `available=None` meant "every key exists", which a real bucket cannot
+    express — so the plan itself (`NWM._search`) says which keys to publish,
+    and `available=` narrows that to the subset a test wants present. A key
+    left out is then genuinely absent, and the `NoSuchKey` the backend sees is
+    S3's own, not a hand-built `ClientError`.
+
+    Nothing is injected: `mock_aws()` intercepts inside botocore, so the
+    unsigned client the backend builds resolves to the seeded bucket.
+    """
+
+    def _seed(nwm, available=None):
+        planned = [product.href for product in nwm._search()]
+        keys = planned if available is None else [k for k in planned if k in available]
+        seed_s3(
+            s3_emulator,
+            BUCKET,
+            {key: b"netcdf:" + key.encode() for key in keys},
+        )
+        return s3_emulator
+
+    return _seed

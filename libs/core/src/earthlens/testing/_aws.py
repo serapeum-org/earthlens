@@ -1,6 +1,6 @@
 """An in-process S3, so a bucket backend is tested against S3's own semantics.
 
-Six backends read unsigned public buckets (goes, nwm, dem, radar, s3, caravan),
+Six backends read unsigned public buckets (goes, nwm, nwp, dem, radar, s3),
 and each grew its own `FakeS3Client` — a hand-written `head_object` /
 `list_objects_v2` / `get_object` / `download_file` that approximates what
 botocore does. The approximations drift from the real thing in the places that
