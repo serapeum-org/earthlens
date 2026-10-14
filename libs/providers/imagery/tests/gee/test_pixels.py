@@ -570,9 +570,10 @@ class TestNodata:
         _FakePyramidsDataset.reset()
         gee = _gee(make_gee, engine="pixels", nodata=-9999)
         gee.download(progress_bar=False)
-        assert [-9999] == [
+        declared = [
             call["no_data_value"] for call in _FakePyramidsDataset.from_array_calls
         ]
+        assert declared == [-9999]
 
     def test_zero_is_a_value_and_not_an_absence(self, make_gee, fake_reader):
         """`0` is a legitimate fill value, so the test cannot be truthiness."""
@@ -581,9 +582,10 @@ class TestNodata:
         gee.download(progress_bar=False)
         (body,) = gee.client.compute_pixels_calls
         assert ("unmask", (0,)) in body["expression"].calls
-        assert [0] == [
+        declared = [
             call["no_data_value"] for call in _FakePyramidsDataset.from_array_calls
         ]
+        assert declared == [0]
 
     def test_an_unset_nodata_changes_nothing(self, make_gee, fake_reader):
         """No unmask, no declaring copy: the default path is untouched."""
