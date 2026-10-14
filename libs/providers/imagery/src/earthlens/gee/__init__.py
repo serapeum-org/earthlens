@@ -46,6 +46,40 @@ Public surface (re-exported from this package):
   `ee.FeatureCollection`s to pandas / GeoPandas (sync + parallel +
   small-FC `getInfo()` paths).
 
+The object surface behind the string constructor params — every
+`reducer=` / `engine=` / `export_via=` name resolves to one of these,
+and they are re-exported so a caller can pass or inspect the object
+instead of the string:
+
+* :class:`Reducer`, with :data:`REDUCERS` and :func:`resolve_reducer`
+  — the temporal-compositing strategies :class:`Mean` /
+  :class:`Median` / :class:`Min` / :class:`Max` / :class:`Sum` /
+  :class:`Mosaic` / :class:`Mode`, plus the parameterised
+  :class:`Percentile` the string form reaches as
+  `reducer="percentile:90"`.
+* :class:`Engine`, with :data:`ENGINES` and :func:`resolve_engine` —
+  what materialises the pixels: :class:`EeEngine` (`getDownloadURL`),
+  :class:`PixelsEngine` (`computePixels`, optionally against
+  :data:`HIGH_VOLUME_ENDPOINT`), :class:`EedaiEngine` (the pyramids-eo
+  reader) and :class:`AutoEngine`, which chooses between them and owns
+  the fallback.
+* :class:`EnginePlan` (back-compat alias :class:`EedaiPlan`) — the
+  frozen routing verdict an engine returns, carrying the reason when a
+  route is declined.
+* :class:`Sink`, with :data:`SINKS` and :func:`resolve_sink` — where
+  the artifact goes: :class:`UrlSink`, :class:`DriveSink`,
+  :class:`GcsSink`, :class:`AssetSink`.
+* :class:`WorkUnit` / :class:`RasterWorkUnit` /
+  :class:`FeatureWorkUnit` — one time bucket's payload; and
+  :class:`Artifact` / :class:`DownloadResult` — what `download()`
+  returns under `materialize=True` instead of written paths.
+* :class:`ExportConfig` / :class:`EngineConfig` — the frozen
+  configuration objects `GEE.__init__` composes itself from.
+* :class:`OutputGrid` — the one owner of the AOI-to-grid derivation
+  (dimensions, affine transform, lattice snapping, tiling).
+* :class:`EedaiReader` — the adapter wrapping the optional pyramids-eo
+  reader, owning its process-global credential hazard.
+
 Two submodules ship more specialised helpers and are intentionally
 **not** re-exported at this top level — import them directly. Both
 feed the `GEE` backend's `cloud_mask=` / `filters=` constructor hooks
