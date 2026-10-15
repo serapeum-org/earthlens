@@ -9,7 +9,7 @@ Two design points carry this backend:
 
 * **Per-instance `OUTPUT_KIND` (`G1`).** The resolved source's `output_kind` is
   copied onto `self.OUTPUT_KIND` in `__init__`: `structures`/`nfhl` return a
-  pyramids `FeatureCollection` (`vector`),
+  pyramids `pyramids.feature.collection.FeatureCollection` (`vector`),
   `nfip` returns a `pandas.DataFrame` (`tabular`). The
   `earthlens.earthlens.EarthLens` facade reads the instance attribute to
   gate `aggregate=` and to know the return shape.
@@ -76,7 +76,7 @@ class NSI(AbstractDataSource):
 
     Resolves `source=` to its catalog row, issues the one bounded request that
     source needs, and returns a
-    `FeatureCollection` (`structures`/`nfhl`)
+    `pyramids.feature.collection.FeatureCollection` (`structures`/`nfhl`)
     or a `pandas.DataFrame` (`nfip`). US-only: a non-US box returns an
     empty result, not an error (`G4`).
 
@@ -413,7 +413,7 @@ class NSI(AbstractDataSource):
                 issued (paged for `nfip`), so this is a no-op.
 
         Returns:
-            A `FeatureCollection` for
+            A `pyramids.feature.collection.FeatureCollection` for
             `structures`/`nfhl`, or a `pandas.DataFrame` (also written to
             `root_dir`) for `nfip`.
 

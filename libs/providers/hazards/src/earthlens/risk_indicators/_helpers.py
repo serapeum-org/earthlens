@@ -2,7 +2,7 @@
 
 Every risk source here is a REST endpoint returning JSON, parsed into a
 `pandas.DataFrame` (ThinkHazard / INFORM / GFW table) or a pyramids
-`FeatureCollection` (GFW geometry). These are
+`pyramids.feature.collection.FeatureCollection` (GFW geometry). These are
 pre-computed country/admin-indexed indices and SQL queries, so this subpackage
 uses **no gridded-array dependency** by design — the parse is pure pandas /
 geopandas text-and-JSON.

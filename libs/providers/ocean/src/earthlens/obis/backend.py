@@ -10,7 +10,7 @@ contract; only the SDK call and the request fields differ.
 `pyobis` 1.x returns a lazy `OccResponse` query object whose `.execute()`
 yields a `pandas.DataFrame` (one row per occurrence) — not the 0.x
 `{"results": [...]}` dict. The DataFrame is mapped straight to a points
-`FeatureCollection` via the shared
+`pyramids.feature.collection.FeatureCollection` via the shared
 `earthlens.biodiversity` mapper (OBIS is Darwin Core, so the coordinate
 fields are `decimalLatitude` / `decimalLongitude`, same as GBIF).
 
@@ -75,7 +75,7 @@ class OBIS(AbstractDataSource):
     `download()` shape every other earthlens backend uses. Each entry in
     `variables` resolves to an OBIS `scientificname`; the bbox becomes a
     WKT polygon; the `.execute()` DataFrame is mapped to a points
-    `FeatureCollection`.
+    `pyramids.feature.collection.FeatureCollection`.
 
     Attributes:
         OUTPUT_KIND: `"vector"` — the facade rejects `aggregate=`.

@@ -14,7 +14,7 @@ Three design points carry this backend:
   `pandas.DataFrame` of events + impacts. Passing `with_geometry=True`
   makes the instance `vector`: it additionally downloads the NUTS-3 region
   boundary shapefile and returns a pyramids
-  `FeatureCollection` of the affected
+  `pyramids.feature.collection.FeatureCollection` of the affected
   regions (the `emdat` / `eumetsat` per-instance pattern). The facade reads the
   instance attribute to know the return shape and to gate `aggregate=`.
 * **Direct file download, not range-read.** HANZE ships small individual Zenodo
@@ -138,7 +138,7 @@ class HANZE(AbstractDataSource):
     Downloads the HANZE events / impacts table from its pinned Zenodo release,
     filters it by country / region / flood type / date window, and returns a
     `pandas.DataFrame`. With `with_geometry=True` it instead returns a
-    `FeatureCollection` of the affected
+    `pyramids.feature.collection.FeatureCollection` of the affected
     NUTS-3 regions.
 
     The record is public (CC-BY-4.0); no credentials are needed.
@@ -584,7 +584,7 @@ class HANZE(AbstractDataSource):
         Returns:
             list[Any]: One element — a filtered `pandas.DataFrame`
                 (tabular), or a
-                `FeatureCollection` of the
+                `pyramids.feature.collection.FeatureCollection` of the
                 affected regions (vector).
         """
         events = self._filter_events(self._load_events())
@@ -648,7 +648,7 @@ class HANZE(AbstractDataSource):
 
         Returns:
             A `pandas.DataFrame` of events + impacts (the default), or a
-            `FeatureCollection` of the
+            `pyramids.feature.collection.FeatureCollection` of the
             affected NUTS-3 regions (`with_geometry=True`). Both are also written
             under `root_dir`.
 

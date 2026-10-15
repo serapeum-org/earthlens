@@ -3,7 +3,7 @@
 Thin wrapper over `tropycal.tracks.TrackDataset` that returns tropical-
 cyclone best tracks — from IBTrACS (global, 1848-present) or HURDAT2
 (NHC North Atlantic / East Pacific reanalysis) — as a pyramids
-`FeatureCollection` of track features
+`pyramids.feature.collection.FeatureCollection` of track features
 (CRS `EPSG:4326`).
 
 This is a `vector` backend: the result is a table of track features, not

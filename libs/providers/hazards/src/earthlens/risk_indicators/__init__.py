@@ -14,7 +14,7 @@ or admin code:
 Output is **per instance**: a dataset's `output_kind` decides whether
 `download` returns a
 `pandas.DataFrame` (`tabular`) or a pyramids
-`FeatureCollection` (`vector`). Auth is
+`pyramids.feature.collection.FeatureCollection` (`vector`). Auth is
 **per source** — only a `gfw` dataset builds a `GfwAuth`; ThinkHazard and
 INFORM stay keyless. Every parse is REST JSON -> pandas / FeatureCollection, with
 no gridded-array dependency in this subpackage.

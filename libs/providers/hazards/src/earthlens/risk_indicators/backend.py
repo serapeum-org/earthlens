@@ -12,7 +12,7 @@ Two design points carry this backend:
 * **Per-instance `OUTPUT_KIND` (`G1`).** The resolved dataset's `output_kind`
   is copied onto `self.OUTPUT_KIND` in `__init__`: `tabular` returns a
   `pandas.DataFrame`, `vector` returns a pyramids
-  `FeatureCollection`. The
+  `pyramids.feature.collection.FeatureCollection`. The
   `earthlens.earthlens.EarthLens` facade reads the instance attribute to
   gate `aggregate=` (rejected for both) and to know the return shape.
 * **Conditional, per-source auth (`G3`).** Only a dataset whose provider is
@@ -138,7 +138,7 @@ class RiskIndicators(AbstractDataSource):
     Resolves one dataset id to its catalog row, routes the request to that
     row's provider (ThinkHazard / INFORM / GFW), and returns a
     `pandas.DataFrame` (`tabular`) or a
-    `FeatureCollection` (`vector`) per the
+    `pyramids.feature.collection.FeatureCollection` (`vector`) per the
     row's `output_kind`. The query is a search/fetch split: `_search`
     pins the one product (dataset + resolved selector), and `_fetch`
     issues the provider call and parses it.
@@ -461,7 +461,7 @@ class RiskIndicators(AbstractDataSource):
         Returns:
             list: One element per product — a `pandas.DataFrame` for a
                 `tabular` dataset, a
-                `FeatureCollection` for a
+                `pyramids.feature.collection.FeatureCollection` for a
                 `vector` one.
         """
         return [self._fetch_one(product) for product in products]
@@ -538,7 +538,7 @@ class RiskIndicators(AbstractDataSource):
         Returns:
             A `pandas.DataFrame` (written to `root_dir` too) for a
             `tabular` dataset, or an in-memory
-            `FeatureCollection` for a
+            `pyramids.feature.collection.FeatureCollection` for a
             `vector` one.
 
         Raises:

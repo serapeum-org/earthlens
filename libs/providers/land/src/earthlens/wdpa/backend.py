@@ -10,7 +10,7 @@ passed as a `?token=` query parameter (resolved by `WdpaAuth`).
 This is the cluster's only polygon-geometry backend (`OUTPUT_KIND =
 "vector"`). Each entry in `variables` selects a country (ISO3 code) or a
 single WDPA id; the per-area GeoJSON geometry is assembled into a polygon
-`FeatureCollection`. `download()`
+`pyramids.feature.collection.FeatureCollection`. `download()`
 returns it and, when `path` is set, writes it (GeoParquet by default).
 
 WDPA data carries a custom UNEP-WCMC license (commercial use needs written
@@ -56,7 +56,7 @@ class WDPA(AbstractDataSource):
     shape every other earthlens backend uses. Each entry in `variables`
     is a country ISO3 code (`"KEN"` or `"country:KEN"`) or a WDPA id;
     results across entries are unioned into one polygon
-    `FeatureCollection`.
+    `pyramids.feature.collection.FeatureCollection`.
 
     Attributes:
         OUTPUT_KIND: `"vector"` — the facade rejects `aggregate=`.

@@ -13,7 +13,7 @@ discriminator:
 
 Output is **per instance**: the resolved source's `output_kind` decides whether
 `download` returns a pyramids
-`FeatureCollection` (`structures`/`nfhl`) or
+`pyramids.feature.collection.FeatureCollection` (`structures`/`nfhl`) or
 a `pandas.DataFrame` (`nfip`). All three are public-domain and keyless —
 no auth. A spatial/attribute bound is **required** (no unbounded national pull),
 and `aggregate=` is rejected (these are records, not gridded rasters).

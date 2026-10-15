@@ -181,7 +181,7 @@ class CatalogRow:
 
 
 def _to_row(raw: Any) -> CatalogRow:
-    """Build a `CatalogRow` from an adapter `RawRow`."""
+    """Build a `CatalogRow` from an adapter `adapter.RawRow`."""
     record = raw.record
     return CatalogRow(
         provider=raw.provider,

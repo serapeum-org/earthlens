@@ -8,7 +8,7 @@ area** to river flooding, aggregated by admin unit — **country**, **state**, o
 baseline, and seven 2030 climate × socio-economic scenarios (RCP4.5 / RCP8.5 ×
 SSP2 / SSP3). The admin polygons carry the risk attributes, so this is a
 `vector` backend: `download()` returns a pyramids
-`FeatureCollection` (or a geometry-dropped
+`pyramids.feature.collection.FeatureCollection` (or a geometry-dropped
 `pandas.DataFrame`), and the `earthlens.earthlens.EarthLens` facade
 rejects an `aggregate=` argument.
 

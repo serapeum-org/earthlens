@@ -6,7 +6,7 @@ from the NASA FIRMS (Fire Information for Resource Management System)
 area CSV endpoint, across MODIS (C6.1) and VIIRS (S-NPP / NOAA-20 /
 NOAA-21) sensors. The rows for a `[start, end]` window over a bbox come
 back as CSV, which `earthlens.firms.events` maps to a pyramids
-`FeatureCollection` of fire-pixel
+`pyramids.feature.collection.FeatureCollection` of fire-pixel
 points.
 
 This is a `vector` backend: the on-the-wire result is a table of
@@ -98,7 +98,7 @@ class FIRMS(AbstractDataSource):
     other earthlens backend uses. Windows longer than the FIRMS 5-day
     per-request cap are chunked, and each `(sensor, ≤5-day chunk)` is
     one CSV GET; the rows are mapped to a
-    `FeatureCollection`.
+    `pyramids.feature.collection.FeatureCollection`.
 
     FIRMS needs a free `MAP_KEY`. Supply it to `authenticate` as
     `api_key=`, or set the `FIRMS_MAP_KEY` environment variable and let

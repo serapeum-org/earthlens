@@ -8,7 +8,7 @@ return-period selection into the `.dbf` column names to read), the **zip IO**
 the doubly-nested `state` bundle), and the **FeatureCollection assembly**
 (selecting + renaming the chosen columns and applying the unit-name / bbox
 filter). All geometry handling stays inside pyramids
-(`FeatureCollection`, itself a
+(`pyramids.feature.collection.FeatureCollection`, itself a
 `geopandas.GeoDataFrame` subclass); this module never imports `xarray`.
 """
 
@@ -226,7 +226,7 @@ def build_feature_collection(
 
     Args:
         source: The full shapefile read as a
-            `FeatureCollection`.
+            `pyramids.feature.collection.FeatureCollection`.
         columns: `{return_period: source_column_name}` from
             `resolve_columns`.
 

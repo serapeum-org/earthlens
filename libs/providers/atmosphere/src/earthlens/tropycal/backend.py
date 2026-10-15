@@ -6,7 +6,7 @@ IBTrACS (global) or HURDAT2 (North Atlantic / East Pacific reanalysis) —
 through the same `download()` shape every other earthlens backend uses.
 Each basin code in `variables` becomes one `TrackDataset` load; the
 storms in the requested seasons are mapped to a pyramids
-`FeatureCollection` by
+`pyramids.feature.collection.FeatureCollection` by
 `earthlens.tropycal.events`.
 
 This is a `vector` backend: the result is a table of track features
@@ -93,7 +93,7 @@ class TropicalCyclone(AbstractDataSource):
     `download()` shape every other earthlens backend uses. Each basin
     code in `variables` becomes one (slow, cached) `TrackDataset` load;
     the storms in the requested seasons are filtered to the window + bbox
-    and mapped to a `FeatureCollection`,
+    and mapped to a `pyramids.feature.collection.FeatureCollection`,
     and the basins' results are unioned into the single FeatureCollection
     `download()` returns.
 

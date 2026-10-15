@@ -10,7 +10,7 @@ Three design points carry this backend:
 * **Per-instance `OUTPUT_KIND`.** The resolved dataset's `output_kind` is copied
   onto `self.OUTPUT_KIND` in `__init__`: `emdat:events` is `tabular` and returns
   a `pandas.DataFrame`, both `gdis:*` rows are `vector` and return a
-  pyramids `FeatureCollection`. The
+  pyramids `pyramids.feature.collection.FeatureCollection`. The
   `earthlens.earthlens.EarthLens` facade reads the instance attribute to
   know the return shape.
 * **Conditional auth.** `emdat:events` comes from the UCLouvain Dataverse and
@@ -126,7 +126,7 @@ class EMDAT(AbstractDataSource):
 
     Resolves one dataset id to its catalog row, fetches it from that row's
     provider, and returns a `pandas.DataFrame` (`tabular`) or a
-    `FeatureCollection` (`vector`) per the
+    `pyramids.feature.collection.FeatureCollection` (`vector`) per the
     row's `output_kind`.
 
     Attributes:
@@ -388,7 +388,7 @@ class EMDAT(AbstractDataSource):
         Returns:
             list[Any]: One element per product — a `pandas.DataFrame` for a
                 `tabular` dataset, a
-                `FeatureCollection` for a
+                `pyramids.feature.collection.FeatureCollection` for a
                 `vector` one.
         """
         return [self._fetch_one(product) for product in products]
@@ -645,7 +645,7 @@ class EMDAT(AbstractDataSource):
         Returns:
             A `pandas.DataFrame` for `emdat:events` (also written to
             `root_dir`), or an in-memory
-            `FeatureCollection` for a
+            `pyramids.feature.collection.FeatureCollection` for a
             `gdis:*` dataset.
 
         Raises:

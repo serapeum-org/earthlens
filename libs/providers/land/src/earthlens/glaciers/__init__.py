@@ -14,7 +14,7 @@ One mixed backend over three open glacier sources:
 
 Output is **per instance**: a dataset's `output_kind` decides whether
 `download` returns a pyramids
-`FeatureCollection` (`vector`, rgi/glims) or
+`pyramids.feature.collection.FeatureCollection` (`vector`, rgi/glims) or
 a `pandas.DataFrame` (`tabular`, wgms). All three sources are open, so the
 backend ships **no auth**. Vector file I/O always goes through pyramids
 `FeatureCollection.read_file` — never a bare geopandas file read — and the WGMS

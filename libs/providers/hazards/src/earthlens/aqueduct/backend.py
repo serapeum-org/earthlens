@@ -5,7 +5,7 @@
 credentials), reads it with pyramids, selects one metric / year / scenario
 across the requested flood return periods, filters by unit name and/or bbox, and
 returns the admin polygons carrying the selected exposure columns as a
-`FeatureCollection` (or, with
+`pyramids.feature.collection.FeatureCollection` (or, with
 `geometry=False`, a geometry-dropped `pandas.DataFrame`).
 
 This is a static, country/state/basin-indexed product with no time axis, so a
@@ -346,7 +346,7 @@ class Aqueduct(AbstractDataSource):
                 this is a no-op.
 
         Returns:
-            A `FeatureCollection` (also
+            A `pyramids.feature.collection.FeatureCollection` (also
             written to `root_dir`) or, when `geometry=False`, a
             `pandas.DataFrame` of the units and their `rp_<n>` columns.
 

@@ -6,7 +6,7 @@ droughts, each with a green/orange/red impact score — from the Global
 Disaster Alert and Coordination System (JRC / UN OCHA) SEARCH feed. The
 whole event list for a `[start, end]` window comes back in a single
 HTTPS GET, which `earthlens.gdacs.events` maps to a pyramids
-`FeatureCollection` of alert
+`pyramids.feature.collection.FeatureCollection` of alert
 features.
 
 This is a `vector` backend: the on-the-wire result is a table of
@@ -94,7 +94,7 @@ class GDACS(AbstractDataSource):
     space/time/hazard window of disaster alerts through the same
     `download()` shape every other earthlens backend uses. All requested
     hazard types come back in one combined GET; the GeoJSON is mapped to
-    a `FeatureCollection` and, if the
+    a `pyramids.feature.collection.FeatureCollection` and, if the
     feed did not honour a bbox, clipped to the requested box
     client-side.
 

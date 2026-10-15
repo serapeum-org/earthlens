@@ -6,7 +6,7 @@ et al., 2016) from the NHESS-2016 paper's public supplement zip
 selects the requested protection layer(s), filters by unit name and/or bbox,
 and returns the ~4650 subnational polygons carrying the selected
 protection-standard columns as a
-`FeatureCollection` (or, with
+`pyramids.feature.collection.FeatureCollection` (or, with
 `geometry=False`, a geometry-dropped `pandas.DataFrame`).
 
 Each polygon's protection standard is a return period in years across the
@@ -280,7 +280,7 @@ class FLOPROS(AbstractDataSource):
                 this is a no-op.
 
         Returns:
-            A `FeatureCollection` (also
+            A `pyramids.feature.collection.FeatureCollection` (also
             written to `root_dir`) or, when `geometry=False`, a
             `pandas.DataFrame` of the units and their protection-standard
             columns.

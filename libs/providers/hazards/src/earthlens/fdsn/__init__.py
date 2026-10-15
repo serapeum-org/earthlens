@@ -5,7 +5,7 @@ FDSN-event web service across six seismological networks — USGS
 (ComCat), EMSC (seismicportal), INGV (Italian seismic + volcano),
 EarthScope (ex-IRIS DMC), ISC (global reviewed bulletin), and GeoNet
 (New Zealand) — and returns the matched events as a pyramids
-`FeatureCollection` of point
+`pyramids.feature.collection.FeatureCollection` of point
 features (CRS `EPSG:4326`).
 
 This is the package's first `vector` backend: the result is a table of

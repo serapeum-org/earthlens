@@ -12,7 +12,7 @@ Three design points carry this backend:
 
 * **Per-instance `OUTPUT_KIND` (`G1`).** The resolved dataset's `output_kind` is
   copied onto `self.OUTPUT_KIND` in `__init__`: `vector` returns a pyramids
-  `FeatureCollection` (rgi/glims outlines),
+  `pyramids.feature.collection.FeatureCollection` (rgi/glims outlines),
   `tabular` returns a `pandas.DataFrame` (wgms fluctuations). The
   `earthlens.earthlens.EarthLens` facade reads the instance attribute to
   gate `aggregate=` (rejected for both) and to know the return shape.
@@ -67,7 +67,7 @@ class Glaciers(AbstractDataSource):
 
     Resolves one dataset id to its catalog row, routes the request to that row's
     source (RGI / GLIMS / WGMS), and returns a pyramids
-    `FeatureCollection` (`vector`) or a
+    `pyramids.feature.collection.FeatureCollection` (`vector`) or a
     `pandas.DataFrame` (`tabular`) per the row's `output_kind`. The query
     is a search/fetch split: `_search` pins the products (one per
     overlapping RGI region, or a single GLIMS / WGMS product) and `_fetch`
@@ -306,7 +306,7 @@ class Glaciers(AbstractDataSource):
             products: The list from `_search`.
 
         Returns:
-            list: One `FeatureCollection`
+            list: One `pyramids.feature.collection.FeatureCollection`
                 per RGI region / the GLIMS query (`vector`), or a single
                 `pandas.DataFrame` (`tabular`, wgms).
         """
@@ -367,7 +367,7 @@ class Glaciers(AbstractDataSource):
                 fetch is a small loop, so this is a no-op.
 
         Returns:
-            A pyramids `FeatureCollection`
+            A pyramids `pyramids.feature.collection.FeatureCollection`
             (`vector`, rgi/glims; clipped, EPSG:4326) or a
             `pandas.DataFrame` (`tabular`, wgms; also written to
             `root_dir`).

@@ -11,7 +11,7 @@ backend.
 This is a `tabular` backend by default: the result is a table of event / impact
 rows, not a gridded array, so the `earthlens.earthlens.EarthLens` facade
 rejects an `aggregate=` argument. Passing `with_geometry=True` instead returns a
-pyramids `FeatureCollection` of the affected
+pyramids `pyramids.feature.collection.FeatureCollection` of the affected
 NUTS-3 regions (a per-instance `vector` output).
 
 HANZE needs **no credentials** — the Zenodo record is public (CC-BY-4.0) — so

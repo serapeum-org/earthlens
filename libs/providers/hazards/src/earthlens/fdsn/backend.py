@@ -8,7 +8,7 @@ EarthScope (ex-IRIS DMC), ISC (global reviewed bulletin), and GeoNet
 because they all speak the identical FDSN-event web-service
 standard. Each provider key in `variables` becomes one server-side
 `get_events` call; the per-network `obspy.core.event.Catalog` is mapped
-to a pyramids `FeatureCollection`
+to a pyramids `pyramids.feature.collection.FeatureCollection`
 by `earthlens.fdsn.events`.
 
 This is the first `vector` backend: the on-the-wire result is a table
@@ -125,7 +125,7 @@ class FDSN(AbstractDataSource):
     FDSN networks through the same `download()` shape every other
     earthlens backend uses. Each network key in `variables` becomes
     one server-side query; the per-network catalog is mapped to a
-    `FeatureCollection` and the
+    `pyramids.feature.collection.FeatureCollection` and the
     networks' results are unioned into the single FeatureCollection
     `download()` returns.
 

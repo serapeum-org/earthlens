@@ -6,7 +6,7 @@ of the downloaded `.gdb.zip` through pyramids and reprojecting it from the DWD
 RADOLAN grid — which the file does not carry — to EPSG:4326), the
 **FeatureCollection assembly** (selecting the event attribute columns), and the
 **date / bbox filter**. All geometry handling stays inside pyramids
-(`FeatureCollection`, itself a
+(`pyramids.feature.collection.FeatureCollection`, itself a
 `geopandas.GeoDataFrame` subclass); this module never imports `xarray`.
 """
 

@@ -7,7 +7,7 @@ reads one of its layers with pyramids — the `EventZones` footprint polygons
 DWD RADOLAN grid (which the file does not carry) to EPSG:4326, filters the
 events by date window and/or bbox, and returns them carrying the event
 attributes (area, duration, severity) as a
-`FeatureCollection` (or, with
+`pyramids.feature.collection.FeatureCollection` (or, with
 `geometry=False`, a geometry-dropped `pandas.DataFrame`).
 
 Two threshold selections are served: `T5` (events with a return period of at
@@ -291,7 +291,7 @@ class CatRaRE(AbstractDataSource):
                 this is a no-op.
 
         Returns:
-            A `FeatureCollection` (also
+            A `pyramids.feature.collection.FeatureCollection` (also
             written to `root_dir`) or, when `geometry=False`, a
             `pandas.DataFrame` of the events and their attributes.
 

@@ -185,7 +185,7 @@ class TemporalExtent(BaseModel):
 
     Attributes:
         start_date: Inclusive start of the requested window. Typed
-            `Any` because pandas / numpy timestamp types
+            `typing.Any` because pandas / numpy timestamp types
             are not native pydantic primitives; the cross-field
             validator below enforces `start_date <= end_date` for
             anything that supports comparison.
@@ -195,7 +195,7 @@ class TemporalExtent(BaseModel):
             `"D"` for daily, `"MS"` for month-start. Same
             shorthand pandas uses for `date_range(freq=...)`.
         dates: The `pandas.DatetimeIndex` the download loop
-            iterates. Typed `Any` to avoid a hard
+            iterates. Typed `typing.Any` to avoid a hard
             pandas import in the abstract module.
     """
 

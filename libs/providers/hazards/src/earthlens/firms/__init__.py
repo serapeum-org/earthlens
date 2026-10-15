@@ -4,7 +4,7 @@ Thin wrapper over the NASA FIRMS (Fire Information for Resource
 Management System) area CSV API that returns near-real-time and archival
 **active-fire detections** from MODIS (C6.1) and VIIRS (S-NPP / NOAA-20 /
 NOAA-21) as a pyramids
-`FeatureCollection` of fire-pixel
+`pyramids.feature.collection.FeatureCollection` of fire-pixel
 points (CRS `EPSG:4326`).
 
 This is a `vector` backend: the result is a table of geolocated fire

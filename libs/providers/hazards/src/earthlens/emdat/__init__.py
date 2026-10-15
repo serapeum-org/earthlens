@@ -14,7 +14,7 @@ Two routes, selected by the dataset id passed in `variables`:
   the preferred route for research. Returns a `pandas.DataFrame`.
 * **`gdis:points`** / **`gdis:polygons`** — **GDIS** (Geocoded Disasters), the
   CC-BY-4.0 geocoded derivative of EM-DAT *natural* disasters, 1960-2018, as a
-  pyramids `FeatureCollection`.
+  pyramids `pyramids.feature.collection.FeatureCollection`.
   `gdis:points` is the centroid CSV (about 1 MB, and the only distribution
   carrying `year` / `latitude` / `longitude`); `gdis:polygons` is the
   admin-unit footprint GeoPackage, which is a **2.2 GB** download and is

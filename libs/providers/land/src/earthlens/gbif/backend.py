@@ -7,7 +7,7 @@ API. The request is one taxon/geometry/time window: every entry in
 `variables` resolves to a GBIF backbone `taxonKey`, the bounding box
 becomes a WKT polygon, and `[start, end]` becomes GBIF's `eventDate`
 range. The paginated result is mapped to a pyramids
-`FeatureCollection` of points by the
+`pyramids.feature.collection.FeatureCollection` of points by the
 shared `earthlens.biodiversity` mapper.
 
 This is the reference occurrence backend the OBIS twin mirrors. Like
@@ -86,7 +86,7 @@ class GBIF(AbstractDataSource):
     `download()` shape every other earthlens backend uses. Each entry in
     `variables` resolves to a GBIF backbone `taxonKey`; the bbox becomes a
     WKT polygon; the paginated result is mapped to a points
-    `FeatureCollection`.
+    `pyramids.feature.collection.FeatureCollection`.
 
     Attributes:
         OUTPUT_KIND: `"vector"` — the facade rejects `aggregate=`.

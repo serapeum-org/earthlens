@@ -8,7 +8,7 @@ supplement zip via the shared `earthlens.base.archive.extract_members`),
 and the **FeatureCollection assembly** (selecting + renaming the identity and
 chosen layer columns and applying the unit-name / bbox filter). All geometry
 handling stays inside pyramids
-(`FeatureCollection`, itself a
+(`pyramids.feature.collection.FeatureCollection`, itself a
 `geopandas.GeoDataFrame` subclass); this module never imports `xarray`.
 """
 
@@ -110,7 +110,7 @@ def build_feature_collection(
 
     Args:
         source: The full FLOPROS shapefile read as a
-            `FeatureCollection`.
+            `pyramids.feature.collection.FeatureCollection`.
         identity_columns: The identity columns to keep (`name` / `geonunit` /
             `type_en`).
         layers: `{public_name: source_column}` from `resolve_layers`.

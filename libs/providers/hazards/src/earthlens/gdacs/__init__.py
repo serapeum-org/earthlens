@@ -4,7 +4,7 @@ Thin wrapper over the public GDACS SEARCH feed — the Global Disaster
 Alert and Coordination System (JRC / UN OCHA) — that returns
 multi-hazard alerts (earthquakes, tropical cyclones, floods, volcanoes,
 wildfires, droughts), each with a green/orange/red impact score, as a
-pyramids `FeatureCollection` of
+pyramids `pyramids.feature.collection.FeatureCollection` of
 geolocated alert features (CRS `EPSG:4326`).
 
 This is a `vector` backend: the result is a table of alerts, not a
