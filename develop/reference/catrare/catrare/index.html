@@ -817,34 +817,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../testing-rules/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Testing rules
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -24856,11 +24828,11 @@ raster.</p>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download + read the FileGDB layer and build the filtered collection.</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a vector backend returns</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        an in-memory :class:`FeatureCollection`. The download is cached under</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        :attr:`_cache_root`, so a repeat request reuses the FileGDB.</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        an in-memory `FeatureCollection`. The download is cached under</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        `_cache_root`, so a repeat request reuses the FileGDB.</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            products: The single-element list from :meth:`_search`.</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            products: The single-element list from `_search`.</span>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            list[FeatureCollection]: One trimmed, filtered collection.</span>
@@ -24899,7 +24871,7 @@ raster.</p>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the local FileGDB zip path, downloading it on a cache miss.</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            product: The product from :meth:`_search` (carries the download URL</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            product: The product from `_search` (carries the download URL</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">                in `href`).</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        Returns:</span>
@@ -24944,9 +24916,9 @@ raster.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">                this is a no-op.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            A :class:`~pyramids.feature.collection.FeatureCollection` (also</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` (also</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            written to `root_dir`) or, when `geometry=False`, a</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            :class:`pandas.DataFrame` of the events and their attributes.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            `pandas.DataFrame` of the events and their attributes.</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            requests.HTTPError: If the download returns a non-2xx status.</span>
@@ -25474,23 +25446,23 @@ this is a no-op.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>A</code></td>            <td>
+            <td>
                   <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>~pyramids.feature.collection.FeatureCollection</code> (also</p>
+                <p>A <code>pyramids.feature.collection.FeatureCollection</code> (also</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
@@ -25500,12 +25472,12 @@ this is a no-op.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>pandas.DataFrame</code> of the events and their attributes.</p>
+                <p><code>pandas.DataFrame</code> of the events and their attributes.</p>
               </div>
             </td>
           </tr>
@@ -25597,9 +25569,9 @@ this is a no-op.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            this is a no-op.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        A :class:`~pyramids.feature.collection.FeatureCollection` (also</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` (also</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        written to `root_dir`) or, when `geometry=False`, a</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        :class:`pandas.DataFrame` of the events and their attributes.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        `pandas.DataFrame` of the events and their attributes.</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        requests.HTTPError: If the download returns a non-2xx status.</span>
@@ -25658,7 +25630,7 @@ this is a no-op.</p>
 
         <p>One CatRaRE threshold selection's spec.</p>
 <p>The threshold key (<code>"t5"</code> / <code>"w3"</code>) is the parent key in
-:attr:<code>Catalog.datasets</code>, not stored on the row.</p>
+<code>Catalog.datasets</code>, not stored on the row.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -25749,7 +25721,7 @@ this is a no-op.</p>
 <a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One CatRaRE threshold selection&#39;s spec.</span>
 <a id="__codelineno-0-42" name="__codelineno-0-42"></a>
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    The threshold key (`&quot;t5&quot;` / `&quot;w3&quot;`) is the parent key in</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    :attr:`Catalog.datasets`, not stored on the row.</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    `Catalog.datasets`, not stored on the row.</span>
 <a id="__codelineno-0-45" name="__codelineno-0-45"></a>
 <a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">        threshold: The threshold code embedded in the file / layer names</span>
@@ -25818,10 +25790,10 @@ this is a no-op.</p>
 
         <p>Catalog for the CatRaRE heavy-rainfall event-catalogue backend.</p>
 <p>Reads the bundled <code>catrare_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>t5</code> / <code>w3</code> threshold rows under the inherited :attr:<code>datasets</code>
+exposes its <code>t5</code> / <code>w3</code> threshold rows under the inherited <code>datasets</code>
 map, plus the shared metadata used to build a download URL and FileGDB layer
 name. Instantiate with no arguments (<code>Catalog()</code>); resolve a threshold with
-:meth:<code>get</code>.</p>
+<code>get</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -25842,7 +25814,7 @@ name. Instantiate with no arguments (<code>Catalog()</code>); resolve a threshol
             <td>
               <div class="doc-md-description">
                 <p>Map from threshold key (<code>"t5"</code> / <code>"w3"</code>) to its
-:class:<code>CatRaReDataset</code> row.</p>
+<code>CatRaReDataset</code> row.</p>
               </div>
             </td>
           </tr>
@@ -26149,14 +26121,14 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Catalog for the CatRaRE heavy-rainfall event-catalogue backend.</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">    Reads the bundled `catrare_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">    exposes its `t5` / `w3` threshold rows under the inherited :attr:`datasets`</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">    exposes its `t5` / `w3` threshold rows under the inherited `datasets`</span>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    map, plus the shared metadata used to build a download URL and FileGDB layer</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">    name. Instantiate with no arguments (`Catalog()`); resolve a threshold with</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">    :meth:`get`.</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">    `get`.</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">        datasets: Map from threshold key (`&quot;t5&quot;` / `&quot;w3&quot;`) to its</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">            :class:`CatRaReDataset` row.</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">            `CatRaReDataset` row.</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">        base_url: DWD open-data host prefix.</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        version: Dotted directory version (`&quot;v2026.01&quot;`).</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">        version_tag: The tag embedded in file / layer names (`&quot;v2026_01&quot;`).</span>
@@ -26227,10 +26199,10 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">                `CATALOG_PATH`.</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            ValueError: If the file has no `datasets:` block or a row fails</span>
@@ -26240,9 +26212,9 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">))</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CatRaReDataset</span><span class="p">:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a threshold key to its :class:`CatRaReDataset` row.</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a threshold key to its `CatRaReDataset` row.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key.</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        Args:</span>
@@ -26466,8 +26438,8 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a threshold key to its :class:<code>CatRaReDataset</code> row.</p>
-<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
+        <p>Resolve a threshold key to its <code>CatRaReDataset</code> row.</p>
+<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown key.</p>
 
 
@@ -26566,9 +26538,9 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
 <span class="normal"><a href="#__codelineno-0-253">253</a></span>
 <span class="normal"><a href="#__codelineno-0-254">254</a></span>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CatRaReDataset</span><span class="p">:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a threshold key to its :class:`CatRaReDataset` row.</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a threshold key to its `CatRaReDataset` row.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key.</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">    Args:</span>
@@ -26783,7 +26755,7 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-:data:<code>CATALOG_PATH</code>.</p>
+<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -26809,7 +26781,7 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -26865,10 +26837,10 @@ validation.</p>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            `CATALOG_PATH`.</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        ValueError: If the file has no `datasets:` block or a row fails</span>
@@ -26919,14 +26891,14 @@ reads one of its layers with pyramids — the <code>EventZones</code> footprint 
 DWD RADOLAN grid (which the file does not carry) to EPSG:4326, filters the
 events by date window and/or bbox, and returns them carrying the event
 attributes (area, duration, severity) as a
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> (or, with
-<code>geometry=False</code>, a geometry-dropped :class:<code>pandas.DataFrame</code>).</p>
+<code>pyramids.feature.collection.FeatureCollection</code> (or, with
+<code>geometry=False</code>, a geometry-dropped <code>pandas.DataFrame</code>).</p>
 <p>Two threshold selections are served: <code>T5</code> (events with a return period of at
 least 5 years) and <code>W3</code> (a severity-weighted selection). This is a static
 2001-2025 archive, so a missing <code>start</code> / <code>end</code> is legal
 (<code>REQUIRES_TIME_WINDOW = False</code>) and simply returns every event; when supplied,
 the dates filter the events. It is a <code>vector</code> backend: the
-:class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument.
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code> argument.
 The downloaded FileGDB is cached under <code>cache_dir</code>, so repeated requests reuse
 it. The companion to the <code>radklim</code> grids.</p>
 
@@ -27453,11 +27425,11 @@ raster.</p>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download + read the FileGDB layer and build the filtered collection.</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a vector backend returns</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        an in-memory :class:`FeatureCollection`. The download is cached under</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        :attr:`_cache_root`, so a repeat request reuses the FileGDB.</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        an in-memory `FeatureCollection`. The download is cached under</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        `_cache_root`, so a repeat request reuses the FileGDB.</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            products: The single-element list from :meth:`_search`.</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            products: The single-element list from `_search`.</span>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            list[FeatureCollection]: One trimmed, filtered collection.</span>
@@ -27496,7 +27468,7 @@ raster.</p>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the local FileGDB zip path, downloading it on a cache miss.</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            product: The product from :meth:`_search` (carries the download URL</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            product: The product from `_search` (carries the download URL</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">                in `href`).</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        Returns:</span>
@@ -27541,9 +27513,9 @@ raster.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">                this is a no-op.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            A :class:`~pyramids.feature.collection.FeatureCollection` (also</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` (also</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            written to `root_dir`) or, when `geometry=False`, a</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            :class:`pandas.DataFrame` of the events and their attributes.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            `pandas.DataFrame` of the events and their attributes.</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            requests.HTTPError: If the download returns a non-2xx status.</span>
@@ -28071,23 +28043,23 @@ this is a no-op.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>A</code></td>            <td>
+            <td>
                   <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>~pyramids.feature.collection.FeatureCollection</code> (also</p>
+                <p>A <code>pyramids.feature.collection.FeatureCollection</code> (also</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
@@ -28097,12 +28069,12 @@ this is a no-op.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>pandas.DataFrame</code> of the events and their attributes.</p>
+                <p><code>pandas.DataFrame</code> of the events and their attributes.</p>
               </div>
             </td>
           </tr>
@@ -28194,9 +28166,9 @@ this is a no-op.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            this is a no-op.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        A :class:`~pyramids.feature.collection.FeatureCollection` (also</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` (also</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        written to `root_dir`) or, when `geometry=False`, a</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        :class:`pandas.DataFrame` of the events and their attributes.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        `pandas.DataFrame` of the events and their attributes.</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        requests.HTTPError: If the download returns a non-2xx status.</span>
@@ -28262,14 +28234,14 @@ this is a no-op.</p>
 (v2026.01). Two threshold selections are published — <code>T5</code> (return period</p>
 <blockquote>
 <p>= 5 yr) and <code>W3</code> (severity-weighted) — so the catalog exposes them as a map of
-:class:<code>CatRaReDataset</code> rows under the inherited :attr:<code>datasets</code> field, keyed
+<code>CatRaReDataset</code> rows under the inherited <code>datasets</code> field, keyed
 <code>"t5"</code> / <code>"w3"</code>, alongside the shared <code>base_url</code>, <code>version</code> / <code>version_tag</code> /
 <code>years</code>, the RADOLAN <code>source_crs</code>, the <code>geometry_layers</code> stems, the
 <code>event_columns</code> to keep, and the <code>license</code> / <code>attribution</code>. The concrete
-download URL and FileGDB layer name are composed by :meth:<code>Catalog.download_url</code>
-/ :meth:<code>Catalog.layer_name</code>.</p>
+download URL and FileGDB layer name are composed by <code>Catalog.download_url</code>
+/ <code>Catalog.layer_name</code>.</p>
 </blockquote>
-<p>:data:<code>CATALOG_PATH</code> is the path to the bundled YAML; it is monkey-patchable in
+<p><code>CATALOG_PATH</code> is the path to the bundled YAML; it is monkey-patchable in
 tests.</p>
 
 
@@ -28310,7 +28282,7 @@ tests.</p>
 
         <p>One CatRaRE threshold selection's spec.</p>
 <p>The threshold key (<code>"t5"</code> / <code>"w3"</code>) is the parent key in
-:attr:<code>Catalog.datasets</code>, not stored on the row.</p>
+<code>Catalog.datasets</code>, not stored on the row.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -28401,7 +28373,7 @@ tests.</p>
 <a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One CatRaRE threshold selection&#39;s spec.</span>
 <a id="__codelineno-0-42" name="__codelineno-0-42"></a>
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    The threshold key (`&quot;t5&quot;` / `&quot;w3&quot;`) is the parent key in</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    :attr:`Catalog.datasets`, not stored on the row.</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    `Catalog.datasets`, not stored on the row.</span>
 <a id="__codelineno-0-45" name="__codelineno-0-45"></a>
 <a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">        threshold: The threshold code embedded in the file / layer names</span>
@@ -28470,10 +28442,10 @@ tests.</p>
 
         <p>Catalog for the CatRaRE heavy-rainfall event-catalogue backend.</p>
 <p>Reads the bundled <code>catrare_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>t5</code> / <code>w3</code> threshold rows under the inherited :attr:<code>datasets</code>
+exposes its <code>t5</code> / <code>w3</code> threshold rows under the inherited <code>datasets</code>
 map, plus the shared metadata used to build a download URL and FileGDB layer
 name. Instantiate with no arguments (<code>Catalog()</code>); resolve a threshold with
-:meth:<code>get</code>.</p>
+<code>get</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -28494,7 +28466,7 @@ name. Instantiate with no arguments (<code>Catalog()</code>); resolve a threshol
             <td>
               <div class="doc-md-description">
                 <p>Map from threshold key (<code>"t5"</code> / <code>"w3"</code>) to its
-:class:<code>CatRaReDataset</code> row.</p>
+<code>CatRaReDataset</code> row.</p>
               </div>
             </td>
           </tr>
@@ -28801,14 +28773,14 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Catalog for the CatRaRE heavy-rainfall event-catalogue backend.</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">    Reads the bundled `catrare_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">    exposes its `t5` / `w3` threshold rows under the inherited :attr:`datasets`</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">    exposes its `t5` / `w3` threshold rows under the inherited `datasets`</span>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    map, plus the shared metadata used to build a download URL and FileGDB layer</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">    name. Instantiate with no arguments (`Catalog()`); resolve a threshold with</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">    :meth:`get`.</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">    `get`.</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">        datasets: Map from threshold key (`&quot;t5&quot;` / `&quot;w3&quot;`) to its</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">            :class:`CatRaReDataset` row.</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">            `CatRaReDataset` row.</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">        base_url: DWD open-data host prefix.</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        version: Dotted directory version (`&quot;v2026.01&quot;`).</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">        version_tag: The tag embedded in file / layer names (`&quot;v2026_01&quot;`).</span>
@@ -28879,10 +28851,10 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">                `CATALOG_PATH`.</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            ValueError: If the file has no `datasets:` block or a row fails</span>
@@ -28892,9 +28864,9 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">))</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CatRaReDataset</span><span class="p">:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a threshold key to its :class:`CatRaReDataset` row.</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a threshold key to its `CatRaReDataset` row.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key.</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        Args:</span>
@@ -29118,8 +29090,8 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a threshold key to its :class:<code>CatRaReDataset</code> row.</p>
-<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
+        <p>Resolve a threshold key to its <code>CatRaReDataset</code> row.</p>
+<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown key.</p>
 
 
@@ -29218,9 +29190,9 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
 <span class="normal"><a href="#__codelineno-0-253">253</a></span>
 <span class="normal"><a href="#__codelineno-0-254">254</a></span>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CatRaReDataset</span><span class="p">:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a threshold key to its :class:`CatRaReDataset` row.</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a threshold key to its `CatRaReDataset` row.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key.</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">    Args:</span>
@@ -29435,7 +29407,7 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-:data:<code>CATALOG_PATH</code>.</p>
+<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -29461,7 +29433,7 @@ date-window filter compares against (<code>Date_START</code> / <code>Date_END</c
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -29517,10 +29489,10 @@ validation.</p>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            `CATALOG_PATH`.</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        ValueError: If the file has no `datasets:` block or a row fails</span>

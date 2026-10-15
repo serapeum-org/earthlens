@@ -817,34 +817,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../testing-rules/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Testing rules
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -24241,12 +24213,12 @@ inventory of what was fetched. The feed is near-real-time (a rolling
 buffer of recent volumes), not a historical archive.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li>:class:<code>Radar</code> — the backend; instantiate with a time window, a bbox,
-  and a <code>{station_id: [...]}</code> mapping, then call :meth:<code>Radar.download</code>.</li>
-<li>:class:<code>StationCatalog</code> — loader for the bundled <code>radar_data_catalog.yaml</code>.</li>
-<li>:class:<code>Station</code> — one WSR-88D site row (name / lat / lon / state).</li>
-<li>:data:<code>CATALOG_PATH</code> — absolute path to the bundled station YAML.</li>
-<li>:data:<code>BUCKET</code> — the unsigned chunk bucket name.</li>
+<li><code>Radar</code> — the backend; instantiate with a time window, a bbox,
+  and a <code>{station_id: [...]}</code> mapping, then call <code>Radar.download</code>.</li>
+<li><code>StationCatalog</code> — loader for the bundled <code>radar_data_catalog.yaml</code>.</li>
+<li><code>Station</code> — one WSR-88D site row (name / lat / lon / state).</li>
+<li><code>CATALOG_PATH</code> — absolute path to the bundled station YAML.</li>
+<li><code>BUCKET</code> — the unsigned chunk bucket name.</li>
 </ul>
 <p>The <code>[radar]</code> extra pulls <code>boto3</code> (unsigned S3); it is imported lazily,
 so the package imports without the extra installed. Reading / gridding
@@ -24421,7 +24393,7 @@ as a typed <code>dict[str, Station]</code>. Instantiate with no arguments
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">_load_stations</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">)}</span>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_station</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Station</span><span class="p">:</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a site id to its :class:`Station` (did-you-mean on miss).</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a site id to its `Station` (did-you-mean on miss).</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">            site_id: A four-letter WSR-88D id (e.g. `&quot;KTLX&quot;`).</span>
@@ -24491,7 +24463,7 @@ as a typed <code>dict[str, Station]</code>. Instantiate with no arguments
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a site id to its :class:<code>Station</code> (did-you-mean on miss).</p>
+        <p>Resolve a site id to its <code>Station</code> (did-you-mean on miss).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -24588,7 +24560,7 @@ hint from the base class).</p>
 <span class="normal"><a href="#__codelineno-0-163">163</a></span>
 <span class="normal"><a href="#__codelineno-0-164">164</a></span>
 <span class="normal"><a href="#__codelineno-0-165">165</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_station</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Station</span><span class="p">:</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a site id to its :class:`Station` (did-you-mean on miss).</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a site id to its `Station` (did-you-mean on miss).</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">        site_id: A four-letter WSR-88D id (e.g. `&quot;KTLX&quot;`).</span>
@@ -25266,7 +25238,7 @@ pyramids-reducible).</p>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">                ISO datetime (`&quot;%Y-%m-%dT%H:%M:%S&quot;`) since the feed is</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">                sub-hourly real-time.</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">            region: AWS region of the chunk bucket.</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">            catalog: Optional pre-built :class:`Catalog` (tests</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">            catalog: Optional pre-built `Catalog` (tests</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">                inject a faked one).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        Raises:</span>
@@ -25295,7 +25267,7 @@ pyramids-reducible).</p>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the scan-time window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the scan-time window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">            start: Inclusive window start.</span>
@@ -25336,7 +25308,7 @@ pyramids-reducible).</p>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        `{STATION}/`, then lists each volume&#39;s chunks, parses the</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        volume scan start time, and keeps the volumes whose start time</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        falls in the request window. The ordered chunk keys ride on the</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        product metadata so :meth:`_fetch` needs no re-listing.</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        product metadata so `_fetch` needs no re-listing.</span>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            list[RemoteProduct]: One product per in-window volume, each</span>
@@ -25436,7 +25408,7 @@ pyramids-reducible).</p>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        volume does not lose the others (mirrors the FDSN/NWP policy).</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            products: The products from :meth:`_search`.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            products: The products from `_search`.</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">            list[Path]: One assembled `.ar2v` path per successfully</span>
@@ -25449,13 +25421,13 @@ pyramids-reducible).</p>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]:</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Assemble each volume, returning `(product, path)` pairs.</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        Like :meth:`_fetch` but keeps each path paired with the product</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        Like `_fetch` but keeps each path paired with the product</span>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        it came from, so the inventory needs no filename re-matching. A</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        volume whose download fails is logged and skipped. The loop shows</span>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        a `tqdm` bar unless `download(progress_bar=False)` disabled it.</span>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            products: The products from :meth:`_search`.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            products: The products from `_search`.</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            list[tuple[RemoteProduct, Path]]: One pair per successfully</span>
@@ -25776,7 +25748,7 @@ sub-hourly real-time.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional pre-built :class:<code>Catalog</code> (tests
+                <p>Optional pre-built <code>Catalog</code> (tests
 inject a faked one).</p>
               </div>
             </td>
@@ -25899,7 +25871,7 @@ inject a faked one).</p>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">            ISO datetime (`&quot;%Y-%m-%dT%H:%M:%S&quot;`) since the feed is</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            sub-hourly real-time.</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">        region: AWS region of the chunk bucket.</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        catalog: Optional pre-built :class:`Catalog` (tests</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        catalog: Optional pre-built `Catalog` (tests</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">            inject a faked one).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Raises:</span>
@@ -26159,8 +26131,8 @@ documented exception.</p>
 
         <p>One WSR-88D radar site.</p>
 <p>The site id (e.g. <code>"KTLX"</code>) is the parent key in
-:attr:<code>Catalog.datasets</code>; the loader copies it onto the row as
-:attr:<code>code</code> so a resolved station is self-describing.</p>
+<code>Catalog.datasets</code>; the loader copies it onto the row as
+<code>code</code> so a resolved station is self-describing.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -26281,8 +26253,8 @@ rejected at load time, and the field is excluded from
 <a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One WSR-88D radar site.</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    The site id (e.g. `&quot;KTLX&quot;`) is the parent key in</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    :attr:`Catalog.datasets`; the loader copies it onto the row as</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    :attr:`code` so a resolved station is self-describing.</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    `Catalog.datasets`; the loader copies it onto the row as</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    `code` so a resolved station is self-describing.</span>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        code: The station&#39;s catalog key (its ICAO id, e.g. `&quot;KABR&quot;`),</span>
@@ -26858,7 +26830,7 @@ pyramids-reducible).</p>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">                ISO datetime (`&quot;%Y-%m-%dT%H:%M:%S&quot;`) since the feed is</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">                sub-hourly real-time.</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">            region: AWS region of the chunk bucket.</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">            catalog: Optional pre-built :class:`Catalog` (tests</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">            catalog: Optional pre-built `Catalog` (tests</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">                inject a faked one).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        Raises:</span>
@@ -26887,7 +26859,7 @@ pyramids-reducible).</p>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the scan-time window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the scan-time window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">            start: Inclusive window start.</span>
@@ -26928,7 +26900,7 @@ pyramids-reducible).</p>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        `{STATION}/`, then lists each volume&#39;s chunks, parses the</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        volume scan start time, and keeps the volumes whose start time</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        falls in the request window. The ordered chunk keys ride on the</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        product metadata so :meth:`_fetch` needs no re-listing.</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        product metadata so `_fetch` needs no re-listing.</span>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            list[RemoteProduct]: One product per in-window volume, each</span>
@@ -27028,7 +27000,7 @@ pyramids-reducible).</p>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        volume does not lose the others (mirrors the FDSN/NWP policy).</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            products: The products from :meth:`_search`.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            products: The products from `_search`.</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">            list[Path]: One assembled `.ar2v` path per successfully</span>
@@ -27041,13 +27013,13 @@ pyramids-reducible).</p>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]:</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Assemble each volume, returning `(product, path)` pairs.</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        Like :meth:`_fetch` but keeps each path paired with the product</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        Like `_fetch` but keeps each path paired with the product</span>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        it came from, so the inventory needs no filename re-matching. A</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        volume whose download fails is logged and skipped. The loop shows</span>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        a `tqdm` bar unless `download(progress_bar=False)` disabled it.</span>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            products: The products from :meth:`_search`.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            products: The products from `_search`.</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            list[tuple[RemoteProduct, Path]]: One pair per successfully</span>
@@ -27368,7 +27340,7 @@ sub-hourly real-time.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional pre-built :class:<code>Catalog</code> (tests
+                <p>Optional pre-built <code>Catalog</code> (tests
 inject a faked one).</p>
               </div>
             </td>
@@ -27491,7 +27463,7 @@ inject a faked one).</p>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">            ISO datetime (`&quot;%Y-%m-%dT%H:%M:%S&quot;`) since the feed is</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            sub-hourly real-time.</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">        region: AWS region of the chunk bucket.</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        catalog: Optional pre-built :class:`Catalog` (tests</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        catalog: Optional pre-built `Catalog` (tests</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">            inject a faked one).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Raises:</span>
@@ -27754,14 +27726,14 @@ documented exception.</p>
     <div class="doc doc-contents first">
 
         <p>Station registry for the NEXRAD radar backend.</p>
-<p>Hosts :class:<code>Catalog</code>, the pydantic-backed reader for the
+<p>Hosts <code>Catalog</code>, the pydantic-backed reader for the
 bundled <code>radar_data_catalog.yaml</code> — a curated map of WSR-88D site ids
 (<code>"KTLX"</code>) to name / latitude / longitude / state. The catalog gives
 each fetched volume a point geometry and lets a request select the
 radars inside a bounding box.</p>
 <p>The catalog is <strong>informational</strong>: any valid four-letter site id can be
 fetched even if it is absent here (the volume just gets no geometry).
-The path to the bundled YAML lives at :data:<code>CATALOG_PATH</code>;
+The path to the bundled YAML lives at <code>CATALOG_PATH</code>;
 monkey-patch it to redirect the loader in tests.</p>
 
 
@@ -27933,7 +27905,7 @@ as a typed <code>dict[str, Station]</code>. Instantiate with no arguments
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">_load_stations</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">)}</span>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_station</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Station</span><span class="p">:</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a site id to its :class:`Station` (did-you-mean on miss).</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a site id to its `Station` (did-you-mean on miss).</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">            site_id: A four-letter WSR-88D id (e.g. `&quot;KTLX&quot;`).</span>
@@ -28003,7 +27975,7 @@ as a typed <code>dict[str, Station]</code>. Instantiate with no arguments
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a site id to its :class:<code>Station</code> (did-you-mean on miss).</p>
+        <p>Resolve a site id to its <code>Station</code> (did-you-mean on miss).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -28100,7 +28072,7 @@ hint from the base class).</p>
 <span class="normal"><a href="#__codelineno-0-163">163</a></span>
 <span class="normal"><a href="#__codelineno-0-164">164</a></span>
 <span class="normal"><a href="#__codelineno-0-165">165</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_station</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Station</span><span class="p">:</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a site id to its :class:`Station` (did-you-mean on miss).</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a site id to its `Station` (did-you-mean on miss).</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">        site_id: A four-letter WSR-88D id (e.g. `&quot;KTLX&quot;`).</span>
@@ -28337,8 +28309,8 @@ hint from the base class).</p>
 
         <p>One WSR-88D radar site.</p>
 <p>The site id (e.g. <code>"KTLX"</code>) is the parent key in
-:attr:<code>Catalog.datasets</code>; the loader copies it onto the row as
-:attr:<code>code</code> so a resolved station is self-describing.</p>
+<code>Catalog.datasets</code>; the loader copies it onto the row as
+<code>code</code> so a resolved station is self-describing.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -28459,8 +28431,8 @@ rejected at load time, and the field is excluded from
 <a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One WSR-88D radar site.</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    The site id (e.g. `&quot;KTLX&quot;`) is the parent key in</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    :attr:`Catalog.datasets`; the loader copies it onto the row as</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    :attr:`code` so a resolved station is self-describing.</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    `Catalog.datasets`; the loader copies it onto the row as</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    `code` so a resolved station is self-describing.</span>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        code: The station&#39;s catalog key (its ICAO id, e.g. `&quot;KABR&quot;`),</span>

@@ -817,34 +817,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../testing-rules/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Testing rules
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -24238,7 +24210,7 @@ rendered API.</p>
 Information Facility through <code>pygbif.occurrences.search</code> (anonymous), maps
 the taxon/space/time window to a points <code>FeatureCollection</code>, and warns on
 restrictive per-record licenses. The reference occurrence backend the OBIS
-twin mirrors. See :class:<code>earthlens.gbif.backend.GBIF</code>.</p>
+twin mirrors. See <code>earthlens.gbif.backend.GBIF</code>.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -24288,10 +24260,10 @@ twin mirrors. See :class:<code>earthlens.gbif.backend.GBIF</code>.</p>
 
         <p>Taxon catalog for the GBIF occurrence backend.</p>
 <p>Reads the bundled <code>gbif_data_catalog.yaml</code> (shipped as package data)
-and exposes its <code>taxa:</code> block as a map of :class:<code>Taxon</code> rows.
-Instantiate with no arguments (<code>Catalog()</code>); :func:<code>model_post_init</code>
+and exposes its <code>taxa:</code> block as a map of <code>Taxon</code> rows.
+Instantiate with no arguments (<code>Catalog()</code>); <code>model_post_init</code>
 loads and validates the YAML (cached) in one pass. The rows live in
-the framework's :attr:<code>datasets</code> field so the inherited dict-like
+the framework's <code>datasets</code> field so the inherited dict-like
 surface behaves like every other backend's catalog.</p>
 
 
@@ -24312,7 +24284,7 @@ surface behaves like every other backend's catalog.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from the friendly taxon name to its :class:<code>Taxon</code>
+                <p>Map from the friendly taxon name to its <code>Taxon</code>
 row (the framework field).</p>
               </div>
             </td>
@@ -24469,14 +24441,14 @@ row (the framework field).</p>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Taxon catalog for the GBIF occurrence backend.</span>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    Reads the bundled `gbif_data_catalog.yaml` (shipped as package data)</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">    and exposes its `taxa:` block as a map of :class:`Taxon` rows.</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    Instantiate with no arguments (`Catalog()`); :func:`model_post_init`</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">    and exposes its `taxa:` block as a map of `Taxon` rows.</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    Instantiate with no arguments (`Catalog()`); `model_post_init`</span>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    loads and validates the YAML (cached) in one pass. The rows live in</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    the framework&#39;s :attr:`datasets` field so the inherited dict-like</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    the framework&#39;s `datasets` field so the inherited dict-like</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    surface behaves like every other backend&#39;s catalog.</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        datasets: Map from the friendly taxon name to its :class:`Taxon`</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        datasets: Map from the friendly taxon name to its `Taxon`</span>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            row (the framework field).</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    Examples:</span>
@@ -24536,14 +24508,14 @@ row (the framework field).</p>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            ValueError: If the file has no `taxa:` block, or a row fails</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">                :class:`Taxon` validation.</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">                `Taxon` validation.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -24629,7 +24601,7 @@ row (the framework field).</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level :data:<code>CATALOG_PATH</code>.</p>
+module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -24655,7 +24627,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -24679,7 +24651,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the file has no <code>taxa:</code> block, or a row fails
-:class:<code>Taxon</code> validation.</p>
+<code>Taxon</code> validation.</p>
               </div>
             </td>
           </tr>
@@ -24712,14 +24684,14 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        ValueError: If the file has no `taxa:` block, or a row fails</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            :class:`Taxon` validation.</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            `Taxon` validation.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>    <span class="n">rows</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -24913,7 +24885,7 @@ taxon/space/time window of species occurrences through the same
 <code>download()</code> shape every other earthlens backend uses. Each entry in
 <code>variables</code> resolves to a GBIF backbone <code>taxonKey</code>; the bbox becomes a
 WKT polygon; the paginated result is mapped to a points
-:class:<code>~pyramids.feature.collection.FeatureCollection</code>.</p>
+<code>pyramids.feature.collection.FeatureCollection</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -25244,7 +25216,7 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    `download()` shape every other earthlens backend uses. Each entry in</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    `variables` resolves to a GBIF backbone `taxonKey`; the bbox becomes a</span>
 <a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    WKT polygon; the paginated result is mapped to a points</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection`.</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection`.</span>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        OUTPUT_KIND: `&quot;vector&quot;` — the facade rejects `aggregate=`.</span>
@@ -25347,7 +25319,7 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse `[start, end]` into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse `[start, end]` into a `TemporalExtent`.</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        GBIF issues one search spanning the window, so there is no</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        per-date loop and the resolution is the sentinel `&quot;all&quot;`.</span>
@@ -25403,7 +25375,7 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            occ: The `pygbif.occurrences` module (or a stand-in exposing</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                `search(**kwargs)`).</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            params: The `occ.search` kwargs from :meth:`_plan_search`.</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            params: The `occ.search` kwargs from `_plan_search`.</span>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            list[dict]: Up to `max_records` occurrence record dicts.</span>
@@ -26065,7 +26037,7 @@ file under <code>path</code> when <code>path</code> is set.</p>
 
 
         <p>One friendly GBIF taxon's dispatch row.</p>
-<p>The user-facing name is the parent key in :attr:<code>Catalog.datasets</code>
+<p>The user-facing name is the parent key in <code>Catalog.datasets</code>
 and is not stored on the row.</p>
 
 
@@ -26174,7 +26146,7 @@ informational.</p>
 <span class="normal"><a href="#__codelineno-0-160">160</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="k">class</span><span class="w"> </span><span class="nc">Taxon</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One friendly GBIF taxon&#39;s dispatch row.</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    The user-facing name is the parent key in :attr:`Catalog.datasets`</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    The user-facing name is the parent key in `Catalog.datasets`</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    and is not stored on the row.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Attributes:</span>
@@ -26259,11 +26231,11 @@ API. The request is one taxon/geometry/time window: every entry in
 <code>variables</code> resolves to a GBIF backbone <code>taxonKey</code>, the bounding box
 becomes a WKT polygon, and <code>[start, end]</code> becomes GBIF's <code>eventDate</code>
 range. The paginated result is mapped to a pyramids
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> of points by the
+<code>pyramids.feature.collection.FeatureCollection</code> of points by the
 shared <code>earthlens.biodiversity</code> mapper.</p>
 <p>This is the reference occurrence backend the OBIS twin mirrors. Like
 FDSN/Overture it is a <code>vector</code> backend (<code>OUTPUT_KIND = "vector"</code>), so the
-:class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
+<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument. <code>download()</code> returns the in-memory FeatureCollection and, when
 <code>path</code> is set, writes it (GeoParquet by default).</p>
 <p>GBIF search is paginated at 300 records/page and capped at an
@@ -26314,7 +26286,7 @@ taxon/space/time window of species occurrences through the same
 <code>download()</code> shape every other earthlens backend uses. Each entry in
 <code>variables</code> resolves to a GBIF backbone <code>taxonKey</code>; the bbox becomes a
 WKT polygon; the paginated result is mapped to a points
-:class:<code>~pyramids.feature.collection.FeatureCollection</code>.</p>
+<code>pyramids.feature.collection.FeatureCollection</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -26645,7 +26617,7 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    `download()` shape every other earthlens backend uses. Each entry in</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    `variables` resolves to a GBIF backbone `taxonKey`; the bbox becomes a</span>
 <a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    WKT polygon; the paginated result is mapped to a points</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection`.</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection`.</span>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        OUTPUT_KIND: `&quot;vector&quot;` — the facade rejects `aggregate=`.</span>
@@ -26748,7 +26720,7 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse `[start, end]` into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse `[start, end]` into a `TemporalExtent`.</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        GBIF issues one search spanning the window, so there is no</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        per-date loop and the resolution is the sentinel `&quot;all&quot;`.</span>
@@ -26804,7 +26776,7 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            occ: The `pygbif.occurrences` module (or a stand-in exposing</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                `search(**kwargs)`).</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            params: The `occ.search` kwargs from :meth:`_plan_search`.</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            params: The `occ.search` kwargs from `_plan_search`.</span>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            list[dict]: Up to `max_records` occurrence record dicts.</span>
@@ -27477,13 +27449,13 @@ helper that also accepts a raw integer key or a live <code>taxon:&lt;scientific
 name&gt;</code> lookup. There is no <code>refresh</code> / <code>probe</code> tooling and no
 <code>tools/gbif/</code> directory — the curated rows are a hand-edit of one YAML
 file (<code>earthlens datasets validate gbif</code> confirms the keys upstream).</p>
-<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code>
+<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code>
 subclass storing the rows in the framework's
-:attr:<code>~earthlens.base.AbstractCatalog.datasets</code> field, so the inherited
+<code>datasets</code> field, so the inherited
 dict-like surface (<code>len(cat)</code>, <code>name in cat</code>, <code>cat[name]</code>, <code>iter(cat)</code>,
-:meth:<code>get_dataset</code> with a did-you-mean hint) works. Parsing is cached on
-<code>(path, mtime)</code> (see :data:<code>_CATALOG_CACHE</code> / :func:<code>clear_catalog_cache</code>);
-:data:<code>CATALOG_PATH</code> is the bundled YAML and is monkey-patchable in tests.</p>
+<code>get_dataset</code> with a did-you-mean hint) works. Parsing is cached on
+<code>(path, mtime)</code> (see <code>_CATALOG_CACHE</code> / <code>clear_catalog_cache</code>);
+<code>CATALOG_PATH</code> is the bundled YAML and is monkey-patchable in tests.</p>
 
 
 
@@ -27523,10 +27495,10 @@ dict-like surface (<code>len(cat)</code>, <code>name in cat</code>, <code>cat[na
 
         <p>Taxon catalog for the GBIF occurrence backend.</p>
 <p>Reads the bundled <code>gbif_data_catalog.yaml</code> (shipped as package data)
-and exposes its <code>taxa:</code> block as a map of :class:<code>Taxon</code> rows.
-Instantiate with no arguments (<code>Catalog()</code>); :func:<code>model_post_init</code>
+and exposes its <code>taxa:</code> block as a map of <code>Taxon</code> rows.
+Instantiate with no arguments (<code>Catalog()</code>); <code>model_post_init</code>
 loads and validates the YAML (cached) in one pass. The rows live in
-the framework's :attr:<code>datasets</code> field so the inherited dict-like
+the framework's <code>datasets</code> field so the inherited dict-like
 surface behaves like every other backend's catalog.</p>
 
 
@@ -27547,7 +27519,7 @@ surface behaves like every other backend's catalog.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from the friendly taxon name to its :class:<code>Taxon</code>
+                <p>Map from the friendly taxon name to its <code>Taxon</code>
 row (the framework field).</p>
               </div>
             </td>
@@ -27704,14 +27676,14 @@ row (the framework field).</p>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Taxon catalog for the GBIF occurrence backend.</span>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    Reads the bundled `gbif_data_catalog.yaml` (shipped as package data)</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">    and exposes its `taxa:` block as a map of :class:`Taxon` rows.</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    Instantiate with no arguments (`Catalog()`); :func:`model_post_init`</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">    and exposes its `taxa:` block as a map of `Taxon` rows.</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    Instantiate with no arguments (`Catalog()`); `model_post_init`</span>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    loads and validates the YAML (cached) in one pass. The rows live in</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    the framework&#39;s :attr:`datasets` field so the inherited dict-like</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    the framework&#39;s `datasets` field so the inherited dict-like</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    surface behaves like every other backend&#39;s catalog.</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        datasets: Map from the friendly taxon name to its :class:`Taxon`</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        datasets: Map from the friendly taxon name to its `Taxon`</span>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            row (the framework field).</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    Examples:</span>
@@ -27771,14 +27743,14 @@ row (the framework field).</p>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            ValueError: If the file has no `taxa:` block, or a row fails</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">                :class:`Taxon` validation.</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">                `Taxon` validation.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -27864,7 +27836,7 @@ row (the framework field).</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level :data:<code>CATALOG_PATH</code>.</p>
+module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -27890,7 +27862,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -27914,7 +27886,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the file has no <code>taxa:</code> block, or a row fails
-:class:<code>Taxon</code> validation.</p>
+<code>Taxon</code> validation.</p>
               </div>
             </td>
           </tr>
@@ -27947,14 +27919,14 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        ValueError: If the file has no `taxa:` block, or a row fails</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            :class:`Taxon` validation.</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            `Taxon` validation.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>    <span class="n">rows</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -28143,7 +28115,7 @@ hint) or a name lookup finds no backbone match.</p>
 
 
         <p>One friendly GBIF taxon's dispatch row.</p>
-<p>The user-facing name is the parent key in :attr:<code>Catalog.datasets</code>
+<p>The user-facing name is the parent key in <code>Catalog.datasets</code>
 and is not stored on the row.</p>
 
 
@@ -28252,7 +28224,7 @@ informational.</p>
 <span class="normal"><a href="#__codelineno-0-160">160</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="k">class</span><span class="w"> </span><span class="nc">Taxon</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One friendly GBIF taxon&#39;s dispatch row.</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    The user-facing name is the parent key in :attr:`Catalog.datasets`</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    The user-facing name is the parent key in `Catalog.datasets`</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    and is not stored on the row.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Attributes:</span>
