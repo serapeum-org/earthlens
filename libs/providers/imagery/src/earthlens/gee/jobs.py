@@ -1,26 +1,26 @@
 """Track Earth Engine batch tasks the way `earthlens.ecmwf.jobs` tracks CDS jobs.
 
-The synchronous `export_via="url"` path of :class:`earthlens.gee.GEE`
+The synchronous `export_via="url"` path of `earthlens.gee.GEE`
 produces nothing trackable — once the GeoTIFF arrives there is no
 queue entry to inspect. The asynchronous sinks (`"drive"` / `"gcs"` /
 `"asset"`) do, and Earth Engine exposes two stacked APIs over them
 (`ee.batch.Task.*` and the lower-level `ee.data.{listOperations,
 getOperation, cancelOperation}`). This module normalises both shapes
-into a single frozen :class:`TaskInfo` value object and gives the
+into a single frozen `TaskInfo` value object and gives the
 caller four operations on top:
 
-* :func:`list_recent_tasks` — every batch task on the current project,
+* `list_recent_tasks` — every batch task on the current project,
   with client-side filters by `state` / age / `task_type` /
   description prefix.
-* :func:`get_task_status` — one task by id.
-* :func:`cancel_task` — cancel a queued or running task by id.
-* :func:`wait_for_task_id` — id-based blocking poll until the task
+* `get_task_status` — one task by id.
+* `cancel_task` — cancel a queued or running task by id.
+* `wait_for_task_id` — id-based blocking poll until the task
   reaches a terminal state.
-* :func:`resolve_destination` — return the `destination_uris` of a
+* `resolve_destination` — return the `destination_uris` of a
   completed task as a list (does *not* auto-download Drive / GCS
   payloads — that's `L2` in the GEE jobs tracking plan).
 
-These mirror :mod:`earthlens.ecmwf.jobs` so a user juggling both
+These mirror `earthlens.ecmwf.jobs` so a user juggling both
 backends sees the same surface.
 
 Examples:
@@ -71,8 +71,8 @@ TERMINAL_TASK_STATES: frozenset[str] = frozenset({"COMPLETED", "FAILED", "CANCEL
 #: underlying Google Long-Running-Operations names that
 #: `ee.data.listOperations()` returns (`PENDING` for queued,
 #: `SUCCEEDED` for completed). The adapter folds the LRO names into
-#: their `Task.State` equivalents via :data:`_STATE_ALIASES` so
-#: downstream code sees the single :data:`_VALID_TASK_STATES`
+#: their `Task.State` equivalents via `_STATE_ALIASES` so
+#: downstream code sees the single `_VALID_TASK_STATES`
 #: vocabulary.
 _VALID_TASK_STATES: frozenset[str] = frozenset(
     {
@@ -123,7 +123,7 @@ class TaskInfo(BaseModel):
         description: Human description set when the task was
             submitted (e.g. the `description=` kwarg of
             `ee.batch.Export.image.toDrive`).
-        state: One of :data:`_VALID_TASK_STATES`.
+        state: One of `_VALID_TASK_STATES`.
         task_type: `EXPORT_IMAGE` / `EXPORT_TABLE` / `EXPORT_MAP` /
             `EXPORT_VIDEO` / `EXPORT_CLASSIFIER`.
         create_time: Submission time as a naive UTC datetime.
@@ -241,7 +241,7 @@ def _parse_ms(ms: int | float | None) -> dt.datetime | None:
 
 
 def _op_to_taskinfo(payload: dict[str, Any]) -> TaskInfo:
-    """Build a :class:`TaskInfo` from either of the two EE response shapes.
+    """Build a `TaskInfo` from either of the two EE response shapes.
 
     Two distinguishing markers:
 
@@ -254,11 +254,11 @@ def _op_to_taskinfo(payload: dict[str, Any]) -> TaskInfo:
         payload: One operation dict from either API.
 
     Returns:
-        A :class:`TaskInfo` with normalised fields.
+        A `TaskInfo` with normalised fields.
 
     Raises:
         ValueError: If `payload` is neither shape, or carries a `state`
-            outside :data:`_VALID_TASK_STATES`.
+            outside `_VALID_TASK_STATES`.
     """
     if "metadata" in payload:
         meta = payload.get("metadata") or {}
@@ -375,10 +375,10 @@ def list_recent_tasks(
             caps the returned list, not the underlying pagination.
 
     Returns:
-        A list of :class:`TaskInfo` sorted newest first.
+        A list of `TaskInfo` sorted newest first.
 
     Raises:
-        ValueError: If a passed `state` is not in :data:`_VALID_TASK_STATES`.
+        ValueError: If a passed `state` is not in `_VALID_TASK_STATES`.
     """
     wanted_states: frozenset[str] | None
     if state is None:
@@ -417,7 +417,7 @@ def list_recent_tasks(
 
 
 def get_task_status(task_id: str, project: str | None = None) -> TaskInfo:
-    """Fetch one task by id and return its normalised :class:`TaskInfo`.
+    """Fetch one task by id and return its normalised `TaskInfo`.
 
     Args:
         task_id: The bare task id (e.g. `"SNR3SZ6GNH5LUJQJ52VVNSZT"`)
@@ -426,12 +426,12 @@ def get_task_status(task_id: str, project: str | None = None) -> TaskInfo:
             id. Defaults to the SDK's current project.
 
     Returns:
-        A :class:`TaskInfo`.
+        A `TaskInfo`.
 
     Raises:
-        Exceptions from the underlying `ee.data.getOperation` call
-        propagate verbatim — most commonly a `googleapiclient.errors.HttpError`
-        with a 404 when the id is unknown to EE.
+        googleapiclient.errors.HttpError: Propagated verbatim from
+            `ee.data.getOperation` — most commonly a 404 when the id is
+            unknown to Earth Engine.
     """
     op_name = _operation_name(task_id, project)
     raw = ee.data.getOperation(op_name)
@@ -450,14 +450,13 @@ def cancel_task(task_id: str, project: str | None = None) -> None:
 
     Args:
         task_id: The bare task id or full operation name (see
-            :func:`get_task_status`).
+            `get_task_status`).
         project: Cloud project id to scope to when `task_id` is bare.
 
     Raises:
-        Exceptions from the underlying `ee.data.cancelOperation`
-        propagate verbatim **except** the already-terminal
-        `FAILED_PRECONDITION` HttpError, which is downgraded to an
-        INFO log.
+        googleapiclient.errors.HttpError: Propagated verbatim from
+            `ee.data.cancelOperation`, **except** the already-terminal
+            `FAILED_PRECONDITION` one, which is downgraded to an INFO log.
     """
     op_name = _operation_name(task_id, project)
     try:
@@ -486,7 +485,7 @@ def wait_for_task_id(
 ) -> TaskInfo:
     """Block until a task reaches a terminal state, then return its `TaskInfo`.
 
-    Unlike :func:`earthlens.gee._helpers.wait_for_task` (which needs a
+    Unlike `earthlens.gee._helpers.wait_for_task` (which needs a
     live `ee.batch.Task` handle), this only needs the id, so it works
     for tasks submitted from a previous process / session.
 
@@ -500,7 +499,7 @@ def wait_for_task_id(
         sleep: Sleep implementation (injectable so tests run instantly).
 
     Returns:
-        The final :class:`TaskInfo` (state `"COMPLETED"`).
+        The final `TaskInfo` (state `"COMPLETED"`).
 
     Raises:
         RuntimeError: If the task ends `FAILED` / `CANCELLED` /
@@ -557,7 +556,7 @@ def _pull_gcs(bucket: str, key: str, dest_dir: Path) -> Path:
     — not whatever Application Default Credentials happen to be on
     the box. Requires the EE service account (or whichever identity
     initialised `ee`) to have the `devstorage.full_control` scope;
-    :class:`earthlens.gee.auth.EarthEngineAuth` requests it by
+    `earthlens.gee.auth.EarthEngineAuth` requests it by
     default.
     """
     from google.cloud import storage as _gcs
@@ -624,8 +623,8 @@ def resolve_destination(
     logged at WARNING so the caller can decide what to do with it.
 
     Args:
-        task_info: A terminal-state :class:`TaskInfo` (typically from
-            :func:`get_task_status` after :func:`wait_for_task_id`).
+        task_info: A terminal-state `TaskInfo` (typically from
+            `get_task_status` after `wait_for_task_id`).
         download_to: When given, a directory path; downloaded files
             land under it (created on demand). When `None` (the
             default), the helper only returns the URIs verbatim — no
@@ -633,15 +632,16 @@ def resolve_destination(
 
     Returns:
         A list whose entries are either local
-        :class:`pathlib.Path`s (for downloaded files) or URI strings
+        `pathlib.Path`s (for downloaded files) or URI strings
         (for the no-op asset path / unrecognised URIs / when
         `download_to is None`). Ordering matches
         `task_info.destination_uris`.
 
     Raises:
-        Exceptions from the underlying GCS / Drive client calls
-        propagate verbatim. Missing optional deps surface as
-        `ImportError`.
+        ImportError: If the optional GCS / Drive client dependency the
+            destination needs is not installed.
+        Exception: Propagated verbatim from the underlying GCS / Drive client
+            calls.
     """
     if task_info.state != "COMPLETED":
         logger.warning(
@@ -728,7 +728,7 @@ def _maybe_initialize_ee() -> None:
 
 
 def _print_task_oneline(t: TaskInfo) -> None:
-    """Render a single :class:`TaskInfo` as one terminal-friendly line.
+    """Render a single `TaskInfo` as one terminal-friendly line.
 
     Uses ASCII `-` for the unstarted-task placeholder so the line
     renders cleanly on Windows `cmd.exe` (cp437 / cp1252), which
