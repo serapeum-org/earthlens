@@ -9,13 +9,13 @@ param is gone) and advises a ~2-second delay between calls.
 Two fetches return a list of assessment row dicts (the backend turns them
 into a `pandas.DataFrame`):
 
-* :func:`fetch_species` is the **two-step** species path: it looks a binomial
+* `fetch_species` is the **two-step** species path: it looks a binomial
   up via `GET /taxa/scientific_name?genus_name=&species_name=` (which returns
   the assessment list), then fetches `GET /assessment/{id}` for the latest
   assessment to enrich it with the criteria / population trend, handling the
   flat `red_list_category_code` (list) vs nested `red_list_category.code`
   (detail) shapes.
-* :func:`fetch_country` lists a country's assessments via
+* `fetch_country` lists a country's assessments via
   `GET /countries/{code}` (ISO alpha-2).
 
 The exact assessment-body field names are verified against the rOpenSci
@@ -45,7 +45,7 @@ THROTTLE_SECONDS = 2.0
 #: Module-level monotonic time of the last successful `_get` request, and a
 #: companion "has any call happened yet" flag. The flag is what gates the first
 #: call — a `0.0` value alone is ambiguous under a simulated (test) clock that
-#: starts at zero. Tests reset both via :func:`clear_throttle_state`. The lock
+#: starts at zero. Tests reset both via `clear_throttle_state`. The lock
 #: guards reads/writes so concurrent callers (e.g. a `ThreadPoolExecutor` of
 #: per-species lookups) cannot race past the inter-call window.
 _LAST_CALL_MONOTONIC: float = 0.0
@@ -134,11 +134,11 @@ def _get(
 ) -> dict:
     """GET a v4 endpoint with the Bearer header and return parsed JSON.
 
-    Throttles consecutive calls to at most one every :data:`THROTTLE_SECONDS`
+    Throttles consecutive calls to at most one every `THROTTLE_SECONDS`
     (the IUCN advisory; the first call does not wait). Retries on `429`
     (honouring `Retry-After`) and on `500`/`502`/`503`/`504` with capped
-    exponential back-off. Maps `401` to :class:`AuthenticationError`, `404`
-    to a clear :class:`ValueError` naming the path so a typo'd species /
+    exponential back-off. Maps `401` to `AuthenticationError`, `404`
+    to a clear `ValueError` naming the path so a typo'd species /
     country reads as "not found in the IUCN Red List" rather than a raw
     `HTTPError`. The Bearer token is held by the session and never echoed
     by `requests` in error messages.
@@ -146,7 +146,7 @@ def _get(
     Args:
         session: The HTTP session.
         token: The v4 API token (sent as `Authorization: Bearer`).
-        path: Endpoint path under :data:`BASE_URL` (e.g.
+        path: Endpoint path under `BASE_URL` (e.g.
             `"taxa/scientific_name"`).
         params: Optional query parameters.
 
@@ -278,7 +278,7 @@ def _row(scientific_name: str | None, assessment: dict) -> dict[str, Any]:
         assessment: An assessment dict from a `taxa` / `countries` list.
 
     Returns:
-        A row dict keyed by :data:`IUCN_COLUMNS` (detail fields left `None`).
+        A row dict keyed by `IUCN_COLUMNS` (detail fields left `None`).
     """
     return {
         "scientific_name": scientific_name,

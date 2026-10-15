@@ -8,12 +8,12 @@ buffer of recent volumes), not a historical archive.
 
 Public surface (re-exported from this package):
 
-* :class:`Radar` — the backend; instantiate with a time window, a bbox,
-  and a `{station_id: [...]}` mapping, then call :meth:`Radar.download`.
-* :class:`StationCatalog` — loader for the bundled `radar_data_catalog.yaml`.
-* :class:`Station` — one WSR-88D site row (name / lat / lon / state).
-* :data:`CATALOG_PATH` — absolute path to the bundled station YAML.
-* :data:`BUCKET` — the unsigned chunk bucket name.
+* `Radar` — the backend; instantiate with a time window, a bbox,
+  and a `{station_id: [...]}` mapping, then call `Radar.download`.
+* `StationCatalog` — loader for the bundled `radar_data_catalog.yaml`.
+* `Station` — one WSR-88D site row (name / lat / lon / state).
+* `CATALOG_PATH` — absolute path to the bundled station YAML.
+* `BUCKET` — the unsigned chunk bucket name.
 
 The `[radar]` extra pulls `boto3` (unsigned S3); it is imported lazily,
 so the package imports without the extra installed. Reading / gridding

@@ -7,15 +7,15 @@
 just rebuild the wide signature one layer down.
 
 Two cohesive frozen value objects give each strategy a typed, validated slice:
-:class:`ExportConfig` is *where the pixels go*, :class:`EngineConfig` is *how
+`ExportConfig` is *where the pixels go*, `EngineConfig` is *how
 they are computed*. The same move `AggregationConfig` already made in core.
 
 One thing deliberately **not** done here: `crs` and `scale` are not carried as
 raw fields on both objects. Duplicating the grid inputs while leaving the
 derivation on the backend is how the god-class survives a refactor. They live on
-:class:`EngineConfig` once, and :class:`~earthlens.gee.grid.OutputGrid` owns
+`EngineConfig` once, and `OutputGrid` owns
 turning them into a grid; a sink that needs them for an Earth Engine export call
-reads the pair back through :attr:`EngineConfig.grid_inputs`.
+reads the pair back through `EngineConfig.grid_inputs`.
 """
 
 from __future__ import annotations
@@ -176,8 +176,8 @@ class EngineConfig(SummarisedLeaf):
         discover_extent: Fall back to an Earth Engine-side extent query when the
             catalog row's dates are missing.
         high_volume: Ask for Earth Engine's high-volume endpoint, read by the
-            engines that can use it (see :meth:`~earthlens.gee.engines.Engine.endpoint`,
-            which only :class:`~earthlens.gee.pixels.PixelsEngine` overrides).
+            engines that can use it (see `endpoint`,
+            which only `PixelsEngine` overrides).
             Less caching, and complex queries cost more EECU-time there, so it
             is opted into per request rather than switched on globally.
         crs_transform: A 6-element affine transform pinning the output grid's

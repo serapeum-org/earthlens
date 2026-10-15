@@ -1,17 +1,17 @@
 """Dataset-catalog loader for the NASA Earthdata backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
-Earthdata catalog. Mirrors the shape of :mod:`earthlens.cmems.catalog`
-and :mod:`earthlens.gee.catalog`: the catalog ships as a directory of
+Hosts `Catalog`, the pydantic-backed reader for the bundled
+Earthdata catalog. Mirrors the shape of `earthlens.cmems.catalog`
+and `earthlens.gee.catalog`: the catalog ships as a directory of
 per-DAAC YAML files at `src/earthlens/earthdata/catalog/`
 (`ges_disc.yaml`, `po_daac.yaml`, `lp_daac.yaml`, …) plus a single
 `_index.yaml` carrying the merged `available_datasets:` list. Each
 per-DAAC file contributes its `datasets:` block; the loader unions
-them into one :class:`Catalog` at construction time.
+them into one `Catalog` at construction time.
 
 A dataset key (e.g. `"GPM_3IMERGHHL_07"`) resolves to an
-:class:`EarthdataDataset` via :meth:`Catalog.get_dataset` /
-`Catalog()["..."]` / :meth:`Catalog.resolve`. The row carries the
+`EarthdataDataset` via `Catalog.get_dataset` /
+`Catalog()["..."]` / `Catalog.resolve`. The row carries the
 fields the backend needs to shape a CMR search and a fetch:
 `short_name` / `version` / `provider` (the CMR provider code), the
 per-instance `output_kind` (`G1`), the on-disk `format`, the
@@ -22,7 +22,7 @@ in-region S3 streaming path (`G4`).
 the CMR walk found per provider (the `C7` auto-generated index); the
 curated `datasets:` map is the small vetted subset the maintainer
 hand-checks. The path to the bundled catalog directory lives at
-:data:`CATALOG_PATH`; tests can monkey-patch that module attribute to
+`CATALOG_PATH`; tests can monkey-patch that module attribute to
 redirect the loader at a temporary directory or single YAML file.
 """
 
@@ -389,7 +389,7 @@ class EarthdataDataset(SummarisedLeaf):
 
     Mirrors a single `datasets.<key>:` block in one of the per-DAAC
     `catalog/*.yaml` files. The dataset key itself is the parent key
-    in :attr:`Catalog.datasets` and is not stored on the row.
+    in `Catalog.datasets` and is not stored on the row.
 
     Attributes:
         short_name: CMR `short_name` (the collection identifier the
@@ -417,7 +417,7 @@ class EarthdataDataset(SummarisedLeaf):
             Harmony-enabled at all.
         bands: Per-band metadata map (informational for whole-granule
             fetch).
-        temporal: :class:`TemporalCoverage` — start / end dates.
+        temporal: `TemporalCoverage` — start / end dates.
 
     Examples:
         - Inspect a curated raster row:
@@ -463,7 +463,7 @@ class Catalog(AbstractCatalog[EarthdataDataset]):
     Reads the bundled `catalog/` directory (shipped as package data)
     and exposes its consumed top-level sections as typed pydantic
     fields. Instantiate with no arguments (`Catalog()`) —
-    :func:`model_post_init` parses the YAML and populates every field
+    `model_post_init` parses the YAML and populates every field
     in one pass.
 
     Attributes:
@@ -471,7 +471,7 @@ class Catalog(AbstractCatalog[EarthdataDataset]):
             CMR walk found per provider (the `C7` index). Runtime code
             does not consume it.
         datasets: Structural map keyed by the curated dataset key. Each
-            value is an :class:`EarthdataDataset`.
+            value is an `EarthdataDataset`.
 
     Examples:
         - Resolve a curated dataset:
@@ -504,7 +504,7 @@ class Catalog(AbstractCatalog[EarthdataDataset]):
 
         Raises:
             ValueError: When auto-loading, propagates the same errors
-                as :meth:`load`.
+                as `load`.
         """
         if not self.datasets:
             loaded = Catalog.load()
@@ -526,16 +526,16 @@ class Catalog(AbstractCatalog[EarthdataDataset]):
         Args:
             catalog_path: Path to the `catalog/` directory or a single
                 `*.yaml` file. Defaults to module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
             providers_path: Path to `providers.yaml`. Defaults to
-                module-level :data:`PROVIDERS_PATH`.
+                module-level `PROVIDERS_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
-            ValueError: Propagated from :func:`_load_providers` /
-                :func:`_load_catalog_data`, including when a dataset
+            ValueError: Propagated from `_load_providers` /
+                `_load_catalog_data`, including when a dataset
                 row names a `provider:` absent from `providers.yaml`.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
@@ -571,9 +571,9 @@ class Catalog(AbstractCatalog[EarthdataDataset]):
     def auto_datasets(self) -> dict[str, EarthdataDataset]:
         """The machine-derived long-tail rows as a built map.
 
-        Builds an :class:`EarthdataDataset` for every auto row — heavy
+        Builds an `EarthdataDataset` for every auto row — heavy
         (~8k rows). For membership or single-key resolution prefer
-        :meth:`get_dataset`, which builds only the one row requested.
+        `get_dataset`, which builds only the one row requested.
 
         Returns:
             dict[str, EarthdataDataset]: Map keyed by `short_name`
@@ -582,7 +582,7 @@ class Catalog(AbstractCatalog[EarthdataDataset]):
         return {k: self._build_auto(k) for k in self._auto_rows()}
 
     def _build_auto(self, name: str) -> EarthdataDataset:
-        """Build the :class:`EarthdataDataset` for one auto row."""
+        """Build the `EarthdataDataset` for one auto row."""
         body = {k: v for k, v in self._auto_rows()[name].items() if k != "bands"}
         return EarthdataDataset(**body)
 
@@ -620,7 +620,7 @@ class Catalog(AbstractCatalog[EarthdataDataset]):
         )
 
     def get_daac(self, provider_code: str) -> EarthdataDAAC:
-        """Return the :class:`EarthdataDAAC` for a CMR provider code.
+        """Return the `EarthdataDAAC` for a CMR provider code.
 
         Args:
             provider_code: A CMR provider code registered in
@@ -673,7 +673,7 @@ class Catalog(AbstractCatalog[EarthdataDataset]):
         them by DAAC.
 
         Args:
-            key: Curated dataset key (a member of :attr:`datasets`).
+            key: Curated dataset key (a member of `datasets`).
             daac: Optional DAAC id to disambiguate; when given, the
                 resolved row's `daac` must match.
 
@@ -684,7 +684,7 @@ class Catalog(AbstractCatalog[EarthdataDataset]):
             ValueError: When `key` is unknown (with a did-you-mean hint)
                 or when `daac=` is given but does not match the row.
                 Both not-found conditions raise `ValueError`, matching
-                :meth:`get_dataset`.
+                `get_dataset`.
 
         Examples:
             - Resolve a key and read its provider:

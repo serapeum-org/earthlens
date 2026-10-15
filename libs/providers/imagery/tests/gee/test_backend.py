@@ -63,7 +63,7 @@ class _FakeImageCollection:
 
     Chain methods (`filterDate`, `filterBounds`, `select`) return a new
     instance carrying the accumulated call log; the reducer convenience
-    methods (`mean`/`median`/`mosaic`/...) return a :class:`_FakeImage`.
+    methods (`mean`/`median`/`mosaic`/...) return a `_FakeImage`.
     """
 
     def __init__(self, source, calls: list | None = None):

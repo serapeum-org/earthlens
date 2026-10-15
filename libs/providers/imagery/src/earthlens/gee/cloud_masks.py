@@ -6,7 +6,7 @@ backend's `cloud_mask=` hook, which `.map`-applies it to the stack
 before compositing, so a cloud-screened median mosaic can be expressed
 through the facade instead of raw `ee`.
 
-:func:`landsat_sr` masks an LS7 / LS8 / LS9 Collection-2 Level-2
+`landsat_sr` masks an LS7 / LS8 / LS9 Collection-2 Level-2
 surface-reflectance image to its `QA_PIXEL` Clear bit (bit 6). The
 Landsat C2-L2 `QA_PIXEL` bitmask is identical across LS7 / LS8 / LS9,
 so the `sensor` argument is currently informational — kept on the
@@ -14,7 +14,7 @@ signature so callers can be explicit and so future per-sensor
 refinements (e.g. extra confidence-bit thresholds) don't break the
 public API.
 
-:func:`sentinel2_scl` masks a Sentinel-2 L2A image via its Scene
+`sentinel2_scl` masks a Sentinel-2 L2A image via its Scene
 Classification (`SCL`) band, dropping cloud shadow (class 3), cloud
 medium / high probability (8 / 9) and thin cirrus (10).
 
@@ -110,7 +110,7 @@ def landsat_sr(image: ee.Image, sensor: Sensor = "auto") -> ee.Image:
 
 
 #: Sentinel-2 L2A Scene Classification (`SCL`) codes dropped by
-#: :func:`sentinel2_scl`: cloud shadow (3), cloud medium probability (8),
+#: `sentinel2_scl`: cloud shadow (3), cloud medium probability (8),
 #: cloud high probability (9) and thin cirrus (10). Every other class
 #: (vegetation, bare soil, water, snow/ice, ...) is kept.
 _S2_SCL_MASKED_CLASSES: tuple[int, ...] = (3, 8, 9, 10)
@@ -127,7 +127,7 @@ def sentinel2_scl(image: ee.Image) -> ee.Image:
     It deliberately keeps some non-clear classes that other recipes also
     drop — notably saturated / defective (1) and snow / ice (11) — so a
     scene with those will retain them; screen them separately if that
-    matters. The masked set (:data:`_S2_SCL_MASKED_CLASSES`) is the one
+    matters. The masked set (`_S2_SCL_MASKED_CLASSES`) is the one
     specified for this helper and is not a universal standard.
 
     Args:
@@ -138,7 +138,7 @@ def sentinel2_scl(image: ee.Image) -> ee.Image:
     Returns:
         The input image with `updateMask(...)` applied, the mask being
         the logical AND of `SCL != c` over every dropped class `c` in
-        :data:`_S2_SCL_MASKED_CLASSES`.
+        `_S2_SCL_MASKED_CLASSES`.
 
     Examples:
         - Drop cloudy pixels from a Sentinel-2 L2A stack before compositing:

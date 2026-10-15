@@ -1,6 +1,6 @@
 """Dataset catalog for the JAXA backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled JAXA
+Hosts `Catalog`, the pydantic-backed reader for the bundled JAXA
 catalog. The catalog ships as a directory of per-mission YAML files at
 `src/earthlens/jaxa/catalog/` (`jaxa-earth.yaml`, `sgli.yaml`,
 `amsr.yaml`, `alos-palsar.yaml`, `earthcare.yaml`,
@@ -17,14 +17,14 @@ G-Portal numeric dataset id for `"gportal"`, or a P-Tree product token
 backend route a request to the right branch without re-parsing the
 YAML at every fetch.
 
-The aliases map is a separate small index resolved by :meth:`Catalog.resolve`,
+The aliases map is a separate small index resolved by `Catalog.resolve`,
 giving every dataset a friendly key (``"elevation"`` → ``"aw3d30"``) on top
 of its canonical key. The model is `extra="forbid"` so typos in the bundled
 YAML fail loudly on first load rather than silently being ignored.
 
 `CATALOG_PATH` points at the bundled catalog directory (or, for tests
-that monkey-patch it, a single `*.yaml` file); :func:`clear_catalog_cache`
-empties the `(path, mtime)` parse cache used by :meth:`Catalog.load`.
+that monkey-patch it, a single `*.yaml` file); `clear_catalog_cache`
+empties the `(path, mtime)` parse cache used by `Catalog.load`.
 """
 
 from __future__ import annotations
@@ -44,7 +44,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
 #: Keyed on the resolved path + every contributing file's stamp so editing any
 #: per-mission YAML invalidates the cache without re-walking the whole tree.
-#: Holds the construction kwargs rather than a built :class:`Catalog`, so each
+#: Holds the construction kwargs rather than a built `Catalog`, so each
 #: `load()` returns a fresh instance that a caller can mutate in isolation.
 _CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
@@ -75,7 +75,7 @@ def clear_catalog_cache() -> None:
 
 #: Re-exported so a reader of `catalog.py`'s `Dataset` model can import
 #: the discriminator type from the same module. The single source of
-#: truth lives in :mod:`earthlens.jaxa.auth` so a new credentialed
+#: truth lives in `earthlens.jaxa.auth` so a new credentialed
 #: protocol only needs to grow the Literal in one place.
 from earthlens.jaxa.auth import JaxaProtocol  # noqa: E402  (re-export)
 
@@ -200,14 +200,14 @@ class Dataset(SummarisedLeaf):
 class Catalog(AbstractCatalog[Dataset]):
     """Reader for the bundled JAXA dataset catalog.
 
-    Subclasses :class:`AbstractCatalog` so the dict-like surface
+    Subclasses `AbstractCatalog` so the dict-like surface
     (`cat["aw3d30"]`, `"aw3d30" in cat`, `len(cat)`) comes for free. The
     `resolve` method maps a friendly alias (`"elevation"`) to its canonical
-    key (`"aw3d30"`); :meth:`by_protocol` lists the keys filtered by
-    protocol; :meth:`get` is a thin alias for `get_dataset`.
+    key (`"aw3d30"`); `by_protocol` lists the keys filtered by
+    protocol; `get` is a thin alias for `get_dataset`.
 
     Attributes:
-        datasets: Map from canonical key to its :class:`Dataset` row.
+        datasets: Map from canonical key to its `Dataset` row.
         available_datasets: Sorted canonical keys.
 
     Examples:
@@ -231,7 +231,7 @@ class Catalog(AbstractCatalog[Dataset]):
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no datasets were supplied.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by
+        `Catalog()` with no args reads `CATALOG_PATH` (cached by
         `(path, mtime)`); passing `datasets=...` skips the disk read (used
         in tests). Either way the `aliases` map is derived from the loaded
         rows. `available_datasets` is populated from the YAML's optional
@@ -270,10 +270,10 @@ class Catalog(AbstractCatalog[Dataset]):
         Args:
             catalog_path: Path to the catalog directory (the sharded
                 default) or a single YAML file (tests / legacy). Defaults
-                to the module-level :data:`CATALOG_PATH`.
+                to the module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog` merged across every
+            A fully-populated `Catalog` merged across every
             contributing file.
 
         Raises:
@@ -289,13 +289,13 @@ class Catalog(AbstractCatalog[Dataset]):
         return cls(**payload)
 
     def get(self, key: str) -> Dataset:
-        """Return the :class:`Dataset` for `key` (canonical, alias, or raw id).
+        """Return the `Dataset` for `key` (canonical, alias, or raw id).
 
-        Resolves `key` through :meth:`resolve` first, then returns the
+        Resolves `key` through `resolve` first, then returns the
         matching curated row when one exists. **Raw G-Portal numeric ids**
         (e.g. ``"11001002"``) and **raw jaxa.earth STAC collection names**
         (e.g. ``"JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_yearly"``)
-        pass through unmapped: a passthrough :class:`Dataset` row is
+        pass through unmapped: a passthrough `Dataset` row is
         synthesized on the fly with the right protocol so the backend
         dispatches correctly — the full 799-entry G-Portal universe + the
         ~119-entry JAXA Earth STAC catalogue are usable without bloating
@@ -432,7 +432,7 @@ class Catalog(AbstractCatalog[Dataset]):
     def __contains__(self, name: object) -> bool:
         """`name in cat` — accept both canonical keys and friendly aliases.
 
-        Overrides :meth:`AbstractCatalog.__contains__`, which only checks
+        Overrides `AbstractCatalog.__contains__`, which only checks
         `self.datasets`, so the alias surface (`"elevation" in cat`)
         matches what `cat.get("elevation")` already accepts.
 
@@ -455,10 +455,10 @@ class Catalog(AbstractCatalog[Dataset]):
     def __getitem__(self, name: str) -> Dataset:
         """`cat[name]` — accept both canonical keys and friendly aliases.
 
-        Overrides :meth:`AbstractCatalog.__getitem__` so dict-style
-        lookup matches the same alias surface as :meth:`get`. Raises
-        :class:`KeyError` on miss (the dict-style contract; callers that
-        want a did-you-mean hint use :meth:`get` instead).
+        Overrides `AbstractCatalog.__getitem__` so dict-style
+        lookup matches the same alias surface as `get`. Raises
+        `KeyError` on miss (the dict-style contract; callers that
+        want a did-you-mean hint use `get` instead).
 
         Examples:
             - Lookup by alias returns the canonical row:

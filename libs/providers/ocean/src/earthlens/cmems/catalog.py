@@ -1,19 +1,19 @@
 """Variable-catalog loader for the Copernicus Marine backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
-CMEMS catalog. Mirrors the shape of :mod:`earthlens.gee.catalog`: the
+Hosts `Catalog`, the pydantic-backed reader for the bundled
+CMEMS catalog. Mirrors the shape of `earthlens.gee.catalog`: the
 catalog ships as a directory of per-domain YAML files at
 `src/earthlens/cmems/catalog/` (`global.yaml`, `mediterranean.yaml`,
 `black-sea.yaml`, `arctic.yaml`, …) plus a single `_index.yaml`
 carrying the merged `available_datasets:` list. Each per-domain file
 contributes its `datasets:` block; the loader unions them into one
-:class:`Catalog` at construction time, the same way
-:mod:`earthlens.gee.catalog` merges its per-category files.
+`Catalog` at construction time, the same way
+`earthlens.gee.catalog` merges its per-category files.
 
 A `(dataset_id, variable_short_name)` pair resolves to a
-:class:`Variable` via :meth:`Catalog.get_variable`, and the full
-:class:`Dataset` shape (cadence, temporal coverage, domain) is
-available via :meth:`AbstractCatalog.get_dataset` /
+`Variable` via `Catalog.get_variable`, and the full
+`Dataset` shape (cadence, temporal coverage, domain) is
+available via `AbstractCatalog.get_dataset` /
 `Catalog()["..."]`.
 
 `available_datasets:` is the informational index of every dataset id
@@ -22,11 +22,11 @@ the toolbox publishes (~1,251 today, the full
 subset of it (those that carry downloadable variables). Every curated
 dataset id must appear in `available_datasets:` — the loader enforces
 this. Users who need a dataset outside the curated list can still
-call :meth:`CMEMS.download` with the id directly; the catalog lookup
+call `CMEMS.download` with the id directly; the catalog lookup
 is a metadata convenience, not a gate.
 
 The path to the bundled catalog directory lives at
-:data:`CATALOG_PATH`; tests can monkey-patch that module attribute to
+`CATALOG_PATH`; tests can monkey-patch that module attribute to
 redirect the loader at a temporary directory or single YAML file.
 """
 
@@ -89,7 +89,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
     """Parse, validate, and cache the CMEMS catalog at `path`.
 
     Returns a `(available_datasets, datasets)` tuple of the same
-    shape :class:`Catalog` exposes. When `path` is a directory, every
+    shape `Catalog` exposes. When `path` is a directory, every
     `*.yaml` file is merged: `available_datasets:` lists are
     concatenated and `datasets:` maps are unioned (a dataset id
     declared in two files is an error). Cached on the resolved path
@@ -206,7 +206,7 @@ class Variable(FluxableLeaf):
     in the toolbox's `describe()` output; the curated rows here
     mirror what `describe()` would report for the same
     `(dataset_id, variable)` pair. Inherits `types` + `is_flux`
-    from :class:`earthlens.base.FluxableLeaf`, the same shared base
+    from `earthlens.base.FluxableLeaf`, the same shared base
     CHIRPS and ECMWF variable rows use.
 
     Attributes:
@@ -348,7 +348,7 @@ class Dataset(SummarisedLeaf):
 
     Mirrors a single `datasets.<dataset_id>:` block in one of the
     per-domain `catalog/*.yaml` files. The dataset id itself is the
-    parent key in :attr:`Catalog.datasets` and is not stored on the
+    parent key in `Catalog.datasets` and is not stored on the
     row.
 
     Attributes:
@@ -364,7 +364,7 @@ class Dataset(SummarisedLeaf):
         domain: Spatial domain (`"global"`, `"mediterranean"`,
             `"black-sea"`, `"baltic-sea"`, `"arctic"`, `"ibi"`,
             `"polar"`). Mainly for catalogue browsing.
-        temporal: :class:`TemporalCoverage` — start / end dates of
+        temporal: `TemporalCoverage` — start / end dates of
             the dataset.
         variables: Per-variable map keyed by the short variable
             name as it appears inside the NetCDF (`"thetao"`,
@@ -408,11 +408,11 @@ class Catalog(AbstractCatalog[Dataset]):
     Reads the bundled `catalog/` directory (shipped as package data)
     and exposes its consumed top-level sections as typed pydantic
     fields. Instantiate with no arguments (`Catalog()`) —
-    :func:`model_post_init` parses the YAML and populates every
+    `model_post_init` parses the YAML and populates every
     field in one pass.
 
     Variables are addressed by the `(dataset_id, variable_name)`
-    pair via :meth:`get_variable`. The same short name (e.g.
+    pair via `get_variable`. The same short name (e.g.
     `"thetao"`, `"so"`) appears across multiple datasets so the
     dataset id is part of the identity.
 
@@ -425,7 +425,7 @@ class Catalog(AbstractCatalog[Dataset]):
             every curated `datasets:` key is a member of this list.
             Runtime code does not consume it.
         datasets: Structural map keyed by CMEMS dataset id. Each
-            value is a :class:`Dataset` carrying that dataset's
+            value is a `Dataset` carrying that dataset's
             cadence / domain / temporal coverage / variables map.
 
     Examples:
@@ -477,13 +477,13 @@ class Catalog(AbstractCatalog[Dataset]):
         Args:
             catalog_path: Path to the `catalog/` directory or a
                 single `*.yaml` file. Defaults to module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
-            ValueError: Propagated from :func:`_load_catalog_data`.
+            ValueError: Propagated from `_load_catalog_data`.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         available_datasets, datasets = _load_catalog_data(catalog_path)
@@ -493,11 +493,11 @@ class Catalog(AbstractCatalog[Dataset]):
         )
 
     def get_variable(self, dataset_id: str, variable_name: str) -> Variable:
-        """Return the :class:`Variable` for a `(dataset_id, name)` pair.
+        """Return the `Variable` for a `(dataset_id, name)` pair.
 
         Args:
             dataset_id: CMEMS dataset id as it appears as a key in
-                :attr:`datasets` (e.g.
+                `datasets` (e.g.
                 `"cmems_mod_glo_phy_my_0.083deg_P1D-m"`).
             variable_name: Short variable name as it appears inside
                 the NetCDF (e.g. `"thetao"`, `"so"`).

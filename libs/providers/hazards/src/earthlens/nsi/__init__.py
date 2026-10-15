@@ -12,14 +12,14 @@ discriminator:
   with paid amounts, via the OpenFEMA OData endpoint; `tabular`.
 
 Output is **per instance**: the resolved source's `output_kind` decides whether
-:meth:`~earthlens.nsi.backend.NSI.download` returns a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection` (`structures`/`nfhl`) or
-a :class:`pandas.DataFrame` (`nfip`). All three are public-domain and keyless —
+`download` returns a pyramids
+`FeatureCollection` (`structures`/`nfhl`) or
+a `pandas.DataFrame` (`nfip`). All three are public-domain and keyless —
 no auth. A spatial/attribute bound is **required** (no unbounded national pull),
 and `aggregate=` is rejected (these are records, not gridded rasters).
 
-The public surface is the :class:`Catalog` (source name -> endpoint + output kind
-+ field map) and its :class:`Source` rows, the :class:`NSI` backend, and the pure
+The public surface is the `Catalog` (source name -> endpoint + output kind
++ field map) and its `Source` rows, the `NSI` backend, and the pure
 query/geometry helpers.
 """
 

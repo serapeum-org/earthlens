@@ -171,12 +171,12 @@ class HDX(AbstractDataSource):
                 escape hatch — a single glob / format label or a list of
                 them.
             cores: Number of worker threads for downloading resources in
-                :meth:`_fetch`. `1` (default) downloads sequentially;
+                `_fetch`. `1` (default) downloads sequentially;
                 `> 1` downloads concurrently (I/O-bound HTTP, so threads),
                 preserving result order. Mirrors the CHC backend's
                 `cores=`.
             max_retries: Total attempts for each CKAN read in
-                :meth:`_search` (`Dataset.read_from_hdx`) before giving
+                `_search` (`Dataset.read_from_hdx`) before giving
                 up, with exponential backoff between tries. `1` disables
                 retrying. Defaults to `4` (≈1s, 2s, 4s backoff).
 
@@ -300,7 +300,7 @@ class HDX(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a :class:`TemporalExtent` (ignored).
+        """Parse the `[start, end]` window into a `TemporalExtent` (ignored).
 
         HDX has no temporal query (`G2`); the window is parsed only for
         facade parity and never narrows the resource selection. The
@@ -328,11 +328,11 @@ class HDX(AbstractDataSource):
 
         One `Dataset.read_from_hdx` call per target (a curated dataset's
         `hdx_id` or the `hdx_id=` escape hatch, `G6`); each dataset's
-        resources are filtered with :func:`match_resource` against the
+        resources are filtered with `match_resource` against the
         target's filter list (`G2`). bbox / time are **not** used — CKAN
         has no spatial/temporal query. Each surviving resource becomes
-        one :class:`RemoteProduct` whose `metadata` carries the raw SDK
-        resource handle, so :meth:`_fetch` can download without
+        one `RemoteProduct` whose `metadata` carries the raw SDK
+        resource handle, so `_fetch` can download without
         re-querying.
 
         Returns:
@@ -404,7 +404,7 @@ class HDX(AbstractDataSource):
         input order in the result.
 
         Args:
-            products: The products from :meth:`_search`.
+            products: The products from `_search`.
 
         Returns:
             list[Path]: Local paths of every downloaded resource, in
@@ -428,7 +428,7 @@ class HDX(AbstractDataSource):
         """Download one product's resource into its per-dataset subdir.
 
         Args:
-            product: A product from :meth:`_search`.
+            product: A product from `_search`.
 
         Returns:
             Path: The local path of the downloaded resource file.
@@ -450,8 +450,8 @@ class HDX(AbstractDataSource):
     ) -> list[Path] | list:
         """Resolve the requested datasets and download their resources.
 
-        Composes :meth:`_search` (resolve each dataset → filter its
-        resources) and :meth:`_fetch` (download the matching files to
+        Composes `_search` (resolve each dataset → filter its
+        resources) and `_fetch` (download the matching files to
         `self.root_dir`). By default returns the local file paths; with
         `read=True` each downloaded resource is additionally read into
         its pyramids type via `pyramids.read_resource` (`M1`).

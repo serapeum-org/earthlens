@@ -7,15 +7,15 @@ reads one of its layers with pyramids — the `EventZones` footprint polygons
 DWD RADOLAN grid (which the file does not carry) to EPSG:4326, filters the
 events by date window and/or bbox, and returns them carrying the event
 attributes (area, duration, severity) as a
-:class:`~pyramids.feature.collection.FeatureCollection` (or, with
-`geometry=False`, a geometry-dropped :class:`pandas.DataFrame`).
+`FeatureCollection` (or, with
+`geometry=False`, a geometry-dropped `pandas.DataFrame`).
 
 Two threshold selections are served: `T5` (events with a return period of at
 least 5 years) and `W3` (a severity-weighted selection). This is a static
 2001-2025 archive, so a missing `start` / `end` is legal
 (`REQUIRES_TIME_WINDOW = False`) and simply returns every event; when supplied,
 the dates filter the events. It is a `vector` backend: the
-:class:`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument.
+`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument.
 The downloaded FileGDB is cached under `cache_dir`, so repeated requests reuse
 it. The companion to the `radklim` grids.
 """
@@ -203,11 +203,11 @@ class CatRaRE(AbstractDataSource):
         """Download + read the FileGDB layer and build the filtered collection.
 
         Widens the inherited `-> list[Path]` contract: a vector backend returns
-        an in-memory :class:`FeatureCollection`. The download is cached under
-        :attr:`_cache_root`, so a repeat request reuses the FileGDB.
+        an in-memory `FeatureCollection`. The download is cached under
+        `_cache_root`, so a repeat request reuses the FileGDB.
 
         Args:
-            products: The single-element list from :meth:`_search`.
+            products: The single-element list from `_search`.
 
         Returns:
             list[FeatureCollection]: One trimmed, filtered collection.
@@ -246,7 +246,7 @@ class CatRaRE(AbstractDataSource):
         """Return the local FileGDB zip path, downloading it on a cache miss.
 
         Args:
-            product: The product from :meth:`_search` (carries the download URL
+            product: The product from `_search` (carries the download URL
                 in `href`).
 
         Returns:
@@ -291,9 +291,9 @@ class CatRaRE(AbstractDataSource):
                 this is a no-op.
 
         Returns:
-            A :class:`~pyramids.feature.collection.FeatureCollection` (also
+            A `FeatureCollection` (also
             written to `root_dir`) or, when `geometry=False`, a
-            :class:`pandas.DataFrame` of the events and their attributes.
+            `pandas.DataFrame` of the events and their attributes.
 
         Raises:
             requests.HTTPError: If the download returns a non-2xx status.

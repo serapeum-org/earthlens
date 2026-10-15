@@ -1,15 +1,15 @@
 """OAuth2 client-credentials authentication for the Sentinel Hub backend.
 
-Hosts :class:`SentinelHubAuth`, a thin wrapper that builds and holds a
+Hosts `SentinelHubAuth`, a thin wrapper that builds and holds a
 `sentinelhub.SHConfig`. Unlike the openEO backend's interactive OIDC device
 flow, Sentinel Hub authenticates **non-interactively** with an OAuth2
 *client-credentials* pair (a `client_id` / `client_secret` minted in the CDSE
 Dashboard) — closest to GEE's service-account model. `sentinelhub-py` mints and
 refreshes the bearer token internally from the config, so there is no explicit
-login step here: :meth:`SentinelHubAuth.configure` only assembles the
+login step here: `SentinelHubAuth.configure` only assembles the
 `SHConfig` (base URL, token URL, credentials).
 
-The credential resolution order in :meth:`SentinelHubAuth.configure` is:
+The credential resolution order in `SentinelHubAuth.configure` is:
 
 1. **kwargs** — an explicit `client_id` / `client_secret` on the credentials
    object.
@@ -27,7 +27,7 @@ resolved above overwrites the value the profile carries.
 
 `endpoint=` switches the CDSE-free deployment (the default) and the commercial
 one (`services.sentinel-hub.com`, a different token URL). Any failure is wrapped
-as :class:`AuthenticationError` with a pointer at the CDSE Dashboard OAuth-client
+as `AuthenticationError` with a pointer at the CDSE Dashboard OAuth-client
 page, never a raw `sentinelhub` exception.
 """
 
@@ -52,7 +52,7 @@ class AuthenticationError(_BaseAuthenticationError):
 
     Wraps the missing-credentials case with an actionable message pointing at
     the CDSE Dashboard. A subclass of the cross-backend
-    :class:`earthlens.base.AuthenticationError` so callers can catch every
+    `earthlens.base.AuthenticationError` so callers can catch every
     backend's auth failure with one `except` clause.
     """
 
@@ -127,16 +127,16 @@ class SentinelHubCredentials(BaseModel):
 class SentinelHubAuth(AbstractAuth[SentinelHubCredentials]):
     """Assemble and hold a Sentinel Hub `SHConfig` (non-interactive OAuth2).
 
-    Conforms to the cross-backend :class:`earthlens.base.AbstractAuth` contract:
-    :meth:`configure` builds the `SHConfig` lazily and idempotently;
-    :meth:`is_authenticated` is the cheap predicate; and :meth:`config` returns
+    Conforms to the cross-backend `earthlens.base.AbstractAuth` contract:
+    `configure` builds the `SHConfig` lazily and idempotently;
+    `is_authenticated` is the cheap predicate; and `config` returns
     the configured `SHConfig` (configuring on first use). The token itself is
     minted and refreshed by `sentinelhub-py` from the config on the first
     request — there is no interactive flow.
 
     Args:
         credentials: The OAuth credentials. Defaults to an empty
-            :class:`SentinelHubCredentials` (env / profile path).
+            `SentinelHubCredentials` (env / profile path).
         endpoint: A named endpoint alias (`"cdse"`, `"commercial"`) or a full
             base URL. Defaults to CDSE-free.
 
@@ -192,7 +192,7 @@ class SentinelHubAuth(AbstractAuth[SentinelHubCredentials]):
         """Build the `SHConfig` (base/token urls + credentials); idempotent.
 
         Resolves credentials kwargs → env → profile. A second call after
-        :meth:`is_authenticated` returns `True` is a no-op.
+        `is_authenticated` returns `True` is a no-op.
 
         Raises:
             ImportError: When the `sentinel-hub` extra is not installed.
@@ -225,7 +225,7 @@ class SentinelHubAuth(AbstractAuth[SentinelHubCredentials]):
         self._config = cfg
 
     def is_authenticated(self) -> bool:
-        """`True` once :meth:`configure` has assembled an `SHConfig`.
+        """`True` once `configure` has assembled an `SHConfig`.
 
         Cheap predicate — does not call the network. Returns `True` exactly when
         a config object has been built.

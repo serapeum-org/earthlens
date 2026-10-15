@@ -8,11 +8,11 @@ helper that also accepts an explicit `species:<name>` selector. There is no
 are a hand-edit of one YAML file (`earthlens datasets validate obis` confirms
 the names upstream).
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog` subclass
-storing the rows in the framework's :attr:`~earthlens.base.AbstractCatalog.datasets`
+`Catalog` is a thin `earthlens.base.AbstractCatalog` subclass
+storing the rows in the framework's `datasets`
 field, so the inherited dict-like surface (`len(cat)`, `name in cat`,
-`cat[name]`, :meth:`get_dataset` with a did-you-mean hint) works. Parsing is
-cached on `(path, mtime)`; :data:`CATALOG_PATH` is the bundled YAML and is
+`cat[name]`, `get_dataset` with a did-you-mean hint) works. Parsing is
+cached on `(path, mtime)`; `CATALOG_PATH` is the bundled YAML and is
 monkey-patchable in tests.
 """
 
@@ -54,7 +54,7 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Species], list[str]]:
     """Parse, validate, and cache the OBIS species catalog at `path`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
         A pair `(rows, available)` of the friendly-name `Species` map and the
@@ -63,7 +63,7 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Species], list[str]]:
 
     Raises:
         ValueError: If the file has no `species:` block, or a row fails
-            :class:`Species` validation.
+            `Species` validation.
     """
     key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
@@ -94,7 +94,7 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Species], list[str]]:
 class Species(SummarisedLeaf):
     """One friendly OBIS species' dispatch row.
 
-    The user-facing name is the parent key in :attr:`Catalog.datasets`
+    The user-facing name is the parent key in `Catalog.datasets`
     and is not stored on the row.
 
     Attributes:
@@ -128,15 +128,15 @@ class Catalog(AbstractCatalog[Species]):
     """Species catalog for the OBIS occurrence backend.
 
     Reads the bundled `obis_data_catalog.yaml` (shipped as package data)
-    and exposes its `species:` block as a map of :class:`Species` rows.
-    Instantiate with no arguments (`Catalog()`); :func:`model_post_init`
+    and exposes its `species:` block as a map of `Species` rows.
+    Instantiate with no arguments (`Catalog()`); `model_post_init`
     loads and validates the YAML (cached) in one pass. The rows live in the
-    framework's :attr:`datasets` field so the inherited dict-like surface
+    framework's `datasets` field so the inherited dict-like surface
     behaves like every other backend's catalog.
 
     Attributes:
         datasets: Map from the friendly species name to its
-            :class:`Species` row (the framework field).
+            `Species` row (the framework field).
 
     Examples:
         - The dict-like surface and name resolution work like GBIF's:
@@ -185,14 +185,14 @@ class Catalog(AbstractCatalog[Species]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `species:` block, or a row
-                fails :class:`Species` validation.
+                fails `Species` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         rows, available = _load_catalog_data(catalog_path)

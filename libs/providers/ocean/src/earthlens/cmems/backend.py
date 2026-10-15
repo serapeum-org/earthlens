@@ -12,18 +12,18 @@ the user's `path`.
 
 The on-disk artefact is a gridded NetCDF/Zarr, so
 `OUTPUT_KIND = "raster"` — structurally identical to ECMWF's
-per-variable NetCDF output. The :class:`earthlens.earthlens.EarthLens`
+per-variable NetCDF output. The `earthlens.earthlens.EarthLens`
 facade therefore forwards `aggregate=AggregationConfig(...)` to this
 backend's `download()`. The aggregation runs through
-:meth:`pyramids.netcdf.NetCDF.reduce` (the generalised time-window
+`pyramids.netcdf.NetCDF.reduce` (the generalised time-window
 reducer shipped in pyramids): the optional `depth` axis is collapsed
 to a column mean (or pinned with `AggregationConfig.level`), the
 `time` axis is windowed by `AggregationConfig.freq`, and one GeoTIFF
 per `(variable, window)` is written — the same output shape the ECMWF
-backend produces via :func:`earthlens.aggregate.aggregate_netcdf`.
+backend produces via `earthlens.aggregate.aggregate_netcdf`.
 The window labels are computed from the file's own decoded time axis
 because pyramids' native `get_time_variable` does not decode the CMEMS
-time coordinate; see :meth:`CMEMS._window_labels`. A pyramids build
+time coordinate; see `CMEMS._window_labels`. A pyramids build
 without `NetCDF.reduce` raises a clear `NotImplementedError`.
 """
 
@@ -76,16 +76,16 @@ def _describe_product(product: RemoteProduct) -> str:
 class CMEMS(AbstractDataSource):
     """Copernicus Marine Service backend (gridded NetCDF/Zarr output).
 
-    Wraps :func:`copernicusmarine.subset` so a user can request a
+    Wraps `copernicusmarine.subset` so a user can request a
     space/time window of one or more CMEMS datasets through the
     same `download()` shape every other earthlens backend uses.
     Each `(dataset_id, [variables])` pair becomes one server-side
     subset call; the toolbox returns a single NetCDF (or Zarr) per
     request, ready to be opened by any NetCDF reader — within this
-    package, that reader is :class:`pyramids.netcdf.NetCDF`.
+    package, that reader is `pyramids.netcdf.NetCDF`.
 
-    Authentication is one-time: the first :meth:`_initialize` call
-    delegates to :class:`CmemsAuth`, which validates the credentials
+    Authentication is one-time: the first `_initialize` call
+    delegates to `CmemsAuth`, which validates the credentials
     against the Copernicus Marine portal. After that, every
     `subset()` call in this process — and in future processes that
     read the same `~/.copernicusmarine/` config directory — is
@@ -95,9 +95,9 @@ class CMEMS(AbstractDataSource):
         OUTPUT_KIND: `"raster"` — the on-disk artefact is a gridded
             NetCDF/Zarr, structurally identical to ECMWF's per-
             variable NetCDF output. Composes with the
-            :class:`earthlens.aggregate.AggregationConfig` flow:
+            `earthlens.aggregate.AggregationConfig` flow:
             `download(aggregate=...)` reduces each subset via
-            :meth:`pyramids.netcdf.NetCDF.reduce` (depth collapse +
+            `pyramids.netcdf.NetCDF.reduce` (depth collapse +
             time windowing) into per-`(variable, window)` GeoTIFFs.
     """
 
@@ -199,14 +199,14 @@ class CMEMS(AbstractDataSource):
         )
 
     def _initialize(self):
-        """Build the :class:`CmemsAuth`; defer `configure()` to download.
+        """Build the `CmemsAuth`; defer `configure()` to download.
 
         Returns `None` so the parent class does not bind any opaque
         object to `self.client` — the toolbox has no per-instance client;
         credentials live in a config file that every subsequent
         `copernicusmarine.subset()` call reads. The actual
-        :meth:`CmemsAuth.configure` (which contacts the auth server) is
-        deferred to the first :meth:`download`, so constructing the
+        `CmemsAuth.configure` (which contacts the auth server) is
+        deferred to the first `download`, so constructing the
         backend never authenticates and `_search()` stays offline.
         """
         creds = CmemsCredentials(
@@ -275,7 +275,7 @@ class CMEMS(AbstractDataSource):
         """Subset every `(dataset_id, variables)` pair in `self.vars`.
 
         Each pair becomes one server-side
-        :func:`copernicusmarine.subset` call; the toolbox returns
+        `copernicusmarine.subset` call; the toolbox returns
         the absolute path to the NetCDF (or Zarr store) it wrote.
         Failures on one pair are logged and surface in a summary
         line at the end of the loop, but do not abort the remaining
@@ -286,18 +286,18 @@ class CMEMS(AbstractDataSource):
             progress_bar: When `False`, the toolbox's per-request
                 progress bar is suppressed. Defaults to `True`.
             aggregate: Optional
-                :class:`earthlens.aggregate.AggregationConfig`.
-                Accepted because :data:`OUTPUT_KIND` is `"raster"`,
+                `earthlens.aggregate.AggregationConfig`.
+                Accepted because `OUTPUT_KIND` is `"raster"`,
                 so the facade allows the kwarg through. When set,
                 every subset NetCDF is reduced via
-                :meth:`pyramids.netcdf.NetCDF.reduce`: any `depth`
+                `pyramids.netcdf.NetCDF.reduce`: any `depth`
                 axis is collapsed first (mean) or pinned
                 (`config.level`), then the `time` axis is windowed by
                 `config.freq` with the `config.op` operator, and one
                 GeoTIFF per `(variable, window)` is written (shaped
                 like the ECMWF aggregate output). Requires a pyramids
                 build that ships `NetCDF.reduce`
-                (see :meth:`_aggregate_outputs`).
+                (see `_aggregate_outputs`).
 
         Returns:
             list[Path]: When `aggregate` is `None`, the absolute
@@ -308,7 +308,7 @@ class CMEMS(AbstractDataSource):
                 GeoTIFF paths instead.
 
         Raises:
-            AuthenticationError: When :meth:`CmemsAuth.configure` fails
+            AuthenticationError: When `CmemsAuth.configure` fails
                 (no credentials, rejected credentials, or the auth server
                 unreachable) — now surfaced on first download rather than
                 at construction.
@@ -349,7 +349,7 @@ class CMEMS(AbstractDataSource):
     ) -> list[Path]:
         """Reduce each subset NetCDF via `pyramids.netcdf.NetCDF.reduce`.
 
-        Maps the :class:`earthlens.aggregate.AggregationConfig` request
+        Maps the `earthlens.aggregate.AggregationConfig` request
         onto the pyramids time-window reducer (shipped as
         `NetCDF.reduce(dim, how, *, groupby, skipna)`): for every path
         in `nc_paths` the depth axis is resolved first (pinned to
@@ -405,17 +405,17 @@ class CMEMS(AbstractDataSource):
 
         Resolves the depth axis (pinned via `config.level` or collapsed
         by mean), windows the `time` axis by `config.freq` using
-        :meth:`pyramids.netcdf.NetCDF.reduce`, then writes one GeoTIFF
+        `pyramids.netcdf.NetCDF.reduce`, then writes one GeoTIFF
         per variable per window via
-        :meth:`pyramids.dataset.Dataset.from_array` — the same
-        proven raster-write path :func:`earthlens.aggregate.aggregate_netcdf`
+        `pyramids.dataset.Dataset.from_array` — the same
+        proven raster-write path `earthlens.aggregate.aggregate_netcdf`
         uses for the ECMWF backend, so CMEMS aggregate output is shaped
         like ECMWF's (per-window GeoTIFFs, not a multidimensional
         NetCDF, which the GDAL netCDF driver cannot write back).
 
         The window labels are computed here from the file's CF-decoded
         time axis (pyramids' `NetCDF.get_time_variable`, which parses the
-        CF `units` + `calendar`; see :meth:`_window_labels`) and handed to
+        CF `units` + `calendar`; see `_window_labels`) and handed to
         `reduce` as an explicit per-timestep label sequence, so each
         output slice carries a start-of-window `YYYYMMDD` label for its
         filename.
@@ -496,11 +496,11 @@ class CMEMS(AbstractDataSource):
         """Return one window label per timestep, bucketing time by `freq`.
 
         Reads the NetCDF's CF-decoded time axis from pyramids'
-        :meth:`pyramids.netcdf.NetCDF.get_time_variable` (which parses
+        `pyramids.netcdf.NetCDF.get_time_variable` (which parses
         the CF `units` + `calendar`), builds a `pandas.DatetimeIndex`,
         then assigns each timestep the start-of-window timestamp of its
         `freq` bucket. Timesteps in the same window share a label, so
-        :meth:`pyramids.netcdf.NetCDF.reduce` coarsens `time` to one
+        `pyramids.netcdf.NetCDF.reduce` coarsens `time` to one
         slice per distinct window.
 
         The axis is requested at second resolution
@@ -533,7 +533,7 @@ class CMEMS(AbstractDataSource):
         return window_labels(times, freq)
 
     def _search(self) -> list[RemoteProduct]:
-        """One :class:`RemoteProduct` per `(dataset_id, variables)` group.
+        """One `RemoteProduct` per `(dataset_id, variables)` group.
 
         CMEMS exposes a single server-side subset endpoint per
         dataset, so there is exactly one product per dataset in
@@ -565,17 +565,17 @@ class CMEMS(AbstractDataSource):
         return products
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
-        """Subset each :class:`RemoteProduct` server-side.
+        """Subset each `RemoteProduct` server-side.
 
         Default progress-bar setting (`disable_progress_bar=False`
         in the toolbox) is overridden by
-        :meth:`_api_via_search_fetch_with_progress` when called
-        through :meth:`download`; the plain `_api` /
+        `_api_via_search_fetch_with_progress` when called
+        through `download`; the plain `_api` /
         `_api_via_search_fetch` path leaves the toolbox's default
         in place.
 
         Args:
-            products: The list returned by :meth:`_search` (or any
+            products: The list returned by `_search` (or any
                 user-filtered subset of it).
 
         Returns:
@@ -635,7 +635,7 @@ class CMEMS(AbstractDataSource):
         """Submit one `copernicusmarine.subset` request.
 
         Args:
-            product: One :class:`RemoteProduct` from `_search`;
+            product: One `RemoteProduct` from `_search`;
                 `product.id` is the CMEMS dataset id and
                 `product.metadata["variables"]` is the list of
                 variable short names to retrieve.
@@ -711,7 +711,7 @@ class CMEMS(AbstractDataSource):
 def _unique_output_names(dataset_ids: list[str], ext: str) -> dict[str, str]:
     """Map each dataset id to a collision-free `<stem>.<ext>` filename.
 
-    :func:`_safe_filename` is many-to-one — two distinct dataset ids
+    `_safe_filename` is many-to-one — two distinct dataset ids
     can normalise to the same stem (e.g. an id with a `.` and one with
     a `_` in the same position). Writing both to the same output
     directory in one `download()` would silently overwrite. This

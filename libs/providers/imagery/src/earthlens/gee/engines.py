@@ -8,7 +8,7 @@ string in `_ENGINES` plus new branches in both.
 
 Each engine is an object here, and the registry resolves the `engine=` string to
 one. Adding an engine is a subclass plus a registry entry — which
-:class:`~earthlens.gee.pixels.PixelsEngine` does, registering itself on import
+`PixelsEngine` does, registering itself on import
 with no edit to the routing or export methods.
 
 **What moved and what did not.** The *decision* moved: eligibility, the forced
@@ -16,8 +16,8 @@ raise, the no-scenes skip, the sizing-failure fallback and the post-routing
 refusal all live in the engines now. The *mechanics* — building the collection,
 writing through the reader or `getDownloadURL`, queueing a batch task — stay on
 the backend and are called back into, so routing an engine changes no observable
-behaviour. :class:`~earthlens.gee.sinks.Sink` and
-:class:`~earthlens.gee.work.WorkUnit` likewise carry the destination and the
+behaviour. `Sink` and
+`WorkUnit` likewise carry the destination and the
 payload as types without having taken the writing itself off the backend.
 """
 
@@ -57,11 +57,11 @@ NO_SCENES: str = "no scenes"
 class Engine(ABC):
     """Decide whether this engine serves a request, and if so with what plan.
 
-    Only :meth:`plan` is required. An engine whose plan can accept a read also
+    Only `plan` is required. An engine whose plan can accept a read also
     declares `refusal_is_fatal()`, which the backend consults when the read it
     routed is refused after the fact — fatal under a forced engine, a fallback
     under `auto`. It is only ever asked of an engine that accepted, which is why
-    :class:`EeEngine`, whose plan never does, does not define it.
+    `EeEngine`, whose plan never does, does not define it.
 
     Attributes:
         name: The registry key, and the value a user's `engine=` string resolves
@@ -342,7 +342,7 @@ class AutoEngine(Engine):
 
 #: Every engine addressable by `engine=`. Mutable on purpose: an engine in
 #: another module registers itself here on import — as
-#: :class:`~earthlens.gee.pixels.PixelsEngine` does — so the accepted names are
+#: `PixelsEngine` does — so the accepted names are
 #: derived from this one dict rather than restated anywhere.
 ENGINES: dict[str, type[Engine]] = {
     cls.name: cls for cls in (AutoEngine, EeEngine, EedaiEngine)

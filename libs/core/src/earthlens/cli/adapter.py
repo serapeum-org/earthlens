@@ -13,9 +13,9 @@ scan them all:
 This module reflectively loads each backend's `Catalog` (the catalog
 loaders are pure pydantic/YAML, independent of the heavy provider SDKs),
 normalises the divergences, and isolates per-backend failures into
-:class:`LoadError` records rather than letting one broken backend crash a
+`LoadError` records rather than letting one broken backend crash a
 federated scan. The richer, cached table built on top of these helpers
-lives in :mod:`earthlens.cli.table`.
+lives in `earthlens.cli.table`.
 """
 
 from __future__ import annotations
@@ -98,9 +98,9 @@ class RawRow:
 def list_backends() -> list[BackendInfo]:
     """Enumerate the distinct provider backends from the facade registry.
 
-    Reads :attr:`EarthLens.DataSources` and collapses its many keys (the
+    Reads `EarthLens.DataSources` and collapses its many keys (the
     facade exposes aliases such as `"chirps"` / `"google-earth-engine"`)
-    down to one :class:`BackendInfo` per backend module, so a federated
+    down to one `BackendInfo` per backend module, so a federated
     scan visits each catalog exactly once.
 
     Returns:
@@ -250,10 +250,10 @@ def iter_catalog_rows(info: BackendInfo, catalog: Any) -> Iterator[RawRow]:
 
     Args:
         info: The backend the catalog belongs to.
-        catalog: The constructed `Catalog` (see :func:`load_catalog`).
+        catalog: The constructed `Catalog` (see `load_catalog`).
 
     Yields:
-        One :class:`RawRow` per curated dataset, in catalog order.
+        One `RawRow` per curated dataset, in catalog order.
     """
     for dataset_id, record in _row_mapping(catalog).items():
         yield RawRow(
@@ -270,9 +270,9 @@ def load_all_rows(
     """Load and normalise every backend's catalog, isolating failures.
 
     Iterates the backends (optionally filtered to `providers`), loads each
-    catalog, and flattens them into one list of :class:`RawRow`. A backend
+    catalog, and flattens them into one list of `RawRow`. A backend
     that fails to load (missing SDK, parse error) is recorded as a
-    :class:`LoadError` and skipped — one broken backend never aborts the
+    `LoadError` and skipped — one broken backend never aborts the
     scan.
 
     Args:

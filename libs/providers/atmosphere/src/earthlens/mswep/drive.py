@@ -9,12 +9,12 @@ carries. Two rules shape the module:
   one, and the listing silently returns nothing without them.
 * **Never enumerate a granule folder.** `Past/Hourly/` holds roughly
   400,000 files (46 years x 8760), so `files.list` paging to find 24 of
-  them is absurd. :func:`find_children_by_name` resolves **by name** in
+  them is absurd. `find_children_by_name` resolves **by name** in
   chunked `or`-joined queries instead; folder listing is reserved for
   the handful of structural levels (the share root, the variant and
   temporal folders) where cardinality is tiny.
 
-:class:`RootResolver` wraps the shared folder as the product/version
+`RootResolver` wraps the shared folder as the product/version
 root. GloH2O shares one folder per product and per version, so the
 `folder_id` a user is given **is** the `MSWEP_V280` / `MSWX_V100` /
 `MSWEP_V316_test` folder — there is no parent to search, and the version
@@ -56,7 +56,7 @@ class DriveEntry:
     Attributes:
         id: The Drive file id, used for every subsequent call.
         name: The object's name within its parent folder.
-        mime_type: Drive MIME type; equals :data:`FOLDER_MIME` for a
+        mime_type: Drive MIME type; equals `FOLDER_MIME` for a
             folder.
 
     Examples:
@@ -206,7 +206,7 @@ def find_children_by_name(
 
     The granule-enumeration primitive. Rather than page a folder holding
     ~400,000 files, this asks Drive for exactly the names wanted,
-    `or`-joining up to :data:`NAME_QUERY_CHUNK` of them per request — so
+    `or`-joining up to `NAME_QUERY_CHUNK` of them per request — so
     a 24-granule day costs one call, not 400 pages.
 
     Args:
@@ -253,7 +253,7 @@ class DownloadQuotaExceededError(DriveTransportError):
 class RateLimitedError(DriveTransportError):
     """Raised when Drive throttles the caller and retries are exhausted.
 
-    Distinct from :class:`DownloadQuotaExceededError`: this one *is*
+    Distinct from `DownloadQuotaExceededError`: this one *is*
     cleared by waiting, so it is retried with exponential back-off first
     and only surfaces when the retry budget runs out.
     """
@@ -289,8 +289,8 @@ def classify_http_error(exc: Exception) -> DriveTransportError | None:
         exc: The exception raised by the Drive client.
 
     Returns:
-        DriveTransportError | None: A :class:`DownloadQuotaExceededError`
-            / :class:`RateLimitedError` when the status and reason say
+        DriveTransportError | None: A `DownloadQuotaExceededError`
+            / `RateLimitedError` when the status and reason say
             so, or `None` when `exc` is not a transport failure this
             module handles — the caller re-raises the original so it
             keeps its own traceback.
@@ -343,7 +343,7 @@ def download_media(
 
     Throttling and 5xx responses are retried with exponential back-off.
     A **quota** refusal is not: it is raised immediately as
-    :class:`DownloadQuotaExceededError`, because waiting does not clear
+    `DownloadQuotaExceededError`, because waiting does not clear
     it and retrying only burns the budget.
 
     Args:

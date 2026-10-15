@@ -22,14 +22,14 @@ thing per protocol:
 * `JaxaAuth(creds, protocol="gportal")` makes `configure()` resolve and
   store the username + password from explicit credentials or from
   `$GPORTAL_USERNAME` / `$GPORTAL_PASSWORD`, raising
-  :class:`AuthenticationError` on miss.
+  `AuthenticationError` on miss.
 * `JaxaAuth(creds, protocol="ptree")` does the same for P-Tree, reading
   `ptree_username` / `ptree_password` off the credentials or falling back
   to `$JAXA_PTREE_USERNAME` / `$JAXA_PTREE_PASSWORD`. The two credential
   pairs never share values — P-Tree registration is separate from G-Portal.
 
-The resolved username / password are exposed as :attr:`JaxaAuth.username`
-and :attr:`JaxaAuth.password` (the latter is a :class:`pydantic.SecretStr`)
+The resolved username / password are exposed as `JaxaAuth.username`
+and `JaxaAuth.password` (the latter is a `pydantic.SecretStr`)
 so each credentialed branch can pass them straight to its transport client
 as kwargs — no module-level mutation of the SDK is required.
 """
@@ -74,12 +74,12 @@ class JaxaCredentials(BaseModel):
     """Frozen value object holding the credentialed-branch secrets.
 
     All fields are optional at construction time: `None` means "resolve
-    from the corresponding environment variable at :meth:`JaxaAuth.configure`
+    from the corresponding environment variable at `JaxaAuth.configure`
     time". The real "are credentials available?" gate is
-    :meth:`JaxaAuth.configure`, not this model.
+    `JaxaAuth.configure`, not this model.
 
     G-Portal and P-Tree credentials are stored side-by-side because a
-    single :class:`JAXA` instance is bound to one protocol per call — the
+    single `JAXA` instance is bound to one protocol per call — the
     unused pair is simply ignored.
 
     Attributes:
@@ -133,7 +133,7 @@ class JaxaCredentials(BaseModel):
 
 
 class _ProtocolSpec(NamedTuple):
-    """Per-protocol resolver spec consumed by :meth:`JaxaAuth.configure`.
+    """Per-protocol resolver spec consumed by `JaxaAuth.configure`.
 
     Named-tuple access (`spec.cred_user`) keeps `configure()` readable
     and gives static type-checkers a chance to catch a typo when a new
@@ -180,17 +180,17 @@ class JaxaAuth(AbstractAuth[JaxaCredentials]):
     makes `configure()` a no-op; `JaxaAuth(creds, protocol="gportal")` or
     `JaxaAuth(creds, protocol="ptree")` resolves the matching username +
     password from explicit credentials or the protocol's env-var pair,
-    raising :class:`AuthenticationError` on miss.
+    raising `AuthenticationError` on miss.
 
     After a successful `configure()` on a credentialed protocol, the
-    resolved values are available via :attr:`username` and
-    :attr:`password` so the branch can pass them straight into its
+    resolved values are available via `username` and
+    `password` so the branch can pass them straight into its
     transport client (`gportal.download(username=, password=)`,
     `ftplib.FTP.login(...)`, `paramiko.Transport.connect(...)`) instead of
     mutating any SDK's module-level globals.
 
     Attributes:
-        _creds: The :class:`JaxaCredentials` passed at construction.
+        _creds: The `JaxaCredentials` passed at construction.
         _protocol: The bound protocol — one of `"jaxa-earth"`, `"gportal"`
             or `"ptree"`.
 
@@ -214,10 +214,10 @@ class JaxaAuth(AbstractAuth[JaxaCredentials]):
         """Bind the protocol; does not resolve credentials yet.
 
         Args:
-            credentials: The :class:`JaxaCredentials` value object carrying
+            credentials: The `JaxaCredentials` value object carrying
                 the optional G-Portal and P-Tree username / password pairs.
             protocol: The protocol this auth instance targets. The
-                parent's no-arg :meth:`configure` dispatches on this so
+                parent's no-arg `configure` dispatches on this so
                 `AbstractDataSource.authenticate()` fails fast for missing
                 credentials on either credentialed branch.
 
@@ -250,7 +250,7 @@ class JaxaAuth(AbstractAuth[JaxaCredentials]):
     def password(self) -> SecretStr | None:
         """The resolved password (still wrapped in `SecretStr`).
 
-        Returns `None` until :meth:`configure` runs. Callers that need
+        Returns `None` until `configure` runs. Callers that need
         the raw string call `.get_secret_value()` themselves at the call
         site — the wrapper stays on `JaxaAuth` so it never lands in a
         `repr` or a log line.
@@ -266,7 +266,7 @@ class JaxaAuth(AbstractAuth[JaxaCredentials]):
         variables (`$GPORTAL_USERNAME` / `$GPORTAL_PASSWORD` and
         `$JAXA_PTREE_USERNAME` / `$JAXA_PTREE_PASSWORD` respectively) as
         fallback, and caches them on the instance for the branch to read
-        through :attr:`username` / :attr:`password`. Idempotent — a
+        through `username` / `password`. Idempotent — a
         second call after `is_authenticated()` returns `True`
         short-circuits.
 

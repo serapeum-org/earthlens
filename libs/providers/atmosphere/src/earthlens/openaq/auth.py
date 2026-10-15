@@ -1,6 +1,6 @@
 """Credentials and API-key resolution for the OpenAQ backend.
 
-Hosts :class:`OpenaqAuth`, an :class:`earthlens.base.SingleSecretAuth`
+Hosts `OpenaqAuth`, an `earthlens.base.SingleSecretAuth`
 subclass that resolves a single OpenAQ **`X-API-Key`** from, in
 priority order, an explicit `api_key=` argument or the
 `OPENAQ_API_KEY` environment variable. OpenAQ v3 requires a (free)
@@ -11,20 +11,20 @@ chain but without the toolbox login.
 
 The shape:
 
-* :class:`OpenaqCredentials` is a frozen pydantic value object
-  carrying the optional API key as a :class:`pydantic.SecretStr`.
-* :class:`OpenaqAuth` binds those credentials and lets the shared
-  :meth:`earthlens.base.SingleSecretAuth.configure` resolve the key —
+* `OpenaqCredentials` is a frozen pydantic value object
+  carrying the optional API key as a `pydantic.SecretStr`.
+* `OpenaqAuth` binds those credentials and lets the shared
+  `earthlens.base.SingleSecretAuth.configure` resolve the key —
   explicit key first, then the `OPENAQ_API_KEY` env var, then a clear
-  :class:`AuthenticationError` naming the free-registration URL (never
+  `AuthenticationError` naming the free-registration URL (never
   an interactive prompt).
 * `configure()` is idempotent — a second call after
-  :meth:`OpenaqAuth.is_authenticated` returns `True` short-circuits,
+  `OpenaqAuth.is_authenticated` returns `True` short-circuits,
   so it is safe to call from long-lived workers.
 
-The resolved key is read back via the :attr:`OpenaqAuth.api_key`
+The resolved key is read back via the `OpenaqAuth.api_key`
 property and attached as the `X-API-Key` header by
-:class:`earthlens.openaq.client.OpenaqClient`.
+`earthlens.openaq.client.OpenaqClient`.
 """
 
 from __future__ import annotations
@@ -44,7 +44,7 @@ class AuthenticationError(_BaseAuthenticationError):
     Carries a message that names a fix: pass `api_key=` to
     `OpenAQ(...)`, set the `OPENAQ_API_KEY` environment variable, or
     register a free key at `explore.openaq.org/register`. A subclass
-    of the cross-backend :class:`earthlens.base.AuthenticationError`
+    of the cross-backend `earthlens.base.AuthenticationError`
     so callers can catch every backend's auth failure with one
     `except` clause.
     """
@@ -55,12 +55,12 @@ class OpenaqCredentials(BaseModel):
 
     The key is optional at construction time: `None` means "resolve
     from the `OPENAQ_API_KEY` environment variable at
-    :meth:`OpenaqAuth.configure` time". The real "is there a usable
-    key?" gate is :meth:`OpenaqAuth.configure`, not this model.
+    `OpenaqAuth.configure` time". The real "is there a usable
+    key?" gate is `OpenaqAuth.configure`, not this model.
 
     Attributes:
         api_key: The OpenAQ `X-API-Key`, stored as a
-            :class:`pydantic.SecretStr` so it is never echoed by
+            `pydantic.SecretStr` so it is never echoed by
             `repr(creds)` or in logs. `None` defers resolution to the
             environment variable.
 
@@ -92,21 +92,21 @@ class OpenaqCredentials(BaseModel):
 class OpenaqAuth(SingleSecretAuth[OpenaqCredentials]):
     """Resolve and hold the OpenAQ API key.
 
-    Implements the :class:`earthlens.base.SingleSecretAuth` contract
+    Implements the `earthlens.base.SingleSecretAuth` contract
     for a single-secret backend: it declares its env var and provider
     name and supplies `_explicit_credential` / `_connect`, while the
-    inherited :meth:`configure` performs the resolution and is
+    inherited `configure` performs the resolution and is
     idempotent. After a successful `configure()`, the key is available
-    via the :attr:`api_key` property for the HTTP client to attach as
+    via the `api_key` property for the HTTP client to attach as
     the `X-API-Key` header.
 
     The class is a context manager (inherited from
-    :class:`AbstractAuth`): `with OpenaqAuth(creds) as auth: ...`
+    `AbstractAuth`): `with OpenaqAuth(creds) as auth: ...`
     calls `configure()` on enter and the default no-op `close()` on
     exit — there is no per-instance resource to release.
 
     Attributes:
-        _creds: The :class:`OpenaqCredentials` passed at construction.
+        _creds: The `OpenaqCredentials` passed at construction.
 
     Examples:
         - Resolve an explicit key:
@@ -144,13 +144,13 @@ class OpenaqAuth(SingleSecretAuth[OpenaqCredentials]):
 
     @property
     def api_key(self) -> str:
-        """The resolved API key; valid only after :meth:`configure`.
+        """The resolved API key; valid only after `configure`.
 
         Returns:
             str: The OpenAQ `X-API-Key` string.
 
         Raises:
-            AuthenticationError: When read before :meth:`configure`
+            AuthenticationError: When read before `configure`
                 has resolved a key.
         """
         if self._key is None:

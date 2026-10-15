@@ -3,9 +3,9 @@
 Fetches protected-area polygons from the World Database on Protected and
 Conserved Areas through a thin direct Protected Planet v4 REST client
 (`pywdpa` is not used — it targets the retired v3 API). Authenticated with a
-personal token (`?token=` query param) via :class:`WdpaAuth`; every fetch
+personal token (`?token=` query param) via `WdpaAuth`; every fetch
 raises a `LicenseWarning` for the custom UNEP-WCMC terms. See
-:class:`earthlens.wdpa.backend.WDPA`.
+`earthlens.wdpa.backend.WDPA`.
 """
 
 from __future__ import annotations

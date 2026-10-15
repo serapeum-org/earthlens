@@ -7,8 +7,8 @@ for the asset's real type / title / date window / band names and splice them
 into the existing stanza **in place** — the comments and ordering of the
 surrounding rows are preserved, only the placeholder fields are rewritten.
 
-Credentialed: the Earth Engine read sits behind :func:`_fetch_asset_payload`
-(monkeypatch-able), so the stanza-rewriting core (:func:`_rewrite_stanza`)
+Credentialed: the Earth Engine read sits behind `_fetch_asset_payload`
+(monkeypatch-able), so the stanza-rewriting core (`_rewrite_stanza`)
 stays pure and fully testable offline.
 """
 
@@ -167,7 +167,7 @@ def _rewrite_stanza(
     Args:
         text: The full per-family catalog file text.
         asset_id: The asset id whose stanza to rewrite.
-        payload: The hydration payload from :func:`_fetch_asset_payload`.
+        payload: The hydration payload from `_fetch_asset_payload`.
         existing_title: The curated title (only overwritten if a placeholder).
 
     Returns:

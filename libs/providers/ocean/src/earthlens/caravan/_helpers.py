@@ -5,7 +5,7 @@ lives here, in two transports that the rest of the backend never has to tell
 apart:
 
 * **ZIP over HTTP Range (the fast path).** A ZIP stores its central directory at
-  the tail, so :class:`earthlens.base.HttpRangeFile` turns a multi-gigabyte
+  the tail, so `earthlens.base.HttpRangeFile` turns a multi-gigabyte
   Zenodo archive into random-access storage. Indexing the 8.84 GB GRDC archive
   costs 4 requests / 0.8 MB, and one catchment a further 2 requests / 2.1 MB —
   nothing is written to disk. Every community extension, and base ≤ 1.2, is a
@@ -139,7 +139,7 @@ def resolve_record(
 
     Args:
         record: The Zenodo **version** record id.
-        client: Transport to read through; a default :class:`HttpClient` when
+        client: Transport to read through; a default `HttpClient` when
             `None`.
 
     Returns:
@@ -243,7 +243,7 @@ def ensure_archive(
 
     Args:
         archive: The catalog's file descriptor, carrying the URL, size and md5.
-        cache_root: Cache directory; :func:`cache_dir` when `None`.
+        cache_root: Cache directory; `cache_dir` when `None`.
         client: Transport to download through.
         progress: Show a progress bar for the download.
 
@@ -476,7 +476,7 @@ def _tar_index(tarball: Path, extract_dir: Path, fingerprint: str) -> list[str]:
 class CaravanArchive:
     """Uniform member access over a Caravan archive, remote ZIP or local tar.
 
-    Built by :meth:`open_remote_zip` or :meth:`open_local_tar`. The backend
+    Built by `open_remote_zip` or `open_local_tar`. The backend
     talks only to this object, so the two very different transports — random
     access over HTTP versus sequential scans of a downloaded file — do not leak
     into the request logic.
@@ -558,7 +558,7 @@ class CaravanArchive:
 
         Args:
             tarball: The local archive, already verified by
-                :func:`ensure_archive`.
+                `ensure_archive`.
             extract_dir: Directory members are extracted into; a
                 fingerprint-scoped `members-*` sibling of the tarball when
                 `None`.

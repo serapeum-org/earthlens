@@ -8,15 +8,15 @@ bundled `available_datasets` index so the user can see what has appeared
 or disappeared upstream.
 
 Only providers with a public listing endpoint (or public SDK call, or
-anonymous FTP tree) have a refresher wired up in :data:`_REFRESHERS`; every
+anonymous FTP tree) have a refresher wired up in `_REFRESHERS`; every
 other provider reports `unsupported` so `refresh all` degrades gracefully
 instead of failing. The live ids are diffed against the bundled index that
 fits the provider — usually `available_datasets`, but a backend whose
 refresh axis differs (Overture's `available_releases`, CHC's `ftp_bases`
 paths, or radar / firms / fdsn whose `datasets` map *is* the index) resolves
-its own via :func:`_bundled_ids`.
+its own via `_bundled_ids`.
 
-The `--write` half (:data:`_WRITERS`) persists a live fetch back into the
+The `--write` half (`_WRITERS`) persists a live fetch back into the
 bundled informational index. For the sharded `_index.yaml` providers (and
 HDX's gzipped sidecar) it rewrites the in-file block; for the providers
 whose `available_*` attribute is *computed* from the curated rows at load
@@ -245,7 +245,7 @@ def _index_writer(
 
     The returned writer flattens the grouped live fetch (or keeps it
     grouped, for backends that persist their index per-group) and splices
-    it into the provider's `_index.yaml` via :func:`_replace_index_block`.
+    it into the provider's `_index.yaml` via `_replace_index_block`.
 
     Args:
         block_key: The index block to rewrite (`"available_datasets"` or
@@ -641,14 +641,14 @@ def audit_one(info: BackendInfo) -> AuditOutcome:
     Flags `broken` curated upstream ids the provider no longer serves (the
     actionable drift a `--strict` CI gate fails on) and, informationally,
     `untracked` live ids missing from the bundled index. Reuses the same
-    live refresher as :func:`refresh_one`; providers without one report
+    live refresher as `refresh_one`; providers without one report
     `"unsupported"`, and fetch failures report `"error"` — never raises.
 
     Args:
         info: The backend to audit.
 
     Returns:
-        The :class:`AuditOutcome` for `info`.
+        The `AuditOutcome` for `info`.
     """
     lister = _REFRESHERS.get(info.provider)
     if lister is None:
@@ -696,7 +696,7 @@ _COVERAGE_BUCKETS = ("DONE", "addressable", "thin", "table", "missing")
 class CoverageOutcome:
     """The result of classifying a provider's available universe for curation.
 
-    Distinct from :class:`AuditOutcome` (drift of curated-vs-live): coverage
+    Distinct from `AuditOutcome` (drift of curated-vs-live): coverage
     answers "of everything the provider exposes, how much is curated, and
     what is worth curating next".
 
@@ -704,7 +704,7 @@ class CoverageOutcome:
         provider: Canonical provider id.
         status: `"ok"`, `"unsupported"` (no classifier), or `"error"`.
         detail: Failure reason for `"error"` / `"unsupported"`, else empty.
-        counts: Per-bucket counts (see :data:`_COVERAGE_BUCKETS`).
+        counts: Per-bucket counts (see `_COVERAGE_BUCKETS`).
         todo: The `addressable`-but-not-yet-curated ids worth curating next.
     """
 
@@ -760,7 +760,7 @@ def coverage_one(info: BackendInfo) -> CoverageOutcome:
         info: The backend to classify.
 
     Returns:
-        The :class:`CoverageOutcome` for `info`.
+        The `CoverageOutcome` for `info`.
     """
     classifier = _COVERAGE.get(info.provider)
     if classifier is None:
@@ -795,7 +795,7 @@ def refresh_one(info: BackendInfo, write: bool = False) -> RefreshOutcome:
             (the skip is reported in `detail`, not treated as an error).
 
     Returns:
-        The :class:`RefreshOutcome` for `info`.
+        The `RefreshOutcome` for `info`.
     """
     lister = _REFRESHERS.get(info.provider)
     if lister is None:

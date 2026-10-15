@@ -156,7 +156,7 @@ class EumetsatAuth(AbstractAuth[EumetsatCredentials]):
 
     Each half is resolved on its own, so a pair may be assembled from two
     sources — an explicit key with a secret from the environment. This
-    matches :class:`~earthlens.base.auth.SingleSecretAuth` and the other
+    matches `SingleSecretAuth` and the other
     backends; it read the environment first until #1184, which meant an
     explicit `consumer_key=` was silently discarded whenever
     `EUMETSAT_CONSUMER_KEY` happened to be set.

@@ -38,7 +38,7 @@ from earthlens.base import (
 #: SEARCH returns a spurious `400` on a well-formed query under load (issue #929),
 #: so a `400` is retry-worthy here and, if it persists, an availability failure.
 #: The backend both retries these and re-raises a survivor as
-#: :class:`GdacsUnavailableError`; every other status (`403` / `404` / ...) stays
+#: `GdacsUnavailableError`; every other status (`403` / `404` / ...) stays
 #: an authoritative failure.
 GDACS_SERVICE_STATUSES: frozenset[int] = frozenset(
     {400, 408, 425, 429, 500, 502, 503, 504}
@@ -94,7 +94,7 @@ class GdacsUnavailableError(UpstreamUnavailableError):
             ```
 
     The `(message, status_code)` constructor is inherited from
-    :class:`~earthlens.base.UpstreamUnavailableError`.
+    `UpstreamUnavailableError`.
     """
 
 
@@ -144,7 +144,7 @@ def service_failure_reason(exc: BaseException) -> str | None:
 
     Returns a short reason string when the failure is the service being
     unreachable or refusing the request in a retry-worthy way — a connection or
-    timeout error, or a status in :data:`GDACS_SERVICE_STATUSES` — and `None`
+    timeout error, or a status in `GDACS_SERVICE_STATUSES` — and `None`
     for anything else (a `403` / `404`, a JSON-decode `ValueError`, ...), which
     the backend then propagates unchanged.
 

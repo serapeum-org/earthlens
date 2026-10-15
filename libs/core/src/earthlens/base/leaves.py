@@ -280,7 +280,7 @@ class SummarisedLeaf(BaseModel):
     #: beyond the class name, which is the honest answer for a row that has
     #: not declared one. A subclass declaration **replaces** its parent's
     #: rather than extending it — to keep a parent's fragments, override
-    #: :meth:`summary_parts` and call `super()`, as `FluxableLeaf` does.
+    #: `summary_parts` and call `super()`, as `FluxableLeaf` does.
     _summary_fields: ClassVar[tuple[str, ...]] = ()
 
     @classmethod
@@ -374,7 +374,7 @@ class SummarisedLeaf(BaseModel):
         Returns:
             str: The one-line summary. The row's own text is reproduced as
             itself, so a title carrying `—` or `≥` keeps it — the same choice
-            :meth:`earthlens.base.AbstractCatalog.__str__` makes, since
+            `earthlens.base.AbstractCatalog.__str__` makes, since
             escaping the text into ASCII sequences is what actually makes a
             summary unreadable. A console on a narrow codepage (`cp1252`) can
             therefore still raise `UnicodeEncodeError` on `print(row)`; that
@@ -420,15 +420,15 @@ class SummarisedLeaf(BaseModel):
 class FluxableLeaf(SummarisedLeaf):
     """Catalog row that flags whether its quantity accumulates over time.
 
-    Both ECMWF :class:`earthlens.ecmwf.Variable` and CHIRPS
-    :class:`earthlens.chc.Variable` carry an identical `types` field
+    Both ECMWF `earthlens.ecmwf.Variable` and CHIRPS
+    `earthlens.chc.Variable` carry an identical `types` field
     plus `is_flux` property — flux quantities (precipitation,
     evapotranspiration, radiation) are accumulated per timestep on
     the server side, so monthly aggregation has to multiply by the
     number of days in the month. State / instantaneous values
     (temperature, pressure) don't need that scaling.
 
-    GEE :class:`earthlens.gee.Band` does NOT inherit from this — its
+    GEE `earthlens.gee.Band` does NOT inherit from this — its
     raster bands don't carry flux semantics (cloud-screened optical
     reflectance, NDVI, etc.).
 

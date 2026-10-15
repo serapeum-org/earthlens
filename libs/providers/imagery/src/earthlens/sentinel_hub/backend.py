@@ -224,7 +224,7 @@ class SentinelHub(AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Parse the date window into a :class:`TemporalExtent`.
+        """Parse the date window into a `TemporalExtent`.
 
         Args:
             start: Inclusive start date string (parsed with `fmt`).
@@ -268,7 +268,7 @@ class SentinelHub(AbstractDataSource):
     def _config(self) -> Any:
         """Return the authenticated `sentinelhub.SHConfig`.
 
-        The auth wrapper is created in :meth:`_initialize` (run by the base
+        The auth wrapper is created in `_initialize` (run by the base
         constructor), so it is always present by the time any fetch method
         needs the SDK config.
 
@@ -324,7 +324,7 @@ class SentinelHub(AbstractDataSource):
     def _search(self) -> list[RemoteProduct]:
         """List the planned requests without rendering (cheap dry-run).
 
-        Returns one :class:`RemoteProduct` per requested key; the resolved row
+        Returns one `RemoteProduct` per requested key; the resolved row
         rides on `metadata["resolved"]`. No network call.
 
         Returns:
@@ -338,8 +338,8 @@ class SentinelHub(AbstractDataSource):
     def search(self, limit: int = 100) -> list[RemoteProduct]:
         """Query the Sentinel Hub Catalog API for scenes intersecting the request.
 
-        A real STAC-style search (distinct from the internal :meth:`_search`
-        fetch-planner): returns one :class:`RemoteProduct` per catalog item that
+        A real STAC-style search (distinct from the internal `_search`
+        fetch-planner): returns one `RemoteProduct` per catalog item that
         intersects the request bbox + window, so a caller can enumerate coverage
         before rendering. An empty result is an empty list (not an error).
 
@@ -382,7 +382,7 @@ class SentinelHub(AbstractDataSource):
         """Dispatch to the per-plane fetcher for the resolved `api`.
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             The written raster paths (raster planes) or table paths / S3 URIs
@@ -440,7 +440,7 @@ class SentinelHub(AbstractDataSource):
             size: The `(width, height)` render size in pixels.
 
         Raises:
-            ValueError: When either side exceeds :data:`SH_MAX_DIMENSION`.
+            ValueError: When either side exceeds `SH_MAX_DIMENSION`.
         """
         if max(size) > SH_MAX_DIMENSION:
             raise ValueError(
@@ -481,7 +481,7 @@ class SentinelHub(AbstractDataSource):
         re-hashing).
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             The written GeoTIFF paths, one per product.
@@ -513,7 +513,7 @@ class SentinelHub(AbstractDataSource):
     ) -> Path:
         """Build + run one Process request and return the written GeoTIFF path.
 
-        Shared by :meth:`_fetch_process` (whole bbox) and :meth:`_fetch_tiling`
+        Shared by `_fetch_process` (whole bbox) and `_fetch_tiling`
         (per tile).
 
         Args:
@@ -577,7 +577,7 @@ class SentinelHub(AbstractDataSource):
             size: The `(width, height)` render size in pixels.
 
         Raises:
-            ValueError: When either side exceeds :data:`ASYNC_MAX_DIMENSION`.
+            ValueError: When either side exceeds `ASYNC_MAX_DIMENSION`.
         """
         if max(size) > ASYNC_MAX_DIMENSION:
             raise ValueError(
@@ -595,7 +595,7 @@ class SentinelHub(AbstractDataSource):
         not a direct synchronous download).
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             The S3 **delivery prefix** (the configured `batch_output` bucket), one
@@ -660,7 +660,7 @@ class SentinelHub(AbstractDataSource):
         per-product subdirectory and removed after the merge.
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             The merged GeoTIFF paths, one per product (union bounds).
@@ -748,7 +748,7 @@ class SentinelHub(AbstractDataSource):
         the tiling grid (default 0).
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             The S3 **delivery prefix** (the configured `batch_output` bucket), one
@@ -868,7 +868,7 @@ class SentinelHub(AbstractDataSource):
         one CSV per product (`feature_id` carried for a `FeatureCollection`).
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             The written table paths, one per product.
@@ -950,7 +950,7 @@ class SentinelHub(AbstractDataSource):
         and an output bucket.
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             The written table paths, one per product.

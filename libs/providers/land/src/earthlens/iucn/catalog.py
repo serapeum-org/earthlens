@@ -8,10 +8,10 @@ and the `validate` target — the backend accepts **any** valid alpha-2 code
 whether or not it is listed here, and species are selected by binomial
 (`species:<name>`), not from this catalog.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog` subclass
-storing the rows in the framework's :attr:`~earthlens.base.AbstractCatalog.datasets`
+`Catalog` is a thin `earthlens.base.AbstractCatalog` subclass
+storing the rows in the framework's `datasets`
 field, so the inherited dict-like surface works. Parsing is cached on
-`(path, mtime)`; :data:`CATALOG_PATH` is the bundled YAML and is
+`(path, mtime)`; `CATALOG_PATH` is the bundled YAML and is
 monkey-patchable in tests.
 """
 
@@ -52,7 +52,7 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Country], list[str]]:
     """Parse, validate, and cache the IUCN country catalog at `path`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
         A pair `(rows, available)` of the ISO2-keyed `Country` map and the
@@ -60,7 +60,7 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Country], list[str]]:
 
     Raises:
         ValueError: If the file has no `countries:` block, or a row fails
-            :class:`Country` validation.
+            `Country` validation.
     """
     key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
@@ -91,7 +91,7 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Country], list[str]]:
 class Country(SummarisedLeaf):
     """One curated IUCN country's dispatch row.
 
-    The ISO2 code is the parent key in :attr:`Catalog.datasets` and is not
+    The ISO2 code is the parent key in `Catalog.datasets` and is not
     stored on the row.
 
     Attributes:
@@ -124,12 +124,12 @@ class Catalog(AbstractCatalog[Country]):
     """Country catalog for the IUCN Red List backend.
 
     Reads the bundled `iucn_data_catalog.yaml` (shipped as package data) and
-    exposes its `countries:` block as a map of :class:`Country` rows.
-    Instantiate with no arguments (`Catalog()`); :func:`model_post_init`
+    exposes its `countries:` block as a map of `Country` rows.
+    Instantiate with no arguments (`Catalog()`); `model_post_init`
     loads and validates the YAML (cached) in one pass.
 
     Attributes:
-        datasets: Map from the ISO2 code to its :class:`Country` row.
+        datasets: Map from the ISO2 code to its `Country` row.
 
     Examples:
         - Resolve a code, a friendly name, and a `country:` selector:
@@ -178,14 +178,14 @@ class Catalog(AbstractCatalog[Country]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `countries:` block, or a row
-                fails :class:`Country` validation.
+                fails `Country` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         rows, available = _load_catalog_data(catalog_path)

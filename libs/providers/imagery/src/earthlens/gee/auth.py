@@ -1,10 +1,10 @@
 """Service-account authentication for the Google Earth Engine backend.
 
-Hosts :class:`EarthEngineAuth`, a thin wrapper over the
+Hosts `EarthEngineAuth`, a thin wrapper over the
 `earthengine-api` (`ee`) authentication entry points. The Earth Engine
 backend authenticates with a Google Cloud *service account* plus a JSON
 key file (no interactive browser login on the machine that runs the
-download); :class:`EarthEngineAuth.initialize` performs the one-time
+download); `EarthEngineAuth.initialize` performs the one-time
 `ee.Initialize` against a *registered* Cloud project.
 
 The Cloud project the calls are scoped/billed to is mandatory on
@@ -12,7 +12,7 @@ current `earthengine-api` releases: it is taken from the explicit
 `project` argument when given, else from the key file's `project_id`
 field. A project that has never been registered for Earth Engine, or
 that the service account lacks permission on, surfaces as an
-:class:`AuthenticationError` with a pointer at the registration /
+`AuthenticationError` with a pointer at the registration /
 permissions docs rather than a raw `ee` exception.
 
 See:
@@ -50,7 +50,7 @@ class AuthenticationError(_BaseAuthenticationError):
     an Earth Engine IAM role on the target project.
 
     A subclass of the cross-backend
-    :class:`earthlens.base.AuthenticationError` so callers can catch
+    `earthlens.base.AuthenticationError` so callers can catch
     every backend's auth failure with one `except` clause; backward
     compatible with existing `except earthlens.gee.AuthenticationError`
     consumers.
@@ -246,10 +246,10 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
     from the key file's `project_id`.
 
     Conforms to the cross-backend
-    :class:`earthlens.base.AbstractAuth` contract: construction
+    `earthlens.base.AbstractAuth` contract: construction
     still authenticates eagerly for backward compatibility, but the
-    underlying work lives in :meth:`configure` and is idempotent —
-    the second call after :meth:`is_authenticated` returns `True`
+    underlying work lives in `configure` and is idempotent —
+    the second call after `is_authenticated` returns `True`
     short-circuits.
 
     Args:
@@ -292,7 +292,7 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
                 file's `project_id`.
 
         Raises:
-            AuthenticationError: As described on :class:`EarthEngineAuth`.
+            AuthenticationError: As described on `EarthEngineAuth`.
         """
         creds = EarthEngineCredentials(
             service_account=service_account,
@@ -554,7 +554,7 @@ class EarthEngineAuth(AbstractAuth[EarthEngineCredentials]):
     def decode_service_account(service_key_bytes: bytes) -> dict[str, Any]:
         """Decode a base64-encoded service-account key back to a mapping.
 
-        Inverse of :meth:`encode_service_account`.
+        Inverse of `encode_service_account`.
 
         Args:
             service_key_bytes: The base64-encoded JSON content.

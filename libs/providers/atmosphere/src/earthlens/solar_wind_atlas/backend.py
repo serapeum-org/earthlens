@@ -53,8 +53,8 @@ class SolarWindAtlas(AbstractDataSource):
     Resolves each requested layer id against the bundled catalog and fetches it
     by its declared transport — windowed `/vsicurl` for the wind COGs,
     download-once-and-cache for the solar ZIPs — writing one cropped GeoTIFF per
-    layer. The request is a search/fetch split: :meth:`_search` names one product
-    per layer and :meth:`_fetch` realises each (windowed read → GeoTIFF).
+    layer. The request is a search/fetch split: `_search` names one product
+    per layer and `_fetch` realises each (windowed read → GeoTIFF).
 
     Attributes:
         OUTPUT_KIND: Fixed `"raster"`; every layer yields a gridded GeoTIFF.
@@ -197,7 +197,7 @@ class SolarWindAtlas(AbstractDataSource):
 
         Returns:
             list[RemoteProduct]: One product per requested layer, carrying its
-                resolved :class:`Layer` row in `metadata`.
+                resolved `Layer` row in `metadata`.
         """
         return [
             RemoteProduct(id=layer.id, href=layer.url, metadata={"layer": layer})
@@ -208,7 +208,7 @@ class SolarWindAtlas(AbstractDataSource):
         """Fetch every product by its transport, writing one GeoTIFF each.
 
         Args:
-            products: The list from :meth:`_search`.
+            products: The list from `_search`.
 
         Returns:
             list[Path]: The written GeoTIFF path(s), in `products` order.

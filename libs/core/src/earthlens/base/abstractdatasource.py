@@ -174,10 +174,10 @@ class RemoteProduct:
 
 
 class TemporalExtent(BaseModel):
-    """Per-instance temporal context produced by :meth:`check_input_dates`.
+    """Per-instance temporal context produced by `check_input_dates`.
 
     Replaces the `self.time` dict that earlier versions of
-    :class:`AbstractDataSource` accepted from subclass overrides. The
+    `AbstractDataSource` accepted from subclass overrides. The
     frozen pydantic model enforces presence of every consumer-visible
     field at construction time, so a subclass that returns a malformed
     container fails fast instead of surfacing as `KeyError` deep
@@ -185,17 +185,17 @@ class TemporalExtent(BaseModel):
 
     Attributes:
         start_date: Inclusive start of the requested window. Typed
-            :data:`~typing.Any` because pandas / numpy timestamp types
+            `Any` because pandas / numpy timestamp types
             are not native pydantic primitives; the cross-field
             validator below enforces `start_date <= end_date` for
             anything that supports comparison.
         end_date: Inclusive end of the requested window.
         resolution: Spacing between consecutive entries in
-            :attr:`dates`, expressed as a pandas frequency alias —
+            `dates`, expressed as a pandas frequency alias —
             `"D"` for daily, `"MS"` for month-start. Same
             shorthand pandas uses for `date_range(freq=...)`.
-        dates: The :class:`pandas.DatetimeIndex` the download loop
-            iterates. Typed :data:`~typing.Any` to avoid a hard
+        dates: The `pandas.DatetimeIndex` the download loop
+            iterates. Typed `Any` to avoid a hard
             pandas import in the abstract module.
     """
 
@@ -246,7 +246,7 @@ class SpatialExtent(BaseModel):
             latitude and longitude. `None` for backends that work
             on irregular grids or do not need a cell size for their
             request shape (e.g. CHIRPS FTP file lookup, S3 prefix
-            listing). Mirrors :attr:`TemporalExtent.resolution` —
+            listing). Mirrors `TemporalExtent.resolution` —
             the spatial counterpart of the temporal cadence.
     """
 
@@ -357,7 +357,7 @@ class SpatialExtent(BaseModel):
     ) -> SpatialExtent:
         """Build from the legacy `[min, max]` pair shape.
 
-        :class:`AbstractDataSource.__init__` accepts `lat_lim` /
+        `AbstractDataSource.__init__` accepts `lat_lim` /
         `lon_lim` as constructor kwargs in the public API; this
         classmethod adapts that shape to the four named fields.
 
@@ -403,7 +403,7 @@ class SpatialExtent(BaseModel):
     def estimate_pixel_dims(self, scale_m: float) -> tuple[int, int]:
         """Return `(width_px, height_px)` of this bbox sampled at `scale_m` metres.
 
-        Thin wrapper over :func:`earthlens.base.spatial.estimate_pixel_dims`
+        Thin wrapper over `earthlens.base.spatial.estimate_pixel_dims`
         so every backend can pre-flight a request size without reaching
         into another subpackage. Useful e.g. for GEE's 32768-px
         synchronous-export cap or for any "will this download blow up?"
@@ -434,11 +434,11 @@ class LazyClientMixin:
     """Defer a backend's network client until first `client` access.
 
     A backend that authenticates or opens a connection mixes this in
-    (before :class:`AbstractDataSource` in its bases) and implements
-    :meth:`_open_client` — the network half. Its :meth:`_initialize` then
+    (before `AbstractDataSource` in its bases) and implements
+    `_open_client` — the network half. Its `_initialize` then
     keeps only eager, offline work (input validation, catalog resolution)
     and returns `None`, so the parent never binds an eager `client`. The
-    live client is built lazily on first access to :attr:`client` and
+    live client is built lazily on first access to `client` and
     cached, so constructing the backend — or a bare `EarthLens(...)` —
     never touches the network. Authentication errors therefore surface on
     the first `download()` / `search()` / `client` use rather than at
@@ -482,7 +482,7 @@ class LazyClientMixin:
         """The backend's network client — opened lazily and cached.
 
         Returns:
-            The object :meth:`_open_client` returns, built on first access
+            The object `_open_client` returns, built on first access
             and reused thereafter.
         """
         if "_client_obj" not in self.__dict__:
@@ -505,8 +505,8 @@ class LazyClientMixin:
 def _head_rows(chunk: Any, count: int) -> Any:
     """Return the first `count` rows of a fragment.
 
-    The default trimmer for :meth:`AbstractDataSource._take_limited` and
-    :meth:`AbstractDataSource.iter_download`. Prefers `.iloc` when the fragment
+    The default trimmer for `AbstractDataSource._take_limited` and
+    `AbstractDataSource.iter_download`. Prefers `.iloc` when the fragment
     has it, because slicing a pandas object is label-based for some index types
     and would not reliably keep the first n rows; falls back to `[:n]`, which
     covers lists and `FeatureCollection`-style sequences.
@@ -558,7 +558,7 @@ def _unwind_created(created: list[Path]) -> None:
     both left alone.
 
     Args:
-        created: The paths from :func:`_missing_ancestors`, leaf first.
+        created: The paths from `_missing_ancestors`, leaf first.
     """
     for directory in created:
         try:
@@ -701,7 +701,7 @@ def native_parameters(backend_cls: type) -> frozenset[str]:
 
 
 def _describe_remote_product(product: Any) -> str:
-    """Render a product for the :meth:`AbstractDataSource._run_items` log lines.
+    """Render a product for the `AbstractDataSource._run_items` log lines.
 
     Args:
         product: The product whose fetch failed. Only its `id` is read, so a
@@ -719,18 +719,18 @@ class AbstractDataSource(ABC):
     Subclasses encapsulate the request shape, authentication, and
     download orchestration for a single provider (CHIRPS, ERA5 on AWS
     S3, ECMWF CDS, Google Earth Engine). The base class wires the
-    abstract hooks (:meth:`_initialize`, :meth:`_create_grid`,
-    :meth:`_check_input_dates`) into a uniform `__init__` shape and
-    exposes a single :meth:`download` entry point.
+    abstract hooks (`_initialize`, `_create_grid`,
+    `_check_input_dates`) into a uniform `__init__` shape and
+    exposes a single `download` entry point.
 
     Attributes:
         OUTPUT_KIND: Class-level declaration of the natural output
             shape this backend emits. Read by
-            :class:`earthlens.earthlens.EarthLens` at facade
+            `earthlens.earthlens.EarthLens` at facade
             `download()` time to gate the `aggregate=` argument:
             `"raster"` accepts it (the existing pyramids-backed
             `aggregate_netcdf` flow); `"vector"` and `"tabular"`
-            reject it with :class:`NotImplementedError`; `"mixed"`
+            reject it with `NotImplementedError`; `"mixed"`
             forwards it unchanged. Subclasses override the class
             attribute; the default is `"raster"`.
 
@@ -744,7 +744,7 @@ class AbstractDataSource(ABC):
             `ships` product (else `"vector"`). The facade reads the
             instance attribute, so both forms work.
         REQUIRES_TIME_WINDOW: Whether this backend needs both `start` and
-            `end`. `True` (the default) makes :meth:`__init__` reject a
+            `end`. `True` (the default) makes `__init__` reject a
             missing bound up front with an actionable message, instead of
             letting the `None` reach the subclass's date parsing and surface
             as a bare `TypeError: strptime() argument 1 must be str, not
@@ -759,8 +759,8 @@ class AbstractDataSource(ABC):
             through `earthlens.base.spatial.crop_to_aoi` /
             `mask_to_geometry` (or reading `space.geometry` itself) and sets
             this to `True`. When it is `False`,
-            :meth:`_attach_clip_geometry` emits a
-            :class:`PolygonAoiWarning`, because the request silently returns
+            `_attach_clip_geometry` emits a
+            `PolygonAoiWarning`, because the request silently returns
             the polygon's bounding box — a plausible-looking raster over
             roughly the right area, which is the hardest kind of wrong
             output to notice.
@@ -779,7 +779,7 @@ class AbstractDataSource(ABC):
         thread its own instance. Where earthlens itself fans out — ghsl's tile
         downloads run through `joblib.Parallel(prefer="threads")` — the shared
         helpers take a session from
-        :func:`earthlens.base.http.thread_local_session`, one per thread,
+        `earthlens.base.http.thread_local_session`, one per thread,
         because `requests.Session` is not guaranteed thread-safe either.
 
         A consequence worth knowing: `min_interval` throttling is per
@@ -790,8 +790,8 @@ class AbstractDataSource(ABC):
     Note:
         **Processes.** A freshly constructed backend usually pickles, because
         the SDK clients are lazy. Once one materialises — after
-        :meth:`authenticate` or the first download — it generally does not, and
-        a backend that caches an :class:`~earthlens.base.http.HttpClient` on
+        `authenticate` or the first download — it generally does not, and
+        a backend that caches an `HttpClient` on
         `self._http` (erddap, bathymetry, gee) never does: the client holds a
         `threading.Lock` for the throttle, and locks do not pickle. (A bare
         `requests.Session`, perhaps surprisingly, does.)
@@ -819,14 +819,14 @@ class AbstractDataSource(ABC):
 
     #: Optional sentence explaining why this backend refuses `aggregate=`,
     #: appended to the central message by
-    #: :meth:`_refuse_unsupported_aggregate`. Worth setting: the specific reason
+    #: `_refuse_unsupported_aggregate`. Worth setting: the specific reason
     #: ("a single static prediction with no temporal axis") is more use to a
     #: caller than the generic one.
     AGGREGATE_REFUSAL_REASON: str = ""
 
     #: Minimum seconds between consecutive requests to this provider — a
     #: client-side politeness limit, passed to
-    #: :class:`~earthlens.base.http.HttpClient`'s `min_interval`. `0.0` (the
+    #: `HttpClient`'s `min_interval`. `0.0` (the
     #: default) means the provider publishes no etiquette we are bound by.
     #:
     #: Declared on the backend rather than read from the `providers.yaml`
@@ -835,7 +835,7 @@ class AbstractDataSource(ABC):
     #: actually get rate-limited (osm's Overpass / ohsome) have no provider
     #: record at all.
     #:
-    #: The throttle is per :class:`HttpClient`, so a backend fanning out over N
+    #: The throttle is per `HttpClient`, so a backend fanning out over N
     #: threads with a client each waits `min_interval` N times in parallel — see
     #: the concurrency note on this class.
     MIN_REQUEST_INTERVAL: float = 0.0
@@ -845,8 +845,8 @@ class AbstractDataSource(ABC):
 
         Two independent pieces of wiring run for each concrete backend:
 
-        1. :meth:`_wrap_download` wraps whichever `download` the class
-           defines so :attr:`root_dir` is created when a download starts
+        1. `_wrap_download` wraps whichever `download` the class
+           defines so `root_dir` is created when a download starts
            rather than at construction. This runs for *every* subclass,
            including one that declares no `__init__` of its own.
         2. The backend's `__init__` is wrapped so that — whether reached
@@ -855,7 +855,7 @@ class AbstractDataSource(ABC):
 
         The constructor sugar adds:
 
-        * `aoi` (+ `buffer`): any shape :func:`earthlens.base.spatial.normalize_aoi`
+        * `aoi` (+ `buffer`): any shape `earthlens.base.spatial.normalize_aoi`
           understands, reduced to `lat_lim` / `lon_lim`; a backend that
           declares its own `aoi` (WorldPop) keeps it;
         * `cadence`: a clearer alias for `temporal_resolution`;
@@ -1044,8 +1044,8 @@ class AbstractDataSource(ABC):
         """Make the backend's own `download` create `root_dir` before it runs.
 
         `root_dir` is resolved at construction but deliberately not created
-        there (see :meth:`_ensure_root_dir`). Rather than make every backend
-        remember to call it, :meth:`__init_subclass__` calls this so the
+        there (see `_ensure_root_dir`). Rather than make every backend
+        remember to call it, `__init_subclass__` calls this so the
         directory exists the moment a real download starts.
 
         The wrap is applied only to a `download` the class defines itself, and
@@ -1121,21 +1121,21 @@ class AbstractDataSource(ABC):
         Captures the return values of the abstract hooks so subclasses
         do not have to wire them onto `self` themselves:
 
-        * `self.client` — whatever :meth:`_initialize` returns (a CDS
+        * `self.client` — whatever `_initialize` returns (a CDS
           client, an S3 client, `None` for FTP). Subclasses that
-          assign `self.client` inside :meth:`_initialize` (e.g.
-          :class:`S3`) keep their own assignment; the parent only sets
-          the attribute when :meth:`_initialize` returns a non-`None`
+          assign `self.client` inside `_initialize` (e.g.
+          `S3`) keep their own assignment; the parent only sets
+          the attribute when `_initialize` returns a non-`None`
           value.
-        * `self.space` — the :class:`SpatialExtent` returned by
-          :meth:`_create_grid`.
-        * `self.time` — the :class:`TemporalExtent` returned by
-          :meth:`_check_input_dates`.
-        * `self.root_dir` — the absolute :class:`pathlib.Path` of the
+        * `self.space` — the `SpatialExtent` returned by
+          `_create_grid`.
+        * `self.time` — the `TemporalExtent` returned by
+          `_check_input_dates`.
+        * `self.root_dir` — the absolute `pathlib.Path` of the
           output directory. `self.path` is kept as a legacy alias so
           older backends (CHIRPS, S3) continue to work. The directory is
           *resolved* here but only *created* when a download actually
-          runs (see :meth:`_ensure_root_dir`), so merely constructing a
+          runs (see `_ensure_root_dir`), so merely constructing a
           backend — to read its catalog, inspect its options, or validate
           a request — never litters the filesystem.
 
@@ -1161,7 +1161,7 @@ class AbstractDataSource(ABC):
                 an already-constructed backend.
 
         Raises:
-            ValueError: If :attr:`REQUIRES_TIME_WINDOW` is `True` and either
+            ValueError: If `REQUIRES_TIME_WINDOW` is `True` and either
                 `start` or `end` is `None`.
         """
         self._check_time_window(start, end)
@@ -1196,12 +1196,12 @@ class AbstractDataSource(ABC):
         The single implementation of a policy 40 backends used to each write for
         themselves. Two independent questions have to pass:
 
-        * :attr:`SUPPORTS_AGGREGATE` — does the class wire the reducer at all;
-        * :attr:`OUTPUT_KIND` — is *this instance's* output gridded. A handful of
+        * `SUPPORTS_AGGREGATE` — does the class wire the reducer at all;
+        * `OUTPUT_KIND` — is *this instance's* output gridded. A handful of
           backends resolve their kind per request, so a backend that aggregates
           its raster datasets must still refuse for a vector one.
 
-        A backend may set :attr:`AGGREGATE_REFUSAL_REASON` to a sentence saying
+        A backend may set `AGGREGATE_REFUSAL_REASON` to a sentence saying
         why, which is appended to the message. That is worth doing: "SoilGrids is
         a single static prediction with no temporal axis" tells a caller
         something the generic sentence cannot.
@@ -1279,10 +1279,10 @@ class AbstractDataSource(ABC):
         return info.st_size > 0
 
     def _ensure_root_dir(self) -> Path:
-        """Create :attr:`root_dir` if it does not exist yet, and return it.
+        """Create `root_dir` if it does not exist yet, and return it.
 
         Called by the `download` wrapper installed in
-        :meth:`__init_subclass__`, so every backend's output directory exists
+        `__init_subclass__`, so every backend's output directory exists
         by the time its own `download` body runs — without construction
         itself creating one. Constructing a backend to read its catalog,
         inspect `options_for`, or validate a request is a read-only act and
@@ -1295,7 +1295,7 @@ class AbstractDataSource(ABC):
         preparation from the caller.
 
         Returns:
-            Path: The (now existing) :attr:`root_dir`.
+            Path: The (now existing) `root_dir`.
 
         Note:
             Construction resolves `root_dir` without touching the filesystem;
@@ -1308,8 +1308,8 @@ class AbstractDataSource(ABC):
     def _check_time_window(self, start: Any, end: Any) -> None:
         """Reject a missing `start` / `end` when the backend needs both.
 
-        Runs before :meth:`_check_input_dates` so a backend that declares
-        :attr:`REQUIRES_TIME_WINDOW` never has to defend against `None`, and
+        Runs before `_check_input_dates` so a backend that declares
+        `REQUIRES_TIME_WINDOW` never has to defend against `None`, and
         the user gets the name of the missing bound rather than a bare
         `strptime` `TypeError` from deep inside the subclass.
 
@@ -1341,10 +1341,10 @@ class AbstractDataSource(ABC):
 
         Called by the ergonomic `__init__` wrapper when the request's
         `aoi=` was a polygon rather than a plain bbox. The geometry is
-        stored on the (frozen) :class:`SpatialExtent` via a copy so that
+        stored on the (frozen) `SpatialExtent` via a copy so that
         raster backends clipping through `pyramids.Dataset.crop` can mask
         the fetched bbox down to the exact shape. A no-op when `self.space`
-        is not a :class:`SpatialExtent`.
+        is not a `SpatialExtent`.
 
         Backends that do not clip to the polygon (`SUPPORTS_POLYGON_AOI` is
         `False`) still get the mask recorded — a later migration then needs no
@@ -1388,12 +1388,12 @@ class AbstractDataSource(ABC):
         """Eagerly establish the backend's authenticated connection.
 
         The explicit, fail-fast counterpart to the lazy authentication
-        that otherwise happens on the first :meth:`download` / `search`:
+        that otherwise happens on the first `download` / `search`:
         it opens the network client for backends that have one (those
-        mixing in :class:`LazyClientMixin` — e.g. GEE, ECMWF, STAC) or
+        mixing in `LazyClientMixin` — e.g. GEE, ECMWF, STAC) or
         runs the credential `configure()` step for backends that hold an
         auth object (CMEMS, Earthdata, EUMETSAT, …), raising
-        :class:`~earthlens.base.AuthenticationError` on failure. It is a
+        `AuthenticationError` on failure. It is a
         no-op for credential-free backends (CHIRPS, GDACS, Overture, …),
         and is idempotent.
 
@@ -1423,8 +1423,8 @@ class AbstractDataSource(ABC):
         Still abstract, because the *shape* of a backend's time axis is a real
         design decision rather than boilerplate. Most implementations are one
         call to one of the three factories below —
-        :meth:`_whole_window_extent`, :meth:`_cadence_extent`, or
-        :meth:`_static_extent` — which cover the three archetypes the 48
+        `_whole_window_extent`, `_cadence_extent`, or
+        `_static_extent` — which cover the three archetypes the 48
         backends fall into; only a genuinely bespoke axis (a provider release
         cadence to snap to, a forecast `(cycle, step)` grid) needs its own body.
         """
@@ -1457,7 +1457,7 @@ class AbstractDataSource(ABC):
 
         Args:
             start: The requested start bound, in any form
-                :func:`~earthlens.base.to_datetime` accepts.
+                `to_datetime` accepts.
             end: The requested end bound.
             fmt: `strptime` format tried first for a string bound.
             resolution: The label to record — conventionally `"all"` (one
@@ -1493,7 +1493,7 @@ class AbstractDataSource(ABC):
 
         The archetype for a provider addressed one file / request per period.
         The cadence is resolved through
-        :func:`~earthlens.base.resolve_cadence`, so an unsupported or mistyped
+        `resolve_cadence`, so an unsupported or mistyped
         spelling raises instead of silently substituting a different cadence,
         and `dates` is the expanded period axis the download loop iterates.
 
@@ -1573,8 +1573,8 @@ class AbstractDataSource(ABC):
     def _initialize(self, *args: Any, **kwargs: Any) -> Any:
         """Prepare the backend before the extents are built; return its client.
 
-        Called once by :meth:`__init__`, before :meth:`_create_grid` and
-        :meth:`_check_input_dates`. A non-`None` return is captured onto
+        Called once by `__init__`, before `_create_grid` and
+        `_check_input_dates`. A non-`None` return is captured onto
         `self.client`.
 
         The default does nothing and returns `None` — the right behaviour for a
@@ -1582,7 +1582,7 @@ class AbstractDataSource(ABC):
         HTTP/FTP endpoint, or a lazily-imported stateless SDK). Backends that
         must resolve a catalog row, build an auth object, or open a client
         override it. A backend whose client is a *network* connection should
-        prefer :class:`LazyClientMixin` and keep `_initialize` offline, so
+        prefer `LazyClientMixin` and keep `_initialize` offline, so
         construction never touches the network.
 
         Returns:
@@ -1594,11 +1594,11 @@ class AbstractDataSource(ABC):
     def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
         """Turn the requested lat/lon bounds into this backend's spatial extent.
 
-        Called once by :meth:`__init__`; the result is captured onto
+        Called once by `__init__`; the result is captured onto
         `self.space`.
 
         The default wraps the bounds verbatim in a validated
-        :class:`SpatialExtent`, which is what all but a handful of backends
+        `SpatialExtent`, which is what all but a handful of backends
         need — most providers accept an arbitrary WGS84 bbox and do any
         snapping server-side. Override only to do real work on the bounds:
         snap them to the provider's grid (ecmwf), attach a native cell size
@@ -1625,7 +1625,7 @@ class AbstractDataSource(ABC):
         arbitrary keywords, which is the opposite of a contract.
 
         Capability-gated arguments appear only where they are honoured
-        (`aggregate=` on the backends declaring :attr:`SUPPORTS_AGGREGATE`,
+        (`aggregate=` on the backends declaring `SUPPORTS_AGGREGATE`,
         `errors=` where the batch is a loop over independent items, `force=`
         where a re-run can skip completed artefacts), alongside genuinely
         backend-specific ones (`cores=` on chc, `tailor=` on eumetsat). Read the
@@ -1639,13 +1639,13 @@ class AbstractDataSource(ABC):
                 catch a signature drifting.
 
         Returns:
-            Any: The produced artifacts, shaped by :attr:`OUTPUT_KIND` —
+            Any: The produced artifacts, shaped by `OUTPUT_KIND` —
                 `"raster"` / `"mixed"` file-writing backends return the written
                 paths (`list[Path]`); `"vector"` backends return an in-memory
                 `FeatureCollection` (radar returns a `GeoDataFrame`);
                 `"tabular"` backends return a `pandas.DataFrame`. Every backend
                 returns its artifacts; the file-writing ones also leave them on
-                disk under :attr:`root_dir`.
+                disk under `root_dir`.
 
         Partial-failure policy across a multi-item batch defaults to
         **skip-and-continue** — a failed `(dataset, variable)` / chunk /
@@ -1656,29 +1656,29 @@ class AbstractDataSource(ABC):
         (`chc`, `cmems`, `ecmwf`, `fdsn`, `nwp`, `radar`, `soilgrids`) make
         that policy caller-controllable with an explicit
         `errors="warn" | "raise" | "ignore"` argument, routed through
-        :meth:`check_errors_policy` and :meth:`_run_items`. A backend whose
+        `check_errors_policy` and `_run_items`. A backend whose
         `download` does not take `errors=` has nothing to apply it to — it
         issues one request, or its loop needs per-failure recovery the
         shared helper cannot express (chc re-opens its FTP session between
         failed dates). So **check the backend's own `download` signature**
-        rather than assuming; :meth:`_search_fetch_each` also takes
+        rather than assuming; `_search_fetch_each` also takes
         `errors=` for backends composed from it.
         """
 
     def _api(self, *args: Any, **kwargs: Any) -> Any:
         """Send / receive the request(s) this download needs.
 
-        Called by :meth:`download`. The default
-        is the search→fetch composition, :meth:`_api_via_search_fetch`, which
-        is what a backend built on the :meth:`_search` / :meth:`_fetch` split
+        Called by `download`. The default
+        is the search→fetch composition, `_api_via_search_fetch`, which
+        is what a backend built on the `_search` / `_fetch` split
         wants — the great majority. Override it only for a backend that talks
         to its provider in one indivisible step and has no listable product
         set (chc composes an FTP path per date; ecmwf queues a CDS job; gee
         builds an ee chain), or one whose `_fetch` takes no product list.
 
         Returns:
-            Whatever :meth:`_fetch` returned — see :meth:`_fetch` for the
-            element type, which tracks :attr:`OUTPUT_KIND`.
+            Whatever `_fetch` returned — see `_fetch` for the
+            element type, which tracks `OUTPUT_KIND`.
 
             Typed `Any` rather than `list[Any]` deliberately: the overrides do
             not all return lists. chc returns a per-date mapping and gee a
@@ -1689,7 +1689,7 @@ class AbstractDataSource(ABC):
 
         Raises:
             NotImplementedError: If the backend overrides neither this method
-                nor the :meth:`_search` / :meth:`_fetch` pair.
+                nor the `_search` / `_fetch` pair.
         """
         return self._api_via_search_fetch()
 
@@ -1703,7 +1703,7 @@ class AbstractDataSource(ABC):
     # New backends (earthlens.stac, earthlens.earthdata, earthlens.fdsn,
     # earthlens.openaq, …) should override `_search` and `_fetch`
     # instead — `_search` returns a list of `RemoteProduct`s and
-    # `_fetch` consumes them. The :meth:`_api_via_search_fetch` helper
+    # `_fetch` consumes them. The `_api_via_search_fetch` helper
     # is the canonical composition; backends can opt into it by
     # overriding `_api` as `return self._api_via_search_fetch()`.
     # ------------------------------------------------------------------
@@ -1740,9 +1740,9 @@ class AbstractDataSource(ABC):
         )
 
     def _count(self) -> int:
-        """Return how many products :meth:`_search` would yield, without fetching.
+        """Return how many products `_search` would yield, without fetching.
 
-        Default implementation runs :meth:`_search` and counts the
+        Default implementation runs `_search` and counts the
         result. Backends with a cheap server-side total (e.g. a STAC
         `numberMatched` read with `limit=1`) should override this to
         avoid materialising the whole product list.
@@ -1752,7 +1752,7 @@ class AbstractDataSource(ABC):
 
         Raises:
             NotImplementedError: When the backend keeps the legacy
-                `_api`-only flow and implements no :meth:`_search`.
+                `_api`-only flow and implements no `_search`.
         """
         return len(self._search())
 
@@ -1772,7 +1772,7 @@ class AbstractDataSource(ABC):
 
         Returns:
             list[Any]: One element per product, in `products` order.
-                The element type tracks :attr:`OUTPUT_KIND`: written
+                The element type tracks `OUTPUT_KIND`: written
                 `Path`s for `"raster"` / `"mixed"`, `FeatureCollection`
                 fragments for `"vector"`, and `DataFrame` fragments for
                 `"tabular"` (these are concatenated by the backend's
@@ -1809,7 +1809,7 @@ class AbstractDataSource(ABC):
 
         Returns:
             list[Any]: Whatever `_fetch` returned (element type tracks
-                :attr:`OUTPUT_KIND` — see :meth:`_fetch`). An empty list
+                `OUTPUT_KIND` — see `_fetch`). An empty list
                 when `_search` returned no products.
         """
         products = self._search()
@@ -1817,16 +1817,16 @@ class AbstractDataSource(ABC):
             return []
         return self._fetch(products)
 
-    #: The partial-failure policies :meth:`_run_items` accepts. `"skip"` is a
+    #: The partial-failure policies `_run_items` accepts. `"skip"` is a
     #: deprecated alias for `"ignore"`, kept because the nwp backend shipped it
     #: before the convention settled on the three names documented on
-    #: :meth:`download`.
+    #: `download`.
     ERROR_POLICIES: frozenset[str] = frozenset({"raise", "warn", "ignore", "skip"})
 
-    #: The policy :meth:`_run_items` applies when a backend's own `download`
+    #: The policy `_run_items` applies when a backend's own `download`
     #: was not given one. Declared here rather than per backend so a loop can
     #: read `self._errors` unconditionally; a `download(errors=...)` overrides
-    #: it by assigning the :meth:`check_errors_policy` result.
+    #: it by assigning the `check_errors_policy` result.
     _errors: str = "warn"
 
     #: The total-row cap a backend's `download(limit=...)` recorded, read by
@@ -1981,13 +1981,13 @@ class AbstractDataSource(ABC):
     def iter_download(self, *, limit: int | None = None) -> Iterator[Any]:
         """Yield the download's artifacts one item at a time.
 
-        The streaming counterpart to :meth:`download`, for callers who want to
+        The streaming counterpart to `download`, for callers who want to
         consume a large vector / tabular result without the whole thing being
         resident: each `_search` product's fragment is yielded as it arrives
         and can be dropped before the next is fetched. `download()` remains the
         batch form and is unaffected.
 
-        The default implementation composes the `_search` / :meth:`_fetch_one`
+        The default implementation composes the `_search` / `_fetch_one`
         split, so any backend with that split gets it for free. A backend whose
         fetch is inherently whole-batch (one server-side request for
         everything) does not override this and raises below, rather than
@@ -2001,8 +2001,8 @@ class AbstractDataSource(ABC):
 
         Yields:
             Any: One fragment per product — the same element type
-                :meth:`_fetch` returns for this backend's
-                :attr:`OUTPUT_KIND`.
+                `_fetch` returns for this backend's
+                `OUTPUT_KIND`.
 
         Raises:
             NotImplementedError: When the backend implements neither the
@@ -2088,7 +2088,7 @@ class AbstractDataSource(ABC):
 
         The shared form of the skip-and-continue loop the multi-item backends
         each hand-rolled, and the reason `errors=` was previously advertised on
-        :meth:`download` but honoured by exactly one backend: without somewhere
+        `download` but honoured by exactly one backend: without somewhere
         to put the policy, every loop hard-coded "log it and carry on", so a
         caller could not ask for a batch to fail fast.
 
@@ -2189,7 +2189,7 @@ class AbstractDataSource(ABC):
     ) -> Iterator[Any]:
         """Apply `fn` to each item under the failure policy, yielding as it goes.
 
-        The lazy form of :meth:`_run_items`, and the single implementation of
+        The lazy form of `_run_items`, and the single implementation of
         the policy: `_run_items` is `list()` of this plus a summary line. Being
         a generator is what lets a bounded caller stop early — under a policy a
         cap cannot be turned into a slice of `items`, because failures consume
@@ -2262,7 +2262,7 @@ class AbstractDataSource(ABC):
     ) -> Any:
         """Log and record one item's failure under a non-raising policy.
 
-        Split out of :meth:`_iter_items` so the generator stays a plain
+        Split out of `_iter_items` so the generator stays a plain
         try/except around the item call.
 
         Args:
@@ -2301,9 +2301,9 @@ class AbstractDataSource(ABC):
         consumes lazily, so a product past the cap is never requested.
 
         Args:
-            products: The products from :meth:`_search`.
+            products: The products from `_search`.
             limit: Total rows to collect, or `None` for all of them. Usually
-                :attr:`_limit`, recorded by the backend's `download(limit=...)`.
+                `_limit`, recorded by the backend's `download(limit=...)`.
 
         Returns:
             list[Any]: One fragment per fetched product, the last trimmed when it
@@ -2340,8 +2340,8 @@ class AbstractDataSource(ABC):
     ) -> list[Any]:
         """C3 composition with an optional per-product `tqdm` progress bar.
 
-        Like :meth:`_api_via_search_fetch`, but maps the per-product
-        :meth:`_fetch_one` hook over the `_search` results so a `tqdm`
+        Like `_api_via_search_fetch`, but maps the per-product
+        `_fetch_one` hook over the `_search` results so a `tqdm`
         bar can show per-item progress — the shared form of the
         progress-aware composition several backends (FIRMS, OpenAQ)
         previously duplicated. Backends that fetch the whole product
@@ -2357,12 +2357,12 @@ class AbstractDataSource(ABC):
                 `download` accepts `errors=`. `None` — the default —
                 propagates the first failure, which is what a caller that
                 never opted into a policy already expects.
-            label: Noun for the :meth:`_run_items` log lines when a policy
+            label: Noun for the `_run_items` log lines when a policy
                 is in force.
 
         Returns:
-            list[Any]: One :meth:`_fetch_one` result per product
-                (element type tracks :attr:`OUTPUT_KIND`), or `[]` when
+            list[Any]: One `_fetch_one` result per product
+                (element type tracks `OUTPUT_KIND`), or `[]` when
                 `_search` matched nothing. With a policy in force, failed
                 products are absent rather than aborting the batch.
 
@@ -2424,7 +2424,7 @@ class AbstractDataSource(ABC):
 
 
 #: The row type a concrete catalog holds. Providers parameterise
-#: :class:`AbstractCatalog` with their own pydantic row model
+#: `AbstractCatalog` with their own pydantic row model
 #: (`AbstractCatalog[Dataset]`), so `datasets`, `get_catalog` and
 #: `get_dataset` keep that type instead of degrading to `Any`. Left
 #: unparameterised the catalog still works; it is simply untyped in the rows.
@@ -2434,7 +2434,7 @@ RowT = TypeVar("RowT")
 #: Concrete catalog classes already warned about an empty `datasets`, keyed by
 #: `type(self)` so every instance of one subclass shares a single warning. An
 #: empty default catalog is a property of the class rather than of an instance,
-#: and :attr:`AbstractCatalog.catalog` recomputes `get_catalog()` on every read,
+#: and `AbstractCatalog.catalog` recomputes `get_catalog()` on every read,
 #: so warning per call would put one line in the log per loop iteration. Never
 #: pruned — it holds at most one entry per catalog class defined in the process.
 _WARNED_EMPTY_CATALOGS: set[type] = set()
@@ -2446,9 +2446,9 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
     Subclasses load a backend-specific catalog (a YAML file, an
     in-code dict, or a remote query) and expose its entries through the
     dict-like surface below — `len`, `in`, `[key]`, iteration and
-    :meth:`get_dataset` — plus :meth:`get_variable` for the two-level
-    catalogs. The :meth:`model_post_init` hook fills the row fields from
-    :meth:`_autoload` only while the field is still falsy, so `Catalog()`
+    `get_dataset` — plus `get_variable` for the two-level
+    catalogs. The `model_post_init` hook fills the row fields from
+    `_autoload` only while the field is still falsy, so `Catalog()`
     reads from disk and so does `Catalog(datasets={})` — an empty mapping
     is indistinguishable from an absent one here. Only a non-empty
     `Catalog(datasets=...)` is kept as handed, and no subclass writes its
@@ -2456,7 +2456,7 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
 
     Generic in `RowT`, the row model the backend stores. Parameterising
     the base — `class Catalog(AbstractCatalog[Dataset])` — keeps
-    :attr:`datasets`, :meth:`get_catalog`, :meth:`get_dataset` and
+    `datasets`, `get_catalog`, `get_dataset` and
     `[key]` typed as that model instead of degrading to `Any`. Leaving it
     unparameterised is allowed and changes nothing at runtime.
 
@@ -2464,14 +2464,14 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
     — declare any backend-specific construction parameters as
     pydantic fields rather than `__init__` arguments.
 
-    :meth:`get_catalog` defaults to returning :attr:`datasets`, which is
+    `get_catalog` defaults to returning `datasets`, which is
     where every backend keeps its rows and what the dict surface below
     already reads, so a subclass storing them there needs no override.
     **A subclass whose rows live in another field must override it** —
-    otherwise `get_catalog()` and the :attr:`catalog` property report an
+    otherwise `get_catalog()` and the `catalog` property report an
     empty mapping rather than failing, and a catalog that silently has no
-    entries is harder to notice than one that raises. :meth:`get_variable`
-    still raises :class:`NotImplementedError`, since there is no sensible
+    entries is harder to notice than one that raises. `get_variable`
+    still raises `NotImplementedError`, since there is no sensible
     default for a per-dataset variable level.
 
     Attributes:
@@ -2486,19 +2486,19 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
         providers: Provider-registry rows, for the backends that populate
             the base `providers` field. Empty otherwise.
         catalog: Read-only `MappingProxyType` view over whatever
-            :meth:`get_catalog` returns, rebuilt on each access, so it can
+            `get_catalog` returns, rebuilt on each access, so it can
             neither drift from the rows nor be written through.
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    #: Short label used by :meth:`get_dataset`'s did-you-mean error
+    #: Short label used by `get_dataset`'s did-you-mean error
     #: message — concrete subclasses override (e.g. `"GEE catalog"`,
     #: `"CDS catalog"`, `"CHC catalog"`) so the user sees which
     #: catalog they failed against.
     _catalog_kind: str = "catalog"
 
-    #: Plural noun for the catalog entries, used in :meth:`get_dataset`'s
+    #: Plural noun for the catalog entries, used in `get_dataset`'s
     #: did-you-mean message (`"Known {noun}: [...]"`). Defaults to
     #: `"datasets"`; subclasses whose entries are not "datasets" override
     #: it (e.g. `"parameters"` for the openaq / usgs_water catalogs).
@@ -2510,9 +2510,9 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
 
     @property
     def catalog(self) -> Mapping[str, Any]:
-        """Read-only view of the catalog mapping (see :meth:`get_catalog`).
+        """Read-only view of the catalog mapping (see `get_catalog`).
 
-        For nearly every backend `get_catalog()` returns :attr:`datasets`
+        For nearly every backend `get_catalog()` returns `datasets`
         itself, so `catalog` used to be a second name bound to the very same
         `dict` — assigning through one silently rewrote the other, and a
         caller who mutated `cat.catalog` corrupted the shared parse cache
@@ -2547,7 +2547,7 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
         The one part of post-init that genuinely differs per backend: *how* the
         rows are read. Everything around it — only read when no rows were
         supplied, never clobber what the caller passed — is the same everywhere
-        and lives in :meth:`model_post_init`.
+        and lives in `model_post_init`.
 
         Returns:
             Mapping[str, Any]: Field name to value, e.g.
@@ -2560,16 +2560,16 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
         """Fill an empty catalog from disk, then run the subclass's wiring.
 
         `Catalog()` with no arguments reads from disk, and so does
-        `Catalog(datasets={})` — the gate is whether :attr:`datasets` is falsy,
+        `Catalog(datasets={})` — the gate is whether `datasets` is falsy,
         and an empty mapping is indistinguishable from an absent one here. A
         **non-empty** `datasets=` suppresses the read entirely, so the other
-        fields :meth:`_autoload` would have filled keep their defaults too:
+        fields `_autoload` would have filled keep their defaults too:
         `Catalog(datasets={...})` is a catalog built from literals, not a
         partially-filled one.
 
         Within a read, a field the caller already supplied is never overwritten
         — `Catalog(available_datasets=[...])` keeps that list and takes
-        :attr:`datasets` from disk.
+        `datasets` from disk.
 
         This used to be written out in all 48 provider catalogs. The bodies
         differed only in the loader call, and the surrounding rule had drifted —
@@ -2589,28 +2589,28 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
     def get_catalog(self) -> dict[str, RowT]:
         """Return the catalog's rows.
 
-        Defaults to :attr:`datasets`, which is where every backend keeps
+        Defaults to `datasets`, which is where every backend keeps
         them and what the inherited dict surface (`len`, `in`, `[]`,
-        iteration, :meth:`get_dataset`) already reads. Raising
+        iteration, `get_dataset`) already reads. Raising
         `NotImplementedError` here instead made the method mandatory, and
         all 61 provider catalogs answered it with the same
         `return self.datasets`.
 
         A backend whose catalog is genuinely a different shape still
-        overrides this. When it does not, and :attr:`datasets` is empty,
+        overrides this. When it does not, and `datasets` is empty,
         the empty mapping is returned but a warning is logged naming the
         class — the default cannot tell "no rows yet" from "rows kept in
         some other field", and a catalog that silently has no entries is
         harder to notice than one that complains. The warning is emitted
-        once per class, not once per call: :attr:`catalog` recomputes this
+        once per class, not once per call: `catalog` recomputes this
         on every read, so a caller iterating it would otherwise be warned
         on each access.
 
         Returns:
             dict[str, RowT]: The `{key: row}` mapping backing this catalog,
             typed as the row model the subclass parameterised the base with.
-            This is :attr:`datasets` itself, not a copy, so callers that
-            need an unwritable view should read :attr:`catalog` instead.
+            This is `datasets` itself, not a copy, so callers that
+            need an unwritable view should read `catalog` instead.
 
         Examples:
             - Read the rows and inspect one:
@@ -2667,7 +2667,7 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
 
         Single-level catalogs (where one row *is* the leaf — fdsn, gdacs,
         radar, openaq, overture, usgs_water) do not implement this; their
-        rows are addressed directly with :meth:`get_dataset` / `[key]`.
+        rows are addressed directly with `get_dataset` / `[key]`.
 
         Note:
             This supersedes the former single-argument
@@ -2696,7 +2696,7 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
     def get_dataset(self, name: str) -> RowT:
         """Return the dataset record for `name`, with a did-you-mean hint on miss.
 
-        Backend-generic: looks up `name` in :attr:`datasets` and raises
+        Backend-generic: looks up `name` in `datasets` and raises
         `ValueError` (not `KeyError`) with the closest known name when
         absent. Concrete subclasses can override to narrow the return
         type or customise the error message.
@@ -2709,7 +2709,7 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
             The matching dataset record (type depends on the subclass).
 
         Raises:
-            ValueError: If `name` is not a key of :attr:`datasets`.
+            ValueError: If `name` is not a key of `datasets`.
         """
         try:
             return self.datasets[name]
@@ -2750,8 +2750,8 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
     def get_provider(self, slug: str) -> Any:
         """Return the provider record for `slug` (with a did-you-mean hint on miss).
 
-        The value type depends on the backend's :attr:`providers` field:
-        most backends store an :class:`earthlens.base.Provider`, but some
+        The value type depends on the backend's `providers` field:
+        most backends store an `earthlens.base.Provider`, but some
         mirror a domain-specific record (earthdata mirrors its
         `EarthdataDAAC` from `daacs`, stac its `Endpoint` from
         `endpoints`).
@@ -2802,7 +2802,7 @@ class AbstractCatalog(BaseModel, Generic[RowT]):
           across DAACs / mission groups.
 
         Backends without a resolve step address their catalog directly
-        through :meth:`get_dataset` / `__getitem__`.
+        through `get_dataset` / `__getitem__`.
 
         Args:
             key: The logical catalog key to resolve.

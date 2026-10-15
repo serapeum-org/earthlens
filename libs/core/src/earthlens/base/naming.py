@@ -3,7 +3,7 @@
 Several raster backends turn a provider dataset / product id into an output
 file stem and independently re-spelled the same sanitisation — s3's
 `_safe_name`, cmems's `_safe_filename`, and stac's ad-hoc `.replace("/", "_")`.
-:func:`safe_filename` is the single implementation they now delegate to: a
+`safe_filename` is the single implementation they now delegate to: a
 whitelist collapse that keeps only `A-Z a-z 0-9 . _ -`, so every path separator
 (`/`, `\\`) and Windows-illegal character (`: * ? " < > |`) — plus any other
 punctuation or whitespace — becomes a single `_`.

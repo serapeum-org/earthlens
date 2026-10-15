@@ -2,7 +2,7 @@
 
 Turns a uniform request — a `Dataset`, its resolved `Variable` rows, an
 AOI bbox, and a date index — into the concrete list of S3 objects to
-download, expressed as :class:`~earthlens.base.RemoteProduct` rows
+download, expressed as `RemoteProduct` rows
 (`href` carries the S3 key). Two layout families, dispatched by the
 dataset's `params["builder"]` token:
 
@@ -53,8 +53,8 @@ def plan_products(
     """Resolve a request to the list of S3 products to download.
 
     Args:
-        dataset: The resolved :class:`~earthlens.s3.catalog.Dataset`.
-        variables: The resolved :class:`~earthlens.s3.catalog.Variable`
+        dataset: The resolved `Dataset`.
+        variables: The resolved `Variable`
             rows the caller asked for.
         bbox: AOI as `(west, south, east, north)` in degrees (EPSG:4326).
         dates: The request's date index (each item exposes `.year`,
@@ -65,7 +65,7 @@ def plan_products(
             deterministic-tile builders.
 
     Returns:
-        One :class:`~earthlens.base.RemoteProduct` per object to fetch;
+        One `RemoteProduct` per object to fetch;
         `href` is the S3 key and `metadata` carries `bucket`, the native
         variable token, and (where applicable) the date/tile.
 

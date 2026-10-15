@@ -38,7 +38,7 @@ def empty_canonical() -> pd.DataFrame:
     """Return the zero-row canonical long frame.
 
     Returns:
-        pd.DataFrame: An empty frame with exactly the :data:`COLUMNS`
+        pd.DataFrame: An empty frame with exactly the `COLUMNS`
             schema (`date`, `index`, `value`, `source`) and no rows —
             the all-empty fallback the backend returns when no requested
             index yields any data.
@@ -136,7 +136,7 @@ def parse_climexp(text: str) -> pd.DataFrame:
 
     Skips `#`-prefixed comment lines and reads `year jan..dec` rows (13
     tokens) or `year jan..dec annual` rows (14 tokens — the trailing
-    annual-mean column is dropped). The fixed :data:`CLIMEXP_SENTINEL`
+    annual-mean column is dropped). The fixed `CLIMEXP_SENTINEL`
     (`-999.9`) is mapped to `NaN`. A non-grid body (an HTML error page,
     or the `YYYYMMDD value` long form) yields no rows.
 

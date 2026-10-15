@@ -1,9 +1,9 @@
 """Offline fixtures for the NSI backend tests.
 
-Every fixture is offline: a :class:`_FakeSession` records requests and returns
+Every fixture is offline: a `_FakeSession` records requests and returns
 canned NSI / NFHL GeoJSON and OpenFEMA NFIP JSON. It is injected into the backend
 via `session=` (the repo's HTTP-test idiom), so the real
-:class:`~earthlens.base.http.HttpClient` runs on top of it. No network, no real
+`HttpClient` runs on top of it. No network, no real
 GDAL beyond pyramids' GeoJSON decode.
 """
 
@@ -151,7 +151,7 @@ class _FakeResponse:
     """A minimal `requests.Response` stand-in wrapping a JSON payload.
 
     Carries `status_code` and `headers` so the real
-    :class:`~earthlens.base.http.HttpClient` retry/JSON path runs unchanged.
+    `HttpClient` retry/JSON path runs unchanged.
     """
 
     def __init__(
@@ -175,7 +175,7 @@ class _FakeResponse:
 class _FakeSession:
     """A `requests.Session` stand-in routing each verb to a canned payload.
 
-    :class:`~earthlens.base.http.HttpClient` dispatches to `session.get` /
+    `HttpClient` dispatches to `session.get` /
     `session.post`, so implementing those two is enough to drive the backend
     through the real client offline.
 

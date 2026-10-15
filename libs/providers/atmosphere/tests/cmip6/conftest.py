@@ -1,7 +1,7 @@
 """Fixtures + fakes for the CMIP6 backend tests (offline, no network / GDAL).
 
 The consolidated-stores CSV is replaced by a tiny in-memory `DataFrame`
-(:func:`store_frame`) injected into :class:`~earthlens.cmip6.StoreResolver`, and
+(`store_frame`) injected into `StoreResolver`, and
 the pyramids readers are replaced by the fakes below so no `gs://` store is ever
 opened.
 """

@@ -4,7 +4,7 @@ GDACS is a single fixed query feed, not a curated dataset catalogue, so
 this "catalog" is deliberately tiny: a six-row map from a GDACS
 event-type code (`"EQ"`, `"TC"`, `"FL"`, `"VO"`, `"WF"`, `"DR"`) to a
 little metadata. It mirrors `fdsn_data_catalog.yaml` / the FDSN
-:class:`~earthlens.fdsn.catalog.Catalog`: there is no `available_*`
+`Catalog`: there is no `available_*`
 index (the six codes *are* the whole GDACS universe, so an "available
 vs curated" split would just duplicate the map) and no
 `refresh` / `probe` / `audit` tooling.
@@ -15,14 +15,14 @@ types — every event carries the same flat
 already names the hazard-specific unit (`"M"` for an earthquake, wind
 speed for a cyclone, …). There is therefore no per-hazard property
 schema to model: a single `severity` / `severity_unit` / `severity_text`
-column trio in :mod:`earthlens.gdacs.events` covers every hazard.
+column trio in `earthlens.gdacs.events` covers every hazard.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
+`Catalog` is a thin `earthlens.base.AbstractCatalog`
 subclass that loads the bundled `gdacs_data_catalog.yaml` and exposes
-each row as a :class:`HazardType`, keyed by code under the inherited
+each row as a `HazardType`, keyed by code under the inherited
 `datasets` field — which is what gives it the `cat["EQ"]` /
 `"EQ" in cat` / `len(cat)` dict-like surface and the did-you-mean error
-for free. :data:`CATALOG_PATH` is the path to the bundled YAML and is
+for free. `CATALOG_PATH` is the path to the bundled YAML and is
 monkey-patchable in tests.
 """
 
@@ -54,7 +54,7 @@ class HazardType(SummarisedLeaf):
     """One GDACS hazard type's dispatch row.
 
     The GDACS event-type code is the parent key in
-    :attr:`Catalog.datasets` and is not stored on the row.
+    `Catalog.datasets` and is not stored on the row.
 
     Attributes:
         name: Human-readable hazard name (`"Earthquake"`,
@@ -95,7 +95,7 @@ def _parse_hazard_types(files: list[Path]) -> dict[str, HazardType]:
 
     Raises:
         ValueError: If the `hazard_types:` block is missing or empty, or a
-            row fails :class:`HazardType` validation.
+            row fails `HazardType` validation.
     """
     catalog_path = files[0]
     data = load_yaml_strict(catalog_path) or {}
@@ -121,15 +121,15 @@ class Catalog(AbstractCatalog[HazardType]):
 
     Reads the bundled `gdacs_data_catalog.yaml` (shipped as package
     data) and exposes its `hazard_types:` block as a map of
-    :class:`HazardType` rows, keyed by GDACS event-type code under the
-    inherited :attr:`datasets` field. Instantiate with no arguments
-    (`Catalog()`); :func:`model_post_init` loads and validates the YAML
-    in one pass. Resolve a hazard with :meth:`get_hazard` (a thin alias
-    over :meth:`~earthlens.base.AbstractCatalog.get_dataset`).
+    `HazardType` rows, keyed by GDACS event-type code under the
+    inherited `datasets` field. Instantiate with no arguments
+    (`Catalog()`); `model_post_init` loads and validates the YAML
+    in one pass. Resolve a hazard with `get_hazard` (a thin alias
+    over `get_dataset`).
 
     Attributes:
         datasets: Map from the GDACS event-type code to its
-            :class:`HazardType` row.
+            `HazardType` row.
 
     Examples:
         - List hazard codes and resolve one:
@@ -177,14 +177,14 @@ class Catalog(AbstractCatalog[HazardType]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If `catalog_path` does not exist, or if the file has no
-                `hazard_types:` block, or a row fails :class:`HazardType`
+                `hazard_types:` block, or a row fails `HazardType`
                 validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
@@ -194,10 +194,10 @@ class Catalog(AbstractCatalog[HazardType]):
         return cls(datasets=dict(hazards))
 
     def get_hazard(self, code: str) -> HazardType:
-        """Return the :class:`HazardType` for `code`, with a did-you-mean hint.
+        """Return the `HazardType` for `code`, with a did-you-mean hint.
 
         Thin alias over
-        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.
+        `get_dataset`.
 
         Args:
             code: A GDACS event-type code (`"EQ"`, `"TC"`, …).

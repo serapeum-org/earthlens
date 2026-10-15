@@ -1,6 +1,6 @@
 """Auto-categorise a Copernicus dataset id into its per-family catalog shard.
 
-`curate ecmwf --write` uses :func:`categorise_dataset` to pick which
+`curate ecmwf --write` uses `categorise_dataset` to pick which
 per-family `catalog/<category>.yaml` shard a freshly seeded row belongs in,
 so the maintainer no longer has to pass `--target` for the common case. The
 rules are pure id-prefix tests (dataset ids across CDS / ADS / EWDS / ECDS /
@@ -73,7 +73,7 @@ def categorise_dataset(dataset_id: str) -> str:
             `tigge-forecasts`).
 
     Returns:
-        The shard file stem the row belongs in (one of :data:`CATEGORIES`);
+        The shard file stem the row belongs in (one of `CATEGORIES`);
         `other` when the id matches no prefix rule.
 
     Examples:

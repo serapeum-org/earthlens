@@ -3,15 +3,15 @@
 Fetches the HANZE (Historical Analysis of Natural Hazards in Europe) database of
 observed European flood events and their impacts (Paprotny et al.) from its
 pinned static Zenodo release, and returns the event / impact records as a
-:class:`pandas.DataFrame`. It is the observed hazard -> loss record: real floods
+`pandas.DataFrame`. It is the observed hazard -> loss record: real floods
 with fatalities, persons affected, area flooded and economic losses, against
 which a modelled event set can be validated. Companion to the global `emdat`
 backend.
 
 This is a `tabular` backend by default: the result is a table of event / impact
-rows, not a gridded array, so the :class:`earthlens.earthlens.EarthLens` facade
+rows, not a gridded array, so the `earthlens.earthlens.EarthLens` facade
 rejects an `aggregate=` argument. Passing `with_geometry=True` instead returns a
-pyramids :class:`~pyramids.feature.collection.FeatureCollection` of the affected
+pyramids `FeatureCollection` of the affected
 NUTS-3 regions (a per-instance `vector` output).
 
 HANZE needs **no credentials** — the Zenodo record is public (CC-BY-4.0) — so
@@ -20,14 +20,14 @@ pandas, `base/archive`, pyramids) are all core.
 
 Public surface (re-exported from this package):
 
-* :class:`HANZE` — the backend; instantiate with a date range and optional
-  `country=` / `region=` / `flood_type=` filters, then call :meth:`HANZE.download`.
-* :class:`Catalog` — loader for the bundled `hanze_data_catalog.yaml`.
-* :class:`ZenodoRecord` / :class:`HanzeFile` / :class:`FloodType` /
-  :class:`GeometryJoin` — the catalog's frozen row models.
-* :func:`join_events_to_regions` / :func:`empty_region_fc` — the event ->
+* `HANZE` — the backend; instantiate with a date range and optional
+  `country=` / `region=` / `flood_type=` filters, then call `HANZE.download`.
+* `Catalog` — loader for the bundled `hanze_data_catalog.yaml`.
+* `ZenodoRecord` / `HanzeFile` / `FloodType` /
+  `GeometryJoin` — the catalog's frozen row models.
+* `join_events_to_regions` / `empty_region_fc` — the event ->
   region-geometry join and its empty-result counterpart.
-* :data:`CATALOG_PATH` — path to the bundled catalog YAML; monkey-patchable in
+* `CATALOG_PATH` — path to the bundled catalog YAML; monkey-patchable in
   tests.
 
 Examples:

@@ -37,7 +37,7 @@ EGRESS = "egress"
 UNKNOWN = "unknown"
 
 #: Default size above which a cross-region pull warrants an egress warning
-#: (1 GiB). A parameter of :func:`warn_if_egress`, never hard-coded at a
+#: (1 GiB). A parameter of `warn_if_egress`, never hard-coded at a
 #: call site.
 DEFAULT_EGRESS_THRESHOLD_BYTES = 1 << 30
 
@@ -61,7 +61,7 @@ _AZURE_LOCATION_URL = (
 _UNSET: object = object()
 
 #: Per-process cache of the detected caller region (`None` = probed but
-#: undetermined). Reset with :func:`clear_region_cache`. Intentionally
+#: undetermined). Reset with `clear_region_cache`. Intentionally
 #: lock-free: a first-call race between threads only repeats the fail-safe
 #: probe, and the assignment is atomic under the GIL, so there is no
 #: correctness bug — only (at most) a redundant probe on a cold start.
@@ -187,7 +187,7 @@ def _detect_caller_region(*, timeout: float = PROBE_TIMEOUT) -> str | None:
     `timeout` and each fail-safe to `None`. The first non-empty result
     wins. The outcome (including `None`) is cached for the process so a
     cold, off-cloud caller pays the probe cost at most once; reset with
-    :func:`clear_region_cache`.
+    `clear_region_cache`.
 
     Args:
         timeout: Hard per-probe timeout in seconds.
@@ -279,7 +279,7 @@ def warn_if_egress(
             1 GiB). A parameter, never hard-coded at the call site.
         caller_region: An explicit override for the caller's region.
         probe: Whether to allow the instance-metadata probe (see
-            :func:`region_affinity`).
+            `region_affinity`).
 
     Returns:
         The affinity hint — `"in-region"`, `"egress"`, or `"unknown"`.

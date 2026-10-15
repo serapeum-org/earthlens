@@ -3,7 +3,7 @@
 `HANZE(AbstractDataSource)` downloads the HANZE (Historical Analysis of Natural
 Hazards in Europe) database of observed European flood events and their impacts
 (Paprotny et al.) from its pinned static Zenodo release, filters it, and returns
-the event / impact records as a :class:`pandas.DataFrame`. It is the observed
+the event / impact records as a `pandas.DataFrame`. It is the observed
 hazard -> loss record — real floods with fatalities, persons affected, area
 flooded and economic losses — so a modelled event set can be validated against
 the *observed* loss distribution. Companion to the global `emdat` backend.
@@ -11,15 +11,15 @@ the *observed* loss distribution. Companion to the global `emdat` backend.
 Three design points carry this backend:
 
 * **Per-instance `OUTPUT_KIND`.** The default is `tabular`, returning a
-  :class:`pandas.DataFrame` of events + impacts. Passing `with_geometry=True`
+  `pandas.DataFrame` of events + impacts. Passing `with_geometry=True`
   makes the instance `vector`: it additionally downloads the NUTS-3 region
   boundary shapefile and returns a pyramids
-  :class:`~pyramids.feature.collection.FeatureCollection` of the affected
+  `FeatureCollection` of the affected
   regions (the `emdat` / `eumetsat` per-instance pattern). The facade reads the
   instance attribute to know the return shape and to gate `aggregate=`.
 * **Direct file download, not range-read.** HANZE ships small individual Zenodo
   objects (a 618 KB events CSV, a 2.4 MB region zip), so each is fetched whole
-  with :class:`~earthlens.base.http.HttpClient` and cached under `path` — none
+  with `HttpClient` and cached under `path` — none
   of caravan's multi-GB range-read machinery applies.
 * **No new dependency.** `HttpClient` + pandas + `base/archive` + pyramids are
   all core, and the Zenodo record is public (CC-BY-4.0), so there is no auth and
@@ -137,14 +137,14 @@ class HANZE(AbstractDataSource):
 
     Downloads the HANZE events / impacts table from its pinned Zenodo release,
     filters it by country / region / flood type / date window, and returns a
-    :class:`pandas.DataFrame`. With `with_geometry=True` it instead returns a
-    :class:`~pyramids.feature.collection.FeatureCollection` of the affected
+    `pandas.DataFrame`. With `with_geometry=True` it instead returns a
+    `FeatureCollection` of the affected
     NUTS-3 regions.
 
     The record is public (CC-BY-4.0); no credentials are needed.
 
     Attributes:
-        OUTPUT_KIND: Set **per instance** in :meth:`__init__` — `"tabular"` by
+        OUTPUT_KIND: Set **per instance** in `__init__` — `"tabular"` by
             default, `"vector"` when `with_geometry=True`. The facade reads it
             to know the return shape and rejects `aggregate=` for both.
         REQUIRES_TIME_WINDOW: `False` — a request without a window returns every
@@ -298,7 +298,7 @@ class HANZE(AbstractDataSource):
         raise AssertionError("unreachable")  # pragma: no cover
 
     def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Capture the requested bounds as a :class:`SpatialExtent`.
+        """Capture the requested bounds as a `SpatialExtent`.
 
         Args:
             lat_lim: `[min_lat, max_lat]`.
@@ -316,7 +316,7 @@ class HANZE(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the optional `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the optional `[start, end]` window into a `TemporalExtent`.
 
         HANZE covers a whole record and is indexed by event year, so `None`
         bounds are legal and yield a `None`-dated extent.
@@ -579,12 +579,12 @@ class HANZE(AbstractDataSource):
         """Download, filter, and shape the one product to the instance's kind.
 
         Args:
-            products: The single-element list from :meth:`_search`.
+            products: The single-element list from `_search`.
 
         Returns:
-            list[Any]: One element — a filtered :class:`pandas.DataFrame`
+            list[Any]: One element — a filtered `pandas.DataFrame`
                 (tabular), or a
-                :class:`~pyramids.feature.collection.FeatureCollection` of the
+                `FeatureCollection` of the
                 affected regions (vector).
         """
         events = self._filter_events(self._load_events())
@@ -629,7 +629,7 @@ class HANZE(AbstractDataSource):
         return FeatureCollection(within.reset_index(drop=True))
 
     def _api(self) -> list[Any]:
-        """Compose :meth:`_search` and :meth:`_fetch`.
+        """Compose `_search` and `_fetch`.
 
         Returns:
             list[Any]: The fetched result (one element).
@@ -647,8 +647,8 @@ class HANZE(AbstractDataSource):
                 to the transport, so `False` really does silence it.
 
         Returns:
-            A :class:`pandas.DataFrame` of events + impacts (the default), or a
-            :class:`~pyramids.feature.collection.FeatureCollection` of the
+            A `pandas.DataFrame` of events + impacts (the default), or a
+            `FeatureCollection` of the
             affected NUTS-3 regions (`with_geometry=True`). Both are also written
             under `root_dir`.
 

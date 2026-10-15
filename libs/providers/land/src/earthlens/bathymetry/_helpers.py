@@ -296,7 +296,7 @@ def bbox_from_extent(space: SpatialExtent) -> tuple[float, float, float, float]:
     """Return the `(west, south, east, north)` bbox of a spatial extent.
 
     Args:
-        space: A :class:`~earthlens.base.SpatialExtent` (the backend's
+        space: A `SpatialExtent` (the backend's
             `self.space`).
 
     Returns:

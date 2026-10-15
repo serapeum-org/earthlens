@@ -1,7 +1,7 @@
 """Météo-France centre — GRIB2 fetch from an unsigned public S3 bucket.
 
 Météo-France publishes ARPEGE / AROME forecasts to the open
-`s3://mf-nwp-models` bucket (no credentials). :class:`MeteoFranceCentre`
+`s3://mf-nwp-models` bucket (no credentials). `MeteoFranceCentre`
 is the `direct-boto3` adapter: it reads each requested variable's object
 with an unsigned `boto3` client (the same pattern as `earthlens.s3`) and
 concatenates the GRIB messages into one `.grib2`, written atomically.

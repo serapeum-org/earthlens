@@ -1,7 +1,7 @@
 """The normalised, cached catalog table that every query command reads.
 
 Rather than have each command re-walk all 22 backends, the CLI builds one
-in-memory table of :class:`CatalogRow` — `(provider, dataset_id, title,
+in-memory table of `CatalogRow` — `(provider, dataset_id, title,
 cadence, resolution, license, record)` — once per process and filters it
 with plain Python. The result is cached for the process lifetime so
 successive commands in the same invocation are free, and provider-scoped
@@ -13,7 +13,7 @@ whose first import is serialized by Python's import lock, so a thread pool
 buys nothing here and merely risks concurrent-import deadlocks.
 
 This is the intake-esm "one searchable table" model: `where` / `search` /
-`facets` are all `filter` / `groupby` / `unique` over :attr:`CatalogTable.rows`.
+`facets` are all `filter` / `groupby` / `unique` over `CatalogTable.rows`.
 """
 
 from __future__ import annotations
@@ -181,7 +181,7 @@ class CatalogRow:
 
 
 def _to_row(raw: Any) -> CatalogRow:
-    """Build a :class:`CatalogRow` from an adapter :class:`~adapter.RawRow`."""
+    """Build a `CatalogRow` from an adapter `RawRow`."""
     record = raw.record
     return CatalogRow(
         provider=raw.provider,
@@ -301,7 +301,7 @@ def build_table(
     """Build (or return a cached) normalised table of every backend's catalog.
 
     Loads the requested backends and flattens them into one
-    :class:`CatalogTable`. The result is cached per `(providers,
+    `CatalogTable`. The result is cached per `(providers,
     include_available)` selection for the process lifetime; pass
     `refresh=True` to rebuild.
 

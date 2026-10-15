@@ -6,43 +6,43 @@ dataset are *bands*, and one image carries many at once), plus a date
 range, a bbox (or a `GeoDataFrame` region), a temporal-compositing
 resolution (`"raw"` / `"daily"` / `"monthly"` / `"yearly"`), and an
 output pixel `scale` in metres. Asset ids and band metadata are resolved
-through :class:`Catalog`, which loads the per-category YAMLs under
+through `Catalog`, which loads the per-category YAMLs under
 `src/earthlens/gee/catalog/` (the GEE analogue of the ECMWF
 `cds_data_catalog.yaml`, but shaped by Earth Engine's own data model —
 see that directory's `_index.yaml` header).
 
 Public surface (re-exported from this package):
 
-* :class:`GEE` — the backend; instantiate with a date range, a bbox, a
+* `GEE` — the backend; instantiate with a date range, a bbox, a
   `{asset_id: [band, ...]}` request, an output `scale`, and credentials
   (`service_account` + `service_key`, or a registered `project`), then
-  call :meth:`GEE.download`.
-* :class:`AuthenticationError` — raised when Earth Engine cannot be
+  call `GEE.download`.
+* `AuthenticationError` — raised when Earth Engine cannot be
   initialised (missing/invalid key, unregistered project, missing IAM role).
-* :data:`CloudMask` / :data:`CollectionFilter` — the callable type
+* `CloudMask` / `CollectionFilter` — the callable type
   aliases for the `GEE(cloud_mask=..., filters=...)` hooks
   (`ee.Image -> ee.Image` and `ee.ImageCollection -> ee.ImageCollection`);
   handy for annotating your own masks / filters.
-* :class:`Catalog` — pydantic-backed loader for the bundled per-category
+* `Catalog` — pydantic-backed loader for the bundled per-category
   catalog under `src/earthlens/gee/catalog/`, exposing
   `available_datasets`, `datasets`, `providers`, and
   `get_dataset` / `get_band` / `get_variable` / `get_provider`.
-* :class:`Dataset` / :class:`Band` / :class:`Cadence` / :class:`Extent`
-  / :class:`Provider` — the frozen value objects the catalog is built
+* `Dataset` / `Band` / `Cadence` / `Extent`
+  / `Provider` — the frozen value objects the catalog is built
   from.
-* :data:`CATALOG_PATH` / :data:`PROVIDERS_PATH` — absolute paths to
+* `CATALOG_PATH` / `PROVIDERS_PATH` — absolute paths to
   the bundled catalog directory and `providers.yaml`; monkey-patchable
   to redirect the loader at a temp directory.
-* :class:`EarthEngineAuth` — the low-level service-account auth helper
+* `EarthEngineAuth` — the low-level service-account auth helper
   (`ee.Initialize` against a registered project; base64 key encode/decode).
-* :func:`create_geometry` / :func:`create_feature` — Shapely /
+* `create_geometry` / `create_feature` — Shapely /
   `GeoDataFrame` → `ee.Geometry` / `ee.FeatureCollection` converters.
-* :func:`sample_points` / :func:`sample_points_to_gdf` — sample a
+* `sample_points` / `sample_points_to_gdf` — sample a
   raster at point locations via leaf-batched `reduceRegions`; the
   `_to_gdf` variant returns a `GeoDataFrame` via `getInfo()`.
-* :func:`feature_collection_to_dataframe` /
-  :func:`feature_collections_to_dataframe` /
-  :func:`feature_collection_to_gdf` — download
+* `feature_collection_to_dataframe` /
+  `feature_collections_to_dataframe` /
+  `feature_collection_to_gdf` — download
   `ee.FeatureCollection`s to pandas / GeoPandas (sync + parallel +
   small-FC `getInfo()` paths).
 
@@ -52,49 +52,49 @@ value objects the backend is built from. Two constructor params,
 the rest of these are config, payload and return types rather than
 anything a string names:
 
-* :class:`Reducer`, with :data:`REDUCERS` and :func:`resolve_reducer`
+* `Reducer`, with `REDUCERS` and `resolve_reducer`
   — the reduction strategies. `GEE(reducer=...)` accepts a name, a spec
   string or an instance: `"mean"`, `Mean()`, `"percentile:90"` and
   `Percentile(q=90)` all work. The seven that reduce a time
-  bucket's images are :class:`Mean` / :class:`Median` / :class:`Min` /
-  :class:`Max` / :class:`Sum` / :class:`Mosaic` / :class:`Mode`, which
-  `reducers.collection_reducers()` names. :data:`REDUCERS` is the whole
+  bucket's images are `Mean` / `Median` / `Min` /
+  `Max` / `Sum` / `Mosaic` / `Mode`, which
+  `reducers.collection_reducers()` names. `REDUCERS` is the whole
   registry, so it also holds the region-only `first` / `stdDev` /
-  `variance` / `count` that :func:`sample_points` uses and that
+  `variance` / `count` that `sample_points` uses and that
   `GEE(reducer=...)` refuses with `ValueError` ("reduces pixels in a
-  region, not images in a collection"). :class:`Percentile` is
+  region, not images in a collection"). `Percentile` is
   deliberately **not** in the registry — it needs a parameter — so it
   is reachable only as a spec string or an instance.
-* :class:`Engine`, with :data:`ENGINES` and :func:`resolve_engine` —
+* `Engine`, with `ENGINES` and `resolve_engine` —
   what materialises the pixels. `engine="auto"` routes between
-  :class:`EedaiEngine` (the pyramids-eo reader) and :class:`EeEngine`
+  `EedaiEngine` (the pyramids-eo reader) and `EeEngine`
   (`getDownloadURL`), falling back to the latter whenever the reader
-  declines. :class:`PixelsEngine` (`computePixels`, optionally against
-  :data:`HIGH_VOLUME_ENDPOINT`) is opt-in via `engine="pixels"` and is
-  never selected by `auto`. :class:`AutoEngine` is that routing
+  declines. `PixelsEngine` (`computePixels`, optionally against
+  `HIGH_VOLUME_ENDPOINT`) is opt-in via `engine="pixels"` and is
+  never selected by `auto`. `AutoEngine` is that routing
   decision as an object.
-* :class:`EnginePlan` (back-compat alias `EedaiPlan`) — the frozen
+* `EnginePlan` (back-compat alias `EedaiPlan`) — the frozen
   routing verdict an engine returns, carrying the reason when a route
   is declined.
-* :class:`Sink`, with :data:`SINKS` and :func:`resolve_sink` — where
-  the artifact goes: :class:`UrlSink`, :class:`DriveSink`,
-  :class:`GcsSink`, :class:`AssetSink`. Unlike `reducer=` / `engine=`,
+* `Sink`, with `SINKS` and `resolve_sink` — where
+  the artifact goes: `UrlSink`, `DriveSink`,
+  `GcsSink`, `AssetSink`. Unlike `reducer=` / `engine=`,
   `GEE(export_via=...)` takes the **name** only; pass an instance and
-  :class:`ExportConfig` rejects it. Call :func:`resolve_sink` yourself
+  `ExportConfig` rejects it. Call `resolve_sink` yourself
   when you want the object.
-* :class:`WorkUnit` / :class:`RasterWorkUnit` — one time bucket's
-  payload. :class:`FeatureWorkUnit` is the vector/tabular seam for the
+* `WorkUnit` / `RasterWorkUnit` — one time bucket's
+  payload. `FeatureWorkUnit` is the vector/tabular seam for the
   later epics; nothing produces one yet.
-* :class:`Artifact` / :class:`DownloadResult` — what `download()`
+* `Artifact` / `DownloadResult` — what `download()`
   returns under `materialize=True`: the in-memory pyramids object
   *alongside* the written file, iterating and indexing like the list of
   paths the method returns without it.
-* :class:`ExportConfig`, composed in `GEE.__init__`, and
-  :class:`EngineConfig`, derived on each read from the live attributes
+* `ExportConfig`, composed in `GEE.__init__`, and
+  `EngineConfig`, derived on each read from the live attributes
   so a reassigned `crs` or `scale` cannot go stale behind it.
-* :class:`OutputGrid` — the one owner of the AOI-to-grid derivation
+* `OutputGrid` — the one owner of the AOI-to-grid derivation
   (dimensions, affine transform, lattice snapping, tiling).
-* :class:`EedaiReader` — the adapter wrapping the optional pyramids-eo
+* `EedaiReader` — the adapter wrapping the optional pyramids-eo
   reader, owning its process-global credential hazard.
 
 Two submodules ship more specialised helpers and are intentionally
@@ -112,24 +112,24 @@ median composite is a facade call rather than raw `ee`:
   for `ee.ImageCollection.filter*` composition.
 
 Job / task tracking — for asynchronous `export_via="drive"` /
-`"gcs"` / `"asset"` sinks, the :mod:`earthlens.gee.jobs` module
+`"gcs"` / `"asset"` sinks, the `earthlens.gee.jobs` module
 exposes a small set of helpers re-exported from this package:
 
 * Pass `wait_for_export=False` to `GEE(...)` so `download()` returns
-  :class:`TaskInfo` value objects at submission time instead of
+  `TaskInfo` value objects at submission time instead of
   blocking until each task reaches a terminal state.
-* :func:`list_recent_tasks` (also as `Catalog.list_recent_tasks`)
+* `list_recent_tasks` (also as `Catalog.list_recent_tasks`)
   lists every Earth Engine batch task on the current project, with
   filters by `state` / age / `task_type` / `description_prefix`.
-* :func:`get_task_status` (also as `Catalog.get_task_status`),
-  :func:`cancel_task`, :func:`wait_for_task_id` operate by task id —
+* `get_task_status` (also as `Catalog.get_task_status`),
+  `cancel_task`, `wait_for_task_id` operate by task id —
   no live `ee.batch.Task` handle required, so they work across
   process / session boundaries.
-* :func:`resolve_destination` surfaces a completed task's
+* `resolve_destination` surfaces a completed task's
   destination URIs (Drive / GCS / asset paths) for follow-up
   pulls.
 
-Mirrors :mod:`earthlens.ecmwf.jobs` — see also the
+Mirrors `earthlens.ecmwf.jobs` — see also the
 "`Tracking async exports`" notebook under
 `docs/examples/gee/`.
 

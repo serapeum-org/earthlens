@@ -12,16 +12,16 @@ or admin code:
   `vector`.
 
 Output is **per instance**: a dataset's `output_kind` decides whether
-:meth:`~earthlens.risk_indicators.backend.RiskIndicators.download` returns a
-:class:`pandas.DataFrame` (`tabular`) or a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection` (`vector`). Auth is
-**per source** — only a `gfw` dataset builds a :class:`GfwAuth`; ThinkHazard and
+`download` returns a
+`pandas.DataFrame` (`tabular`) or a pyramids
+`FeatureCollection` (`vector`). Auth is
+**per source** — only a `gfw` dataset builds a `GfwAuth`; ThinkHazard and
 INFORM stay keyless. Every parse is REST JSON -> pandas / FeatureCollection, with
 no gridded-array dependency in this subpackage.
 
-The public surface is the :class:`Catalog` (dataset id -> provider + output kind
+The public surface is the `Catalog` (dataset id -> provider + output kind
 + request detail, plus an ISO3 -> ThinkHazard ADM0 code lookup) and its
-:class:`Dataset` rows, the GFW-only :class:`GfwAuth` / :class:`GfwCredentials`,
+`Dataset` rows, the GFW-only `GfwAuth` / `GfwCredentials`,
 and the pure query/parse helpers.
 """
 

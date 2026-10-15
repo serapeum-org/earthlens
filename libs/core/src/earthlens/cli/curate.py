@@ -1,6 +1,6 @@
 """Curation probes — extract a dataset's band/asset schema from a live sample.
 
-The companion to :mod:`earthlens.cli.refresh`. Where `refresh` regenerates the
+The companion to `earthlens.cli.refresh`. Where `refresh` regenerates the
 informational `available_*` index, `probe` produces the *seed* for the curated,
 load-bearing rows: it fetches one sample record from a provider and records the
 per-band / per-asset metadata (media type, common name, dtype, nodata) a
@@ -9,8 +9,8 @@ maintainer reviews before pasting into the catalog. This is the CLI port of the
 
 Like `refresh`, only providers with a usable sample source have a prober
 wired up; others report `unsupported`. Adding one is a single entry in
-:data:`_PROBERS`. The heavier **credentialed** samplers (real NetCDF /
-granule / CDS retrieval / full NWP availability) live in :data:`_DEEP_PROBERS`
+`_PROBERS`. The heavier **credentialed** samplers (real NetCDF /
+granule / CDS retrieval / full NWP availability) live in `_DEEP_PROBERS`
 and are reached with `probe --deep` (cmems, earthdata, ecmwf, nwp); `--deep`
 falls back to the light prober for providers without a deep sampler.
 """
@@ -153,7 +153,7 @@ def probe_dataset(info: BackendInfo, dataset: str, deep: bool = False) -> ProbeR
         deep: Use the credentialed deep sampler when available.
 
     Returns:
-        The :class:`ProbeResult`.
+        The `ProbeResult`.
     """
     prober = (_DEEP_PROBERS.get(info.provider) if deep else None) or _PROBERS.get(
         info.provider

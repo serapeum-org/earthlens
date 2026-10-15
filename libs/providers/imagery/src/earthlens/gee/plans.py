@@ -12,8 +12,8 @@ tuple element, and an `engine` field lets a plan say which engine produced it â€
 needed as soon as there is more than one.
 
 Two named constructors cover every shape the backend actually builds:
-:meth:`EnginePlan.declined` for a refusal with a reason, and
-:meth:`EnginePlan.serves` for an acceptance with its unit count.
+`EnginePlan.declined` for a refusal with a reason, and
+`EnginePlan.serves` for an acceptance with its unit count.
 
 ```python
 >>> print(EnginePlan.declined("no native resolution", engine="eedai"))

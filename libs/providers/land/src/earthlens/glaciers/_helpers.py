@@ -2,19 +2,19 @@
 
 Grouped by source:
 
-* **Spatial / region mapping** — :func:`shapely_bbox` builds the AOI box that
-  `SpatialExtent` does not carry, and :func:`regions_for_bbox` maps a request
+* **Spatial / region mapping** — `shapely_bbox` builds the AOI box that
+  `SpatialExtent` does not carry, and `regions_for_bbox` maps a request
   bbox to the overlapping GTN-G region id(s) (`G4` / `G6`).
-* **Vector read (rgi/glims)** — :func:`download_zip` caches a region ZIP the
-  ghsl way; :func:`read_outlines` reads the inner shapefile via pyramids
+* **Vector read (rgi/glims)** — `download_zip` caches a region ZIP the
+  ghsl way; `read_outlines` reads the inner shapefile via pyramids
   `FeatureCollection.read_file("/vsizip/<zip>/<shp>")` and clips it to the bbox;
-  :func:`fetch_glims` issues a GLIMS WFS bbox query, saves the GeoJSON, reads it
+  `fetch_glims` issues a GLIMS WFS bbox query, saves the GeoJSON, reads it
   via `FeatureCollection.read_file`, and clips. Vector file I/O always goes
   through pyramids — never a bare geopandas file read (`G3`).
-  :func:`concat_outlines` merges per-region fragments.
-* **Tabular read (wgms)** — :func:`parse_wgms_csv` reads one FoG table out of the
-  cached zip with pandas (`G8`); :func:`wgms_glacier_table` reads the `glacier`
-  join table (coordinates + region); :func:`empty_canonical` builds a schema-only
+  `concat_outlines` merges per-region fragments.
+* **Tabular read (wgms)** — `parse_wgms_csv` reads one FoG table out of the
+  cached zip with pandas (`G8`); `wgms_glacier_table` reads the `glacier`
+  join table (coordinates + region); `empty_canonical` builds a schema-only
   frame. Pure pandas — no array/NetCDF stack.
 """
 
@@ -49,7 +49,7 @@ def shapely_bbox(space: SpatialExtent) -> Any:
     bbox intersect-filter needs this small adapter.
 
     Args:
-        space: The request's :class:`~earthlens.base.SpatialExtent`.
+        space: The request's `SpatialExtent`.
 
     Returns:
         A `shapely.geometry.box(west, south, east, north)` polygon.
@@ -133,7 +133,7 @@ def _stream_download(
 ) -> None:
     """Stream `url` to `dest_path` with retry + exponential backoff.
 
-    Delegates the streamed transfer to :meth:`HttpClient.download`, which
+    Delegates the streamed transfer to `HttpClient.download`, which
     writes to a sibling `.part` file, renames it on success, and removes the
     temp on any failure — so an interrupted download never leaves a truncated
     file. Retries are configured to mirror the previous hand-rolled loop:
@@ -234,7 +234,7 @@ def read_outlines(
     the bbox.
 
     Args:
-        zip_path: The local RGI region `.zip` (from :func:`download_zip`).
+        zip_path: The local RGI region `.zip` (from `download_zip`).
         bbox: `[west, south, east, north]` AOI in EPSG:4326.
         inner_shp: The inner `.shp` member name; resolved from the zip when
             `None`.
@@ -337,7 +337,7 @@ def fetch_glims(
 
 
 def empty_feature_collection() -> FeatureCollection:
-    """Build an empty EPSG:4326 :class:`FeatureCollection` (no features).
+    """Build an empty EPSG:4326 `FeatureCollection` (no features).
 
     Returned by the vector path when a request's bbox overlaps no glacier
     region / matches no outline, so `download()` always yields a collection.
@@ -354,7 +354,7 @@ def concat_outlines(fragments: list[FeatureCollection]) -> FeatureCollection:
     """Merge per-region outline fragments into one collection.
 
     Args:
-        fragments: One :class:`FeatureCollection` per region (or query).
+        fragments: One `FeatureCollection` per region (or query).
 
     Returns:
         FeatureCollection: The concatenated collection in EPSG:4326. The first
@@ -388,7 +388,7 @@ def parse_wgms_csv(zip_path: Path, table: str) -> pd.DataFrame:
     member — no reshaping, no array/NetCDF stack.
 
     Args:
-        zip_path: The cached WGMS FoG `.zip` (from :func:`download_zip`).
+        zip_path: The cached WGMS FoG `.zip` (from `download_zip`).
         table: The table name (`"mass_balance"`, `"front_variation"`,
             `"state"`).
 

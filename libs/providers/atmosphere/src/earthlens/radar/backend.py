@@ -166,7 +166,7 @@ class Radar(AbstractDataSource):
                 ISO datetime (`"%Y-%m-%dT%H:%M:%S"`) since the feed is
                 sub-hourly real-time.
             region: AWS region of the chunk bucket.
-            catalog: Optional pre-built :class:`Catalog` (tests
+            catalog: Optional pre-built `Catalog` (tests
                 inject a faked one).
 
         Raises:
@@ -195,7 +195,7 @@ class Radar(AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Parse the scan-time window into a :class:`TemporalExtent`.
+        """Parse the scan-time window into a `TemporalExtent`.
 
         Args:
             start: Inclusive window start.
@@ -236,7 +236,7 @@ class Radar(AbstractDataSource):
         `{STATION}/`, then lists each volume's chunks, parses the
         volume scan start time, and keeps the volumes whose start time
         falls in the request window. The ordered chunk keys ride on the
-        product metadata so :meth:`_fetch` needs no re-listing.
+        product metadata so `_fetch` needs no re-listing.
 
         Returns:
             list[RemoteProduct]: One product per in-window volume, each
@@ -336,7 +336,7 @@ class Radar(AbstractDataSource):
         volume does not lose the others (mirrors the FDSN/NWP policy).
 
         Args:
-            products: The products from :meth:`_search`.
+            products: The products from `_search`.
 
         Returns:
             list[Path]: One assembled `.ar2v` path per successfully
@@ -349,13 +349,13 @@ class Radar(AbstractDataSource):
     ) -> list[tuple[RemoteProduct, Path]]:
         """Assemble each volume, returning `(product, path)` pairs.
 
-        Like :meth:`_fetch` but keeps each path paired with the product
+        Like `_fetch` but keeps each path paired with the product
         it came from, so the inventory needs no filename re-matching. A
         volume whose download fails is logged and skipped. The loop shows
         a `tqdm` bar unless `download(progress_bar=False)` disabled it.
 
         Args:
-            products: The products from :meth:`_search`.
+            products: The products from `_search`.
 
         Returns:
             list[tuple[RemoteProduct, Path]]: One pair per successfully

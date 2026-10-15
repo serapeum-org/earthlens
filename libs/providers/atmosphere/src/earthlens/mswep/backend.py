@@ -23,7 +23,7 @@ Properties that shape the backend:
   forecast is requested with `variant=Mid`, `init=<date>` and
   `members=[…]`; `start` / `end` then select the valid (lead) times.
 * **Granules are resolved by name, never by listing.** `Past/Hourly/`
-  holds roughly 400,000 files; :mod:`earthlens.mswep.drive` asks Drive
+  holds roughly 400,000 files; `earthlens.mswep.drive` asks Drive
   for exactly the names wanted, in chunks.
 
 A granule that is genuinely absent — expected near the NRT edge, whose
@@ -288,8 +288,8 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
     def _initialize(self) -> None:
         """Keep construction offline; the Drive client opens lazily.
 
-        `MSWEP` mixes in :class:`~earthlens.base.LazyClientMixin`, so
-        authentication is deferred to first :attr:`client` access (via
+        `MSWEP` mixes in `LazyClientMixin`, so
+        authentication is deferred to first `client` access (via
         `download` / `search` / `authenticate`) rather than run here.
         Returns `None` so the parent binds no eager client and
         constructing the backend — or a bare `EarthLens("mswep", ...)` —
@@ -300,8 +300,8 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
     def _open_client(self) -> Any:
         """Authenticate and return the Drive v3 client (opened lazily).
 
-        Called once, on first access to :attr:`client`, and cached by
-        :class:`~earthlens.base.LazyClientMixin`.
+        Called once, on first access to `client`, and cached by
+        `LazyClientMixin`.
 
         Returns:
             Any: The authenticated Drive v3 client.
@@ -336,7 +336,7 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
         Args:
             start: Inclusive start of the window.
             end: Inclusive end of the window.
-            temporal_resolution: One of :data:`CADENCES`.
+            temporal_resolution: One of `CADENCES`.
             fmt: `strptime` format tried first for a string bound.
 
         Returns:
@@ -357,7 +357,7 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
     def resolver(self) -> RootResolver:
         """Return the version to root-folder resolver, built on first use.
 
-        Reading :attr:`client` first opens the Drive connection lazily
+        Reading `client` first opens the Drive connection lazily
         (authenticating), so the resolver is always built on a live
         service.
         """
@@ -739,7 +739,7 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
         revision window, where the local copy is known to be superseded.
 
         Args:
-            products: The plan from :meth:`_search`.
+            products: The plan from `_search`.
 
         Returns:
             list[Path]: The granules written or already present, in plan

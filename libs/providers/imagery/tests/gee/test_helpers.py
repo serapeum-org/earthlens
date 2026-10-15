@@ -92,7 +92,7 @@ class TestEeSizeGuard:
     The general `estimate_pixel_dims` tests live in
     `tests/test_base/test_spatial.py`; this class only verifies the
     EE-specific interplay between the bbox sizing and
-    :data:`EE_MAX_DIMENSION`.
+    `EE_MAX_DIMENSION`.
     """
 
     def test_oversized_box_exceeds_ee_limit(self):

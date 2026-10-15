@@ -1,6 +1,6 @@
 """Dataset/band catalog loader for the Google Earth Engine backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled GEE
+Hosts `Catalog`, the pydantic-backed reader for the bundled GEE
 catalog — the analogue of `earthlens.ecmwf.Catalog` /
 `cds_data_catalog.yaml`. The catalog ships as a directory of
 per-category YAML files at `src/earthlens/gee/catalog/`
@@ -9,21 +9,21 @@ per-category YAML files at `src/earthlens/gee/catalog/`
 `community.yaml` for `projects/...` user-contributed assets, …),
 plus a single `_index.yaml` carrying the merged
 `available_datasets:` list. Per-file sections each map to a typed
-field on :class:`Catalog` once merged:
+field on `Catalog` once merged:
 
 * `available_datasets` (informational list of Earth Engine asset ids)
-  → :attr:`Catalog.available_datasets`
+  → `Catalog.available_datasets`
 * `datasets` (curated map of collections, each with band + aggregation
-  metadata) → :attr:`Catalog.datasets`, with each value a
-  :class:`Dataset` and each band a :class:`Band`.
+  metadata) → `Catalog.datasets`, with each value a
+  `Dataset` and each band a `Band`.
 
 Datasets are addressed by their Earth Engine asset id (e.g.
 `"USGS/SRTMGL1_003"`, `"COPERNICUS/S2_SR_HARMONIZED"`); bands by
-`(asset_id, band_id)` via :meth:`Catalog.get_band` (aliased as
-:meth:`Catalog.get_variable` for parity with the ECMWF catalog).
+`(asset_id, band_id)` via `Catalog.get_band` (aliased as
+`Catalog.get_variable` for parity with the ECMWF catalog).
 
 The path to the bundled catalog directory lives at
-:data:`CATALOG_PATH`; tests can monkey-patch that module attribute to
+`CATALOG_PATH`; tests can monkey-patch that module attribute to
 redirect the loader at a temporary directory or single YAML file.
 
 Examples:
@@ -81,7 +81,7 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 # 11k+ band entries is ~5 s on the bundled catalog; a second `Catalog()`
 # call on an unchanged tree should be ~1 ms. `_PROVIDERS_CACHE` below
 # applies the same pattern to `providers.yaml`; both are cleared
-# together by :func:`clear_catalog_cache`.
+# together by `clear_catalog_cache`.
 _CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
@@ -89,7 +89,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
     """Return the catalog at `path`, memoised on the contributing files.
 
     Returns a `(available_datasets, datasets)` tuple of the same shape
-    the :class:`Catalog` model exposes. The result is cached on the
+    the `Catalog` model exposes. The result is cached on the
     resolved path + every contributing file's stamp, so a fresh
     `Catalog()` on an unchanged tree skips YAML parsing and pydantic
     validation.
@@ -476,7 +476,7 @@ class Dataset(SummarisedLeaf):
               than the first two.
 
             Replaces the older ambiguous `user_uploaded: bool` flag.
-        bands: Band id → :class:`Band`.
+        bands: Band id → `Band`.
     """
 
     model_config = ConfigDict(frozen=True)
@@ -557,9 +557,9 @@ class Dataset(SummarisedLeaf):
         """Whether the asset is a raster (image or image_collection).
 
         Returns:
-            `True` if :attr:`ee_type` is `"image"` or `"image_collection"`,
+            `True` if `ee_type` is `"image"` or `"image_collection"`,
             else `False`. Use this to gate "can the backend download
-            this?" decisions — :attr:`is_image_collection` excludes
+            this?" decisions — `is_image_collection` excludes
             static `Image` assets (e.g. SRTM) and is therefore misleading
             for that question.
 
@@ -582,7 +582,7 @@ class Dataset(SummarisedLeaf):
         """Whether the asset is tabular (FeatureCollection / table / BigQuery).
 
         Returns:
-            `True` if :attr:`ee_type` is `"table"`, `"table_collection"`,
+            `True` if `ee_type` is `"table"`, `"table_collection"`,
             or `"bigquery_table"`, else `False`. Tabular assets are out
             of scope for the raster backend.
         """
@@ -593,10 +593,10 @@ class Dataset(SummarisedLeaf):
         """Whether the asset is an `ImageCollection` (vs. a single `Image`).
 
         Returns:
-            `True` if :attr:`ee_type` is `"image_collection"`, else `False`.
+            `True` if `ee_type` is `"image_collection"`, else `False`.
 
         .. deprecated::
-            Prefer :attr:`is_raster` for the "can the backend download
+            Prefer `is_raster` for the "can the backend download
             this?" question — it correctly includes static `image`
             assets like SRTM. This narrower property is kept for
             back-compat with older callers.
@@ -616,13 +616,13 @@ class Dataset(SummarisedLeaf):
         return self.ee_type == "image_collection"
 
     def get_band(self, band_id: str) -> Band:
-        """Return the :class:`Band` for `band_id`.
+        """Return the `Band` for `band_id`.
 
         Args:
             band_id: The Earth Engine band id.
 
         Returns:
-            The matching :class:`Band`.
+            The matching `Band`.
 
         Raises:
             ValueError: If `band_id` is not a band of this dataset; the
@@ -671,12 +671,12 @@ _load_providers = _load_providers_base
 class Catalog(AbstractCatalog[Dataset]):
     """YAML-backed catalog of Earth Engine datasets for the GEE backend.
 
-    Reads every `*.yaml` file under :data:`CATALOG_PATH` (the
+    Reads every `*.yaml` file under `CATALOG_PATH` (the
     per-category `catalog/` directory shipped with the package) on
     construction plus the canonical provider registry at
-    :data:`PROVIDERS_PATH`, merging them into one logical catalog and
-    validating every entry into typed :class:`Dataset` / :class:`Band`
-    / :class:`Provider` models. A duplicate dataset/band key in the
+    `PROVIDERS_PATH`, merging them into one logical catalog and
+    validating every entry into typed `Dataset` / `Band`
+    / `Provider` models. A duplicate dataset/band key in the
     YAML (within a file or across files), an unknown band field, a
     curated dataset not listed in `available_datasets`, or a
     `provider:` slug that is missing from `providers.yaml` is a
@@ -685,8 +685,8 @@ class Catalog(AbstractCatalog[Dataset]):
     Attributes:
         available_datasets: Informational list of every Earth Engine
             asset id the package knows about.
-        datasets: Curated asset id → :class:`Dataset`.
-        providers: Canonical provider slug → :class:`Provider`.
+        datasets: Curated asset id → `Dataset`.
+        providers: Canonical provider slug → `Provider`.
 
     Examples:
         - Construct the catalog and look at what it holds:
@@ -723,12 +723,12 @@ class Catalog(AbstractCatalog[Dataset]):
         reads the bundled `catalog/*.yaml` and `providers.yaml`. If
         the caller passed `datasets=...` (or any non-empty field),
         the disk read is skipped: that path is for tests and ad-hoc
-        in-memory catalogs (see :meth:`load` for the heavy-lifting
+        in-memory catalogs (see `load` for the heavy-lifting
         classmethod).
 
         Raises:
             ValueError: When auto-loading, propagates the same errors
-                as :meth:`load` (missing YAML, duplicate key, unknown
+                as `load` (missing YAML, duplicate key, unknown
                 band field, unregistered provider slug, …).
         """
         if self.datasets:
@@ -759,13 +759,13 @@ class Catalog(AbstractCatalog[Dataset]):
         Args:
             catalog_path: Per-category catalog directory (or a single
                 `*.yaml` file for tests). Defaults to module-level
-                :data:`CATALOG_PATH` at call time (so test
+                `CATALOG_PATH` at call time (so test
                 monkey-patches take effect).
             providers_path: Path to `providers.yaml`. Defaults to
-                module-level :data:`PROVIDERS_PATH` at call time.
+                module-level `PROVIDERS_PATH` at call time.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If a YAML is missing, declares the same key
@@ -850,17 +850,17 @@ class Catalog(AbstractCatalog[Dataset]):
         }
 
     # `get_provider(slug)` (with did-you-mean hint) lifted to
-    # :class:`earthlens.base.AbstractCatalog`.
+    # `earthlens.base.AbstractCatalog`.
 
     def get_band(self, dataset_id: str, band_id: str) -> Band:
-        """Return the :class:`Band` for `(dataset_id, band_id)`.
+        """Return the `Band` for `(dataset_id, band_id)`.
 
         Args:
             dataset_id: The Earth Engine asset id.
             band_id: The band id within that dataset.
 
         Returns:
-            The matching :class:`Band`.
+            The matching `Band`.
 
         Raises:
             ValueError: If the dataset or the band is unknown.
@@ -886,17 +886,17 @@ class Catalog(AbstractCatalog[Dataset]):
         return cast("Band", self.get_dataset(dataset_id).get_band(band_id))
 
     def get_variable(self, dataset_id: str, band_id: str) -> Band:
-        """Alias of :meth:`get_band` (name parity with the ECMWF catalog).
+        """Alias of `get_band` (name parity with the ECMWF catalog).
 
         Args:
             dataset_id: The Earth Engine asset id.
             band_id: The band id within that dataset.
 
         Returns:
-            The matching :class:`Band`.
+            The matching `Band`.
 
         Examples:
-            - Same result as :meth:`get_band`:
+            - Same result as `get_band`:
                 ```python
                 >>> Catalog().get_variable("USGS/SRTMGL1_003", "elevation").units
                 'm'
@@ -915,12 +915,12 @@ class Catalog(AbstractCatalog[Dataset]):
 
         Args:
             **kwargs: Forwarded verbatim to
-                :func:`earthlens.gee.jobs.list_recent_tasks` —
+                `earthlens.gee.jobs.list_recent_tasks` —
                 `state` / `max_age_min` / `task_type` /
                 `description_prefix` / `project` / `limit`.
 
         Returns:
-            A list of :class:`earthlens.gee.jobs.TaskInfo`, newest first.
+            A list of `earthlens.gee.jobs.TaskInfo`, newest first.
         """
         from earthlens.gee.jobs import list_recent_tasks
 
@@ -932,11 +932,11 @@ class Catalog(AbstractCatalog[Dataset]):
         Args:
             task_id: Bare task id or full operation name.
             **kwargs: Forwarded to
-                :func:`earthlens.gee.jobs.get_task_status` —
+                `earthlens.gee.jobs.get_task_status` —
                 currently just `project`.
 
         Returns:
-            A :class:`earthlens.gee.jobs.TaskInfo`.
+            A `earthlens.gee.jobs.TaskInfo`.
         """
         from earthlens.gee.jobs import get_task_status
 
@@ -949,7 +949,7 @@ class Catalog(AbstractCatalog[Dataset]):
     ) -> dict[str, list[TaskInfo]]:
         """Group recent batch tasks by state — the task-side `health()`.
 
-        Walks :func:`earthlens.gee.jobs.list_recent_tasks` with the
+        Walks `earthlens.gee.jobs.list_recent_tasks` with the
         given `max_age_min` (default: 7 days) and any extra filters
         from `**kwargs`, then groups the results by `TaskInfo.state`.
         Useful for "are any of yesterday's exports stuck or failed?"
@@ -959,7 +959,7 @@ class Catalog(AbstractCatalog[Dataset]):
             max_age_min: Window length in minutes. Defaults to 7 days
                 — long enough to cover a typical weekly batch.
             **kwargs: Forwarded to
-                :func:`earthlens.gee.jobs.list_recent_tasks` —
+                `earthlens.gee.jobs.list_recent_tasks` —
                 `task_type` / `description_prefix` / `project` / `limit`.
                 Do not pass `state` here (the helper groups by state
                 itself); a `state` kwarg would silently narrow the
@@ -995,7 +995,7 @@ class Catalog(AbstractCatalog[Dataset]):
 
     # dict-like surface (`__repr__` / `__str__` / `__getitem__` / `__contains__`
     # / `__iter__` / `__len__`) and the `get_dataset(name)`-with-hint helper
-    # are inherited from :class:`earthlens.base.AbstractCatalog`. Cost note
+    # are inherited from `earthlens.base.AbstractCatalog`. Cost note
     # for `__str__`:
     # with the shipped 1104-dataset catalog the YAML round-trip serialises
     # ~2.3 MB and takes ~3 s — fine for one-off `print(cat)` but don't drop

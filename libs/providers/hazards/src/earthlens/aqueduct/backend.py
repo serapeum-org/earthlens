@@ -5,12 +5,12 @@
 credentials), reads it with pyramids, selects one metric / year / scenario
 across the requested flood return periods, filters by unit name and/or bbox, and
 returns the admin polygons carrying the selected exposure columns as a
-:class:`~pyramids.feature.collection.FeatureCollection` (or, with
-`geometry=False`, a geometry-dropped :class:`pandas.DataFrame`).
+`FeatureCollection` (or, with
+`geometry=False`, a geometry-dropped `pandas.DataFrame`).
 
 This is a static, country/state/basin-indexed product with no time axis, so a
 missing `start` / `end` is legal (`REQUIRES_TIME_WINDOW = False`). It is a
-`vector` backend: the :class:`earthlens.earthlens.EarthLens` facade rejects an
+`vector` backend: the `earthlens.earthlens.EarthLens` facade rejects an
 `aggregate=` argument — there is no meaningful gridded reduction of an
 admin-aggregated exposure table.
 
@@ -63,8 +63,8 @@ class Aqueduct(AbstractDataSource):
     selection, downloads and caches the admin level's shapefile, reads it with
     pyramids, and returns the admin polygons carrying the per-return-period
     exposure columns (`rp_<n>`). The query is a search/fetch split:
-    :meth:`_search` pins the one product (admin level + resolved column names),
-    and :meth:`_fetch` downloads, extracts, reads, and filters it.
+    `_search` pins the one product (admin level + resolved column names),
+    and `_fetch` downloads, extracts, reads, and filters it.
 
     Needs no credentials. `aggregate=` is rejected — the data is an
     admin-aggregated exposure table, not a gridded raster.
@@ -221,7 +221,7 @@ class Aqueduct(AbstractDataSource):
     ) -> TemporalExtent:
         """Return the base static-snapshot extent (the product has no time axis).
 
-        Delegates to :meth:`~earthlens.base.AbstractDataSource._static_extent`,
+        Delegates to `_static_extent`,
         the shared factory for no-time-axis backends, so `start` / `end` / `fmt`
         are ignored — there is no window to parse.
 
@@ -255,12 +255,12 @@ class Aqueduct(AbstractDataSource):
         """Download + read the shapefile and build the filtered collection.
 
         Widens the inherited `-> list[Path]` contract: a vector backend returns
-        an in-memory :class:`FeatureCollection`. The download is cached under
-        :attr:`cache_dir`, so a repeat request for the same admin level reuses
+        an in-memory `FeatureCollection`. The download is cached under
+        `cache_dir`, so a repeat request for the same admin level reuses
         the zip.
 
         Args:
-            products: The single-element list from :meth:`_search`.
+            products: The single-element list from `_search`.
 
         Returns:
             list[FeatureCollection]: One trimmed, filtered collection.
@@ -298,7 +298,7 @@ class Aqueduct(AbstractDataSource):
         """Return the local zip path, downloading it on a cache miss.
 
         Args:
-            product: The product from :meth:`_search` (carries the download URL
+            product: The product from `_search` (carries the download URL
                 in `href`).
 
         Returns:
@@ -346,9 +346,9 @@ class Aqueduct(AbstractDataSource):
                 this is a no-op.
 
         Returns:
-            A :class:`~pyramids.feature.collection.FeatureCollection` (also
+            A `FeatureCollection` (also
             written to `root_dir`) or, when `geometry=False`, a
-            :class:`pandas.DataFrame` of the units and their `rp_<n>` columns.
+            `pandas.DataFrame` of the units and their `rp_<n>` columns.
 
         Raises:
             requests.HTTPError: If the download returns a non-2xx status.

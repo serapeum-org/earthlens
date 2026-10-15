@@ -1,21 +1,21 @@
 """Dataset-catalog loader for the NWP backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+Hosts `Catalog`, the pydantic-backed reader for the bundled
 `nwp_data_catalog.yaml`. Mirrors the shape of
-:mod:`earthlens.ecmwf.catalog` and :mod:`earthlens.gee.catalog`: a
+`earthlens.ecmwf.catalog` and `earthlens.gee.catalog`: a
 single YAML file with a top-level `datasets:` block keyed by model key
 (`gfs`, `gefs`, `hrrr`, `ifs-hres`, `icon-global`, …). Each block
-parses into an :class:`NWPModel` carrying the provider, the forecast
+parses into an `NWPModel` carrying the provider, the forecast
 cadence (`cycles_utc` / `horizon_h`), the download `backend`
 (`herbie` / `ecmwf-opendata` / `direct-https` / `direct-boto3`), the
 cloud `mirrors`, the direct-centre `url_template`, and the
 `param → selector` band map.
 
-A model key resolves to an :class:`NWPModel` via
-:meth:`Catalog.get_model` / :meth:`Catalog.resolve` /
+A model key resolves to an `NWPModel` via
+`Catalog.get_model` / `Catalog.resolve` /
 `Catalog()["..."]`, each with a did-you-mean hint on a miss (inherited
-from :class:`earthlens.base.AbstractCatalog`). The path to the bundled
-YAML lives at :data:`CATALOG_PATH`; tests can monkey-patch that module
+from `earthlens.base.AbstractCatalog`). The path to the bundled
+YAML lives at `CATALOG_PATH`; tests can monkey-patch that module
 attribute to redirect the loader at a temporary file.
 """
 
@@ -117,7 +117,7 @@ class NWPModel(SummarisedLeaf):
 
     Mirrors a single `datasets.<key>:` block in
     `nwp_data_catalog.yaml`. The model key itself is the parent key in
-    :attr:`Catalog.datasets` and is not stored on the row.
+    `Catalog.datasets` and is not stored on the row.
 
     Attributes:
         provider: Provider slug (e.g. `"noaa-nodd"`, `"dwd-opendata"`,
@@ -143,7 +143,7 @@ class NWPModel(SummarisedLeaf):
         idx: Whether the source exposes a `.idx` byte-range index (NOAA
             / ECMWF yes; DWD no — its files are already per-variable).
         backend: Which download path handles this model (see
-            :data:`BackendLiteral`).
+            `BackendLiteral`).
         mirrors: Ordered list of cloud-mirror keys the model is served
             from (e.g. `["aws", "google", "azure"]`).
         url_template: For `direct-*` backends, a `str.format` template
@@ -177,7 +177,7 @@ class NWPModel(SummarisedLeaf):
             it rolls off the live endpoint. `None` means archival or
             unspecified (the backend stays silent); a positive integer is
             the rolling-window length in days, and `NWP.__init__` emits a
-            :class:`RetentionWarning` when the requested `start` is older
+            `RetentionWarning` when the requested `start` is older
             than `now - retention_days` (the #1 confusing failure for
             short-retention providers — DWD keeps roughly one day, MF
             fourteen). Never inferred — populated per row from the
@@ -263,12 +263,12 @@ class Catalog(AbstractCatalog[NWPModel]):
     Reads the bundled `nwp_data_catalog.yaml` (shipped as package data)
     and exposes its `datasets:` block as a typed `dict[str, NWPModel]`.
     Instantiate with no arguments (`Catalog()`) —
-    :func:`model_post_init` parses the YAML and populates
-    :attr:`datasets` in one pass.
+    `model_post_init` parses the YAML and populates
+    `datasets` in one pass.
 
     Attributes:
         datasets: Structural map keyed by the model key; each value is
-            an :class:`NWPModel`.
+            an `NWPModel`.
 
     Examples:
         - Load the bundled catalog and check which models are present:
@@ -303,7 +303,7 @@ class Catalog(AbstractCatalog[NWPModel]):
         return {"datasets": _load_catalog_data(CATALOG_PATH)}
 
     def get_model(self, model_key: str) -> NWPModel:
-        """Resolve a model key to its :class:`NWPModel` row.
+        """Resolve a model key to its `NWPModel` row.
 
         Args:
             model_key: A curated model key (e.g. `"gfs"`,
@@ -337,5 +337,5 @@ class Catalog(AbstractCatalog[NWPModel]):
         return cast("NWPModel", self.get_dataset(model_key))
 
     def resolve(self, model_key: str) -> NWPModel:
-        """Alias for :meth:`get_model` (matches the other backends' surface)."""
+        """Alias for `get_model` (matches the other backends' surface)."""
         return self.get_model(model_key)

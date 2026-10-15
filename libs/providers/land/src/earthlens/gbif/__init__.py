@@ -4,7 +4,7 @@ Fetches georeferenced species occurrences from the Global Biodiversity
 Information Facility through `pygbif.occurrences.search` (anonymous), maps
 the taxon/space/time window to a points `FeatureCollection`, and warns on
 restrictive per-record licenses. The reference occurrence backend the OBIS
-twin mirrors. See :class:`earthlens.gbif.backend.GBIF`.
+twin mirrors. See `earthlens.gbif.backend.GBIF`.
 
 Examples:
     - The catalog resolves friendly taxon keys:

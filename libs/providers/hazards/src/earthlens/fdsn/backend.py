@@ -8,17 +8,17 @@ EarthScope (ex-IRIS DMC), ISC (global reviewed bulletin), and GeoNet
 because they all speak the identical FDSN-event web-service
 standard. Each provider key in `variables` becomes one server-side
 `get_events` call; the per-network `obspy.core.event.Catalog` is mapped
-to a pyramids :class:`~pyramids.feature.collection.FeatureCollection`
-by :mod:`earthlens.fdsn.events`.
+to a pyramids `FeatureCollection`
+by `earthlens.fdsn.events`.
 
 This is the first `vector` backend: the on-the-wire result is a table
 of point features, not a gridded array, so `OUTPUT_KIND = "vector"`
 and an `aggregate=` argument is refused (there is no meaningful
 gridded reduction of an event table). The refusal itself lives in
-:meth:`earthlens.base.AbstractDataSource._refuse_unsupported_aggregate`,
+`earthlens.base.AbstractDataSource._refuse_unsupported_aggregate`,
 which every backend's `download` routes through, so a direct
 `FDSN(...).download(aggregate=...)` is rejected identically to one
-made through the :class:`earthlens.earthlens.EarthLens` facade.
+made through the `earthlens.earthlens.EarthLens` facade.
 `download()` returns the in-memory FeatureCollection (the union across
 requested networks) and, as a side effect, writes one vector file per
 network to `path`.
@@ -30,7 +30,7 @@ written as a GeoTIFF alongside the vector files. This does not change
 and the rasters are a side effect on disk. ShakeMap is a USGS ComCat
 product and is not exposed through the FDSN event standard at all, so
 that path is USGS-only and costs one extra request per event — see
-:mod:`earthlens.fdsn._helpers`.
+`earthlens.fdsn._helpers`.
 
 Provider selection follows the FDSN-specific reading of `variables`
 (see the package docstring): `variables` is a `list[str]` of network
@@ -125,7 +125,7 @@ class FDSN(AbstractDataSource):
     FDSN networks through the same `download()` shape every other
     earthlens backend uses. Each network key in `variables` becomes
     one server-side query; the per-network catalog is mapped to a
-    :class:`~pyramids.feature.collection.FeatureCollection` and the
+    `FeatureCollection` and the
     networks' results are unioned into the single FeatureCollection
     `download()` returns.
 
@@ -397,7 +397,7 @@ class FDSN(AbstractDataSource):
     def _initialize(self):
         """Resolve the optional EarthScope token; build no global client.
 
-        FDSN clients are per-network and built lazily in :meth:`_fetch`,
+        FDSN clients are per-network and built lazily in `_fetch`,
         so there is no shared client to bind to `self.client`. The only
         global state is the optional EarthScope token, resolved here so
         a missing-token situation surfaces once up front rather than per
@@ -416,7 +416,7 @@ class FDSN(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the `[start, end]` window into a `TemporalExtent`.
 
         FDSN issues a single `get_events` call spanning the whole
         window, so there is no per-date loop. The resolution is kept as
@@ -442,7 +442,7 @@ class FDSN(AbstractDataSource):
         return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _search(self) -> list[RemoteProduct]:
-        """One :class:`RemoteProduct` per requested network.
+        """One `RemoteProduct` per requested network.
 
         Resolves each network key in `self.vars` against the bundled
         provider catalog (raising with a did-you-mean hint on an
@@ -479,7 +479,7 @@ class FDSN(AbstractDataSource):
         """Query every network and map each result to a FeatureCollection.
 
         Widens the inherited `-> list[Path]` contract: a vector backend
-        returns in-memory :class:`FeatureCollection`s, not file paths.
+        returns in-memory `FeatureCollection`s, not file paths.
         A network whose query matches nothing
         (`FDSNNoDataException`, HTTP 204) yields an empty
         FeatureCollection — an empty result is a legitimate answer for a
@@ -501,7 +501,7 @@ class FDSN(AbstractDataSource):
         regardless of the policy.
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             list[FeatureCollection]: One collection per product, in the
@@ -543,7 +543,7 @@ class FDSN(AbstractDataSource):
         """Run one network's `get_events` and map it to a FeatureCollection.
 
         Args:
-            product: One :class:`RemoteProduct` from :meth:`_search`;
+            product: One `RemoteProduct` from `_search`;
                 `product.id` is the network key and
                 `product.metadata["fdsn_id"]` selects the obspy client.
 
@@ -621,7 +621,7 @@ class FDSN(AbstractDataSource):
         Each network in `self.vars` is queried once; its events are
         written to one vector file under `path` (named after the
         network), and the per-network results are concatenated into the
-        single :class:`FeatureCollection` returned. A network that
+        single `FeatureCollection` returned. A network that
         errors is logged and skipped (its events are simply absent from
         the union) rather than aborting the whole request; only a total
         failure — every network errored — raises. An all-empty result
@@ -677,7 +677,7 @@ class FDSN(AbstractDataSource):
 
         Raises:
             RuntimeError: If **every** requested network's query failed
-                (propagated from :meth:`_fetch`). A partial failure of
+                (propagated from `_fetch`). A partial failure of
                 the *network* loop does not raise — the healthy
                 networks' events are returned. The ShakeMap loop is
                 governed by the same `errors=` policy, so under the
@@ -798,9 +798,9 @@ class FDSN(AbstractDataSource):
         logged once and skipped rather than silently producing nothing.
 
         Args:
-            products: The products from :meth:`_search`.
+            products: The products from `_search`.
             collections: The per-product FeatureCollections from
-                :meth:`_fetch`, still split by network.
+                `_fetch`, still split by network.
             progress_bar: Whether each archive fetch shows a progress
                 bar. This is the long part of a `with_shakemap=True`
                 call, so it is the only place the flag does anything.
@@ -945,7 +945,7 @@ class FDSN(AbstractDataSource):
     def _cached_rasters(self, dest_dir: Path) -> list[Path] | None:
         """Decide whether an event can be served from disk, without logging.
 
-        Split from :meth:`_reuse_existing` so the fan-out ceiling can ask the
+        Split from `_reuse_existing` so the fan-out ceiling can ask the
         same question about an event it may not process, without emitting a
         skip line for work it never started.
 
@@ -1014,7 +1014,7 @@ class FDSN(AbstractDataSource):
     def _is_fetchable(self, event_id: str) -> bool:
         """Report whether an event could ever yield a ShakeMap.
 
-        Separated from :meth:`_is_cached` because the two answer different
+        Separated from `_is_cached` because the two answer different
         questions: this one asks whether the event is *addressable* at all,
         and an event that is not can never become cached, so counting it as
         pending work would let it block the queue indefinitely.

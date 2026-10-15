@@ -1,6 +1,6 @@
 """Variable-catalog loader for the CHC (Climate Hazards Center) FTP data source.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the per-family
+Hosts `Catalog`, the pydantic-backed reader for the per-family
 YAML files under `<package>/catalog/`. Mirrors the GEE backend's
 split-catalog layout (one file per product family + `_index.yaml`)
 and adapts it for the CHC FTP directory structure.
@@ -10,20 +10,20 @@ Catalog layout (under `src/earthlens/chc/catalog/`):
 * `_index.yaml` — `available_datasets:` (informational walk-order
   list of every CHC dataset key) and `regions:` (named
   geographic-coverage profiles keyed by region name). Read into
-  :attr:`Catalog.available_datasets` and
-  :attr:`Catalog.available_regions`.
+  `Catalog.available_datasets` and
+  `Catalog.available_regions`.
 * `<family>.yaml` — one file per product family
   (`chirps-2.0.yaml`, `chirps-v3.yaml`, `chirp.yaml`, `chirts.yaml`,
   `gefs.yaml`, `indices.yaml`, `cmip6.yaml`, `derived.yaml`). The
   last file is a bucket for small auxiliary families with 1-2
   datasets each (CHPclim, WBGT, CentennialTrends). Each file carries
   a `datasets:` block whose entries are merged into
-  :attr:`Catalog.datasets`. Dataset keys must be unique across files.
+  `Catalog.datasets`. Dataset keys must be unique across files.
 
 Variables are addressed by the `(dataset_key, variable_name)` pair
-via :meth:`Catalog.get_variable`.
+via `Catalog.get_variable`.
 
-The bundled-catalog directory lives at :data:`CATALOG_PATH`; tests
+The bundled-catalog directory lives at `CATALOG_PATH`; tests
 can monkey-patch that module attribute to redirect the loader at a
 temporary directory (or, via the back-compat single-file branch, a
 flat legacy YAML).
@@ -116,7 +116,7 @@ class Variable(FluxableLeaf):
     row in a CHC catalog YAML. CHIRPS-the-product only provides
     precipitation, but the typed model keeps the interface symmetric
     with the ECMWF catalog. Inherits `types` + `is_flux` from
-    :class:`earthlens.base.FluxableLeaf`.
+    `earthlens.base.FluxableLeaf`.
 
     Attributes:
         dataset_key: CHIRPS dataset identifier (e.g. `"global-daily"`).
@@ -156,13 +156,13 @@ class Dataset(SummarisedLeaf):
             FTP directory path relative to the server root, possibly with
             `{year}` as a placeholder.  At least one entry is always
             present; additional entries are added as their server paths
-            are verified. Use :attr:`ftp_base` for the default path.
+            are verified. Use `ftp_base` for the default path.
         file_patterns: Remote filename templates per format code, keyed
             the same way as `ftp_bases`.  Each value is a Python
             format-string whose placeholders are expanded by
-            :meth:`earthlens.chc.CHIRPS._placeholders`: `{year}`,
+            `earthlens.chc.CHIRPS._placeholders`: `{year}`,
             `{month}`, `{day}`, `{dekad}`, `{pentad}`, `{hour}`,
-            `{doy}`.  Use :attr:`file_pattern` for the default pattern.
+            `{doy}`.  Use `file_pattern` for the default pattern.
             `None` for datasets that publish a fixed enumerated set
             of files (`discrete_files`) instead of per-date partitions.
         discrete_files: Format-keyed map of fixed filenames for datasets
@@ -292,7 +292,7 @@ class Dataset(SummarisedLeaf):
 
     @property
     def primary_spatial_resolution(self) -> float:
-        """The first (primary) pixel size from :attr:`spatial_resolution`.
+        """The first (primary) pixel size from `spatial_resolution`.
 
         Convenience accessor for the common single-resolution case.
         After C3 every shipped dataset has a 1-element list, so this
@@ -356,12 +356,12 @@ def _build_chc_dataset(
     regions_map: dict[str, dict[str, list[float]]],
     source_path: Path,
 ) -> tuple[Dataset, int]:
-    """Build one :class:`Dataset` from its YAML body + variables (N1).
+    """Build one `Dataset` from its YAML body + variables (N1).
 
-    Validates every variable into a :class:`Variable`, resolves the
+    Validates every variable into a `Variable`, resolves the
     dataset's `region:` key against `regions_map` (with per-dataset
     inline `lat_boundaries` / `lon_boundaries` overrides winning), and
-    constructs the :class:`Dataset` record.
+    constructs the `Dataset` record.
 
     Args:
         ds_key: The dataset name (used in error messages).
@@ -502,7 +502,7 @@ def _load_catalog_data(
       layout above is the canonical form.
 
     Returns a `(available_datasets, regions_map, datasets)` triple of
-    the same shape :class:`Catalog` exposes. Results are cached on
+    the same shape `Catalog` exposes. Results are cached on
     `(resolved-path, mtime-fingerprint)`; for a directory the
     fingerprint is a `tuple((name, mtime_ns), ...)` over the sorted
     YAML members (H4 — collision-free under mtime permutations), so
@@ -530,7 +530,7 @@ def _parse_catalog(
 
     Args:
         path: The catalog directory or single YAML file, as handed to
-            :func:`_load_catalog_data` — it is what decides the layout.
+            `_load_catalog_data` — it is what decides the layout.
         files: The contributing YAML files. Used only for the single-file
             layout; the directory reader re-reads `_index.yaml` and its
             siblings by name.
@@ -644,11 +644,11 @@ class Catalog(AbstractCatalog[Dataset]):
 
     Reads the per-family `catalog/*.yaml` files (shipped as package data) and
     exposes its consumed top-level sections as typed pydantic fields.
-    Instantiate with no arguments (`Catalog()`) — :func:`model_post_init`
+    Instantiate with no arguments (`Catalog()`) — `model_post_init`
     parses the YAML and populates every field in one pass.
 
     Variables are addressed by the `(dataset_key, variable_name)`
-    pair via :meth:`get_variable`. The dataset key is part of the
+    pair via `get_variable`. The dataset key is part of the
     identity because the same variable name (`"precipitation"`)
     appears under every dataset with different metadata (units,
     FTP path, etc.).
@@ -662,7 +662,7 @@ class Catalog(AbstractCatalog[Dataset]):
             Populated from the `regions:` block (catalog v2+); empty dict
             for v1 files.
         datasets: Structural map keyed by dataset identifier. Each
-            value is a :class:`Dataset` carrying spatial / temporal
+            value is a `Dataset` carrying spatial / temporal
             metadata and its per-variable map.
 
     Examples:
@@ -728,9 +728,9 @@ class Catalog(AbstractCatalog[Dataset]):
     ) -> Catalog:
         """Read the CHC catalog from disk (cached).
 
-        Mirrors :meth:`earthlens.gee.Catalog.load` and
-        :meth:`earthlens.ecmwf.Catalog.load`. The default resolves
-        :data:`CATALOG_PATH` at *call* time so test monkey-patches
+        Mirrors `earthlens.gee.Catalog.load` and
+        `earthlens.ecmwf.Catalog.load`. The default resolves
+        `CATALOG_PATH` at *call* time so test monkey-patches
         take effect.
 
         Args:
@@ -740,13 +740,13 @@ class Catalog(AbstractCatalog[Dataset]):
                 default), or a single flat YAML file with
                 `available_datasets:` / `regions:` / `datasets:` at
                 top level (legacy back-compat). Defaults to
-                module-level :data:`CATALOG_PATH` (the directory).
+                module-level `CATALOG_PATH` (the directory).
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
-            ValueError: Propagated from :func:`_load_catalog_data`.
+            ValueError: Propagated from `_load_catalog_data`.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         available_datasets, regions_map, datasets = _load_catalog_data(catalog_path)
@@ -757,11 +757,11 @@ class Catalog(AbstractCatalog[Dataset]):
         )
 
     def get_variable(self, dataset_key: str, variable_name: str) -> Variable:
-        """Return the :class:`Variable` for a `(dataset, variable)` pair.
+        """Return the `Variable` for a `(dataset, variable)` pair.
 
         Args:
             dataset_key: CHC dataset identifier as it appears as a
-                key in :attr:`datasets` (e.g. `"global-daily"`).
+                key in `datasets` (e.g. `"global-daily"`).
             variable_name: Short variable code. Required (M4).
                 Pre-M4 this defaulted to `"precipitation"`, which
                 was CHIRPS-2.0-centric and silently `KeyError`d on
@@ -803,7 +803,7 @@ class Catalog(AbstractCatalog[Dataset]):
 
     # `get_dataset(name)` (with the did-you-mean hint) and the dict-like
     # dunders are inherited from
-    # :class:`earthlens.base.AbstractCatalog` (M1 in
+    # `earthlens.base.AbstractCatalog` (M1 in
     # the cross-backend catalog comparison).
 
     def health(self) -> dict[str, list[str]]:
@@ -927,7 +927,7 @@ class Catalog(AbstractCatalog[Dataset]):
 
         Args:
             dataset_key: CHC dataset identifier as it appears as a
-                key in :attr:`datasets`.
+                key in `datasets`.
 
         Returns:
             dict with keys `dataset`, `region`,

@@ -1,25 +1,25 @@
 """Config + curated-vocabulary catalog for the CMIP6 backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+Hosts `Catalog`, the pydantic-backed reader for the bundled
 `cmip6_data_catalog.yaml`. CMIP6 is addressed by a *facet tuple*
 (`source_id`, `experiment_id`, `variable_id`, `table_id`, plus optional
 `member_id` / `grid_label` / `version`), and the per-store index — one Zarr
 store per facet combination — is far too large to inline (~515k rows). That
-index is the consolidated-stores CSV at :attr:`Catalog.csv_url`, fetched and
-cached by :mod:`earthlens.cmip6.resolver`; this catalog holds only the *config*
+index is the consolidated-stores CSV at `Catalog.csv_url`, fetched and
+cached by `earthlens.cmip6.resolver`; this catalog holds only the *config*
 (CSV URL, bucket, facet columns, defaults) plus a *curated vocabulary* of the
 common variables / experiments / tables / sources used for output metadata,
 docs, and did-you-mean hints.
 
 The curated `variables:` block is exposed under the inherited
-:attr:`~earthlens.base.AbstractCatalog.datasets` field, so a variable resolves
+`datasets` field, so a variable resolves
 with `cat["tas"]` / `"tas" in cat` / the did-you-mean error for free;
 `experiments:` / `tables:` / `sources:` hang off parallel maps. Resolution
 itself runs against the full CSV, so an *uncurated* facet still downloads — the
 curated rows only enrich metadata and error messages.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML;
-:func:`clear_catalog_cache` empties the `(path, mtime)` parse cache.
+`CATALOG_PATH` is the path to the bundled YAML;
+`clear_catalog_cache` empties the `(path, mtime)` parse cache.
 """
 
 from __future__ import annotations
@@ -175,7 +175,7 @@ class Source(SummarisedLeaf):
 
 
 def _parse_catalog(files: list[Path]) -> dict[str, Any]:
-    """Parse the CMIP6 catalog YAML into a populated :class:`Catalog`.
+    """Parse the CMIP6 catalog YAML into a populated `Catalog`.
 
     Args:
         files: The contributing YAML files (CMIP6 ships a single file).
@@ -225,12 +225,12 @@ class Catalog(AbstractCatalog[Cmip6Variable]):
     """Config + curated-vocabulary catalog for the CMIP6 backend.
 
     Reads the bundled `cmip6_data_catalog.yaml` (shipped as package data) and
-    exposes its `variables:` block as a map of :class:`Cmip6Variable` rows keyed
-    by `variable_id` under the inherited :attr:`datasets` field, plus parallel
-    :attr:`experiments`, :attr:`tables`, and :attr:`sources` maps and the
-    resolution config (:attr:`csv_url`, :attr:`bucket`, :attr:`facet_columns`,
-    :attr:`default_member_id`, :attr:`default_version`). Instantiate with no
-    arguments (`Catalog()`); :func:`model_post_init` loads and validates the YAML
+    exposes its `variables:` block as a map of `Cmip6Variable` rows keyed
+    by `variable_id` under the inherited `datasets` field, plus parallel
+    `experiments`, `tables`, and `sources` maps and the
+    resolution config (`csv_url`, `bucket`, `facet_columns`,
+    `default_member_id`, `default_version`). Instantiate with no
+    arguments (`Catalog()`); `model_post_init` loads and validates the YAML
     in one pass and caches it by `(path, mtime)`.
 
     Attributes:
@@ -240,10 +240,10 @@ class Catalog(AbstractCatalog[Cmip6Variable]):
         default_member_id: Member label applied when a request omits it.
         default_version: Version-selection policy (`"latest"`).
         default_terms_note: Attribution fallback for an uncurated source.
-        datasets: Map from `variable_id` to its :class:`Cmip6Variable` row.
-        experiments: Map from `experiment_id` to its :class:`Experiment` row.
-        tables: Map from `table_id` to its :class:`Table` row.
-        sources: Map from `source_id` to its :class:`Source` row.
+        datasets: Map from `variable_id` to its `Cmip6Variable` row.
+        experiments: Map from `experiment_id` to its `Experiment` row.
+        tables: Map from `table_id` to its `Table` row.
+        sources: Map from `source_id` to its `Source` row.
 
     Examples:
         - List curated variables and resolve one:
@@ -287,13 +287,13 @@ class Catalog(AbstractCatalog[Cmip6Variable]):
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no variables were supplied.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by
+        `Catalog()` with no args reads `CATALOG_PATH` (cached by
         `(path, mtime)`); passing `datasets=...` skips the disk read (used in
         tests). Either way the `available_datasets` index is derived from the
         loaded variable map.
 
         Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is missing,
+            ValueError: Propagated from `load` when the YAML is missing,
                 empty, or has a malformed row.
         """
         if not self.datasets and not self.csv_url:
@@ -316,10 +316,10 @@ class Catalog(AbstractCatalog[Cmip6Variable]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If `catalog_path` does not exist, or if the file is missing
@@ -355,7 +355,7 @@ class Catalog(AbstractCatalog[Cmip6Variable]):
         return out
 
     def get_experiment(self, key: str) -> Experiment:
-        """Return the :class:`Experiment` for `key`, with a did-you-mean hint.
+        """Return the `Experiment` for `key`, with a did-you-mean hint.
 
         Args:
             key: An `experiment_id` (`"ssp585"`, `"historical"`).
@@ -369,7 +369,7 @@ class Catalog(AbstractCatalog[Cmip6Variable]):
         return cast("Experiment", self._get_from(self.experiments, key, "experiment"))
 
     def get_table(self, key: str) -> Table:
-        """Return the :class:`Table` for `key`, with a did-you-mean hint.
+        """Return the `Table` for `key`, with a did-you-mean hint.
 
         Args:
             key: A `table_id` (`"Amon"`, `"day"`, `"Omon"`).
@@ -383,7 +383,7 @@ class Catalog(AbstractCatalog[Cmip6Variable]):
         return cast("Table", self._get_from(self.tables, key, "table"))
 
     def get_source(self, key: str) -> Source:
-        """Return the :class:`Source` for `key`, with a did-you-mean hint.
+        """Return the `Source` for `key`, with a did-you-mean hint.
 
         Args:
             key: A `source_id` (`"CanESM5"`, `"GFDL-ESM4"`).
@@ -399,7 +399,7 @@ class Catalog(AbstractCatalog[Cmip6Variable]):
     def terms_note(self, source_id: str) -> str:
         """Return the attribution note for `source_id`.
 
-        Falls back to :attr:`default_terms_note` for an uncurated source (or a
+        Falls back to `default_terms_note` for an uncurated source (or a
         curated one with no per-model note).
 
         Args:

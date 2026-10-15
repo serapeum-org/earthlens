@@ -1,12 +1,12 @@
 """Private, stateless helpers for the CatRaRE backend.
 
-Three concerns live here so :class:`~earthlens.catrare.backend.CatRaRE` stays a
+Three concerns live here so `CatRaRE` stays a
 thin orchestration layer: the **FileGDB read + reprojection** (reading one layer
 of the downloaded `.gdb.zip` through pyramids and reprojecting it from the DWD
 RADOLAN grid — which the file does not carry — to EPSG:4326), the
 **FeatureCollection assembly** (selecting the event attribute columns), and the
 **date / bbox filter**. All geometry handling stays inside pyramids
-(:class:`~pyramids.feature.collection.FeatureCollection`, itself a
+(`FeatureCollection`, itself a
 `geopandas.GeoDataFrame` subclass); this module never imports `xarray`.
 """
 
@@ -53,7 +53,7 @@ def build_feature_collection(
     """Select the event attribute columns (+ geometry) from the read layer.
 
     Args:
-        source: The reprojected layer from :func:`read_events`.
+        source: The reprojected layer from `read_events`.
         event_columns: The attribute columns to keep.
 
     Returns:
@@ -94,8 +94,8 @@ def filter_events(
     intersects it. Both filters compose.
 
     Args:
-        collection: The trimmed collection from :func:`build_feature_collection`.
-        space: The requested :class:`~earthlens.base.SpatialExtent`; a
+        collection: The trimmed collection from `build_feature_collection`.
+        space: The requested `SpatialExtent`; a
             whole-globe extent applies no spatial filter.
         start: Inclusive window start, or `None` for no lower bound.
         end: Inclusive window end, or `None` for no upper bound.

@@ -1,21 +1,21 @@
 """Pure per-source HTTP query builders and JSON parsers for risk-indicators.
 
 Every risk source here is a REST endpoint returning JSON, parsed into a
-:class:`pandas.DataFrame` (ThinkHazard / INFORM / GFW table) or a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection` (GFW geometry). These are
+`pandas.DataFrame` (ThinkHazard / INFORM / GFW table) or a pyramids
+`FeatureCollection` (GFW geometry). These are
 pre-computed country/admin-indexed indices and SQL queries, so this subpackage
 uses **no gridded-array dependency** by design — the parse is pure pandas /
 geopandas text-and-JSON.
 
 The module groups three concerns, none of which holds state:
 
-* **Query builders** — :func:`thinkhazard_query`, :func:`inform_query`,
-  :func:`gfw_query`, :func:`gfw_geostore` issue one GET each and return parsed
+* **Query builders** — `thinkhazard_query`, `inform_query`,
+  `gfw_query`, `gfw_geostore` issue one GET each and return parsed
   JSON. Only the GFW calls attach the `x-api-key` header.
-* **Parsers** — :func:`thinkhazard_to_frame`, :func:`inform_to_frame`,
-  :func:`to_frame`, :func:`to_feature_collection` turn a source's JSON into the
+* **Parsers** — `thinkhazard_to_frame`, `inform_to_frame`,
+  `to_frame`, `to_feature_collection` turn a source's JSON into the
   canonical tabular / vector shape.
-* **Resolution** — :func:`resolve_admin` turns a country ISO3 into the
+* **Resolution** — `resolve_admin` turns a country ISO3 into the
   ThinkHazard ADM0 division code via the catalog's shipped lookup table.
 
 Endpoints / response shapes were live-verified 2026-06-27 (see
@@ -162,7 +162,7 @@ def _client(
         timeout: Per-request timeout in seconds.
         extra_retry_statuses: HTTP statuses to retry in addition to the 5xx
             range. Used only by ThinkHazard, whose report endpoints flap `404`
-            (see :data:`THINKHAZARD_RETRY_STATUSES`); empty for every other
+            (see `THINKHAZARD_RETRY_STATUSES`); empty for every other
             source, so an INFORM or GFW `404` still fails fast.
 
     Returns:
@@ -192,9 +192,9 @@ def _request_json(
 ) -> dict | list:
     """GET `url` and return parsed JSON, retrying transient failures.
 
-    Retries are delegated to :class:`~earthlens.base.http.HttpClient`: a 5xx
+    Retries are delegated to `HttpClient`: a 5xx
     response (plus any `retry_statuses`) or a transient transport error (see
-    :data:`_TRANSIENT_ERRORS`) is retried up to :data:`_HTTP_RETRIES` times
+    `_TRANSIENT_ERRORS`) is retried up to `_HTTP_RETRIES` times
     with exponential back-off (`1s`, `2s`); any other 4xx (including 429)
     fails fast.
 
@@ -206,7 +206,7 @@ def _request_json(
         timeout: Per-request timeout in seconds.
         retry_statuses: Extra HTTP statuses to retry beyond the 5xx range.
             Only ThinkHazard passes one (`404`, see
-            :data:`THINKHAZARD_RETRY_STATUSES`); left empty, a `404` fails fast.
+            `THINKHAZARD_RETRY_STATUSES`); left empty, a `404` fails fast.
 
     Returns:
         The parsed JSON body.
@@ -254,7 +254,7 @@ def _headers(api_key: str | None = None) -> dict[str, str]:
     """Build the per-call GFW `x-api-key` header, when given.
 
     The descriptive `User-Agent` rides on every request via `HttpClient`'s
-    client-level default (set in :func:`_request_json`), so it does not need
+    client-level default (set in `_request_json`), so it does not need
     to be re-set here — a per-call `User-Agent` header would only shadow the
     identical default.
 
@@ -291,7 +291,7 @@ def thinkhazard_query(
 
     Raises:
         requests.HTTPError: If the endpoint returns a non-2xx status after
-            retries. A `404` is retried (see :data:`THINKHAZARD_RETRY_STATUSES`),
+            retries. A `404` is retried (see `THINKHAZARD_RETRY_STATUSES`),
             because the report endpoints flap it, and raises only if it persists.
     """
     suffix = f"/{hazard}" if hazard else ""
@@ -347,7 +347,7 @@ def _inform_frame(columns: dict[str, object]) -> pd.DataFrame:
             constructor.
 
     Returns:
-        pd.DataFrame: Columns :data:`INFORM_COLUMNS`, re-indexed from zero.
+        pd.DataFrame: Columns `INFORM_COLUMNS`, re-indexed from zero.
     """
     frame = pd.DataFrame(columns, columns=INFORM_COLUMNS).reset_index(drop=True)
     return frame.astype(
@@ -396,7 +396,7 @@ def inform_release_url(
     """Find the newest INFORM Risk release workbook published on the JRC site.
 
     The answer is memoised per page for the life of the process
-    (:func:`clear_release_cache` forgets it): a run pulling all four Risk
+    (`clear_release_cache` forgets it): a run pulling all four Risk
     datasets would otherwise hit the results page four times, and the host drops
     connections under rapid repeat requests.
 
@@ -447,7 +447,7 @@ def inform_download_release(
     release lands beside the old one instead of having to invalidate it.
 
     Args:
-        url: The workbook URL from :func:`inform_release_url`.
+        url: The workbook URL from `inform_release_url`.
         dest: Local path to write. An existing, valid file is reused.
         timeout: Per-request timeout in seconds.
 
@@ -516,7 +516,7 @@ def inform_release_to_frame(
             omitted.
 
     Returns:
-        pd.DataFrame: Columns :data:`INFORM_COLUMNS`, one row per country.
+        pd.DataFrame: Columns `INFORM_COLUMNS`, one row per country.
 
     Raises:
         ValueError: If no country sheet matches, or the sheet has no `column`.
@@ -646,7 +646,7 @@ def gfw_geostore(
 
 
 def to_frame(payload: dict | list, columns: list[str] | None = None) -> pd.DataFrame:
-    """Build a flat :class:`pandas.DataFrame` from a JSON rows payload.
+    """Build a flat `pandas.DataFrame` from a JSON rows payload.
 
     Accepts either a GFW-style `{"data": [...]}` envelope or a bare list of row
     dicts; a single dict (not under `data`) becomes a one-row frame.
@@ -685,7 +685,7 @@ def thinkhazard_to_frame(
     `hazard_category`.
 
     Args:
-        payload: The JSON returned by :func:`thinkhazard_query`.
+        payload: The JSON returned by `thinkhazard_query`.
         admin_code: The division code the report was fetched for (stamped onto
             every row).
         hazard: The hazard mnemonic for a single-hazard report; ignored for the
@@ -693,7 +693,7 @@ def thinkhazard_to_frame(
         country: Optional ISO3 to stamp onto every row.
 
     Returns:
-        pd.DataFrame: Columns :data:`THINKHAZARD_COLUMNS` — one row per hazard.
+        pd.DataFrame: Columns `THINKHAZARD_COLUMNS` — one row per hazard.
     """
     records: list[dict] = []
     if isinstance(payload, list):
@@ -736,14 +736,14 @@ def inform_to_frame(
     rather than being indistinguishable from a pull of any other.
 
     Args:
-        payload: The score rows from :func:`inform_query`.
+        payload: The score rows from `inform_query`.
         country: Optional ISO3 to filter to a single country (case-insensitive);
             `None` keeps every country.
         workflow_id: The WorkflowId the payload was fetched with, recorded in
             the `workflow_id` column; `None` leaves the column empty.
 
     Returns:
-        pd.DataFrame: Columns :data:`INFORM_COLUMNS` — one row per country (or
+        pd.DataFrame: Columns `INFORM_COLUMNS` — one row per country (or
             one row for the filtered country).
     """
     records = [
@@ -771,10 +771,10 @@ def gfw_geostore_to_feature_collection(payload: dict) -> FeatureCollection:
     The geostore response nests the boundary at `data.attributes.geojson`; this
     digs it out with a descriptive error (rather than a bare `KeyError`) when an
     unexpected payload shape comes back, then delegates to
-    :func:`to_feature_collection`.
+    `to_feature_collection`.
 
     Args:
-        payload: The parsed JSON from :func:`gfw_geostore`.
+        payload: The parsed JSON from `gfw_geostore`.
 
     Returns:
         FeatureCollection: The admin-boundary features tagged `EPSG:4326`.
@@ -827,9 +827,9 @@ def to_feature_collection(geojson: dict) -> FeatureCollection:
 def resolve_admin(country: str, level: int = 0) -> str:
     """Turn a country ISO3 into the ThinkHazard ADM0 division code.
 
-    Convenience wrapper over :meth:`earthlens.risk_indicators.catalog.Catalog.resolve_admin`
+    Convenience wrapper over `earthlens.risk_indicators.catalog.Catalog.resolve_admin`
     that loads the bundled catalog itself, so callers can resolve a code without
-    holding a :class:`~earthlens.risk_indicators.catalog.Catalog`.
+    holding a `Catalog`.
 
     Args:
         country: An ISO3 country code (`"KEN"`).

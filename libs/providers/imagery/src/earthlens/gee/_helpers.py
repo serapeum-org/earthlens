@@ -1,11 +1,11 @@
 """Module-scope helpers for the Google Earth Engine backend.
 
-Small, side-effect-free utilities used by :mod:`earthlens.gee.backend`,
+Small, side-effect-free utilities used by `earthlens.gee.backend`,
 kept out of the backend module so there are no nested function
 definitions and so they are independently testable.
 
-Backend-agnostic spatial helpers (e.g. :func:`estimate_pixel_dims`)
-live in :mod:`earthlens.base.spatial` so the CHC / ECMWF / S3 backends
+Backend-agnostic spatial helpers (e.g. `estimate_pixel_dims`)
+live in `earthlens.base.spatial` so the CHC / ECMWF / S3 backends
 can use them too.
 """
 
@@ -69,7 +69,7 @@ def __getattr__(name: str) -> frozenset[str]:
 
 # Terminal `ee.batch.Task` states (the bare, upper-cased name — `task.status()`
 # may report e.g. `"COMPLETED"` or `"State.COMPLETED"` depending on SDK
-# version, so callers normalise via :func:`task_state_name` before comparing).
+# version, so callers normalise via `task_state_name` before comparing).
 TERMINAL_TASK_STATES: frozenset[str] = frozenset(
     {"COMPLETED", "FAILED", "CANCELLED", "CANCEL_REQUESTED"}
 )
@@ -161,11 +161,11 @@ def split_aoi_for_url(
     scale_m: float,
     max_dim: int = EE_MAX_DIMENSION,
 ) -> list[SpatialExtent]:
-    """Tile a :class:`SpatialExtent` into sub-extents each within `max_dim` px per axis.
+    """Tile a `SpatialExtent` into sub-extents each within `max_dim` px per axis.
 
-    Used by :meth:`GEE._export_via_url` to auto-split oversized
+    Used by `GEE._export_via_url` to auto-split oversized
     synchronous downloads. This is a per-AXIS tiler — the more general
-    per-total-cells `split_polygon` in :mod:`earthlens.spatial` solves
+    per-total-cells `split_polygon` in `earthlens.spatial` solves
     a different problem (cap on cells per tile, not cap on pixels per
     axis). The bbox is divided into an `Nx*Ny` grid in its own
     lon/lat coordinates, sized so each tile satisfies
@@ -176,7 +176,7 @@ def split_aoi_for_url(
         space: The full request extent (in WGS84 degrees).
         scale_m: Output pixel size in metres.
         max_dim: Per-axis pixel cap each tile must respect. Defaults to
-            :data:`EE_MAX_DIMENSION`.
+            `EE_MAX_DIMENSION`.
 
     Returns:
         A list of `SpatialExtent`s tiling `space`. If `space` already

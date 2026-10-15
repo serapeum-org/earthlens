@@ -5,17 +5,17 @@ ASCII files from two open sources (NOAA PSL, KNMI Climate Explorer). This
 module is the bridge from a short index id (`"oni"`, `"nao"`, …) to the
 URL + ASCII dialect + light metadata needed to fetch and parse it.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
+`Catalog` is a thin `earthlens.base.AbstractCatalog`
 subclass that loads the bundled `climate_indices_data_catalog.yaml` and
-exposes each row as an :class:`Index`. The YAML keeps a DRY `sources:`
+exposes each row as an `Index`. The YAML keeps a DRY `sources:`
 block (base URL + citation per source) and a `datasets:` block (one row
 per index); the loader joins `base_url + file` into each row's
-:attr:`Index.url` and attaches the source citation, so a resolved
-:class:`Index` is self-describing. Resolve one with :meth:`Catalog.get`
+`Index.url` and attaches the source citation, so a resolved
+`Index` is self-describing. Resolve one with `Catalog.get`
 (a did-you-mean hint on an unknown id); list the shipped ids with
-:meth:`Catalog.available`.
+`Catalog.available`.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML.
+`CATALOG_PATH` is the path to the bundled YAML.
 """
 
 from __future__ import annotations
@@ -60,17 +60,17 @@ def _load_catalog_data(path: Path) -> dict[str, Index]:
 
     Reads the `sources:` and `datasets:` blocks, joins each row's
     `base_url + file` into its `url`, attaches the source citation, and
-    validates the merged row as an :class:`Index`.
+    validates the merged row as an `Index`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
-        Mapping from index id to its :class:`Index` row.
+        Mapping from index id to its `Index` row.
 
     Raises:
         ValueError: If the file has no `datasets:` block, a row names an
-            unknown `source`, or a row fails :class:`Index` validation.
+            unknown `source`, or a row fails `Index` validation.
     """
     key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
@@ -113,7 +113,7 @@ def _load_catalog_data(path: Path) -> dict[str, Index]:
 class Index(SummarisedLeaf):
     """One climate-index catalogue row.
 
-    The index id is the parent key in :attr:`Catalog.datasets`; the row
+    The index id is the parent key in `Catalog.datasets`; the row
     carries everything the backend needs to fetch and parse the series.
 
     Attributes:
@@ -165,12 +165,12 @@ class Catalog(AbstractCatalog[Index]):
 
     Reads the bundled `climate_indices_data_catalog.yaml` (shipped as
     package data) and exposes its `datasets:` block as a map of
-    :class:`Index` rows keyed by index id. Instantiate with no arguments
-    (`Catalog()`). Resolve one row with :meth:`get`, or list the shipped
-    ids with :meth:`available`.
+    `Index` rows keyed by index id. Instantiate with no arguments
+    (`Catalog()`). Resolve one row with `get`, or list the shipped
+    ids with `available`.
 
     Attributes:
-        datasets: Map from index id to its :class:`Index` row.
+        datasets: Map from index id to its `Index` row.
 
     Examples:
         - Resolve a row and read its dialect:
@@ -197,9 +197,9 @@ class Catalog(AbstractCatalog[Index]):
     _catalog_kind: str = "climate-indices catalog"
     _entry_noun: str = "indices"
 
-    #: The index rows live in the base :attr:`datasets` field so the
+    #: The index rows live in the base `datasets` field so the
     #: inherited dict surface (`len`, `in`, `[]`, iteration) and
-    #: :meth:`get_dataset`'s did-you-mean hint work unchanged.
+    #: `get_dataset`'s did-you-mean hint work unchanged.
     datasets: dict[str, Index] = Field(default_factory=dict)
 
     @classmethod
@@ -218,10 +218,10 @@ class Catalog(AbstractCatalog[Index]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `datasets:` block, or a row
@@ -231,9 +231,9 @@ class Catalog(AbstractCatalog[Index]):
         return cls(datasets=dict(_load_catalog_data(catalog_path)))
 
     def get(self, index_id: str) -> Index:
-        """Resolve an index id to its :class:`Index` row.
+        """Resolve an index id to its `Index` row.
 
-        Thin wrapper over the inherited :meth:`get_dataset`, which raises
+        Thin wrapper over the inherited `get_dataset`, which raises
         a `ValueError` with a did-you-mean hint on an unknown id.
 
         Args:

@@ -1,7 +1,7 @@
 """Unsigned (and optionally profile-signed) AWS S3 transport.
 
 Hosts `S3Credentials` and `S3Auth`, a shared
-:class:`~earthlens.base.AbstractAuth` implementation for the AWS
+`AbstractAuth` implementation for the AWS
 Open-Data buckets that several backends read — `nsf-ncar-era5`
 (`earthlens.s3`), `copernicus-dem-30m` / `-90m` (`earthlens.dem`),
 `noaa-goes16` / `noaa-goes18`, `sentinel-cogs` and `esa-worldcover`.
@@ -13,7 +13,7 @@ lives in `earthlens.base` beside `HttpClient`; a backend that reads an
 open bucket imports it from here instead of depending on a sibling
 backend.
 
-`boto3` / `botocore` are imported lazily inside :meth:`S3Auth.configure`,
+`boto3` / `botocore` are imported lazily inside `S3Auth.configure`,
 so this module — and therefore `earthlens.base` — carries no SDK of its
 own; the import raises only when a client is actually built without the
 `[s3]` extra installed.
@@ -72,11 +72,11 @@ class S3Credentials(BaseModel):
 class S3Auth(AbstractAuth[S3Credentials]):
     """Build an unsigned (or profile-signed) `boto3` S3 client lazily.
 
-    Implements the :class:`~earthlens.base.AbstractAuth` contract for
+    Implements the `AbstractAuth` contract for
     public AWS Open-Data buckets. `configure()` constructs the client on
     first use (importing `boto3` lazily so the package imports without
     the `[s3]` extra); `is_authenticated()` reports whether the client
-    exists; :meth:`client` is the accessor the backend's fetch step
+    exists; `client` is the accessor the backend's fetch step
     calls.
 
     Because the target buckets are public, "authenticated" simply means
@@ -97,7 +97,7 @@ class S3Auth(AbstractAuth[S3Credentials]):
         """Store credentials and reset the (lazily built) client.
 
         Args:
-            credentials: The :class:`S3Credentials` to use. `None`
+            credentials: The `S3Credentials` to use. `None`
                 defaults to unsigned public access.
         """
         super().__init__(credentials or S3Credentials())
@@ -106,7 +106,7 @@ class S3Auth(AbstractAuth[S3Credentials]):
     def configure(self) -> None:
         """Build the `boto3` S3 client if it does not exist yet.
 
-        Idempotent: returns immediately once :meth:`is_authenticated`
+        Idempotent: returns immediately once `is_authenticated`
         is `True`. Imports `boto3` / `botocore` lazily so importing the
         package without the `[s3]` extra does not fail.
 

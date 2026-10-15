@@ -9,7 +9,7 @@ output shape — `griddap` datasets are gridded fields → **raster
 NetCDF**, `tabledap` datasets are record tables → **tabular
 `DataFrame`**. The backend therefore sets its `OUTPUT_KIND` **per
 instance** from the resolved dataset (a sanctioned earthdata/eumetsat
-override), so the :class:`earthlens.earthlens.EarthLens` facade accepts
+override), so the `earthlens.earthlens.EarthLens` facade accepts
 `aggregate=` for a griddap dataset and rejects it for a tabledap one.
 
 Built on the **`erddapy`** SDK (the tabledap `to_pandas()` path); the
@@ -19,15 +19,15 @@ Only public (no-auth) servers ship in the catalog.
 
 Public surface (re-exported from this package):
 
-* :class:`ERDDAP` — the backend; instantiate with `dataset=<id>`, a
+* `ERDDAP` — the backend; instantiate with `dataset=<id>`, a
   date range, a bbox, and optional `variables=[...]`, then call
-  :meth:`ERDDAP.download`.
-* :class:`Catalog` — pydantic-backed loader for the bundled sharded
+  `ERDDAP.download`.
+* `Catalog` — pydantic-backed loader for the bundled sharded
   server catalog.
-* :class:`Dataset` — one curated catalog row (`server_url`,
+* `Dataset` — one curated catalog row (`server_url`,
   `dataset_id`, `protocol`, `variables`, `dim_names`, …).
-* :data:`CATALOG_PATH` — path to the bundled `catalog/` directory.
-* :func:`clear_catalog_cache` — drop the module-level parse cache
+* `CATALOG_PATH` — path to the bundled `catalog/` directory.
+* `clear_catalog_cache` — drop the module-level parse cache
   (tests that rewrite the catalog on disk).
 """
 

@@ -1,14 +1,14 @@
 """Private, stateless helpers for the Aqueduct backend.
 
 Three concerns live here, kept out of `backend.py` so the
-:class:`~earthlens.aqueduct.backend.Aqueduct` class stays a thin orchestration
+`Aqueduct` class stays a thin orchestration
 layer: the **column grammar** (turning a metric / year / scenario /
 return-period selection into the `.dbf` column names to read), the **zip IO**
 (pulling one shapefile — and its sidecars — out of a downloaded zip, including
 the doubly-nested `state` bundle), and the **FeatureCollection assembly**
 (selecting + renaming the chosen columns and applying the unit-name / bbox
 filter). All geometry handling stays inside pyramids
-(:class:`~pyramids.feature.collection.FeatureCollection`, itself a
+(`FeatureCollection`, itself a
 `geopandas.GeoDataFrame` subclass); this module never imports `xarray`.
 """
 
@@ -51,7 +51,7 @@ def resolve_columns(
     scenario, and a 2030 scenario has no 2010 column).
 
     Args:
-        catalog: The loaded :class:`~earthlens.aqueduct.catalog.Catalog`.
+        catalog: The loaded `Catalog`.
         metric: A public indicator name (`"gdp_affected"` /
             `"population_affected"` / `"urban_damage"`).
         year: `"2010"` or `"2030"`.
@@ -226,9 +226,9 @@ def build_feature_collection(
 
     Args:
         source: The full shapefile read as a
-            :class:`~pyramids.feature.collection.FeatureCollection`.
+            `FeatureCollection`.
         columns: `{return_period: source_column_name}` from
-            :func:`resolve_columns`.
+            `resolve_columns`.
 
     Returns:
         FeatureCollection: The trimmed, renamed collection, CRS `EPSG:4326`.
@@ -266,9 +266,9 @@ def filter_units(
     geometry intersects it (via `GeoDataFrame.cx`). Both filters compose.
 
     Args:
-        collection: The trimmed collection from :func:`build_feature_collection`.
+        collection: The trimmed collection from `build_feature_collection`.
         country: A unit name to match (case-insensitive exact), or `None`.
-        space: The requested :class:`~earthlens.base.SpatialExtent`; a
+        space: The requested `SpatialExtent`; a
             whole-globe extent applies no spatial filter.
 
     Returns:

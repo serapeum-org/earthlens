@@ -10,22 +10,22 @@ configuration.
 
 Four shapes are modelled, all frozen:
 
-* :class:`ZenodoRecord` — the pinned version record, its concept DOI, `version`,
+* `ZenodoRecord` — the pinned version record, its concept DOI, `version`,
   `data_period`, licence and attribution. Pinning a version rather than the
   moving concept DOI is what makes a request reproducible.
-* :class:`HanzeFile` — one downloadable Zenodo object (its name, and the REST
+* `HanzeFile` — one downloadable Zenodo object (its name, and the REST
   content `url` composed from the pinned record). HANZE ships small individual
   files, so each is a direct download, never a range-read.
-* :class:`FloodType` — one row of the `Type` vocabulary (`River`, `Flash`,
+* `FloodType` — one row of the `Type` vocabulary (`River`, `Flash`,
   `Coastal`, `River/Coastal`). These are the catalog's dict-surface rows, keyed
-  by type under the inherited :attr:`datasets` field.
-* :class:`GeometryJoin` — the region-shapefile join: its member stem, the join
+  by type under the inherited `datasets` field.
+* `GeometryJoin` — the region-shapefile join: its member stem, the join
   field (`Code`), the name field, and the shapefile CRS (`EPSG:3035`).
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog` subclass that
+`Catalog` is a thin `earthlens.base.AbstractCatalog` subclass that
 loads the bundled `hanze_data_catalog.yaml` through the shared
-:func:`~earthlens.base.catalog_source.load_catalog` (with a `CatalogParseCache`),
-mirroring `gdacs/catalog.py`. :data:`CATALOG_PATH` is the path to the bundled
+`load_catalog` (with a `CatalogParseCache`),
+mirroring `gdacs/catalog.py`. `CATALOG_PATH` is the path to the bundled
 YAML and is monkey-patchable in tests.
 """
 
@@ -151,8 +151,8 @@ class FloodType(SummarisedLeaf):
     """One entry of the HANZE flood-`Type` vocabulary.
 
     The type string (`"River"`, `"River/Coastal"`) is the parent key in
-    :attr:`Catalog.datasets`; the loader copies it onto the row as
-    :attr:`name` so a resolved flood type is self-describing.
+    `Catalog.datasets`; the loader copies it onto the row as
+    `name` so a resolved flood type is self-describing.
 
     Attributes:
         name: The flood type's catalog key, injected by the loader; the
@@ -240,13 +240,13 @@ def _flood_type(name: str, body: Any, source: Path | None = None) -> FloodType:
 
 
 def _parse_catalog(files: list[Path]) -> dict[str, Any]:
-    """Parse the HANZE catalog YAML into the :class:`Catalog` field payload.
+    """Parse the HANZE catalog YAML into the `Catalog` field payload.
 
     Args:
         files: The contributing YAML files (HANZE ships a single file).
 
     Returns:
-        dict[str, Any]: The keyword payload for :class:`Catalog` — `record`,
+        dict[str, Any]: The keyword payload for `Catalog` — `record`,
             `files`, `geometry`, `datasets` (the flood types) and `columns`.
 
     Raises:
@@ -311,17 +311,17 @@ class Catalog(AbstractCatalog[FloodType]):
 
     Reads the bundled `hanze_data_catalog.yaml` (shipped as package data) and
     exposes the pinned Zenodo record, the per-file names, the flood-`Type`
-    vocabulary (as :class:`FloodType` rows keyed by type under the inherited
-    :attr:`datasets` field — the `cat["River"]` / `"River" in cat` / `len(cat)`
+    vocabulary (as `FloodType` rows keyed by type under the inherited
+    `datasets` field — the `cat["River"]` / `"River" in cat` / `len(cat)`
     dict surface), the friendly-name -> CSV-header map, and the region-geometry
     join configuration. Instantiate with no arguments (`Catalog()`).
 
     Attributes:
-        datasets: Map from a flood-`Type` string to its :class:`FloodType` row.
-        record: The pinned :class:`ZenodoRecord`.
+        datasets: Map from a flood-`Type` string to its `FloodType` row.
+        record: The pinned `ZenodoRecord`.
         files: Map from a logical key (`"events"`, `"regions"`,
-            `"region_names"`) to its :class:`HanzeFile`.
-        geometry: The :class:`GeometryJoin` for the region attach.
+            `"region_names"`) to its `HanzeFile`.
+        geometry: The `GeometryJoin` for the region attach.
         columns: Friendly name -> exact HANZE CSV header.
 
     Examples:
@@ -355,7 +355,7 @@ class Catalog(AbstractCatalog[FloodType]):
 
     datasets: dict[str, FloodType] = Field(default_factory=dict)
     #: `record` / `geometry` default to `None` rather than a placeholder model:
-    #: the base :meth:`model_post_init` autoload fills a field only when its
+    #: the base `model_post_init` autoload fills a field only when its
     #: current value is falsy, and a placeholder model instance is truthy, so it
     #: would be skipped and `Catalog()` would keep the placeholder. `None` is
     #: falsy, so the bundled record / geometry load as intended. `load()` and a
@@ -380,10 +380,10 @@ class Catalog(AbstractCatalog[FloodType]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If `catalog_path` does not exist, a required block is
@@ -408,9 +408,9 @@ class Catalog(AbstractCatalog[FloodType]):
         return cls(**parsed)
 
     def get_flood_type(self, flood_type: str) -> FloodType:
-        """Return the :class:`FloodType` for `flood_type`, with a did-you-mean hint.
+        """Return the `FloodType` for `flood_type`, with a did-you-mean hint.
 
-        Thin alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.
+        Thin alias over `get_dataset`.
 
         Args:
             flood_type: A HANZE flood-`Type` string (`"River"`, `"Coastal"`,
@@ -452,7 +452,7 @@ class Catalog(AbstractCatalog[FloodType]):
         return sorted(self.datasets)
 
     def file(self, key: str) -> HanzeFile:
-        """Return the :class:`HanzeFile` for a logical key.
+        """Return the `HanzeFile` for a logical key.
 
         Args:
             key: `"events"`, `"regions"`, or `"region_names"`.

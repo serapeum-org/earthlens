@@ -5,18 +5,18 @@ per fire pixel, with brightness, confidence, and fire-radiative-power —
 from the NASA FIRMS (Fire Information for Resource Management System)
 area CSV endpoint, across MODIS (C6.1) and VIIRS (S-NPP / NOAA-20 /
 NOAA-21) sensors. The rows for a `[start, end]` window over a bbox come
-back as CSV, which :mod:`earthlens.firms.events` maps to a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection` of fire-pixel
+back as CSV, which `earthlens.firms.events` maps to a pyramids
+`FeatureCollection` of fire-pixel
 points.
 
 This is a `vector` backend: the on-the-wire result is a table of
 geolocated detections, not a gridded array, so `OUTPUT_KIND = "vector"`
-and the :class:`earthlens.earthlens.EarthLens` facade rejects an
+and the `earthlens.earthlens.EarthLens` facade rejects an
 `aggregate=` argument (there is no meaningful gridded reduction of a
 detection table). `download()` returns the in-memory FeatureCollection
 and, as a side effect, writes it to one vector file under `path`.
 
-FIRMS needs a free **`MAP_KEY`** — pass it to :meth:`FIRMS.authenticate`
+FIRMS needs a free **`MAP_KEY`** — pass it to `FIRMS.authenticate`
 as `api_key=`, or set `FIRMS_MAP_KEY` and let `authenticate()` /
 `download()` read it from the environment. It is *not* a constructor
 argument: the constructor describes only what to fetch. There is no SDK
@@ -98,9 +98,9 @@ class FIRMS(AbstractDataSource):
     other earthlens backend uses. Windows longer than the FIRMS 5-day
     per-request cap are chunked, and each `(sensor, ≤5-day chunk)` is
     one CSV GET; the rows are mapped to a
-    :class:`~pyramids.feature.collection.FeatureCollection`.
+    `FeatureCollection`.
 
-    FIRMS needs a free `MAP_KEY`. Supply it to :meth:`authenticate` as
+    FIRMS needs a free `MAP_KEY`. Supply it to `authenticate` as
     `api_key=`, or set the `FIRMS_MAP_KEY` environment variable and let
     `authenticate()` / `download()` resolve it. Credentials are not a
     constructor argument — the constructor describes only what to fetch.
@@ -200,17 +200,17 @@ class FIRMS(AbstractDataSource):
         )
 
     def _initialize(self) -> FirmsAuth:
-        """Build the (unconfigured) :class:`FirmsAuth` holder.
+        """Build the (unconfigured) `FirmsAuth` holder.
 
         No credentials are resolved here — the constructor describes only
         what to fetch. The `MAP_KEY` is resolved later by
-        :meth:`authenticate` (explicitly via `api_key=`, or from the
+        `authenticate` (explicitly via `api_key=`, or from the
         `FIRMS_MAP_KEY` environment variable), which `download()` also
         triggers lazily if it has not run.
 
         Returns:
             FirmsAuth: An unconfigured auth; `is_authenticated()` is
-                `False` until :meth:`authenticate` resolves a key.
+                `False` until `authenticate` resolves a key.
         """
         return FirmsAuth(FirmsCredentials(api_key=None))
 
@@ -220,7 +220,7 @@ class FIRMS(AbstractDataSource):
         The explicit, fail-fast credential step. Pass `api_key=` to use a
         key directly; omit it (or pass `None`) to read the `FIRMS_MAP_KEY`
         environment variable. Either way the resolved key is held for the
-        subsequent :meth:`download`. Calling it again with a different
+        subsequent `download`. Calling it again with a different
         `api_key` re-arms with the new key. `download()` calls this with
         no argument on your behalf if you never do, so an explicit call is
         only needed to pass a key directly or to validate up front.
@@ -285,10 +285,10 @@ class FIRMS(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the `[start, end]` window into a `TemporalExtent`.
 
         FIRMS chunks the window into ≤5-day requests internally (see
-        :meth:`_search`), so the resolution is kept as the sentinel
+        `_search`), so the resolution is kept as the sentinel
         `"all"` (not a real pandas frequency alias) and `dates`
         collapses to the two endpoints.
 
@@ -310,7 +310,7 @@ class FIRMS(AbstractDataSource):
         return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _search(self) -> list[RemoteProduct]:
-        """List one :class:`RemoteProduct` per `(sensor, ≤5-day chunk)`.
+        """List one `RemoteProduct` per `(sensor, ≤5-day chunk)`.
 
         Validates each code in `self.vars` against the bundled catalog
         (raising with a did-you-mean hint on an unknown sensor), warns
@@ -380,14 +380,14 @@ class FIRMS(AbstractDataSource):
         """Warn (do not auto-swap) when the window is outside coverage.
 
         An `*_NRT` sensor holds only roughly the last
-        :data:`NRT_RETENTION_DAYS` days; a request for older data returns
+        `NRT_RETENTION_DAYS` days; a request for older data returns
         a silently empty CSV rather than an error. This logs a loud
         warning naming the `*_SP` archive variant when that variant
         exists. A request that predates the sensor's mission start is
         warned the same way.
 
         Args:
-            sensor: The resolved :class:`~earthlens.firms.Sensor`.
+            sensor: The resolved `Sensor`.
             start_date: Requested inclusive start.
             end_date: Requested inclusive end.
         """
@@ -428,14 +428,14 @@ class FIRMS(AbstractDataSource):
         """Fetch each product's CSV and map it to a FeatureCollection.
 
         Widens the inherited `-> list[Path]` contract: a vector backend
-        returns in-memory :class:`FeatureCollection`s, not file paths.
+        returns in-memory `FeatureCollection`s, not file paths.
         Each product is one CSV GET issued through the quota back-off
         (`G2`); the response body is classified before parsing (`G6`) so
         a FIRMS error-as-HTTP-200 text body never reaches
         `pandas.read_csv`.
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             list[FeatureCollection]: One collection per product, in the
@@ -447,7 +447,7 @@ class FIRMS(AbstractDataSource):
         """Fetch and map one `(sensor, chunk)` product.
 
         Args:
-            product: One :class:`RemoteProduct` from :meth:`_search`.
+            product: One `RemoteProduct` from `_search`.
 
         Returns:
             FeatureCollection: The chunk's detections (schema-only empty
@@ -505,10 +505,10 @@ class FIRMS(AbstractDataSource):
         """Compose the FIRMS area-CSV URL for one product.
 
         The bbox path segment is `W,S,E,N` (FIRMS area order). The
-        `MAP_KEY` is read from the configured :class:`FirmsAuth`.
+        `MAP_KEY` is read from the configured `FirmsAuth`.
 
         Args:
-            product: One :class:`RemoteProduct` from :meth:`_search`.
+            product: One `RemoteProduct` from `_search`.
 
         Returns:
             str: The fully-formed request URL.
@@ -530,7 +530,7 @@ class FIRMS(AbstractDataSource):
         """C3 composition with a per-chunk progress bar.
 
         Mirrors the CMEMS / OpenAQ progress-aware composition: run the
-        cheap :meth:`_search`, then map :meth:`_fetch_one` over the
+        cheap `_search`, then map `_fetch_one` over the
         products wrapped in a `tqdm` bar (disabled when `progress_bar`
         is `False`). Short-circuits on an empty search.
 
@@ -551,8 +551,8 @@ class FIRMS(AbstractDataSource):
     ) -> FeatureCollection:
         """Query FIRMS and return the matched detections.
 
-        Runs the cheap :meth:`_search` (sensor validation + chunk
-        planning) then the throttled :meth:`_fetch` (one CSV GET per
+        Runs the cheap `_search` (sensor validation + chunk
+        planning) then the throttled `_fetch` (one CSV GET per
         chunk), concatenates the per-chunk collections into one
         FeatureCollection, writes it to one vector file under `path`, and
         returns it. An empty result returns — and writes nothing for — a

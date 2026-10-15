@@ -4,7 +4,7 @@ Pure functions that turn a `[lat_lim, lon_lim]` bounding box into the two
 spatial request shapes the vector sources need — a GeoJSON polygon body for the
 NSI structures POST, and an ArcGIS envelope query for the FEMA NFHL layer — and
 that wrap a returned GeoJSON `FeatureCollection` into a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection`. No network, no state.
+`FeatureCollection`. No network, no state.
 """
 
 from __future__ import annotations

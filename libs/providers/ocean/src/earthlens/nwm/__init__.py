@@ -34,15 +34,15 @@ without the extra installed (a friendly `ImportError` naming
 
 Public surface (re-exported from this package):
 
-* :class:`NWM` — the backend; instantiate with a cycle-date window, a
+* `NWM` — the backend; instantiate with a cycle-date window, a
   bbox, `variables={product: [variable, ...]}`, and a `configuration=`,
-  then call :meth:`NWM.download`.
-* :class:`Catalog` — loader for the bundled `nwm_data_catalog.yaml`.
-* :class:`NWMProduct` / :class:`NWMVariable` / :class:`NWMConfig` — one
+  then call `NWM.download`.
+* `Catalog` — loader for the bundled `nwm_data_catalog.yaml`.
+* `NWMProduct` / `NWMVariable` / `NWMConfig` — one
   product row, one of its variables, and one configuration row.
-* :data:`CATALOG_PATH` — path to the bundled YAML; monkey-patchable in
+* `CATALOG_PATH` — path to the bundled YAML; monkey-patchable in
   tests.
-* :data:`BUCKET` — the unsigned NWM bucket name.
+* `BUCKET` — the unsigned NWM bucket name.
 
 Examples:
     - List the registered NWM products:

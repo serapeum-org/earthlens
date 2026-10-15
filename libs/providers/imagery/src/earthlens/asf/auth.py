@@ -1,7 +1,7 @@
 """Credentials and authentication for the ASF InSAR backend.
 
-Hosts :class:`ASFAuth`, an :class:`earthlens.base.AbstractAuth`
-subclass that wraps :class:`earthlens.earthdata.EarthdataAuth` to
+Hosts `ASFAuth`, an `earthlens.base.AbstractAuth`
+subclass that wraps `earthlens.earthdata.EarthdataAuth` to
 produce an authenticated `asf_search.ASFSession`. ASF SAR data lives
 behind NASA Earthdata Login (EDL), so the credential surface is the
 same EDL bearer-token / username-password / `~/.netrc` ladder the
@@ -10,9 +10,9 @@ system.
 
 The wrapper:
 
-* Builds an :class:`EarthdataCredentials` from the four optional
+* Builds an `EarthdataCredentials` from the four optional
   inputs (`token`, `username`, `password`, `netrc_path`) and runs
-  :meth:`EarthdataAuth.configure` to validate the credentials.
+  `EarthdataAuth.configure` to validate the credentials.
 * Pulls the resolved EDL bearer token from the underlying
   `earthaccess.Auth` handle (`edl._auth.token["access_token"]`,
   populated for every strategy after a successful login).
@@ -23,7 +23,7 @@ The wrapper:
 predicate (`self._session is not None`). Search calls do not need
 auth (`asf_search.geo_search`, `granule_search` and
 `ASFProduct.stack` are anonymous endpoints), so the backend builds
-an :class:`ASFAuth` in `_initialize` and calls :meth:`configure`
+an `ASFAuth` in `_initialize` and calls `configure`
 only from `_fetch`.
 """
 
@@ -49,7 +49,7 @@ class AuthenticationError(_BaseAuthenticationError):
     """Raised when the ASF backend cannot establish an authenticated session.
 
     Subclass of the cross-backend
-    :class:`earthlens.base.AuthenticationError` so callers can catch
+    `earthlens.base.AuthenticationError` so callers can catch
     every backend's auth failure with one `except` clause. The
     message names a fix — register an EDL account, set the
     `EARTHDATA_TOKEN` (or `EARTHDATA_USERNAME` + `EARTHDATA_PASSWORD`)
@@ -61,23 +61,23 @@ class AuthenticationError(_BaseAuthenticationError):
 class ASFCredentials(BaseModel):
     """Frozen value object holding the EDL credentials for ASF.
 
-    Mirrors :class:`EarthdataCredentials` field-for-field, since ASF
+    Mirrors `EarthdataCredentials` field-for-field, since ASF
     reuses NASA Earthdata Login. Validation is intentionally
     permissive — the real "do these creds work?" gate is
-    :meth:`ASFAuth.configure`, which talks to EDL through
+    `ASFAuth.configure`, which talks to EDL through
     `earthaccess`.
 
     Attributes:
         token: Optional EDL **bearer token** — the JSON Web Token
             generated from the EDL profile. Stored as a
-            :class:`pydantic.SecretStr` so it is never echoed by
+            `pydantic.SecretStr` so it is never echoed by
             `repr(creds)` or in logs. `None` defers to the
             `EARTHDATA_TOKEN` env var, then username/password, then
             netrc.
         username: EDL account username. `None` means "look at the
             environment / netrc".
         password: Account password, stored as
-            :class:`pydantic.SecretStr`. `None` means same as
+            `pydantic.SecretStr`. `None` means same as
             `username`.
         netrc_path: Optional path to a `.netrc` file holding a
             `machine urs.earthdata.nasa.gov` entry. `None` falls back
@@ -113,26 +113,26 @@ class ASFCredentials(BaseModel):
 class ASFAuth(AbstractAuth[ASFCredentials]):
     """Authenticate `asf_search` against NASA Earthdata Login.
 
-    Composes the shipped :class:`EarthdataAuth` to log into EDL and
+    Composes the shipped `EarthdataAuth` to log into EDL and
     mint a bearer token, then hands the token to
     `asf_search.ASFSession().auth_with_token(token)`. The same
-    credential ladder as :class:`EarthdataAuth` — explicit token,
+    credential ladder as `EarthdataAuth` — explicit token,
     explicit username/password, the `EARTHDATA_TOKEN` /
     `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` env vars, then a
     `urs.earthdata.nasa.gov` entry in `~/.netrc` — applies unchanged.
 
     The class is a context manager (inherited from
-    :class:`AbstractAuth`): `with ASFAuth(creds) as auth: ...` calls
+    `AbstractAuth`): `with ASFAuth(creds) as auth: ...` calls
     `configure()` on enter and the default no-op `close()` on exit.
 
     Attributes:
-        _creds: The :class:`ASFCredentials` value object passed at
+        _creds: The `ASFCredentials` value object passed at
             construction. Treated as write-once.
-        _edl: The composed :class:`EarthdataAuth` instance, kept so
+        _edl: The composed `EarthdataAuth` instance, kept so
             `configure()` can be re-checked / re-used. `None` until
-            :meth:`configure` runs.
+            `configure` runs.
         _session: The `asf_search.ASFSession` bound to the EDL bearer
-            token. `None` until :meth:`configure` runs.
+            token. `None` until `configure` runs.
 
     Examples:
         - Build, configure, inspect — marked `# doctest: +SKIP`
@@ -152,11 +152,11 @@ class ASFAuth(AbstractAuth[ASFCredentials]):
         """Store credentials; does not authenticate.
 
         Construction is side-effect-free — the user (or the
-        backend's `_fetch`) must call :meth:`configure` (or use the
+        backend's `_fetch`) must call `configure` (or use the
         context-manager form) to talk to EDL.
 
         Args:
-            credentials: The :class:`ASFCredentials` value object.
+            credentials: The `ASFCredentials` value object.
         """
         super().__init__(credentials)
         self._edl: EarthdataAuth | None = None
@@ -165,11 +165,11 @@ class ASFAuth(AbstractAuth[ASFCredentials]):
     def configure(self) -> None:
         """Authenticate against EDL and build an `ASFSession`.
 
-        Idempotent — short-circuits when :meth:`is_authenticated`
+        Idempotent — short-circuits when `is_authenticated`
         already returns `True`. On the first call:
 
-        1. builds an :class:`EarthdataCredentials` from `self._creds`
-           and runs :meth:`EarthdataAuth.configure` to log into EDL;
+        1. builds an `EarthdataCredentials` from `self._creds`
+           and runs `EarthdataAuth.configure` to log into EDL;
         2. reads the bearer token from the resolved
            `earthaccess.Auth` handle
            (`edl._auth.token["access_token"]`, populated for the
@@ -183,7 +183,7 @@ class ASFAuth(AbstractAuth[ASFCredentials]):
                 edge case the underlying `EarthdataAuth` already
                 guards against, re-raised here for the ASF backend's
                 error message). The base `EarthdataAuth.configure`
-                raises its own :class:`AuthenticationError` for the
+                raises its own `AuthenticationError` for the
                 no-credentials / bad-credentials cases.
             ImportError: When `asf_search` is not installed; the
                 message names the `earthlens[asf]` extra.
@@ -240,12 +240,12 @@ class ASFAuth(AbstractAuth[ASFCredentials]):
         so this is a synchronous read with no side effects.
 
         Args:
-            edl: A configured :class:`EarthdataAuth` instance.
+            edl: A configured `EarthdataAuth` instance.
 
         Returns:
             The bearer token string, or `None` when the handle does
             not carry one (the configured callers re-raise this as a
-            user-facing :class:`AuthenticationError`).
+            user-facing `AuthenticationError`).
         """
         handle = getattr(edl, "_auth", None)
         token = getattr(handle, "token", None) if handle is not None else None
@@ -261,7 +261,7 @@ class ASFAuth(AbstractAuth[ASFCredentials]):
         during the current process and the `ASFSession` is ready.
 
         Returns:
-            bool: `True` after a successful :meth:`configure`,
+            bool: `True` after a successful `configure`,
                 `False` before.
 
         Examples:
@@ -288,7 +288,7 @@ class ASFAuth(AbstractAuth[ASFCredentials]):
                 bearer token.
 
         Raises:
-            AuthenticationError: Propagated from :meth:`configure`
+            AuthenticationError: Propagated from `configure`
                 on missing / bad credentials.
         """
         self.configure()
