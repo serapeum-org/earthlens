@@ -515,6 +515,19 @@ class TestInformRelease:
             f"expected {_helpers.INFORM_RELEASE_ATTEMPTS} reads, got {len(reads)}"
         )
 
+    def test_release_url_with_no_attempt_budget_still_raises_value_error(
+        self, monkeypatch
+    ):
+        """A zero budget reports the documented error, not an unbound local."""
+        monkeypatch.setattr(_helpers, "INFORM_RELEASE_ATTEMPTS", 0)
+        monkeypatch.setattr(
+            _helpers.HttpClient,
+            "get",
+            lambda self, url, **kwargs: _TextResponse("<p>unused</p>"),
+        )
+        with pytest.raises(ValueError, match="No INFORM Risk release workbook"):
+            _helpers.inform_release_url()
+
     def test_download_reuses_a_cached_workbook(self, monkeypatch, release_workbook):
         """An already-downloaded workbook is reused instead of re-fetched."""
         monkeypatch.setattr(_helpers.HttpClient, "download", _explode_download)

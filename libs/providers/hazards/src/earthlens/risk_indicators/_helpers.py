@@ -430,6 +430,9 @@ def inform_release_url(
     if page in _RELEASE_CACHE:
         return _RELEASE_CACHE[page]
     client = _client(timeout)
+    # Bound before the loop: a budget of zero must still reach the raise below
+    # with the documented `ValueError`, not an `UnboundLocalError`.
+    candidates: list[tuple[str, str, str]] = []
     for attempt in range(INFORM_RELEASE_ATTEMPTS):
         html = client.get(page).text
         candidates = [
