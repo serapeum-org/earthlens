@@ -431,6 +431,23 @@ class TestResolveAdminAndEmpty:
         assert df.empty and list(df.columns) == ["a", "b"]
 
 
+def _record_sleeps(monkeypatch) -> list[float]:
+    """Replace the module's `time.sleep` with a recorder and return its log."""
+    waits: list[float] = []
+    monkeypatch.setattr(_helpers.time, "sleep", waits.append)
+    return waits
+
+
+def _serve_in_order(pages: list[str]):
+    """Return a `HttpClient.get` stand-in serving `pages` front to back."""
+
+    def _get(self, url, **kwargs):
+        assert pages, f"an unexpected extra read of {url}"
+        return _TextResponse(pages.pop(0))
+
+    return _get
+
+
 class TestInformRelease:
     """Discovery and parsing of the published INFORM Risk release workbook."""
 
@@ -477,32 +494,26 @@ class TestInformRelease:
             _helpers.inform_release_url()
 
     def test_release_url_rereads_a_page_that_rendered_no_link(self, monkeypatch):
-        """A page that renders no link once is re-read before giving up.
-
-        The JRC results page intermittently serves a body with no workbook
-        link at all; the regex is not at fault, because it matches again
-        seconds later. The first such render used to fail the live e2e and
-        redden the whole hazards lane.
-        """
+        """A linkless render is re-read, and the recovered workbook memoised."""
         pages = [
             "<p>no downloads</p>",
             '<a href="/inform-index/Portals/0/InfoRM/2026/'
             'INFORM_Risk_2026_v072.xlsx">2026</a>',
         ]
-        monkeypatch.setattr(_helpers, "INFORM_RELEASE_BACKOFF_SECONDS", 0)
-        monkeypatch.setattr(
-            _helpers.HttpClient,
-            "get",
-            lambda self, url, **kwargs: _TextResponse(pages.pop(0)),
-        )
+        waits = _record_sleeps(monkeypatch)
+        monkeypatch.setattr(_helpers.HttpClient, "get", _serve_in_order(pages))
         url, year = _helpers.inform_release_url()
         assert year == 2026, "the second read's workbook is used"
         assert not pages, "both reads were made"
+        assert waits == [1.0], f"one 1s wait between the two reads: {waits}"
+        assert _helpers._RELEASE_CACHE[_helpers.INFORM_RESULTS_PAGE] == (url, 2026), (
+            "the recovered workbook must be memoised like a first-read one"
+        )
 
     def test_release_url_stops_rereading_after_the_attempt_budget(self, monkeypatch):
-        """A page that never renders a link still raises, bounded."""
+        """A page that never renders a link raises after exactly three reads."""
         reads = []
-        monkeypatch.setattr(_helpers, "INFORM_RELEASE_BACKOFF_SECONDS", 0)
+        waits = _record_sleeps(monkeypatch)
 
         def _empty(self, url, **kwargs):
             reads.append(url)
@@ -511,8 +522,11 @@ class TestInformRelease:
         monkeypatch.setattr(_helpers.HttpClient, "get", _empty)
         with pytest.raises(ValueError, match="No INFORM Risk release workbook"):
             _helpers.inform_release_url()
-        assert len(reads) == _helpers.INFORM_RELEASE_ATTEMPTS, (
-            f"expected {_helpers.INFORM_RELEASE_ATTEMPTS} reads, got {len(reads)}"
+        # The literal, not the constant: reading the budget from the module
+        # under test would let a budget of 1 satisfy this vacuously.
+        assert len(reads) == 3, f"expected 3 reads, got {len(reads)}"
+        assert waits == [1.0, 2.0], (
+            f"linear back-off, and none after the last read: {waits}"
         )
 
     def test_release_url_with_no_attempt_budget_still_raises_value_error(
