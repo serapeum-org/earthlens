@@ -175,13 +175,13 @@ def feature_collection_to_dataframe(
         selectors: Optional iterable of property names to include.
             See semantic note above. Defaults to `None`.
 
+    Nothing is caught on the way: an Earth Engine failure building the
+    download URL, an HTTP failure fetching it, and a parse failure reading
+    the CSV all reach the caller as whatever the underlying library raised.
+
     Returns:
         A `DataFrame` with one row per feature, in the order Earth Engine
         wrote the CSV.
-
-    Raises:
-        Exception: Propagated verbatim from the underlying Earth Engine /
-            HTTP / CSV-parsing calls.
 
     Examples:
         - Download every property and inspect the frame (needs an

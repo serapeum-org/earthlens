@@ -46,8 +46,12 @@ Public surface (re-exported from this package):
   `ee.FeatureCollection`s to pandas / GeoPandas (sync + parallel +
   small-FC `getInfo()` paths).
 
-Object surface (also re-exported) — the strategy objects and frozen
-value objects the backend is built from. Two constructor params,
+Object surface (also re-exported) — the strategy objects, the frozen
+value objects and the work-unit payloads the backend is built from.
+`EnginePlan`, `ExportConfig`, `EngineConfig`, `OutputGrid`, `Artifact`
+and `DownloadResult` are frozen pydantic models; the `WorkUnit` family
+is a plain ABC and its subclasses, mutable by design. Two constructor
+params,
 `reducer=` and `engine=`, accept an instance in place of their string;
 the rest of these are config, payload and return types rather than
 anything a string names:

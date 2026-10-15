@@ -578,7 +578,10 @@ def _reader_errors(reader: Any) -> tuple[type[BaseException], ...]:
         from pyramids_eo.errors import ReaderError
 
         candidates.append(ReaderError)
-    except ImportError:  # pragma: no cover - the extra is installed wherever this runs
+    # Reached whenever the `[eedai]` extra is absent, which is a supported
+    # lane - `earthlens[all]` omits it, so the wheel job runs here - but not
+    # one coverage is measured in, since every dev install pins pyramids-eo.
+    except ImportError:  # pragma: no cover - needs the extra uninstalled
         pass
     for candidate in candidates:
         if isinstance(candidate, type) and issubclass(candidate, BaseException):

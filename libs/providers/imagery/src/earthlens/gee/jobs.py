@@ -434,9 +434,11 @@ def get_task_status(task_id: str, project: str | None = None) -> TaskInfo:
             current Earth Engine project cannot be resolved from the SDK. The
             message names `project=` and `ee.Initialize(project=...)` as the
             two remedies.
-        googleapiclient.errors.HttpError: Propagated verbatim from
-            `ee.data.getOperation` — most commonly a 404 when the id is
-            unknown to Earth Engine.
+        ee.EEException: Propagated from `ee.data.getOperation` — most commonly
+            a 404 when the id is unknown to Earth Engine. The SDK translates
+            the transport error on the way out (`ee.data._execute_cloud_call`
+            catches `googleapiclient.errors.HttpError` and re-raises
+            `EEException`), so that is the type a caller sees.
 
     Examples:
         - Poll one task and read its state (needs an initialised `ee`):
@@ -487,9 +489,12 @@ def cancel_task(task_id: str, project: str | None = None) -> None:
             current Earth Engine project cannot be resolved from the SDK. The
             message names `project=` and `ee.Initialize(project=...)` as the
             two remedies.
-        googleapiclient.errors.HttpError: Propagated verbatim from
-            `ee.data.cancelOperation`, **except** the already-terminal
-            `FAILED_PRECONDITION` one, which is downgraded to an INFO log.
+        ee.EEException: Propagated from `ee.data.cancelOperation`, which the
+            SDK translates the transport error into. Two cases are swallowed
+            instead of raised, whatever their type: an HTTP 400, and any
+            failure whose text carries `FAILED_PRECONDITION`, which is what an
+            already-terminal task answers with — both are downgraded to an
+            INFO log, because cancelling a finished task is not an error.
 
     Examples:
         - Cancel one task by id (needs an initialised `ee`):
@@ -690,11 +695,12 @@ def resolve_destination(
         `download_to is None`). Ordering matches
         `task_info.destination_uris`.
 
+    Failures from the GCS / Drive clients themselves are not caught, so a
+    download error reaches the caller as whatever that client raised.
+
     Raises:
         ImportError: If the optional GCS / Drive client dependency the
             destination needs is not installed.
-        Exception: Propagated verbatim from the underlying GCS / Drive client
-            calls.
 
     Examples:
         - Look at where a finished task wrote, without downloading anything:
